@@ -1,7 +1,7 @@
-<div class="content flex flex-col gap-large">
-  <h1>Settings</h1>
+<div class="flex flex-col gap-large">
+  <h1><%= t('settings.title') %></h1>
 
-  <%= form_with model: @user, url: settings_path, method: :patch, class: 'flex flex-col gap-large' do |form| %>
+  <%= form_with model: @user, url: settings_path, method: :patch, class: 'account-form flex flex-col gap-large' do |form| %>
     <% if @user.errors.any? %>
       <ul class="form-errors">
         <% @user.errors.full_messages.each do |message| %>
@@ -11,25 +11,28 @@
     <% end %>
 
     <section class="flex flex-col gap-small">
-      <h2>Notifications</h2>
+      <h2><%= t('settings.notifications_heading') %></h2>
       <label class="flex flex-col gap-small">
-        <span>How often should we tell you about new events?</span>
-        <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [f.capitalize, f] } %>
+        <span><%= t('settings.frequency_label') %></span>
+        <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [t("frequencies.#{f}"), f] } %>
       </label>
     </section>
 
     <section class="flex flex-col gap-small">
-      <h2>Favorite locations</h2>
-      <p>Get notified about events at these places.</p>
-      <div class="chips flex flex-row wrap gap-small">
-        <%= form.collection_check_boxes :location_list, available_tags(context: :locations), :name, :name do |b| %>
-          <label class="tag"><%= b.check_box %> <%= b.text %></label>
-        <% end %>
-      </div>
+      <h2><%= t('settings.language_heading') %></h2>
+      <%= form.select :locale,
+            I18n.available_locales.map { |l| [t("languages.#{l}"), l] },
+            include_blank: t('settings.language_auto') %>
     </section>
 
     <section class="flex flex-col gap-small">
-      <h2>Favorite styles</h2>
+      <h2><%= t('settings.favorite_locations_heading') %></h2>
+      <p><%= t('settings.favorite_locations_hint') %></p>
+      <div class="location-picker"><%= render 'location_picker', user: @user %></div>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('settings.favorite_styles_heading') %></h2>
       <div class="chips flex flex-row wrap gap-small">
         <%= form.collection_check_boxes :style_list, Style.order(name: :asc), :name, :name do |b| %>
           <label class="tag"><%= b.check_box %> <%= b.text %></label>
@@ -38,25 +41,25 @@
     </section>
 
     <section class="flex flex-col gap-small">
-      <h2>Email <span class="muted">(optional)</span></h2>
-      <p>Only needed if you want password reset or email digests later.</p>
-      <%= form.email_field :email_address, autocomplete: "email", placeholder: "you@example.com" %>
+      <h2><%= t('settings.email_heading') %> <span class="muted"><%= t('settings.email_optional') %></span></h2>
+      <p><%= t('settings.email_hint') %></p>
+      <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
     </section>
 
     <section class="flex flex-col gap-small">
-      <h2>Change password</h2>
-      <p>Leave blank to keep your current password.</p>
-      <%= form.password_field :password, autocomplete: "new-password", placeholder: "New password", maxlength: 72 %>
-      <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: "Confirm new password", maxlength: 72 %>
+      <h2><%= t('settings.password_heading') %></h2>
+      <p><%= t('settings.password_hint') %></p>
+      <%= form.password_field :password, autocomplete: "new-password", placeholder: t('settings.new_password'), maxlength: 72 %>
+      <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: t('settings.confirm_new_password'), maxlength: 72 %>
     </section>
 
-    <%= form.submit "Save settings" %>
+    <%= form.submit t('settings.save') %>
   <% end %>
 
   <section class="flex flex-col gap-small">
-    <h2>Delete account</h2>
-    <p>This permanently removes your account and favorites.</p>
-    <%= button_to "Delete my account", registration_path, method: :delete, class: "button delete",
-          data: { turbo_confirm: "Permanently delete your account? This cannot be undone." } %>
+    <h2><%= t('settings.delete_account_heading') %></h2>
+    <p><%= t('settings.delete_account_hint') %></p>
+    <%= button_to t('settings.delete_account'), registration_path, method: :delete, class: "button delete",
+          data: { turbo_confirm: t('settings.delete_account_confirm') } %>
   </section>
 </div>

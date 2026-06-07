@@ -25,28 +25,38 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="flex flex-col align-stretch">
-    <div class="content flex-grow">
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <%= link_to 'üsgu', root_path, class: 'site-brand' %>
+        <nav class="site-nav">
+          <%= link_to t('nav.events'), root_path %>
+          <% if authenticated? %>
+            <% if current_user&.admin? %>
+              <%= link_to t('nav.admin'), admin_path %>
+            <% end %>
+            <%= link_to notifications_path do %>
+              <%= t('nav.notifications') %><% if (unread = current_user.notifications.unread.count).positive? %> <span class="badge"><%= unread %></span><% end %>
+            <% end %>
+            <%= link_to t('nav.settings'), settings_path %>
+            <%= link_to t('nav.logout'), session_path, data: { turbo_method: :delete } %>
+          <% else %>
+            <%= link_to t('nav.login'), new_session_path %>
+            <%= link_to t('nav.signup'), signup_path %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="content">
       <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>
       <% if alert.present? %><p class="flash alert"><%= alert %></p><% end %>
       <%= yield %>
-    </div>
+    </main>
 
-    <footer class="footer">
-      <div class="content flex justify-end gap-medium">
-        <% if authenticated? %>
-          <% if current_user&.admin? %>
-            <%= link_to 'Admin', admin_path %>
-          <% end %>
-          <%= link_to notifications_path do %>
-            Notifications<% if (unread = current_user.notifications.unread.count).positive? %> (<%= unread %>)<% end %>
-          <% end %>
-          <%= link_to 'Settings', settings_path %>
-          <%= link_to 'Logout', session_path, data: { turbo_method: :delete } %>
-        <% else %>
-          <%= link_to 'Login', new_session_path %>
-          <%= link_to 'Sign up', signup_path %>
-        <% end %>
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <%= t('footer.tagline') %>
       </div>
     </footer>
   </body>

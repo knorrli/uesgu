@@ -20,7 +20,7 @@
           <% event.locations.each do |location| %>
             <%= button_tag type: :button, class: class_names(:tag, active: filter.location_list.include?(location.name)), data: { action: 'filter#toggleFilter', filter_field_name_param: 'l[]', filter_value_param: location.name } do %>
               <div class="flex gap-small">
-                <span class="<%= tag_icon_class(context: 'locations') %>"></span>
+                <span class="<%= tag_icon_class(context: Location.type_for(location.name)) %>"></span>
                 <span><%= location %></span>
               </div>
             <% end %>

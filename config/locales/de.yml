@@ -1,15 +1,114 @@
 ---
 de:
-  genre_style_assignments:
+  nav:
+    events: Programm
+    admin: Admin
+    notifications: Mitteilungen
+    settings: Einstellungen
+    logout: Abmelden
+    login: Anmelden
+    signup: Registrieren
+  footer:
+    tagline: üsgu — Konzärt für Fründe
+  languages:
+    de: Deutsch
+    fr: Französisch
+    en: Englisch
+  cantons:
+    AG: Aargau
+    BE: Bern
+    FR: Freiburg
+    LU: Luzern
+    SO: Solothurn
+    VD: Waadt
+  auth:
+    login_title: Anmelden
+    signup_title: Registrieren
+    username: Benutzername
+    password: Passwort
+    password_confirmation: Passwort bestätigen
+    login_submit: Anmelden
+    signup_submit: Konto erstellen
+    no_account_html: Noch kein Konto? %{link}.
+    have_account_html: Schon ein Konto? %{link}.
+    sign_up_link: Registrieren
+    log_in_link: Anmelden
+    invalid_credentials: Versuche es mit einem anderen Benutzernamen oder Passwort.
+    rate_limited: Versuche es später erneut.
+    notify_label: Über neue Veranstaltungen informieren
+  registrations:
+    welcome: Willkommen bei üsgu!
+    account_deleted: Dein Konto wurde gelöscht.
+  frequencies:
+    weekly: Wöchentlich
+    monthly: Monatlich
+  settings:
+    title: Einstellungen
+    saved: Einstellungen gespeichert.
+    notifications_heading: Mitteilungen
+    frequency_label: Wie oft sollen wir dich über neue Veranstaltungen informieren?
+    language_heading: Sprache
+    language_auto: Automatisch (Browser)
+    favorite_locations_heading: Lieblings-Locations
+    favorite_locations_hint: Erhalte Mitteilungen zu Veranstaltungen an diesen Orten.
+    follow_all: Alle in %{name}
+    other_locations: Weitere Orte
+    favorite_styles_heading: Lieblings-Stile
+    email_heading: E-Mail
+    email_optional: (optional)
+    email_hint: Nur nötig, falls du später Passwort-Zurücksetzen oder E-Mail-Updates möchtest.
+    email_placeholder: du@beispiel.ch
+    password_heading: Passwort ändern
+    password_hint: Leer lassen, um das aktuelle Passwort zu behalten.
+    new_password: Neues Passwort
+    confirm_new_password: Neues Passwort bestätigen
+    save: Einstellungen speichern
+    delete_account_heading: Konto löschen
+    delete_account_hint: Entfernt dein Konto und deine Favoriten endgültig.
+    delete_account: Mein Konto löschen
+    delete_account_confirm: Konto endgültig löschen? Das kann nicht rückgängig gemacht werden.
+  notifications:
     index:
-      unassigned_genre_tags: Nicht zugewiesene Genre-Tags
-      suggestions: Vorschläge
-      manual_entry: Manuelle Zuweisung
+      title: Mitteilungen
+      empty: Noch keine Mitteilungen. Neu hinzugefügte Veranstaltungen fassen wir hier für dich zusammen.
+      unread_badge: Neu
+      new_events:
+        one: 1 neue Veranstaltung
+        other: "%{count} neue Veranstaltungen"
+    show:
+      back: ← Alle Mitteilungen
+      title: Neue Veranstaltungen
+      all: Alle neuen Veranstaltungen
+      relevant: Nur meine Favoriten
+      empty_all: Keine neuen Veranstaltungen in diesem Zeitraum.
+      empty_relevant: In diesem Zeitraum passten keine neuen Veranstaltungen zu deinen Lieblings-Locations oder -Stilen.
   actions:
     assign: Zuweisen
     save: Speichern
     cancel: Abbrechen
     delete: Löschen
+  genre_style_assignments:
+    index:
+      unassigned_genre_tags: Nicht zugewiesene Genre-Tags
+      suggestions: Vorschläge
+      manual_entry: Manuelle Zuweisung
+  tags:
+    tag:
+      usage: Verwendung
+      suggestions: Vorschläge
+      manual_entry: Manuelle Zuweisung
+    edit:
+      usage: Verwendung
+      suggestions: Vorschläge
+  admin:
+    index:
+      total: Total
+      assign_unassigned_genres: Zuweisungen erstellen
+      reload: neu laden
+      clear: leeren
+      scrape: scrapen
+      assigned: "Zugewiesen: %{count}"
+      unassigned: "Nicht zugewiesen: %{count}"
   activemodel:
     models:
       genre:
@@ -29,10 +128,14 @@ de:
       style:
         one: Style
         other: Styles
-  admin:
-    index:
-      total: Total
-      assign_unassigned_genres: Zuweisungen erstellen
+    attributes:
+      user:
+        username: Benutzername
+        password: Passwort
+        password_confirmation: Passwortbestätigung
+        email_address: E-Mail-Adresse
+        locale: Sprache
+        notification_frequency: Benachrichtigungshäufigkeit
   date:
     formats:
       default: "%d.%m.%Y"
@@ -47,6 +150,8 @@ de:
     today: Heute
     tomorrow: Morgen
   events:
+    index:
+      title: üsgu
     filter:
       what: Was?
       when: Wann?
@@ -58,7 +163,7 @@ de:
       one_page:
         display_entries:
           one: Zeige <b>1</b> %{entry_name}
-          other: Zeige <b>all %{count}</b> %{entry_name}
+          other: Zeige <b>alle %{count}</b> %{entry_name}
           zero: Keine %{entry_name} gefunden
   time:
     formats:

@@ -15,6 +15,7 @@ class User < ApplicationRecord
                        format: { with: /\A[a-z0-9_.-]+\z/, message: "may only contain letters, numbers, and . _ -" }
   validates :email_address, uniqueness: true, allow_nil: true
   validates :notification_frequency, inclusion: { in: FREQUENCIES }
+  validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }, allow_blank: true
 
   def admin?
     admin

@@ -1,0 +1,64 @@
+/* Site header, primary nav, footer. Mobile-first. */
+
+.site-header {
+  border-bottom: var(--border-width) solid var(--theme-accent-color);
+}
+
+.site-header__inner,
+.site-footer__inner {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+  padding: var(--gap-medium) var(--content-padding);
+}
+
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-small) var(--gap-large);
+}
+
+.site-brand {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+  text-decoration: none;
+  color: var(--theme-fg-color);
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--gap-small) var(--gap-medium);
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: var(--theme-accent-color);
+}
+
+.site-nav a:hover {
+  text-decoration: underline;
+}
+
+.site-footer {
+  flex-shrink: 0;
+  border-top: var(--border-width) solid var(--theme-accent-color);
+}
+
+.site-footer__inner {
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+/* Small count pill, e.g. unread notifications */
+.badge {
+  display: inline-block;
+  padding: 0 var(--gap-xsmall);
+  background-color: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+  font-size: var(--font-size-small);
+  line-height: 1.4;
+}

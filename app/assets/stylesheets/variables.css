@@ -10,10 +10,22 @@
   --color-black: black;
   /* app styles */
   --border-radius: none;
+  --gap-xsmall: 3px;
   --gap-small: 5px;
   --gap-medium: 10px;
   --gap-large: 20px;
   --gap-xlarge: 50px;
+
+  /* layout */
+  --content-max-width: 720px;
+  --content-padding: var(--gap-medium);
+
+  /* type scale */
+  --font-size-small: 0.8rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.6rem;
+
   --tag-line-height: 1.1;
   --filter-input-line-height: 1.5rem;
   --filter-icon-size: var(--filter-input-line-height);

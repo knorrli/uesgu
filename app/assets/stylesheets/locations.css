@@ -1,0 +1,45 @@
+/* Canton > city > venue favorites accordion (settings). Mobile-first. */
+
+.location-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}
+
+.loc-canton,
+.loc-city {
+  border-left: var(--border-width) solid var(--theme-accent-muted);
+  padding-left: var(--gap-small);
+}
+
+.loc-city {
+  margin-left: var(--gap-medium);
+  margin-block: var(--gap-xsmall);
+}
+
+.loc-summary {
+  cursor: pointer;
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-small);
+  padding: var(--gap-xsmall) 0;
+}
+
+/* checkbox rows */
+.loc-option {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-small);
+  padding: var(--gap-xsmall) 0;
+  margin-left: var(--gap-medium);
+  cursor: pointer;
+}
+
+.loc-follow {
+  color: var(--theme-fg-muted);
+}
+
+.loc-option input,
+.loc-summary {
+  flex-shrink: 0;
+}

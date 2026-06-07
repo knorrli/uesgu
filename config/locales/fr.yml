@@ -1,0 +1,178 @@
+---
+fr:
+  nav:
+    events: Programme
+    admin: Admin
+    notifications: Notifications
+    settings: Paramètres
+    logout: Déconnexion
+    login: Connexion
+    signup: Inscription
+  footer:
+    tagline: üsgu — Des concerts entre amis
+  languages:
+    de: Allemand
+    fr: Français
+    en: Anglais
+  cantons:
+    AG: Argovie
+    BE: Berne
+    FR: Fribourg
+    LU: Lucerne
+    SO: Soleure
+    VD: Vaud
+  auth:
+    login_title: Connexion
+    signup_title: Inscription
+    username: Nom d'utilisateur
+    password: Mot de passe
+    password_confirmation: Confirmer le mot de passe
+    login_submit: Se connecter
+    signup_submit: Créer un compte
+    no_account_html: Pas encore de compte ? %{link}.
+    have_account_html: Vous avez déjà un compte ? %{link}.
+    sign_up_link: S'inscrire
+    log_in_link: Se connecter
+    invalid_credentials: Essayez un autre nom d'utilisateur ou mot de passe.
+    rate_limited: Réessayez plus tard.
+    notify_label: M'informer des nouveaux événements
+  registrations:
+    welcome: Bienvenue sur üsgu !
+    account_deleted: Votre compte a été supprimé.
+  frequencies:
+    weekly: Hebdomadaire
+    monthly: Mensuel
+  settings:
+    title: Paramètres
+    saved: Paramètres enregistrés.
+    notifications_heading: Notifications
+    frequency_label: À quelle fréquence souhaitez-vous être informé des nouveaux événements ?
+    language_heading: Langue
+    language_auto: Automatique (navigateur)
+    favorite_locations_heading: Lieux favoris
+    favorite_locations_hint: Recevez des notifications pour les événements dans ces lieux.
+    follow_all: Tout %{name}
+    other_locations: Autres lieux
+    favorite_styles_heading: Styles favoris
+    email_heading: E-mail
+    email_optional: (facultatif)
+    email_hint: Nécessaire uniquement pour réinitialiser votre mot de passe ou recevoir des e-mails plus tard.
+    email_placeholder: vous@exemple.ch
+    password_heading: Changer le mot de passe
+    password_hint: Laissez vide pour conserver votre mot de passe actuel.
+    new_password: Nouveau mot de passe
+    confirm_new_password: Confirmer le nouveau mot de passe
+    save: Enregistrer les paramètres
+    delete_account_heading: Supprimer le compte
+    delete_account_hint: Supprime définitivement votre compte et vos favoris.
+    delete_account: Supprimer mon compte
+    delete_account_confirm: Supprimer définitivement votre compte ? Cette action est irréversible.
+  notifications:
+    index:
+      title: Notifications
+      empty: Aucune notification pour l'instant. Nous regrouperons ici les événements récemment ajoutés.
+      unread_badge: Nouveau
+      new_events:
+        one: 1 nouvel événement
+        other: "%{count} nouveaux événements"
+    show:
+      back: ← Toutes les notifications
+      title: Nouveaux événements
+      all: Tous les nouveaux événements
+      relevant: Seulement mes favoris
+      empty_all: Aucun nouvel événement durant cette période.
+      empty_relevant: Aucun nouvel événement ne correspondait à vos lieux ou styles favoris durant cette période.
+  actions:
+    assign: Assigner
+    save: Enregistrer
+    cancel: Annuler
+    delete: Supprimer
+  genre_style_assignments:
+    index:
+      unassigned_genre_tags: Tags de genre non assignés
+      suggestions: Suggestions
+      manual_entry: Assignation manuelle
+  tags:
+    tag:
+      usage: Utilisation
+      suggestions: Suggestions
+      manual_entry: Assignation manuelle
+    edit:
+      usage: Utilisation
+      suggestions: Suggestions
+  admin:
+    index:
+      total: Total
+      assign_unassigned_genres: Créer des assignations
+      reload: recharger
+      clear: vider
+      scrape: scraper
+      assigned: "Assignés : %{count}"
+      unassigned: "Non assignés : %{count}"
+  activemodel:
+    models:
+      genre:
+        one: Genre
+        other: Genres
+      location:
+        one: Lieu
+        other: Lieux
+  activerecord:
+    models:
+      acts_as_taggable_on/tag:
+        one: Tag
+        other: Tags
+      event:
+        one: Événement
+        other: Événements
+      style:
+        one: Style
+        other: Styles
+    attributes:
+      user:
+        username: Nom d'utilisateur
+        password: Mot de passe
+        password_confirmation: Confirmation du mot de passe
+        email_address: Adresse e-mail
+        locale: Langue
+        notification_frequency: Fréquence des notifications
+  date:
+    formats:
+      default: "%d.%m.%Y"
+      detailed: "%A, %d.%m.%Y"
+  datepicker:
+    next_month: Mois prochain
+    next_week: Semaine prochaine
+    next_weekend: Week-end prochain
+    this_month: Ce mois
+    this_week: Cette semaine
+    this_weekend: Ce week-end
+    today: Aujourd'hui
+    tomorrow: Demain
+  events:
+    index:
+      title: üsgu
+    filter:
+      what: Quoi ?
+      when: Quand ?
+      where: Où ?
+  helpers:
+    page_entries_info:
+      more_pages:
+        display_entries: Affichage de %{entry_name} <b>%{first}–%{last}</b> sur <b>%{total}</b> au total
+      one_page:
+        display_entries:
+          one: Affichage de <b>1</b> %{entry_name}
+          other: Affichage des <b>%{count}</b> %{entry_name}
+          zero: Aucun %{entry_name} trouvé
+  time:
+    formats:
+      default: "%d.%m.%Y, %H:%M"
+      time: "%H:%M"
+  views:
+    pagination:
+      first: "&laquo; Début"
+      last: Fin &raquo;
+      next: Suivant &rsaquo;
+      previous: "&lsaquo; Précédent"
+      truncate: "&hellip;"

@@ -1,0 +1,104 @@
+<!-- BEGIN app/views/layouts/application.html.erb --><!DOCTYPE html>
+<html>
+  <head>
+    <title>üsgu</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="YlFlvJJAeg8kLRul2nxC_Y5t89dRyG2eZ1Lvm5YoiNOhrVTEQgbI9qt9CHjQuiYTru4ScHJqUWTZPNIVghrLhA" />
+    
+
+    
+
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <link rel="stylesheet" href="/assets/hotwire_combobox-f35a07fc.css" />
+    <link rel="stylesheet" href="/assets/easepick.min-03983060.css" data-turbo-track="reload" />
+    <link rel="stylesheet" href="/assets/_easepick_overrides-86f9c1ae.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/_hotwire_combobox_overrides-a3082390.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/_reset-092e8c79.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/admin-e3f50689.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/application-9b3a26f5.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/controls-0b7e364b.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/datepicker-c8964d37.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/events-04df8c07.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/flex-0ebccf0f.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/fonts-08822536.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/genre_style_assignments-19fa3452.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/grid-b2c4835f.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/layout-fe841f9e.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/locations-a97248cf.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/notifications-60f54fe6.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/tags-85cdd348.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/theme-7cd38c42.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/themify-icons-628560d4.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/variables-4677bd8b.css" data-turbo-track="reload" />
+    <script type="importmap" data-turbo-track="reload">{
+  "imports": {
+    "controllers/hw_combobox_controller": "/assets/hotwire_combobox.esm-c1203551.js",
+    "application": "/assets/application-bfcdf840.js",
+    "@hotwired/turbo-rails": "/assets/turbo.min-3a2e143f.js",
+    "@hotwired/stimulus": "/assets/@hotwired--stimulus-132cbc23.js",
+    "@hotwired/stimulus-loading": "/assets/stimulus-loading-1fc53fe7.js",
+    "@easepick/bundle": "/assets/@easepick--bundle-779e1b1d.js",
+    "controllers/application": "/assets/controllers/application-3affb389.js",
+    "controllers/datepicker_controller": "/assets/controllers/datepicker_controller-69b5c92c.js",
+    "controllers/filter_controller": "/assets/controllers/filter_controller-14b2b49f.js",
+    "controllers/genre_style_assignments_controller": "/assets/controllers/genre_style_assignments_controller-a4280093.js",
+    "controllers": "/assets/controllers/index-ee64e1f1.js"
+  }
+}</script>
+<link rel="modulepreload" href="/assets/hotwire_combobox.esm-c1203551.js">
+<link rel="modulepreload" href="/assets/application-bfcdf840.js">
+<link rel="modulepreload" href="/assets/turbo.min-3a2e143f.js">
+<link rel="modulepreload" href="/assets/@hotwired--stimulus-132cbc23.js">
+<link rel="modulepreload" href="/assets/stimulus-loading-1fc53fe7.js">
+<link rel="modulepreload" href="/assets/@easepick--bundle-779e1b1d.js">
+<link rel="modulepreload" href="/assets/controllers/application-3affb389.js">
+<link rel="modulepreload" href="/assets/controllers/datepicker_controller-69b5c92c.js">
+<link rel="modulepreload" href="/assets/controllers/filter_controller-14b2b49f.js">
+<link rel="modulepreload" href="/assets/controllers/genre_style_assignments_controller-a4280093.js">
+<link rel="modulepreload" href="/assets/controllers/index-ee64e1f1.js">
+<script type="module">import "application"</script>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="/">üsgu</a>
+        <nav class="site-nav">
+          <a href="/">Programm</a>
+            <a href="/session/new">Anmelden</a>
+            <a href="/signup">Registrieren</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="content">
+      
+      
+      <!-- BEGIN app/views/sessions/new.html.erb --><div class="flex flex-col gap-medium">
+  <h1>Anmelden</h1>
+
+  <form class="account-form flex flex-col align-stretch gap-medium" action="/session" accept-charset="UTF-8" method="post"><input type="hidden" name="authenticity_token" value="sUoR9GuXO-bG3MZKgX-7P2ilXfeqXz9pKfDwYkYO7QlytiCMu9GJH0mM1ZeLud_RSCa8UIn9A5OXns3sUjyuXg" autocomplete="off" />
+    <input required="required" autofocus="autofocus" autocomplete="username" placeholder="Benutzername" type="text" name="username" id="username" />
+    <input required="required" autocomplete="current-password" placeholder="Passwort" maxlength="72" size="72" type="password" name="password" id="password" />
+    <input type="submit" name="commit" value="Anmelden" data-disable-with="Anmelden" />
+</form>
+  <p>Noch kein Konto? <a href="/signup">Registrieren</a>.</p>
+</div>
+<!-- END app/views/sessions/new.html.erb -->
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        üsgu — Konzärt für Fründe
+      </div>
+    </footer>
+  </body>
+</html>
+<!-- END app/views/layouts/application.html.erb -->

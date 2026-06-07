@@ -1,5 +1,7 @@
 class TagsController < ApplicationController
-  allow_unauthenticated_access
+  # index/chips power the public events filter autocomplete; the rest is tag management.
+  allow_unauthenticated_access only: %i[ index chips ]
+  before_action :require_admin, only: %i[ edit update destroy ]
 
   def index
     @tags = ActsAsTaggableOn::Tag

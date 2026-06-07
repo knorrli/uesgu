@@ -27,15 +27,22 @@
 
   <body class="flex flex-col align-stretch">
     <div class="content flex-grow">
+      <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>
+      <% if alert.present? %><p class="flash alert"><%= alert %></p><% end %>
       <%= yield %>
     </div>
 
     <footer class="footer">
       <div class="content flex justify-end gap-medium">
         <% if authenticated? %>
+          <% if current_user&.admin? %>
+            <%= link_to 'Admin', admin_path %>
+          <% end %>
+          <%= link_to 'Settings', settings_path %>
           <%= link_to 'Logout', session_path, data: { turbo_method: :delete } %>
         <% else %>
-          <%= link_to 'Admin', admin_path %>
+          <%= link_to 'Login', new_session_path %>
+          <%= link_to 'Sign up', signup_path %>
         <% end %>
       </div>
     </footer>

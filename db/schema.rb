@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_07_174754) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_07_175446) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -194,11 +194,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_174754) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email_address", null: false
+    t.string "email_address"
     t.string "password_digest", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "username", null: false
+    t.boolean "admin", default: false, null: false
+    t.string "notification_frequency", default: "weekly", null: false
+    t.datetime "last_notified_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["username"], name: "index_users_on_username", unique: true
   end
 
   add_foreign_key "sessions", "users"

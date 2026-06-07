@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
-  allow_unauthenticated_access
-
+  allow_unauthenticated_access only: %i[ index ]
+  before_action :require_admin, only: %i[ destroy ]
   before_action :set_event, only: %i[ destroy ]
 
   # GET /events

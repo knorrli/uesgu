@@ -1,0 +1,26 @@
+<div class="content flex flex-col gap-medium">
+  <h1>Sign up</h1>
+
+  <%= form_with model: @user, url: registration_path, class: 'flex flex-col align-stretch gap-medium' do |form| %>
+    <% if @user.errors.any? %>
+      <ul class="form-errors">
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+    <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", placeholder: "Username" %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Password", maxlength: 72 %>
+    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Confirm password", maxlength: 72 %>
+
+    <label class="flex flex-col gap-small">
+      <span>Notify me about new events</span>
+      <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [f.capitalize, f] }, selected: @user.notification_frequency || "weekly" %>
+    </label>
+
+    <%= form.submit "Create account" %>
+  <% end %>
+
+  <p>Already have an account? <%= link_to "Log in", new_session_path %>.</p>
+</div>

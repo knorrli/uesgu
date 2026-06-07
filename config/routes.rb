@@ -15,6 +15,9 @@ Rails.application.routes.draw do
   root 'events#index'
 
   resource :session
+  resource :registration, only: %i[new create destroy]
+  get 'signup', to: 'registrations#new'
+  resource :settings, only: %i[show update]
 
   resources :events, only: [:index, :destroy]
   resources :styles, only: :index do

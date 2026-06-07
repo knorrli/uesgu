@@ -1,4 +1,6 @@
 class GenreStyleAssignmentsController < ApplicationController
+  before_action :require_admin
+
   def index
     Rails.logger.info 'Loading index'
     @event_tag_stats = EventTagStatsPresenter.new

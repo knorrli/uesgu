@@ -68,7 +68,7 @@ module Scrapers
     end
 
     def event_title(event_page:)
-      event_page.css('.event_detail_header .event_title_title').text
+      event_page.css('.event_detail_header .event_title_title').text.squish
     end
 
     def event_subtitle(event_page:)
@@ -76,7 +76,7 @@ module Scrapers
     end
 
     def event_genres(event_page:)
-      event_page.css('.event_detail_header .event_title_info').text.split(/,|\s-\s|\s[u|a]nd\s/).compact_blank.map(&:squish)
+      event_page.css('.event_detail_header .event_title_info').text.split(/,|\s-\s|\s[au]nd\s/).compact_blank.map(&:squish)
     end
 
     def preprocess(event_page:)

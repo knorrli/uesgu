@@ -55,7 +55,6 @@ module Scrapers
     end
 
     def event_genres(event_page:)
-      event_page.css('.event__status').map { |node| node.text.squish }.compact_blank
       nil
     end
   end

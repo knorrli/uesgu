@@ -18,11 +18,6 @@ module Scrapers
       new.call
     end
 
-    def initialize
-      super
-      robots = true
-    end
-
     def call
       Rails.logger.info "Start processing #{self.class.location} at #{self.class.url}"
 
@@ -43,17 +38,18 @@ module Scrapers
 
     def month_numbers
       @month_numbers ||= {
-        'Januar' => 1,
-        'Februar' => 2,
-        'Mär' => 3,
-        'März' => 3,
+        'Jan' => 1, 'Januar' => 1,
+        'Feb' => 2, 'Februar' => 2,
+        'Mär' => 3, 'Mrz' => 3, 'März' => 3,
+        'Apr' => 4, 'April' => 4,
         'Mai' => 5,
-        'Juni' => 6,
-        'Juli' => 7,
-        'Okt' => 10,
-        'Oktober' => 10,
-        'Dez' => 12,
-        'Dezember' => 12
+        'Jun' => 6, 'Juni' => 6,
+        'Jul' => 7, 'Juli' => 7,
+        'Aug' => 8, 'August' => 8,
+        'Sep' => 9, 'Sept' => 9, 'September' => 9,
+        'Okt' => 10, 'Oktober' => 10,
+        'Nov' => 11, 'November' => 11,
+        'Dez' => 12, 'Dezember' => 12
       }
     end
   end

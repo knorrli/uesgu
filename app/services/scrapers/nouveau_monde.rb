@@ -60,7 +60,7 @@ module Scrapers
 
     def event_genres(event_page:)
       main_tags = event_page.css('.plateSmall').map { |node| node.text.squish }
-      artist_tags = event_page.css('.groupIntro .genTexArea h5').map { |node| node.text.squish }.split(/,|\s\-\s|\s[a|u]nd\s|&|\//).compact_blank
+      artist_tags = event_page.css('.groupIntro .genTexArea h5').flat_map { |node| node.text.split(/,|\s\-\s|\s[au]nd\s|&|\//) }.map(&:squish).compact_blank
       (main_tags | artist_tags).sort
     end
   end

@@ -22,7 +22,6 @@ module Scrapers
         Rails.logger.info "Processing event URL #{url}"
 
         event = Event.find_or_initialize_by(url: url)
-        puts "(#{event.id}): #{event.url}"
         transact do
           event_page = click(link)
           event.start_time = event_start_time(event_page: event_page)
@@ -53,11 +52,10 @@ module Scrapers
     end
 
     def event_subtitle(event_page:)
-      support = event_page.css('.elementor-top-section .event-single-untertitel').text.squish
+      event_page.css('.elementor-top-section .event-single-untertitel').text.squish
     end
 
     def event_genres(event_page:)
-      event_page.css('.event__status').map { |node| node.text.squish }.compact_blank
       nil
     end
   end

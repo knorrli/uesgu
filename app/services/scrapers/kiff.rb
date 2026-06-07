@@ -40,9 +40,9 @@ module Scrapers
     end
 
     def event_title(event_page:)
-      elements = event_page.css('.EventPage__Subtitle h2').children.map do |node|
+      event_page.css('.EventPage__Subtitle h2').children.map do |node|
         next ',' if node.name == 'br'
-        next "(#{node.text.squish})" if node['class'] == 'Act__coutry-code' && node.text.squish.present?
+        next "(#{node.text.squish})" if node['class'] == 'Act__country-code' && node.text.squish.present?
 
         node.text.squish
       end.compact_blank.join(' ')

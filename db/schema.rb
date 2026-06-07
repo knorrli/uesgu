@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_07_181145) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_07_203229) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -214,6 +214,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_07_181145) do
     t.boolean "admin", default: false, null: false
     t.string "notification_frequency", default: "weekly", null: false
     t.datetime "last_notified_at"
+    t.string "locale"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end

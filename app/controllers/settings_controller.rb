@@ -6,7 +6,7 @@ class SettingsController < ApplicationController
 
   def update
     if @user.update(settings_params)
-      redirect_to settings_path, notice: "Settings saved."
+      redirect_to settings_path, notice: t("settings.saved")
     else
       render :show, status: :unprocessable_entity
     end
@@ -20,7 +20,7 @@ class SettingsController < ApplicationController
 
   def settings_params
     permitted = params.expect(
-      user: [:notification_frequency, :email_address, :password, :password_confirmation, { location_list: [], style_list: [] }]
+      user: [:notification_frequency, :locale, :email_address, :password, :password_confirmation, { location_list: [], style_list: [] }]
     )
 
     # Blank password means "leave it unchanged" rather than clearing it.

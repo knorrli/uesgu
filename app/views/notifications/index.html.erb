@@ -1,9 +1,9 @@
-<% content_for :title, "Notifications" %>
+<% content_for :title, t('notifications.index.title') %>
 
-<h1>Notifications</h1>
+<h1><%= t('notifications.index.title') %></h1>
 
 <% if @notifications.empty? %>
-  <p class="empty-state">No notifications yet. We'll round up newly added events for you here.</p>
+  <p class="empty-state"><%= t('notifications.index.empty') %></p>
 <% else %>
   <ul class="notifications">
     <% @notifications.each do |notification| %>
@@ -13,8 +13,8 @@
             <%= l notification.period_start.to_date %> – <%= l notification.period_end.to_date %>
           </span>
           <span class="notification__meta">
-            <%= pluralize notification.events.count, 'new event' %>
-            <% unless notification.read? %><span class="badge">New</span><% end %>
+            <%= t('notifications.index.new_events', count: notification.events.count) %>
+            <% unless notification.read? %><span class="badge"><%= t('notifications.index.unread_badge') %></span><% end %>
           </span>
         <% end %>
       </li>

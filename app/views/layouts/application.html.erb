@@ -30,19 +30,19 @@
       <div class="site-header__inner">
         <%= link_to 'üsgu', root_path, class: 'site-brand' %>
         <nav class="site-nav">
-          <%= link_to 'Events', root_path %>
+          <%= link_to t('nav.events'), root_path %>
           <% if authenticated? %>
             <% if current_user&.admin? %>
-              <%= link_to 'Admin', admin_path %>
+              <%= link_to t('nav.admin'), admin_path %>
             <% end %>
             <%= link_to notifications_path do %>
-              Notifications<% if (unread = current_user.notifications.unread.count).positive? %> <span class="badge"><%= unread %></span><% end %>
+              <%= t('nav.notifications') %><% if (unread = current_user.notifications.unread.count).positive? %> <span class="badge"><%= unread %></span><% end %>
             <% end %>
-            <%= link_to 'Settings', settings_path %>
-            <%= link_to 'Logout', session_path, data: { turbo_method: :delete } %>
+            <%= link_to t('nav.settings'), settings_path %>
+            <%= link_to t('nav.logout'), session_path, data: { turbo_method: :delete } %>
           <% else %>
-            <%= link_to 'Log in', new_session_path %>
-            <%= link_to 'Sign up', signup_path %>
+            <%= link_to t('nav.login'), new_session_path %>
+            <%= link_to t('nav.signup'), signup_path %>
           <% end %>
         </nav>
       </div>
@@ -56,7 +56,7 @@
 
     <footer class="site-footer">
       <div class="site-footer__inner">
-        üsgu — Konzärt für Fründe
+        <%= t('footer.tagline') %>
       </div>
     </footer>
   </body>

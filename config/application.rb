@@ -34,6 +34,8 @@ module Uesgu
     # in config/environments, which are processed later.
     #
     config.i18n.default_locale = :de
+    config.i18n.available_locales = [:de, :fr]
+    config.i18n.fallbacks = [:de]
     config.time_zone = 'Europe/Berlin'
     # config.eager_load_paths << Rails.root.join("extras")
 

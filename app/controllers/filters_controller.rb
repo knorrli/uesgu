@@ -15,12 +15,12 @@ class FiltersController < ApplicationController
 
       format.ics do
         cal = Icalendar::Calendar.new
-        cal.x_wr_calname = "WasLouft - #{@filter.name}"
+        cal.x_wr_calname = "üsgu - #{@filter.name}"
         @filter.events.group_by(&:start_date).each do |date, events|
           sorted_events = events.sort_by { |e| e.locations.sort }
           cal.event do |e|
             e.dtstart = Icalendar::Values::Date.new(date.strftime('%Y%m%d'))
-            e.uid = "waslouft.ch@#{@filter.id}-#{date.strftime('%Y%m%d')}"
+            e.uid = "uesgu.ch@#{@filter.id}-#{date.strftime('%Y%m%d')}"
             e.summary = "#{events.count} #{Event.model_name.human(count: events.count)}"
             e.description = sorted_events.map do |event|
               locations = event.locations.join(', ')

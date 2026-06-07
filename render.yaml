@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: waslouft
+    name: uesgu
     runtime: ruby
     plan: free
     region: frankfurt
@@ -10,13 +10,13 @@ services:
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: waslouft-db
+          name: uesgu-db
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false # You'll provide this value on Blueprint creation
       - key: WEB_CONCURRENCY
         value: 2
 databases:
-  - name: waslouft-db
+  - name: uesgu-db
     plan: free
     region: frankfurt

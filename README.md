@@ -1,24 +1,25 @@
-# README
+# üsgu
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+**üsgu** ([uesgu.ch](https://uesgu.ch)) — Swiss-German for "Ausgang" (going out).
 
-Things you may want to cover:
+A concert & event aggregator for Swiss music venues. It scrapes event listings
+from live-music venues across Switzerland, normalizes and tags them, and
+presents a filterable feed. Users can favorite locations and styles and receive
+periodic notifications about newly-added events.
 
-* Ruby version
+## Stack
 
-* System dependencies
+- Ruby on Rails 8, PostgreSQL
+- Hotwire (Turbo + Stimulus), importmap, Propshaft
+- Solid Queue for background jobs (scrapers run daily)
+- Mechanize for scraping, acts-as-taggable-on for the location/style/genre taxonomy
 
-* Configuration
+## Development
 
-* Database creation
+```sh
+bin/setup        # install deps, prepare the database
+bin/rails server # http://localhost:3000
+```
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+The database is `uesgu_development` (see `config/database.yml`). Event data is
+populated by the venue scrapers in `app/services/scrapers/`.

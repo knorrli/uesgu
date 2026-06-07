@@ -9,8 +9,10 @@ module TagsHelper
       'ti-music-alt'
     when 'genres'
       'ti-tag'
-    when 'locations'
+    when 'locations', 'venue'
       'ti-home'
+    when 'region'
+      'ti-world'
     else
       'ti-bolt'
     end

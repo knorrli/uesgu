@@ -31,7 +31,7 @@
           <% end %>
           <div class="event-card__tags">
             <% event.locations.each do |location| %>
-              <span class="tag"><span class="<%= tag_icon_class(context: 'locations') %>"></span> <%= location %></span>
+              <span class="tag"><span class="<%= tag_icon_class(context: Location.type_for(location.name)) %>"></span> <%= location %></span>
             <% end %>
             <% event.styles.each do |style| %>
               <span class="tag"><span class="<%= tag_icon_class(context: 'styles') %>"></span> <%= style %></span>

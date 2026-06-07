@@ -10,11 +10,6 @@ de:
     save: Speichern
     cancel: Abbrechen
     delete: Löschen
-    new_filter: Neuer Filter
-    reset_filter: Filter zurücksetzen
-    create_filter: Filter erstellen
-    update_filter: Filter anpassen
-    delete_filter: Filter löschen
   activemodel:
     models:
       genre:
@@ -53,7 +48,6 @@ de:
     tomorrow: Morgen
   events:
     filter:
-      filter: Filter auswählen oder erstellen
       what: Was?
       when: Wann?
       where: Wo?

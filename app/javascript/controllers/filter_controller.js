@@ -27,13 +27,6 @@ export default class extends Controller {
     'locationsInput',
     'dateRangesInput',
 
-    'filterIdInput',
-    'filterForm',
-    'filterInput',
-
-    'enabledWhenModifiedControl',
-    'disabledWhenModifiedControl',
-
     'queryHandle'
   ];
 
@@ -84,24 +77,6 @@ export default class extends Controller {
     this.#removeComboboxValue(event.params.value, this.dateRangesInputTarget);
   }
 
-  updateFilter(event) {
-    if(event.detail.fieldName == 'f' && event.detail.value) {
-      if (this.filterIdInputTarget.value !== event.detail.value) {
-        window.location.href = `/filters/${event.detail.value}`;
-      }
-    } else {
-      this.#submitFilterForm();
-    }
-  }
-
-  clearFilter(event) {
-    if (event.explicitOriginalTarget.classList.contains('ti-close')) {
-      event.currentTarget.dataset.hwComboboxExpandedValue = false;
-      this.filterIdInputTarget.value = '';
-      this.formTarget.requestSubmit();
-    }
-  }
-
   toggleFilter(event) {
     const value = event.params.value;
     const input = this.formTarget.querySelector(`[name="${event.params.fieldName}"]`);
@@ -110,20 +85,6 @@ export default class extends Controller {
       this.#removeComboboxValue(value, input);
     } else {
       this.#addComboboxValue(value, input);
-    }
-  }
-
-  updateControlsStatus(event) {
-    const comboboxWrapper = event.target.closest('.hw-combobox');
-    const combobox = comboboxWrapper.querySelector('input[role=combobox]');
-    const filterModified = comboboxWrapper.dataset.originalValue !== combobox.value;
-
-    if (filterModified && combobox.value) {
-      this.disabledWhenModifiedControlTargets.forEach((target) => target.setAttribute('disabled', 'disabled'));
-      this.enabledWhenModifiedControlTargets.forEach((target) => target.removeAttribute('disabled'));
-    } else {
-      this.disabledWhenModifiedControlTargets.forEach((target) => target.removeAttribute('disabled'));
-      this.enabledWhenModifiedControlTargets.forEach((target) => target.setAttribute('disabled', 'disabled'));
     }
   }
 
@@ -151,14 +112,5 @@ export default class extends Controller {
     });
 
     this.formTarget.requestSubmit();
-  }
-
-  #submitFilterForm() {
-    this.filterInputTargets.forEach((input) => {
-      const sourceInput = document.querySelector(`[name='${input.dataset.sourceName}']`);
-      input.value = JSON.parse(sourceInput.dataset.existingValues);
-    });
-
-    this.filterFormTarget.requestSubmit();
   }
 }

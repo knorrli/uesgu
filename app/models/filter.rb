@@ -1,40 +1,39 @@
-class Filter < ApplicationRecord
-  acts_as_taggable_on :locations, :styles, :genres
+# Plain query object built from request params (see EventsController#index).
+# Filters are no longer persisted, so this is not an ActiveRecord model.
+class Filter
+  attr_reader :queries, :style_list, :location_list, :genre_list, :date_ranges
 
-  validates :name, presence: true
-
-  def self.ransackable_attributes(auth_object = nil)
-    ['name']
+  def initialize
+    @queries = []
+    @style_list = []
+    @location_list = []
+    @genre_list = []
+    @date_ranges = []
   end
 
-  def self.ransackable_associations(auth_object = nil)
-    ['taggings', 'locations', 'styles', 'genres']
+  def queries=(new_queries)
+    @queries = parse(new_queries)
   end
 
-  def to_s
-    name
+  def style_list=(new_styles)
+    @style_list = parse(new_styles)
   end
 
-  def to_combobox_display
-    name
+  def location_list=(new_locations)
+    @location_list = parse(new_locations)
   end
 
-  def events
-    Event.ransack(ransack_query).result(distinct: true).order(start_date: :asc)
+  def genre_list=(new_genres)
+    @genre_list = parse(new_genres)
   end
 
-  def to_params
-    params = { f: id }
-    params[:q] = queries.presence
-    params[:l] = location_list.presence
-    params[:s] = style_list.presence
-    params[:g] = genre_list.presence
-    params[:d] = date_ranges.presence
-    params
+  def date_ranges=(new_date_ranges)
+    ranges = parse(new_date_ranges)
+    @date_ranges = ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] }
   end
 
   def ransack_query
-    ransack_query = {
+    {
       g: [
         {
           title_or_subtitle_or_styles_name_or_genres_name_cont_any: queries,
@@ -54,21 +53,13 @@ class Filter < ApplicationRecord
         end
       ]
     }
-
-    ransack_query
-  end
-
-
-  def queries=(new_queries)
-    super(ActsAsTaggableOn.default_parser.new(new_queries).parse)
-  end
-
-  def date_ranges=(new_date_ranges)
-    ranges = ActsAsTaggableOn.default_parser.new(new_date_ranges).parse
-    super(ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] })
   end
 
   private
+
+  def parse(value)
+    ActsAsTaggableOn.default_parser.new(value).parse
+  end
 
   def map_date_ranges(date_ranges)
     return [] if date_ranges.blank?

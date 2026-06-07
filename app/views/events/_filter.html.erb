@@ -1,7 +1,5 @@
 <section class="filter flex flex-col gap-medium" >
   <%= form_with url: events_path, method: :get, id: 'filter-form', class: 'flex flex-col gap-medium', html: { autocomplete: 'off' }, data: { filter_target: 'form', turbo_frame: '_top' } do |f| %>
-    <%= f.hidden_field 'f', value: @filter.id, data: { filter_target: 'filterIdInput' } %>
-
     <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addStyleOrQuery">
       <% if @filter.style_list.present? || @filter.queries.present? %>
         <div class="chips flex flex-row wrap gap-small">
@@ -75,40 +73,6 @@
         </div>
       </div>
     </div>
-  <% end %>
-
-  <%= form_with model: @filter, class: 'flex flex-col gap-large', data: { turbo_frame: '_top', filter_target: 'filterForm' } do |f| %>
-    <%= f.hidden_field :queries, value: @filter.queries.join(','), data: { source_name: 'q[]', filter_target: 'filterInput' } %>
-    <%= f.hidden_field :style_list, value: @filter.style_list.join(','), data: { source_name: 's[]', filter_target: 'filterInput' } %>
-    <%= f.hidden_field :location_list, value: @filter.location_list.join(','), data: { source_name: 'l[]', filter_target: 'filterInput' } %>
-    <%= f.hidden_field :date_ranges, value: @filter.date_ranges.join(','), data: { source_name: 'd[]', filter_target: 'filterInput' } %>
-
-    <div class="flex flex-row gap-medium justify-between">
-      <div class="filter-select input-wrapper flex flex-grow flex-wrap gap-large justify-between" data-action="hw-combobox:selection->filter#updateFilter">
-        <%= combobox_tag 'f', Filter.order(name: :asc), value: @filter.id, name_when_new: 'filter[name]', placeholder: t('.filter'), data: { original_value: @filter.name.to_s, action: 'input->filter#updateControlsStatus click->filter#clearFilter'  } do |combobox| %>
-          <% combobox.customize_fieldset class: 'flex-grow' %>
-          <% combobox.customize_hidden_field data: { filter_target: 'filterIdInput' } %>
-          <% if @filter.persisted? %>
-            <% combobox.customize_handle class: "filter-icon ti-close" %>
-          <% else %>
-            <% combobox.customize_handle class: "filter-icon ti-filter" %>
-          <% end %>
-        <% end %>
-      </div>
-
-      <div class="actions flex gap-small">
-        <%= submit_tag t('actions.save'), class: 'filter-button', disabled: (@filter.new_record? || !@filter.changed?), data: { turbo_frame: '_top', action: 'filter#updateFilter:prevent:stop', filter_target: 'enabledWhenModifiedControl' } %>
-        <% if @filter.persisted? %>
-          <%= link_to t('actions.delete'), filter_path(@filter), class: 'button delete', data: { turbo_method: :delete, turbo_frame: '_top', filter_target: 'disabledWhenModified' } %>
-        <% end %>
-      </div>
-    </div>
-
-    <% if @filter.persisted? %>
-      <div class="flex">
-        <%= link_to calendar_url(@filter, protocol: :webcal, format: :ics), calendar_url(@filter, protocol: :webcal, format: :ics), readonly: true, class: 'flex-grow' %>
-      </div>
-    <% end %>
   <% end %>
 </section>
 

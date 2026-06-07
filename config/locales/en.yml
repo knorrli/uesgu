@@ -40,9 +40,6 @@ en:
     tomorrow: Tomorrow
   events:
     filter:
-      create_filter: Create Filter
-      delete_filter: Delete Filter
-      update_filter: Update Filter
       what: What?
       when: When?
       where: Where?

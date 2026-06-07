@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_19_023205) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_07_174754) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -21,14 +21,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_19_023205) do
     t.date "start_date", null: false
     t.datetime "start_time"
     t.string "url", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "filters", force: :cascade do |t|
-    t.string "name"
-    t.jsonb "queries", default: []
-    t.jsonb "date_ranges", default: []
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

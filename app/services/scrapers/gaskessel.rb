@@ -40,6 +40,8 @@ module Scrapers
       /(?<day>\d{1,2})?\.(?<month>\d{1,2})?\.(?<year>\d+)/ =~ date_string
       /(?<hour>\d{1,2})?:(?<minute>\d{1,2})?/ =~ time_string
 
+      raise "Unparseable date #{date_string.inspect}" if day.blank? || month.blank? || year.blank?
+
       Time.zone.parse("20#{year}-#{month}-#{day} #{hour}:#{minute}")
     end
 

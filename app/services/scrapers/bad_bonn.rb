@@ -39,8 +39,10 @@ module Scrapers
     end
 
     def event_start_time(event_page:)
-      date_string = event_page.at_css('article.show').attr('data-date').to_s
-      time_string = event_page.css('article.show').attr('data-time').to_s
+      article = event_page.at_css('article.show')
+      date_string = article&.attr('data-date').to_s
+      time_string = article&.attr('data-time').to_s
+      raise "Missing date (article.show[data-date]) on #{event_page.uri}" if date_string.blank?
       Time.zone.parse("#{date_string}, #{time_string}")
     end
 

@@ -41,6 +41,7 @@ module Scrapers
     def event_start_time(event_page:)
       date_string = event_page.css('.event__date').text.squish[/\d{1,2}\.\d{1,2}\.\d{4}/]
       time_string = event_page.css('.sidebar time').last&.text&.squish.try(:[], /\d{2}:\d{2}/)
+      raise "Unparseable date #{event_page.css('.event__date').text.squish.inspect}" if date_string.blank?
       Time.zone.parse("#{date_string}, #{time_string}")
     end
 

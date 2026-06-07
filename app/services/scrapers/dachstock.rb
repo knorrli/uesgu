@@ -44,6 +44,7 @@ module Scrapers
 
     def event_start_time(event_container:)
       date_string = event_container.css('.event-date').text.squish
+      raise "Unparseable date #{date_string.inspect}" unless date_string =~ /\d{1,2}\.\d{1,2}\.\d{4}/
       Time.zone.parse(date_string)
     end
 

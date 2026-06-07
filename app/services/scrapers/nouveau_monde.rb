@@ -41,6 +41,7 @@ module Scrapers
     def event_start_time(event_page:)
       date_string = event_page.css('#section-schedule').children.first.text.squish[/\d{1,2}\.\d{1,2}\.\d{4}/]
       time_string = event_page.css('#section-schedule .scheduleLine').find { |node| node.text.squish.starts_with?(/Beginn|Debut/) }.text.squish[/\d{1,2}h\d{1,2}/]
+      raise "Unparseable date #{event_page.css('#section-schedule').children.first.text.squish.inspect}" if date_string.blank?
       Time.zone.parse("#{date_string}, #{time_string}")
     end
 

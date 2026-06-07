@@ -64,6 +64,8 @@ module Scrapers
       /(?<day>\d{1,2})?\.(?<month>\d{1,2})?\./ =~ date_string
       /(?<hour>\d{1,2})?:(?<minute>\d{1,2})?/ =~ time_string
 
+      raise "Unparseable date #{date_string.inspect}" if day.blank? || month.blank?
+
       @last_start_time = Time.zone.parse("#{current_year}-#{month}-#{day}, #{hour}:#{minute}")
     end
 

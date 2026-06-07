@@ -1,0 +1,27 @@
+<% content_for :title, "Notifications" %>
+
+<div class="content flex flex-col gap-large">
+  <h1>Notifications</h1>
+
+  <% if @notifications.empty? %>
+    <p>No notifications yet. We'll round up newly added events for you here.</p>
+  <% else %>
+    <ul class="notifications flex flex-col gap-medium">
+      <% @notifications.each do |notification| %>
+        <li class="<%= class_names('notification flex justify-between gap-medium', unread: !notification.read?) %>">
+          <%= link_to notification_path(notification), class: 'flex-grow flex justify-between gap-medium' do %>
+            <span class="notification-period">
+              <%= l notification.period_start.to_date %> – <%= l notification.period_end.to_date %>
+            </span>
+            <span class="notification-count">
+              <%= pluralize notification.events.count, 'new event' %>
+            </span>
+          <% end %>
+          <% unless notification.read? %>
+            <span class="badge">New</span>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

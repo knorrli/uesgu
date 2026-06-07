@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_secure_password
   has_many :sessions, dependent: :destroy
+  has_many :notifications, dependent: :destroy
 
   # Favorites: users follow locations and styles (genres stay internal).
   acts_as_taggable_on :locations, :styles

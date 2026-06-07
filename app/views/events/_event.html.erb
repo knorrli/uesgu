@@ -44,7 +44,7 @@
               <div class="flex gap-small">
                 <span class="<%= tag_icon_class(context: 'genres') %>"></span>
                 <span><%= genre %></span>
-                <% if authenticated? %>
+                <% if current_user&.admin? %>
                   <%= link_to edit_tag_path(genre), target: :blank do %>
                     <span class="ti-settings"></span>
                   <% end %>
@@ -58,7 +58,7 @@
     </div>
   </div>
 
-  <% if authenticated? %>
+  <% if current_user&.admin? %>
     <div class="event-actions">
       <%= button_to event, class: 'button', data: { turbo_method: :delete } do %>
         <span class="ti-trash"></span>

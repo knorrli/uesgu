@@ -38,6 +38,9 @@
           <% if current_user&.admin? %>
             <%= link_to 'Admin', admin_path %>
           <% end %>
+          <%= link_to notifications_path do %>
+            Notifications<% if (unread = current_user.notifications.unread.count).positive? %> (<%= unread %>)<% end %>
+          <% end %>
           <%= link_to 'Settings', settings_path %>
           <%= link_to 'Logout', session_path, data: { turbo_method: :delete } %>
         <% else %>

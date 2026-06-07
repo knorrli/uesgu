@@ -1,24 +1,78 @@
 /*
- * This is a manifest file that'll be compiled into application.css.
- *
- * With Propshaft, assets are served efficiently without preprocessing steps. You can still include
- * application-wide styles in this file, but keep in mind that CSS precedence will follow the standard
- * cascading order, meaning styles declared later in the document or manifest will override earlier ones,
- * depending on specificity.
- *
- * Consider organizing styles into separate files for maintainability.
+ * Foundation / layout. Mobile-first: styles apply to small screens by default,
+ * with min-width media queries layering on larger-screen adjustments.
+ * Brand tokens live in variables.css / theme.css.
  */
 
-.content {
-  margin: var(--gap-large) calc(30vw - 100px);
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
+/* The single page container. Full width with padding on mobile, a centered
+ * max-width column on larger screens. Replaces the old fixed 30vw margins. */
+.content {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+  padding: var(--gap-large) var(--content-padding);
+}
+
+main.content {
+  flex: 1 0 auto;
+}
+
+/* Base typography */
+h1 { font-size: var(--font-size-xl); }
+h2 { font-size: var(--font-size-lg); }
+h3 { font-size: var(--font-size-base); }
+h4, h5, h6 { font-size: var(--font-size-small); font-weight: normal; }
+
+a {
+  color: var(--theme-accent-color);
+}
+
+.muted {
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+/* Unstyled icon/action buttons (e.g. event delete) — overrides controls.css */
 .button {
   background: none;
   border: none;
   cursor: pointer;
 }
 
-.footer {
-  height: var(--gap-large);
+/* Account / auth form fields. Scoped so the events filter comboboxes
+ * (styled borderless by controls.css) keep their single wrapper border. */
+.account-form input[type="text"],
+.account-form input[type="email"],
+.account-form input[type="password"],
+.account-form select {
+  padding: var(--gap-small);
+  border: var(--border-width) solid var(--theme-accent-color);
+  background: var(--theme-bg-color);
+  max-width: 100%;
+}
+
+/* Flash messages */
+.flash {
+  padding: var(--gap-small) var(--gap-medium);
+  border: var(--border-width) solid var(--theme-accent-color);
+  margin-bottom: var(--gap-medium);
+}
+
+.flash.alert {
+  border-color: var(--theme-warn-color);
+  color: var(--theme-warn-color);
+}
+
+/* Form errors list */
+.form-errors {
+  border: var(--border-width) solid var(--theme-warn-color);
+  color: var(--theme-warn-color);
+  padding: var(--gap-small) var(--gap-large);
+  margin: 0;
 }

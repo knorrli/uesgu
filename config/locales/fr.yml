@@ -13,6 +13,13 @@ fr:
   languages:
     de: Allemand
     fr: Français
+  cantons:
+    AG: Argovie
+    BE: Berne
+    FR: Fribourg
+    LU: Lucerne
+    SO: Soleure
+    VD: Vaud
   auth:
     login_title: Connexion
     signup_title: Inscription
@@ -43,6 +50,8 @@ fr:
     language_auto: Automatique (navigateur)
     favorite_locations_heading: Lieux favoris
     favorite_locations_hint: Recevez des notifications pour les événements dans ces lieux.
+    follow_all: Tout %{name}
+    other_locations: Autres lieux
     favorite_styles_heading: Styles favoris
     email_heading: E-mail
     email_optional: (facultatif)

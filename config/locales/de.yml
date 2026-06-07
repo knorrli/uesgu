@@ -13,6 +13,13 @@ de:
   languages:
     de: Deutsch
     fr: Französisch
+  cantons:
+    AG: Aargau
+    BE: Bern
+    FR: Freiburg
+    LU: Luzern
+    SO: Solothurn
+    VD: Waadt
   auth:
     login_title: Anmelden
     signup_title: Registrieren
@@ -43,6 +50,8 @@ de:
     language_auto: Automatisch (Browser)
     favorite_locations_heading: Lieblings-Locations
     favorite_locations_hint: Erhalte Mitteilungen zu Veranstaltungen an diesen Orten.
+    follow_all: Alle in %{name}
+    other_locations: Weitere Orte
     favorite_styles_heading: Lieblings-Stile
     email_heading: E-Mail
     email_optional: (optional)

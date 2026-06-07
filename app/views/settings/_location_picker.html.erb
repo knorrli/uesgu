@@ -1,0 +1,53 @@
+<%# Canton > city > venue accordion. Every level is an existing location tag,
+    so each checkbox just follows that tag (canton/city follow all their events). %>
+<%= hidden_field_tag "user[location_list][]", "" %>
+
+<% Location.hierarchy.sort.each do |canton, cities| %>
+  <% canton_open = ([canton] + cities.keys + cities.values.flatten).any? { |n| user.location_list.include?(n) } %>
+  <details class="loc-canton" <%= 'open' if canton_open %>>
+    <summary class="loc-summary">
+      <span class="<%= tag_icon_class(context: :region) %>"></span>
+      <strong><%= canton_name(canton) %></strong> <span class="muted">(<%= canton %>)</span>
+    </summary>
+
+    <label class="loc-option loc-follow">
+      <%= check_box_tag "user[location_list][]", canton, user.location_list.include?(canton), id: "loc-#{canton.parameterize}" %>
+      <%= t('settings.follow_all', name: canton_name(canton)) %>
+    </label>
+
+    <% cities.sort.each do |city, venues| %>
+      <% city_open = ([city] + venues).any? { |n| user.location_list.include?(n) } %>
+      <details class="loc-city" <%= 'open' if city_open %>>
+        <summary class="loc-summary">
+          <span class="<%= tag_icon_class(context: :region) %>"></span> <%= city %>
+        </summary>
+
+        <label class="loc-option loc-follow">
+          <%= check_box_tag "user[location_list][]", city, user.location_list.include?(city), id: "loc-#{city.parameterize}" %>
+          <%= t('settings.follow_all', name: city) %>
+        </label>
+
+        <% venues.sort.each do |venue| %>
+          <label class="loc-option">
+            <%= check_box_tag "user[location_list][]", venue, user.location_list.include?(venue), id: "loc-#{venue.parameterize}" %>
+            <span class="<%= tag_icon_class(context: :venue) %>"></span> <%= venue %>
+          </label>
+        <% end %>
+      </details>
+    <% end %>
+  </details>
+<% end %>
+
+<% known = Location.hierarchy.flat_map { |canton, cities| [canton] + cities.keys + cities.values.flatten } %>
+<% others = (user.location_list - known).sort %>
+<% if others.any? %>
+  <details class="loc-canton" open>
+    <summary class="loc-summary"><%= t('settings.other_locations') %></summary>
+    <% others.each do |name| %>
+      <label class="loc-option">
+        <%= check_box_tag "user[location_list][]", name, true, id: "loc-#{name.parameterize}" %>
+        <span class="<%= tag_icon_class(context: Location.type_for(name)) %>"></span> <%= name %>
+      </label>
+    <% end %>
+  </details>
+<% end %>

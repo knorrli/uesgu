@@ -28,11 +28,7 @@
     <section class="flex flex-col gap-small">
       <h2><%= t('settings.favorite_locations_heading') %></h2>
       <p><%= t('settings.favorite_locations_hint') %></p>
-      <div class="chips flex flex-row wrap gap-small">
-        <%= form.collection_check_boxes :location_list, available_tags(context: :locations), :name, :name do |b| %>
-          <label class="tag"><%= b.check_box %> <%= b.text %></label>
-        <% end %>
-      </div>
+      <div class="location-picker"><%= render 'location_picker', user: @user %></div>
     </section>
 
     <section class="flex flex-col gap-small">

@@ -1,0 +1,384 @@
+<!-- BEGIN app/views/layouts/application.html.erb --><!DOCTYPE html>
+<html>
+  <head>
+    <title>üsgu</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="obpj2PKeYE9LSTaXoZ5ODa4lnsUKGCLDtzR5OgN9w6FiRlKgItjStsQZJUqrWCrjjqZ_Yim6HjkJWkS0F0-A9g" />
+    
+
+    
+
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <link rel="stylesheet" href="/assets/hotwire_combobox-f35a07fc.css" />
+    <link rel="stylesheet" href="/assets/easepick.min-03983060.css" data-turbo-track="reload" />
+    <link rel="stylesheet" href="/assets/_easepick_overrides-86f9c1ae.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/_hotwire_combobox_overrides-a3082390.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/_reset-092e8c79.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/admin-e3f50689.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/application-9b3a26f5.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/controls-0b7e364b.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/datepicker-c8964d37.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/events-04df8c07.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/flex-0ebccf0f.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/fonts-08822536.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/genre_style_assignments-19fa3452.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/grid-b2c4835f.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/layout-fe841f9e.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/locations-a97248cf.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/notifications-60f54fe6.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/tags-85cdd348.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/theme-7cd38c42.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/themify-icons-628560d4.css" data-turbo-track="reload" />
+<link rel="stylesheet" href="/assets/variables-4677bd8b.css" data-turbo-track="reload" />
+    <script type="importmap" data-turbo-track="reload">{
+  "imports": {
+    "controllers/hw_combobox_controller": "/assets/hotwire_combobox.esm-c1203551.js",
+    "application": "/assets/application-bfcdf840.js",
+    "@hotwired/turbo-rails": "/assets/turbo.min-3a2e143f.js",
+    "@hotwired/stimulus": "/assets/@hotwired--stimulus-132cbc23.js",
+    "@hotwired/stimulus-loading": "/assets/stimulus-loading-1fc53fe7.js",
+    "@easepick/bundle": "/assets/@easepick--bundle-779e1b1d.js",
+    "controllers/application": "/assets/controllers/application-3affb389.js",
+    "controllers/datepicker_controller": "/assets/controllers/datepicker_controller-69b5c92c.js",
+    "controllers/filter_controller": "/assets/controllers/filter_controller-14b2b49f.js",
+    "controllers/genre_style_assignments_controller": "/assets/controllers/genre_style_assignments_controller-a4280093.js",
+    "controllers": "/assets/controllers/index-ee64e1f1.js"
+  }
+}</script>
+<link rel="modulepreload" href="/assets/hotwire_combobox.esm-c1203551.js">
+<link rel="modulepreload" href="/assets/application-bfcdf840.js">
+<link rel="modulepreload" href="/assets/turbo.min-3a2e143f.js">
+<link rel="modulepreload" href="/assets/@hotwired--stimulus-132cbc23.js">
+<link rel="modulepreload" href="/assets/stimulus-loading-1fc53fe7.js">
+<link rel="modulepreload" href="/assets/@easepick--bundle-779e1b1d.js">
+<link rel="modulepreload" href="/assets/controllers/application-3affb389.js">
+<link rel="modulepreload" href="/assets/controllers/datepicker_controller-69b5c92c.js">
+<link rel="modulepreload" href="/assets/controllers/filter_controller-14b2b49f.js">
+<link rel="modulepreload" href="/assets/controllers/genre_style_assignments_controller-a4280093.js">
+<link rel="modulepreload" href="/assets/controllers/index-ee64e1f1.js">
+<script type="module">import "application"</script>
+  </head>
+
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="/">üsgu</a>
+        <nav class="site-nav">
+          <a href="/">Programm</a>
+            <a href="/notifications">
+              Mitteilungen
+</a>            <a href="/settings">Einstellungen</a>
+            <a data-turbo-method="delete" href="/session">Abmelden</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="content">
+      
+      
+      <!-- BEGIN app/views/settings/show.html.erb --><div class="flex flex-col gap-large">
+  <h1>Einstellungen</h1>
+
+  <form class="account-form flex flex-col gap-large" action="/settings" accept-charset="UTF-8" method="post"><input type="hidden" name="_method" value="patch" autocomplete="off" /><input type="hidden" name="authenticity_token" value="FdoxrWAtcsmFMvgKhAuhJRdN6w_LciScsWYo35Ylr7_WJgDVsGvAMApi69eOzcXLN84KqOjQGGYPCBVRghfs6A" autocomplete="off" />
+
+    <section class="flex flex-col gap-small">
+      <h2>Mitteilungen</h2>
+      <label class="flex flex-col gap-small">
+        <span>Wie oft sollen wir dich über neue Veranstaltungen informieren?</span>
+        <select name="user[notification_frequency]" id="user_notification_frequency"><option selected="selected" value="weekly">Wöchentlich</option>
+<option value="monthly">Monatlich</option></select>
+      </label>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2>Sprache</h2>
+      <select name="user[locale]" id="user_locale"><option value="">Automatisch (Browser)</option>
+<option value="de">Deutsch</option>
+<option value="fr">Französisch</option></select>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2>Lieblings-Locations</h2>
+      <p>Erhalte Mitteilungen zu Veranstaltungen an diesen Orten.</p>
+      <div class="location-picker"><!-- BEGIN app/views/settings/_location_picker.html.erb --><input type="hidden" name="user[location_list][]" id="user_location_list_" value="" autocomplete="off" />
+
+  <details class="loc-canton" >
+    <summary class="loc-summary">
+      <span class="ti-world"></span>
+      <strong>Aargau</strong> <span class="muted">(AG)</span>
+    </summary>
+
+    <label class="loc-option loc-follow">
+      <input type="checkbox" name="user[location_list][]" id="loc-ag" value="AG" />
+      Alle in Aargau
+    </label>
+
+      <details class="loc-city" >
+        <summary class="loc-summary">
+          <span class="ti-world"></span> Aarau
+        </summary>
+
+        <label class="loc-option loc-follow">
+          <input type="checkbox" name="user[location_list][]" id="loc-aarau" value="Aarau" />
+          Alle in Aarau
+        </label>
+
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-boeroem" value="Böröm" />
+            <span class="ti-home"></span> Böröm
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-kiff" value="KIFF" />
+            <span class="ti-home"></span> KIFF
+          </label>
+      </details>
+  </details>
+  <details class="loc-canton" >
+    <summary class="loc-summary">
+      <span class="ti-world"></span>
+      <strong>Bern</strong> <span class="muted">(BE)</span>
+    </summary>
+
+    <label class="loc-option loc-follow">
+      <input type="checkbox" name="user[location_list][]" id="loc-be" value="BE" />
+      Alle in Bern
+    </label>
+
+      <details class="loc-city" >
+        <summary class="loc-summary">
+          <span class="ti-world"></span> Bern
+        </summary>
+
+        <label class="loc-option loc-follow">
+          <input type="checkbox" name="user[location_list][]" id="loc-bern" value="Bern" />
+          Alle in Bern
+        </label>
+
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-dachstock" value="Dachstock" />
+            <span class="ti-home"></span> Dachstock
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-gaskessel" value="Gaskessel" />
+            <span class="ti-home"></span> Gaskessel
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-isc" value="ISC" />
+            <span class="ti-home"></span> ISC
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-mahogany-hall" value="Mahogany Hall" />
+            <span class="ti-home"></span> Mahogany Hall
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-roessli" value="Rössli" />
+            <span class="ti-home"></span> Rössli
+          </label>
+      </details>
+  </details>
+  <details class="loc-canton" >
+    <summary class="loc-summary">
+      <span class="ti-world"></span>
+      <strong>Freiburg</strong> <span class="muted">(FR)</span>
+    </summary>
+
+    <label class="loc-option loc-follow">
+      <input type="checkbox" name="user[location_list][]" id="loc-fr" value="FR" />
+      Alle in Freiburg
+    </label>
+
+      <details class="loc-city" >
+        <summary class="loc-summary">
+          <span class="ti-world"></span> Fribourg
+        </summary>
+
+        <label class="loc-option loc-follow">
+          <input type="checkbox" name="user[location_list][]" id="loc-fribourg" value="Fribourg" />
+          Alle in Fribourg
+        </label>
+
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-bad-bonn" value="Bad Bonn" />
+            <span class="ti-home"></span> Bad Bonn
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-frison" value="FriSon" />
+            <span class="ti-home"></span> FriSon
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-nouveau-monde" value="Nouveau Monde" />
+            <span class="ti-home"></span> Nouveau Monde
+          </label>
+      </details>
+  </details>
+  <details class="loc-canton" >
+    <summary class="loc-summary">
+      <span class="ti-world"></span>
+      <strong>Luzern</strong> <span class="muted">(LU)</span>
+    </summary>
+
+    <label class="loc-option loc-follow">
+      <input type="checkbox" name="user[location_list][]" id="loc-lu" value="LU" />
+      Alle in Luzern
+    </label>
+
+      <details class="loc-city" >
+        <summary class="loc-summary">
+          <span class="ti-world"></span> Luzern
+        </summary>
+
+        <label class="loc-option loc-follow">
+          <input type="checkbox" name="user[location_list][]" id="loc-luzern" value="Luzern" />
+          Alle in Luzern
+        </label>
+
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-schueuer" value="Schüür" />
+            <span class="ti-home"></span> Schüür
+          </label>
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-sedel" value="Sedel" />
+            <span class="ti-home"></span> Sedel
+          </label>
+      </details>
+  </details>
+  <details class="loc-canton" >
+    <summary class="loc-summary">
+      <span class="ti-world"></span>
+      <strong>Solothurn</strong> <span class="muted">(SO)</span>
+    </summary>
+
+    <label class="loc-option loc-follow">
+      <input type="checkbox" name="user[location_list][]" id="loc-so" value="SO" />
+      Alle in Solothurn
+    </label>
+
+      <details class="loc-city" >
+        <summary class="loc-summary">
+          <span class="ti-world"></span> Solothurn
+        </summary>
+
+        <label class="loc-option loc-follow">
+          <input type="checkbox" name="user[location_list][]" id="loc-solothurn" value="Solothurn" />
+          Alle in Solothurn
+        </label>
+
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-kofmehl" value="Kofmehl" />
+            <span class="ti-home"></span> Kofmehl
+          </label>
+      </details>
+  </details>
+  <details class="loc-canton" >
+    <summary class="loc-summary">
+      <span class="ti-world"></span>
+      <strong>Waadt</strong> <span class="muted">(VD)</span>
+    </summary>
+
+    <label class="loc-option loc-follow">
+      <input type="checkbox" name="user[location_list][]" id="loc-vd" value="VD" />
+      Alle in Waadt
+    </label>
+
+      <details class="loc-city" >
+        <summary class="loc-summary">
+          <span class="ti-world"></span> Lausanne
+        </summary>
+
+        <label class="loc-option loc-follow">
+          <input type="checkbox" name="user[location_list][]" id="loc-lausanne" value="Lausanne" />
+          Alle in Lausanne
+        </label>
+
+          <label class="loc-option">
+            <input type="checkbox" name="user[location_list][]" id="loc-docks" value="Docks" />
+            <span class="ti-home"></span> Docks
+          </label>
+      </details>
+  </details>
+
+  <details class="loc-canton" open>
+    <summary class="loc-summary">Weitere Orte</summary>
+      <label class="loc-option">
+        <input type="checkbox" name="user[location_list][]" id="loc-demo-hall" value="Demo Hall" checked="checked" />
+        <span class="ti-world"></span> Demo Hall
+      </label>
+  </details>
+<!-- END app/views/settings/_location_picker.html.erb --></div>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2>Lieblings-Stile</h2>
+      <div class="chips flex flex-row wrap gap-small">
+        <input type="hidden" name="user[style_list][]" value="" autocomplete="off" />
+          <label class="tag"><input type="checkbox" value="Blues" name="user[style_list][]" id="user_style_list_blues" /> Blues</label>
+
+          <label class="tag"><input type="checkbox" value="Classical" name="user[style_list][]" id="user_style_list_classical" /> Classical</label>
+
+          <label class="tag"><input type="checkbox" value="Country" name="user[style_list][]" id="user_style_list_country" /> Country</label>
+
+          <label class="tag"><input type="checkbox" value="Easy Listening" name="user[style_list][]" id="user_style_list_easy_listening" /> Easy Listening</label>
+
+          <label class="tag"><input type="checkbox" value="Electronic" name="user[style_list][]" id="user_style_list_electronic" /> Electronic</label>
+
+          <label class="tag"><input type="checkbox" value="Folk/Acoustic" name="user[style_list][]" id="user_style_list_folkacoustic" /> Folk/Acoustic</label>
+
+          <label class="tag"><input type="checkbox" value="Hip Hop" name="user[style_list][]" id="user_style_list_hip_hop" /> Hip Hop</label>
+
+          <label class="tag"><input type="checkbox" value="Jazz" name="user[style_list][]" id="user_style_list_jazz" /> Jazz</label>
+
+          <label class="tag"><input type="checkbox" value="Latin" name="user[style_list][]" id="user_style_list_latin" /> Latin</label>
+
+          <label class="tag"><input type="checkbox" value="Metal" name="user[style_list][]" id="user_style_list_metal" /> Metal</label>
+
+          <label class="tag"><input type="checkbox" value="New Age" name="user[style_list][]" id="user_style_list_new_age" /> New Age</label>
+
+          <label class="tag"><input type="checkbox" value="Pop" name="user[style_list][]" id="user_style_list_pop" /> Pop</label>
+
+          <label class="tag"><input type="checkbox" value="R&amp;B" name="user[style_list][]" id="user_style_list_rb" /> R&amp;B</label>
+
+          <label class="tag"><input type="checkbox" value="Rock" name="user[style_list][]" id="user_style_list_rock" /> Rock</label>
+
+          <label class="tag"><input type="checkbox" value="World/Traditional" name="user[style_list][]" id="user_style_list_worldtraditional" /> World/Traditional</label>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2>E-Mail <span class="muted">(optional)</span></h2>
+      <p>Nur nötig, falls du später Passwort-Zurücksetzen oder E-Mail-Updates möchtest.</p>
+      <input autocomplete="email" placeholder="du@beispiel.ch" type="email" name="user[email_address]" id="user_email_address" />
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2>Passwort ändern</h2>
+      <p>Leer lassen, um das aktuelle Passwort zu behalten.</p>
+      <input autocomplete="new-password" placeholder="Neues Passwort" maxlength="72" size="72" type="password" name="user[password]" id="user_password" />
+      <input autocomplete="new-password" placeholder="Neues Passwort bestätigen" maxlength="72" size="72" type="password" name="user[password_confirmation]" id="user_password_confirmation" />
+    </section>
+
+    <input type="submit" name="commit" value="Einstellungen speichern" data-disable-with="Einstellungen speichern" />
+</form>
+  <section class="flex flex-col gap-small">
+    <h2>Konto löschen</h2>
+    <p>Entfernt dein Konto und deine Favoriten endgültig.</p>
+    <form class="button_to" method="post" action="/registration"><input type="hidden" name="_method" value="delete" autocomplete="off" /><button class="button delete" data-turbo-confirm="Konto endgültig löschen? Das kann nicht rückgängig gemacht werden." type="submit">Mein Konto löschen</button><input type="hidden" name="authenticity_token" value="Z0C_1joDjUZUx3epI4hHnMhdwBJYAh6buwW64zoQ7IKkvI6u6kU_v9uXZHQpTiNy6N4htXugImEFa4dtLiKv1Q" autocomplete="off" /></form>
+  </section>
+</div>
+<!-- END app/views/settings/show.html.erb -->
+    </main>
+
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        üsgu — Konzärt für Fründe
+      </div>
+    </footer>
+  </body>
+</html>
+<!-- END app/views/layouts/application.html.erb -->

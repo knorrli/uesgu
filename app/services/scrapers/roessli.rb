@@ -34,12 +34,15 @@ module Scrapers
     end
 
     def event_start_time(event_container:)
+      # e.g. "So., 7. Juni 2026 20:00 - 23:30" or a range
+      # "Do., 11. Juni 2026 - Fr., 12. Juni 2026 21:00 - 2:30" (use the start date/time)
       event_date_string = event_container.css('.event-date').attr('datetime').to_s
-      /(?<date_string>\d{1,2}\.\s*\w{3}\s\d{4})/ =~ event_date_string
-      /(?<day>\d{1,2})\.\s*(?<month>\S{3})\s*(?<year>\d{4})/ =~ date_string
-      /(?<time_string>\d{1,2}:\d{1,2})/ =~ event_date_string
+      /(?<day>\d{1,2})\.\s*(?<month>\p{L}+)\.?\s+(?<year>\d{4})/ =~ event_date_string
+      /(?<time_string>\d{1,2}:\d{2})/ =~ event_date_string
 
-      Time.zone.parse("#{year}-#{month_number(month: month)}-#{day}, #{time_string}")
+      raise "Unparseable date #{event_date_string.inspect}" if day.blank? || month.blank? || year.blank?
+
+      Time.zone.parse("#{year}-#{month_number(month: month)}-#{day} #{time_string}")
     end
 
     def event_title(event_container:)

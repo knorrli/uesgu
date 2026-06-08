@@ -45,16 +45,25 @@ a {
   cursor: pointer;
 }
 
-/* Account / auth form fields. Scoped so the events filter comboboxes
- * (styled borderless by controls.css) keep their single wrapper border. */
+/* Account / auth form fields: underline inputs, matching the events filter bar.
+ * Scoped so the events filter comboboxes keep their own treatment. */
 .account-form input[type="text"],
 .account-form input[type="email"],
 .account-form input[type="password"],
 .account-form select {
-  padding: var(--gap-small);
-  border: var(--border-width) solid var(--theme-accent-color);
+  padding: var(--gap-small) 0;
+  border: 0;
+  border-bottom: var(--border-width) solid var(--theme-accent-color);
   background: var(--theme-bg-color);
+  color: inherit;
+  font: inherit;
   max-width: 100%;
+}
+
+.account-form input:focus,
+.account-form select:focus {
+  outline: none;
+  border-bottom-color: var(--theme-fg-color);
 }
 
 /* Flash messages */

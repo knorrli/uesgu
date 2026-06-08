@@ -16,7 +16,7 @@
     <div class="flex flex-col gap-small wrap">
 
       <% if event.locations.exists? %>
-        <div class="location-tags flex gap-small">
+        <div class="location-tags flex gap-small wrap">
           <% event.locations.each do |location| %>
             <%= button_tag type: :button, class: class_names(:tag, active: filter.location_list.include?(location.name)), data: { action: 'filter#toggleFilter', filter_field_name_param: 'l[]', filter_value_param: location.name } do %>
               <div class="flex gap-small">

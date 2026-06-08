@@ -41,6 +41,16 @@
     border-bottom: var(--border-width) solid var(--theme-accent-color);
     padding-bottom: var(--gap-medium);
 
+    /* Let the flex content column shrink and long titles wrap, so events
+       don't push past the viewport on narrow screens. */
+    .event-info {
+      min-width: 0;
+    }
+
+    .event-title {
+      overflow-wrap: anywhere;
+    }
+
     .event-details {
       margin-bottom: var(--gap-large);
     }

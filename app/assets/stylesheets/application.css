@@ -45,28 +45,92 @@ a {
   cursor: pointer;
 }
 
-/* Account / auth form fields. Scoped so the events filter comboboxes
- * (styled borderless by controls.css) keep their single wrapper border. */
+/* The delete-account button matches the form submit buttons: full width, and a
+   matching border so its height lines up (the .button reset removes borders). */
+.button.delete {
+  width: 100%;
+  border: var(--border-width) solid var(--theme-warn-color);
+}
+
+/* Account / auth form fields: underline inputs, matching the events filter bar.
+ * Scoped so the events filter comboboxes keep their own treatment. */
 .account-form input[type="text"],
 .account-form input[type="email"],
 .account-form input[type="password"],
 .account-form select {
-  padding: var(--gap-small);
-  border: var(--border-width) solid var(--theme-accent-color);
+  padding: var(--gap-small) 0;
+  border: 0;
+  border-bottom: var(--border-width) solid var(--theme-accent-color);
   background: var(--theme-bg-color);
+  color: inherit;
+  font: inherit;
   max-width: 100%;
 }
 
-/* Flash messages */
+.account-form input:focus,
+.account-form select:focus {
+  outline: none;
+  border-bottom-color: var(--theme-fg-color);
+}
+
+/* Make the select read unmistakably as a dropdown: strip the native chrome and
+   add a prominent accent chevron (the tiny native arrow was easy to miss). */
+.account-form select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 1.8em;
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='9'%20viewBox='0%200%2014%209'%3E%3Cpath%20d='M1%201l6%206%206-6'%20fill='none'%20stroke='%230e8857'%20stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.2em center;
+  background-size: 0.85em;
+}
+
+/* When the empty prompt option is showing, grey it to match input placeholders;
+   real options stay full-contrast. */
+.account-form select:has(option[value=""]:checked) {
+  color: var(--theme-fg-muted);
+}
+
+.account-form select option {
+  color: var(--theme-fg-color);
+}
+
+/* Flash messages: a fixed toast at the bottom so they never push content down;
+   auto-dismiss after a few seconds. */
+.flashes {
+  position: fixed;
+  left: 50%;
+  bottom: var(--gap-large);
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 100%;
+  max-width: var(--content-max-width);
+  padding-inline: var(--content-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+  pointer-events: none;
+}
+
 .flash {
+  pointer-events: auto;
   padding: var(--gap-small) var(--gap-medium);
   border: var(--border-width) solid var(--theme-accent-color);
-  margin-bottom: var(--gap-medium);
+  background: var(--theme-bg-color);
+  animation: flash-dismiss 0.4s ease 4.5s forwards;
 }
 
 .flash.alert {
   border-color: var(--theme-warn-color);
   color: var(--theme-warn-color);
+}
+
+@keyframes flash-dismiss {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 /* Form errors list */

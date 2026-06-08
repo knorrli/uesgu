@@ -1,66 +1,39 @@
-<article id="<%= dom_id event %>" class="flex justify-between gap-small <%= class_names(:event, past: event.start_date < Date.current.beginning_of_day) %>">
-  <div class="flex event-info flex-col gap-medium">
+<% interactive = local_assigns.fetch(:interactive, true) %>
+<article id="<%= dom_id event %>" class="<%= class_names(:event, past: event.start_date < Date.current.beginning_of_day) %>">
+  <div class="event-body">
 
-    <div class="event-details flex flex-col gap-medium">
-      <% if event.start_time.present? %>
-        <h5 class="event-time"><%= l event.start_time, format: :time %></h5>
-      <% end %>
-      <h3 class="event-title"><%= link_to event.title, event.url, target: :blank %></h3>
+    <h3 class="event-title">
+      <% if event.start_time.present? %><span class="event-time"><%= l event.start_time, format: :time %></span> <% end %><%= link_to event.url, target: :blank do %><%= event.title %> <span class="event-link-marker" aria-hidden="true">&#8599;</span><% end %>
+    </h3>
 
-      <% if event.subtitle.present? %>
-        <h4 class="event-subtitle"><%= simple_format(event.subtitle) %></h4>
-      <% end %>
-    </div>
+    <% if event.subtitle.present? %>
+      <div class="event-subtitle"><%= simple_format(event.subtitle) %></div>
+    <% end %>
 
+    <% if event.styles.any? %>
+      <div class="event-styles">
+        <% event.styles.each_with_index do |style, i| %>
+          <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
+          <%= event_filter_tag style.name, field: 's[]', value: style.name, interactive: interactive,
+                active: (interactive && (filter.style_list.include?(style.name) || filter.queries.any? { |query| style.name =~ %r{.*#{query}.*}i })) %>
+        <% end %>
+      </div>
+    <% end %>
 
-    <div class="flex flex-col gap-small wrap">
+    <% if event.genres.any? %>
+      <div class="event-genres">
+        <% event.genres.each_with_index do |genre, i| %>
+          <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
+          <span class="<%= class_names('genre', active: (interactive && filter.queries.any? { |query| genre.name =~ %r{.*#{query}.*}i })) %>"><%= genre.name %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), target: :blank, class: 'meta-edit', 'aria-label': 'Edit tag' do %><span class="ti-settings"></span><% end %><% end %></span>
+        <% end %>
+      </div>
+    <% end %>
 
-      <% if event.locations.exists? %>
-        <div class="location-tags flex gap-small wrap">
-          <% event.locations.each do |location| %>
-            <%= button_tag type: :button, class: class_names(:tag, active: filter.location_list.include?(location.name)), data: { action: 'filter#toggleFilter', filter_field_name_param: 'l[]', filter_value_param: location.name } do %>
-              <div class="flex gap-small">
-                <span class="<%= tag_icon_class(context: Location.type_for(location.name)) %>"></span>
-                <span><%= location %></span>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <% if event.styles.exists? || event.genres.exists? %>
-        <div class="style-and-genre-tags flex gap-small wrap">
-          <% event.styles.each do |style| %>
-            <%= button_tag type: :button, class: class_names(:tag, active: (filter.style_list.include?(style.name) || filter.queries.any? {|query| style.name =~ %r{.*#{query}.*}i })), data: { action: 'filter#toggleFilter', filter_field_name_param: 's[]', filter_value_param: style.name } do %>
-              <div class="flex gap-small">
-                <span class="<%= tag_icon_class(context: 'styles') %>"></span>
-                <span><%= style %></span>
-              </div>
-            <% end %>
-          <% end %>
-
-          <% event.genres.each do |genre| %>
-            <div class="<%= class_names(:tag, active: filter.queries.any? {|query| genre.name =~ %r{.*#{query}.*}i }) %>">
-              <div class="flex gap-small">
-                <span class="<%= tag_icon_class(context: 'genres') %>"></span>
-                <span><%= genre %></span>
-                <% if current_user&.admin? %>
-                  <%= link_to edit_tag_path(genre), target: :blank do %>
-                    <span class="ti-settings"></span>
-                  <% end %>
-                <% end %>
-              </div>
-            </div>
-          <% end %>
-        </div>
-      <% end %>
-
-    </div>
   </div>
 
-  <% if current_user&.admin? %>
+  <% if current_user&.admin? && interactive %>
     <div class="event-actions">
-      <%= button_to event, class: 'button', data: { turbo_method: :delete } do %>
+      <%= button_to event, class: 'button event-delete', data: { turbo_method: :delete }, 'aria-label': 'Delete event' do %>
         <span class="ti-trash"></span>
       <% end %>
     </div>

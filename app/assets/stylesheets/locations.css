@@ -1,4 +1,4 @@
-/* Canton > city > venue favorites accordion (settings). Mobile-first. */
+/* Canton > city > venue favorites picker, fully expanded. Mobile-first. */
 
 .location-picker {
   display: flex;
@@ -6,6 +6,7 @@
   gap: var(--gap-xsmall);
 }
 
+/* Nested left rules convey the canton > city hierarchy. */
 .loc-canton,
 .loc-city {
   border-left: var(--border-width) solid var(--theme-accent-muted);
@@ -17,29 +18,23 @@
   margin-block: var(--gap-xsmall);
 }
 
-.loc-summary {
-  cursor: pointer;
-  display: flex;
-  align-items: baseline;
-  gap: var(--gap-small);
-  padding: var(--gap-xsmall) 0;
-}
-
-/* checkbox rows */
 .loc-option {
   display: flex;
   align-items: baseline;
   gap: var(--gap-small);
   padding: var(--gap-xsmall) 0;
-  margin-left: var(--gap-medium);
   cursor: pointer;
 }
 
-.loc-follow {
-  color: var(--theme-fg-muted);
+.loc-region {
+  margin: 0;
 }
 
-.loc-option input,
-.loc-summary {
+/* Venues sit indented beneath their city heading. */
+.loc-venue {
+  margin-left: var(--gap-medium);
+}
+
+.loc-option input {
   flex-shrink: 0;
 }

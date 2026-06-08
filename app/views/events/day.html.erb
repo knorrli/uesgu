@@ -1,12 +1,12 @@
 <%= turbo_frame_tag 'day-detail' do %>
   <section class="day-detail event-list flex flex-col gap-small">
-    <h2 class="flex date"><%= l @date, format: :detailed %></h2>
+    <header class="day-detail-header flex">
+      <h2 class="flex date"><%= l @date, format: :detailed %></h2>
+      <button type="button" class="day-detail-close" data-action="calendar#collapse"
+              aria-label="<%= t('events.day.close') %>" title="<%= t('events.day.close') %>">✕</button>
+    </header>
     <% if @events.any? %>
-      <div class="flex flex-col gap-medium">
-        <% @events.each do |event| %>
-          <%= render event, filter: @filter %>
-        <% end %>
-      </div>
+      <%= render 'venue_groups', events: @events, filter: @filter %>
     <% else %>
       <p class="muted"><%= t('events.day.empty') %></p>
     <% end %>

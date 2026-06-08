@@ -11,14 +11,6 @@
     <% end %>
 
     <section class="flex flex-col gap-small">
-      <h2><%= t('settings.notifications_heading') %></h2>
-      <label class="flex flex-col gap-small">
-        <span><%= t('settings.frequency_label') %></span>
-        <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [t("frequencies.#{f}"), f] } %>
-      </label>
-    </section>
-
-    <section class="flex flex-col gap-small">
       <h2><%= t('settings.language_heading') %></h2>
       <%= form.select :locale,
             I18n.available_locales.map { |l| [t("languages.#{l}"), l] },
@@ -26,18 +18,11 @@
     </section>
 
     <section class="flex flex-col gap-small">
-      <h2><%= t('settings.favorite_locations_heading') %></h2>
-      <p><%= t('settings.favorite_locations_hint') %></p>
-      <div class="location-picker"><%= render 'location_picker', user: @user %></div>
-    </section>
-
-    <section class="flex flex-col gap-small">
-      <h2><%= t('settings.favorite_styles_heading') %></h2>
-      <div class="chips flex flex-row wrap gap-small">
-        <%= form.collection_check_boxes :style_list, Style.order(name: :asc), :name, :name do |b| %>
-          <label class="tag"><%= b.check_box %> <%= b.text %></label>
-        <% end %>
-      </div>
+      <h2><%= t('settings.notifications_heading') %></h2>
+      <label class="flex flex-col gap-small">
+        <span><%= t('settings.frequency_label') %></span>
+        <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [t("frequencies.#{f}"), f] } %>
+      </label>
     </section>
 
     <section class="flex flex-col gap-small">

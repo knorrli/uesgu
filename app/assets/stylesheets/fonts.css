@@ -1,3 +1,21 @@
+@font-face {
+  font-family: "Space Mono";
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url("space-mono-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Mono";
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url("space-mono-700.woff2") format("woff2");
+}
+
 body {
-  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  /* Self-hosted Space Mono — distinctive, characterful identity. System mono
+     fallbacks (SF Mono on Apple, Cascadia on Windows, etc.) cover load/failure. */
+  font-family: "Space Mono", ui-monospace, "SF Mono", "Cascadia Mono",
+    "Roboto Mono", Menlo, Consolas, monospace;
 }

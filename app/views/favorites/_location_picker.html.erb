@@ -1,0 +1,43 @@
+<%# Canton > city > venue, fully expanded so you can see everything you follow at
+    a glance. Every level is an existing location tag; checking a canton/city
+    follows all of its events, checking a venue follows just that venue. %>
+<%= hidden_field_tag "user[location_list][]", "" %>
+
+<% Location.hierarchy.sort.each do |canton, cities| %>
+  <div class="loc-canton">
+    <label class="loc-option loc-region loc-canton-head">
+      <%= check_box_tag "user[location_list][]", canton, user.location_list.include?(canton), id: "loc-#{canton.parameterize}" %>
+      <strong><%= canton_name(canton) %></strong> <span class="muted">(<%= canton %>)</span>
+    </label>
+
+    <% cities.sort.each do |city, venues| %>
+      <div class="loc-city">
+        <label class="loc-option loc-region">
+          <%= check_box_tag "user[location_list][]", city, user.location_list.include?(city), id: "loc-#{city.parameterize}" %>
+          <%= city %>
+        </label>
+
+        <% venues.sort.each do |venue| %>
+          <label class="loc-option loc-venue">
+            <%= check_box_tag "user[location_list][]", venue, user.location_list.include?(venue), id: "loc-#{venue.parameterize}" %>
+            <%= venue %>
+          </label>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
+<% known = Location.hierarchy.flat_map { |canton, cities| [canton] + cities.keys + cities.values.flatten } %>
+<% others = (user.location_list - known).sort %>
+<% if others.any? %>
+  <div class="loc-canton">
+    <p class="loc-region"><strong><%= t('settings.other_locations') %></strong></p>
+    <% others.each do |name| %>
+      <label class="loc-option loc-venue">
+        <%= check_box_tag "user[location_list][]", name, true, id: "loc-#{name.parameterize}" %>
+        <%= name %>
+      </label>
+    <% end %>
+  </div>
+<% end %>

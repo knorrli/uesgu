@@ -6,7 +6,10 @@ class SettingsController < ApplicationController
 
   def update
     if @user.update(settings_params)
-      redirect_to settings_path, notice: t("settings.saved")
+      # Re-evaluate the locale from the just-saved preference so the flash is in
+      # the newly chosen language (set_locale ran before the update).
+      set_locale
+      redirect_to settings_path, notice: t('settings.saved')
     else
       render :show, status: :unprocessable_entity
     end
@@ -20,7 +23,7 @@ class SettingsController < ApplicationController
 
   def settings_params
     permitted = params.expect(
-      user: [:notification_frequency, :locale, :email_address, :password, :password_confirmation, { location_list: [], style_list: [] }]
+      user: [:notification_frequency, :locale, :email_address, :password, :password_confirmation]
     )
 
     # Blank password means "leave it unchanged" rather than clearing it.

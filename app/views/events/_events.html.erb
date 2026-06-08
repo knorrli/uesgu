@@ -1,13 +1,9 @@
 <section id="events" class="flex flex-col gap-xlarge event-list">
   <% events_by_date = @events.group_by(&:start_date) %>
   <% events_by_date.each do |date, events| %>
-    <div class="flex flex-col gap-small date-events <%= class_names(past: date < Date.current.beginning_of_day) %>">
+    <div class="flex flex-col gap-medium date-events <%= class_names(past: date < Date.current.beginning_of_day) %>">
       <h2 id="<%= date.iso8601 %>" class="flex date"><%= l date, format: :detailed %></h2>
-      <div class="flex flex-col gap-medium">
-        <% events.each do |event| %>
-          <%= render event, filter: @filter %>
-        <% end %>
-      </div>
+      <%= render 'venue_groups', events: events, filter: @filter %>
     </div>
   <% end %>
 

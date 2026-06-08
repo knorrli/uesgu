@@ -4,6 +4,7 @@ en:
     events: Programme
     admin: Admin
     notifications: Notifications
+    favorites: Favorites
     settings: Settings
     logout: Log out
     login: Log in
@@ -35,13 +36,25 @@ en:
     log_in_link: Log in
     invalid_credentials: Try another username or password.
     rate_limited: Try again later.
-    notify_label: Notify me about new events
+    notify_label: Don't notify me about new events
   registrations:
     welcome: Welcome to üsgu!
     account_deleted: Your account was deleted.
   frequencies:
+    daily: Daily
     weekly: Weekly
+    biweekly: Every two weeks
     monthly: Monthly
+    never: Never
+  simple_calendar:
+    previous: Previous
+    today: Today
+    next: Next
+  favorites:
+    title: Favorites
+    intro: Choose the venues and styles you follow — they're highlighted in the calendar and shape your notifications.
+    saved: Favorites saved.
+    save: Save favorites
   settings:
     title: Settings
     saved: Settings saved.
@@ -159,6 +172,7 @@ en:
     day:
       prompt: Tap a day to see its events.
       empty: No events on this day.
+      close: Close
     calendar:
       more:
         one: +1 more

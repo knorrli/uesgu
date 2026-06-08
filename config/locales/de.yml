@@ -4,6 +4,7 @@ de:
     events: Programm
     admin: Admin
     notifications: Mitteilungen
+    favorites: Favoriten
     settings: Einstellungen
     logout: Abmelden
     login: Anmelden
@@ -35,13 +36,25 @@ de:
     log_in_link: Anmelden
     invalid_credentials: Versuche es mit einem anderen Benutzernamen oder Passwort.
     rate_limited: Versuche es später erneut.
-    notify_label: Über neue Veranstaltungen informieren
+    notify_label: Nicht über neue Veranstaltungen informieren
   registrations:
     welcome: Willkommen bei üsgu!
     account_deleted: Dein Konto wurde gelöscht.
   frequencies:
+    daily: Täglich
     weekly: Wöchentlich
+    biweekly: Alle zwei Wochen
     monthly: Monatlich
+    never: Nie
+  simple_calendar:
+    previous: Zurück
+    today: Heute
+    next: Weiter
+  favorites:
+    title: Favoriten
+    intro: Wähle die Locations und Stile, denen du folgst – sie werden im Kalender hervorgehoben und bestimmen deine Mitteilungen.
+    saved: Favoriten gespeichert.
+    save: Favoriten speichern
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.
@@ -159,6 +172,7 @@ de:
     day:
       prompt: Tippe auf einen Tag, um die Events zu sehen.
       empty: Keine Events an diesem Tag.
+      close: Schliessen
     calendar:
       more:
         one: +1 mehr

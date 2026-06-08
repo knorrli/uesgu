@@ -17,28 +17,14 @@
     <%= @only_relevant ? t('notifications.show.empty_relevant') : t('notifications.show.empty_all') %>
   </p>
 <% else %>
-  <% @events.group_by(&:start_date).each do |date, events| %>
-    <section class="event-day <%= class_names(past: date < Date.current.beginning_of_day) %>">
-      <h2 class="event-day__heading"><%= l date, format: :detailed %></h2>
-      <% events.each do |event| %>
-        <article class="event-card">
-          <% if event.start_time.present? %>
-            <span class="event-card__time"><%= l event.start_time, format: :time %></span>
-          <% end %>
-          <h3 class="event-card__title"><%= link_to event.title, event.url, target: :blank %></h3>
-          <% if event.subtitle.present? %>
-            <%= simple_format(event.subtitle, class: "muted") %>
-          <% end %>
-          <div class="event-card__tags">
-            <% event.locations.each do |location| %>
-              <span class="tag"><span class="<%= tag_icon_class(context: Location.type_for(location.name)) %>"></span> <%= location %></span>
-            <% end %>
-            <% event.styles.each do |style| %>
-              <span class="tag"><span class="<%= tag_icon_class(context: 'styles') %>"></span> <%= style %></span>
-            <% end %>
-          </div>
-        </article>
-      <% end %>
-    </section>
-  <% end %>
+  <div class="event-list flex flex-col gap-xlarge">
+    <% @events.group_by(&:start_date).each do |date, events| %>
+      <div class="date-events flex flex-col gap-medium <%= class_names(past: date < Date.current.beginning_of_day) %>">
+        <h2 class="date"><%= l date, format: :detailed %></h2>
+        <%# Read-only reuse of the events list rendering: tags become links to the
+            filtered list rather than live filter toggles. %>
+        <%= render 'events/venue_groups', events: events, filter: nil, interactive: false %>
+      </div>
+    <% end %>
+  </div>
 <% end %>

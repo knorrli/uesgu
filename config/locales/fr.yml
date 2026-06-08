@@ -4,6 +4,7 @@ fr:
     events: Programme
     admin: Admin
     notifications: Notifications
+    favorites: Favoris
     settings: Paramètres
     logout: Déconnexion
     login: Connexion
@@ -35,13 +36,25 @@ fr:
     log_in_link: Se connecter
     invalid_credentials: Essayez un autre nom d'utilisateur ou mot de passe.
     rate_limited: Réessayez plus tard.
-    notify_label: M'informer des nouveaux événements
+    notify_label: Ne pas m'informer des nouveaux événements
   registrations:
     welcome: Bienvenue sur üsgu !
     account_deleted: Votre compte a été supprimé.
   frequencies:
+    daily: Quotidien
     weekly: Hebdomadaire
+    biweekly: Toutes les deux semaines
     monthly: Mensuel
+    never: Jamais
+  simple_calendar:
+    previous: Précédent
+    today: Aujourd'hui
+    next: Suivant
+  favorites:
+    title: Favoris
+    intro: Choisissez les lieux et styles que vous suivez — ils sont mis en avant dans le calendrier et déterminent vos notifications.
+    saved: Favoris enregistrés.
+    save: Enregistrer les favoris
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.
@@ -159,6 +172,7 @@ fr:
     day:
       prompt: Touchez un jour pour voir ses événements.
       empty: Aucun événement ce jour-là.
+      close: Fermer
     calendar:
       more:
         one: +1 de plus

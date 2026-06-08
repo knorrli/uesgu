@@ -1,6 +1,8 @@
+/* Filter fields as underlined inputs rather than full boxes — lighter, reads as
+   a form line, consistent with the de-boxed list below. */
 .input-wrapper {
-  padding: var(--gap-small);
-  border: var(--border-width) solid var(--border-color);
+  padding: var(--gap-small) 0;
+  border-bottom: var(--border-width) solid var(--theme-accent-color);
   line-height: var(--filter-input-line-height);
   position: relative;
 
@@ -30,38 +32,158 @@
   line-height: var(--filter-input-line-height);
 }
 
+/* Date group heading: a single hairline rule instead of the old 5px double
+   border — a quiet section divider, not a decorative slab. */
 .date {
+  color: var(--theme-fg-color);
+  font-weight: bold;
+  padding-bottom: var(--gap-small);
+  border-bottom: var(--calendar-border-width) solid var(--theme-accent-color);
+}
+
+/* Venue-led row, zero boxes. One rule does the work: green = a clickable
+   filter (matching every link on the site), muted grey = passive info, black =
+   the event itself. The venue is the headline; time/genres stay quiet. */
+.event {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-medium);
+}
+
+.event-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}
+
+/* Clickable filter terms: plain accent-coloured text, no border/fill. */
+.filter-link {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
   color: var(--theme-accent-color);
-  border-bottom: 5px solid var(--theme-accent-color);
-  border-bottom-style: double;
+  cursor: pointer;
 }
 
-.event-list {
-  .event {
-    border-bottom: var(--border-width) solid var(--theme-accent-color);
-    padding-bottom: var(--gap-medium);
-
-    /* Let the flex content column shrink and long titles wrap, so events
-       don't push past the viewport on narrow screens. */
-    .event-info {
-      min-width: 0;
-    }
-
-    .event-title {
-      overflow-wrap: anywhere;
-    }
-
-    .event-details {
-      margin-bottom: var(--gap-large);
-    }
-  }
+.filter-link:hover {
+  text-decoration: underline;
 }
 
+/* An applied filter is underlined so you can see what's currently narrowing
+   the list. */
+.filter-link.active {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Venue is the headline: the largest, boldest thing in the row. */
+.event-where .venue {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+}
+
+.event-title {
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+.event-title a {
+  color: var(--theme-fg-color);
+  text-decoration: none;
+}
+
+.event-title a:hover {
+  text-decoration: underline;
+}
+
+.event-link-marker {
+  color: var(--theme-accent-color);
+  font-weight: normal;
+}
+
+/* Time leads the title at full size but in muted grey, so it reads before the
+   act without competing with the venue headline above it. */
+.event-time {
+  margin-right: 0.8ch;
+  color: var(--theme-fg-muted);
+  font-weight: normal;
+}
+
+.event-subtitle {
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+.event-subtitle p {
+  margin: 0;
+}
+
+.event-styles,
+.event-genres {
+  font-size: var(--font-size-small);
+}
+
+/* Genres are display-only (not filters): muted, so the colour alone says
+   "not clickable". */
+.event-genres {
+  color: var(--theme-fg-muted);
+}
+
+.event-genres .genre.active {
+  color: var(--theme-accent-color);
+}
+
+.meta-edit {
+  margin-left: 0.4ch;
+  color: var(--theme-fg-muted);
+}
+
+/* Real, inert separator between terms — a sibling element, not a pseudo on the
+   button, so only the link text is hoverable/clickable, never the dot. */
+.sep {
+  margin: 0 0.5ch;
+  color: var(--theme-fg-muted);
+  font-weight: normal;
+}
+
+/* Admin delete: a quiet line-icon, not a boxed button. */
+.event-delete {
+  color: var(--theme-fg-muted);
+}
+
+.event-delete:hover {
+  color: var(--theme-warn-color);
+}
+
+/* Past events recede but stay legible. */
+.event.past,
+.date-events.past .date {
+  opacity: 0.5;
+}
+
+/* List / Calendar as a plain text toggle, not filled buttons: the active view
+   is bold accent, the other a muted link. */
 .view-switcher {
+  gap: var(--gap-medium);
+
+  .button {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--theme-fg-muted);
+    text-decoration: none;
+  }
+
+  .button:hover {
+    text-decoration: underline;
+  }
+
   .button.active {
-    border-color: var(--theme-accent-color);
-    background-color: var(--theme-accent-color);
-    color: var(--theme-bg-color);
+    color: var(--theme-accent-color);
+    font-weight: bold;
+    background: none;
   }
 }
 
@@ -72,38 +194,50 @@
     border-collapse: collapse;
   }
 
+  .calendar-heading {
+    margin-bottom: var(--gap-small);
+  }
+
+  /* The month anchors the calendar — bold, but no taller than the toolbar so the
+     view switcher stays pinned to the same spot as in list view. */
+  .calendar-title {
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+  }
+
   th {
     padding: var(--gap-small);
     text-align: center;
+    font-weight: normal;
+    color: var(--theme-fg-muted);
+    /* A thicker accent rule under the weekday header, mirroring the list date. */
+    border-bottom: var(--border-width) solid var(--theme-accent-color);
   }
 
+  /* A defined hairline grid (no fills) keeps cells distinguishable without the
+     heavy filled boxes of before. */
   .day {
     position: relative;
-    border: var(--calendar-border-width) solid var(--border-color);
+    border: var(--calendar-border-width) solid var(--theme-accent-color);
     /* Minimum height; busy cells grow to fit their in-flow .day-content. */
     height: 7rem;
     vertical-align: top;
 
-    &.current-month {
+    /* Adjacent-month days recede instead of being filled differently. */
+    &.prev-month, &.next-month {
+      opacity: 0.4;
+    }
+
+    /* Hover: a soft darker-pink wash, not a flat accent fill. */
+    &:has(.calendar-day-link:hover) {
       background-color: var(--theme-bg-muted);
     }
 
-    &.prev-month, &.next-month {
-      color: var(--theme-fg-muted);
-    }
-
-    /* Highlight the whole cell when its overlay link is hovered/selected. */
-    &:has(.calendar-day-link:hover) {
-      background-color: var(--theme-accent-muted);
-    }
-
+    /* Selected: an inset accent frame that ties the day to its drawer below,
+       rather than flooding the cell. */
     &:has(.calendar-day-link.selected) {
-      background-color: var(--theme-accent-color);
-      color: var(--theme-bg-color);
-
-      .day-venue.favorite .day-venue-name,
-      .day-venue-count,
-      .calendar-day-number.today { color: inherit; }
+      background-color: var(--theme-bg-muted);
+      box-shadow: inset 0 0 0 var(--border-width) var(--theme-accent-color);
     }
   }
 
@@ -120,12 +254,18 @@
 
   .calendar-day-number {
     display: block;
-    text-align: right;
+    text-align: left;
     font-size: var(--font-size-small);
 
+    /* Today: a filled accent badge so it can't get lost in the grid. Stays
+       display:block (shrink-wrapped) so it keeps the same line height as plain
+       day numbers — an inline-block badge would push the cell's venues down. */
     &.today {
+      width: fit-content;
       font-weight: bold;
-      color: var(--theme-accent-color);
+      padding: 0 0.45em;
+      color: var(--theme-bg-color);
+      background-color: var(--theme-accent-color);
     }
   }
 
@@ -173,9 +313,53 @@
     .day-venues { display: block; }
     .day-count { display: none; }
   }
+
+  /* Inline expanding row: the day-detail frame rendered full-width beneath the
+     week of the clicked day. The lighter page background (vs. the muted cells)
+     plus bold accent rules top and bottom frame it as a distinct drawer lifted
+     out of the calendar grid, rather than blending in as just another cell. */
+  .day-detail-row td {
+    border: 0;
+    border-block: var(--border-width) solid var(--theme-accent-color);
+    padding: var(--gap-large);
+    background-color: var(--theme-bg-color);
+  }
 }
 
 .day-detail {
   border-top: var(--border-width) solid var(--theme-accent-color);
   padding-top: var(--gap-medium);
+}
+
+/* Inside the inline row the cell already supplies the frame; the accent divider
+   and padding above would be redundant. */
+.day-detail-row .day-detail {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.day-detail-header {
+  align-items: center;
+  gap: var(--gap-small);
+}
+
+/* The date keeps its full-width double underline; the close button caps it. */
+.day-detail-header .date {
+  flex: 1;
+}
+
+.day-detail-close {
+  flex: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--theme-accent-color);
+  cursor: pointer;
+}
+
+.day-detail-close:hover,
+.day-detail-close:focus-visible {
+  color: var(--theme-fg-color);
 }

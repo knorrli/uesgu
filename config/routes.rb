@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create destroy]
   get 'signup', to: 'registrations#new'
   resource :settings, only: %i[show update]
+  resource :favorites, only: %i[show update]
   resources :notifications, only: %i[index show]
 
   resources :events, only: [:index, :destroy] do

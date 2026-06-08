@@ -1,8 +1,10 @@
 <% content_for :title, t('events.index.title') %>
 
-<div class="flex flex-col gap-xlarge align-stretch" data-controller="filter">
+<div class="flex flex-col gap-large align-stretch" data-controller="filter">
   <%= render 'filter', filter: @filter %>
 
+  <%# Toggle sits on its own row above the content in both views, so the first
+      bold header (calendar's month / list's first date) aligns across views. %>
   <%= render 'view_switcher', view: @view %>
 
   <% if @view == 'calendar' %>

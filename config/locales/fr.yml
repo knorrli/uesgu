@@ -55,6 +55,7 @@ fr:
     intro: Choisissez les lieux et styles que vous suivez — ils sont mis en avant dans le calendrier et déterminent vos notifications.
     saved: Favoris enregistrés.
     save: Enregistrer les favoris
+    toggle: 'Suivre ou ne plus suivre %{name}'
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.

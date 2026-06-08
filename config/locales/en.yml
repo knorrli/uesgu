@@ -55,6 +55,7 @@ en:
     intro: Choose the venues and styles you follow — they're highlighted in the calendar and shape your notifications.
     saved: Favorites saved.
     save: Save favorites
+    toggle: 'Follow or unfollow %{name}'
   settings:
     title: Settings
     saved: Settings saved.

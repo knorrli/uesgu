@@ -14,7 +14,7 @@
       <div class="event-styles">
         <% event.styles.each_with_index do |style, i| %>
           <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <%= event_filter_tag style.name, field: 's[]', value: style.name, interactive: interactive,
+          <%= event_filter_tag style.name, field: 's[]', value: style.name, interactive: interactive, favorite_type: :style,
                 active: (interactive && (filter.style_list.include?(style.name) || filter.queries.any? { |query| style.name =~ %r{.*#{query}.*}i })) %>
         <% end %>
       </div>

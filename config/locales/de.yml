@@ -55,6 +55,7 @@ de:
     intro: Wähle die Locations und Stile, denen du folgst – sie werden im Kalender hervorgehoben und bestimmen deine Mitteilungen.
     saved: Favoriten gespeichert.
     save: Favoriten speichern
+    toggle: '%{name} folgen oder entfolgen'
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.

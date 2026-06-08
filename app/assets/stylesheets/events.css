@@ -140,6 +140,35 @@
   color: var(--theme-fg-muted);
 }
 
+/* Inline follow toggle: a quiet heart trailing each location/style tag. Muted
+   when not followed, accent-green when followed — colour carries state, since
+   themify ships only an outline heart, matching the "green = active" language. */
+.fav-toggle {
+  border: 0;
+  padding: 0;
+  margin-left: 0.4ch;
+  background: none;
+  font: inherit;
+  line-height: 1;
+  color: var(--theme-fg-muted);
+  cursor: pointer;
+}
+
+/* Outline heart by default, solid when followed — the fill carries state and
+   the accent colour reinforces it (the "green = active" language). */
+.fav-toggle::before {
+  content: "\2661";
+}
+
+.fav-toggle.followed::before {
+  content: "\2665";
+}
+
+.fav-toggle:hover,
+.fav-toggle.followed {
+  color: var(--theme-accent-color);
+}
+
 /* Real, inert separator between terms — a sibling element, not a pseudo on the
    button, so only the link text is hoverable/clickable, never the dot. */
 .sep {
@@ -269,6 +298,19 @@
     }
   }
 
+  /* A followed location or style on this day: a small solid heart tucked into
+     the top-right corner. Decorative and click-through, so the full-cell day
+     link underneath still receives the tap. */
+  .day-favorite-marker {
+    position: absolute;
+    top: var(--gap-small);
+    right: var(--gap-small);
+    font-size: var(--font-size-small);
+    line-height: 1;
+    color: var(--theme-accent-color);
+    pointer-events: none;
+  }
+
   /* Wide screens: a deduped, favorites-first venue summary. Titles are dropped
      (they never fit a 1/7 column); full detail is one tap away in the panel. */
   .day-venues {
@@ -284,11 +326,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    &.favorite .day-venue-name {
-      font-weight: bold;
-      color: var(--theme-accent-color);
-    }
 
     &.more {
       color: var(--theme-fg-muted);

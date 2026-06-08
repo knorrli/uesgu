@@ -152,6 +152,17 @@ en:
   events:
     index:
       title: üsgu
+      view:
+        label: View
+        list: List
+        calendar: Calendar
+    day:
+      prompt: Tap a day to see its events.
+      empty: No events on this day.
+    calendar:
+      more:
+        one: +1 more
+        other: "+%{count} more"
     filter:
       what: What?
       when: When?

@@ -152,6 +152,17 @@ fr:
   events:
     index:
       title: üsgu
+      view:
+        label: Vue
+        list: Liste
+        calendar: Calendrier
+    day:
+      prompt: Touchez un jour pour voir ses événements.
+      empty: Aucun événement ce jour-là.
+    calendar:
+      more:
+        one: +1 de plus
+        other: "+%{count} de plus"
     filter:
       what: Quoi ?
       when: Quand ?

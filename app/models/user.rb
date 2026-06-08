@@ -16,6 +16,7 @@ class User < ApplicationRecord
   validates :email_address, uniqueness: true, allow_nil: true
   validates :notification_frequency, inclusion: { in: FREQUENCIES }
   validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }, allow_blank: true
+  validates :events_view, inclusion: { in: %w[list calendar] }, allow_nil: true
 
   def admin?
     admin

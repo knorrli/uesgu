@@ -20,7 +20,11 @@ Rails.application.routes.draw do
   resource :settings, only: %i[show update]
   resources :notifications, only: %i[index show]
 
-  resources :events, only: [:index, :destroy]
+  resources :events, only: [:index, :destroy] do
+    collection do
+      get :day
+    end
+  end
   resources :styles, only: :index do
     collection do
       post :chips

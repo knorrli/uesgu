@@ -36,11 +36,136 @@
   border-bottom-style: double;
 }
 
-.event {
-  border-bottom: var(--border-width) solid var(--theme-accent-color);
-  padding-bottom: var(--gap-medium);
+.event-list {
+  .event {
+    border-bottom: var(--border-width) solid var(--theme-accent-color);
+    padding-bottom: var(--gap-medium);
 
-  .event-details {
-    margin-bottom: var(--gap-large);
+    .event-details {
+      margin-bottom: var(--gap-large);
+    }
   }
+}
+
+.view-switcher {
+  .button.active {
+    border-color: var(--theme-accent-color);
+    background-color: var(--theme-accent-color);
+    color: var(--theme-bg-color);
+  }
+}
+
+.simple-calendar {
+  .table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    padding: var(--gap-small);
+    text-align: center;
+  }
+
+  .day {
+    position: relative;
+    border: var(--calendar-border-width) solid var(--border-color);
+    /* Minimum height; busy cells grow to fit their in-flow .day-content. */
+    height: 7rem;
+    vertical-align: top;
+
+    &.current-month {
+      background-color: var(--theme-bg-muted);
+    }
+
+    &.prev-month, &.next-month {
+      color: var(--theme-fg-muted);
+    }
+
+    /* Highlight the whole cell when its overlay link is hovered/selected. */
+    &:has(.calendar-day-link:hover) {
+      background-color: var(--theme-accent-muted);
+    }
+
+    &:has(.calendar-day-link.selected) {
+      background-color: var(--theme-accent-color);
+      color: var(--theme-bg-color);
+
+      .day-venue.favorite .day-venue-name,
+      .day-venue-count,
+      .calendar-day-number.today { color: inherit; }
+    }
+  }
+
+  .day-content {
+    padding: var(--gap-small);
+  }
+
+  /* Transparent click target covering the cell's full (row) height. */
+  .calendar-day-link {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+  }
+
+  .calendar-day-number {
+    display: block;
+    text-align: right;
+    font-size: var(--font-size-small);
+
+    &.today {
+      font-weight: bold;
+      color: var(--theme-accent-color);
+    }
+  }
+
+  /* Wide screens: a deduped, favorites-first venue summary. Titles are dropped
+     (they never fit a 1/7 column); full detail is one tap away in the panel. */
+  .day-venues {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .day-venue {
+    font-size: 70%;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.favorite .day-venue-name {
+      font-weight: bold;
+      color: var(--theme-accent-color);
+    }
+
+    &.more {
+      color: var(--theme-fg-muted);
+      font-style: italic;
+    }
+  }
+
+  .day-venue-count {
+    color: var(--theme-fg-muted);
+  }
+
+  /* Narrow screens (mobile-first default): a count instead of unreadable text. */
+  .day-count {
+    display: block;
+    margin-top: var(--gap-small);
+    text-align: center;
+    font-size: var(--font-size-small);
+    color: var(--theme-fg-muted);
+  }
+
+  @media (min-width: 600px) {
+    .day-venues { display: block; }
+    .day-count { display: none; }
+  }
+}
+
+.day-detail {
+  border-top: var(--border-width) solid var(--theme-accent-color);
+  padding-top: var(--gap-medium);
 }

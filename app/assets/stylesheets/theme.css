@@ -6,6 +6,7 @@ body {
 
   --border-width: 2px;
   --tag-border-width: 1px;
+  --calendar-border-width: 1px;
   --border-color: var(--theme-accent-color);
 
   --theme-bg-color: var(--color-background);

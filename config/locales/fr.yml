@@ -152,6 +152,10 @@ fr:
   events:
     index:
       title: üsgu
+      view:
+        label: Vue
+        list: Liste
+        calendar: Calendrier
     filter:
       what: Quoi ?
       when: Quand ?

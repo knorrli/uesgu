@@ -60,6 +60,9 @@ gem 'solid_queue'
 # Tracking Jobs
 gem "mission_control-jobs"
 
+# Calendar View
+gem 'simple_calendar'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/ndebugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

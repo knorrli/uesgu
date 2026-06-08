@@ -1,0 +1,23 @@
+<% list_params = request.query_parameters.except('view', 'start_date', 'page', 'd') %>
+<section id="calendar" class="event-calendar">
+  <%= month_calendar(start_date: @calendar_start, events: events, attribute: :start_date) do |date, day_events| %>
+    <% number = class_names('calendar-day-number', today: date == Date.current) %>
+    <% if day_events.any? %>
+      <%# Open this day in the list view (full details: venue, time, tags). Filter to the
+          single day so it isn't buried on a later page; anchor scrolls to the day heading. %>
+      <% day_path = events_path(list_params.merge('view' => 'list', 'd' => ["#{date.iso8601} - #{date.iso8601}"])) %>
+      <%= link_to date.day, "#{day_path}##{date.iso8601}", class: number %>
+    <% else %>
+      <div class="<%= number %>"><%= date.day %></div>
+    <% end %>
+
+    <% day_events.each do |event| %>
+      <% tooltip = [(l(event.start_time, format: :time) if event.start_time), event.venue&.name, event.title].compact.join(' · ') %>
+      <div class="event">
+        <%= link_to event.url, target: :blank, title: tooltip do %>
+          <% if event.venue %><span class="event-venue"><%= event.venue.name %></span> <% end %><span class="event-title"><%= event.title %></span>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</section>

@@ -348,6 +348,8 @@ GEM
     rubyntlm (0.6.5)
       base64
     securerandom (0.4.1)
+    simple_calendar (3.1.0)
+      rails (>= 6.1)
     solid_queue (1.2.0)
       activejob (>= 7.1)
       activerecord (>= 7.1)
@@ -428,6 +430,7 @@ DEPENDENCIES
   rails-i18n (~> 8.0.0)
   ransack
   rubocop-rails-omakase
+  simple_calendar
   solid_queue
   stimulus-rails
   thruster

@@ -152,6 +152,10 @@ de:
   events:
     index:
       title: üsgu
+      view:
+        label: Ansicht
+        list: Liste
+        calendar: Kalender
     filter:
       what: Was?
       when: Wann?

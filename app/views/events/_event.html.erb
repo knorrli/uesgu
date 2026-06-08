@@ -1,3 +1,4 @@
+<% interactive = local_assigns.fetch(:interactive, true) %>
 <article id="<%= dom_id event %>" class="<%= class_names(:event, past: event.start_date < Date.current.beginning_of_day) %>">
   <div class="event-body">
 
@@ -13,9 +14,8 @@
       <div class="event-styles">
         <% event.styles.each_with_index do |style, i| %>
           <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <%= button_tag style.name, type: :button,
-                class: class_names('filter-link', active: (filter.style_list.include?(style.name) || filter.queries.any? { |query| style.name =~ %r{.*#{query}.*}i })),
-                data: { action: 'filter#toggleFilter', filter_field_name_param: 's[]', filter_value_param: style.name } %>
+          <%= event_filter_tag style.name, field: 's[]', value: style.name, interactive: interactive,
+                active: (interactive && (filter.style_list.include?(style.name) || filter.queries.any? { |query| style.name =~ %r{.*#{query}.*}i })) %>
         <% end %>
       </div>
     <% end %>
@@ -24,14 +24,14 @@
       <div class="event-genres">
         <% event.genres.each_with_index do |genre, i| %>
           <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <span class="<%= class_names('genre', active: filter.queries.any? { |query| genre.name =~ %r{.*#{query}.*}i }) %>"><%= genre.name %><% if current_user&.admin? %><%= link_to edit_tag_path(genre), target: :blank, class: 'meta-edit', 'aria-label': 'Edit tag' do %><span class="ti-settings"></span><% end %><% end %></span>
+          <span class="<%= class_names('genre', active: (interactive && filter.queries.any? { |query| genre.name =~ %r{.*#{query}.*}i })) %>"><%= genre.name %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), target: :blank, class: 'meta-edit', 'aria-label': 'Edit tag' do %><span class="ti-settings"></span><% end %><% end %></span>
         <% end %>
       </div>
     <% end %>
 
   </div>
 
-  <% if current_user&.admin? %>
+  <% if current_user&.admin? && interactive %>
     <div class="event-actions">
       <%= button_to event, class: 'button event-delete', data: { turbo_method: :delete }, 'aria-label': 'Delete event' do %>
         <span class="ti-trash"></span>

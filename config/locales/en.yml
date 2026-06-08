@@ -4,6 +4,7 @@ en:
     events: Programme
     admin: Admin
     notifications: Notifications
+    favorites: Favorites
     settings: Settings
     logout: Log out
     login: Log in
@@ -49,6 +50,11 @@ en:
     previous: Previous
     today: Today
     next: Next
+  favorites:
+    title: Favorites
+    intro: Choose the venues and styles you follow — they're highlighted in the calendar and shape your notifications.
+    saved: Favorites saved.
+    save: Save favorites
   settings:
     title: Settings
     saved: Settings saved.

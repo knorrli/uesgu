@@ -4,6 +4,7 @@ fr:
     events: Programme
     admin: Admin
     notifications: Notifications
+    favorites: Favoris
     settings: Paramètres
     logout: Déconnexion
     login: Connexion
@@ -49,6 +50,11 @@ fr:
     previous: Précédent
     today: Aujourd'hui
     next: Suivant
+  favorites:
+    title: Favoris
+    intro: Choisissez les lieux et styles que vous suivez — ils sont mis en avant dans le calendrier et déterminent vos notifications.
+    saved: Favoris enregistrés.
+    save: Enregistrer les favoris
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.

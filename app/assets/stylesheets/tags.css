@@ -24,3 +24,22 @@ button.tag {
   font-size: 75%;
   line-height: 1;
 }
+
+/* Selectable chip (favorite styles): the chip itself shows selection, so hide
+   the native checkbox and fill the chip with accent when checked. */
+label.tag {
+  cursor: pointer;
+}
+
+label.tag input[type="checkbox"] {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+label.tag:has(input:checked) {
+  background-color: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+}

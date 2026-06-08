@@ -4,6 +4,7 @@ de:
     events: Programm
     admin: Admin
     notifications: Mitteilungen
+    favorites: Favoriten
     settings: Einstellungen
     logout: Abmelden
     login: Anmelden
@@ -49,6 +50,11 @@ de:
     previous: Zurück
     today: Heute
     next: Weiter
+  favorites:
+    title: Favoriten
+    intro: Wähle die Locations und Stile, denen du folgst – sie werden im Kalender hervorgehoben und bestimmen deine Mitteilungen.
+    saved: Favoriten gespeichert.
+    save: Favoriten speichern
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.

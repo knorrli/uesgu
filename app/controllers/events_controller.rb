@@ -25,6 +25,8 @@ class EventsController < ApplicationController
       # simple_calendar navigates via params[:start_date]; load the focused
       # month plus a week of padding so adjacent-month grid cells are covered.
       @events = events.includes(:locations).where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))
+      # Favorited venues (logged-in users) are surfaced first in each cell.
+      @favorites = current_user&.location_list.to_a
     else
       @events = events.page(params[:page])
     end

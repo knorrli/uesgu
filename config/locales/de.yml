@@ -159,6 +159,10 @@ de:
     day:
       prompt: Tippe auf einen Tag, um die Events zu sehen.
       empty: Keine Events an diesem Tag.
+    calendar:
+      more:
+        one: +1 mehr
+        other: "+%{count} mehr"
     filter:
       what: Was?
       when: Wann?

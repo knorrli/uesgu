@@ -11,10 +11,21 @@
     <% end %>
     <div class="day-content">
       <div class="<%= number %>"><%= date.day %></div>
-      <% day_events.each do |event| %>
-        <div class="event">
-          <% if event.venue %><span class="event-venue"><%= event.venue.name %></span> <% end %><span class="event-title"><%= event.title %></span>
-        </div>
+      <% if day_events.any? %>
+        <% venues = calendar_day_venues(day_events, favorites: @favorites) %>
+        <%# Wide screens: a glanceable, deduped venue summary (full detail on tap). %>
+        <ul class="day-venues">
+          <% venues.first(4).each do |venue| %>
+            <li class="day-venue <%= 'favorite' if venue.favorite %>">
+              <span class="day-venue-name"><%= venue.name %></span><% if venue.count > 1 %> <span class="day-venue-count">×<%= venue.count %></span><% end %>
+            </li>
+          <% end %>
+          <% if venues.size > 4 %>
+            <li class="day-venue more"><%= t('events.calendar.more', count: venues.size - 4) %></li>
+          <% end %>
+        </ul>
+        <%# Narrow screens: just a count — columns are too narrow for text. %>
+        <span class="day-count" aria-hidden="true"><%= day_events.size %></span>
       <% end %>
     </div>
   <% end %>

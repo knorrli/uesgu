@@ -159,6 +159,7 @@ de:
     day:
       prompt: Tippe auf einen Tag, um die Events zu sehen.
       empty: Keine Events an diesem Tag.
+      close: Schliessen
     calendar:
       more:
         one: +1 mehr

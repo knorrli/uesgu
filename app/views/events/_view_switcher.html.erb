@@ -1,6 +1,6 @@
 <% base = request.query_parameters.except('view', 'page', 'start_date') %>
 <nav class="view-switcher flex gap-small justify-end" aria-label="<%= t('events.index.view.label') %>">
-  <%= link_to t('events.index.view.list'), events_path(base),
+  <%= link_to t('events.index.view.list'), events_path(base.merge('view' => 'list')),
         class: class_names('button', active: view != 'calendar') %>
   <%= link_to t('events.index.view.calendar'), events_path(base.merge('view' => 'calendar')),
         class: class_names('button', active: view == 'calendar') %>

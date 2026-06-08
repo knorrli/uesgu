@@ -1,0 +1,30 @@
+<%# A single day's events, grouped under their venue so a venue hosting several
+    events that day shows its name once. Chronological by start time; untimed
+    events sort last. Used by both the list view and the calendar day drawer. %>
+<% groups = events
+     .sort_by { |event| [event.start_time ? 0 : 1, event.start_time, event.title.to_s] }
+     .group_by { |event| event.venue&.name || "event-#{event.id}" } %>
+<div class="venue-groups flex flex-col gap-large">
+  <% groups.each_value do |group| %>
+    <% lead = group.first %>
+    <% venue = lead.venue %>
+    <% where_tags = [venue].compact + lead.locations.to_a.reject { |location| location == venue } %>
+    <section class="venue-group flex flex-col gap-small">
+      <% if where_tags.any? %>
+        <div class="event-where">
+          <% where_tags.each_with_index do |location, i| %>
+            <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
+            <%= button_tag location.name, type: :button,
+                  class: class_names('filter-link', venue: location == venue, active: filter.location_list.include?(location.name)),
+                  data: { action: 'filter#toggleFilter', filter_field_name_param: 'l[]', filter_value_param: location.name } %>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="venue-events flex flex-col gap-medium">
+        <% group.each do |event| %>
+          <%= render event, filter: filter %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>

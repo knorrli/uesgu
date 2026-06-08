@@ -28,7 +28,7 @@ class EventsController < ApplicationController
       # Favorited venues (logged-in users) are surfaced first in each cell.
       @favorites = current_user&.location_list.to_a
     else
-      @events = events.page(params[:page])
+      @events = events.includes(:locations, :styles, :genres).page(params[:page])
     end
   end
 

@@ -1,6 +1,8 @@
+/* Filter fields as underlined inputs rather than full boxes — lighter, reads as
+   a form line, consistent with the de-boxed list below. */
 .input-wrapper {
-  padding: var(--gap-small);
-  border: var(--border-width) solid var(--border-color);
+  padding: var(--gap-small) 0;
+  border-bottom: var(--border-width) solid var(--theme-accent-color);
   line-height: var(--filter-input-line-height);
   position: relative;
 
@@ -161,11 +163,27 @@
   opacity: 0.5;
 }
 
+/* List / Calendar as a plain text toggle, not filled buttons: the active view
+   is bold accent, the other a muted link. */
 .view-switcher {
+  gap: var(--gap-medium);
+
+  .button {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--theme-fg-muted);
+    text-decoration: none;
+  }
+
+  .button:hover {
+    text-decoration: underline;
+  }
+
   .button.active {
-    border-color: var(--theme-accent-color);
-    background-color: var(--theme-accent-color);
-    color: var(--theme-bg-color);
+    color: var(--theme-accent-color);
+    font-weight: bold;
+    background: none;
   }
 }
 

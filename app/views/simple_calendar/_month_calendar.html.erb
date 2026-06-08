@@ -2,16 +2,16 @@
     and the list/calendar view switcher share one toolbar row. Table rendering is
     unchanged from the gem. %>
 <div class="simple-calendar">
-  <div class="calendar-heading flex justify-between align-start wrap gap-medium">
-    <div class="calendar-nav flex align-baseline wrap gap-medium">
-      <time datetime="<%= start_date.strftime('%Y-%m') %>" class="calendar-title"><%= t('date.month_names')[start_date.month] %> <%= start_date.year %></time>
-      <nav class="flex gap-medium">
-        <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar.url_for_previous_view %>
-        <%= link_to t('simple_calendar.today', default: 'Today'), calendar.url_for_today_view %>
-        <%= link_to t('simple_calendar.next', default: 'Next'), calendar.url_for_next_view %>
-      </nav>
-    </div>
-    <%= render 'events/view_switcher', view: @view %>
+  <%# Month title + nav only; the list/calendar switcher lives on its own row in
+      index.html.erb so it stays put and the month title aligns with the list's
+      first date header. %>
+  <div class="calendar-heading flex align-baseline wrap gap-medium">
+    <time datetime="<%= start_date.strftime('%Y-%m') %>" class="calendar-title"><%= t('date.month_names')[start_date.month] %> <%= start_date.year %></time>
+    <nav class="flex gap-medium">
+      <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar.url_for_previous_view %>
+      <%= link_to t('simple_calendar.today', default: 'Today'), calendar.url_for_today_view %>
+      <%= link_to t('simple_calendar.next', default: 'Next'), calendar.url_for_next_view %>
+    </nav>
   </div>
 
   <table class="table table-striped">

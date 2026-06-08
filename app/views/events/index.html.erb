@@ -3,11 +3,13 @@
 <div class="flex flex-col gap-large align-stretch" data-controller="filter">
   <%= render 'filter', filter: @filter %>
 
+  <%# Toggle sits on its own row above the content in both views, so the first
+      bold header (calendar's month / list's first date) aligns across views. %>
+  <%= render 'view_switcher', view: @view %>
+
   <% if @view == 'calendar' %>
-    <%# The calendar renders the view switcher inside its heading toolbar. %>
     <%= render 'calendar', events: @events %>
   <% else %>
-    <%= render 'view_switcher', view: @view %>
     <%= render 'events', events: @events %>
   <% end %>
 </div>

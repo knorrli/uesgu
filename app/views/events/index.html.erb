@@ -1,13 +1,13 @@
 <% content_for :title, t('events.index.title') %>
 
-<div class="flex flex-col gap-xlarge align-stretch" data-controller="filter">
+<div class="flex flex-col gap-large align-stretch" data-controller="filter">
   <%= render 'filter', filter: @filter %>
 
-  <%= render 'view_switcher', view: @view %>
-
   <% if @view == 'calendar' %>
+    <%# The calendar renders the view switcher inside its heading toolbar. %>
     <%= render 'calendar', events: @events %>
   <% else %>
+    <%= render 'view_switcher', view: @view %>
     <%= render 'events', events: @events %>
   <% end %>
 </div>

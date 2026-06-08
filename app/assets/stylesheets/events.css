@@ -194,20 +194,31 @@
     border-collapse: collapse;
   }
 
+  .calendar-heading {
+    margin-bottom: var(--gap-small);
+  }
+
+  /* The month anchors the calendar — bold, but no taller than the toolbar so the
+     view switcher stays pinned to the same spot as in list view. */
+  .calendar-title {
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+  }
+
   th {
     padding: var(--gap-small);
     text-align: center;
     font-weight: normal;
     color: var(--theme-fg-muted);
-    /* The weekday header rule mirrors the list's date hairline. */
+    /* A thicker accent rule under the weekday header, mirroring the list date. */
     border-bottom: var(--border-width) solid var(--theme-accent-color);
   }
 
-  /* Agenda-style grid: no cell fills or vertical borders — just a hairline
-     between weeks. Content and accents carry the cells, not boxes. */
+  /* A defined hairline grid (no fills) keeps cells distinguishable without the
+     heavy filled boxes of before. */
   .day {
     position: relative;
-    border-bottom: var(--calendar-border-width) solid var(--theme-accent-color);
+    border: var(--calendar-border-width) solid var(--theme-accent-color);
     /* Minimum height; busy cells grow to fit their in-flow .day-content. */
     height: 7rem;
     vertical-align: top;
@@ -217,18 +228,16 @@
       opacity: 0.4;
     }
 
-    /* Highlight the whole cell when its overlay link is hovered/selected. */
+    /* Hover: a soft darker-pink wash, not a flat accent fill. */
     &:has(.calendar-day-link:hover) {
-      background-color: var(--theme-accent-muted);
+      background-color: var(--theme-bg-muted);
     }
 
+    /* Selected: an inset accent frame that ties the day to its drawer below,
+       rather than flooding the cell. */
     &:has(.calendar-day-link.selected) {
-      background-color: var(--theme-accent-color);
-      color: var(--theme-bg-color);
-
-      .day-venue.favorite .day-venue-name,
-      .day-venue-count,
-      .calendar-day-number.today { color: inherit; }
+      background-color: var(--theme-bg-muted);
+      box-shadow: inset 0 0 0 var(--border-width) var(--theme-accent-color);
     }
   }
 
@@ -245,12 +254,16 @@
 
   .calendar-day-number {
     display: block;
-    text-align: right;
+    text-align: left;
     font-size: var(--font-size-small);
 
+    /* Today: a filled accent badge so it can't get lost in the grid. */
     &.today {
+      display: inline-block;
       font-weight: bold;
-      color: var(--theme-accent-color);
+      padding: 0 0.45em;
+      color: var(--theme-bg-color);
+      background-color: var(--theme-accent-color);
     }
   }
 

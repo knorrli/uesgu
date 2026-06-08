@@ -45,6 +45,10 @@ fr:
     biweekly: Toutes les deux semaines
     monthly: Mensuel
     never: Jamais
+  simple_calendar:
+    previous: Précédent
+    today: Aujourd'hui
+    next: Suivant
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.

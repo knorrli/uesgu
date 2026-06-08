@@ -45,6 +45,10 @@ en:
     biweekly: Every two weeks
     monthly: Monthly
     never: Never
+  simple_calendar:
+    previous: Previous
+    today: Today
+    next: Next
   settings:
     title: Settings
     saved: Settings saved.

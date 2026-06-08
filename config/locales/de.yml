@@ -45,6 +45,10 @@ de:
     biweekly: Alle zwei Wochen
     monthly: Monatlich
     never: Nie
+  simple_calendar:
+    previous: Zurück
+    today: Heute
+    next: Weiter
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.

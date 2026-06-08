@@ -11,18 +11,18 @@
     <% end %>
 
     <section class="flex flex-col gap-small">
+      <h2><%= t('settings.language_heading') %></h2>
+      <%= form.select :locale,
+            I18n.available_locales.map { |l| [t("languages.#{l}"), l] },
+            include_blank: t('settings.language_auto') %>
+    </section>
+
+    <section class="flex flex-col gap-small">
       <h2><%= t('settings.notifications_heading') %></h2>
       <label class="flex flex-col gap-small">
         <span><%= t('settings.frequency_label') %></span>
         <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [t("frequencies.#{f}"), f] } %>
       </label>
-    </section>
-
-    <section class="flex flex-col gap-small">
-      <h2><%= t('settings.language_heading') %></h2>
-      <%= form.select :locale,
-            I18n.available_locales.map { |l| [t("languages.#{l}"), l] },
-            include_blank: t('settings.language_auto') %>
     </section>
 
     <section class="flex flex-col gap-small">

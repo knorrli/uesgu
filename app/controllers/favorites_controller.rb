@@ -6,7 +6,7 @@ class FavoritesController < ApplicationController
 
   def update
     if @user.update(favorites_params)
-      redirect_to favorites_path, notice: t("favorites.saved")
+      redirect_to favorites_path, notice: t('favorites.saved')
     else
       render :show, status: :unprocessable_entity
     end

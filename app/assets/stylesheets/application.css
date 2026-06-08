@@ -45,6 +45,11 @@ a {
   cursor: pointer;
 }
 
+/* The delete-account button spans full width like the form submit buttons. */
+.button.delete {
+  width: 100%;
+}
+
 /* Account / auth form fields: underline inputs, matching the events filter bar.
  * Scoped so the events filter comboboxes keep their own treatment. */
 .account-form input[type="text"],
@@ -89,16 +94,41 @@ a {
   color: var(--theme-fg-color);
 }
 
-/* Flash messages */
+/* Flash messages: a fixed toast at the bottom so they never push content down;
+   auto-dismiss after a few seconds. */
+.flashes {
+  position: fixed;
+  left: 50%;
+  bottom: var(--gap-large);
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 100%;
+  max-width: var(--content-max-width);
+  padding-inline: var(--content-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+  pointer-events: none;
+}
+
 .flash {
+  pointer-events: auto;
   padding: var(--gap-small) var(--gap-medium);
   border: var(--border-width) solid var(--theme-accent-color);
-  margin-bottom: var(--gap-medium);
+  background: var(--theme-bg-color);
+  animation: flash-dismiss 0.4s ease 4.5s forwards;
 }
 
 .flash.alert {
   border-color: var(--theme-warn-color);
   color: var(--theme-warn-color);
+}
+
+@keyframes flash-dismiss {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
 
 /* Form errors list */

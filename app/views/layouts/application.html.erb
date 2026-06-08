@@ -26,6 +26,13 @@
   </head>
 
   <body>
+    <% if notice.present? || alert.present? %>
+      <div class="flashes" role="status" aria-live="polite">
+        <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>
+        <% if alert.present? %><p class="flash alert"><%= alert %></p><% end %>
+      </div>
+    <% end %>
+
     <header class="site-header">
       <div class="site-header__inner">
         <%= link_to 'üsgu', root_path, class: 'site-brand' %>
@@ -50,8 +57,6 @@
     </header>
 
     <main class="content">
-      <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>
-      <% if alert.present? %><p class="flash alert"><%= alert %></p><% end %>
       <%= yield %>
     </main>
 

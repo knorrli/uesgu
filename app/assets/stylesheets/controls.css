@@ -36,6 +36,11 @@ input[type=submit] {
   }
 }
 
+input[type=checkbox],
+input[type=radio] {
+  accent-color: var(--theme-accent-color);
+}
+
 input[type=text] {
   background-color: inherit;
   color: inherit;

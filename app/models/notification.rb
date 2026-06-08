@@ -36,7 +36,15 @@ class Notification < ApplicationRecord
   # digest for each window that actually has new events. Advances last_notified_at.
   # Idempotent given the same clock; safe to call lazily on page load or from a job.
   def self.generate_for(user, now: Time.current)
-    interval = user.notification_frequency == "monthly" ? 1.month : 1.week
+    interval = user.notification_interval
+
+    # "never": notifications off. Keep the cursor current so that if the user
+    # later re-enables them they start fresh, rather than receiving a backlog.
+    if interval.nil?
+      user.update_column(:last_notified_at, now)
+      return []
+    end
+
     cursor = user.last_notified_at || user.created_at
     created = []
 

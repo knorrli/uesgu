@@ -40,8 +40,11 @@ en:
     welcome: Welcome to üsgu!
     account_deleted: Your account was deleted.
   frequencies:
+    daily: Daily
     weekly: Weekly
+    biweekly: Every two weeks
     monthly: Monthly
+    never: Never
   settings:
     title: Settings
     saved: Settings saved.

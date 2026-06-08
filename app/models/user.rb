@@ -1,5 +1,14 @@
 class User < ApplicationRecord
-  FREQUENCIES = %w[weekly monthly].freeze
+  FREQUENCIES = %w[daily weekly biweekly monthly never].freeze
+
+  # Digest cadence per frequency. "never" has no interval (notifications off).
+  # "daily" is mainly for testing the delivery pipeline.
+  FREQUENCY_INTERVALS = {
+    "daily" => 1.day,
+    "weekly" => 1.week,
+    "biweekly" => 2.weeks,
+    "monthly" => 1.month
+  }.freeze
 
   has_secure_password
   has_many :sessions, dependent: :destroy
@@ -20,5 +29,10 @@ class User < ApplicationRecord
 
   def admin?
     admin
+  end
+
+  # Digest interval for this user's frequency, or nil when notifications are off.
+  def notification_interval
+    FREQUENCY_INTERVALS[notification_frequency]
   end
 end

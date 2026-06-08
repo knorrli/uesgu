@@ -40,8 +40,11 @@ de:
     welcome: Willkommen bei üsgu!
     account_deleted: Dein Konto wurde gelöscht.
   frequencies:
+    daily: Täglich
     weekly: Wöchentlich
+    biweekly: Alle zwei Wochen
     monthly: Monatlich
+    never: Nie
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.

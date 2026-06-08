@@ -40,8 +40,11 @@ fr:
     welcome: Bienvenue sur üsgu !
     account_deleted: Votre compte a été supprimé.
   frequencies:
+    daily: Quotidien
     weekly: Hebdomadaire
+    biweekly: Toutes les deux semaines
     monthly: Mensuel
+    never: Jamais
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.

@@ -257,9 +257,11 @@
     text-align: left;
     font-size: var(--font-size-small);
 
-    /* Today: a filled accent badge so it can't get lost in the grid. */
+    /* Today: a filled accent badge so it can't get lost in the grid. Stays
+       display:block (shrink-wrapped) so it keeps the same line height as plain
+       day numbers — an inline-block badge would push the cell's venues down. */
     &.today {
-      display: inline-block;
+      width: fit-content;
       font-weight: bold;
       padding: 0 0.45em;
       color: var(--theme-bg-color);

@@ -156,6 +156,9 @@ de:
         label: Ansicht
         list: Liste
         calendar: Kalender
+    day:
+      prompt: Tippe auf einen Tag, um die Events zu sehen.
+      empty: Keine Events an diesem Tag.
     filter:
       what: Was?
       when: Wann?

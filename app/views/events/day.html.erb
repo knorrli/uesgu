@@ -1,0 +1,14 @@
+<%= turbo_frame_tag 'day-detail' do %>
+  <section class="day-detail event-list flex flex-col gap-small">
+    <h2 class="flex date"><%= l @date, format: :detailed %></h2>
+    <% if @events.any? %>
+      <div class="flex flex-col gap-medium">
+        <% @events.each do |event| %>
+          <%= render event, filter: @filter %>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="muted"><%= t('events.day.empty') %></p>
+    <% end %>
+  </section>
+<% end %>

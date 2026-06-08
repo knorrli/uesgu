@@ -1,16 +1,11 @@
 class EventsController < ApplicationController
-  allow_unauthenticated_access only: %i[ index ]
+  allow_unauthenticated_access only: %i[ index day ]
   before_action :require_admin, only: %i[ destroy ]
   before_action :set_event, only: %i[ destroy ]
 
   # GET /events
   def index
-    @filter = Filter.new
-    @filter.queries = params[:q].compact_blank if params[:q].present?
-    @filter.location_list = params[:l] if params[:l].present?
-    @filter.style_list = params[:s] if params[:s].present?
-    @filter.date_ranges = params[:d].compact_blank if params[:d].present?
-
+    @filter = build_filter
     @q = Event.ransack(@filter.ransack_query)
 
     # Remember the chosen view across requests (filter changes, pagination) so
@@ -35,6 +30,19 @@ class EventsController < ApplicationController
     end
   end
 
+  # GET /events/day?date=YYYY-MM-DD — a single day's events, rendered into the
+  # calendar's day-detail Turbo Frame (full detail, same partial as the list).
+  def day
+    @date = (Date.parse(params[:date]) rescue Date.current)
+    @filter = build_filter
+    # Constrain to the clicked day, overriding the default "today onward" floor
+    # so past days in the visible month still show their events.
+    @filter.date_ranges = ["#{@date.iso8601} - #{@date.iso8601}"]
+
+    @q = Event.ransack(@filter.ransack_query)
+    @events = @q.result(distinct: true).includes(:locations, :styles, :genres).order(:start_time, :title)
+  end
+
   # DELETE /events/1
   def destroy
     @event.destroy!
@@ -42,6 +50,16 @@ class EventsController < ApplicationController
   end
 
   private
+
+  def build_filter
+    Filter.new.tap do |filter|
+      filter.queries = params[:q].compact_blank if params[:q].present?
+      filter.location_list = params[:l] if params[:l].present?
+      filter.style_list = params[:s] if params[:s].present?
+      filter.date_ranges = params[:d].compact_blank if params[:d].present?
+    end
+  end
+
   # Use callbacks to share common setup or constraints between actions.
   def set_event
     @event = Event.find(params.expect(:id))

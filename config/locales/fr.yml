@@ -156,6 +156,9 @@ fr:
         label: Vue
         list: Liste
         calendar: Calendrier
+    day:
+      prompt: Touchez un jour pour voir ses événements.
+      empty: Aucun événement ce jour-là.
     filter:
       what: Quoi ?
       when: Quand ?

@@ -156,6 +156,9 @@ en:
         label: View
         list: List
         calendar: Calendar
+    day:
+      prompt: Tap a day to see its events.
+      empty: No events on this day.
     filter:
       what: What?
       when: When?

@@ -1,23 +1,25 @@
 <% list_params = request.query_parameters.except('view', 'start_date', 'page', 'd') %>
-<section id="calendar" class="event-calendar">
+<section id="calendar" class="event-calendar flex flex-col gap-medium" data-controller="calendar">
   <%= month_calendar(start_date: @calendar_start, events: events, attribute: :start_date) do |date, day_events| %>
     <% number = class_names('calendar-day-number', today: date == Date.current) %>
     <% if day_events.any? %>
-      <%# Open this day in the list view (full details: venue, time, tags). Filter to the
-          single day so it isn't buried on a later page; anchor scrolls to the day heading. %>
-      <% day_path = events_path(list_params.merge('view' => 'list', 'd' => ["#{date.iso8601} - #{date.iso8601}"])) %>
-      <%= link_to date.day, "#{day_path}##{date.iso8601}", class: number %>
-    <% else %>
+      <%# Transparent overlay fills the cell's full (row) height so the whole cell
+          is clickable; the in-flow .day-content below sizes the cell so it grows. %>
+      <%= link_to '', day_events_path(list_params.merge('date' => date.iso8601)),
+            class: 'calendar-day-link', 'aria-label': l(date, format: :detailed),
+            data: { action: 'calendar#select', turbo_frame: 'day-detail' } %>
+    <% end %>
+    <div class="day-content">
       <div class="<%= number %>"><%= date.day %></div>
-    <% end %>
-
-    <% day_events.each do |event| %>
-      <% tooltip = [(l(event.start_time, format: :time) if event.start_time), event.venue&.name, event.title].compact.join(' · ') %>
-      <div class="event">
-        <%= link_to event.url, target: :blank, title: tooltip do %>
+      <% day_events.each do |event| %>
+        <div class="event">
           <% if event.venue %><span class="event-venue"><%= event.venue.name %></span> <% end %><span class="event-title"><%= event.title %></span>
-        <% end %>
-      </div>
-    <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag 'day-detail' do %>
+    <p class="day-detail-prompt muted"><%= t('events.day.prompt') %></p>
   <% end %>
 </section>

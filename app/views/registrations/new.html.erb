@@ -14,10 +14,12 @@
     <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: t('auth.password'), maxlength: 72 %>
     <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: t('auth.password_confirmation'), maxlength: 72 %>
 
-    <label class="flex flex-col gap-small">
-      <span><%= t('auth.notify_label') %></span>
-      <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [t("frequencies.#{f}"), f] }, selected: @user.notification_frequency || "weekly" %>
-    </label>
+    <%# Notifications are opt-in: the greyed prompt is the off default; the four
+        cadences are the opt-in choices. "never" is the prompt itself, so it's
+        not repeated as an option here. %>
+    <%= form.select :notification_frequency,
+          User::FREQUENCY_INTERVALS.keys.map { |f| [t("frequencies.#{f}"), f] },
+          { prompt: t('auth.notify_label'), selected: params.dig(:user, :notification_frequency) } %>
 
     <%= form.submit t('auth.signup_submit') %>
   <% end %>

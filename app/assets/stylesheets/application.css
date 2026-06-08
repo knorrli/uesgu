@@ -79,6 +79,16 @@ a {
   background-size: 0.85em;
 }
 
+/* When the empty prompt option is showing, grey it to match input placeholders;
+   real options stay full-contrast. */
+.account-form select:has(option[value=""]:checked) {
+  color: var(--theme-fg-muted);
+}
+
+.account-form select option {
+  color: var(--theme-fg-color);
+}
+
 /* Flash messages */
 .flash {
   padding: var(--gap-small) var(--gap-medium);

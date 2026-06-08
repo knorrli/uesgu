@@ -35,7 +35,7 @@ de:
     log_in_link: Anmelden
     invalid_credentials: Versuche es mit einem anderen Benutzernamen oder Passwort.
     rate_limited: Versuche es später erneut.
-    notify_label: Über neue Veranstaltungen informieren
+    notify_label: Nicht über neue Veranstaltungen informieren
   registrations:
     welcome: Willkommen bei üsgu!
     account_deleted: Dein Konto wurde gelöscht.

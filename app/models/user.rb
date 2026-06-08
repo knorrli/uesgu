@@ -19,6 +19,9 @@ class User < ApplicationRecord
 
   normalizes :username, with: ->(u) { u.strip.downcase }
   normalizes :email_address, with: ->(e) { e.strip.downcase.presence }
+  # Opt-in: a blank selection (the signup prompt left untouched) means no
+  # notifications, not an error.
+  normalizes :notification_frequency, with: ->(f) { f.presence || "never" }
 
   validates :username, presence: true, uniqueness: true, length: { in: 2..30 },
                        format: { with: /\A[a-z0-9_.-]+\z/, message: "may only contain letters, numbers, and . _ -" }

@@ -45,9 +45,11 @@ a {
   cursor: pointer;
 }
 
-/* The delete-account button spans full width like the form submit buttons. */
+/* The delete-account button matches the form submit buttons: full width, and a
+   matching border so its height lines up (the .button reset removes borders). */
 .button.delete {
   width: 100%;
+  border: var(--border-width) solid var(--theme-warn-color);
 }
 
 /* Account / auth form fields: underline inputs, matching the events filter bar.

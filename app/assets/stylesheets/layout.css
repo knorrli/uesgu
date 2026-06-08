@@ -43,6 +43,48 @@
   text-decoration: underline;
 }
 
+/* Account dropdown: a native <details> menu so personal links don't crowd the
+   bar. The username is the trigger; items drop into a bordered panel. */
+.nav-menu {
+  position: relative;
+}
+
+.nav-menu > summary {
+  cursor: pointer;
+  list-style: none;
+  /* Match the nav links exactly (guards against summary UA-font quirks). */
+  font: inherit;
+  color: var(--theme-accent-color);
+}
+
+.nav-menu > summary::-webkit-details-marker {
+  display: none;
+}
+
+.nav-menu > summary::after {
+  content: "\25BE"; /* ▾ */
+  margin-left: 0.5ch;
+}
+
+.nav-menu[open] > summary::after {
+  content: "\25B4"; /* ▴ */
+}
+
+.nav-menu__items {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 100;
+  margin-top: var(--gap-small);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+  padding: var(--gap-medium);
+  border: var(--border-width) solid var(--theme-accent-color);
+  background-color: var(--theme-bg-color);
+  white-space: nowrap;
+}
+
 .site-footer {
   flex-shrink: 0;
   border-top: var(--border-width) solid var(--theme-accent-color);

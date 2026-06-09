@@ -4,7 +4,7 @@
   --color-bg-secondary: var(--theme-bg-color);
   --color-fg-default: var(--theme-fg-color);
   --color-fg-primary: var(--theme-accent-color);
-  --color-fg-secondary: #748194;
+  --color-fg-secondary: var(--theme-fg-muted);
   --color-fg-selected: var(--theme-bg-color);
   --color-fg-muted: var(--theme-fg-muted);
   --color-fg-accent: var(--theme-accent-color);

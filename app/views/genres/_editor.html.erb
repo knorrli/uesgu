@@ -40,9 +40,13 @@
     <%= f.submit t('genres.editor.assign') %>
   <% end %>
 
-  <div class="flex gap-medium wrap">
-    <%= button_to t('genres.editor.skip'), dismiss_genre_path(genre), params: { return_to: return_to } %>
-    <%= button_to t('genres.editor.exclude'), exclude_genre_path(genre), params: { return_to: return_to } %>
+  <%# Three terminal dispositions besides Assign (which lives in the form above):
+      ignore = keep the genre but leave it unmapped; hide = non-music, drop the
+      event; block = scraper noise, strip the tag entirely. %>
+  <div class="flex gap-small wrap genre-dispositions">
+    <%= button_to t('genres.editor.ignore'), ignore_genre_path(genre), params: { return_to: return_to } %>
+    <%= button_to t('genres.editor.hide'), hide_genre_path(genre), params: { return_to: return_to } %>
+    <%= button_to t('genres.editor.block'), block_genre_path(genre), params: { return_to: return_to } %>
   </div>
 
   <% if sample_events.any? %>

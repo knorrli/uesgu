@@ -33,9 +33,9 @@
         <dd class="muted"><%= @event_tag_stats.unassigned_genre_tags.count %></dd>
       </div>
       <div class="stat">
-        <dt><%= t('.dismissed') %></dt>
+        <dt><%= t('.ignored') %></dt>
         <span class="stat__leader"></span>
-        <dd class="muted"><%= @event_tag_stats.dismissed_genre_tags.count %></dd>
+        <dd class="muted"><%= @event_tag_stats.ignored_genre_tags.count %></dd>
       </div>
     </dl>
     <div class="flex gap-medium wrap">

@@ -109,20 +109,24 @@ de:
       status_all: alle
       status_unassigned: nicht zugewiesen
       status_assigned: zugewiesen
-      status_dismissed: verworfen
-      status_excluded: ausgeschlossen
+      status_ignored: ignoriert
+      status_hidden: verborgen
+      status_blocked: blockiert
+      sort_by: "Sortieren:"
+      sort_name: A–Z
+      sort_count: am häufigsten
     queue:
       title: Genre-Zuweisung
       remaining: "%{count} nicht zugewiesen"
-      empty: Nichts zuzuweisen — jedes verwendete Genre ist zugewiesen oder verworfen.
-      dismissed: "Verworfen (%{count})"
+      empty: Nichts zuzuweisen — jedes verwendete Genre ist zugewiesen oder bearbeitet.
       restore: Wiederherstellen
     editor:
       usage: "auf %{count} Events"
       suggested: Vorschläge
       assign: Zuweisen
-      skip: Überspringen
-      exclude: Keine Musik
+      ignore: "Ignorieren (behalten, kein Style)"
+      hide: "Event verbergen (keine Musik)"
+      block: "Blockieren (Tag entfernen)"
       appears_on: Erscheint bei
   admin:
     index:
@@ -131,7 +135,7 @@ de:
       browse_genres: Alle durchsuchen
       assigned: Zugewiesen
       unassigned: Nicht zugewiesen
-      dismissed: Verworfen
+      ignored: Ignoriert
       jobs_heading: Jobs
       jobs_hint: Scraping und Hintergrundaufgaben laufen als geplante Jobs.
       job_queue: Job-Warteschlange

@@ -5,6 +5,9 @@
   color: var(--theme-fg-color);
   line-height: var(--tag-line-height);
   border: var(--tag-border-width) solid var(--theme-fg-color);
+  /* Tags read as chips, never links — kill the underline on the cases rendered
+     as <a> (e.g. the genre-index status filters). Harmless on button/span tags. */
+  text-decoration: none;
 
   &.active {
     background-color: var(--theme-accent-color);

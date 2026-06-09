@@ -4,30 +4,53 @@
     <%= link_to t('.queue_link'), queue_genres_path %>
   </div>
 
-  <div class="flex gap-small wrap">
-    <% %w[all unassigned assigned dismissed excluded].each do |status| %>
+  <%# Two groups: assignment status (all / unassigned / assigned), then the
+      parked dispositions (ignored / hidden / blocked) where Restore lives. %>
+  <div class="flex gap-small wrap align-baseline genre-status-filters">
+    <% %w[all unassigned assigned].each do |status| %>
       <%= link_to t(".status_#{status}"),
             genres_path(status: (status == 'all' ? nil : status), q: params[:q].presence),
+            class: class_names(:tag, active: @status == status) %>
+    <% end %>
+    <span class="filter-divider" aria-hidden="true"></span>
+    <% %w[ignored hidden blocked].each do |status| %>
+      <%= link_to t(".status_#{status}"),
+            genres_path(status: status, q: params[:q].presence),
             class: class_names(:tag, active: @status == status) %>
     <% end %>
   </div>
 
   <%= form_with url: genres_path, method: :get, data: { turbo_frame: '_top' } do %>
     <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
     <div class="input-wrapper flex">
       <%= text_field_tag :q, params[:q], placeholder: t('.search'), autocomplete: 'off' %>
     </div>
   <% end %>
 
+  <div class="flex gap-small align-baseline muted genre-sort">
+    <span><%= t('.sort_by') %></span>
+    <% %w[name count].each do |sort| %>
+      <%= link_to t(".sort_#{sort}"),
+            genres_path(status: params[:status].presence, q: params[:q].presence, sort: sort),
+            class: class_names('genre-sort-option', active: @sort == sort) %>
+    <% end %>
+  </div>
+
+  <%# Left-aligned and tight so name, count and status read as one row (the old
+      justify-between stranded the status far right). The count makes the sort
+      legible. %>
   <div class="flex flex-col gap-small">
     <% @genres.each do |genre| %>
-      <div class="flex justify-between align-baseline gap-medium">
+      <div class="flex align-baseline gap-medium wrap genre-row">
         <%= link_to genre.name, edit_genre_path(genre) %>
-        <div class="flex gap-small wrap justify-end align-baseline">
-          <% if genre.dismissed? || genre.excluded? %>
-            <span class="muted"><%= t(genre.excluded? ? '.status_excluded' : '.status_dismissed') %></span>
+        <span class="muted genre-count" title="<%= t('genres.editor.usage', count: genre.events_count) %>"><%= genre.events_count %>&times;</span>
+        <div class="flex gap-small wrap align-baseline">
+          <% if genre.ignored? || genre.hidden? || genre.blocked? %>
+            <% status_key = genre.hidden? ? '.status_hidden' : genre.blocked? ? '.status_blocked' : '.status_ignored' %>
+            <span class="muted"><%= t(status_key) %></span>
             <%= button_to t('genres.queue.restore'), restore_genre_path(genre),
-                  params: { return_to: genres_path(status: params[:status].presence, q: params[:q].presence) } %>
+                  params: { return_to: genres_path(status: params[:status].presence, q: params[:q].presence, sort: params[:sort].presence) } %>
           <% elsif genre.styles.any? %>
             <% genre.styles.each do |style| %><span class="tag"><%= style.name %></span><% end %>
           <% else %>

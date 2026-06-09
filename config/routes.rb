@@ -40,11 +40,12 @@ Rails.application.routes.draw do
 
     # Genre → style mapping. index/edit are standard CRUD over all genres in
     # use; queue is the "tinder" flow serving the next unmapped genre; update
-    # assigns styles; dismiss/restore toggle "won't fix".
+    # assigns styles; ignore/hide/block set a disposition, restore clears it.
     resources :genres, only: %i[index edit update] do
       member do
-        post :dismiss
-        post :exclude
+        post :ignore
+        post :hide
+        post :block
         post :restore
       end
       collection do

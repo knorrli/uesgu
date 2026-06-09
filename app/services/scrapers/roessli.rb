@@ -5,7 +5,7 @@ module Scrapers
     end
 
     def self.locations
-      [location, 'Reitschule', 'Bern', 'BE']
+      [location, 'Bern', 'BE']
     end
 
     def self.url

@@ -60,4 +60,19 @@ module EventsHelper
   def favorite_followed_keys
     followed_locations.map { |name| "l:#{name}" } + followed_styles.map { |name| "s:#{name}" }
   end
+
+  # Offer the "filter to my favorites" shortcut only to a logged-in user who has
+  # at least one followed location or style — otherwise there is nothing to apply.
+  def favorites_filter_available?
+    current_user.present? && (followed_locations.any? || followed_styles.any?)
+  end
+
+  # True when the active filter is exactly the user's favorites (locations and
+  # styles compared as sets, order-independent). When on, the control reads as
+  # active and a click clears it back to the full programme.
+  def favorites_filter_active?
+    favorites_filter_available? &&
+      Set.new(@filter.location_list) == followed_locations &&
+      Set.new(@filter.style_list) == followed_styles
+  end
 end

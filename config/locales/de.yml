@@ -101,28 +101,40 @@ de:
     save: Speichern
     cancel: Abbrechen
     delete: Löschen
-  genre_style_assignments:
+  genres:
     index:
-      unassigned_genre_tags: Nicht zugewiesene Genre-Tags
-      suggestions: Vorschläge
-      manual_entry: Manuelle Zuweisung
-  tags:
-    tag:
-      usage: Verwendung
-      suggestions: Vorschläge
-      manual_entry: Manuelle Zuweisung
-    edit:
-      usage: Verwendung
-      suggestions: Vorschläge
+      title: Genres
+      search: Genres suchen
+      queue_link: Zuweisungs-Queue
+      status_all: alle
+      status_unassigned: nicht zugewiesen
+      status_assigned: zugewiesen
+      status_dismissed: verworfen
+      status_excluded: ausgeschlossen
+    queue:
+      title: Genre-Zuweisung
+      remaining: "%{count} nicht zugewiesen"
+      empty: Nichts zuzuweisen — jedes verwendete Genre ist zugewiesen oder verworfen.
+      dismissed: "Verworfen (%{count})"
+      restore: Wiederherstellen
+    editor:
+      usage: "auf %{count} Events"
+      suggested: Vorschläge
+      assign: Zuweisen
+      skip: Überspringen
+      exclude: Keine Musik
+      appears_on: Erscheint bei
   admin:
     index:
-      total: Total
-      assign_unassigned_genres: Zuweisungen erstellen
-      reload: neu laden
-      clear: leeren
-      scrape: scrapen
-      assigned: "Zugewiesen: %{count}"
-      unassigned: "Nicht zugewiesen: %{count}"
+      title: Admin
+      assign_unassigned_genres: Genres zuweisen
+      browse_genres: Alle durchsuchen
+      assigned: Zugewiesen
+      unassigned: Nicht zugewiesen
+      dismissed: Verworfen
+      jobs_heading: Jobs
+      jobs_hint: Scraping und Hintergrundaufgaben laufen als geplante Jobs.
+      job_queue: Job-Warteschlange
   activemodel:
     models:
       genre:

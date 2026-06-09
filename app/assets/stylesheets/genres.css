@@ -1,0 +1,7 @@
+/* Genre editor — the "appears on" sample events. A hairline above each gives a
+   clear break between events, whose muted date/venue header otherwise blends
+   into the previous event's (equally muted) genre/style meta. */
+.genre-sample-event {
+  border-top: var(--border-width) solid var(--theme-accent-muted);
+  padding-top: var(--gap-medium);
+}

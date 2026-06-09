@@ -3,6 +3,10 @@ class Event < ApplicationRecord
 
   validates :title, :start_date, :url, presence: true
 
+  # Public-facing events: non-music events (carrying an excluded genre, with no
+  # music style) are hidden. Admin/curation views deliberately skip this scope.
+  scope :visible, -> { where(hidden: false) }
+
   def self.ransackable_attributes(auth_object = nil)
     ['title', 'subtitle', 'start_date']
   end
@@ -24,5 +28,25 @@ class Event < ApplicationRecord
       subtitle&.truncate(20),
       locations.map(&:name).join(', ')
     ].compact_blank.join(' || ')
+  end
+
+  # Styles are a derived projection of this event's genres: the union of the
+  # styles each genre maps to. Recomputing from source (rather than nudging the
+  # style list incrementally) is what keeps re-mapping a genre correct even when
+  # several genres on the same event point at the same style.
+  def recompute_styles!
+    Genre.ensure!(genre_list)
+    # Match case-insensitively: scraped genre casing varies, while a genre's
+    # canonical name (e.g. from the taxonomy import) may differ in case.
+    lowered = genre_list.map { |name| name.to_s.downcase }
+    style_names = Style.joins(:genres)
+                       .where('lower(genres.name) IN (?)', lowered.presence || [nil])
+                       .distinct.pluck(:name)
+    self.style_list = style_names
+    # Non-music: carries an excluded genre and has no music style. A real style
+    # always wins (a "concert + reading" stays visible).
+    self.hidden = style_names.empty? &&
+                  Genre.excluded.where('lower(name) IN (?)', lowered.presence || [nil]).exists?
+    save!
   end
 end

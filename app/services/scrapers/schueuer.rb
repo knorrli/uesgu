@@ -31,7 +31,7 @@ module Scrapers
         event.location_list = self.class.locations
         event.save!
       rescue StandardError => e
-        raise ScrapeError.new e.message, event
+        record_failure(event, e)
       end
     end
 

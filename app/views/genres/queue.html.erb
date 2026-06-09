@@ -1,0 +1,13 @@
+<div class="flex flex-col gap-large">
+  <div class="flex justify-between align-baseline gap-medium wrap">
+    <h1><%= t('.title') %></h1>
+    <span class="muted"><%= t('.remaining', count: @remaining) %></span>
+  </div>
+
+  <% if @genre %>
+    <%= render 'genres/editor', genre: @genre, suggestions: @suggestions,
+          sample_events: @sample_events, return_to: queue_genres_path %>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

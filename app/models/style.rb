@@ -1,5 +1,5 @@
 class Style < ApplicationRecord
-  acts_as_taggable_on :genres
+  has_and_belongs_to_many :genres
 
   def to_s
     name

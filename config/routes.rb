@@ -24,12 +24,12 @@ Rails.application.routes.draw do
   resources :notifications, only: %i[index show]
 
   resources :events, only: [:index, :destroy]
-  resources :styles, only: :index do
+  resources :styles, only: [] do
     collection do
       post :chips
     end
   end
-  resources :tags, only: [:index, :edit, :update, :destroy] do
+  resources :tags, only: [:index, :edit] do
     collection do
       post :chips
     end
@@ -37,10 +37,19 @@ Rails.application.routes.draw do
 
   scope :admin do
     get '', to: 'admin#index', as: :admin
-    post 'reload_styles', to: 'admin#reload_styles', as: :reload_styles
-    post 'scrape_events', to: 'admin#scrape_events', as: :scrape_events
-    post 'clear_events', to: 'admin#clear_events', as: :clear_events
 
-    resources :genre_style_assignments, only: [:index, :create, :destroy]
+    # Genre → style mapping. index/edit are standard CRUD over all genres in
+    # use; queue is the "tinder" flow serving the next unmapped genre; update
+    # assigns styles; dismiss/restore toggle "won't fix".
+    resources :genres, only: %i[index edit update] do
+      member do
+        post :dismiss
+        post :exclude
+        post :restore
+      end
+      collection do
+        get :queue
+      end
+    end
   end
 end

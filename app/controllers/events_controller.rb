@@ -6,7 +6,7 @@ class EventsController < ApplicationController
   # GET /events
   def index
     @filter = build_filter
-    @q = Event.ransack(@filter.ransack_query)
+    @q = Event.visible.ransack(@filter.ransack_query)
 
     # Remember the chosen view across requests (filter changes, pagination) so
     # it persists until the visitor explicitly switches it again. Session is the
@@ -52,7 +52,7 @@ class EventsController < ApplicationController
   def day_events(date)
     filter = build_filter
     filter.date_ranges = ["#{date.iso8601} - #{date.iso8601}"]
-    Event.ransack(filter.ransack_query)
+    Event.visible.ransack(filter.ransack_query)
          .result(distinct: true)
          .includes(:locations, :styles, :genres)
          .order(:start_time, :title)

@@ -1,4 +1,19 @@
-.admin-box {
-  border: var(--border-width) solid var(--border-color);
-  padding: var(--gap-medium);
+/* Stat rows on the admin dashboard: label and figure joined by a dotted leader
+   so the eye can follow a row across the width to its number. */
+.stat {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-small);
+}
+
+.stat dt,
+.stat dd {
+  white-space: nowrap;
+}
+
+.stat__leader {
+  flex: 1 1 auto;
+  position: relative;
+  top: -0.3em;
+  border-bottom: 1px dotted var(--theme-fg-muted);
 }

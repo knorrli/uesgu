@@ -1,58 +1,7 @@
+<%# Inline genre editing reached via the gear icon on a genre tag in the event
+    list. Reuses the same editor as the assignment queue; on save the controller
+    redirects back to where you came from. %>
 <div class="flex flex-col gap-medium">
-  <h1><%= @tag %></h1>
-
-  <%= form_with model: @tag, url: tag_path(@tag), class: 'flex flex-col gap-medium', data: { turbo_frame: '_top' } do |f| %>
-
-    <div class="input-wrapper">
-      <%= f.text_field :name %>
-    </div>
-    <div class="input-wrapper flex flex-grow">
-
-      <%= f.combobox :style_ids, Style.order(name: :asc), value: Style.where(id: @tag.taggings.pluck(:taggable_id)).pluck(:id).join(','), id: "genre_#{@tag.id}", placeholder: Genre.model_name.human(count: :many), multiselect_chip_src: chips_styles_path do |combobox| %>
-
-        <% combobox.customize_fieldset class: 'flex-grow' %>
-        <% combobox.customize_input class: 'flex-grow' %>
-      <% end %>
-    </div>
-
-    <div class="actions flex justify-between gap-medium">
-      <div class="flex-grow flex">
-        <%= f.submit t('actions.save'), class: 'flex-grow' %>
-      </div>
-      <div class="flex-grow flex">
-        <%= link_to t('actions.delete'), tag_path(@tag), class: 'flex-grow button delete', data: { turbo_method: :delete, turbo_frame: '_top' } %>
-      </div>
-    </div>
-  <% end %>
-
-  <div class="flex flex-col gap-small">
-    <h4><%= t('.usage') %></h4>
-
-    <ul>
-      <% Event.tagged_with(@tag, on: :genres).order(start_date: :asc).limit(10).each do |event| %>
-        <li><%= link_to event, event.url, target: :blank %></li>
-      <% end %>
-    </ul>
-  </div>
-
-  <div class="flex flex-col gap-small">
-    <h4><%= t('.suggestions') %></h4>
-    <% SimilarTaggingsFinder.call(context: 'genres', taggable_type: Style.name, tag: @tag.name).limit(10).group_by(&:taggable).each do |taggable, taggings| %>
-      <div class="suggestion flex flex-col gap-small">
-        <h4><%= taggable %></h4>
-        <div class="flex flex-row justify-between align-bottom">
-          <div class="flex gap-small wrap align-center">
-            <% taggings.each do |tagging| %>
-              <span class="tag"><%= tagging.tag.name %></span>
-            <% end %>
-          </div>
-          <%= form_with model: @tag, url: tag_path(@tag), class: 'flex align-end', data: { turbo_frame: '_top' } do |f| %>
-            <%= f.hidden_field :style_ids, value: [*Style.where(id: @tag.taggings.pluck(:taggable_id)).pluck(:id), taggable.id].join(',') %>
-            <%= f.submit t('actions.assign') %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-  </div>
+  <%= render 'genres/editor', genre: @genre, suggestions: @suggestions,
+        sample_events: @sample_events, return_to: root_path %>
 </div>
-

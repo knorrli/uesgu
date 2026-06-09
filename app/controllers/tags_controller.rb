@@ -1,7 +1,8 @@
 class TagsController < ApplicationController
-  # index/chips power the public events filter autocomplete; the rest is tag management.
+  # index/chips power the public events filter autocomplete; edit is the inline
+  # (per-event) entry into the genre → style editor.
   allow_unauthenticated_access only: %i[ index chips ]
-  before_action :require_admin, only: %i[ edit update destroy ]
+  before_action :require_admin, only: %i[ edit ]
 
   def index
     @tags = ActsAsTaggableOn::Tag
@@ -23,25 +24,11 @@ class TagsController < ApplicationController
       .order(name: :asc)
   end
 
+  # The gear icon on a genre tag opens the shared genre editor for that genre.
   def edit
-    @tag = ActsAsTaggableOn::Tag.find(params[:id])
-  end
-
-  def update
-    @tag = ActsAsTaggableOn::Tag.find(params[:id])
-    @tag.update(tag_params)
-
-    redirect_back fallback_location: admin_path
-  end
-
-  def destroy
-    @tag = ActsAsTaggableOn::Tag.find(params[:id])
-    @tag.discard
-
-    redirect_back fallback_location: admin_path
-  end
-
-  def tag_params
-    params.expect(acts_as_taggable_on_tag: [:name, :style_ids])
+    tag = ActsAsTaggableOn::Tag.find(params[:id])
+    @genre = Genre.create_or_find_by!(name: tag.name)
+    @suggestions = StyleSuggester.call(@genre)
+    @sample_events = Event.tagged_with(@genre.name, on: :genres).order(start_date: :desc).limit(5)
   end
 end

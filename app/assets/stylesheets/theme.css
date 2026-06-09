@@ -19,8 +19,28 @@ body {
   --theme-bg-muted: hsl(from var(--theme-bg-color) h s calc(l - 10));
   --theme-accent-muted: hsl(from var(--theme-accent-color) h calc(s - 60) calc(l + 15));
 
+  color-scheme: light;
   background-color: var(--theme-bg-color);
   color: var(--theme-fg-color);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark theme. The toggle (theme_controller.js) resolves the user's
+   system/light/dark preference to a concrete light|dark value and sets it on
+   <html data-theme>, so we only need a single dark override here — the muted
+   tokens are recomputed in the opposite direction from light. */
+html[data-theme="dark"] body {
+  --color-text: #ededed;
+  --color-background: #1c1419;
+  --color-accent: #2fbe7e;
+  --color-warn: #f87171;
+  --color-favorite: #ff6b9a;
+
+  --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l - 35));
+  --theme-bg-muted: hsl(from var(--theme-bg-color) h s calc(l + 6));
+  --theme-accent-muted: hsl(from var(--theme-accent-color) h calc(s - 40) calc(l - 15));
+
+  color-scheme: dark;
 }
 
 input {

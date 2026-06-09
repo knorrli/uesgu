@@ -43,6 +43,21 @@
   text-decoration: underline;
 }
 
+/* Theme switcher: a text button styled to match the nav links. Cycles
+   system → light → dark; the visible label reflects the current choice. */
+.theme-toggle {
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--theme-accent-color);
+}
+
+.theme-toggle:hover {
+  text-decoration: underline;
+}
+
 /* Account dropdown: a native <details> menu so personal links don't crowd the
    bar. The username is the trigger; items drop into a bordered panel. */
 .nav-menu {

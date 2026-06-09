@@ -62,6 +62,11 @@ body {
      denser rows, slightly smaller type — without abandoning the terminal box. */
   .hw-combobox__listbox {
     border-width: var(--tag-border-width);
+    /* Sit flush against the field's underline. The gem's 0.2rem nudge is
+       measured from the inner combobox box, which leaves the popup overlapping
+       up into the field; offset instead by the wrapper's padding-bottom +
+       border so the popup top meets the underline with no gap or overlap. */
+    top: calc(100% + var(--gap-small) + var(--border-width));
   }
 
   .hw-combobox__option {

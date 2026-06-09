@@ -1,6 +1,9 @@
 class Datepicker
   def self.preset
-    @preset ||= {
+    # Built fresh per call on purpose: memoizing froze both the locale (labels
+    # stuck at the first request's language) and Date.current (dates going stale
+    # after midnight). The hash is cheap to recompute.
+    {
       today: { label: I18n.t('datepicker.today'), values: [Date.current.iso8601, Date.current.iso8601] },
       tomorrow: { label: I18n.t('datepicker.tomorrow'), values: [Date.current.tomorrow.iso8601, Date.current.tomorrow.iso8601] },
       this_week: { label: I18n.t('datepicker.this_week'), values: [Date.current.beginning_of_week.iso8601, Date.current.end_of_week.iso8601] },

@@ -3,6 +3,7 @@ body {
   --color-background: var(--color-pink);
   --color-accent: var(--color-green);
   --color-warn: var(--color-red);
+  --color-favorite: var(--color-raspberry);
 
   --border-width: 2px;
   --tag-border-width: 1px;
@@ -13,6 +14,7 @@ body {
   --theme-fg-color: var(--color-text);
   --theme-accent-color: var(--color-accent);
   --theme-warn-color: var(--color-warn);
+  --theme-favorite-color: var(--color-favorite);
   --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l + 30));
   --theme-bg-muted: hsl(from var(--theme-bg-color) h s calc(l - 10));
   --theme-accent-muted: hsl(from var(--theme-accent-color) h calc(s - 60) calc(l + 15));

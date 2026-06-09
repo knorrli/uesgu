@@ -1,8 +1,10 @@
 <section id="events" class="flex flex-col gap-xlarge event-list">
+  <% followed_keys = favorite_followed_keys.to_set %>
   <% events_by_date = @events.group_by(&:start_date) %>
   <% events_by_date.each do |date, events| %>
     <div class="flex flex-col gap-medium date-events <%= class_names(past: date < Date.current.beginning_of_day) %>">
-      <h2 id="<%= date.iso8601 %>" class="flex date"><%= l date, format: :detailed %></h2>
+      <% day_keys = calendar_day_favorite_keys(events) %>
+      <h2 id="<%= date.iso8601 %>" class="flex date"><span class="date-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>" <%= 'hidden' unless followed_keys.any? { |key| day_keys.include?(key) } %>>&#9829;</span><%= l date, format: :detailed %></h2>
       <%= render 'venue_groups', events: events, filter: @filter %>
     </div>
   <% end %>

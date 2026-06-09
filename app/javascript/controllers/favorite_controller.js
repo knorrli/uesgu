@@ -47,11 +47,12 @@ export default class extends Controller {
     )
   }
 
-  // A calendar day shows a heart when any of its tags is followed. Each marker
-  // carries its day's keys, so this is a cheap set check — and it touches only
-  // the markers, leaving the drawer that sits among the cells alone.
+  // A day marker — a calendar cell's corner heart or a list date header's heart —
+  // shows when any tag on that day is followed. Each marker carries its day's
+  // keys, so this is a cheap set check that touches only the markers (leaving the
+  // calendar drawer that sits among the cells alone).
   #refreshMarkers() {
-    this.element.querySelectorAll(".day-favorite-marker[data-day-keys]").forEach((marker) => {
+    this.element.querySelectorAll("[data-day-keys]").forEach((marker) => {
       const keys = JSON.parse(marker.dataset.dayKeys)
       marker.hidden = !keys.some((key) => this.followed.has(key))
     })

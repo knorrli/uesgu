@@ -12,4 +12,15 @@ module CalendarHelper
       .map { |name, evs| CalendarVenue.new(name: name, count: evs.size, favorite: favorites.include?(name)) }
       .sort_by { |venue| [venue.favorite ? 0 : 1, -venue.count, venue.name] }
   end
+
+  # The favoritable things happening on a day, as namespaced keys
+  # ("l:<location>" / "s:<style>"). Rendered onto the cell's heart marker so the
+  # favorite Stimulus controller can flip it the instant a matching tag is
+  # toggled, without re-rendering the grid (and disturbing the open day drawer).
+  def calendar_day_favorite_keys(events)
+    events.flat_map do |event|
+      event.locations.map { |location| "l:#{location.name}" } +
+        event.styles.map { |style| "s:#{style.name}" }
+    end.uniq
+  end
 end

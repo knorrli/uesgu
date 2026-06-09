@@ -57,7 +57,36 @@
   gap: var(--gap-xsmall);
 }
 
-/* Clickable filter terms: plain accent-coloured text, no border/fill. */
+/* Plain informational tags: genres, and tags for logged-out visitors who can't
+   follow. Muted; the venue stays foreground as the headline. */
+.event-tag {
+  color: var(--theme-fg-muted);
+}
+
+.event-tag.venue {
+  color: var(--theme-fg-color);
+}
+
+/* Followable tags (logged-in): the whole tag IS the follow toggle, so it reads
+   as interactive — accent colour says "you can follow this", clicking toggles.
+   font:inherit makes the button match the row; the venue's headline size/weight
+   still come from .event-where .venue (defined later, so it wins on size).
+   Placed after .event-tag.venue so a followable venue reads accent, not fg. */
+.event-tag.fav {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: var(--theme-accent-color);
+  cursor: pointer;
+}
+
+.event-tag.fav:hover .fav-label {
+  text-decoration: underline;
+}
+
+/* Read-only link back into the filtered list (notification digests only, where
+   there's no filter form). */
 .filter-link {
   border: 0;
   padding: 0;
@@ -69,13 +98,6 @@
 
 .filter-link:hover {
   text-decoration: underline;
-}
-
-/* An applied filter is underlined so you can see what's currently narrowing
-   the list. */
-.filter-link.active {
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }
 
 /* Venue is the headline: the largest, boldest thing in the row. */
@@ -125,6 +147,13 @@
   font-size: var(--font-size-small);
 }
 
+/* Styles are the primary, followable descriptor — bold them so they assert a tier
+   above the muted, regular-weight subtitle and genres they sit between, without
+   adding another font size to the row. */
+.event-styles {
+  font-weight: bold;
+}
+
 /* Genres are display-only (not filters): muted, so the colour alone says
    "not clickable". */
 .event-genres {
@@ -138,6 +167,24 @@
 .meta-edit {
   margin-left: 0.4ch;
   color: var(--theme-fg-muted);
+}
+
+/* The follow heart trails its tag and inherits the tag's font-size, so the big
+   venue header gets a big heart and a small style tag a small one. Outline and
+   muted when not followed; solid and accent when followed. */
+.fav-heart {
+  margin-left: 0.4ch;
+}
+
+.fav-heart::before {
+  content: "\2661";
+  font-size: 0.9em;
+  color: var(--theme-fg-muted);
+}
+
+.event-tag.fav.followed .fav-heart::before {
+  content: "\2665";
+  color: var(--theme-accent-color);
 }
 
 /* Real, inert separator between terms — a sibling element, not a pseudo on the
@@ -269,6 +316,19 @@
     }
   }
 
+  /* A followed location or style on this day: a small solid heart tucked into
+     the top-right corner. Decorative and click-through, so the full-cell day
+     link underneath still receives the tap. */
+  .day-favorite-marker {
+    position: absolute;
+    top: var(--gap-small);
+    right: var(--gap-small);
+    font-size: var(--font-size-small);
+    line-height: 1;
+    color: var(--theme-accent-color);
+    pointer-events: none;
+  }
+
   /* Wide screens: a deduped, favorites-first venue summary. Titles are dropped
      (they never fit a 1/7 column); full detail is one tap away in the panel. */
   .day-venues {
@@ -284,11 +344,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-
-    &.favorite .day-venue-name {
-      font-weight: bold;
-      color: var(--theme-accent-color);
-    }
 
     &.more {
       color: var(--theme-fg-muted);
@@ -321,7 +376,11 @@
   .day-detail-row td {
     border: 0;
     border-block: var(--border-width) solid var(--theme-accent-color);
-    padding: var(--gap-large);
+    /* Full-width horizontally so the drawer's events line up with the List view
+       (same partial) and the page's left/right edges; the bold accent rules and
+       lighter background still read it as lifted out of the grid. */
+    padding-block: var(--gap-large);
+    padding-inline: 0;
     background-color: var(--theme-bg-color);
   }
 }
@@ -339,7 +398,9 @@
 }
 
 .day-detail-header {
-  align-items: center;
+  /* Bottom-align so the close button sits down on the date's double rule,
+     capping the end of the line instead of floating in the vertical middle. */
+  align-items: flex-end;
   gap: var(--gap-small);
 }
 

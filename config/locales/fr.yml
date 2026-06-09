@@ -52,9 +52,10 @@ fr:
     next: Suivant
   favorites:
     title: Favoris
-    intro: Choisissez les lieux et styles que vous suivez — ils sont mis en avant dans le calendrier et déterminent vos notifications.
+    intro: Choisissez les lieux et styles que vous suivez — les jours correspondants sont marqués d'un cœur dans le calendrier et déterminent vos notifications.
     saved: Favoris enregistrés.
     save: Enregistrer les favoris
+    toggle: 'Suivre ou ne plus suivre %{name}'
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.

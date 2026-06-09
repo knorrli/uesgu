@@ -77,17 +77,6 @@ export default class extends Controller {
     this.#removeComboboxValue(event.params.value, this.dateRangesInputTarget);
   }
 
-  toggleFilter(event) {
-    const value = event.params.value;
-    const input = this.formTarget.querySelector(`[name="${event.params.fieldName}"]`);
-    const existingValues = JSON.parse(input.dataset.existingValues);
-    if (existingValues.includes(value)) {
-      this.#removeComboboxValue(value, input);
-    } else {
-      this.#addComboboxValue(value, input);
-    }
-  }
-
   #clearComboboxInput(comboboxId) {
     document.getElementById(comboboxId).value = '';
   }

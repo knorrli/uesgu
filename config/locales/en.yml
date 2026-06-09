@@ -52,9 +52,10 @@ en:
     next: Next
   favorites:
     title: Favorites
-    intro: Choose the venues and styles you follow — they're highlighted in the calendar and shape your notifications.
+    intro: Choose the venues and styles you follow — matching days are flagged with a heart in the calendar, and they shape your notifications.
     saved: Favorites saved.
     save: Save favorites
+    toggle: 'Follow or unfollow %{name}'
   settings:
     title: Settings
     saved: Settings saved.

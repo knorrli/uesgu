@@ -41,6 +41,15 @@
   transition: none;
 }
 
+/* Fluid day cells (as in easepick's own <480px layout) so the two months fill
+   the field width set on the wrapper (see datepicker.css), instead of a fixed
+   42px/day that would over- or under-shoot it. */
+.calendars .calendar > .days-grid > .day {
+  width: auto;
+  min-width: 0;
+  max-width: none;
+}
+
 .calendar > .days-grid > .day {
   border-radius: var(--border-radius);
 

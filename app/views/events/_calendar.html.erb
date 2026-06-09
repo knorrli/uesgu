@@ -1,4 +1,5 @@
 <% list_params = request.query_parameters.except('view', 'start_date', 'page', 'd') %>
+<% followed_keys = favorite_followed_keys.to_set %>
 <section id="calendar" class="event-calendar flex flex-col gap-medium" data-controller="calendar">
   <%= month_calendar(start_date: @calendar_start, events: events, attribute: :start_date) do |date, day_events| %>
     <% number = class_names('calendar-day-number', today: date == Date.current) %>
@@ -9,6 +10,11 @@
             class: 'calendar-day-link', 'aria-label': l(date, format: :detailed),
             data: { action: 'calendar#select', turbo_frame: 'day-detail' } %>
     <% end %>
+    <% if day_events.any? %>
+      <% day_keys = calendar_day_favorite_keys(day_events) %>
+      <span class="day-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>"
+            <%= 'hidden' unless day_keys.any? { |key| followed_keys.include?(key) } %>>&#9829;</span>
+    <% end %>
     <div class="day-content">
       <div class="<%= number %>"><%= date.day %></div>
       <% if day_events.any? %>
@@ -16,7 +22,7 @@
         <%# Wide screens: a glanceable, deduped venue summary (full detail on tap). %>
         <ul class="day-venues">
           <% venues.first(4).each do |venue| %>
-            <li class="day-venue <%= 'favorite' if venue.favorite %>">
+            <li class="day-venue">
               <span class="day-venue-name"><%= venue.name %></span><% if venue.count > 1 %> <span class="day-venue-count">×<%= venue.count %></span><% end %>
             </li>
           <% end %>

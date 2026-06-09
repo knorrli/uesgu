@@ -38,7 +38,7 @@ module Scrapers
 
         event.save!
       rescue StandardError => e
-        raise ScrapeError.new e.message, event
+        record_failure(event, e)
       end
     end
 

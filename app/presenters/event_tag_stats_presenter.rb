@@ -11,35 +11,20 @@ class EventTagStatsPresenter
       .where(taggings: { context: 'styles', taggable_type: Event.name })
   end
 
+  # Genres are now first-class; "in use" means present on at least one event.
   def genre_tags
-    ActsAsTaggableOn::Tag
-      .includes(:taggings)
-      .where(taggings: { context: 'genres', taggable_type: Event.name })
+    Genre.in_use
   end
 
   def assigned_genre_tags
-    genre_tags
-      .kept
-      .where(
-        'EXISTS (:taggings_for_genre_and_style)',
-        taggings_for_genre_and_style: subquery_genre_tags_associated_to_style
-      )
+    Genre.in_use.assigned
   end
 
   def unassigned_genre_tags
-    genre_tags
-      .kept
-      .where(
-        'NOT EXISTS (:taggings_for_genre_and_style)',
-        taggings_for_genre_and_style: subquery_genre_tags_associated_to_style
-      )
+    Genre.unassigned
   end
 
-  private
-
-  def subquery_genre_tags_associated_to_style
-    ActsAsTaggableOn::Tagging
-      .where(context: 'genres', taggable_type: Style.name)
-      .where('taggings.tag_id = tags.id')
+  def dismissed_genre_tags
+    Genre.in_use.dismissed
   end
 end

@@ -9,7 +9,7 @@ class Notification < ApplicationRecord
 
   # Events added to the global list during this digest's window.
   def events
-    Event.where(created_at: period_start...period_end).order(start_date: :asc)
+    Event.visible.where(created_at: period_start...period_end).order(start_date: :asc)
   end
 
   # Events in the window narrowed to the user's favorite locations OR styles.
@@ -50,7 +50,7 @@ class Notification < ApplicationRecord
 
     while cursor + interval <= now
       window_end = cursor + interval
-      if Event.where(created_at: cursor...window_end).exists?
+      if Event.visible.where(created_at: cursor...window_end).exists?
         created << user.notifications.create!(period_start: cursor, period_end: window_end)
       end
       cursor = window_end

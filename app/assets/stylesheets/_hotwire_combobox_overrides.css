@@ -50,11 +50,34 @@ body {
     color: var(--theme-fg-color);
   }
 
+  /* Match the selected-style chips to the filter's applied tags (.filter .tag,
+     accent-filled, font-size 75%, line-height 1). The gem otherwise inflates
+     them with a 1.5rem line-height and a 1rem-min remover. */
   .hw-combobox__chip {
-    border-width: var(--tag-border-width);
+    border: var(--tag-border-width) solid var(--theme-accent-color);
+    background-color: var(--theme-accent-color);
+    color: var(--theme-bg-color);
     padding: 5px;
-    font-size: 80%;
+    font-size: 75%;
+    line-height: 1;
     white-space: nowrap;
+  }
+
+  /* The gem renders the × as a fixed grey SVG background-image, which clashes
+     with the accent chip. Mask the shape and fill it with currentColor (the
+     chip's text colour, --theme-bg-color) so it matches the label exactly and
+     adapts to light/dark for free — the "punched" look the filter tags have. */
+  .hw-combobox__chip__remover {
+    min-height: 0;
+    min-width: 0;
+    width: 1em;
+    height: 1em;
+    margin-left: var(--gap-small);
+    background-image: none;
+    background-color: currentColor;
+    --hw-chip-remover-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18 18 6M6 6l12 12'/%3E%3C/svg%3E");
+    -webkit-mask: var(--hw-chip-remover-mask) center / contain no-repeat;
+    mask: var(--hw-chip-remover-mask) center / contain no-repeat;
   }
 
   /* The default dropdown reads as a heavy green slab: a 2px full-accent frame

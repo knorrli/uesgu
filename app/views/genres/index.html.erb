@@ -1,0 +1,44 @@
+<div class="flex flex-col gap-large">
+  <div class="flex justify-between align-baseline gap-medium wrap">
+    <h1><%= t('.title') %></h1>
+    <%= link_to t('.queue_link'), queue_genres_path %>
+  </div>
+
+  <div class="flex gap-small wrap">
+    <% %w[all unassigned assigned dismissed excluded].each do |status| %>
+      <%= link_to t(".status_#{status}"),
+            genres_path(status: (status == 'all' ? nil : status), q: params[:q].presence),
+            class: class_names(:tag, active: @status == status) %>
+    <% end %>
+  </div>
+
+  <%= form_with url: genres_path, method: :get, data: { turbo_frame: '_top' } do %>
+    <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+    <div class="input-wrapper flex">
+      <%= text_field_tag :q, params[:q], placeholder: t('.search'), autocomplete: 'off' %>
+    </div>
+  <% end %>
+
+  <div class="flex flex-col gap-small">
+    <% @genres.each do |genre| %>
+      <div class="flex justify-between align-baseline gap-medium">
+        <%= link_to genre.name, edit_genre_path(genre) %>
+        <div class="flex gap-small wrap justify-end align-baseline">
+          <% if genre.dismissed? || genre.excluded? %>
+            <span class="muted"><%= t(genre.excluded? ? '.status_excluded' : '.status_dismissed') %></span>
+            <%= button_to t('genres.queue.restore'), restore_genre_path(genre),
+                  params: { return_to: genres_path(status: params[:status].presence, q: params[:q].presence) } %>
+          <% elsif genre.styles.any? %>
+            <% genre.styles.each do |style| %><span class="tag"><%= style.name %></span><% end %>
+          <% else %>
+            <span class="muted"><%= t('.status_unassigned') %></span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex justify-center">
+    <%= paginate @genres %>
+  </div>
+</div>

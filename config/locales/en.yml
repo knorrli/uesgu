@@ -101,28 +101,40 @@ en:
     save: Save
     cancel: Cancel
     delete: Delete
-  genre_style_assignments:
+  genres:
     index:
-      unassigned_genre_tags: Unassigned genre tags
-      suggestions: Suggestions
-      manual_entry: Manual assignment
-  tags:
-    tag:
-      usage: Usage
-      suggestions: Suggestions
-      manual_entry: Manual assignment
-    edit:
-      usage: Usage
-      suggestions: Suggestions
+      title: Genres
+      search: Search genres
+      queue_link: Assignment queue
+      status_all: all
+      status_unassigned: unassigned
+      status_assigned: assigned
+      status_dismissed: dismissed
+      status_excluded: excluded
+    queue:
+      title: Genre assignment
+      remaining: "%{count} unassigned"
+      empty: Nothing to assign — every genre in use is mapped or dismissed.
+      dismissed: "Dismissed (%{count})"
+      restore: Restore
+    editor:
+      usage: "on %{count} events"
+      suggested: Suggested
+      assign: Assign
+      skip: Skip
+      exclude: Not music
+      appears_on: Appears on
   admin:
     index:
-      total: Total
-      assign_unassigned_genres: Create assignments
-      reload: reload
-      clear: clear
-      scrape: scrape
-      assigned: "Assigned: %{count}"
-      unassigned: "Unassigned: %{count}"
+      title: Admin
+      assign_unassigned_genres: Assign genres
+      browse_genres: Browse all
+      assigned: Assigned
+      unassigned: Unassigned
+      dismissed: Dismissed
+      jobs_heading: Jobs
+      jobs_hint: Scraping and background tasks run as scheduled jobs.
+      job_queue: Job queue
   activemodel:
     models:
       genre:

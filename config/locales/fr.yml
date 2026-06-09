@@ -101,28 +101,40 @@ fr:
     save: Enregistrer
     cancel: Annuler
     delete: Supprimer
-  genre_style_assignments:
+  genres:
     index:
-      unassigned_genre_tags: Tags de genre non assignés
-      suggestions: Suggestions
-      manual_entry: Assignation manuelle
-  tags:
-    tag:
-      usage: Utilisation
-      suggestions: Suggestions
-      manual_entry: Assignation manuelle
-    edit:
-      usage: Utilisation
-      suggestions: Suggestions
+      title: Genres
+      search: Rechercher des genres
+      queue_link: File d'assignation
+      status_all: tous
+      status_unassigned: non assigné
+      status_assigned: assigné
+      status_dismissed: ignoré
+      status_excluded: exclu
+    queue:
+      title: Assignation des genres
+      remaining: "%{count} non assignés"
+      empty: Rien à assigner — chaque genre utilisé est assigné ou ignoré.
+      dismissed: "Ignorés (%{count})"
+      restore: Restaurer
+    editor:
+      usage: "sur %{count} événements"
+      suggested: Suggestions
+      assign: Assigner
+      skip: Ignorer
+      exclude: Non musical
+      appears_on: Apparaît sur
   admin:
     index:
-      total: Total
-      assign_unassigned_genres: Créer des assignations
-      reload: recharger
-      clear: vider
-      scrape: scraper
-      assigned: "Assignés : %{count}"
-      unassigned: "Non assignés : %{count}"
+      title: Admin
+      assign_unassigned_genres: Assigner les genres
+      browse_genres: Tout parcourir
+      assigned: Assignés
+      unassigned: Non assignés
+      dismissed: Ignorés
+      jobs_heading: Tâches
+      jobs_hint: Le scraping et les tâches de fond s'exécutent comme tâches planifiées.
+      job_queue: File d'attente des tâches
   activemodel:
     models:
       genre:

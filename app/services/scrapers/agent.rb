@@ -5,15 +5,6 @@ module Scrapers
   class Agent < Mechanize
     include Registerable
 
-    class ScrapeError < StandardError
-      attr_reader :event
-
-      def initialize(message, event)
-        @event = event
-        super("#{message}, Event: #{event.attributes}")
-      end
-    end
-
     def self.call
       new.call
     end
@@ -21,15 +12,35 @@ module Scrapers
     def call
       Rails.logger.info "Start processing #{self.class.location} at #{self.class.url}"
 
+      @failures = 0
       process_events
 
-      Rails.logger.info "Finished processing #{self.class.location}"
+      if @failures.positive?
+        Rails.logger.warn "Finished #{self.class.location} with #{@failures} skipped event(s)"
+      else
+        Rails.logger.info "Finished processing #{self.class.location}"
+      end
     end
 
     private
 
+    # Log and skip a single event that failed to parse or save, so one bad
+    # event doesn't abort the rest of a venue's programme. A total failure
+    # (e.g. the site being down) raises before/around the loop instead, so the
+    # job still surfaces as failed in Mission Control.
+    def record_failure(event, error)
+      @failures = @failures.to_i + 1
+      Rails.logger.error(
+        "[#{self.class.location}] Skipped event #{event&.url}: #{error.class}: #{error.message}"
+      )
+    end
+
+    # Derive styles from the genre → style mapping. Also registers any new
+    # genres (unmapped, so they surface in the assignment queue) — the styles
+    # of a still-unmapped genre are simply none.
     def event_styles(genres:)
-      Style.tagged_with(genres, any: true).pluck(:name)
+      Genre.ensure!(genres)
+      Style.joins(:genres).where(genres: { name: genres }).distinct.pluck(:name)
     end
 
     def month_number(month:)

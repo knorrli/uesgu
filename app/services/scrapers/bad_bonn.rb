@@ -38,20 +38,23 @@ module Scrapers
       end
     end
 
+    # The detail page carries the event data as data-* attributes on <article>.
+    # (The element used to be `article.show`; the site dropped that class in a
+    # Tailwind redesign, but the data attributes are stable.)
     def event_start_time(event_page:)
-      article = event_page.at_css('article.show')
+      article = event_page.at_css('article[data-date]')
       date_string = article&.attr('data-date').to_s
       time_string = article&.attr('data-time').to_s
-      raise "Missing date (article.show[data-date]) on #{event_page.uri}" if date_string.blank?
+      raise "Missing date (article[data-date]) on #{event_page.uri}" if date_string.blank?
       Time.zone.parse("#{date_string}, #{time_string}")
     end
 
     def event_title(event_page:)
-      event_page.at_css('article.show').attr('data-title').to_s
+      event_page.at_css('article[data-date]').attr('data-title').to_s
     end
 
     def event_subtitle(event_page:)
-      event_page.css('.show-text-wrapper p').children.find { |node| node.text.squish.presence }.text.squish
+      event_page.css('article p').map { |node| node.text.squish }.find(&:present?).to_s
     end
 
     def event_genres(event_page:)

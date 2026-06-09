@@ -1,6 +1,7 @@
 <% content_for :title, t('events.index.title') %>
 
-<div class="flex flex-col gap-large align-stretch" data-controller="filter favorite">
+<div class="flex flex-col gap-large align-stretch" data-controller="filter favorite"
+     data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
   <%= render 'filter', filter: @filter %>
 
   <%# Toggle row, above the content in both views (so the first bold header lines

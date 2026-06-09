@@ -79,9 +79,10 @@ module EventsHelper
     @followed_styles ||= Set.new(current_user&.style_list)
   end
 
-  # The user's follows as namespaced keys ("l:<location>" / "s:<style>"), matched
-  # against each day's keys to render its heart marker server-side (the authoritative
-  # source — recomputed on every render). See CalendarHelper#calendar_day_favorite_keys.
+  # The user's follows as namespaced keys ("l:<location>" / "s:<style>"). Used to
+  # render each day's heart marker server-side (the authoritative source on every
+  # render) and handed to the favorite Stimulus controller so it can flip those
+  # markers the instant a tag is toggled. See CalendarHelper#calendar_day_favorite_keys.
   def favorite_followed_keys
     followed_locations.map { |name| "l:#{name}" } + followed_styles.map { |name| "s:#{name}" }
   end

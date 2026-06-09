@@ -1,0 +1,44 @@
+[
+  {
+    "url": "https://www.saegegasse.ch/programm/event/209-2-burgdorfer-plattenboerse",
+    "start_time": "2026-09-12T11:00:00+02:00",
+    "start_date": "2026-09-12",
+    "title": "2. Burgdorfer Plattenbörse",
+    "subtitle": "Die Plattenbörse für Vinyl-LiebhaberInnen - 11:00 -16:00 Uhr",
+    "genre_list": null,
+    "style_list": [],
+    "location_list": [
+      "Sägegasse",
+      "Burgdorf",
+      "BE"
+    ]
+  },
+  {
+    "url": "https://www.saegegasse.ch/programm/event/210-elio-ricca-songs-from-utopia",
+    "start_time": "2026-09-18T20:00:00+02:00",
+    "start_date": "2026-09-18",
+    "title": "Elio Ricca & Songs from Utopia",
+    "subtitle": "Pop trifft auf Underground, Disco kollidiert mit Grunge, Synthwave prallt auf Punk",
+    "genre_list": null,
+    "style_list": [],
+    "location_list": [
+      "Sägegasse",
+      "Burgdorf",
+      "BE"
+    ]
+  },
+  {
+    "url": "https://www.saegegasse.ch/programm/event/197-ruination-metal-fest-4",
+    "start_time": "2026-11-28T15:30:00+01:00",
+    "start_date": "2026-11-28",
+    "title": "Ruination Metal Fest 4",
+    "subtitle": "Mit Days of Ruin, I, Delusionist, Ophelia's Eye, Novara Nyx, Devils Rage, Born in Dorian, Antipodes & The Boyz from Karma",
+    "genre_list": null,
+    "style_list": [],
+    "location_list": [
+      "Sägegasse",
+      "Burgdorf",
+      "BE"
+    ]
+  }
+]

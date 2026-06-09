@@ -166,6 +166,7 @@ de:
   events:
     index:
       title: üsgu
+      empty: Keine Veranstaltungen für die aktuellen Filter.
       view:
         label: Ansicht
         list: Liste

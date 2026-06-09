@@ -17,8 +17,7 @@
           <% where_tags.each_with_index do |location, i| %>
             <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
             <%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive,
-                  modifier: (location == venue ? 'venue' : nil), favorite_type: :location,
-                  active: (interactive && filter.location_list.include?(location.name)) %>
+                  modifier: (location == venue ? 'venue' : nil), favorite_type: :location %>
           <% end %>
         </div>
       <% end %>

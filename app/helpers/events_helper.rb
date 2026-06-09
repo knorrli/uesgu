@@ -1,38 +1,39 @@
 module EventsHelper
-  # A filterable term (venue, location, style). In the interactive events list
-  # it's a toggle button wired to the filter Stimulus controller; in read-only
-  # contexts (e.g. a notification digest) it's a plain link to the filtered list,
-  # so green still means "clickable" without needing a live filter form.
-  def event_filter_tag(label, field:, value:, interactive: true, active: false, modifier: nil, favorite_type: nil)
-    classes = class_names('filter-link', modifier, active: active)
-
-    tag = if interactive
-      button_tag label, type: :button, class: classes,
-                 data: { action: 'filter#toggleFilter', filter_field_name_param: field, filter_value_param: value }
-    else
-      link_to label, events_path(field.delete_suffix('[]').to_sym => [value]), class: classes
+  # A tag on an event (venue, location, style). Filtering the programme is done in
+  # the filter inputs, not by clicking tags — so for a logged-in visitor the whole
+  # tag is instead the *follow* toggle (see #favorite_tag). Logged-out visitors
+  # can't follow, so they get a plain label. In read-only contexts (e.g. a
+  # notification digest) there's no filter form, so it stays a link into the
+  # filtered list as a way back into the site.
+  def event_filter_tag(label, field:, value:, interactive: true, modifier: nil, favorite_type: nil)
+    unless interactive
+      return link_to label, events_path(field.delete_suffix('[]').to_sym => [value]),
+                     class: class_names('filter-link', modifier)
     end
 
-    # Inline favoriting only makes sense in the live list for a logged-in user;
-    # digests (interactive: false) and logged-out visitors get the bare tag.
-    return tag unless interactive && favorite_type && authenticated?
+    return content_tag(:span, label, class: class_names('event-tag', modifier)) unless favorite_type && authenticated?
 
-    safe_join([tag, favorite_toggle(favorite_type, value)])
+    favorite_tag(label, favorite_type, value, modifier)
   end
 
-  # A heart that follows/unfollows one location or style for the current user.
-  # The favorite Stimulus controller flips every matching heart on the page and
-  # POSTs in the background, so the list never reloads; colour carries state
-  # (themify only ships an outline heart), matching the "green = active" language.
-  def favorite_toggle(type, value)
+  # The whole tag is the follow toggle: clicking the venue/style name (a big,
+  # obvious target, not a tiny icon) follows/unfollows it, shown by a trailing
+  # heart that inherits the tag's size. Optimistic — the favorite Stimulus
+  # controller flips every matching tag on the page and POSTs in the background,
+  # so nothing reloads. Accent colour marks a tag as followable; the heart's fill
+  # marks whether you currently follow it.
+  def favorite_tag(label, type, value, modifier = nil)
     followed = followed_tag?(type, value)
-    # Empty button: the heart glyph (outline/solid) comes from CSS so state lives
-    # in one place (the `followed` class) for both the colour and the fill.
-    button_tag '', type: :button,
-               class: class_names('fav-toggle', followed: followed),
+    button_tag type: :button,
+               class: class_names('event-tag', 'fav', modifier, followed: followed),
                'aria-pressed': followed.to_s,
                'aria-label': t('favorites.toggle', name: value),
-               data: { action: 'favorite#toggle', favorite_type_param: type, favorite_value_param: value }
+               data: { action: 'favorite#toggle', favorite_type_param: type, favorite_value_param: value } do
+      safe_join([
+        content_tag(:span, label, class: 'fav-label'),
+        content_tag(:span, '', class: 'fav-heart', 'aria-hidden': true)
+      ])
+    end
   end
 
   def followed_tag?(type, value)

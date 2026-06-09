@@ -52,7 +52,7 @@ de:
     next: Weiter
   favorites:
     title: Favoriten
-    intro: Wähle die Locations und Stile, denen du folgst – sie werden im Kalender hervorgehoben und bestimmen deine Mitteilungen.
+    intro: Wähle die Locations und Stile, denen du folgst – passende Tage werden im Kalender mit einem Herz markiert und bestimmen deine Mitteilungen.
     saved: Favoriten gespeichert.
     save: Favoriten speichern
     toggle: '%{name} folgen oder entfolgen'

@@ -56,4 +56,17 @@ body {
     font-size: 80%;
     white-space: nowrap;
   }
+
+  /* The default dropdown reads as a heavy green slab: a 2px full-accent frame
+     around tall, airy 1rem rows. Soften it into a crisp menu — hairline frame,
+     denser rows, slightly smaller type — without abandoning the terminal box. */
+  .hw-combobox__listbox {
+    border-width: var(--tag-border-width);
+  }
+
+  .hw-combobox__option {
+    padding: var(--gap-xsmall) var(--gap-small);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
 }

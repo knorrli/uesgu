@@ -171,6 +171,8 @@ de:
         label: Ansicht
         list: Liste
         calendar: Kalender
+      favorites_filter:
+        label: Meine Favoriten
     day:
       prompt: Tippe auf einen Tag, um die Events zu sehen.
       empty: Keine Events an diesem Tag.

@@ -253,6 +253,40 @@
   }
 }
 
+/* "My favorites" filter shortcut, sitting in the view-switcher row. A flat, muted
+   text link with a leading heart (the .button.* specificity matches the view
+   switcher's, beating the boxed a.button base). The heart is outline + muted when
+   off; when the favorites filter is applied the label bolds and the heart fills
+   in the favorite accent — echoing the follow-heart language used elsewhere. */
+.button.favorites-filter-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4ch;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--theme-fg-muted);
+  text-decoration: none;
+}
+
+.button.favorites-filter-link:hover {
+  text-decoration: underline;
+}
+
+.favorites-filter-link .fav-heart {
+  margin-left: 0;
+}
+
+.button.favorites-filter-link.active {
+  color: var(--theme-favorite-color);
+  font-weight: bold;
+}
+
+.favorites-filter-link.active .fav-heart::before {
+  content: "\2665";
+  color: var(--theme-favorite-color);
+}
+
 .simple-calendar {
   .table {
     table-layout: fixed;

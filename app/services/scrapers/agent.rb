@@ -24,6 +24,79 @@ module Scrapers
 
     private
 
+    # Template method shared by every scraper. Subclasses provide only the venue
+    # specifics via the hooks below (event_rows / event_url + field extractors);
+    # the fetch-iterate-find-build-save-skip skeleton lives here once.
+    def process_events
+      get(self.class.url)
+
+      event_rows.each do |row|
+        @current_row = row
+        next if skip_row?(row)
+
+        url = event_url(row)
+        next if url.blank?
+
+        Rails.logger.info "Processing event URL #{url}"
+        event = Event.find_or_initialize_by(url: url)
+        transact do
+          build_event(event, row)
+          event.save!
+        rescue StandardError => e
+          record_failure(event, e)
+        end
+      end
+    end
+
+    # Assign every field from the event's content node. `event_content` is the row
+    # itself for list-page scrapers; click-into-detail scrapers override it to fetch
+    # and return the detail page. Wrapped in `transact` (a no-op when nothing is
+    # navigated) so the agent's history is restored after each detail click.
+    def build_event(event, row)
+      content = event_content(row)
+      preprocess(content)
+      event.start_time    = event_start_time(content)
+      event.start_date    = event.start_time.to_date
+      event.title         = event_title(content)
+      event.subtitle      = event_subtitle(content)
+      event.genre_list    = event_genres(content)
+      event.style_list    = event_styles(genres: event.genre_list)
+      event.location_list = self.class.locations
+      postprocess(event)
+    end
+
+    # The list row currently being processed. Exposed for the rare hybrid scraper
+    # whose extractors need the row even after `event_content` clicks into a detail
+    # page (see Kiff), and as the seam for future health/cancellation hooks.
+    attr_reader :current_row
+
+    # --- Hooks: required ---
+    def event_rows
+      raise NotImplementedError, "#{self.class} must implement #event_rows"
+    end
+
+    def event_url(_row)
+      raise NotImplementedError, "#{self.class} must implement #event_url"
+    end
+
+    # --- Hooks: optional, with behaviour-preserving defaults ---
+
+    # Skip a row before it becomes an event (e.g. non-concert entries).
+    def skip_row?(_row) = false
+
+    # The node field extractors read from. List-page default: the row itself.
+    def event_content(row) = row
+
+    # Run before field extraction (e.g. stateful year-rollover detection).
+    def preprocess(_content) = nil
+
+    # Many venues expose no subtitle / no genres; default to none.
+    def event_subtitle(_content) = nil
+    def event_genres(_content) = nil
+
+    # Adjust the built event before saving (e.g. promote a blank title).
+    def postprocess(_event) = nil
+
     # Log and skip a single event that failed to parse or save, so one bad
     # event doesn't abort the rest of a venue's programme. A total failure
     # (e.g. the site being down) raises before/around the loop instead, so the

@@ -12,53 +12,41 @@ module Scrapers
       URI.parse('https://club.badbonn.ch/program')
     end
 
-    def process_events
-      get(self.class.url)
+    def event_rows
+      page.css('.program-row')
+    end
 
-      page.css('.program-row').each do |event_container|
-        link = Page::Link.new(event_container.at_css('.program-bands a'), @mech, page)
-        url = URI.parse(link.href).to_s
+    def event_url(row)
+      URI.parse(link_for(row).href).to_s
+    end
 
-        Rails.logger.info "Processing event URL #{url}"
-
-        event = Event.find_or_initialize_by(url: url)
-        transact do
-          event_page = click(link)
-          event.start_time = event_start_time(event_page: event_page)
-          event.start_date = event.start_time.to_date
-          event.title = event_title(event_page: event_page)
-          event.subtitle = event_subtitle(event_page: event_page)
-          event.genre_list = event_genres(event_page: event_page)
-          event.style_list = event_styles(genres: event.genre_list)
-          event.location_list = self.class.locations
-          event.save!
-        rescue StandardError => e
-          record_failure(event, e)
-        end
-      end
+    def event_content(row)
+      click(link_for(row))
     end
 
     # The detail page carries the event data as data-* attributes on <article>.
     # (The element used to be `article.show`; the site dropped that class in a
     # Tailwind redesign, but the data attributes are stable.)
-    def event_start_time(event_page:)
-      article = event_page.at_css('article[data-date]')
+    def event_start_time(content)
+      article = content.at_css('article[data-date]')
       date_string = article&.attr('data-date').to_s
       time_string = article&.attr('data-time').to_s
-      raise "Missing date (article[data-date]) on #{event_page.uri}" if date_string.blank?
+      raise "Missing date (article[data-date]) on #{content.uri}" if date_string.blank?
       Time.zone.parse("#{date_string}, #{time_string}")
     end
 
-    def event_title(event_page:)
-      event_page.at_css('article[data-date]').attr('data-title').to_s
+    def event_title(content)
+      content.at_css('article[data-date]').attr('data-title').to_s
     end
 
-    def event_subtitle(event_page:)
-      event_page.css('article p').map { |node| node.text.squish }.find(&:present?).to_s
+    def event_subtitle(content)
+      content.css('article p').map { |node| node.text.squish }.find(&:present?).to_s
     end
 
-    def event_genres(event_page:)
-      nil
+    private
+
+    def link_for(row)
+      Page::Link.new(row.at_css('.program-bands a'), @mech, page)
     end
   end
 end

@@ -34,7 +34,7 @@ namespace :scrapers do
       print "#{slug}: list… "
       agent.get(klass.url)
       File.binwrite(dir.join('list.html'), agent.page.body)
-      print "ok"
+      print 'ok'
 
       if (selector = detail_link[slug])
         node = agent.page.at_css(selector)

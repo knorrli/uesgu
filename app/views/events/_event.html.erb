@@ -23,7 +23,7 @@
       <div class="event-genres">
         <% event.genres.each_with_index do |genre, i| %>
           <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <span class="<%= class_names('genre', active: (interactive && filter.queries.any? { |query| genre.name =~ %r{.*#{query}.*}i })) %>"><%= genre.name %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), target: :blank, class: 'meta-edit', 'aria-label': 'Edit tag' do %><span class="ti-settings"></span><% end %><% end %></span>
+          <span class="<%= class_names('genre', active: (interactive && filter.queries.any? { |query| genre.name =~ %r{.*#{query}.*}i })) %>"><%= genre.name %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'meta-edit', 'aria-label': 'Edit tag' do %><span class="ti-settings"></span><% end %><% end %></span>
         <% end %>
       </div>
     <% end %>

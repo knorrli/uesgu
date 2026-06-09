@@ -174,7 +174,6 @@ fr:
       favorites_filter:
         label: Mes favoris
     day:
-      prompt: Touchez un jour pour voir ses événements.
       empty: Aucun événement ce jour-là.
       close: Fermer
     calendar:

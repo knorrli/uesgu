@@ -472,6 +472,7 @@
   font-size: 1.5rem;
   line-height: 1;
   color: var(--theme-accent-color);
+  text-decoration: none;
   cursor: pointer;
 }
 

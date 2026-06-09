@@ -1,0 +1,15 @@
+<%# The expanded day, rendered inline in the calendar grid as a full-width row.
+    URL-driven (params[:day]); the close link just navigates back to the
+    no-day URL. Scrolls itself into view on connect for off-screen opens. %>
+<section class="day-detail event-list flex flex-col gap-small" data-controller="day-detail">
+  <header class="day-detail-header flex">
+    <h2 class="flex date"><%= l date, format: :detailed %></h2>
+    <%= link_to '✕', calendar_collapse_path, class: 'day-detail-close',
+          'aria-label': t('events.day.close'), title: t('events.day.close') %>
+  </header>
+  <% if events.any? %>
+    <%= render 'venue_groups', events: events, filter: filter %>
+  <% else %>
+    <p class="muted"><%= t('events.day.empty') %></p>
+  <% end %>
+</section>

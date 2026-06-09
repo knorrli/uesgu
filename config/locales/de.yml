@@ -122,6 +122,7 @@ de:
       restore: Wiederherstellen
     editor:
       usage: "auf %{count} Events"
+      status: "Status:"
       suggested: Vorschläge
       assign: Zuweisen
       ignore: "Ignorieren (behalten, kein Style)"

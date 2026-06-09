@@ -122,6 +122,7 @@ fr:
       restore: Restaurer
     editor:
       usage: "sur %{count} événements"
+      status: "Statut :"
       suggested: Suggestions
       assign: Assigner
       ignore: "Ignorer (garder, sans style)"

@@ -2,7 +2,8 @@
    self-describing labels. Render them compact — smaller type + tight padding —
    so they group on one row beneath the primary Assign action instead of each
    stacking onto its own line. They still wrap on narrow screens. */
-.genre-dispositions button {
+.genre-dispositions button,
+.genre-current-status button {
   font-size: var(--font-size-small);
   padding: var(--gap-xsmall) var(--gap-small);
 }

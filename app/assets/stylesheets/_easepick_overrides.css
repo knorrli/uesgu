@@ -8,26 +8,12 @@
   --color-fg-selected: var(--theme-bg-color);
   --color-fg-muted: var(--theme-fg-muted);
   --color-fg-accent: var(--theme-accent-color);
-  --color-btn-primary-bg: #fff;
-  --color-btn-primary-fg: #6b82ff;
-  --color-btn-primary-border: #6b82ff;
-  --color-btn-primary-hover-bg: #6b82ff;
-  --color-btn-primary-hover-fg: #fff;
-  --color-btn-primary-hover-border: #6b82ff;
-  --color-btn-primary-disabled-bg: #a2b0ff;
-  --color-btn-primary-disabled-fg: #fff;
-  --color-btn-primary-disabled-border: #a2b0ff;
-  --color-btn-secondary-bg: #fff;
-  --color-btn-secondary-fg: var(--theme-fg-muted);
-  --color-btn-secondary-border: #748194;
-  --color-btn-secondary-hover-bg: #748194;
-  --color-btn-secondary-hover-fg: #fff;
-  --color-btn-secondary-hover-border: #748194;
-  --color-btn-secondary-disabled-bg: #b5bbc4;
-  --color-btn-secondary-disabled-fg: #fff;
-  --color-btn-secondary-disabled-border: #b5bbc4;
-  --color-border-default: #ddd;
-  --color-border-locked: #f9f9f9;
+  --color-border-default: var(--theme-bg-muted);
+  --color-border-locked: var(--theme-bg-muted);
+
+  /* easepick's Apply/Cancel button palette (--color-btn-*) is intentionally
+     left at the gem defaults: this picker auto-applies on select-and-click, so
+     those buttons never render. Theme them here if that ever changes. */
 
   --day-width: 42px;
   --day-height: 37px;
@@ -36,9 +22,32 @@
 
 .container {
   font-family: inherit;
-  border: var(--border-width) solid var(--border-color);
+  /* 1px hairline to match the lightened combobox dropdown (see
+     _hotwire_combobox_overrides.css), not the heavier 2px field borders. */
+  border: var(--tag-border-width) solid var(--border-color);
   border-radius: var(--border-radius);
   transition: none;
+  /* easepick measures a hidden .container.calc and locks a content-based width,
+     so its own .container{width:100%} never wins. Reassert it so the popover
+     spans the field instead of hugging its content. */
+  width: 100% !important;
+  box-sizing: border-box;
+  /* Drop the popup flush against the field underline — easepick positions it
+     overlapping up into the field by the wrapper's padding-bottom + border.
+     Same offset the combobox dropdown uses, so both popups align identically. */
+  margin-top: calc(var(--gap-small) + var(--border-width));
+}
+
+/* With the container now full-width, stretch the inner layout to fill it: the
+   two-month grid grows into the space left of the fixed preset column rather
+   than clustering at min-content. Day cells are already fluid (1fr columns). */
+.preset-plugin > main {
+  width: 100%;
+}
+
+.calendars {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 /* Fluid day cells (as in easepick's own <480px layout) so the two months fill

@@ -8,14 +8,16 @@
   left: 0 !important;
 }
 
-/* TODO: use own CSS variables */
+/* The calendar handle deliberately reuses the combobox handle vars
+   (--hw-handle-offset-right, --filter-icon-size) so the date field's icon lines
+   up identically with the What?/Where? combobox icons — intentionally shared,
+   not a TODO to split apart. */
 .datepicker {
   /* Containing block for the absolutely-positioned .easepick-wrapper above. */
   position: relative;
 
   .datepicker-handle {
     height: 100%;
-    /* position: absolute; */
     right: var(--hw-handle-offset-right);
     top: 0;
     width: var(--filter-icon-size);
@@ -24,17 +26,6 @@
       background-size: var(--filter-icon-size);
       position: initial;
       vertical-align: middle;
-    }
-  }
-
-  &.active {
-    background-color: var(--color-bg-black);
-    color: var(--color-white);
-
-
-    .datepicker-handle::before {
-      background-image: var(--hw-handle-image--queried);
-      background-size: var(--hw-handle-width--queried);
     }
   }
 }

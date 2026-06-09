@@ -166,6 +166,7 @@ en:
   events:
     index:
       title: üsgu
+      empty: No events match your current filters.
       view:
         label: View
         list: List

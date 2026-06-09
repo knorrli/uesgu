@@ -166,6 +166,7 @@ fr:
   events:
     index:
       title: üsgu
+      empty: Aucun événement ne correspond aux filtres actuels.
       view:
         label: Vue
         list: Liste

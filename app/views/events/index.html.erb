@@ -4,13 +4,17 @@
      data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
   <%= render 'filter', filter: @filter %>
 
-  <%# Toggle sits on its own row above the content in both views, so the first
-      bold header (calendar's month / list's first date) aligns across views. %>
-  <%= render 'view_switcher', view: @view %>
+  <%# Toggle row, above the content in both views (so the first bold header lines
+      up across views). When the filter comes up empty, the message rides on the
+      left of this same always-present row, so nothing below it jumps. %>
+  <div class="flex justify-between align-baseline gap-medium">
+    <span class="muted"><%= t('events.index.empty') if @events.empty? %></span>
+    <%= render 'view_switcher', view: @view %>
+  </div>
 
   <% if @view == 'calendar' %>
     <%= render 'calendar', events: @events %>
-  <% else %>
+  <% elsif @events.any? %>
     <%= render 'events', events: @events %>
   <% end %>
 </div>

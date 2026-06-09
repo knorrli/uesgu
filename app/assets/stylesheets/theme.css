@@ -30,15 +30,22 @@ body {
    <html data-theme>, so we only need a single dark override here — the muted
    tokens are recomputed in the opposite direction from light. */
 html[data-theme="dark"] body {
-  --color-text: #ededed;
-  --color-background: #1c1419;
-  --color-accent: #2fbe7e;
-  --color-warn: #f87171;
-  --color-favorite: #ff6b9a;
+  /* Soft, faintly warm off-white rather than near-#fff: pure white halates
+     against the dark plum ground and reads as harsh. */
+  --color-text: #d4ced3;
+  --color-background: #17131a;
+  /* Slightly calmer green and raspberry so links/hearts read as accents
+     instead of glowing against the dark field. */
+  --color-accent: #38c08a;
+  --color-warn: #f0837a;
+  --color-favorite: #ec6f98;
 
-  --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l - 35));
-  --theme-bg-muted: hsl(from var(--theme-bg-color) h s calc(l + 6));
-  --theme-accent-muted: hsl(from var(--theme-accent-color) h calc(s - 40) calc(l - 15));
+  /* Muted recalcs run opposite to light: dim the bright fg, lift the dark bg.
+     -25 keeps secondary text comfortably readable (not as dim as the fg drop
+     alone would make it). */
+  --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l - 25));
+  --theme-bg-muted: hsl(from var(--theme-bg-color) h s calc(l + 5));
+  --theme-accent-muted: hsl(from var(--theme-accent-color) h calc(s - 35) calc(l - 12));
 
   color-scheme: dark;
 }

@@ -13,14 +13,16 @@ class GenresController < ApplicationController
   # heaviest hitters (the queue's order).
   SORT_SCOPES = { 'name' => :by_name, 'count' => :by_usage }.freeze
 
-  # Browsable, searchable list of every listable genre — standard CRUD entry,
-  # filterable by status. `listable` (not `in_use`) is the base so blocked genres,
-  # which tag 0 events, still show up to be reviewed/restored.
+  # Standard CRUD entry, filterable by status and sortable. Browsing shows the
+  # curation catalogue (`Genre.listable` = in use + parked); a name search instead
+  # reaches *every* genre — including dormant taxonomy entries and genres you've
+  # touched that currently tag 0 events — so nothing is ever truly hidden, it's
+  # just one search away.
   def index
     @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : 'all'
     @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : 'name'
-    scope = @status == 'all' ? Genre.listable : Genre.listable.public_send(STATUS_SCOPES[@status])
-    scope = scope.where('name ILIKE ?', "%#{params[:q]}%") if params[:q].present?
+    scope = @status == 'all' ? Genre.all : Genre.public_send(STATUS_SCOPES[@status])
+    scope = params[:q].present? ? scope.where('name ILIKE ?', "%#{params[:q]}%") : scope.listable
     @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:styles).page(params[:page]).per(50)
   end
 

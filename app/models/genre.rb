@@ -14,10 +14,13 @@ class Genre < ApplicationRecord
   scope :ignored, -> { where.not(ignored_at: nil) }
   scope :hidden, -> { where.not(hidden_at: nil) }
   scope :blocked, -> { where.not(blocked_at: nil) }
-  # The admin index's universe: genres still in use OR ones we've acted on. A
-  # blocked genre tags 0 events (its taggings were stripped) yet must stay listed
-  # so it can be reviewed/restored — in_use alone would hide it. Same safety net
-  # for an ignored/hidden genre a venue has since stopped using.
+  # The catalogue: genres actually in use OR ones we've parked (given a
+  # disposition). Excludes the ~5.5k dormant taxonomy entries (count 0, pre-mapped
+  # to a style by the genres.json import) that have never appeared on an event —
+  # they'd swamp the curation views. A blocked genre tags 0 events (its taggings
+  # were stripped) yet stays listed via its disposition, so Restore stays
+  # reachable. Genres outside this set are still findable by name search (see
+  # GenresController#index), so nothing is truly hidden.
   scope :listable, -> { where('events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL OR blocked_at IS NOT NULL') }
   scope :by_usage, -> { order(events_count: :desc, name: :asc) }
   scope :by_name, -> { order(name: :asc) }

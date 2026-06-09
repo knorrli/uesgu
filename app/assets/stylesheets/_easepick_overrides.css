@@ -35,7 +35,7 @@
   /* Drop the popup flush against the field underline — easepick positions it
      overlapping up into the field by the wrapper's padding-bottom + border.
      Same offset the combobox dropdown uses, so both popups align identically. */
-  margin-top: calc(var(--gap-small) + var(--border-width));
+  margin-top: calc(var(--gap-small) + var(--border-width) - 1px);
 }
 
 /* With the container now full-width, stretch the inner layout to fill it: the

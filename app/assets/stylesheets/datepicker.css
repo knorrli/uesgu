@@ -1,5 +1,18 @@
+/* easepick makes .easepick-wrapper position:absolute with no width, so its
+   popover only ever sizes to its content (overflowing right) or collapses to
+   nothing. Give the wrapper the field width — its containing block is the
+   position:relative .datepicker below — and pin it left so the popover drops
+   straight under the field at the field's width, like the combobox dropdowns. */
+.easepick-wrapper {
+  width: 100% !important;
+  left: 0 !important;
+}
+
 /* TODO: use own CSS variables */
 .datepicker {
+  /* Containing block for the absolutely-positioned .easepick-wrapper above. */
+  position: relative;
+
   .datepicker-handle {
     height: 100%;
     /* position: absolute; */

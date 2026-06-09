@@ -109,20 +109,24 @@ en:
       status_all: all
       status_unassigned: unassigned
       status_assigned: assigned
-      status_dismissed: dismissed
-      status_excluded: excluded
+      status_ignored: ignored
+      status_hidden: hidden
+      status_blocked: blocked
+      sort_by: "Sort:"
+      sort_name: A–Z
+      sort_count: most used
     queue:
       title: Genre assignment
       remaining: "%{count} unassigned"
-      empty: Nothing to assign — every genre in use is mapped or dismissed.
-      dismissed: "Dismissed (%{count})"
+      empty: Nothing to assign — every genre in use is mapped or handled.
       restore: Restore
     editor:
       usage: "on %{count} events"
       suggested: Suggested
       assign: Assign
-      skip: Skip
-      exclude: Not music
+      ignore: "Ignore (keep, no style)"
+      hide: "Hide event (non-music)"
+      block: "Block (strip the tag)"
       appears_on: Appears on
   admin:
     index:
@@ -131,7 +135,7 @@ en:
       browse_genres: Browse all
       assigned: Assigned
       unassigned: Unassigned
-      dismissed: Dismissed
+      ignored: Ignored
       jobs_heading: Jobs
       jobs_hint: Scraping and background tasks run as scheduled jobs.
       job_queue: Job queue

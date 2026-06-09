@@ -1,3 +1,32 @@
+/* The three secondary disposition actions (keep / hide / strip) carry long,
+   self-describing labels. Render them compact — smaller type + tight padding —
+   so they group on one row beneath the primary Assign action instead of each
+   stacking onto its own line. They still wrap on narrow screens. */
+.genre-dispositions button {
+  font-size: var(--font-size-small);
+  padding: var(--gap-xsmall) var(--gap-small);
+}
+
+/* Genre index tab groups: a short vertical rule separating the assignment-status
+   filters (all / unassigned / assigned) from the parked dispositions. */
+.genre-status-filters .filter-divider {
+  align-self: center;
+  height: 1.2em;
+  border-left: var(--border-width) solid var(--theme-fg-muted);
+  margin-inline: var(--gap-xsmall);
+}
+
+/* Sort toggle: a muted row; the active option goes full-colour + bold, and
+   neither reads as an underlined link. */
+.genre-sort-option {
+  text-decoration: none;
+}
+
+.genre-sort-option.active {
+  color: var(--theme-fg-color);
+  font-weight: bold;
+}
+
 /* Genre editor — the "appears on" sample events. A hairline above each gives a
    clear break between events, whose muted date/venue header otherwise blends
    into the previous event's (equally muted) genre/style meta. */

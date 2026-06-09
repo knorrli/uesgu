@@ -4,21 +4,28 @@ class GenresController < ApplicationController
   STATUS_SCOPES = {
     'unassigned' => :unassigned,
     'assigned' => :assigned,
-    'dismissed' => :dismissed,
-    'excluded' => :excluded
+    'ignored' => :ignored,
+    'hidden' => :hidden,
+    'blocked' => :blocked
   }.freeze
 
-  # Browsable, searchable list of every genre in use — standard CRUD entry,
-  # filterable by assignment status (this is also where dismissed genres live).
+  # Browse default is alphabetical (finding a known genre); 'count' surfaces the
+  # heaviest hitters (the queue's order).
+  SORT_SCOPES = { 'name' => :by_name, 'count' => :by_usage }.freeze
+
+  # Browsable, searchable list of every listable genre — standard CRUD entry,
+  # filterable by status. `listable` (not `in_use`) is the base so blocked genres,
+  # which tag 0 events, still show up to be reviewed/restored.
   def index
     @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : 'all'
-    scope = @status == 'all' ? Genre.in_use : Genre.in_use.public_send(STATUS_SCOPES[@status])
+    @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : 'name'
+    scope = @status == 'all' ? Genre.listable : Genre.listable.public_send(STATUS_SCOPES[@status])
     scope = scope.where('name ILIKE ?', "%#{params[:q]}%") if params[:q].present?
-    @genres = scope.by_usage.includes(:styles).page(params[:page]).per(50)
+    @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:styles).page(params[:page]).per(50)
   end
 
   # The assignment queue: serve the single highest-impact unmapped genre, plus
-  # style suggestions and the events it appears on. Assigning/dismissing it
+  # style suggestions and the events it appears on. Assigning/ignoring it
   # returns here, surfacing the next one — a "tinder" flow.
   def queue
     @remaining = Genre.unassigned.count
@@ -38,13 +45,18 @@ class GenresController < ApplicationController
     redirect_to return_to
   end
 
-  def dismiss
-    Genre.find(params[:id]).dismiss!
+  def ignore
+    Genre.find(params[:id]).ignore!
     redirect_to return_to
   end
 
-  def exclude
-    Genre.find(params[:id]).exclude!
+  def hide
+    Genre.find(params[:id]).hide!
+    redirect_to return_to
+  end
+
+  def block
+    Genre.find(params[:id]).block!
     redirect_to return_to
   end
 

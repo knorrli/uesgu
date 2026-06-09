@@ -24,7 +24,7 @@ class EventTagStatsPresenter
     Genre.unassigned
   end
 
-  def dismissed_genre_tags
-    Genre.in_use.dismissed
+  def ignored_genre_tags
+    Genre.in_use.ignored
   end
 end

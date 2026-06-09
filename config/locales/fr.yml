@@ -109,20 +109,24 @@ fr:
       status_all: tous
       status_unassigned: non assigné
       status_assigned: assigné
-      status_dismissed: ignoré
-      status_excluded: exclu
+      status_ignored: ignoré
+      status_hidden: masqué
+      status_blocked: bloqué
+      sort_by: "Trier:"
+      sort_name: A–Z
+      sort_count: plus fréquents
     queue:
       title: Assignation des genres
       remaining: "%{count} non assignés"
-      empty: Rien à assigner — chaque genre utilisé est assigné ou ignoré.
-      dismissed: "Ignorés (%{count})"
+      empty: Rien à assigner — chaque genre utilisé est assigné ou traité.
       restore: Restaurer
     editor:
       usage: "sur %{count} événements"
       suggested: Suggestions
       assign: Assigner
-      skip: Ignorer
-      exclude: Non musical
+      ignore: "Ignorer (garder, sans style)"
+      hide: "Masquer l'événement (non musical)"
+      block: "Bloquer (retirer le tag)"
       appears_on: Apparaît sur
   admin:
     index:
@@ -131,7 +135,7 @@ fr:
       browse_genres: Tout parcourir
       assigned: Assignés
       unassigned: Non assignés
-      dismissed: Ignorés
+      ignored: Ignorés
       jobs_heading: Tâches
       jobs_hint: Le scraping et les tâches de fond s'exécutent comme tâches planifiées.
       job_queue: File d'attente des tâches

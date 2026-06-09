@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_09_130000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -29,14 +29,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_09_130000) do
 
   create_table "genres", force: :cascade do |t|
     t.string "name", null: false
-    t.datetime "dismissed_at"
+    t.datetime "ignored_at"
     t.integer "events_count", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "excluded_at"
+    t.datetime "hidden_at"
+    t.datetime "blocked_at"
     t.index "lower((name)::text)", name: "index_genres_on_lower_name", unique: true
-    t.index ["dismissed_at"], name: "index_genres_on_dismissed_at"
-    t.index ["excluded_at"], name: "index_genres_on_excluded_at"
+    t.index ["blocked_at"], name: "index_genres_on_blocked_at"
+    t.index ["hidden_at"], name: "index_genres_on_hidden_at"
+    t.index ["ignored_at"], name: "index_genres_on_ignored_at"
   end
 
   create_table "genres_styles", id: false, force: :cascade do |t|

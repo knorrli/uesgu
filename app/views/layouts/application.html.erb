@@ -8,6 +8,17 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%# Resolve the saved theme preference before first paint to avoid a flash
+        of the wrong theme. Mirrors the logic in theme_controller.js. %>
+    <script>
+      (function () {
+        var pref = localStorage.getItem("theme") || "system"
+        var dark = pref === "dark" ||
+          (pref === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        document.documentElement.dataset.theme = dark ? "dark" : "light"
+      })()
+    </script>
+
     <%= yield :head %>
 
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
@@ -58,6 +69,11 @@
             <%= link_to t('nav.login'), new_session_path %>
             <%= link_to t('nav.signup'), signup_path %>
           <% end %>
+          <%# Theme switcher: available to everyone, signed in or not. %>
+          <button type="button" class="theme-toggle"
+                  data-controller="theme" data-action="theme#cycle">
+            <span data-theme-target="label">Auto</span>
+          </button>
         </nav>
       </div>
     </header>

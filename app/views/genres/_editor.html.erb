@@ -9,6 +9,17 @@
     <span class="muted"><%= t('genres.editor.usage', count: genre.events_count) %></span>
   </div>
 
+  <%# Current disposition + an inline Restore, shown only once a genre has one.
+      Explains an otherwise-mysterious empty editor (a blocked genre tags 0
+      events, since block stripped them). %>
+  <% if genre.ignored? || genre.hidden? || genre.blocked? %>
+    <% status_key = genre.hidden? ? 'status_hidden' : genre.blocked? ? 'status_blocked' : 'status_ignored' %>
+    <div class="flex gap-medium align-baseline wrap genre-current-status">
+      <span class="muted"><%= t('genres.editor.status') %> <strong><%= t("genres.index.#{status_key}") %></strong></span>
+      <%= button_to t('genres.queue.restore'), restore_genre_path(genre), params: { return_to: return_to } %>
+    </div>
+  <% end %>
+
   <% if suggestions.any? %>
     <div class="flex flex-col gap-small">
       <h4><%= t('genres.editor.suggested') %></h4>

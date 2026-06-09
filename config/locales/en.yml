@@ -122,6 +122,7 @@ en:
       restore: Restore
     editor:
       usage: "on %{count} events"
+      status: "Status:"
       suggested: Suggested
       assign: Assign
       ignore: "Ignore (keep, no style)"

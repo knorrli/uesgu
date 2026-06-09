@@ -35,15 +35,26 @@
 /* Date group heading: a single hairline rule instead of the old 5px double
    border — a quiet section divider, not a decorative slab. */
 .date {
+  align-items: baseline;
   color: var(--theme-fg-color);
   font-weight: bold;
   padding-bottom: var(--gap-small);
   border-bottom: var(--calendar-border-width) solid var(--theme-accent-color);
 }
 
-/* Venue-led row, zero boxes. One rule does the work: green = a clickable
-   filter (matching every link on the site), muted grey = passive info, black =
-   the event itself. The venue is the headline; time/genres stay quiet. */
+/* A heart before a list date that holds a followed venue/style — the list-view
+   echo of the calendar's day marker. Favorite colour (never green: it's a state
+   marker, not a control); normal weight so it doesn't shout over the date. */
+.date-favorite-marker {
+  margin-right: 0.5ch;
+  color: var(--theme-favorite-color);
+  font-weight: normal;
+}
+
+/* Venue-led row, zero boxes. Colour does the work: green = interactive
+   (followable tags, links, the external-link arrow), raspberry = a favorite you
+   follow, muted grey = passive info, black = the event itself. The venue is the
+   headline; time/genres stay quiet. */
 .event {
   display: flex;
   justify-content: space-between;
@@ -116,11 +127,19 @@
   text-decoration: none;
 }
 
+/* The title is an external link (off-site, marked by the green ↗ which carries
+   the clickable signal at rest). It stays black for headline hierarchy; hover
+   just underlines, so the headline never changes colour. */
 .event-title a:hover {
   text-decoration: underline;
 }
 
 .event-link-marker {
+  /* The only link signal on the (black) title, so give it a touch more presence
+     than the title text — but stay typographic, not icon-sized. line-height:1
+     keeps the larger glyph from inflating the title's line. */
+  font-size: 1.2em;
+  line-height: 1;
   color: var(--theme-accent-color);
   font-weight: normal;
 }
@@ -184,7 +203,7 @@
 
 .event-tag.fav.followed .fav-heart::before {
   content: "\2665";
-  color: var(--theme-accent-color);
+  color: var(--theme-favorite-color);
 }
 
 /* Real, inert separator between terms — a sibling element, not a pseudo on the
@@ -275,15 +294,17 @@
       opacity: 0.4;
     }
 
-    /* Hover: a soft darker-pink wash, not a flat accent fill. */
+    /* Hover: a soft green wash — green = interactive, which also keeps the
+       pink/rose family exclusively for the favorite marker (no collision with a
+       darker-pink hover). */
     &:has(.calendar-day-link:hover) {
-      background-color: var(--theme-bg-muted);
+      background-color: var(--theme-accent-muted);
     }
 
-    /* Selected: an inset accent frame that ties the day to its drawer below,
-       rather than flooding the cell. */
+    /* Selected: green wash plus an inset accent frame that ties the day to its
+       drawer below. */
     &:has(.calendar-day-link.selected) {
-      background-color: var(--theme-bg-muted);
+      background-color: var(--theme-accent-muted);
       box-shadow: inset 0 0 0 var(--border-width) var(--theme-accent-color);
     }
   }
@@ -325,7 +346,7 @@
     right: var(--gap-small);
     font-size: var(--font-size-small);
     line-height: 1;
-    color: var(--theme-accent-color);
+    color: var(--theme-favorite-color);
     pointer-events: none;
   }
 

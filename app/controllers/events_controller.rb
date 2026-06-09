@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  allow_unauthenticated_access only: %i[ index day ]
+  allow_unauthenticated_access only: %i[ index ]
   before_action :require_admin, only: %i[ destroy ]
   before_action :set_event, only: %i[ destroy ]
 
@@ -28,22 +28,14 @@ class EventsController < ApplicationController
       # Followed locations surface venues first in each cell; the per-day heart
       # marker (locations or styles) is computed in the calendar partial.
       @favorites = current_user&.location_list.to_a
+      # A day's expansion is URL state (params[:day]), so the server renders the
+      # open day's detail inline in the grid — linkable, reload-safe, and the
+      # source of truth (no client-side drawer to preserve). See #day_events.
+      @open_day = (Date.parse(params[:day]) rescue nil) if params[:day].present?
+      @open_day_events = day_events(@open_day) if @open_day
     else
       @events = events.includes(:locations, :styles, :genres).page(params[:page])
     end
-  end
-
-  # GET /events/day?date=YYYY-MM-DD — a single day's events, rendered into the
-  # calendar's day-detail Turbo Frame (full detail, same partial as the list).
-  def day
-    @date = (Date.parse(params[:date]) rescue Date.current)
-    @filter = build_filter
-    # Constrain to the clicked day, overriding the default "today onward" floor
-    # so past days in the visible month still show their events.
-    @filter.date_ranges = ["#{@date.iso8601} - #{@date.iso8601}"]
-
-    @q = Event.ransack(@filter.ransack_query)
-    @events = @q.result(distinct: true).includes(:locations, :styles, :genres).order(:start_time, :title)
   end
 
   # DELETE /events/1
@@ -53,6 +45,18 @@ class EventsController < ApplicationController
   end
 
   private
+
+  # Events on a single day, honouring the active filter (queries/locations/
+  # styles) but overriding its date floor so past days in the visible month
+  # still resolve. Used to render the calendar's inline day expansion.
+  def day_events(date)
+    filter = build_filter
+    filter.date_ranges = ["#{date.iso8601} - #{date.iso8601}"]
+    Event.ransack(filter.ransack_query)
+         .result(distinct: true)
+         .includes(:locations, :styles, :genres)
+         .order(:start_time, :title)
+  end
 
   def build_filter
     Filter.new.tap do |filter|

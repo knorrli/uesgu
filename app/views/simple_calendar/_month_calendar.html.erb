@@ -8,9 +8,9 @@
   <div class="calendar-heading flex align-baseline wrap gap-medium">
     <time datetime="<%= start_date.strftime('%Y-%m') %>" class="calendar-title"><%= t('date.month_names')[start_date.month] %> <%= start_date.year %></time>
     <nav class="flex gap-medium">
-      <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar.url_for_previous_view %>
-      <%= link_to t('simple_calendar.today', default: 'Today'), calendar.url_for_today_view %>
-      <%= link_to t('simple_calendar.next', default: 'Next'), calendar.url_for_next_view %>
+      <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar_nav_path(calendar.url_for_previous_view) %>
+      <%= link_to t('simple_calendar.today', default: 'Today'), calendar_nav_path(calendar.url_for_today_view) %>
+      <%= link_to t('simple_calendar.next', default: 'Next'), calendar_nav_path(calendar.url_for_next_view) %>
     </nav>
   </div>
 
@@ -32,6 +32,16 @@
             <% end %>
           <% end %>
         </tr>
+        <%# The events page expands a day inline (URL state): render its detail as
+            a full-width row right under the week that holds it. Harmless on any
+            other month_calendar — @open_day is only set there. %>
+        <% if @open_day && week.include?(@open_day) %>
+          <tr class="day-detail-row">
+            <td colspan="7">
+              <%= render 'events/day_detail', date: @open_day, events: @open_day_events, filter: @filter %>
+            </td>
+          </tr>
+        <% end %>
       <% end %>
     </tbody>
   </table>

@@ -1,4 +1,29 @@
 module EventsHelper
+  # The calendar's open day lives in the URL (?day=YYYY-MM-DD) so it is linkable,
+  # survives reload, and is what the server renders. These keep the rest of the
+  # URL state (filter, focused month) intact while toggling just the open day.
+  def calendar_day_path(date)
+    events_path(calendar_state_params.merge('day' => date.iso8601))
+  end
+
+  def calendar_collapse_path
+    events_path(calendar_state_params)
+  end
+
+  def calendar_state_params
+    request.query_parameters.except('day', 'page').merge('view' => 'calendar')
+  end
+
+  # simple_calendar builds its month-nav links by merging the *current* query —
+  # which would drag a now-irrelevant open day into the next month. Drop it so
+  # changing months collapses any open day. Other state (filter) is preserved.
+  def calendar_nav_path(url)
+    uri = URI.parse(url)
+    query = Rack::Utils.parse_nested_query(uri.query).except('day')
+    uri.query = query.presence && query.to_query
+    uri.to_s
+  end
+
   # A tag on an event (venue, location, style). Filtering the programme is done in
   # the filter inputs, not by clicking tags — so for a logged-in visitor the whole
   # tag is instead the *follow* toggle (see #favorite_tag). Logged-out visitors
@@ -54,9 +79,9 @@ module EventsHelper
     @followed_styles ||= Set.new(current_user&.style_list)
   end
 
-  # The user's follows as namespaced keys ("l:<location>" / "s:<style>"). Handed
-  # to the favorite Stimulus controller so it can recompute calendar day markers
-  # client-side as tags are toggled. See CalendarHelper#calendar_day_favorite_keys.
+  # The user's follows as namespaced keys ("l:<location>" / "s:<style>"), matched
+  # against each day's keys to render its heart marker server-side (the authoritative
+  # source — recomputed on every render). See CalendarHelper#calendar_day_favorite_keys.
   def favorite_followed_keys
     followed_locations.map { |name| "l:#{name}" } + followed_styles.map { |name| "s:#{name}" }
   end

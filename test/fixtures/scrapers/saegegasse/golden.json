@@ -11,7 +11,8 @@
       "Sägegasse",
       "Burgdorf",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.saegegasse.ch/programm/event/210-elio-ricca-songs-from-utopia",
@@ -25,7 +26,8 @@
       "Sägegasse",
       "Burgdorf",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.saegegasse.ch/programm/event/197-ruination-metal-fest-4",
@@ -39,6 +41,7 @@
       "Sägegasse",
       "Burgdorf",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   }
 ]

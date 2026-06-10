@@ -11,7 +11,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/fete-de-la-musique/",
@@ -25,7 +26,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/cory-hanson/",
@@ -39,7 +41,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/what-the-fuzz-maya-ongaku/",
@@ -53,7 +56,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/laure-betris-yann-hunziker-vernissage-prune-carmen-diaz/",
@@ -67,7 +71,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/calle-mambo-la-doce/",
@@ -81,7 +86,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/quentin-sauve-lea-martinez/",
@@ -95,7 +101,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/full-metal-83-convulsif-vernissage-bruyante-vernissage-les-dix-ans-de-reaptile/",
@@ -109,7 +116,8 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.nouveaumonde.ch/agenda/the-veils/",
@@ -123,6 +131,7 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   }
 ]

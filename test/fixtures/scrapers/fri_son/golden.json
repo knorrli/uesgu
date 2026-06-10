@@ -17,7 +17,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/09/prewn-us",
@@ -37,7 +38,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/09/yasmine-hamdan-lbn",
@@ -59,7 +61,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/09/hubris-ch",
@@ -77,7 +80,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/10/sessa-bra",
@@ -99,7 +103,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/10/mitsune-jpde",
@@ -117,7 +122,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/10/daudi-matsiko-uk-momoko-gill-uk",
@@ -139,7 +145,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/11/sisters-mercy-uk",
@@ -161,7 +168,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/11/sniper-fr",
@@ -181,7 +189,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/11/water-damage-us",
@@ -203,7 +212,8 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.fri-son.ch/fr/programme/2026/11/maria-bc-us",
@@ -225,6 +235,7 @@
       "FriSon",
       "Fribourg",
       "FR"
-    ]
+    ],
+    "cancelled_at": false
   }
 ]

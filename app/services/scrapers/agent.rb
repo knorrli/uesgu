@@ -63,6 +63,27 @@ module Scrapers
       event.style_list    = event_styles(genres: event.genre_list)
       event.location_list = self.class.locations
       postprocess(event)
+      mark_cancellation(event, content)
+    end
+
+    # Cancellation markers in German / French / Italian / English. Letter-bounded
+    # (Unicode-aware, so accents work) to avoid matching inside unrelated words
+    # like "Cancellara". Deliberately excludes "verschoben"/"reporté"/"postponed"
+    # — a postponed show keeps a (new) date and is not a cancellation.
+    CANCELLATION_MARKER = /
+      (?<![[:alpha:]])
+      (?: abgesagt | annul(?:é|ée|és|ées|ation) | annullat[oa] | cancell?ed )
+      (?![[:alpha:]])
+    /xi
+
+    # Derive (and keep re-deriving) the cancellation flag from the source, like
+    # styles — set it while the marker is present, clear it once it's gone, and
+    # preserve the original timestamp across re-scrapes.
+    def mark_cancellation(event, content)
+      event.cancelled_at =
+        if event_cancelled?(event, content)
+          event.cancelled_at || Time.current
+        end
     end
 
     # The list row currently being processed. Exposed for the rare hybrid scraper
@@ -96,6 +117,15 @@ module Scrapers
 
     # Adjust the built event before saving (e.g. promote a blank title).
     def postprocess(_event) = nil
+
+    # Whether the event reads as cancelled. Default: a cancellation marker in the
+    # venue-extracted title/subtitle (the common "ABGESAGT: …" / "Annulé" prefix)
+    # — NOT a full-HTML scan, which false-matches boilerplate, JS and other
+    # events. A venue that exposes a dedicated status element should override this
+    # to read it precisely from `content`.
+    def event_cancelled?(event, _content)
+      CANCELLATION_MARKER.match?([event.title, event.subtitle].compact.join("\n"))
+    end
 
     # Log and skip a single event that failed to parse or save, so one bad
     # event doesn't abort the rest of a venue's programme. A total failure

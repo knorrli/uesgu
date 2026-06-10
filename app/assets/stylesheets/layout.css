@@ -20,6 +20,13 @@
   gap: var(--gap-small) var(--gap-large);
 }
 
+/* Brand + theme switcher, grouped at the left of the bar. */
+.site-header__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-medium);
+}
+
 .site-brand {
   font-size: var(--font-size-lg);
   font-weight: bold;
@@ -43,10 +50,12 @@
   text-decoration: underline;
 }
 
-/* Theme switcher: a text button styled to match the nav links. Cycles
-   system → light → dark; the visible label reflects the current choice. */
+/* Theme switcher: an icon-only button beside the brand. Cycles
+   system → light → dark; the glyph reflects the current choice. */
 .theme-toggle {
   font: inherit;
+  font-size: var(--font-size-lg);
+  line-height: 1;
   cursor: pointer;
   padding: 0;
   border: none;
@@ -54,11 +63,10 @@
   color: var(--theme-accent-color);
   display: inline-flex;
   align-items: center;
-  gap: var(--gap-small);
 }
 
 .theme-toggle:hover {
-  text-decoration: underline;
+  opacity: 0.7;
 }
 
 /* Account dropdown: a native <details> menu so personal links don't crowd the

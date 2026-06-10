@@ -137,6 +137,7 @@ fr:
       merge_suggested: "Fusionner avec un genre similaire"
       appears_on: Apparaît sur
   admin:
+    back: "← Admin"
     index:
       title: Admin
       assign_unassigned_genres: Assigner les genres

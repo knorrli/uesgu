@@ -137,6 +137,7 @@ en:
       merge_suggested: "Merge into a similar genre"
       appears_on: Appears on
   admin:
+    back: "← Admin"
     index:
       title: Admin
       assign_unassigned_genres: Assign genres

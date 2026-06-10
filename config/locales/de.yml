@@ -137,6 +137,7 @@ de:
       merge_suggested: "Mit ähnlichem Genre zusammenführen"
       appears_on: Erscheint bei
   admin:
+    back: "← Admin"
     index:
       title: Admin
       assign_unassigned_genres: Genres zuweisen

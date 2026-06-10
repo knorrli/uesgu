@@ -59,8 +59,17 @@
       <% end %>
     </div>
 
-    <div class="datepicker input-wrapper flex gap-small" data-controller="datepicker" data-datepicker-date-range-value="" data-datepicker-date-ranges-value="<%= @filter.date_ranges.to_json %>" data-datepicker-lang-value="<%= I18n.locale %>" data-datepicker-preset-value="<%= Datepicker.preset.to_json %>" data-action="datepicker:selection->filter#addDateRange datepicker:removal->filter#removeDateRange" data-datepicker-target="wrapper">
-      <%= f.hidden_field 'd[]', id: 'd[]-hidden-input', data: { filter_target: 'comboboxInput dateRangesInput', existing_values: @filter.date_ranges.to_json } %>
+    <div class="filter-field flex flex-col gap-small">
+      <div class="datepicker input-wrapper flex flex-row gap-small" data-controller="datepicker" data-datepicker-date-range-value="" data-datepicker-date-ranges-value="<%= @filter.date_ranges.to_json %>" data-datepicker-lang-value="<%= I18n.locale %>" data-datepicker-preset-value="<%= Datepicker.preset.to_json %>" data-action="datepicker:selection->filter#addDateRange datepicker:removal->filter#removeDateRange" data-datepicker-target="wrapper">
+        <%= f.hidden_field 'd[]', id: 'd[]-hidden-input', data: { filter_target: 'comboboxInput dateRangesInput', existing_values: @filter.date_ranges.to_json } %>
+        <div class="flex-grow">
+          <div class="hw-combobox__main__wrapper flex flex-grow">
+            <%= text_field_tag '', nil, id: 'd[]', readonly: true, placeholder: t('.when'), data: { datepicker_target: 'input' } %>
+            <span class="datepicker-handle filter-icon <%= tag_icon_class(context: 'date') %>" data-action="click->datepicker#toggle"></span>
+          </div>
+        </div>
+      </div>
+
       <% if @filter.date_ranges.any? %>
         <div class="chips flex flex-row wrap gap-small">
           <% @filter.date_ranges.each do |date_range| %>
@@ -73,12 +82,6 @@
           <% end %>
         </div>
       <% end %>
-      <div class="flex-grow">
-        <div class="hw-combobox__main__wrapper flex flex-grow">
-          <%= text_field_tag '', nil, id: 'd[]', readonly: true, placeholder: t('.when'), data: { datepicker_target: 'input' } %>
-          <span class="datepicker-handle filter-icon <%= tag_icon_class(context: 'date') %>" data-action="click->datepicker#toggle"></span>
-        </div>
-      </div>
     </div>
   <% end %>
 </section>

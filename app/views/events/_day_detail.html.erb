@@ -5,7 +5,7 @@
   <% day_keys = calendar_day_favorite_keys(events) %>
   <% followed_keys = favorite_followed_keys.to_set %>
   <header class="day-detail-header flex">
-    <h2 class="flex date"><span class="date-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>" <%= 'hidden' unless day_keys.any? { |key| followed_keys.include?(key) } %>>&#9829;</span><%= l date, format: :detailed %></h2>
+    <h2 class="flex date"><span class="date-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>" <%= 'hidden' unless day_keys.any? { |key| followed_keys.include?(key) } %>></span><%= l date, format: :detailed %></h2>
     <%= link_to '✕', calendar_collapse_path, class: 'day-detail-close',
           'aria-label': t('events.day.close'), title: t('events.day.close') %>
   </header>

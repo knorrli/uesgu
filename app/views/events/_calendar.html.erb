@@ -20,7 +20,7 @@
       <% if day_events.any? %>
         <% day_keys = calendar_day_favorite_keys(day_events) %>
         <span class="day-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>"
-              <%= 'hidden' unless day_keys.any? { |key| followed_keys.include?(key) } %>>&#9829;</span>
+              <%= 'hidden' unless day_keys.any? { |key| followed_keys.include?(key) } %>></span>
       <% end %>
       <div class="day-content">
         <div class="<%= number %>"><%= date.day %></div>

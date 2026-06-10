@@ -51,6 +51,17 @@
   font-weight: normal;
 }
 
+.date-favorite-marker::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  background-color: currentColor;
+  -webkit-mask: var(--heart-fill) center / contain no-repeat;
+  mask: var(--heart-fill) center / contain no-repeat;
+}
+
 /* Venue-led row, zero boxes. Colour does the work: green = interactive
    (followable tags, links, the external-link arrow), raspberry = a favorite you
    follow, muted grey = passive info, black = the event itself. The venue is the
@@ -195,15 +206,24 @@
   margin-left: 0.4ch;
 }
 
+/* A masked Phosphor heart: the mask is the shape, background-color paints it, so
+   it inherits a theme colour and the tag's em size. Outline + muted by default,
+   solid + favorite when followed. */
 .fav-heart::before {
-  content: "\2661";
-  font-size: 0.9em;
-  color: var(--theme-fg-muted);
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  background-color: var(--theme-fg-muted);
+  -webkit-mask: var(--heart-outline) center / contain no-repeat;
+  mask: var(--heart-outline) center / contain no-repeat;
 }
 
 .event-tag.fav.followed .fav-heart::before {
-  content: "\2665";
-  color: var(--theme-favorite-color);
+  background-color: var(--theme-favorite-color);
+  -webkit-mask-image: var(--heart-fill);
+  mask-image: var(--heart-fill);
 }
 
 /* Real, inert separator between terms — a sibling element, not a pseudo on the
@@ -295,8 +315,9 @@
 }
 
 .favorites-filter-link.active .fav-heart::before {
-  content: "\2665";
-  color: var(--theme-favorite-color);
+  background-color: var(--theme-favorite-color);
+  -webkit-mask-image: var(--heart-fill);
+  mask-image: var(--heart-fill);
 }
 
 .simple-calendar {
@@ -394,6 +415,16 @@
     line-height: 1;
     color: var(--theme-favorite-color);
     pointer-events: none;
+
+    &::before {
+      content: "";
+      display: block;
+      width: 1em;
+      height: 1em;
+      background-color: currentColor;
+      -webkit-mask: var(--heart-fill) center / contain no-repeat;
+      mask: var(--heart-fill) center / contain no-repeat;
+    }
   }
 
   /* Wide screens: a deduped, favorites-first venue summary. Titles are dropped

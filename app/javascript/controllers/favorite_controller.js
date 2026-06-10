@@ -11,6 +11,7 @@ import { Controller } from "@hotwired/stimulus"
 // any full render; this just keeps the toggle feeling immediate.
 export default class extends Controller {
   static values = { followed: Array }
+  static targets = ["favoritesFilter"]
 
   connect() {
     // The user's follows as namespaced keys ("l:<location>" / "s:<style>"),
@@ -40,6 +41,28 @@ export default class extends Controller {
     followed ? this.followed.add(key) : this.followed.delete(key)
 
     this.#refreshMarkers()
+    this.#refreshFavoritesFilter()
+  }
+
+  // The "apply my favorites" shortcut is rendered hidden until the user follows
+  // something. Reveal/hide it from the live follow set, and keep its href
+  // pointing at the current favorites (unless the filter is already applied, in
+  // which case the link clears back to the full programme).
+  #refreshFavoritesFilter() {
+    if (!this.hasFavoritesFilterTarget) return
+
+    const link = this.favoritesFilterTarget
+    link.hidden = this.followed.size === 0
+
+    if (this.followed.size > 0 && !link.classList.contains("active")) {
+      const params = new URLSearchParams()
+      this.followed.forEach((followKey) => {
+        const separator = followKey.indexOf(":")
+        const param = followKey.slice(0, separator) === "l" ? "l[]" : "s[]"
+        params.append(param, followKey.slice(separator + 1))
+      })
+      link.href = `/?${params}`
+    }
   }
 
   #matching(type, value) {

@@ -3,11 +3,18 @@
     sibling control, not a form submit). Stable label; the heart fills and the
     label bolds when the favorites filter is currently applied — matching the
     follow-heart language used elsewhere. A click then clears back to the full
-    programme. Hidden for guests / users with no favorites. %>
-<% if favorites_filter_available? %>
+    programme.
+
+    Rendered for any logged-in user but `hidden` until they follow something, so
+    favoriting your first tag can reveal it without a reload: the favorite
+    Stimulus controller flips `hidden` and rewrites the href from the live
+    follow set (see favorite_controller.js). Never shown to guests. %>
+<% if current_user.present? %>
   <%= link_to(favorites_filter_active? ? events_path : events_path(l: current_user.location_list.to_a, s: current_user.style_list.to_a),
         class: class_names('button', 'favorites-filter-link', active: favorites_filter_active?),
-        'aria-pressed': favorites_filter_active?.to_s) do %>
+        'aria-pressed': favorites_filter_active?.to_s,
+        hidden: !favorites_filter_available?,
+        data: { favorite_target: 'favoritesFilter' }) do %>
     <span class="fav-heart" aria-hidden="true"></span>
     <span><%= t('events.index.favorites_filter.label') %></span>
   <% end %>

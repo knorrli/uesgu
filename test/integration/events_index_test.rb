@@ -51,6 +51,24 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute_includes response.body, 'PastShow'
   end
 
+  # The favorites shortcut is rendered for any logged-in user but hidden until
+  # they follow something, so the favorite Stimulus controller can reveal it on
+  # the first favorite without a reload (it can only toggle a node that exists).
+  test 'favorites shortcut is absent for guests, hidden with no follows, shown once following' do
+    get events_path
+    assert_select 'a.favorites-filter-link', false, 'guests never see the favorites shortcut'
+
+    u = sign_in_as user
+    get events_path
+    assert_select 'a.favorites-filter-link[hidden]', 1,
+                  'a logged-in user with no follows gets it rendered but hidden'
+
+    u.update!(location_list: ['Dachstock'])
+    get events_path
+    assert_select 'a.favorites-filter-link:not([hidden])', 1,
+                  'once the user follows something the shortcut is shown'
+  end
+
   test 'the chosen view is mirrored onto the logged-in users account' do
     u = sign_in_as user
     get events_path(view: 'calendar')

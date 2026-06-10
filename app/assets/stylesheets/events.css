@@ -301,6 +301,12 @@
   text-decoration: none;
 }
 
+/* The display above overrides the UA [hidden] rule, so re-assert it (at matching
+   specificity) — the shortcut renders hidden until the user follows something. */
+.button.favorites-filter-link[hidden] {
+  display: none;
+}
+
 .button.favorites-filter-link:hover {
   text-decoration: underline;
 }

@@ -267,9 +267,13 @@ en:
         one: +1 more
         other: "+%{count} more"
     filter:
-      what: What?
+      what: "Search acts, styles, anything…"
       when: When?
       where: Where?
+      location_types:
+        venue: Venue
+        city: City
+        canton: Canton
   helpers:
     page_entries_info:
       more_pages:

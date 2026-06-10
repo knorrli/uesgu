@@ -97,4 +97,28 @@ body {
     font-size: 0.9rem;
     line-height: 1.5;
   }
+
+  /* Where-list options carry a quiet "· Venue/City/Canton" suffix so the
+     otherwise-flat mix of three location kinds is unambiguous — an icon can't
+     express "canton", a word can. The label is render-only (it isn't part of the
+     option's filterable/autocomplete text), so typing still matches the name. */
+  .loc-option {
+    display: inline-block;
+  }
+
+  .loc-type {
+    color: var(--theme-fg-muted);
+    font-size: 0.85em;
+  }
+
+  /* Indent by kind. The where-list is ordered canton > its cities > their venues,
+     so a depth-based indent renders as the real hierarchy while browsing (and a
+     consistent kind cue once a query collapses it to matches). */
+  .loc-city {
+    padding-left: 1.2rem;
+  }
+
+  .loc-venue {
+    padding-left: 2.4rem;
+  }
 }

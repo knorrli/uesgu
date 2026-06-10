@@ -25,21 +25,8 @@ export default class extends Controller {
     'queriesInput',
     'stylesInput',
     'locationsInput',
-    'dateRangesInput',
-
-    'queryHandle'
+    'dateRangesInput'
   ];
-
-  switchQueryHandle(event) {
-    // Swap only the Phosphor glyph class; the ph base weight stays put.
-    if (event.target.value) {
-      this.queryHandleTarget.classList.remove(this.queryHandleTarget.dataset.defaultHandle);
-      this.queryHandleTarget.classList.add('ph-magnifying-glass');
-    } else {
-      this.queryHandleTarget.classList.add(this.queryHandleTarget.dataset.defaultHandle);
-      this.queryHandleTarget.classList.remove('ph-magnifying-glass');
-    }
-  }
 
   addStyleOrQuery(event) {
     if (event.detail.fieldName == event.target.dataset.hwComboboxNameWhenNewValue) {

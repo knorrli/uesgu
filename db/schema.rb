@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_140000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -229,7 +229,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_140000) do
     t.datetime "updated_at", null: false
     t.integer "taggings_count", default: 0
     t.datetime "discarded_at"
-    t.index "lower((name)::text)", name: "index_tags_on_lower_name", unique: true
     t.index ["discarded_at"], name: "index_tags_on_discarded_at"
     t.index ["name"], name: "index_tags_on_name", unique: true
   end

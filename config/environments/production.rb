@@ -56,12 +56,18 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
+  # DNS rebinding / Host-header protection: only accept our own hostnames.
+  # üsgu.ch arrives as its punycode form (xn--sgu-goa.ch). uesgu.ch and the www
+  # variants are allowed so the canonicalizing 301 in routes.rb can fire before
+  # rejection; *.onrender.com covers Render's assigned URL and health checks.
+  config.hosts = [
+    "xn--sgu-goa.ch",       # üsgu.ch
+    "www.xn--sgu-goa.ch",   # www.üsgu.ch
+    "uesgu.ch",
+    "www.uesgu.ch",
+    /\A[a-z0-9-]+\.onrender\.com\z/
+  ]
+
   # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end

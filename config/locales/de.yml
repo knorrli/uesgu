@@ -9,6 +9,7 @@ de:
     logout: Abmelden
     login: Anmelden
     signup: Registrieren
+    theme: Erscheinungsbild
   footer:
     tagline: üsgu — Konzärt für Fründe
   languages:
@@ -247,6 +248,8 @@ de:
     tomorrow: Morgen
   events:
     cancelled: Abgesagt
+    delete_event: Veranstaltung löschen
+    edit_tag: Tag bearbeiten
     index:
       title: üsgu
       empty: Keine Veranstaltungen für die aktuellen Filter.

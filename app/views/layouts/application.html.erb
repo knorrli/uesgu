@@ -10,7 +10,7 @@
 
     <%# Resolve the saved theme preference before first paint to avoid a flash
         of the wrong theme. Mirrors the logic in theme_controller.js. %>
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       (function () {
         var pref = "system"
         try { pref = localStorage.getItem("theme") || "system" } catch (e) {}
@@ -51,7 +51,7 @@
             (icon-only) and stays visible whether signed in or not. %>
         <div class="site-header__brand">
           <%= link_to 'üsgu', root_path, class: 'site-brand' %>
-          <button type="button" class="theme-toggle" aria-label="Theme"
+          <button type="button" class="theme-toggle" aria-label="<%= t('nav.theme') %>"
                   data-controller="theme" data-action="theme#cycle">
             <span class="ph ph-circle-half-tilt" data-theme-target="icon" aria-hidden="true"></span>
           </button>

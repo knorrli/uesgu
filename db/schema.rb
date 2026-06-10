@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_170000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -26,6 +26,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_170000) do
     t.boolean "hidden", default: false, null: false
     t.datetime "cancelled_at"
     t.index ["hidden"], name: "index_events_on_hidden"
+    t.index ["start_date"], name: "index_events_on_start_date"
+    t.index ["url"], name: "index_events_on_url", unique: true
   end
 
   create_table "genres", force: :cascade do |t|
@@ -142,6 +144,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_170000) do
   end
 
   add_foreign_key "genres", "genres", column: "canonical_id"
+  add_foreign_key "genres_styles", "genres", on_delete: :cascade
+  add_foreign_key "genres_styles", "styles", on_delete: :cascade
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
   add_foreign_key "notifications", "users"

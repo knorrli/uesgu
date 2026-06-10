@@ -9,6 +9,7 @@ fr:
     logout: Déconnexion
     login: Connexion
     signup: Inscription
+    theme: Thème
   footer:
     tagline: üsgu — Des concerts entre amis
   languages:
@@ -247,6 +248,8 @@ fr:
     tomorrow: Demain
   events:
     cancelled: Annulé
+    delete_event: Supprimer l'événement
+    edit_tag: Modifier le tag
     index:
       title: üsgu
       empty: Aucun événement ne correspond aux filtres actuels.

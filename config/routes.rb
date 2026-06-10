@@ -63,4 +63,12 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  # Account moderation + the invite-only gate. Namespaced (Admin::) so these
+  # get their own admin_users_/admin_invitations_ helpers, distinct from the
+  # legacy scoped dashboard/genre routes above.
+  namespace :admin do
+    resources :users, only: %i[index show destroy]
+    resources :invitations, only: %i[index create destroy]
+  end
 end

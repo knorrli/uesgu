@@ -1,0 +1,22 @@
+<div class="flex flex-col gap-large">
+  <h1><%= t('.title') %> <span class="muted"><%= @users.total_count %></span></h1>
+
+  <% if @users.any? %>
+    <ul class="admin-list">
+      <% @users.each do |user| %>
+        <li class="admin-row">
+          <span class="admin-row__main">
+            <%= link_to user.username, admin_user_path(user) %>
+            <% if user.admin? %><span class="tag"><%= t('admin.users.admin_badge') %></span><% end %>
+          </span>
+          <span class="stat__leader"></span>
+          <span class="admin-row__meta muted"><%= l(user.created_at.to_date) %></span>
+        </li>
+      <% end %>
+    </ul>
+
+    <%= paginate @users %>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

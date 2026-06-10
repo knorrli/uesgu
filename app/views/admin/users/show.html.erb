@@ -1,0 +1,74 @@
+<div class="flex flex-col gap-large">
+  <p><%= link_to t('.back'), admin_users_path %></p>
+
+  <h1>
+    <%= @user.username %>
+    <% if @user.admin? %><span class="tag"><%= t('admin.users.admin_badge') %></span><% end %>
+  </h1>
+
+  <dl class="flex flex-col gap-small">
+    <div class="stat">
+      <dt><%= t('.email') %></dt>
+      <span class="stat__leader"></span>
+      <dd class="muted"><%= @user.email_address.presence || t('.no_email') %></dd>
+    </div>
+    <div class="stat">
+      <dt><%= t('.frequency') %></dt>
+      <span class="stat__leader"></span>
+      <dd class="muted"><%= t("frequencies.#{@user.notification_frequency}") %></dd>
+    </div>
+    <div class="stat">
+      <dt><%= t('.joined') %></dt>
+      <span class="stat__leader"></span>
+      <dd class="muted"><%= l(@user.created_at.to_date) %></dd>
+    </div>
+    <div class="stat">
+      <dt><%= t('.sessions') %></dt>
+      <span class="stat__leader"></span>
+      <dd class="muted"><%= @user.sessions.size %></dd>
+    </div>
+    <div class="stat">
+      <dt><%= t('.invited_by') %></dt>
+      <span class="stat__leader"></span>
+      <dd class="muted">
+        <% if @user.accepted_invitation %>
+          <%= @user.accepted_invitation.created_by&.username || t('admin.unknown') %>
+          <span class="muted">(<%= @user.accepted_invitation.formatted_code %>)</span>
+        <% else %>
+          —
+        <% end %>
+      </dd>
+    </div>
+  </dl>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.favorite_locations') %></h2>
+    <% if @user.location_list.any? %>
+      <div class="flex gap-small wrap">
+        <% @user.location_list.each do |location| %><span class="tag"><%= location %></span><% end %>
+      </div>
+    <% else %>
+      <p class="muted">—</p>
+    <% end %>
+  </section>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.favorite_styles') %></h2>
+    <% if @user.style_list.any? %>
+      <div class="flex gap-small wrap">
+        <% @user.style_list.each do |style| %><span class="tag"><%= style %></span><% end %>
+      </div>
+    <% else %>
+      <p class="muted">—</p>
+    <% end %>
+  </section>
+
+  <% unless @user == current_user %>
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.delete_heading') %></h2>
+      <p class="muted"><%= t('.delete_hint') %></p>
+      <%= button_to t('.delete'), admin_user_path(@user), method: :delete, class: "button delete",
+            data: { turbo_confirm: t('.delete_confirm', username: @user.username) } %>
+    </section>
+  <% end %>
+</div>

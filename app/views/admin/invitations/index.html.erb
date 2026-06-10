@@ -1,0 +1,65 @@
+<div class="flex flex-col gap-large">
+  <h1><%= t('.title') %> <span class="muted"><%= Invitation.available.count %></span></h1>
+  <p class="muted"><%= t('.intro') %></p>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.new_heading') %></h2>
+    <%= form_with model: @invitation, url: admin_invitations_path, class: 'account-form flex flex-col gap-medium' do |form| %>
+      <% if @invitation.errors.any? %>
+        <ul class="form-errors">
+          <% @invitation.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+        </ul>
+      <% end %>
+
+      <%= form.text_field :note, placeholder: t('.note_placeholder'), autocomplete: 'off' %>
+
+      <label class="flex flex-col gap-small">
+        <span class="muted"><%= t('.expires_label') %></span>
+        <%= select_tag 'invitation[expires_in_days]',
+              options_for_select([
+                [t('.expires_never'), ''],
+                [t('.expires_in_days', count: 1), 1],
+                [t('.expires_in_days', count: 7), 7],
+                [t('.expires_in_days', count: 30), 30]
+              ]) %>
+      </label>
+
+      <%= form.submit t('.create') %>
+    <% end %>
+  </section>
+
+  <section class="flex flex-col gap-medium">
+    <h2><%= t('.existing_heading') %></h2>
+    <% if @invitations.any? %>
+      <ul class="admin-list">
+        <% @invitations.each do |invitation| %>
+          <li class="invite flex flex-col gap-small">
+            <div class="admin-row">
+              <span class="admin-row__main">
+                <code class="invite__code"><%= invitation.formatted_code %></code>
+                <span class="tag invite__status invite__status--<%= invitation.status %>"><%= t(".status_#{invitation.status}") %></span>
+              </span>
+              <span class="stat__leader"></span>
+              <span class="admin-row__meta muted">
+                <% if invitation.note.present? %><%= invitation.note %> · <% end %><%= l(invitation.created_at.to_date) %>
+              </span>
+            </div>
+
+            <% if invitation.available? %>
+              <code class="invite__link"><%= signup_url(invite: invitation.code) %></code>
+              <% if invitation.expires_at %>
+                <span class="muted"><%= t('.expires', date: l(invitation.expires_at.to_date)) %></span>
+              <% end %>
+              <%= button_to t('.revoke'), admin_invitation_path(invitation), method: :delete, class: 'button delete',
+                    data: { turbo_confirm: t('.revoke_confirm') } %>
+            <% elsif invitation.redeemed? %>
+              <span class="muted"><%= t('.redeemed_by', username: invitation.redeemed_by&.username || t('admin.unknown'), date: l(invitation.redeemed_at.to_date)) %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="muted"><%= t('.empty') %></p>
+    <% end %>
+  </section>
+</div>

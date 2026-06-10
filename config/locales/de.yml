@@ -37,9 +37,12 @@ de:
     invalid_credentials: Versuche es mit einem anderen Benutzernamen oder Passwort.
     rate_limited: Versuche es später erneut.
     notify_label: Nicht über neue Veranstaltungen informieren
+    invite_label: Einladungscode
+    invite_hint: Die Registrierung ist nur mit Einladung möglich.
   registrations:
     welcome: Willkommen bei üsgu!
     account_deleted: Dein Konto wurde gelöscht.
+    invalid_invite: Dieser Einladungscode ist ungültig oder wurde bereits verwendet.
   frequencies:
     daily: Täglich
     weekly: Wöchentlich
@@ -144,6 +147,57 @@ de:
       jobs_heading: Jobs
       jobs_hint: Scraping und Hintergrundaufgaben laufen als geplante Jobs.
       job_queue: Job-Warteschlange
+      accounts_heading: Konten & Einladungen
+      users: Konten
+      open_invitations: Offene Einladungen
+      manage_users: Konten verwalten
+      manage_invitations: Einladungen verwalten
+    unknown: unbekannt
+    users:
+      admin_badge: Admin
+      cant_delete_self: Du kannst dein eigenes Konto hier nicht löschen.
+      deleted: "Konto %{username} wurde gelöscht."
+      index:
+        title: Konten
+        empty: Noch keine Konten.
+      show:
+        back: ← Alle Konten
+        email: E-Mail
+        no_email: keine
+        frequency: Mitteilungen
+        joined: Beigetreten
+        sessions: Aktive Sitzungen
+        invited_by: Eingeladen von
+        favorite_locations: Lieblings-Locations
+        favorite_styles: Lieblings-Stile
+        delete_heading: Konto löschen
+        delete_hint: Entfernt dieses Konto und seine Favoriten endgültig.
+        delete: Konto löschen
+        delete_confirm: "Konto %{username} endgültig löschen?"
+    invitations:
+      created: "Einladungscode erstellt: %{code}"
+      cant_revoke_redeemed: Eine bereits eingelöste Einladung kann nicht widerrufen werden.
+      revoked: Einladung widerrufen.
+      index:
+        title: Einladungen
+        intro: Einmal verwendbare Einladungscodes. Teile den Link mit einer Person – nach der Registrierung ist der Code verbraucht.
+        new_heading: Neue Einladung
+        note_placeholder: z. B. für Anna
+        expires_label: Gültig bis
+        expires_never: Unbegrenzt
+        expires_in_days:
+          one: 1 Tag
+          other: "%{count} Tage"
+        create: Code erstellen
+        existing_heading: Codes
+        status_available: verfügbar
+        status_redeemed: eingelöst
+        status_expired: abgelaufen
+        expires: "Läuft am %{date} ab"
+        revoke: Widerrufen
+        revoke_confirm: Diese Einladung widerrufen?
+        redeemed_by: "Eingelöst von %{username} am %{date}"
+        empty: Noch keine Einladungen.
   activemodel:
     models:
       genre:
@@ -160,6 +214,9 @@ de:
       event:
         one: Event
         other: Events
+      invitation:
+        one: Einladung
+        other: Einladungen
       style:
         one: Style
         other: Styles
@@ -171,6 +228,9 @@ de:
         email_address: E-Mail-Adresse
         locale: Sprache
         notification_frequency: Benachrichtigungshäufigkeit
+      invitation:
+        code: Code
+        note: Notiz
   date:
     formats:
       default: "%d.%m.%Y"

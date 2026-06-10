@@ -14,6 +14,12 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :notifications, dependent: :destroy
 
+  # Invitations this user (an admin) minted. Gone with the account.
+  has_many :sent_invitations, class_name: 'Invitation', foreign_key: :created_by_id, dependent: :destroy, inverse_of: :created_by
+  # The single-use code this user redeemed to sign up, if any. Kept as an audit
+  # record when the account is deleted (redeemed_at stays set), just unlinked.
+  has_one :accepted_invitation, class_name: 'Invitation', foreign_key: :redeemed_by_id, dependent: :nullify, inverse_of: :redeemed_by
+
   # Favorites: users follow locations and styles (genres stay internal).
   acts_as_taggable_on :locations, :styles
 

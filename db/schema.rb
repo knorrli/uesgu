@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_160000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -52,6 +52,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_160000) do
     t.bigint "style_id", null: false
     t.index ["genre_id", "style_id"], name: "index_genres_styles_on_genre_id_and_style_id", unique: true
     t.index ["style_id"], name: "index_genres_styles_on_style_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.string "code", null: false
+    t.bigint "created_by_id", null: false
+    t.bigint "redeemed_by_id"
+    t.datetime "redeemed_at"
+    t.string "note"
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_invitations_on_code", unique: true
+    t.index ["created_by_id"], name: "index_invitations_on_created_by_id"
+    t.index ["redeemed_by_id"], name: "index_invitations_on_redeemed_by_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -128,6 +142,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_160000) do
   end
 
   add_foreign_key "genres", "genres", column: "canonical_id"
+  add_foreign_key "invitations", "users", column: "created_by_id"
+  add_foreign_key "invitations", "users", column: "redeemed_by_id"
   add_foreign_key "notifications", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "taggings", "tags"

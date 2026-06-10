@@ -190,8 +190,13 @@
   color: var(--theme-fg-muted);
 }
 
+/* A genre matched by the active free-text query. Emphasise it so it stands out
+   from its muted siblings — but stay in the text vocabulary (un-muted + bold),
+   never the accent colour, which in this UI means "interactive/clickable". The
+   match is information, not a link. */
 .event-genres .genre.active {
-  color: var(--theme-accent-color);
+  color: var(--theme-fg-color);
+  font-weight: bold;
 }
 
 .meta-edit {

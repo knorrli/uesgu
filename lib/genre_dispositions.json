@@ -23,7 +23,16 @@
     "Canadian Comedy",
     "Latino Comedy",
     "New Comedy",
-    "Black Comedy"
+    "Black Comedy",
+    "Talent Show",
+    "Deep Talent Show",
+    "Nursery",
+    "Lullaby",
+    "Instrumental Lullaby",
+    "ASMR",
+    "Meditation",
+    "Guided Meditation",
+    "World Meditation"
   ],
   "ignored": [
     "Festival",

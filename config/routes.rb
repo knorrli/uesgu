@@ -40,13 +40,15 @@ Rails.application.routes.draw do
 
     # Genre → style mapping. index/edit are standard CRUD over all genres in
     # use; queue is the "tinder" flow serving the next unmapped genre; update
-    # assigns styles; ignore/hide/block set a disposition, restore clears it.
+    # assigns styles; ignore/hide/block set a disposition, restore clears it;
+    # merge folds the genre into a canonical one (a semantic alias).
     resources :genres, only: %i[index edit update] do
       member do
         post :ignore
         post :hide
         post :block
         post :restore
+        post :merge
       end
       collection do
         get :queue

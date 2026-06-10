@@ -12,7 +12,12 @@
   <%# Current disposition + an inline Restore, shown only once a genre has one.
       Explains an otherwise-mysterious empty editor (a blocked genre tags 0
       events, since block stripped them). %>
-  <% if genre.ignored? || genre.hidden? || genre.blocked? %>
+  <% if genre.aliased? %>
+    <div class="flex gap-medium align-baseline wrap genre-current-status">
+      <span class="muted"><%= t('genres.editor.status') %> <strong><%= t('genres.index.status_merged', canonical: genre.canonical.name) %></strong></span>
+      <%= button_to t('genres.queue.restore'), restore_genre_path(genre), params: { return_to: return_to } %>
+    </div>
+  <% elsif genre.ignored? || genre.hidden? || genre.blocked? %>
     <% status_key = genre.hidden? ? 'status_hidden' : genre.blocked? ? 'status_blocked' : 'status_ignored' %>
     <div class="flex gap-medium align-baseline wrap genre-current-status">
       <span class="muted"><%= t('genres.editor.status') %> <strong><%= t("genres.index.#{status_key}") %></strong></span>
@@ -59,6 +64,37 @@
     <%= button_to t('genres.editor.hide'), hide_genre_path(genre), params: { return_to: return_to } %>
     <%= button_to t('genres.editor.block'), block_genre_path(genre), params: { return_to: return_to } %>
   </div>
+
+  <%# "Did you mean" — the closest existing genres by fingerprint similarity
+      (levenshtein), e.g. "postpunkz" → "Post-Punk". One click merges. %>
+  <% if alias_suggestions.any? %>
+    <div class="flex flex-col gap-small">
+      <h4><%= t('genres.editor.merge_suggested') %></h4>
+      <div class="flex gap-small wrap">
+        <% alias_suggestions.each do |candidate| %>
+          <%= button_to candidate.name, merge_genre_path(genre),
+                params: { genre: { canonical_genre_id: candidate.id }, return_to: return_to },
+                class: 'tag' %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# Merge into a canonical genre — a semantic alias the fingerprint can't catch
+      (e.g. "Elektronik" → "Electronic"). Folds this genre's events onto the
+      canonical and auto-resolves it on every future scrape. %>
+  <%= form_with url: merge_genre_path(genre), method: :post, scope: :genre,
+        class: 'flex justify-between gap-medium wrap align-end genre-merge' do |f| %>
+    <%= hidden_field_tag :return_to, return_to %>
+    <div class="input-wrapper flex flex-grow">
+      <%= f.combobox :canonical_genre_id, Genre.listable.where.not(id: genre.id).by_name,
+            placeholder: t('genres.editor.merge_into') do |combobox| %>
+        <% combobox.customize_fieldset class: 'flex-grow' %>
+        <% combobox.customize_input class: 'flex-grow' %>
+      <% end %>
+    </div>
+    <%= f.submit t('genres.editor.merge') %>
+  <% end %>
 
   <% if sample_events.any? %>
     <div class="flex flex-col gap-medium">

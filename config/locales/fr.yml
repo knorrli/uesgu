@@ -112,6 +112,7 @@ fr:
       status_ignored: ignoré
       status_hidden: masqué
       status_blocked: bloqué
+      status_merged: "fusionné avec %{canonical}"
       sort_by: "Trier:"
       sort_name: A–Z
       sort_count: plus fréquents
@@ -128,6 +129,9 @@ fr:
       ignore: "Ignorer (garder, sans style)"
       hide: "Masquer l'événement (non musical)"
       block: "Bloquer (retirer le tag)"
+      merge: Fusionner
+      merge_into: "Fusionner avec un autre genre…"
+      merge_suggested: "Fusionner avec un genre similaire"
       appears_on: Apparaît sur
   admin:
     index:

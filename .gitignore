@@ -33,5 +33,5 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
-# Claude Code personal per-project settings
-.claude/settings.local.json
+# Claude Code local files (per-project settings, session worktrees, scratch)
+.claude/

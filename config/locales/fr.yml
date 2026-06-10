@@ -267,7 +267,7 @@ fr:
         one: +1 de plus
         other: "+%{count} de plus"
     filter:
-      what: Quoi ?
+      what: "Rechercher : artistes, styles…"
       when: Quand ?
       where: Où ?
       location_types:

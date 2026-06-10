@@ -267,7 +267,7 @@ de:
         one: +1 mehr
         other: "+%{count} mehr"
     filter:
-      what: Was?
+      what: "Acts, Stile, alles suchen…"
       when: Wann?
       where: Wo?
       location_types:

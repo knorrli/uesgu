@@ -3,10 +3,13 @@
     <div class="filter-field flex flex-col gap-small">
       <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addStyleOrQuery">
         <%= f.hidden_field 'q[]', value: '', data: { filter_target: 'comboboxInput queriesInput', existing_values: @filter.queries.to_json } %>
-        <%= f.combobox('s[]', combobox_options(available_tags(context: :styles, applied: @filter.style_list), render_in: { partial: 'tags/chip' }, value: :name), input: { data: { action: 'input->filter#switchQueryHandle' } }, name_when_new: 'query', placeholder: t('.what')) do |combobox| %>
+        <%= f.combobox('s[]', combobox_options(available_tags(context: :styles, applied: @filter.style_list), render_in: { partial: 'tags/chip' }, value: :name), name_when_new: 'query', placeholder: t('.what')) do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_hidden_field data: { filter_target: 'comboboxInput stylesInput', existing_values: @filter.style_list.to_json } %>
-          <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'styles')}", data: { filter_target: 'queryHandle', default_handle: tag_icon_glyph(context: 'styles') } %>
+          <%# Lead with the magnifying glass (not the styles glyph): the field's
+              superpower is free-text search over acts/styles/genres, which a static
+              styles icon hid. A persistent search icon advertises it at rest. %>
+          <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
         <% end %>
       </div>
 

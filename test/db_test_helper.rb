@@ -35,17 +35,32 @@ module TaxonomyFixtures
     g
   end
 
-  # A persisted Event tagged with the given invented genre names. Satisfies the
-  # title/start_date/url presence validations with throwaway values.
-  def event_with_genres(*genre_names)
-    e = Event.new(
-      title: "Synthetic Show #{TaxonomyFixtures.next_seq}",
+  # A persisted Event with throwaway-but-valid title/start_date/url. Extra attrs
+  # (created_at, hidden, cancelled_at, start_date, location_list, ...) override
+  # the defaults — created_at is honoured by Rails when set explicitly, which
+  # lets digest/window tests place events at precise points in time.
+  def event(**attrs)
+    n = TaxonomyFixtures.next_seq
+    Event.create!({
+      title: "Synthetic Show #{n}",
       start_date: Date.new(2030, 1, 1),
-      url: "https://fixture.test/#{TaxonomyFixtures.next_seq}"
-    )
+      url: "https://fixture.test/#{n}"
+    }.merge(attrs))
+  end
+
+  # A persisted Event tagged with the given invented genre names.
+  def event_with_genres(*genre_names)
+    e = event
     e.genre_list = genre_names.flatten if genre_names.any?
     e.save!
     e
+  end
+
+  # A persisted User with a valid synthetic username + password. Pass attrs to
+  # set notification_frequency, last_notified_at, created_at, email_address, etc.
+  def user(**attrs)
+    n = TaxonomyFixtures.next_seq
+    User.create!({ username: "user#{n}", password: 'secret123' }.merge(attrs))
   end
 end
 

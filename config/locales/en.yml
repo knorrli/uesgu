@@ -159,9 +159,6 @@ en:
       deleted: "Account %{username} was deleted."
       index:
         title: Accounts
-        favorites_count:
-          one: 1 favorite
-          other: "%{count} favorites"
         empty: No accounts yet.
       show:
         back: ← All accounts

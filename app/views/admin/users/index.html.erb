@@ -4,16 +4,13 @@
   <% if @users.any? %>
     <ul class="admin-list">
       <% @users.each do |user| %>
-        <% favorites = user.location_list.size + user.style_list.size %>
         <li class="admin-row">
           <span class="admin-row__main">
             <%= link_to user.username, admin_user_path(user) %>
             <% if user.admin? %><span class="tag"><%= t('admin.users.admin_badge') %></span><% end %>
           </span>
           <span class="stat__leader"></span>
-          <span class="admin-row__meta muted">
-            <%= t('.favorites_count', count: favorites) %> · <%= l(user.created_at.to_date) %>
-          </span>
+          <span class="admin-row__meta muted"><%= l(user.created_at.to_date) %></span>
         </li>
       <% end %>
     </ul>

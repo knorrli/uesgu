@@ -159,9 +159,6 @@ fr:
       deleted: "Le compte %{username} a été supprimé."
       index:
         title: Comptes
-        favorites_count:
-          one: 1 favori
-          other: "%{count} favoris"
         empty: Aucun compte pour l'instant.
       show:
         back: ← Tous les comptes

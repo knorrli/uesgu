@@ -1,9 +1,9 @@
 ---
 fr:
   nav:
-    events: Programme
     admin: Admin
     notifications: Notifications
+    unread_notifications: Notifications non lues
     favorites: Favoris
     settings: Paramètres
     logout: Déconnexion

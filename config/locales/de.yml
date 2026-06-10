@@ -1,9 +1,9 @@
 ---
 de:
   nav:
-    events: Programm
     admin: Admin
     notifications: Mitteilungen
+    unread_notifications: Ungelesene Mitteilungen
     favorites: Favoriten
     settings: Einstellungen
     logout: Abmelden

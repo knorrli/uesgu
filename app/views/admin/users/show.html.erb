@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-large">
-  <p><%= link_to t('.back'), admin_users_path %></p>
+  <%= render 'admin/back', path: admin_users_path, label: t('.back') %>
 
   <h1>
     <%= @user.username %>

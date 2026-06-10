@@ -35,7 +35,6 @@ export default class extends Controller {
     const element = this.hasInputTarget ? this.inputTarget : this.element;
     const wrapperTarget = this.wrapperTarget;
     const presetValue = this.presetValue;
-    const activeDateRanges = this.dateRangesValue;
     const gridValue = this.gridValue;
 
 
@@ -83,21 +82,6 @@ export default class extends Controller {
           // CustomEvent so the filter actually hears it.
           this.element.value = '';
           this.element.dispatchEvent(new CustomEvent('datepicker:removal', { bubbles: true, detail: { value: '' } }));
-        });
-        picker.on('view', (e) => {
-          if (e.detail.view == 'PresetPluginButton') {
-            const activeLabels = Object.keys(presetValue).reduce((activeLabels, key) => {
-              if (activeDateRanges.includes(key)) {
-                return [...activeLabels, presetValue[key].label];
-              } else {
-                return activeLabels;
-              };
-            }, []);
-
-            if (activeLabels.includes(e.detail.target.textContent)) {
-              e.detail.target.classList.add('active');
-            }
-          }
         });
       },
     });

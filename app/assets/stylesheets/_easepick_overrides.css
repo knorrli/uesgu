@@ -101,11 +101,6 @@
 
     &.preset-button {
       flex-grow: 1;
-
-      &.active {
-        background-color: var(--theme-accent-color);
-        color: var(--theme-bg-color);
-      }
     }
   }
 

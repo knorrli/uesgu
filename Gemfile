@@ -54,12 +54,6 @@ gem 'discard'
 # Web Scraping
 gem 'mechanize'
 
-# SQL-based queue for Jobs
-gem 'solid_queue'
-
-# Tracking Jobs
-gem "mission_control-jobs"
-
 # Calendar View
 gem 'simple_calendar'
 

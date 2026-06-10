@@ -178,7 +178,11 @@ class Genre < ApplicationRecord
       styles.clear
       update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil, canonical_id: nil)
     end
-    Event.tagged_with(name, on: :genres).find_each do |event|
+    # Snapshot ids first: recompute_styles! drops this genre's tagging from each
+    # event, shrinking the tagged_with set find_each would page over — which would
+    # skip events and leave the blocked tag attached (cf. merge_into!).
+    affected = Event.tagged_with(name, on: :genres).pluck(:id)
+    Event.where(id: affected).find_each do |event|
       event.genre_list.remove(name)
       event.recompute_styles! # persists the dropped tagging + re-derives styles
     end

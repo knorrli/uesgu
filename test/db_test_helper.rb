@@ -60,7 +60,17 @@ module TaxonomyFixtures
   # set notification_frequency, last_notified_at, created_at, email_address, etc.
   def user(**attrs)
     n = TaxonomyFixtures.next_seq
-    User.create!({ username: "user#{n}", password: 'secret123' }.merge(attrs))
+    User.create!({ username: "user#{n}", password: PASSWORD }.merge(attrs))
+  end
+
+  PASSWORD = 'secret123'
+
+  # Integration-test sign-in: drive the real session-create flow so the signed
+  # cookie is set in the test's cookie jar. Only meaningful inside an
+  # ActionDispatch::IntegrationTest (uses post/session_path).
+  def sign_in_as(u, password: PASSWORD)
+    post session_path, params: { username: u.username, password: password }
+    u
   end
 end
 

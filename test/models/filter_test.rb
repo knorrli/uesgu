@@ -1,0 +1,57 @@
+require 'db_test_helper'
+
+# Locks the Filter query object: how request params parse into tag lists, the
+# shape of the ransack query it builds, date-range preset ordering, and the
+# earliest-date resolution used to jump the calendar.
+class FilterTest < ActiveSupport::TestCase
+  test 'list setters parse a comma string into a tag array' do
+    f = Filter.new
+    f.queries = 'rock, jazz'
+    f.style_list = 'wubstep, glimmercore'
+
+    assert_equal %w[rock jazz], f.queries
+    assert_equal %w[wubstep glimmercore], f.style_list
+  end
+
+  test 'date_ranges are ordered by the datepicker preset sequence' do
+    f = Filter.new
+    f.date_ranges = %w[next_week today] # given out of order
+
+    assert_equal %w[today next_week], f.date_ranges,
+                 'presets sort into Datepicker.preset key order'
+  end
+
+  test 'unknown date ranges sort after the known presets' do
+    f = Filter.new
+    f.date_ranges = ['2030-01-01 - 2030-01-31', 'today']
+
+    assert_equal 'today', f.date_ranges.first
+  end
+
+  test 'ransack_query defaults to upcoming events when no date range is set' do
+    f = Filter.new
+    group = f.ransack_query[:g]
+    date_group = group.find { |h| h.key?(:start_date_gteq) || h.key?(:start_date_between_any) }
+
+    assert_equal Date.current.beginning_of_day, date_group[:start_date_gteq]
+  end
+
+  test 'ransack_query maps a date preset into a concrete between range' do
+    f = Filter.new
+    f.date_ranges = ['today']
+    date_group = f.ransack_query[:g].find { |h| h.key?(:start_date_between_any) }
+
+    assert date_group, 'a between range is emitted when a preset is active'
+    assert_includes date_group[:start_date_between_any].first, Date.current.iso8601
+  end
+
+  test 'earliest_date resolves the soonest concrete date across presets' do
+    f = Filter.new
+    f.date_ranges = ['today']
+    assert_equal Date.current, f.earliest_date
+  end
+
+  test 'earliest_date is nil when no date filter is active' do
+    assert_nil Filter.new.earliest_date
+  end
+end

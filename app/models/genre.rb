@@ -266,6 +266,9 @@ class Genre < ApplicationRecord
     ensure!(representative.values)
     rows = where(fingerprint: by_fingerprint.keys.presence || ['']).index_by(&:fingerprint)
     by_fingerprint.each { |fingerprint, count| rows[fingerprint]&.update_columns(events_count: count) }
+    # Zero every genre outside the current tag set. The `|| ['']` matters: when the
+    # set is empty it's *all* genres, and no fingerprint is '', so NOT IN ('')
+    # matches every row — whereas NOT IN (NULL) would be SQL-unknown and zero none.
     where.not(fingerprint: by_fingerprint.keys.presence || ['']).update_all(events_count: 0)
   end
 

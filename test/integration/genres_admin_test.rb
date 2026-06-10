@@ -1,0 +1,63 @@
+require 'db_test_helper'
+
+# Locks the admin genre-curation flow through the controller: the assignment
+# write path, each disposition endpoint, the queue that serves the next
+# highest-impact unmapped genre, and the internal-only return_to. Disposition
+# *behaviour* is unit-tested in genre_disposition_test; here we prove the
+# endpoints wire through and redirect. Synthetic taxonomy only.
+class GenresAdminTest < ActionDispatch::IntegrationTest
+  setup { sign_in_as user(admin: true) }
+
+  test 'update assigns the chosen styles to the genre' do
+    g = genre(events_count: 2)
+    s1 = style
+    s2 = style
+
+    patch genre_path(g), params: { genre: { style_ids: "#{s1.id},#{s2.id}" }, return_to: genres_path }
+
+    assert_redirected_to genres_path
+    assert_equal [s1, s2].map(&:id).sort, g.reload.styles.pluck(:id).sort
+  end
+
+  test 'ignore, hide, block and restore each flip the genre state' do
+    g = genre(events_count: 1)
+
+    post ignore_genre_path(g)
+    assert g.reload.ignored?
+
+    post hide_genre_path(g)
+    assert g.reload.hidden?
+
+    post block_genre_path(g)
+    assert g.reload.blocked?
+
+    post restore_genre_path(g)
+    refute g.reload.blocked?
+    refute g.reload.hidden?
+    refute g.reload.ignored?
+  end
+
+  test 'queue serves the highest-impact unmapped genre' do
+    genre(name: 'light', events_count: 2)
+    heavy = genre(name: 'heavy', events_count: 99)
+
+    get queue_genres_path
+
+    assert_response :success
+    assert_includes response.body, heavy.name, 'the most-used unmapped genre surfaces first'
+  end
+
+  test 'index and edit render for an admin' do
+    g = genre(events_count: 1)
+    get genres_path
+    assert_response :success
+    get edit_genre_path(g)
+    assert_response :success
+  end
+
+  test 'return_to honors an internal path' do
+    g = genre(events_count: 1)
+    post ignore_genre_path(g), params: { return_to: queue_genres_path }
+    assert_redirected_to queue_genres_path
+  end
+end

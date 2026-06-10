@@ -31,12 +31,13 @@ export default class extends Controller {
   ];
 
   switchQueryHandle(event) {
+    // Swap only the Phosphor glyph class; the ph base weight stays put.
     if (event.target.value) {
       this.queryHandleTarget.classList.remove(this.queryHandleTarget.dataset.defaultHandle);
-      this.queryHandleTarget.classList.add('ti-search');
+      this.queryHandleTarget.classList.add('ph-magnifying-glass');
     } else {
       this.queryHandleTarget.classList.add(this.queryHandleTarget.dataset.defaultHandle);
-      this.queryHandleTarget.classList.remove('ti-search');
+      this.queryHandleTarget.classList.remove('ph-magnifying-glass');
     }
   }
 

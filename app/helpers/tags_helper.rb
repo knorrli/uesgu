@@ -1,23 +1,34 @@
 module TagsHelper
-  def tag_icon_class(context:)
+  # Phosphor weight applied to every icon (the base class the glyph sits on).
+  ICON_BASE = 'ph'
+
+  # The Phosphor glyph class for a tag context, without the ICON_BASE weight,
+  # e.g. 'ph-house'. Kept separate so JS can swap a single glyph class on an
+  # element that already carries ICON_BASE (see filter_controller.js).
+  def tag_icon_glyph(context:)
     case context.to_s
     when 'query'
-      'ti-search'
+      'ph-magnifying-glass'
     when 'date'
-      'ti-calendar'
+      'ph-calendar-dots'
     when 'styles'
-      'ti-music-alt'
+      'ph-music-notes'
     when 'genres'
-      'ti-tag'
+      'ph-tag'
     when 'locations', 'venue'
-      'ti-home'
+      'ph-house'
     when 'city'
-      'ti-location-pin'
+      'ph-map-pin'
     when 'canton'
-      'ti-map-alt'
+      'ph-map-trifold'
     else
-      'ti-bolt'
+      'ph-lightning'
     end
+  end
+
+  # Full icon class incl. the Phosphor weight, e.g. 'ph ph-house'.
+  def tag_icon_class(context:)
+    "#{ICON_BASE} #{tag_icon_glyph(context: context)}"
   end
 
   def available_tags(context:, applied: [])

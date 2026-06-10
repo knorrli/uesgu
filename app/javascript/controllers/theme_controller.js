@@ -10,10 +10,12 @@ import { Controller } from "@hotwired/stimulus"
 // handles clicks.
 const ORDER = ["system", "light", "dark"]
 const LABELS = { system: "Auto", light: "Light", dark: "Dark" }
+// Phosphor glyphs (sit on the ph base class on the icon span).
+const ICONS = { system: "ph-circle-half-tilt", light: "ph-sun", dark: "ph-moon" }
 const KEY = "theme"
 
 export default class extends Controller {
-  static targets = ["label"]
+  static targets = ["label", "icon"]
 
   connect() {
     this.media = window.matchMedia("(prefers-color-scheme: dark)")
@@ -52,6 +54,9 @@ export default class extends Controller {
   render() {
     const label = LABELS[this.preference]
     if (this.hasLabelTarget) this.labelTarget.textContent = label
+    if (this.hasIconTarget) {
+      this.iconTarget.className = `ph ${ICONS[this.preference]}`
+    }
     this.element.title = `Theme: ${label}`
     this.element.setAttribute("aria-label", `Theme: ${label} (click to change)`)
   }

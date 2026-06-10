@@ -52,6 +52,9 @@
   border: none;
   background: none;
   color: var(--theme-accent-color);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-small);
 }
 
 .theme-toggle:hover {

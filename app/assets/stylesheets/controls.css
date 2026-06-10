@@ -46,7 +46,11 @@ input[type=text] {
   color: inherit;
   border: none;
   font-size: inherit;
-  min-width: calc(var(--hw-combobox-width) / 2);
+  /* The field now sits alone on its row (chips moved to their own row below), so
+     it no longer needs to reserve half the combobox width against inline chips.
+     min-width: 0 lets it shrink within flex instead of forcing horizontal
+     overflow on narrow (mobile) viewports. */
+  min-width: 0;
   padding: 0;
   text-overflow: ellipsis;
   max-width: 100%;

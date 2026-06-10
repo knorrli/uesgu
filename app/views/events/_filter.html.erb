@@ -1,6 +1,15 @@
 <section class="filter flex flex-col gap-medium" >
   <%= form_with url: events_path, method: :get, id: 'filter-form', class: 'flex flex-col gap-medium', html: { autocomplete: 'off' }, data: { filter_target: 'form', turbo_frame: '_top' } do |f| %>
-    <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addStyleOrQuery">
+    <div class="filter-field flex flex-col gap-small">
+      <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addStyleOrQuery">
+        <%= f.hidden_field 'q[]', value: '', data: { filter_target: 'comboboxInput queriesInput', existing_values: @filter.queries.to_json } %>
+        <%= f.combobox('s[]', combobox_options(available_tags(context: :styles, applied: @filter.style_list), render_in: { partial: 'tags/chip' }, value: :name), input: { data: { action: 'input->filter#switchQueryHandle' } }, name_when_new: 'query', placeholder: t('.what')) do |combobox| %>
+          <% combobox.customize_fieldset class: 'flex-grow' %>
+          <% combobox.customize_hidden_field data: { filter_target: 'comboboxInput stylesInput', existing_values: @filter.style_list.to_json } %>
+          <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'styles')}", data: { filter_target: 'queryHandle', default_handle: tag_icon_glyph(context: 'styles') } %>
+        <% end %>
+      </div>
+
       <% if @filter.style_list.present? || @filter.queries.present? %>
         <div class="chips flex flex-row wrap gap-small">
           <% @filter.style_list.each do |style| %>
@@ -22,16 +31,17 @@
           <% end %>
         </div>
       <% end %>
-
-      <%= f.hidden_field 'q[]', value: '', data: { filter_target: 'comboboxInput queriesInput', existing_values: @filter.queries.to_json } %>
-      <%= f.combobox('s[]', combobox_options(available_tags(context: :styles, applied: @filter.style_list), render_in: { partial: 'tags/chip' }, value: :name), input: { data: { action: 'input->filter#switchQueryHandle' } }, name_when_new: 'query', placeholder: t('.what')) do |combobox| %>
-        <% combobox.customize_fieldset class: 'flex-grow' %>
-        <% combobox.customize_hidden_field data: { filter_target: 'comboboxInput stylesInput', existing_values: @filter.style_list.to_json } %>
-        <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'styles')}", data: { filter_target: 'queryHandle', default_handle: tag_icon_glyph(context: 'styles') } %>
-      <% end %>
     </div>
 
-    <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addLocation">
+    <div class="filter-field flex flex-col gap-small">
+      <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addLocation">
+        <%= f.combobox 'l[]', combobox_options(ordered_location_tags(applied: @filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name), placeholder: t('.where') do |combobox| %>
+          <% combobox.customize_fieldset class: 'flex-grow' %>
+          <% combobox.customize_hidden_field value: 'test', data: { filter_target: 'comboboxInput locationsInput', existing_values: @filter.location_list.to_json } %>
+          <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
+        <% end %>
+      </div>
+
       <% if @filter.location_list.any? %>
         <div class="chips flex flex-row wrap gap-small">
           <% @filter.location_list.each do |location| %>
@@ -43,12 +53,6 @@
             <% end %>
           <% end %>
         </div>
-      <% end %>
-
-      <%= f.combobox 'l[]', combobox_options(ordered_location_tags(applied: @filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name), placeholder: t('.where') do |combobox| %>
-        <% combobox.customize_fieldset class: 'flex-grow' %>
-        <% combobox.customize_hidden_field value: 'test', data: { filter_target: 'comboboxInput locationsInput', existing_values: @filter.location_list.to_json } %>
-        <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
       <% end %>
     </div>
 

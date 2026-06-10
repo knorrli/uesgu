@@ -33,12 +33,14 @@ class GenresController < ApplicationController
     @remaining = Genre.unassigned.count
     @genre = Genre.unassigned.by_usage.first
     @suggestions = @genre ? StyleSuggester.call(@genre) : []
+    @alias_suggestions = @genre ? AliasSuggester.call(@genre) : []
     @sample_events = sample_events_for(@genre)
   end
 
   def edit
     @genre = Genre.find(params[:id])
     @suggestions = StyleSuggester.call(@genre)
+    @alias_suggestions = AliasSuggester.call(@genre)
     @sample_events = sample_events_for(@genre)
   end
 

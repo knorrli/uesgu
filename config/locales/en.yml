@@ -131,6 +131,7 @@ en:
       block: "Block (strip the tag)"
       merge: Merge
       merge_into: "Merge into another genre…"
+      merge_suggested: "Merge into a similar genre"
       appears_on: Appears on
   admin:
     index:

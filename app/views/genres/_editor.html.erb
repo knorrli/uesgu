@@ -65,6 +65,21 @@
     <%= button_to t('genres.editor.block'), block_genre_path(genre), params: { return_to: return_to } %>
   </div>
 
+  <%# "Did you mean" — the closest existing genres by fingerprint similarity
+      (levenshtein), e.g. "postpunkz" → "Post-Punk". One click merges. %>
+  <% if alias_suggestions.any? %>
+    <div class="flex flex-col gap-small">
+      <h4><%= t('genres.editor.merge_suggested') %></h4>
+      <div class="flex gap-small wrap">
+        <% alias_suggestions.each do |candidate| %>
+          <%= button_to candidate.name, merge_genre_path(genre),
+                params: { genre: { canonical_genre_id: candidate.id }, return_to: return_to },
+                class: 'tag' %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
   <%# Merge into a canonical genre — a semantic alias the fingerprint can't catch
       (e.g. "Elektronik" → "Electronic"). Folds this genre's events onto the
       canonical and auto-resolves it on every future scrape. %>

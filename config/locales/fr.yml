@@ -131,6 +131,7 @@ fr:
       block: "Bloquer (retirer le tag)"
       merge: Fusionner
       merge_into: "Fusionner avec un autre genre…"
+      merge_suggested: "Fusionner avec un genre similaire"
       appears_on: Apparaît sur
   admin:
     index:

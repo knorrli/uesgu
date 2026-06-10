@@ -131,6 +131,7 @@ de:
       block: "Blockieren (Tag entfernen)"
       merge: Zusammenführen
       merge_into: "Mit anderem Genre zusammenführen…"
+      merge_suggested: "Mit ähnlichem Genre zusammenführen"
       appears_on: Erscheint bei
   admin:
     index:

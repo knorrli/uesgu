@@ -270,6 +270,10 @@ en:
       what: What?
       when: When?
       where: Where?
+      location_types:
+        venue: Venue
+        city: City
+        canton: Canton
   helpers:
     page_entries_info:
       more_pages:

@@ -270,6 +270,10 @@ fr:
       what: Quoi ?
       when: Quand ?
       where: Où ?
+      location_types:
+        venue: Salle
+        city: Ville
+        canton: Canton
   helpers:
     page_entries_info:
       more_pages:

@@ -1,1 +1,1 @@
-<%= combobox_display %>
+<% type = Location.type_for(combobox_value) %><span class="loc-option loc-<%= type %>"><%= combobox_display %><span class="loc-type"> &middot; <%= t("events.filter.location_types.#{type}") %></span></span>

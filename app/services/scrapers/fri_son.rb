@@ -21,8 +21,10 @@ module Scrapers
     end
 
     def event_start_time(content)
-      date_string = content.css('.field.field--name-field-date .datetime').attr('datetime')
-      date = Time.zone.parse(date_string).to_date.iso8601
+      # Take the date as written in the source's datetime attr — NOT to_date of the
+      # parsed UTC instant, which rolls to the next local day for late-UTC times in
+      # winter (the venue's field-date is a UTC timestamp).
+      date = content.css('.field.field--name-field-date .datetime').attr('datetime').to_s[/\d{4}-\d{2}-\d{2}/]
       time_string = content.css('.field.field--name-field-time-doors').text.squish
       Time.zone.parse("#{date}, #{time_string}")
     end

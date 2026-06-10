@@ -30,11 +30,21 @@ export default class extends Controller {
   }
 
   get preference() {
-    return localStorage.getItem(KEY) || "system"
+    // localStorage can throw (Safari private mode, storage disabled) — fall back
+    // to "system" so the toggle keeps working in-memory rather than dying.
+    try {
+      return localStorage.getItem(KEY) || "system"
+    } catch {
+      return "system"
+    }
   }
 
   set preference(value) {
-    localStorage.setItem(KEY, value)
+    try {
+      localStorage.setItem(KEY, value)
+    } catch {
+      // Storage unavailable; the choice just won't persist across reloads.
+    }
   }
 
   // Advance system → light → dark → system.

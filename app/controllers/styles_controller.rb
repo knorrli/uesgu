@@ -4,7 +4,7 @@ class StylesController < ApplicationController
 
   def chips
     @styles = Style
-      .where(id: params[:combobox_values].split(','))
+      .where(id: params[:combobox_values].to_s.split(','))
       .distinct
       .order(name: :asc)
 

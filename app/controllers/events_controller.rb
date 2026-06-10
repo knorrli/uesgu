@@ -15,7 +15,11 @@ class EventsController < ApplicationController
     @view = params[:view].presence || session[:events_view] || current_user&.events_view || 'list'
     @view = 'list' unless @view == 'calendar'
     session[:events_view] = @view
-    current_user.update_column(:events_view, @view) if current_user && current_user.events_view != @view
+    # Persist to the account only when the visitor explicitly switched view, so a
+    # plain GET render (the hot path) doesn't write on every request.
+    if params[:view].present? && current_user && current_user.events_view != @view
+      current_user.update_column(:events_view, @view)
+    end
 
     events = @q.result(distinct: true).order(start_date: :asc)
     if @view == 'calendar'

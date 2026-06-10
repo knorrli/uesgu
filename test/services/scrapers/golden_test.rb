@@ -23,11 +23,16 @@ class Scrapers::GoldenTest < Minitest::Test
   # Stand-in for an Event that records field assignments instead of persisting.
   class Capture
     FIELDS = %i[start_time start_date title subtitle genre_list style_list location_list cancelled_at].freeze
-    attr_accessor(*FIELDS)
+    attr_accessor(*FIELDS, :hidden)
     attr_reader :url
 
     def initialize(url) = @url = url
     def save! = nil
+
+    # Visibility is a DB-derived projection (Genre.hidden), not a parsing concern,
+    # so the offline run treats every event as visible — mirroring the stubbed
+    # event_styles. The real derivation is covered by EventTest.
+    def hidden_by_genre? = false
 
     def to_h
       { url: url }.merge(FIELDS.index_with { |field| serialize(field, public_send(field)) })

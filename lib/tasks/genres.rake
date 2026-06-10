@@ -89,9 +89,12 @@ namespace :genres do
   desc 'Seed the full genre taxonomy, aliases, and dispositions in order. The ' \
        'one-shot seed for a fresh database. Idempotent.'
   task seed: :environment do
-    Rake::Task['genres:import_taxonomy'].invoke
-    Rake::Task['genres:import_aliases'].invoke
-    Rake::Task['genres:import_dispositions'].invoke
+    # execute, not invoke: invoke no-ops a task already run once in this process,
+    # which would silently skip a step when seed is composed/re-run. The steps are
+    # individually idempotent, so always running them is safe.
+    Rake::Task['genres:import_taxonomy'].execute
+    Rake::Task['genres:import_aliases'].execute
+    Rake::Task['genres:import_dispositions'].execute
     Genre.reconcile!
     puts 'Genre seed complete.'
   end

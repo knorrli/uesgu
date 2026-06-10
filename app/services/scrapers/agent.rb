@@ -34,7 +34,15 @@ module Scrapers
         @current_row = row
         next if skip_row?(row)
 
-        url = event_url(row)
+        # event_url runs inside the per-event rescue too: a single row missing its
+        # anchor (markup tweak, teaser/ad card) must skip that event, not raise out
+        # of the loop and abort the rest of the venue's programme.
+        begin
+          url = event_url(row)
+        rescue StandardError => e
+          record_failure(nil, e)
+          next
+        end
         next if url.blank?
 
         Rails.logger.info "Processing event URL #{url}"
@@ -61,6 +69,10 @@ module Scrapers
       event.subtitle      = event_subtitle(content)
       event.genre_list    = event_genres(content)
       event.style_list    = event_styles(genres: event.genre_list)
+      # Derive visibility from source each scrape, mirroring Event#recompute_styles!
+      # — otherwise a freshly-scraped non-music event (hidden genre, no style) would
+      # stay publicly visible until a later disposition/recompute touched it.
+      event.hidden        = event.hidden_by_genre?
       event.location_list = self.class.locations
       postprocess(event)
       mark_cancellation(event, content)

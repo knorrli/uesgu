@@ -56,6 +56,38 @@ class EventStylesTest < ActiveSupport::TestCase
     refute event.reload.hidden
   end
 
+  test 'recompute_styles! hides a non-music event: a hidden genre and no style' do
+    g = genre(name: 'spoken-word')
+    g.hide!
+    event = event_with_genres(g.name)
+
+    event.recompute_styles!
+
+    assert event.reload.hidden
+  end
+
+  test 'a real style wins: an event keeps visible when a music genre coexists with a hidden one' do
+    lecture = genre(name: 'lecture')
+    lecture.hide!
+    band = genre(name: 'liveband', styles: [style(name: 'postcore')])
+    event = event_with_genres(lecture.name, band.name)
+
+    event.recompute_styles!
+
+    refute event.reload.hidden, 'a real style always wins'
+  end
+
+  test 'hidden_by_genre? flags non-music from the in-memory lists (the scrape path)' do
+    g = genre(name: 'asmr')
+    g.hide!
+    event = event(genre_list: [g.name]) # no style assigned, as a fresh scrape would be
+
+    assert event.hidden_by_genre?
+
+    event.style_list = [style(name: 'drone').name]
+    refute event.hidden_by_genre?, 'a real style always wins'
+  end
+
   test 'genre_list= strips blocklisted genres case-insensitively at tagging time' do
     blocked = Genre.create!(name: 'JunkTag')
     blocked.block!

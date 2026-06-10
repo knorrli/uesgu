@@ -56,12 +56,17 @@ class Event < ApplicationRecord
   # several genres on the same event point at the same style.
   def recompute_styles!
     Genre.ensure!(genre_list)
-    style_names = Genre.styles_for(genre_list)
-    self.style_list = style_names
-    # Non-music: carries a hidden genre and has no music style. A real style
-    # always wins (a "concert + reading" stays visible).
-    fingerprints = genre_list.map { |name| Genre.fingerprint_for(name) }.presence || ['']
-    self.hidden = style_names.empty? && Genre.hidden.where(fingerprint: fingerprints).exists?
+    self.style_list = Genre.styles_for(genre_list)
+    self.hidden = hidden_by_genre?
     save!
+  end
+
+  # Non-music: carries a hidden-dispositioned genre and has no music style (a real
+  # style always wins — a "concert + reading" stays visible). Reads the current
+  # genre_list + style_list, so both recompute_styles! and the scrape path
+  # (Scrapers::Agent#build_event) derive `hidden` identically.
+  def hidden_by_genre?
+    fingerprints = genre_list.map { |name| Genre.fingerprint_for(name) }.presence || ['']
+    style_list.empty? && Genre.hidden.where(fingerprint: fingerprints).exists?
   end
 end

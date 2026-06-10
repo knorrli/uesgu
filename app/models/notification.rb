@@ -45,18 +45,25 @@ class Notification < ApplicationRecord
       return []
     end
 
-    cursor = user.last_notified_at || user.created_at
     created = []
 
-    while cursor + interval <= now
-      window_end = cursor + interval
-      if Event.visible.where(created_at: cursor...window_end).exists?
-        created << user.notifications.create!(period_start: cursor, period_end: window_end)
+    # Lock the user row so two concurrent calls (double-click, prefetch + click,
+    # two tabs) can't both pass the cursor check and create duplicate digests for
+    # the same window — the second waits, then sees the advanced last_notified_at.
+    user.with_lock do
+      cursor = user.last_notified_at || user.created_at
+
+      while cursor + interval <= now
+        window_end = cursor + interval
+        if Event.visible.where(created_at: cursor...window_end).exists?
+          created << user.notifications.create!(period_start: cursor, period_end: window_end)
+        end
+        cursor = window_end
       end
-      cursor = window_end
+
+      user.update_column(:last_notified_at, cursor) if cursor != (user.last_notified_at || user.created_at)
     end
 
-    user.update_column(:last_notified_at, cursor) if cursor != (user.last_notified_at || user.created_at)
     created
   end
 end

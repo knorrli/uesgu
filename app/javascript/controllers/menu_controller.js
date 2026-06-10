@@ -10,16 +10,23 @@ export default class extends Controller {
     this.onKeydown = (event) => {
       if (event.key === "Escape") this.element.open = false
     }
+    // A Turbo cache restore can reconnect with the menu already open, but no
+    // toggle event fires — start listening now so it stays dismissable.
+    if (this.element.open) this.startListening()
   }
 
   // Bound to the <details> toggle event: start listening while open, stop when closed.
   toggle() {
     if (this.element.open) {
-      document.addEventListener("click", this.onDocClick)
-      document.addEventListener("keydown", this.onKeydown)
+      this.startListening()
     } else {
       this.stopListening()
     }
+  }
+
+  startListening() {
+    document.addEventListener("click", this.onDocClick)
+    document.addEventListener("keydown", this.onKeydown)
   }
 
   stopListening() {

@@ -12,8 +12,7 @@ services:
         fromDatabase:
           name: uesgu-db
           property: connectionString
-      - key: RAILS_MASTER_KEY
-        sync: false # You'll provide this value on Blueprint creation
+      - fromGroup: uesgu-secrets
       - key: WEB_CONCURRENCY
         value: 1
 
@@ -37,8 +36,7 @@ services:
         fromDatabase:
           name: uesgu-db
           property: connectionString
-      - key: RAILS_MASTER_KEY
-        sync: false
+      - fromGroup: uesgu-secrets
       - key: RAILS_ENV
         value: production
 
@@ -46,3 +44,12 @@ databases:
   - name: uesgu-db
     plan: basic-256mb
     region: frankfurt
+
+# Shared secrets entered ONCE and referenced by every service above via
+# `fromGroup`. RAILS_MASTER_KEY decrypts credentials.yml.enc (which holds
+# secret_key_base etc.), so every service — web and crons — needs it.
+envVarGroups:
+  - name: uesgu-secrets
+    envVars:
+      - key: RAILS_MASTER_KEY
+        sync: false

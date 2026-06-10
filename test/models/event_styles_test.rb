@@ -40,11 +40,11 @@ class EventStylesTest < ActiveSupport::TestCase
 
   test 'recompute_styles! creates a Genre row for every tag (ensure!)' do
     event = event_with_genres('never-seen-genre')
-    assert_not Genre.exists?(name: 'never-seen-genre')
+    assert_not genre_for('never-seen-genre')
 
     event.recompute_styles!
 
-    assert Genre.exists?(name: 'never-seen-genre')
+    assert genre_for('never-seen-genre')
   end
 
   test 'recompute_styles! leaves a fully-mapped event visible' do
@@ -62,12 +62,13 @@ class EventStylesTest < ActiveSupport::TestCase
 
     event = event_with_genres('junktag', 'kept-genre') # lower-case variant of blocked
 
-    assert_equal ['kept-genre'], event.reload.genre_list
+    # The blocked variant is stripped; the survivor is stored canonicalized.
+    assert_equal ['Kept-Genre'], event.reload.genre_list
   end
 
   test 'genre_list= keeps everything when no genres are blocked' do
     event = event_with_genres('alpha', 'beta')
 
-    assert_equal %w[alpha beta].sort, event.reload.genre_list.sort
+    assert_equal %w[Alpha Beta].sort, event.reload.genre_list.sort
   end
 end

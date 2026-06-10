@@ -14,11 +14,11 @@ class ScrapeEventsJobTest < ActiveSupport::TestCase
   end
 
   test 'perform runs the scraper and reconciles genre usage counts' do
-    assert_not Genre.exists?(name: 'scraped-genre')
+    assert_not genre_for('scraped-genre')
 
     ScrapeEventsJob.new.perform(scraper_class: 'ScrapeEventsJobTest::FakeScraper')
 
-    assert_equal 1, Genre.find_by(name: 'scraped-genre').events_count,
+    assert_equal 1, genre_for('scraped-genre').events_count,
                  'reconcile! ran after the scrape'
   end
 end

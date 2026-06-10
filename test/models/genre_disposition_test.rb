@@ -100,7 +100,7 @@ class GenreDispositionTest < ActiveSupport::TestCase
     fresh = event_with_genres(noise.name, 'techno-ish')
 
     refute_includes fresh.reload.genre_list, noise.name
-    assert_includes fresh.genre_list, 'techno-ish'
+    assert_includes fresh.genre_list, 'Techno-Ish' # survivor stored canonicalized
   end
 
   test 'restore! lifts every disposition mark and un-hides events' do

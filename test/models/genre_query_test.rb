@@ -1,8 +1,10 @@
 require 'db_test_helper'
 
-# Locks Genre's class-level mechanics — ensure! (idempotent, case-insensitive
-# row creation), reconcile! (usage-count refresh from taggings), blocked_names
-# (lowercased blocklist) — and the curation scopes. Synthetic names only.
+# Locks Genre's class-level mechanics — ensure! (idempotent, fingerprint-keyed
+# row creation), reconcile! (usage-count refresh from taggings),
+# blocked_fingerprints (the blocklist) — and the curation scopes. Synthetic
+# names only; genres are matched by fingerprint via the genre_for helper since
+# ingest canonicalizes casing/spelling.
 class GenreQueryTest < ActiveSupport::TestCase
   # --- Genre.ensure! ---------------------------------------------------------
 
@@ -10,8 +12,8 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_difference -> { Genre.count }, 2 do
       Genre.ensure!(%w[zorptronic flarejazz])
     end
-    assert Genre.exists?(name: 'zorptronic')
-    assert Genre.exists?(name: 'flarejazz')
+    assert genre_for('zorptronic')
+    assert genre_for('flarejazz')
   end
 
   test 'ensure! is idempotent across calls' do
@@ -36,17 +38,17 @@ class GenreQueryTest < ActiveSupport::TestCase
 
     Genre.reconcile!
 
-    assert_equal 2, Genre.find_by(name: 'zorptronic').events_count
-    assert_equal 1, Genre.find_by(name: 'flarejazz').events_count
+    assert_equal 2, genre_for('zorptronic').events_count
+    assert_equal 1, genre_for('flarejazz').events_count
   end
 
   test 'reconcile! creates rows for newly-seen tag names' do
     event_with_genres('brand-new-genre')
-    assert_not Genre.exists?(name: 'brand-new-genre')
+    assert_not genre_for('brand-new-genre')
 
     Genre.reconcile!
 
-    assert_equal 1, Genre.find_by(name: 'brand-new-genre').events_count
+    assert_equal 1, genre_for('brand-new-genre').events_count
   end
 
   test 'reconcile! zeroes the count for a genre no longer tagged anywhere' do
@@ -56,7 +58,7 @@ class GenreQueryTest < ActiveSupport::TestCase
     Genre.reconcile!
 
     assert_equal 0, stale.reload.events_count
-    assert_equal 1, Genre.find_by(name: 'still-tagged').events_count
+    assert_equal 1, genre_for('still-tagged').events_count
   end
 
   test 'reconcile! zeroes stale counts even when nothing is tagged at all' do
@@ -69,18 +71,18 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_equal 0, stale.reload.events_count
   end
 
-  # --- Genre.blocked_names ---------------------------------------------------
+  # --- Genre.blocked_fingerprints --------------------------------------------
 
-  test 'blocked_names returns a lowercased set of only blocked genres' do
+  test 'blocked_fingerprints returns the fingerprints of only blocked genres' do
     blocked = Genre.create!(name: 'NoiseTag')
     blocked.block!
     genre(name: 'kept') # un-blocked, must not appear
 
-    names = Genre.blocked_names
+    fingerprints = Genre.blocked_fingerprints
 
-    assert_kind_of Set, names
-    assert_includes names, 'noisetag'
-    refute(names.any? { |n| n.start_with?('kept') })
+    assert_kind_of Set, fingerprints
+    assert_includes fingerprints, Genre.fingerprint_for('NoiseTag')
+    refute(fingerprints.any? { |fp| fp.start_with?('kept') })
   end
 
   # --- scopes ----------------------------------------------------------------

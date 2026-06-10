@@ -56,6 +56,14 @@ module TaxonomyFixtures
     e
   end
 
+  # The persisted Genre a scraped tag name resolves to. Matched by fingerprint
+  # because genre_list=/ensure! canonicalize casing+spelling at ingest, so a raw
+  # 'kept-genre' is stored as 'Kept-Genre' — a find_by(name:) on the raw string
+  # would miss it.
+  def genre_for(name)
+    Genre.find_by(fingerprint: Genre.fingerprint_for(name))
+  end
+
   # A persisted User with a valid synthetic username + password. Pass attrs to
   # set notification_frequency, last_notified_at, created_at, email_address, etc.
   def user(**attrs)

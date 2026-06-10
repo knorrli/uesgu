@@ -43,4 +43,24 @@
       <%= link_to t('.browse_genres'), genres_path %>
     </div>
   </section>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.accounts_heading') %></h2>
+    <dl class="flex flex-col gap-small">
+      <div class="stat">
+        <dt><%= t('.users') %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= User.count %></dd>
+      </div>
+      <div class="stat">
+        <dt><%= t('.open_invitations') %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= Invitation.available.count %></dd>
+      </div>
+    </dl>
+    <div class="flex gap-medium wrap">
+      <%= link_to t('.manage_users'), admin_users_path %>
+      <%= link_to t('.manage_invitations'), admin_invitations_path %>
+    </div>
+  </section>
 </div>

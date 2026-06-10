@@ -71,6 +71,13 @@ module TaxonomyFixtures
     User.create!({ username: "user#{n}", password: PASSWORD }.merge(attrs))
   end
 
+  # A persisted Invitation, minted by an admin unless created_by is given. Pass
+  # expires_at:/redeemed_*: to exercise the expired/spent states.
+  def invitation(**attrs)
+    attrs[:created_by] ||= user(admin: true)
+    Invitation.create!(attrs)
+  end
+
   PASSWORD = 'secret123'
 
   # Integration-test sign-in: drive the real session-create flow so the signed

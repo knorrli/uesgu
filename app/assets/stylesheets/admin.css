@@ -17,3 +17,50 @@
   top: -0.3em;
   border-bottom: 1px dotted var(--theme-fg-muted);
 }
+
+/* Scannable account / invitation lists in the admin area. Same dotted-leader
+   idiom as .stat: a label group on the left, muted meta on the right. */
+.admin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+}
+
+.admin-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-small);
+}
+
+.admin-row__main {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-small);
+  white-space: nowrap;
+}
+
+.admin-row__meta {
+  white-space: nowrap;
+}
+
+/* The redeemable code and its shareable signup link. */
+.invite__code {
+  font-weight: bold;
+  letter-spacing: 0.08em;
+}
+
+.invite__link {
+  word-break: break-all;
+  color: var(--theme-fg-muted);
+}
+
+.invite__status--redeemed {
+  color: var(--theme-fg-muted);
+}
+
+.invite__status--expired {
+  color: var(--theme-warn-color);
+}

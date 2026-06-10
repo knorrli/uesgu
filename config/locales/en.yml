@@ -37,9 +37,12 @@ en:
     invalid_credentials: Try another username or password.
     rate_limited: Try again later.
     notify_label: Don't notify me about new events
+    invite_label: Invitation code
+    invite_hint: Sign-up is invitation only.
   registrations:
     welcome: Welcome to üsgu!
     account_deleted: Your account was deleted.
+    invalid_invite: This invitation code is invalid or has already been used.
   frequencies:
     daily: Daily
     weekly: Weekly
@@ -144,6 +147,60 @@ en:
       jobs_heading: Jobs
       jobs_hint: Scraping and background tasks run as scheduled jobs.
       job_queue: Job queue
+      accounts_heading: Accounts & invitations
+      users: Accounts
+      open_invitations: Open invitations
+      manage_users: Manage accounts
+      manage_invitations: Manage invitations
+    unknown: unknown
+    users:
+      admin_badge: Admin
+      cant_delete_self: You can't delete your own account here.
+      deleted: "Account %{username} was deleted."
+      index:
+        title: Accounts
+        favorites_count:
+          one: 1 favorite
+          other: "%{count} favorites"
+        empty: No accounts yet.
+      show:
+        back: ← All accounts
+        email: Email
+        no_email: none
+        frequency: Notifications
+        joined: Joined
+        sessions: Active sessions
+        invited_by: Invited by
+        favorite_locations: Favorite locations
+        favorite_styles: Favorite styles
+        delete_heading: Delete account
+        delete_hint: This permanently removes this account and its favorites.
+        delete: Delete account
+        delete_confirm: "Permanently delete account %{username}?"
+    invitations:
+      created: "Invitation code created: %{code}"
+      cant_revoke_redeemed: An invitation that has already been used can't be revoked.
+      revoked: Invitation revoked.
+      index:
+        title: Invitations
+        intro: Single-use invitation codes. Share the link with one person — once they sign up, the code is spent.
+        new_heading: New invitation
+        note_placeholder: e.g. for Anna
+        expires_label: Valid until
+        expires_never: Unlimited
+        expires_in_days:
+          one: 1 day
+          other: "%{count} days"
+        create: Create code
+        existing_heading: Codes
+        status_available: available
+        status_redeemed: redeemed
+        status_expired: expired
+        expires: "Expires %{date}"
+        revoke: Revoke
+        revoke_confirm: Revoke this invitation?
+        redeemed_by: "Redeemed by %{username} on %{date}"
+        empty: No invitations yet.
   activemodel:
     models:
       genre:
@@ -160,6 +217,9 @@ en:
       event:
         one: Event
         other: Events
+      invitation:
+        one: Invitation
+        other: Invitations
       style:
         one: Style
         other: Styles
@@ -171,6 +231,9 @@ en:
         email_address: Email address
         locale: Language
         notification_frequency: Notification frequency
+      invitation:
+        code: Code
+        note: Note
   date:
     formats:
       default: "%d.%m.%Y"

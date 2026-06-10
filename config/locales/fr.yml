@@ -37,9 +37,12 @@ fr:
     invalid_credentials: Essayez un autre nom d'utilisateur ou mot de passe.
     rate_limited: Réessayez plus tard.
     notify_label: Ne pas m'informer des nouveaux événements
+    invite_label: Code d'invitation
+    invite_hint: L'inscription se fait uniquement sur invitation.
   registrations:
     welcome: Bienvenue sur üsgu !
     account_deleted: Votre compte a été supprimé.
+    invalid_invite: Ce code d'invitation est invalide ou a déjà été utilisé.
   frequencies:
     daily: Quotidien
     weekly: Hebdomadaire
@@ -144,6 +147,60 @@ fr:
       jobs_heading: Tâches
       jobs_hint: Le scraping et les tâches de fond s'exécutent comme tâches planifiées.
       job_queue: File d'attente des tâches
+      accounts_heading: Comptes et invitations
+      users: Comptes
+      open_invitations: Invitations ouvertes
+      manage_users: Gérer les comptes
+      manage_invitations: Gérer les invitations
+    unknown: inconnu
+    users:
+      admin_badge: Admin
+      cant_delete_self: Vous ne pouvez pas supprimer votre propre compte ici.
+      deleted: "Le compte %{username} a été supprimé."
+      index:
+        title: Comptes
+        favorites_count:
+          one: 1 favori
+          other: "%{count} favoris"
+        empty: Aucun compte pour l'instant.
+      show:
+        back: ← Tous les comptes
+        email: E-mail
+        no_email: aucun
+        frequency: Notifications
+        joined: Inscrit le
+        sessions: Sessions actives
+        invited_by: Invité par
+        favorite_locations: Lieux favoris
+        favorite_styles: Styles favoris
+        delete_heading: Supprimer le compte
+        delete_hint: Supprime définitivement ce compte et ses favoris.
+        delete: Supprimer le compte
+        delete_confirm: "Supprimer définitivement le compte %{username} ?"
+    invitations:
+      created: "Code d'invitation créé : %{code}"
+      cant_revoke_redeemed: Une invitation déjà utilisée ne peut pas être révoquée.
+      revoked: Invitation révoquée.
+      index:
+        title: Invitations
+        intro: Codes d'invitation à usage unique. Partagez le lien avec une personne — une fois inscrite, le code est utilisé.
+        new_heading: Nouvelle invitation
+        note_placeholder: p. ex. pour Anna
+        expires_label: Valable jusqu'au
+        expires_never: Illimité
+        expires_in_days:
+          one: 1 jour
+          other: "%{count} jours"
+        create: Créer le code
+        existing_heading: Codes
+        status_available: disponible
+        status_redeemed: utilisé
+        status_expired: expiré
+        expires: "Expire le %{date}"
+        revoke: Révoquer
+        revoke_confirm: Révoquer cette invitation ?
+        redeemed_by: "Utilisé par %{username} le %{date}"
+        empty: Aucune invitation pour l'instant.
   activemodel:
     models:
       genre:
@@ -160,6 +217,9 @@ fr:
       event:
         one: Événement
         other: Événements
+      invitation:
+        one: Invitation
+        other: Invitations
       style:
         one: Style
         other: Styles
@@ -171,6 +231,9 @@ fr:
         email_address: Adresse e-mail
         locale: Langue
         notification_frequency: Fréquence des notifications
+      invitation:
+        code: Code
+        note: Note
   date:
     formats:
       default: "%d.%m.%Y"

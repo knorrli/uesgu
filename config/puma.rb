@@ -33,8 +33,8 @@ port ENV.fetch("PORT", 3000)
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 
-# Automatically start solid queue
-plugin :solid_queue
+# Background jobs run as scheduled Render cron jobs (see render.yaml), not an
+# in-Puma Solid Queue worker — keeps the 512MB web instance lean.
 
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.

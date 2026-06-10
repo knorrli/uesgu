@@ -49,11 +49,8 @@ module Uesgu
     # Don't generate system test files.
     config.generators.system_tests = nil
 
-    # Disable MissionControl basic auth
-    config.mission_control.jobs.http_basic_auth_enabled = false
-
-
-    # Replace the default in-process and non-durable queuing backend for Active Job.
-    config.active_job.queue_adapter = :solid_queue
+    # No background worker — scheduled work runs as Render cron jobs (see
+    # render.yaml) and anything enqueued runs inline. Nothing currently enqueues.
+    config.active_job.queue_adapter = :inline
   end
 end

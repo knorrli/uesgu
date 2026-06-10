@@ -7,6 +7,16 @@ services:
     buildCommand: "./bin/render-build.sh"
     # preDeployCommand: "bundle exec rails db:migrate" # preDeployCommand only available on paid instance types
     startCommand: "./bin/rails server"
+    # Custom domains. üsgu.ch is the public, canonical web domain; it MUST be
+    # listed in its punycode form (xn--sgu-goa.ch) — Render rejects raw umlauts.
+    # uesgu.ch is the canonical code/email domain; Render terminates TLS for it
+    # and the app 301s every uesgu.ch request to https://üsgu.ch (see routes.rb).
+    # Render auto-issues + renews certs for all four once DNS points at it.
+    domains:
+      - xn--sgu-goa.ch
+      - www.xn--sgu-goa.ch
+      - uesgu.ch
+      - www.uesgu.ch
     envVars:
       - key: DATABASE_URL
         fromDatabase:

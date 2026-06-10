@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
+  # Canonical host. üsgu.ch (punycode xn--sgu-goa.ch) is the public web domain.
+  # Render also terminates TLS for uesgu.ch (the code/email domain) and the www
+  # variants, so 301 every one of those to the umlaut domain, preserving path +
+  # query. www.üsgu.ch is included here too so Rails is the single source of
+  # truth for canonicalization rather than relying on Render's www handling.
+  constraints(host: /\A(?:www\.xn--sgu-goa\.ch|(?:www\.)?uesgu\.ch)\z/i) do
+    match "(*path)", via: :all,
+      to: redirect(status: 301) { |_params, request| "https://xn--sgu-goa.ch#{request.fullpath}" }
+  end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

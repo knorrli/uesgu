@@ -59,6 +59,16 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_equal 1, Genre.find_by(name: 'still-tagged').events_count
   end
 
+  test 'reconcile! zeroes stale counts even when nothing is tagged at all' do
+    # Regression: with an empty taggings set the old `NOT IN (NULL)` matched no
+    # rows, so phantom counts survived and genres stayed falsely "in use".
+    stale = genre(name: 'orphan', events_count: 7)
+
+    Genre.reconcile!
+
+    assert_equal 0, stale.reload.events_count
+  end
+
   # --- Genre.blocked_names ---------------------------------------------------
 
   test 'blocked_names returns a lowercased set of only blocked genres' do

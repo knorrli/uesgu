@@ -137,8 +137,16 @@ class Genre < ApplicationRecord
                .index_by { |genre| genre.name.downcase }
     counts.each { |name, count| by_lower[name.downcase]&.update_columns(events_count: count) }
 
-    where('lower(name) NOT IN (?)', counts.keys.map(&:downcase).presence || [nil])
-      .update_all(events_count: 0)
+    # Zero every genre outside the current tag set. When that set is empty, it's
+    # *all* of them — and `NOT IN (NULL)` is SQL-unknown for every row (matches
+    # none), so the placeholder fallback can't express "zero everything." Branch
+    # explicitly instead.
+    if counts.any?
+      where('lower(name) NOT IN (?)', counts.keys.map(&:downcase))
+        .update_all(events_count: 0)
+    else
+      update_all(events_count: 0)
+    end
   end
 
   private

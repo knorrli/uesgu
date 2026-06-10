@@ -66,7 +66,10 @@ export default class extends Controller {
   }
 
   #clearComboboxInput(comboboxId) {
-    document.getElementById(comboboxId).value = '';
+    // Some selection events arrive with a blank fieldName; guard so we never
+    // call getElementById('') (logs a console warning) or deref a missing node.
+    const input = comboboxId && document.getElementById(comboboxId);
+    if (input) input.value = '';
   }
 
   #addComboboxValue(value, target) {

@@ -3,5 +3,6 @@
     redirects back to where you came from. %>
 <div class="flex flex-col gap-medium">
   <%= render 'genres/editor', genre: @genre, suggestions: @suggestions,
+        alias_suggestions: @alias_suggestions,
         sample_events: @sample_events, return_to: root_path %>
 </div>

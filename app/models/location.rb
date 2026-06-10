@@ -14,9 +14,20 @@ class Location
     Scrapers::All.scrapers.values.map(&:location).to_set
   end
 
-  # :venue for a concrete venue, :region for a city or canton.
+  # The canton codes our scrapers cover (== each scraper's last location element).
+  def self.canton_codes
+    Scrapers::All.scrapers.values.map { |scraper| scraper.locations.last }.to_set
+  end
+
+  # :venue for a concrete venue, :canton for a canton code, :city otherwise. The
+  # canton code is the last element each scraper declares; anything else that is
+  # not a venue is treated as a city.
   def self.type_for(name)
-    venue_names.include?(name.to_s) ? :venue : :region
+    name = name.to_s
+    return :venue if venue_names.include?(name)
+    return :canton if canton_codes.include?(name)
+
+    :city
   end
 
   def self.venue?(name)

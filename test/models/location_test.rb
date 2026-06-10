@@ -21,9 +21,19 @@ class LocationTest < ActiveSupport::TestCase
     assert_equal :venue, Location.type_for(@scraper.location)
   end
 
-  test 'an unknown place is classified as :region, not a venue' do
+  test 'an unknown place is classified as a region (:city), not a venue' do
     refute Location.venue?('Definitely Not A Venue 9000')
-    assert_equal :region, Location.type_for('Bern')
+    assert_equal :city, Location.type_for('Definitely Not A Venue 9000')
+  end
+
+  test 'a declared canton code is classified as :canton' do
+    canton = @scraper.locations.last
+    assert_equal :canton, Location.type_for(canton)
+  end
+
+  test 'a declared city is classified as :city' do
+    city = @scraper.locations[-2]
+    assert_equal :city, Location.type_for(city)
   end
 
   test 'hierarchy groups each venue under its canton and city' do

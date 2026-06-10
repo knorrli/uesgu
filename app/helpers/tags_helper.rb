@@ -11,8 +11,10 @@ module TagsHelper
       'ti-tag'
     when 'locations', 'venue'
       'ti-home'
-    when 'region'
-      'ti-world'
+    when 'city'
+      'ti-location-pin'
+    when 'canton'
+      'ti-map-alt'
     else
       'ti-bolt'
     end

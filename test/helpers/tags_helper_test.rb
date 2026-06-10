@@ -10,7 +10,8 @@ class TagsHelperTest < ActionView::TestCase
     assert_equal 'ti-music-alt', tag_icon_class(context: 'styles')
     assert_equal 'ti-tag', tag_icon_class(context: 'genres')
     assert_equal 'ti-home', tag_icon_class(context: 'venue')
-    assert_equal 'ti-world', tag_icon_class(context: 'region')
+    assert_equal 'ti-location-pin', tag_icon_class(context: 'city')
+    assert_equal 'ti-map-alt', tag_icon_class(context: 'canton')
     assert_equal 'ti-bolt', tag_icon_class(context: 'something-unknown')
   end
 

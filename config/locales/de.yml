@@ -112,6 +112,7 @@ de:
       status_ignored: ignoriert
       status_hidden: verborgen
       status_blocked: blockiert
+      status_merged: "zusammengeführt mit %{canonical}"
       sort_by: "Sortieren:"
       sort_name: A–Z
       sort_count: am häufigsten
@@ -128,6 +129,8 @@ de:
       ignore: "Ignorieren (behalten, kein Style)"
       hide: "Event verbergen (keine Musik)"
       block: "Blockieren (Tag entfernen)"
+      merge: Zusammenführen
+      merge_into: "Mit anderem Genre zusammenführen…"
       appears_on: Erscheint bei
   admin:
     index:

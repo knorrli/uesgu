@@ -46,7 +46,11 @@
         <%= link_to genre.name, edit_genre_path(genre) %>
         <span class="muted genre-count" title="<%= t('genres.editor.usage', count: genre.events_count) %>"><%= genre.events_count %>&times;</span>
         <div class="flex gap-small wrap align-baseline">
-          <% if genre.ignored? || genre.hidden? || genre.blocked? %>
+          <% if genre.aliased? %>
+            <span class="muted"><%= t('.status_merged', canonical: genre.canonical.name) %></span>
+            <%= button_to t('genres.queue.restore'), restore_genre_path(genre),
+                  params: { return_to: genres_path(status: params[:status].presence, q: params[:q].presence, sort: params[:sort].presence) } %>
+          <% elsif genre.ignored? || genre.hidden? || genre.blocked? %>
             <% status_key = genre.hidden? ? '.status_hidden' : genre.blocked? ? '.status_blocked' : '.status_ignored' %>
             <span class="muted"><%= t(status_key) %></span>
             <%= button_to t('genres.queue.restore'), restore_genre_path(genre),

@@ -1,29 +1,63 @@
 class Genre < ApplicationRecord
   # A genre is a raw, scraped descriptor (e.g. "indie-rock", "techno"). It maps
-  # to zero or more curated Styles; an event's styles are derived from the
-  # styles of its genres (see Event#recompute_styles!). Genres live alongside
-  # the AATO genre tags on events and are matched to them by name.
+  # to zero or more curated Styles; an event's styles are derived from the styles
+  # of its genres (see Event#recompute_styles!). Genres live alongside the AATO
+  # genre tags on events and are matched to them by *fingerprint* (see
+  # fingerprint_for) so spelling variants collapse to one row.
   has_and_belongs_to_many :styles
 
+  # An alias points at the canonical genre it should be treated as (e.g.
+  # "Elektronik" → "Electronic"): semantic merges the fingerprint can't catch.
+  belongs_to :canonical, class_name: 'Genre', optional: true
+  has_many :aliases, class_name: 'Genre', foreign_key: :canonical_id,
+                     inverse_of: :canonical, dependent: :nullify
+
   # Unassigned = the assignment queue: in active use, mapped to no style, and
-  # carrying no disposition. Ordered most-used first so the highest-impact genres
-  # surface.
+  # carrying no disposition (including not an alias). Ordered most-used first so
+  # the highest-impact genres surface.
   scope :in_use, -> { where('events_count > 0') }
-  scope :unassigned, -> { in_use.left_joins(:styles).where(styles: { id: nil }, ignored_at: nil, hidden_at: nil, blocked_at: nil).distinct }
+  scope :unassigned, lambda {
+    in_use.left_joins(:styles)
+          .where(styles: { id: nil }, ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+          .distinct
+  }
   scope :assigned, -> { joins(:styles).distinct }
   scope :ignored, -> { where.not(ignored_at: nil) }
   scope :hidden, -> { where.not(hidden_at: nil) }
   scope :blocked, -> { where.not(blocked_at: nil) }
-  # The catalogue: genres actually in use OR ones we've parked (given a
-  # disposition). Excludes the ~5.5k dormant taxonomy entries (count 0, pre-mapped
-  # to a style by the genres.json import) that have never appeared on an event —
-  # they'd swamp the curation views. A blocked genre tags 0 events (its taggings
-  # were stripped) yet stays listed via its disposition, so Restore stays
-  # reachable. Genres outside this set are still findable by name search (see
-  # GenresController#index), so nothing is truly hidden.
-  scope :listable, -> { where('events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL OR blocked_at IS NOT NULL') }
+  scope :aliased, -> { where.not(canonical_id: nil) }
+  # The catalogue: genres actually in use OR parked (given a disposition or merged
+  # into a canonical). Excludes the dormant taxonomy entries (count 0, pre-mapped
+  # by the seed) that have never appeared on an event — they'd swamp the curation
+  # views. Blocked/aliased genres tag 0 events yet stay listed via their mark so
+  # Restore stays reachable. Genres outside this set remain findable by name
+  # search (see GenresController#index), so nothing is truly hidden.
+  scope :listable, lambda {
+    where('events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL ' \
+          'OR blocked_at IS NOT NULL OR canonical_id IS NOT NULL')
+  }
   scope :by_usage, -> { order(events_count: :desc, name: :asc) }
   scope :by_name, -> { order(name: :asc) }
+
+  # Folded accented Latin letters used by both the SQL `fingerprint` generated
+  # column (see AddFingerprintToGenres) and fingerprint_for below. Keep in sync.
+  FINGERPRINT_ACCENTS_FROM = 'äöüàâéèêëïîôûç'.freeze
+  FINGERPRINT_ACCENTS_TO   = 'aouaaeeeeiiouc'.freeze
+
+  # Curated display spellings, keyed by fingerprint. Reuses the alias-map
+  # canonicals so collapsed variants surface with a nice name (the lowercase
+  # taxonomy seed and raw scrapes both store a pretty `name`; `fingerprint` stays
+  # the matching key). Anything not listed falls back to titleize_genre.
+  DISPLAY_OVERRIDES = {
+    'hiphop' => 'Hip Hop', 'postpunk' => 'Post-Punk', 'blackmetal' => 'Black Metal',
+    'indiepop' => 'Indie Pop', 'randb' => 'R&B', 'dreampop' => 'Dream Pop',
+    'indiefolk' => 'Indie Folk', 'postrock' => 'Post-Rock', 'progrock' => 'Prog Rock',
+    'garagerock' => 'Garage Rock', 'punkrock' => 'Punk Rock', 'bluesrock' => 'Blues Rock',
+    'globalperreo' => 'Global Perreo', 'hardrock' => 'Hard Rock', 'indiepunk' => 'Indie Punk',
+    'italodisco' => 'Italo Disco', 'noiserock' => 'Noise Rock', 'numetal' => 'Nu-Metal',
+    'synthpop' => 'Synth Pop', 'drumandbass' => 'Drum & Bass', 'nyhc' => 'NYHC',
+    'psychrock' => 'Psych Rock'
+  }.freeze
 
   def to_s
     name
@@ -49,14 +83,68 @@ class Genre < ApplicationRecord
     blocked_at.present?
   end
 
-  # Set this genre's styles (clearing any disposition mark) and re-derive the
+  def aliased?
+    canonical_id.present?
+  end
+
+  # The normalized matching key. MUST reproduce the SQL `fingerprint` generated
+  # column exactly (AddFingerprintToGenres) — verified by test. Used at ingest on
+  # raw scraped strings that have no row to read the stored column off.
+  def self.fingerprint_for(str)
+    str.to_s.downcase
+       .gsub('&', 'and').gsub("'n'", 'and')
+       .tr(FINGERPRINT_ACCENTS_FROM, FINGERPRINT_ACCENTS_TO)
+       .gsub(/[^a-z0-9]/, '')
+  end
+
+  # The display spelling for a (possibly messy) scraped/seeded name: a curated
+  # override if any, else a title-caser that — unlike Rails #titleize — preserves
+  # `-`, `/`, and `&` separators (so "post-punk" → "Post-Punk", not "Post Punk").
+  def self.display_name_for(str)
+    DISPLAY_OVERRIDES[fingerprint_for(str)] || titleize_genre(str)
+  end
+
+  def self.titleize_genre(str)
+    str.to_s.strip.split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
+  end
+
+  # The style names mapped to the given genre names, matched by fingerprint (the
+  # single source of truth used by both Event#recompute_styles! and the scrape
+  # path). Robust to spelling variants without any per-variant upkeep.
+  def self.styles_for(names)
+    fingerprints = Array(names).map { |name| fingerprint_for(name) }.uniq.reject(&:blank?)
+    return [] if fingerprints.empty?
+
+    Style.joins(:genres).where(genres: { fingerprint: fingerprints }).distinct.pluck(:name)
+  end
+
+  # Replace each scraped name with the canonical *display* name of the Genre it
+  # resolves to (by fingerprint): the collapsed spelling for known genres, the
+  # canonical for semantic aliases, or a titleized form for brand-new ones. This
+  # is what dedupes the publicly-shown genre tag — see Event#genre_list=.
+  def self.canonicalize_names(names)
+    names = Array(names).map(&:to_s)
+    return names if names.empty?
+
+    fingerprints = names.map { |name| fingerprint_for(name) }
+    rows = where(fingerprint: fingerprints.uniq).includes(:canonical).index_by(&:fingerprint)
+    names.each_with_index.map do |name, i|
+      genre = rows[fingerprints[i]]
+      if genre.nil? then display_name_for(name)
+      elsif genre.canonical then genre.canonical.name
+      else genre.name
+      end
+    end
+  end
+
+  # Set this genre's styles (clearing any disposition/alias) and re-derive the
   # styles (and visibility) of every event carrying it.
   def assign_styles!(ids)
     # Accepts the combobox's comma-joined string ("3,7") or a single id.
     ids = Array(ids).join(',').split(',').map(&:strip).reject(&:blank?)
     transaction do
       self.style_ids = ids
-      update!(ignored_at: nil, hidden_at: nil, blocked_at: nil)
+      update!(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
     end
     recompute_events!
   end
@@ -66,7 +154,7 @@ class Genre < ApplicationRecord
   def ignore!
     transaction do
       styles.clear
-      update!(ignored_at: Time.current, hidden_at: nil, blocked_at: nil)
+      update!(ignored_at: Time.current, hidden_at: nil, blocked_at: nil, canonical_id: nil)
     end
     recompute_events!
   end
@@ -76,7 +164,7 @@ class Genre < ApplicationRecord
   def hide!
     transaction do
       styles.clear
-      update!(hidden_at: Time.current, ignored_at: nil, blocked_at: nil)
+      update!(hidden_at: Time.current, ignored_at: nil, blocked_at: nil, canonical_id: nil)
     end
     recompute_events!
   end
@@ -88,7 +176,7 @@ class Genre < ApplicationRecord
   def block!
     transaction do
       styles.clear
-      update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil)
+      update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil, canonical_id: nil)
     end
     Event.tagged_with(name, on: :genres).find_each do |event|
       event.genre_list.remove(name)
@@ -97,48 +185,88 @@ class Genre < ApplicationRecord
     update_columns(events_count: 0)
   end
 
-  # Back to the queue: clear every mark and re-derive events (un-hiding any it
-  # was hiding). For a previously-blocked genre the stripped taggings only return
-  # on the next scrape — restore just lifts the blocklist.
+  # Merge this genre into a canonical one (a semantic alias the fingerprint can't
+  # catch, e.g. "Elektronik" → "Electronic"). Operates on AATO taggings directly
+  # (never via genre_list, which would re-parse and trip the unique tag index):
+  # repoints this genre's event taggings onto the canonical tag, dropping
+  # duplicates where an event already carries the canonical. Idempotent — re-runs
+  # converge to a no-op. Future scrapes auto-resolve via Genre.canonicalize_names.
+  def merge_into!(canonical)
+    raise ArgumentError, 'a genre cannot be merged into itself' if canonical.id == id
+
+    affected = []
+    transaction do
+      alias_tag = ActsAsTaggableOn::Tag.named(name).first
+      if alias_tag
+        canonical_tag = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(canonical.name).first
+        taggings = ActsAsTaggableOn::Tagging.where(context: 'genres', taggable_type: Event.name, tag_id: alias_tag.id)
+        affected = taggings.pluck(:taggable_id)
+        # Events already carrying the canonical tag: drop the duplicate alias
+        # tagging instead of repointing (which would violate the unique index).
+        dup_ids = ActsAsTaggableOn::Tagging
+                  .where(context: 'genres', taggable_type: Event.name, tag_id: canonical_tag.id, taggable_id: affected)
+                  .pluck(:taggable_id)
+        taggings.where(taggable_id: dup_ids).delete_all
+        taggings.update_all(tag_id: canonical_tag.id)
+      end
+      styles.clear
+      update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil)
+    end
+    Event.where(id: affected).find_each(&:recompute_styles!)
+    Genre.reconcile!
+  end
+
+  # Back to the queue: clear every mark (disposition or alias) and re-derive
+  # events. Like restoring a blocked genre, repointed/stripped taggings don't
+  # come back — restore only lifts the mark for future scrapes.
   def restore!
-    update!(ignored_at: nil, hidden_at: nil, blocked_at: nil)
+    update!(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
     recompute_events!
   end
 
-  # Lowercased set of every blocked genre name, for case-insensitive blocklist
-  # matching at tagging time (see Event#genre_list=).
-  def self.blocked_names
-    blocked.pluck(:name).map(&:downcase).to_set
+  # Fingerprints of every blocked genre, for blocklist matching at tagging time
+  # (see Event#genre_list=) — fingerprint-based so spelling variants are caught.
+  def self.blocked_fingerprints
+    blocked.pluck(:fingerprint).to_set
   end
 
-  # Ensure a Genre row exists for each given name (e.g. freshly scraped genres).
-  # Matches case-insensitively to line up with the unique lower(name) index, so
-  # a case variant of an existing genre never attempts a duplicate insert.
+  # Ensure a Genre row exists for each given name, matched and de-duplicated by
+  # fingerprint (so "Post Punk" resolves to an existing "Post-Punk" rather than
+  # spawning a third row). New rows are stored under their display name.
   def self.ensure!(names)
-    names = Array(names).map(&:to_s).uniq
-    existing = where('lower(name) IN (?)', names.map(&:downcase)).pluck(Arel.sql('lower(name)'))
-    names.reject { |name| existing.include?(name.downcase) }
-         .each { |name| create_or_find_by!(name: name) }
+    names = Array(names).map(&:to_s).reject(&:blank?).uniq
+    return if names.empty?
+
+    representative = names.index_by { |name| fingerprint_for(name) } # fingerprint => a raw name
+    existing = where(fingerprint: representative.keys).pluck(:fingerprint)
+    (representative.keys - existing).each do |fingerprint|
+      create!(name: display_name_for(representative[fingerprint]))
+    rescue ActiveRecord::RecordNotUnique
+      next # a concurrent insert or fingerprint race already created it
+    end
   end
 
   # Refresh the cached usage count from the current genre taggings on events,
-  # creating rows for any new genres and zeroing those no longer in use.
-  # Matches case-insensitively so a taxonomy-imported genre and a scraped tag
-  # that differ only in case map to the same row.
+  # creating rows for any new genres and zeroing those no longer in use. Folds
+  # tag-name variants that share a fingerprint into the one Genre, so a stray
+  # case/spacing variant never re-splits what fingerprinting merged.
   def self.reconcile!
     counts = ActsAsTaggableOn::Tagging
-      .where(context: 'genres', taggable_type: Event.name)
-      .joins(:tag)
-      .group('tags.name')
-      .count
+             .where(context: 'genres', taggable_type: Event.name)
+             .joins(:tag).group('tags.name').count
 
-    ensure!(counts.keys)
-    by_lower = where('lower(name) IN (?)', counts.keys.map(&:downcase).presence || [nil])
-               .index_by { |genre| genre.name.downcase }
-    counts.each { |name, count| by_lower[name.downcase]&.update_columns(events_count: count) }
+    by_fingerprint = Hash.new(0)
+    representative = {}
+    counts.each do |name, count|
+      fingerprint = fingerprint_for(name)
+      by_fingerprint[fingerprint] += count
+      representative[fingerprint] ||= name
+    end
 
-    where('lower(name) NOT IN (?)', counts.keys.map(&:downcase).presence || [nil])
-      .update_all(events_count: 0)
+    ensure!(representative.values)
+    rows = where(fingerprint: by_fingerprint.keys.presence || ['']).index_by(&:fingerprint)
+    by_fingerprint.each { |fingerprint, count| rows[fingerprint]&.update_columns(events_count: count) }
+    where.not(fingerprint: by_fingerprint.keys.presence || ['']).update_all(events_count: 0)
   end
 
   private

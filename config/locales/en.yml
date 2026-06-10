@@ -112,6 +112,7 @@ en:
       status_ignored: ignored
       status_hidden: hidden
       status_blocked: blocked
+      status_merged: "merged into %{canonical}"
       sort_by: "Sort:"
       sort_name: A–Z
       sort_count: most used
@@ -128,6 +129,8 @@ en:
       ignore: "Ignore (keep, no style)"
       hide: "Hide event (non-music)"
       block: "Block (strip the tag)"
+      merge: Merge
+      merge_into: "Merge into another genre…"
       appears_on: Appears on
   admin:
     index:

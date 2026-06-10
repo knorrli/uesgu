@@ -37,34 +37,31 @@ class Event < ApplicationRecord
     ].compact_blank.join(' || ')
   end
 
-  # Drop blocked genres (scraper noise like country codes or artist-name
-  # fragments) at the source, so they never get tagged. Central choke point for
-  # every scraper — re-applied each run, since scrapers re-tag by name and
-  # remove_unused_tags can't outlive the next scrape. Lets AATO parse the input
-  # first, then strips the blocklisted names off the in-memory tag list.
+  # Normalize scraped genres at the source — the central choke point for every
+  # scraper, re-applied each run. Lets AATO parse the input first, then (1)
+  # canonicalizes each name to its collapsed/aliased spelling so the stored tag
+  # is deduped, and (2) strips blocked genres (scraper noise like country codes
+  # or artist-name fragments) by fingerprint so they never get tagged.
   def genre_list=(value)
     super
-    blocked = Genre.blocked_names
-    genre_list.reject! { |name| blocked.include?(name.downcase) } if blocked.any?
+    genre_list.replace(Genre.canonicalize_names(genre_list))
+    blocked = Genre.blocked_fingerprints
+    genre_list.reject! { |name| blocked.include?(Genre.fingerprint_for(name)) } if blocked.any?
   end
 
   # Styles are a derived projection of this event's genres: the union of the
-  # styles each genre maps to. Recomputing from source (rather than nudging the
+  # styles each genre maps to, matched by fingerprint (Genre.styles_for — the
+  # same path the scraper uses). Recomputing from source (rather than nudging the
   # style list incrementally) is what keeps re-mapping a genre correct even when
   # several genres on the same event point at the same style.
   def recompute_styles!
     Genre.ensure!(genre_list)
-    # Match case-insensitively: scraped genre casing varies, while a genre's
-    # canonical name (e.g. from the taxonomy import) may differ in case.
-    lowered = genre_list.map { |name| name.to_s.downcase }
-    style_names = Style.joins(:genres)
-                       .where('lower(genres.name) IN (?)', lowered.presence || [nil])
-                       .distinct.pluck(:name)
+    style_names = Genre.styles_for(genre_list)
     self.style_list = style_names
     # Non-music: carries a hidden genre and has no music style. A real style
     # always wins (a "concert + reading" stays visible).
-    self.hidden = style_names.empty? &&
-                  Genre.hidden.where('lower(name) IN (?)', lowered.presence || [nil]).exists?
+    fingerprints = genre_list.map { |name| Genre.fingerprint_for(name) }.presence || ['']
+    self.hidden = style_names.empty? && Genre.hidden.where(fingerprint: fingerprints).exists?
     save!
   end
 end

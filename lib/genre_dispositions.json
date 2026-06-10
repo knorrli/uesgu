@@ -1,0 +1,24 @@
+{
+  "blocked": [
+    "Konzert",
+    "Music"
+  ],
+  "hidden": [
+    "Public-Viewing",
+    "Lesung",
+    "Pup Quiz",
+    "Schachturnier",
+    "Spieleabend",
+    "E-Sports",
+    "Workshop",
+    "Drag Show",
+    "Shibari",
+    "Politik",
+    "Picnic",
+    "Humor"
+  ],
+  "ignored": [
+    "Festival",
+    "Mini-Festival"
+  ]
+}

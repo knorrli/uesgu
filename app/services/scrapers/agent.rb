@@ -143,7 +143,7 @@ module Scrapers
     # of a still-unmapped genre are simply none.
     def event_styles(genres:)
       Genre.ensure!(genres)
-      Style.joins(:genres).where(genres: { name: genres }).distinct.pluck(:name)
+      Genre.styles_for(genres)
     end
 
     def month_number(month:)

@@ -67,10 +67,18 @@ class GenresController < ApplicationController
     redirect_to return_to
   end
 
+  # Fold this genre into a canonical one (a semantic alias the fingerprint can't
+  # catch). The combobox emits a single genre id.
+  def merge
+    canonical = Genre.find(genre_params[:canonical_genre_id])
+    Genre.find(params[:id]).merge_into!(canonical)
+    redirect_to return_to
+  end
+
   private
 
   def genre_params
-    params.expect(genre: [:style_ids])
+    params.expect(genre: %i[style_ids canonical_genre_id])
   end
 
   # Where to land after an action. Constrained to internal paths so the

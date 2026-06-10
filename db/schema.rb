@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_10_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -36,10 +36,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_120000) do
     t.datetime "updated_at", null: false
     t.datetime "hidden_at"
     t.datetime "blocked_at"
+    t.virtual "fingerprint", type: :string, as: "regexp_replace(translate(replace(replace(lower((name)::text), '&'::text, 'and'::text), '''n'''::text, 'and'::text), 'äöüàâéèêëïîôûç'::text, 'aouaaeeeeiiouc'::text), '[^a-z0-9]'::text, ''::text, 'g'::text)", stored: true
+    t.bigint "canonical_id"
     t.index "lower((name)::text)", name: "index_genres_on_lower_name", unique: true
     t.index ["blocked_at"], name: "index_genres_on_blocked_at"
+    t.index ["canonical_id"], name: "index_genres_on_canonical_id"
+    t.index ["fingerprint"], name: "index_genres_on_fingerprint", unique: true
     t.index ["hidden_at"], name: "index_genres_on_hidden_at"
     t.index ["ignored_at"], name: "index_genres_on_ignored_at"
+    t.check_constraint "canonical_id IS NULL OR canonical_id <> id", name: "genres_canonical_not_self"
   end
 
   create_table "genres_styles", id: false, force: :cascade do |t|
@@ -244,6 +249,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_120000) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "genres", "genres", column: "canonical_id"
   add_foreign_key "notifications", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

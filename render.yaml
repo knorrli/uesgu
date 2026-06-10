@@ -1,63 +1,92 @@
-services:
-  - type: web
-    name: uesgu
-    runtime: ruby
-    plan: starter
-    region: frankfurt
-    buildCommand: "./bin/render-build.sh"
-    # preDeployCommand: "bundle exec rails db:migrate" # preDeployCommand only available on paid instance types
-    startCommand: "./bin/rails server"
-    # Custom domains. üsgu.ch is the public, canonical web domain; it MUST be
-    # listed in its punycode form (xn--sgu-goa.ch) — Render rejects raw umlauts.
-    # uesgu.ch is the canonical code/email domain; Render terminates TLS for it
-    # and the app 301s every uesgu.ch request to https://üsgu.ch (see routes.rb).
-    # Render auto-issues + renews certs for all four once DNS points at it.
-    domains:
-      - xn--sgu-goa.ch
-      - www.xn--sgu-goa.ch
-      - uesgu.ch
-      - www.uesgu.ch
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: uesgu-db
-          property: connectionString
-      - fromGroup: uesgu-secrets
-      - key: WEB_CONCURRENCY
-        value: 1
+# Render Blueprint.
+#
+# The üsgu.ch project and its Production environment are declared here and
+# matched BY NAME, so a sync adopts the existing ones rather than creating
+# duplicates — the names below must match the dashboard exactly (case-sensitive).
+#
+# The shared-secret env group stays at the ROOT level (bottom): environment-
+# scoped envVarGroups can't hold `sync: false` vars, so RAILS_MASTER_KEY must
+# live in a workspace-level group. Scope it to Production in the Render dashboard
+# if you want it to appear under the project — that assignment survives syncs.
+version: "1"
 
-  # Daily scrape of every venue — replaces the in-Puma Solid Queue scheduler.
-  # Runs on its own ephemeral instance (billed per second), so scraping no longer
-  # competes with Puma for the web instance's RAM. Render cron schedules are UTC;
-  # the exact hour isn't critical. The rake task loops all scrapers SEQUENTIALLY
-  # (one Mechanize agent in memory at a time — safe on 512MB, and a natural
-  # stagger), logs a per-scraper summary, and exits non-zero if any scraper fails
-  # so Render sends a failure notification.
-  - type: cron
-    name: scrape-all
-    runtime: ruby
-    plan: starter
-    region: frankfurt
-    schedule: "0 2 * * *"
-    buildCommand: "bundle install"
-    startCommand: "bin/rails scrapers:run_all"
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: uesgu-db
-          property: connectionString
-      - fromGroup: uesgu-secrets
-      - key: RAILS_ENV
-        value: production
+projects:
+  - name: "üsgu.ch"
+    environments:
+      - name: "Production"
+        services:
+          - type: web
+            name: uesgu
+            repo: https://github.com/knorrli/uesgu
+            runtime: ruby
+            plan: starter
+            region: frankfurt
+            buildCommand: "./bin/render-build.sh"
+            # preDeployCommand: "bundle exec rails db:migrate" # preDeployCommand only available on paid instance types
+            startCommand: "./bin/rails server"
+            # Custom domains. üsgu.ch is the public, canonical web domain; it MUST be
+            # listed in its punycode form (xn--sgu-goa.ch) — Render rejects raw umlauts.
+            # uesgu.ch is the canonical code/email domain; Render terminates TLS for it
+            # and the app 301s every uesgu.ch request to https://üsgu.ch (see routes.rb).
+            # Render auto-issues + renews certs for all four once DNS points at it.
+            domains:
+              - xn--sgu-goa.ch
+              - www.xn--sgu-goa.ch
+              - uesgu.ch
+              - www.uesgu.ch
+            envVars:
+              - key: DATABASE_URL
+                fromDatabase:
+                  name: uesgu-db
+                  property: connectionString
+              - fromGroup: uesgu-secrets
+              - key: WEB_CONCURRENCY
+                value: 1
+            autoDeployTrigger: commit
 
-databases:
-  - name: uesgu-db
-    plan: basic-256mb
-    region: frankfurt
+          # Daily scrape of every venue — replaces the in-Puma Solid Queue scheduler.
+          # Runs on its own ephemeral instance (billed per second), so scraping no longer
+          # competes with Puma for the web instance's RAM. Render cron schedules are UTC;
+          # the exact hour isn't critical. The rake task loops all scrapers SEQUENTIALLY
+          # (one Mechanize agent in memory at a time — safe on 512MB, and a natural
+          # stagger), logs a per-scraper summary, and exits non-zero if any scraper fails
+          # so Render sends a failure notification.
+          - type: cron
+            name: scrape-all
+            repo: https://github.com/knorrli/uesgu
+            runtime: ruby
+            plan: starter
+            region: frankfurt
+            schedule: "0 2 * * *"
+            buildCommand: "bundle install"
+            startCommand: "bin/rails scrapers:run_all"
+            envVars:
+              - key: DATABASE_URL
+                fromDatabase:
+                  name: uesgu-db
+                  property: connectionString
+              - fromGroup: uesgu-secrets
+              - key: RAILS_ENV
+                value: production
+            autoDeployTrigger: commit
 
-# Shared secrets entered ONCE and referenced by every service above via
-# `fromGroup`. RAILS_MASTER_KEY decrypts credentials.yml.enc (which holds
-# secret_key_base etc.), so every service — web and crons — needs it.
+        databases:
+          - name: uesgu-db
+            databaseName: uesgu_db_hmks
+            user: uesgu_db_hmks_user
+            plan: basic-256mb
+            region: frankfurt
+            # Locked down: no public connections. The app reaches the DB over the
+            # private network (fromDatabase resolves to the internal URL), so an
+            # empty allow-list doesn't affect it — only external psql is blocked.
+            ipAllowList: []
+            postgresMajorVersion: "18"
+            diskSizeGB: 1
+
+# Shared secrets entered ONCE and referenced by every service via `fromGroup`.
+# RAILS_MASTER_KEY decrypts credentials.yml.enc (secret_key_base etc.), so every
+# service — web and cron — needs it. Kept at the ROOT (workspace) level on
+# purpose: environment-scoped envVarGroups can't contain `sync: false` vars.
 envVarGroups:
   - name: uesgu-secrets
     envVars:

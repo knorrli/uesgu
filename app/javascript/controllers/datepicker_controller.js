@@ -11,6 +11,7 @@ export default class extends Controller {
   static values = {
     firstDay: { type: Number, default: 1 },
     lang: { type: String, default: "en-US" },
+    dateRange: { type: String, default: "" },
     dateRanges: { type: Array, default: [] },
     format: { type: String, default: "YYYY-MM-DD" },
     grid: { type: Number, default: 2 },
@@ -76,9 +77,12 @@ export default class extends Controller {
             )
           );
         });
-        picker.on('clear', (e) => {
-          inputTarget.value = '';
-          inputTarget.dispatchEvent(new Event('datepicker.removal', { bubbles: true }));
+        picker.on('clear', () => {
+          // `this` here is the easepick core (same as the select handler above);
+          // this.element is the bound input. Mirror select's colon-namespaced
+          // CustomEvent so the filter actually hears it.
+          this.element.value = '';
+          this.element.dispatchEvent(new CustomEvent('datepicker:removal', { bubbles: true, detail: { value: '' } }));
         });
         picker.on('view', (e) => {
           if (e.detail.view == 'PresetPluginButton') {

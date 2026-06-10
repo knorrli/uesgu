@@ -42,6 +42,14 @@ projects:
               - fromGroup: uesgu-secrets
               - key: WEB_CONCURRENCY
                 value: 1
+              # Cap glibc's malloc arenas (default ~8 x CPU cores). Ruby's GVL
+              # serialises Ruby code anyway, so the extra arenas buy no real
+              # parallelism here — they just over-reserve and fragment, ratcheting
+              # RSS up. With a single Puma worker + 3 threads, 2 arenas is plenty
+              # and typically trims 10-30% off resident memory for free headroom
+              # under the 512MB starter limit.
+              - key: MALLOC_ARENA_MAX
+                value: 2
             autoDeployTrigger: commit
 
           # Daily scrape of every venue — replaces the in-Puma Solid Queue scheduler.

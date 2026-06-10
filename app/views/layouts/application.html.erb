@@ -57,12 +57,15 @@
         </div>
         <nav class="site-nav">
           <% if authenticated? %>
-            <%# Personal/account links collapse into one menu to keep the bar light. %>
+            <% unread = current_user.notifications.unread.count %>
+            <%# Personal/account links collapse into one menu to keep the bar light.
+                A dot on the trigger preserves the at-a-glance unread signal now
+                that the Notifications link lives inside the menu. %>
             <details class="nav-menu" data-controller="menu" data-action="toggle->menu#toggle">
-              <summary><%= current_user.username %></summary>
+              <summary><%= current_user.username %><% if unread.positive? %> <span class="unread-dot" role="img" aria-label="<%= t('nav.unread_notifications') %>"></span><% end %></summary>
               <div class="nav-menu__items">
                 <%= link_to notifications_path do %>
-                  <%= t('nav.notifications') %><% if (unread = current_user.notifications.unread.count).positive? %> <span class="badge"><%= unread %></span><% end %>
+                  <%= t('nav.notifications') %><% if unread.positive? %> <span class="badge"><%= unread %></span><% end %>
                 <% end %>
                 <%= link_to t('nav.favorites'), favorites_path %>
                 <%= link_to t('nav.settings'), settings_path %>

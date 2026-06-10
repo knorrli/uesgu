@@ -130,3 +130,13 @@
   font-size: var(--font-size-small);
   line-height: 1.4;
 }
+
+/* Unread-notifications dot on the account-menu trigger. */
+.unread-dot {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  background-color: var(--theme-accent-color);
+  vertical-align: middle;
+}

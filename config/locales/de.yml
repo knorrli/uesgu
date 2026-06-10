@@ -3,6 +3,7 @@ de:
   nav:
     admin: Admin
     notifications: Mitteilungen
+    unread_notifications: Ungelesene Mitteilungen
     favorites: Favoriten
     settings: Einstellungen
     logout: Abmelden

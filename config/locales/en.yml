@@ -3,6 +3,7 @@ en:
   nav:
     admin: Admin
     notifications: Notifications
+    unread_notifications: Unread notifications
     favorites: Favorites
     settings: Settings
     logout: Log out

@@ -4,9 +4,9 @@ services:
     runtime: ruby
     plan: starter
     region: frankfurt
-    buildCommand: './bin/render-build.sh'
+    buildCommand: "./bin/render-build.sh"
     # preDeployCommand: "bundle exec rails db:migrate" # preDeployCommand only available on paid instance types
-    startCommand: './bin/rails server'
+    startCommand: "./bin/rails server"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -30,8 +30,8 @@ services:
     plan: starter
     region: frankfurt
     schedule: "0 2 * * *"
-    buildCommand: 'bundle install'
-    startCommand: 'bin/rails scrapers:run_all'
+    buildCommand: "bundle install"
+    startCommand: "bin/rails scrapers:run_all"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -44,5 +44,5 @@ services:
 
 databases:
   - name: uesgu-db
-    plan: basic_256mb
+    plan: basic-256mb
     region: frankfurt

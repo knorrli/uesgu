@@ -181,6 +181,7 @@ fr:
     today: Aujourd'hui
     tomorrow: Demain
   events:
+    cancelled: Annulé
     index:
       title: üsgu
       empty: Aucun événement ne correspond aux filtres actuels.

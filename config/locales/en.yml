@@ -181,6 +181,7 @@ en:
     today: Today
     tomorrow: Tomorrow
   events:
+    cancelled: Cancelled
     index:
       title: üsgu
       empty: No events match your current filters.

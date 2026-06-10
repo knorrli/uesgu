@@ -229,6 +229,18 @@
   opacity: 0.5;
 }
 
+/* Cancelled events stay listed (so a follower sees the show was called off) but
+   the title is struck through and prefixed with a warning-coloured badge. */
+.event.cancelled .event-title a {
+  text-decoration: line-through;
+}
+
+.event-cancelled {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--theme-warn-color);
+}
+
 /* List / Calendar as a plain text toggle, not filled buttons: the active view
    is bold accent, the other a muted link. */
 .view-switcher {

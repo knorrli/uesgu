@@ -11,7 +11,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/12-06-2026-neo-perreo",
@@ -37,7 +38,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/13-06-2026-plh",
@@ -59,7 +61,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/31698",
@@ -83,7 +86,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/32067",
@@ -113,7 +117,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/20-06-2026-darkside-2",
@@ -133,7 +138,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/11-07-2026-wanna-be-innenhof",
@@ -157,7 +163,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/11-08-2026-schach",
@@ -177,7 +184,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/no-borders-no-nations",
@@ -195,7 +203,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/28-08-2026-six-sex",
@@ -223,7 +232,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/29-08-2026-darkside",
@@ -243,7 +253,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/32204",
@@ -267,7 +278,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/12-09-2026-bermuda-dreieck",
@@ -281,7 +293,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/18-09-2026-kumbia-queers",
@@ -303,7 +316,8 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://www.dachstock.ch/events/25-09-2026-eto-release",
@@ -327,6 +341,7 @@
       "Dachstock",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   }
 ]

@@ -15,7 +15,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/evolution/",
@@ -33,7 +34,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/manifest-fuer-dini-mueter/",
@@ -51,7 +53,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/free-quenzy-bash/",
@@ -69,7 +72,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/zero-zero-juni-26/",
@@ -87,7 +91,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/bttr-juli-26/",
@@ -105,7 +110,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/saisonschluss-26/",
@@ -123,7 +129,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/musikfestival-bern/",
@@ -141,7 +148,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/outro/",
@@ -159,7 +167,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/lovehead/",
@@ -177,7 +186,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/the-young-gods/",
@@ -195,7 +205,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/crimer-special-solo-show-valentino-vivace/",
@@ -213,7 +224,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/futurebae/",
@@ -231,7 +243,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/jack-botts/",
@@ -249,7 +262,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/club-quiz-okt-26/",
@@ -267,7 +281,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/finojet/",
@@ -285,7 +300,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/luvre47/",
@@ -303,7 +319,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/manic-pixxies-batbait/",
@@ -321,7 +338,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/sento/",
@@ -339,7 +357,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/club-quiz-nov-26/",
@@ -357,7 +376,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/kids-with-buns/",
@@ -375,7 +395,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/florian-paul-die-kapelle-der-letzten-hoffnung/",
@@ -393,7 +414,8 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://gaskessel.ch/programm/club-quiz-dez-26/",
@@ -411,6 +433,7 @@
       "Gaskessel",
       "Bern",
       "BE"
-    ]
+    ],
+    "cancelled_at": false
   }
 ]

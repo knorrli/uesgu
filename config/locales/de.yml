@@ -181,6 +181,7 @@ de:
     today: Heute
     tomorrow: Morgen
   events:
+    cancelled: Abgesagt
     index:
       title: üsgu
       empty: Keine Veranstaltungen für die aktuellen Filter.

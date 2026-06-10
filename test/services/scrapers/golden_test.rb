@@ -22,7 +22,7 @@ class Scrapers::GoldenTest < Minitest::Test
 
   # Stand-in for an Event that records field assignments instead of persisting.
   class Capture
-    FIELDS = %i[start_time start_date title subtitle genre_list style_list location_list].freeze
+    FIELDS = %i[start_time start_date title subtitle genre_list style_list location_list cancelled_at].freeze
     attr_accessor(*FIELDS)
     attr_reader :url
 
@@ -30,12 +30,16 @@ class Scrapers::GoldenTest < Minitest::Test
     def save! = nil
 
     def to_h
-      { url: url }.merge(FIELDS.index_with { |field| serialize(public_send(field)) })
+      { url: url }.merge(FIELDS.index_with { |field| serialize(field, public_send(field)) })
     end
 
     private
 
-    def serialize(value)
+    def serialize(field, value)
+      # cancelled_at is a wall-clock timestamp; record only its presence so the
+      # golden stays deterministic while still proving detection fired.
+      return !value.nil? if field == :cancelled_at
+
       value.respond_to?(:iso8601) ? value.iso8601 : value
     end
   end

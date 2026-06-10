@@ -6,6 +6,13 @@ class Event < ApplicationRecord
   # Public-facing events: non-music events (carrying a hidden genre, with no
   # music style) are hidden. Admin/curation views deliberately skip this scope.
   scope :visible, -> { where(hidden: false) }
+  scope :cancelled, -> { where.not(cancelled_at: nil) }
+
+  # Cancelled events stay listed (with a marker) rather than vanishing, so a
+  # follower sees the show was called off. Derived from the source each scrape.
+  def cancelled?
+    cancelled_at.present?
+  end
 
   def self.ransackable_attributes(auth_object = nil)
     ['title', 'subtitle', 'start_date']

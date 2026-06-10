@@ -11,7 +11,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-2/",
@@ -25,7 +26,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-3/",
@@ -39,7 +41,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill/",
@@ -53,7 +56,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-2/",
@@ -67,7 +71,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-3/",
@@ -81,7 +86,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill/",
@@ -95,7 +101,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-2/",
@@ -109,7 +116,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-3/",
@@ -123,7 +131,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill/",
@@ -137,7 +146,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-2/",
@@ -151,7 +161,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/boeroem-rockngrill-3/",
@@ -165,7 +176,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/dor/",
@@ -179,7 +191,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/stop-stop-2/",
@@ -193,7 +206,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/duel-3/",
@@ -207,7 +221,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/kilmister/",
@@ -221,7 +236,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/musa-dagh/",
@@ -235,7 +251,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/chase-the-pancake/",
@@ -249,7 +266,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/king-sable/",
@@ -263,7 +281,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/gogo-the-gogogirls-3/",
@@ -277,7 +296,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/sascha-lange/",
@@ -291,7 +311,8 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   },
   {
     "url": "https://boeroem.ch/veranstaltung/gogo-pedro-lenz-3/",
@@ -305,6 +326,7 @@
       "Böröm",
       "Aarau",
       "AG"
-    ]
+    ],
+    "cancelled_at": false
   }
 ]

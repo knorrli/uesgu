@@ -1,185 +1,123 @@
-# Genre vocabulary clean-reset runbook
+# Genre tag clean-reset runbook
 
-Goal: replace the bloated genre vocabulary (~5800 rows, mostly junk minted from
-prose/artist-names over time) with a clean one. Run it **locally first**, verify,
-then repeat the identical steps on prod.
+Goal: purge the free-text junk genre tags that scrapers minted before the
+discovery/consumption split (e.g. `Us`, `Any Stile`, a stray `Salsa Namá` row).
+The curated dictionary in `lib/genres.json` (15 styles + ~5,747 genre→style
+mappings, derived from the Spotify/Every-Noise taxonomy) is **kept and re-seeded
+unchanged** — it's the auto-mapper that buckets scraped genres into styles.
 
-## Why this is now easy
+## Why a wipe is needed (and a plain re-seed/re-scrape is not enough)
 
-The discovery/consumption split (branch `scraper-discovery-consumption-split`)
-means consumption scrapers (docks, mahogany_hall) can only *match* existing
-genres — they never create. So **scraping against an empty genre table mints
-only discovery-scraper genres** (the clean, structured sources). The bootstrap is
-automatic: `wipe + run_all` produces a clean vocabulary by construction.
+- The discovery/consumption split already stops *new* junk: scrapers without a
+  clean structured genre field can no longer create genres.
+- But the *existing* junk is already Genre rows. `genres:seed` is additive (it
+  creates missing dictionary genres, never deletes), and a re-scrape doesn't help
+  either — `Genre.existing_only` *matches* the junk rows because they still exist,
+  so they survive. **You must delete the junk rows.** Wiping + re-seeding the
+  dictionary is the simplest way, and it doubles as proof the fix works (the junk
+  must not reappear).
 
-Two levels of effort — pick based on how polished you want it:
-
-- **Minimum (mechanical):** wipe → `run_all`. Eliminates *all* consumption
-  pollution immediately; you're left with only discovery-source genres (a few
-  hundred, not 5800). Good enough to ship.
-- **Polish (judgment, iterative):** curate that smaller set — map genres to
-  styles, block/hide/ignore the event-type leftovers ("Konzert", "E-Sports",
-  "Party"). Done on the now-small set via the seed files + `/admin` UI.
-
-## Pre-requisite
-
-The mechanism must be live where you're running this. Locally it's on the branch
-already. **For prod, deploy the branch (merge to main) before the prod reset** —
-otherwise prod scrapers still run in create-everything mode.
+Run locally first, verify, then run the identical steps on prod.
 
 ---
 
-## Stage 0 — Backup (both envs; cheap insurance even though data is disposable)
+## Stage 0 — Backup (cheap insurance; data is disposable but still)
 
 ```bash
-# local
-pg_dump "$DATABASE_URL" > /tmp/uesgu_backup_local.sql
-# prod: run from the Render shell, or pull a Render Postgres backup snapshot first
+pg_dump "$DATABASE_URL" > /tmp/uesgu_backup.sql   # local; on prod use a Render Postgres snapshot
 ```
 
-Also snapshot the current seed inputs so you can diff later:
+Optional: drop the two known seed contaminants while you're here.
 ```bash
-cp lib/genres.json /tmp/genres.json.before
+# remove the lines "berner mundartrock" and "salsa namá" from lib/genres.json, then commit
 ```
 
 ---
 
-## Stage 1 — Bootstrap the candidate vocabulary (LOCAL)
+## Stage 1 — Wipe + re-seed + re-scrape (LOCAL)
 
-Wipe the taxonomy + events (keeps `users`, `invitations`, `sessions`), then let
-the scrapers repopulate. `notifications` reference events, so they go too
-(regenerated later).
+Keeps `users`, `invitations`, `sessions`. `notifications` reference events, so
+they go too (regenerated on the next digest run).
 
 ```bash
+# 1. wipe events + the whole taxonomy (CASCADE clears the genres_styles join + any FK)
 bin/rails runner '
   ActiveRecord::Base.connection.execute(
     "TRUNCATE events, genres, genres_styles, styles, taggings, tags, notifications RESTART IDENTITY CASCADE;"
   )
-  puts "wiped. genres=#{Genre.count} events=#{Event.count} users=#{User.count}"
+  puts "wiped — genres=#{Genre.count} events=#{Event.count} users=#{User.count} (preserved)"
 '
+
+# 2. rebuild the curated dictionary (styles + genre→style map + aliases + dispositions)
+bin/rails genres:seed
+
+# 3. re-scrape every venue (discovery genres auto-map; consumption matches the dictionary only)
+bin/rails scrapers:run_all
+
+# 4. refresh each event's derived styles + hidden flag
+bin/rails runner 'Event.find_each(&:recompute_styles!)'
 ```
-
-Re-seed the **styles** taxonomy (so discovery genres can map as they appear) and
-scrape:
-```bash
-bin/rails genres:seed       # styles + current aliases/dispositions from lib/*.json
-bin/rails scrapers:run_all  # discovery genres minted; consumption matches the seed only
-```
-
-> Note: `genres:seed` still imports today's bloated `lib/genres.json`. That's
-> fine for the bootstrap — `run_all` + `reconcile!` only keep genres actually in
-> use (`events_count > 0`). The unused seed bloat stays dormant and is dropped
-> when you rebuild the seed in Stage 2. If you want a *pure* discovery bootstrap
-> with nothing pre-seeded, skip `genres:seed` here and run only `scrapers:run_all`.
-
-Inspect what the clean set looks like:
-```bash
-bin/rails runner '
-  rows = Genre.in_use.by_usage.pluck(:name, :events_count)
-  puts "in-use genres: #{rows.size}"
-  rows.first(80).each { |n, c| puts "  #{c.to_s.rjust(4)}  #{n}" }
-  puts "unassigned (no style yet): #{Genre.unassigned.count}"
-'
-```
-
-This list is the candidate vocabulary. If you stop here, you already have a
-clean, pollution-free taxonomy.
 
 ---
 
-## Stage 2 — Curate into new seed files (JUDGMENT — do together)
-
-Turn the candidate set into durable seed files so the reset is reproducible.
-
-1. **Export the current in-use set with any style mapping it already has** (lets
-   us reuse prior curation instead of redoing it):
-   ```bash
-   bin/rails runner '
-     require "json"
-     data = Genre.in_use.includes(:styles).map { |g|
-       { name: g.name, count: g.events_count, styles: g.styles.map(&:name),
-         disposition: (g.blocked? ? "blocked" : g.hidden? ? "hidden" : g.ignored? ? "ignored" : nil) }
-     }
-     File.write("/tmp/candidate_vocab.json", JSON.pretty_generate(data))
-     puts "wrote #{data.size} genres to /tmp/candidate_vocab.json"
-   '
-   ```
-2. **Curate** `/tmp/candidate_vocab.json` → rebuild the three seed files:
-   - `lib/genres.json` — `{ "Style Name": ["genre", "genre", …] }`. Keep only
-     real genres; assign each to a style. (I can draft this from the candidate
-     export — most already carry a style from the old mapping; you review the
-     unmapped and the merges.)
-   - `lib/genre_aliases.json` — `{ "Canonical": ["variant", …] }` for semantic
-     merges the fingerprint can't catch.
-   - `lib/genre_dispositions.json` — `{ "blocked": […], "hidden": […],
-     "ignored": […] }`. This is where event-type leftovers go: "Konzert",
-     "Party", "Public-Viewing", "E-Sports", "Daydance", "Festival" → `ignored`
-     (or `hidden` for non-music); origin codes → `blocked`.
-3. Commit the new seed files.
-
-This is the only irreducible manual step, and it's now over a few hundred genres,
-not 5800.
-
----
-
-## Stage 3 — Clean reset with the curated seed (LOCAL) + verify
+## Stage 2 — Verify (this is point 7: confirm the junk is gone)
 
 ```bash
 bin/rails runner '
-  ActiveRecord::Base.connection.execute(
-    "TRUNCATE events, genres, genres_styles, styles, taggings, tags, notifications RESTART IDENTITY CASCADE;"
-  )
-'
-bin/rails genres:seed                                   # curated taxonomy + aliases + dispositions
-bin/rails scrapers:run_all                              # consumption now matches the curated vocab
-bin/rails runner 'Event.find_each(&:recompute_styles!)' # refresh derived styles + hidden flags
-```
-
-Verify:
-```bash
-bin/rails runner '
-  puts "events=#{Event.count} genres(in use)=#{Genre.in_use.count} unassigned=#{Genre.unassigned.count}"
-  puts "styles=#{Style.count} hidden events=#{Event.where(hidden: true).count}"
-  # spot-check: no origin codes / obvious junk minted
-  %w[Us Ch Au Salsa].each { |j| g = Genre.find_by(fingerprint: Genre.fingerprint_for(j)); puts "#{j}: #{g ? "PRESENT (#{g.events_count})" : "absent ✓"}" }
+  puts "events=#{Event.count}  genres total=#{Genre.count}  in-use=#{Genre.in_use.count}  unassigned=#{Genre.unassigned.count}"
+  # the free-text junk must be ABSENT (no row, or zero usage):
+  %w[Us Ch Au Salsa\ Namá Any\ Stile Move Groove].each do |j|
+    g = Genre.find_by(fingerprint: Genre.fingerprint_for(j))
+    puts "  #{j.ljust(12)} #{g ? "PRESENT events_count=#{g.events_count}" : "absent ✓"}"
+  end
+  # the dictionary must be PRESENT:
+  %w[techno indie\ rock hip\ hop].each do |k|
+    puts "  dict #{k.ljust(10)} #{Genre.exists?(fingerprint: Genre.fingerprint_for(k)) ? "present ✓" : "MISSING"}"
+  end
 '
 bin/rails test
 ```
 
-Click through the local site (`/`, `/favorites`, `/admin/genres`) and confirm the
-genre lists look clean. Any stragglers → add to `genre_dispositions.json` and
-re-run `genres:import_dispositions` + the recompute line.
+Then click through `/`, `/favorites`, `/admin/genres` and confirm the genre lists
+read clean. Discovery scrapers may still surface genuinely-new genres from clean
+fields (e.g. event-type tags like `Konzert`, `Festival`) — those land in the
+assignment queue; dispose them via `lib/genre_dispositions.json` (`ignored`/
+`hidden`) + `bin/rails genres:import_dispositions`, then re-run the recompute line.
 
 ---
 
-## Stage 4 — Repeat on prod
+## Stage 3 — Repeat on prod
 
-Once local looks right and the branch is merged/deployed:
-
-1. **Export prod's current DB curation first** (in case admin-UI dispositions/
-   style-maps were set on prod but never written back to the seed files):
-   ```bash
-   # on the Render shell
-   bin/rails runner '<the candidate_vocab.json export from Stage 2.1>'
-   ```
-   Reconcile any prod-only curation into the committed seed files, redeploy.
-2. Run **Stage 3** verbatim on the Render shell (it already includes the wipe).
-3. Verify with the same checks. Users/invitations/sessions are untouched
-   throughout.
+Once local looks right and the branch is merged/deployed (prod scrapers need the
+split live), run **Stage 1 + Stage 2** verbatim on the Render shell. Users,
+invitations, and sessions are untouched throughout.
 
 ---
 
-## Rollback
+## Alternative — targeted cleanup without wiping events (if ever needed)
+
+If you don't want to drop events (not a concern in alpha, but for later):
 
 ```bash
-psql "$DATABASE_URL" < /tmp/uesgu_backup_local.sql   # local
-# prod: restore the Render Postgres snapshot from Stage 0
+bin/rails runner '
+  bin/rails genres:seed   # ensure the dictionary exists
+  # delete in-use genres that are NOT in the dictionary AND not curated/disposed
+  Genre.in_use
+       .where(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+       .left_joins(:styles).where(styles: { id: nil })   # unmapped == not in dictionary
+       .destroy_all
+  ActsAsTaggableOn::Tag.where("id NOT IN (SELECT DISTINCT tag_id FROM taggings)").delete_all
+'
+bin/rails runner 'Event.find_each(&:recompute_styles!)'
 ```
 
-## Notes / gotchas
+This drops the unmapped junk while keeping events and the dictionary. The wipe
+(Stage 1) is cleaner and self-verifying, so prefer it while data is disposable.
 
-- `scrapers:run_all` hits ~15 live venues sequentially and can take a few minutes;
-  a flaky venue (e.g. Bad Bonn) may fail its section without aborting the run.
-- Order matters: `genres:seed` (styles must exist) → `run_all` → recompute.
-- `genres_styles` is the HABTM join; `TRUNCATE … CASCADE` clears it automatically.
+## Notes
+
+- `scrapers:run_all` hits ~15 live venues sequentially (a few minutes); a flaky
+  venue may fail its section without aborting the run.
+- Order: `genres:seed` (styles must exist before genres map to them) → `run_all`
+  → recompute.
 - Keep `users`, `invitations`, `sessions`. Everything else is regenerated.

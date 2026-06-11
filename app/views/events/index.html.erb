@@ -1,6 +1,7 @@
 <% content_for :title, t('events.index.title') %>
 
 <div class="flex flex-col gap-large align-stretch" data-controller="filter favorite"
+     data-action="turbo:before-frame-render->favorite#beforeFrameRender turbo:frame-load->favorite#reapply"
      data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
   <%= render 'filter', filter: @filter %>
 

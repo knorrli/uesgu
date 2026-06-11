@@ -38,10 +38,15 @@ module Scrapers
       content.css('.event-subtitle').text.split('+').map { |part| part.squish }.compact_blank.join(', ')
     end
 
-    def event_genres(content)
-      main_tags = content.css('.event-info-style').flat_map { |node| node.text.split('/').map(&:squish) }.compact_blank.map { |tag| tag.squish.titleize }
-      artist_tags = content.css('.artist-item .artist-info').map { |node| node.text.squish }.compact_blank.map { |tag| tag.squish.titleize }
-      (main_tags | artist_tags).sort
+    # Consumption-only: Docks has no dedicated genre field (the former
+    # `.event-info-style` selector is dead in the current markup). The only
+    # genre-ish signal is the per-artist `.artist-info` spans, which interleave
+    # the artist's ORIGIN COUNTRY CODE ("US", "CH") with a loose genre word
+    # ("ROCK"). Matched against the curated vocabulary, the real genres survive
+    # and the origin codes drop out for free (a proper origin facet is future
+    # work). Reading it as discovery is what minted "Us"/"Ch" as genres.
+    def event_consumption_genres(content)
+      content.css('.artist-item .artist-info').map { |node| node.text.squish }.compact_blank.map { |tag| tag.squish.titleize }.uniq.sort
     end
 
     private

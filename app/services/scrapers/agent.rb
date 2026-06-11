@@ -67,7 +67,11 @@ module Scrapers
       event.start_date    = event.start_time.to_date
       event.title         = event_title(content)
       event.subtitle      = event_subtitle(content)
-      event.genre_list    = event_genres(content)
+      # Trusted (discovery) genres from a clean structured field may mint new
+      # taxonomy; consumption genres from an unstable free-text source are
+      # attached match-only, never creating a Genre row (see Genre.existing_only).
+      event.genre_list    = Array(event_genres(content)) +
+                            Genre.existing_only(event_consumption_genres(content))
       event.style_list    = event_styles(genres: event.genre_list)
       # Derive visibility from source each scrape, mirroring Event#recompute_styles!
       # — otherwise a freshly-scraped non-music event (hidden genre, no style) would
@@ -125,7 +129,16 @@ module Scrapers
 
     # Many venues expose no subtitle / no genres; default to none.
     def event_subtitle(_content) = nil
+
+    # Trusted genres: a clean, structured genre/style field the venue curates.
+    # These may mint new taxonomy (discovery). Default: none.
     def event_genres(_content) = nil
+
+    # Consumption genres: from an UNSTABLE free-text source (artist blurbs,
+    # subtitle prose, parsed titles, origin codes). Attached match-only against
+    # the curated vocabulary so they never create taxonomy from noise. A scraper
+    # that mixes a clean field and a messy one overrides both. Default: none.
+    def event_consumption_genres(_content) = nil
 
     # Adjust the built event before saving (e.g. promote a blank title).
     def postprocess(_event) = nil

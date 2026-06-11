@@ -33,12 +33,13 @@ module Scrapers
       content.css('.views-field-field-subtitle .field-content').text.squish
     end
 
-    def event_genres(content)
-      # The subtitle is the only genre-ish field Mahogany Hall exposes, but it mixes
-      # real genre lists ("dixieland, blues, gospel und swing") with free-text prose
-      # ("big band goes modern grooves"). Split on the usual delimiters and keep only
-      # short 1–2 word tokens: genres are short phrases, prose is not — so artist/show
-      # blurbs stop landing as junk genres. (There is no dedicated genre field.)
+    # Consumption-only: Mahogany Hall exposes NO dedicated genre field (verified
+    # against the live markup — the event row carries only title/subtitle/teaser/
+    # price). The subtitle mixes real genre lists ("dixieland, blues, gospel und
+    # swing") with free-text prose ("big band goes modern grooves"). The 1–2-word
+    # filter is a damage-limiter; the closed-vocab match (Genre.existing_only) is
+    # what ultimately keeps prose/artist names from minting junk taxonomy.
+    def event_consumption_genres(content)
       event_subtitle(content)
         .split(/,|\s\-\s|\s[au]nd\s|&|\//)
         .map { |part| part.squish }

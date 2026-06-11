@@ -46,7 +46,10 @@ module Scrapers
     end
 
     def event_genres(content)
-      content.css('.eventgenre').map { |node| node.text }.compact_blank.map(&:squish)
+      # The venue packs several genres into one comma-separated `.eventgenre` span
+      # ("City Pop, Funk, Soul"), so split on commas into atomic genres rather than
+      # storing the whole string as a single junk tag. Mirrors event_subtitle.
+      content.css('.eventgenre').flat_map { |node| node.text.split(',') }.map(&:squish).compact_blank
     end
   end
 end

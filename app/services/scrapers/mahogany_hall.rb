@@ -34,8 +34,16 @@ module Scrapers
     end
 
     def event_genres(content)
-      # make sure we don't add full sentences as genre tags
-      event_subtitle(content).split(/,|\s\-\s|\s[au]nd\s|&|\//).map { |part| part.squish.titleize }.reject { |genre| genre.length > 30 }
+      # The subtitle is the only genre-ish field Mahogany Hall exposes, but it mixes
+      # real genre lists ("dixieland, blues, gospel und swing") with free-text prose
+      # ("big band goes modern grooves"). Split on the usual delimiters and keep only
+      # short 1–2 word tokens: genres are short phrases, prose is not — so artist/show
+      # blurbs stop landing as junk genres. (There is no dedicated genre field.)
+      event_subtitle(content)
+        .split(/,|\s\-\s|\s[au]nd\s|&|\//)
+        .map { |part| part.squish }
+        .select { |part| part.split.size.between?(1, 2) }
+        .map(&:titleize)
     end
   end
 end

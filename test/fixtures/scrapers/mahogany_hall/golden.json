@@ -25,12 +25,10 @@
     "title": "Jazzorchester der Universität Bern feat. Stewy von Wattenwyl (Piano)",
     "subtitle": "big band jazz - move and groove",
     "genre_list": [
-      "Big Band Jazz",
       "Move",
       "Groove"
     ],
     "style_list": [
-      "Big Band Jazz",
       "Move",
       "Groove"
     ],
@@ -48,7 +46,6 @@
     "title": "DJ Andy (BluesBar)",
     "subtitle": "blues'n'roll back to the roots, bluesrock, southernrock, funk, soul und blues",
     "genre_list": [
-      "Blues'n'roll Back To The Roots",
       "Bluesrock",
       "Southernrock",
       "Funk",
@@ -56,7 +53,6 @@
       "Blues"
     ],
     "style_list": [
-      "Blues'n'roll Back To The Roots",
       "Bluesrock",
       "Southernrock",
       "Funk",
@@ -76,12 +72,8 @@
     "start_date": "2026-06-14",
     "title": "GROOVE EXTRAVAGANZA – Intercity Jazz Orchestra feat. Anatole Muster",
     "subtitle": "big band goes modern grooves",
-    "genre_list": [
-      "Big Band Goes Modern Grooves"
-    ],
-    "style_list": [
-      "Big Band Goes Modern Grooves"
-    ],
+    "genre_list": [],
+    "style_list": [],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -262,16 +254,12 @@
     "title": "The Neighbours",
     "subtitle": "covers von funk, soul, blues, rock bis latin",
     "genre_list": [
-      "Covers Von Funk",
       "Soul",
-      "Blues",
-      "Rock Bis Latin"
+      "Blues"
     ],
     "style_list": [
-      "Covers Von Funk",
       "Soul",
-      "Blues",
-      "Rock Bis Latin"
+      "Blues"
     ],
     "location_list": [
       "Mahogany Hall",
@@ -534,12 +522,8 @@
     "start_date": "2026-10-15",
     "title": "Woodlands Bäckafall",
     "subtitle": "nordic celtic folk",
-    "genre_list": [
-      "Nordic Celtic Folk"
-    ],
-    "style_list": [
-      "Nordic Celtic Folk"
-    ],
+    "genre_list": [],
+    "style_list": [],
     "location_list": [
       "Mahogany Hall",
       "Bern",

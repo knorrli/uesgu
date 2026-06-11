@@ -14,6 +14,19 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'index shows the visible-event count per digest in one query' do
+    u = user
+    sign_in_as u
+    digest = u.notifications.create!(period_start: 3.days.ago, period_end: 1.day.ago)
+    2.times { event(created_at: 2.days.ago) }
+    event(created_at: 5.days.ago) # outside the window — must not be counted
+
+    get notifications_path
+
+    assert_response :success
+    assert_select '.notification__meta', text: /2/
+  end
+
   test 'show marks the digest read' do
     u = user
     sign_in_as u

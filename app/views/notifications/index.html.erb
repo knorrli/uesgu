@@ -13,7 +13,7 @@
             <%= l notification.period_start.to_date %> – <%= l notification.period_end.to_date %>
           </span>
           <span class="notification__meta">
-            <%= t('notifications.index.new_events', count: notification.events.count) %>
+            <%= t('notifications.index.new_events', count: @event_counts[notification.id]) %>
             <% unless notification.read? %><span class="badge"><%= t('notifications.index.unread_badge') %></span><% end %>
           </span>
         <% end %>

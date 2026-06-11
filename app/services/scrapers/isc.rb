@@ -1,7 +1,5 @@
 module Scrapers
   class Isc < Agent
-    attr_reader :current_year, :last_start_time
-
     def self.location
       'ISC'
     end
@@ -16,7 +14,7 @@ module Scrapers
 
     def initialize
       super
-      @current_year = Date.current.year
+      @scrape_date = Date.current
     end
 
     def event_rows
@@ -36,14 +34,12 @@ module Scrapers
       click(Page::Link.new(row, @mech, page))
     end
 
-    # The detail page omits the year; track the last start time and roll the year
-    # over when the date sequence wraps backwards.
-    def preprocess(content)
-      if last_start_time && last_start_time > event_start_time(content)
-        @current_year += 1
-      end
-    end
-
+    # The detail page omits the year. ISC lists only upcoming concerts, so a
+    # day/month that has already passed in the scrape year must belong to next
+    # year. This covers a leading January event seen while scraping in December,
+    # which the previous "roll the year forward when the date sequence wraps
+    # backwards" heuristic mis-dated — the first event had nothing before it to
+    # wrap against, so it kept the scrape year and landed ~12 months in the past.
     def event_start_time(content)
       date_string = content.css('.event_detail_header .event_title_date').text.squish
       time_string = content.css('.event_detail .facts_listing').text.squish[/\d{1,2}:\d{1,2} Uhr/]
@@ -53,7 +49,7 @@ module Scrapers
 
       raise "Unparseable date #{date_string.inspect}" if day.blank? || month.blank?
 
-      @last_start_time = Time.zone.parse("#{current_year}-#{month}-#{day}, #{hour}:#{minute}")
+      Time.zone.parse("#{year_for(month.to_i, day.to_i)}-#{month}-#{day}, #{hour}:#{minute}")
     end
 
     def event_title(content)
@@ -66,6 +62,17 @@ module Scrapers
 
     def event_genres(content)
       content.css('.event_detail_header .event_title_info').text.split(/,|\s-\s|\s[au]nd\s/).compact_blank.map(&:squish)
+    end
+
+    private
+
+    # The scrape year, advanced by one when this day/month has already passed —
+    # ISC never lists events more than a year out, so the next occurrence is
+    # unambiguous.
+    def year_for(month, day)
+      year = @scrape_date.year
+      year += 1 if Date.new(year, month, day) < @scrape_date
+      year
     end
   end
 end

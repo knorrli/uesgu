@@ -46,11 +46,13 @@ module Scrapers
       end.compact_blank.join(', ')
     end
 
-    def event_genres(content)
-      main_tags = content.css('.plateSmall').map { |node| node.text.squish }
-      artist_tags = content.css('.groupIntro .genTexArea h5').flat_map { |node| node.text.split(/,|\s\-\s|\s[au]nd\s|&|\//) }.map(&:squish).compact_blank
-      (main_tags | artist_tags).sort
-    end
+    # No genre extraction: the live ProcessWire template exposes no genre/style
+    # field (verified against the live site 2026-06-12). Both former selectors
+    # were dead — `.plateSmall` no longer exists and the lone `<h5>` is the
+    # event-info header, not genres. The only genre-ish text is artist-reference
+    # prose ("For fans of : Daughter…") and the bio, which we deliberately don't
+    # mine. So Nouveau Monde is a genre-less venue (inherits the nil default).
+    # (The list/event selectors still work — only genres are absent.)
 
     private
 

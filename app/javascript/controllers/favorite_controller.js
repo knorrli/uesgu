@@ -37,11 +37,45 @@ export default class extends Controller {
       el.setAttribute("aria-pressed", followed)
     })
 
-    const key = `${type === "location" ? "l" : "s"}:${value}`
+    const key = this.#keyFor(type, value)
     followed ? this.followed.add(key) : this.followed.delete(key)
 
-    this.#refreshMarkers()
+    this.#refreshMarkers(this.element)
     this.#refreshFavoritesFilter()
+  }
+
+  // A calendar-frame navigation (opening a day, changing month) swaps in fresh
+  // server-rendered markup whose follow state reflects the *persisted* set — which
+  // lags an optimistic toggle whose background POST hasn't committed yet. Left
+  // alone, the frame regresses the UI to that stale snapshot mid-persist.
+
+  // Correct the incoming frame BEFORE Turbo paints it, so a stale follow state
+  // (e.g. a heart the server still shows as followed) never flashes on screen.
+  beforeFrameRender(event) {
+    this.#syncFollowState(event.detail.newFrame)
+  }
+
+  // Backstop once the frame has loaded, in case before-frame-render didn't apply
+  // (older Turbo, cached render). Idempotent — a no-op when the DOM already agrees.
+  reapply() {
+    this.#syncFollowState(this.element)
+  }
+
+  // Re-assert the in-memory follow set across every follow button and day marker
+  // under `root`.
+  #syncFollowState(root) {
+    root.querySelectorAll("[data-favorite-type-param]").forEach((button) => {
+      const { favoriteTypeParam: type, favoriteValueParam: value } = button.dataset
+      const followed = this.followed.has(this.#keyFor(type, value))
+      button.classList.toggle("followed", followed)
+      button.setAttribute("aria-pressed", followed)
+    })
+
+    this.#refreshMarkers(root)
+  }
+
+  #keyFor(type, value) {
+    return `${type === "location" ? "l" : "s"}:${value}`
   }
 
   // The "apply my favorites" shortcut is rendered hidden until the user follows
@@ -74,8 +108,8 @@ export default class extends Controller {
   // A day marker — a calendar cell's corner heart or a list date header's heart
   // — shows when any tag on that day is followed. Each marker carries its day's
   // keys, so this is a cheap set check that touches only the markers.
-  #refreshMarkers() {
-    this.element.querySelectorAll("[data-day-keys]").forEach((marker) => {
+  #refreshMarkers(root) {
+    root.querySelectorAll("[data-day-keys]").forEach((marker) => {
       const keys = JSON.parse(marker.dataset.dayKeys)
       marker.hidden = !keys.some((key) => this.followed.has(key))
     })

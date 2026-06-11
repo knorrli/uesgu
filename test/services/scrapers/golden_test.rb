@@ -19,6 +19,11 @@ class Scrapers::GoldenTest < Minitest::Test
   # Click-into-detail scrapers: a stubbed `click` returns the saved detail page.
   SHAPE_B = %w[bad_bonn kofmehl docks boeroem isc kiff nouveau_monde sedel].freeze
   CAPTURING = ENV['CAPTURE_GOLDEN'] == '1'
+  # Pin the clock to when the fixtures were captured so year-inferring scrapers
+  # stay deterministic regardless of when the suite runs (ISC reads Date.current
+  # to resolve the year its detail pages omit; left live, its golden rots a year
+  # later). This is the only clock dependency in golden output.
+  REFERENCE_DATE = Date.new(2026, 6, 10)
 
   # Stand-in for an Event that records field assignments instead of persisting.
   class Capture
@@ -78,20 +83,23 @@ class Scrapers::GoldenTest < Minitest::Test
   end
 
   def capture_events(klass, slug, dir)
-    scraper = klass.new
     list_page = page_from(File.join(dir, 'list.html'), klass.url.to_s)
     detail_page = (page_from(File.join(dir, 'detail.html'), 'https://fixture.test/detail') if SHAPE_B.include?(slug))
 
-    scraper.define_singleton_method(:get) { |*| nil }
-    scraper.define_singleton_method(:page) { list_page }
-    scraper.define_singleton_method(:click) { |*| detail_page } if detail_page
-    # Keep the run DB-free: style mapping is not under test, so echo the genres.
-    scraper.define_singleton_method(:event_styles) { |genres:| Array(genres) }
-
     captured = []
     factory = ->(*, **kwargs) { Capture.new(kwargs[:url]).tap { |c| captured << c } }
-    Event.stub(:find_or_initialize_by, factory) do
-      scraper.send(:process_events)
+
+    Date.stub(:current, REFERENCE_DATE) do
+      scraper = klass.new
+      scraper.define_singleton_method(:get) { |*| nil }
+      scraper.define_singleton_method(:page) { list_page }
+      scraper.define_singleton_method(:click) { |*| detail_page } if detail_page
+      # Keep the run DB-free: style mapping is not under test, so echo the genres.
+      scraper.define_singleton_method(:event_styles) { |genres:| Array(genres) }
+
+      Event.stub(:find_or_initialize_by, factory) do
+        scraper.send(:process_events)
+      end
     end
     captured
   end

@@ -74,7 +74,7 @@ de:
     favorite_styles_heading: Lieblings-Stile
     email_heading: E-Mail
     email_optional: (optional)
-    email_hint: Nur nötig, falls du später Passwort-Zurücksetzen oder E-Mail-Updates möchtest.
+    email_hint: Nur nötig, falls du später E-Mail-Updates zu neuen Veranstaltungen möchtest.
     email_placeholder: du@beispiel.ch
     password_heading: Passwort ändern
     password_hint: Leer lassen, um das aktuelle Passwort zu behalten.

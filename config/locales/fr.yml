@@ -74,7 +74,7 @@ fr:
     favorite_styles_heading: Styles favoris
     email_heading: E-mail
     email_optional: (facultatif)
-    email_hint: Nécessaire uniquement pour réinitialiser votre mot de passe ou recevoir des e-mails plus tard.
+    email_hint: Nécessaire uniquement si vous souhaitez recevoir des e-mails sur les nouveaux événements plus tard.
     email_placeholder: vous@exemple.ch
     password_heading: Changer le mot de passe
     password_hint: Laissez vide pour conserver votre mot de passe actuel.

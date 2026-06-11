@@ -74,7 +74,7 @@ en:
     favorite_styles_heading: Favorite styles
     email_heading: Email
     email_optional: (optional)
-    email_hint: Only needed if you want password reset or email digests later.
+    email_hint: Only needed if you'd like email updates about new events later.
     email_placeholder: you@example.com
     password_heading: Change password
     password_hint: Leave blank to keep your current password.

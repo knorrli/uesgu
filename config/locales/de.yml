@@ -75,6 +75,7 @@ de:
     email_heading: E-Mail
     email_optional: (optional)
     email_hint: Nur nötig, falls du später E-Mail-Updates zu neuen Veranstaltungen möchtest.
+    email_third_party: Deine Adresse wird nur an unseren E-Mail-Anbieter Resend weitergegeben, um dir die gewünschten Updates zu schicken — sonst nichts.
     email_placeholder: du@beispiel.ch
     password_heading: Passwort ändern
     password_hint: Leer lassen, um das aktuelle Passwort zu behalten.

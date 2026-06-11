@@ -28,6 +28,7 @@
     <section class="flex flex-col gap-small">
       <h2><%= t('settings.email_heading') %> <span class="muted"><%= t('settings.email_optional') %></span></h2>
       <p><%= t('settings.email_hint') %></p>
+      <p class="muted"><%= t('settings.email_third_party') %></p>
       <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
     </section>
 

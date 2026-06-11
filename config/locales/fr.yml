@@ -75,6 +75,7 @@ fr:
     email_heading: E-mail
     email_optional: (facultatif)
     email_hint: Nécessaire uniquement si vous souhaitez recevoir des e-mails sur les nouveaux événements plus tard.
+    email_third_party: Votre adresse est transmise à notre prestataire d'e-mail, Resend, uniquement pour vous envoyer les mises à jour demandées — rien d'autre.
     email_placeholder: vous@exemple.ch
     password_heading: Changer le mot de passe
     password_hint: Laissez vide pour conserver votre mot de passe actuel.

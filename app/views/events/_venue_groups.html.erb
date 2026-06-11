@@ -10,14 +10,28 @@
   <% groups.each_value do |group| %>
     <% lead = group.first %>
     <% venue = lead.venue %>
-    <% where_tags = [venue].compact + lead.locations.to_a.reject { |location| location == venue } %>
+    <%# Venue is the anchor (own line, headline size); city/canton drop to a quiet
+        metadata line beneath it, so the hierarchy reads the same logged in or out.
+        With no venue, the first location is promoted to the anchor so the group
+        still has a headline. %>
+    <% locations = lead.locations.to_a %>
+    <% anchor = venue || locations.first %>
+    <% meta_locations = locations.reject { |location| location == anchor } %>
     <section class="venue-group flex flex-col gap-small">
-      <% if where_tags.any? %>
-        <div class="event-where">
-          <% where_tags.each_with_index do |location, i| %>
-            <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-            <%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive,
-                  modifier: (location == venue ? 'venue' : nil), favorite_type: :location %>
+      <% if anchor %>
+        <div class="venue-header flex flex-col gap-xsmall">
+          <div class="event-where">
+            <%= event_filter_tag anchor.name, field: 'l[]', value: anchor.name, interactive: interactive,
+                  modifier: 'venue', favorite_type: :location %>
+          </div>
+          <% if meta_locations.any? %>
+            <div class="event-where-meta">
+              <% meta_locations.each_with_index do |location, i| %>
+                <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
+                <%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive,
+                      favorite_type: :location %>
+              <% end %>
+            </div>
           <% end %>
         </div>
       <% end %>

@@ -56,10 +56,11 @@
   mask: var(--heart-fill) center / contain no-repeat;
 }
 
-/* Venue-led row, zero boxes. Colour does the work: green = interactive
-   (followable tags, links, the external-link arrow), raspberry = a favorite you
-   follow, muted grey = passive info, black = the event itself. The venue is the
-   headline; time/genres stay quiet. */
+/* Venue-led row, zero boxes. Hierarchy comes from structure — the venue anchor on
+   its own line, a quiet metadata line (city/canton) beneath it — so the list reads
+   the same logged in or out. Colour is an enhancement, not the separator: green
+   now marks a tag you *follow* (your stuff), plus true links and the external-link
+   arrow; muted grey = passive info; black = the event itself. */
 .event {
   display: flex;
   justify-content: space-between;
@@ -83,18 +84,25 @@
   color: var(--theme-fg-color);
 }
 
-/* Followable tags (logged-in): the whole tag IS the follow toggle, so it reads
-   as interactive — accent colour says "you can follow this", clicking toggles.
-   font:inherit makes the button match the row; the venue's headline size/weight
-   still come from .event-where .venue (defined later, so it wins on size).
-   Placed after .event-tag.venue so a followable venue reads accent, not fg. */
+/* Followable tags (logged-in): the whole tag IS the follow toggle. Colour no
+   longer marks "followable" — at rest a followable tag inherits its neighbours'
+   colour (venue = fg, city/canton = muted, styles = muted bold), identical to the
+   logged-out plain tags, so the page reads the same either way. The follow
+   affordance is the trailing heart; following lights the tag accent (see
+   .event-tag.fav.followed). font:inherit keeps the button matching the row. */
 .event-tag.fav {
   border: 0;
   padding: 0;
   background: none;
   font: inherit;
-  color: var(--theme-accent-color);
   cursor: pointer;
+}
+
+/* The one thing the accent colour now marks: a tag you follow — "this is yours".
+   Three classes outrank .event-tag.venue and the base .event-tag, so a followed
+   venue/city/style lights up regardless of its resting colour. */
+.event-tag.fav.followed {
+  color: var(--theme-accent-color);
 }
 
 .event-tag.fav:hover .fav-label {
@@ -116,10 +124,18 @@
   text-decoration: underline;
 }
 
-/* Venue is the headline: the largest, boldest thing in the row. */
+/* Venue is the headline: the largest, boldest thing in the row, alone on its line
+   so it reads as the anchor (not one oversized token in a mixed-size row). */
 .event-where .venue {
   font-size: var(--font-size-lg);
   font-weight: bold;
+}
+
+/* City / canton: a quiet metadata line beneath the venue. Small + muted so it
+   informs without competing — and still followable (each is a tag). */
+.event-where-meta {
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
 }
 
 .event-title {
@@ -171,11 +187,17 @@
   font-size: var(--font-size-small);
 }
 
-/* Styles are the primary, followable descriptor — bold them so they assert a tier
-   above the muted, regular-weight subtitle and genres they sit between, without
-   adding another font size to the row. */
+/* Styles are the primary, followable descriptor — bold AND full foreground colour
+   so they assert a clear tier above the muted, regular-weight subtitle and genres
+   they sit between, without adding another font size to the row. The fg colour
+   lives on the tags themselves (not the container) so it beats the base .event-tag
+   muted; a followed style still wins to accent via .event-tag.fav.followed. */
 .event-styles {
   font-weight: bold;
+}
+
+.event-styles .event-tag {
+  color: var(--theme-fg-color);
 }
 
 /* Genres are display-only (not filters): muted, so the colour alone says
@@ -199,15 +221,15 @@
 }
 
 /* The follow heart trails its tag and inherits the tag's font-size, so the big
-   venue header gets a big heart and a small style tag a small one. Outline and
-   muted when not followed; solid and accent when followed. */
+   venue header gets a big heart and a small style tag a small one. It's now the
+   sole "you can follow this" signal (colour no longer says it), so it stays
+   visible — mobile-first, no hover to hide behind. */
 .fav-heart {
   margin-left: 0.4ch;
 }
 
 /* A masked Phosphor heart: the mask is the shape, background-color paints it, so
-   it inherits a theme colour and the tag's em size. Outline + muted by default,
-   solid + favorite when followed. */
+   it inherits a theme colour and the tag's em size. */
 .fav-heart::before {
   content: "";
   display: inline-block;
@@ -219,6 +241,14 @@
   mask: var(--heart-outline) center / contain no-repeat;
 }
 
+/* Not-yet-followed: a faint outline heart — present enough to be discoverable and
+   tappable on touch, quiet enough not to clutter the row. */
+.event-tag.fav:not(.followed) .fav-heart {
+  opacity: 0.4;
+}
+
+/* Followed: solid favorite-coloured heart at full strength, so your follows are
+   the only thing that stands out. */
 .event-tag.fav.followed .fav-heart::before {
   background-color: var(--theme-favorite-color);
   -webkit-mask-image: var(--heart-fill);

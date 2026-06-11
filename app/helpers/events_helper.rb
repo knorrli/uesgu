@@ -45,8 +45,10 @@ module EventsHelper
   # obvious target, not a tiny icon) follows/unfollows it, shown by a trailing
   # heart that inherits the tag's size. Optimistic — the favorite Stimulus
   # controller flips every matching tag on the page and POSTs in the background,
-  # so nothing reloads. Accent colour marks a tag as followable; the heart's fill
-  # marks whether you currently follow it.
+  # so nothing reloads. At rest a followable tag looks like plain info (a faint
+  # outline heart is the only "you can follow this" cue, so the list reads the same
+  # logged in or out); following it fills the heart and lights the tag in the
+  # accent colour — the one place colour now means "this is yours".
   def favorite_tag(label, type, value, modifier = nil)
     followed = followed_tag?(type, value)
     button_tag type: :button,

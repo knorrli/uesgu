@@ -18,7 +18,7 @@
 
   <% if (latest = @presenter.latest) %>
     <section class="flex flex-col gap-small">
-      <h2 class="flex gap-small wrap">
+      <h2 class="flex gap-small wrap align-center">
         <%= link_to l(latest.started_at), admin_scrape_run_path(latest) %>
         <%= render 'admin/scrape_runs/run_badge', run: latest %>
       </h2>

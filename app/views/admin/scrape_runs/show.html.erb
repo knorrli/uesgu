@@ -6,7 +6,7 @@
 
   <%= render 'admin/back', path: admin_scrape_runs_path, label: t('.back') %>
 
-  <h1 class="flex gap-small wrap">
+  <h1 class="flex gap-small wrap align-center">
     <%= l(@run.started_at) %>
     <%= render 'admin/scrape_runs/run_badge', run: @run %>
   </h1>

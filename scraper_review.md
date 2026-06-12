@@ -15,11 +15,13 @@
 3. **Südpol** → location changed to **`['Südpol', 'Kriens', 'LU']`**. ✓
 4. **Mascotte** → **dropped** for now (no code was ever written; revisit later).
 
-### Still worth a glance before merge (heads-ups, not blockers)
-- **Treibhaus** scrapes the whole programme incl. non-concerts (quiz nights) — concert-only filtering needs a per-event detail fetch; say the word.
-- **Bar 59** includes "Sommerpause" placeholder entries — filter them out?
-- **Volkshaus** `genre-musik` is coarse — swept in one comedy show (Daniel Sloss).
-- **Helsinki** titles are free-text and occasionally run words together.
+### Resolved during finalize
+- **Treibhaus** → switched to the server-rendered `?filter=konzerte` view: concert-only, no detail fetch needed. ✓
+- **Bar 59 "Sommerpause"** → handled by the new **dismiss** feature (below) rather than a per-venue skip. ✓
+- **Volkshaus** `genre-musik` is coarse (swept in one comedy show, Daniel Sloss) and **Helsinki** titles occasionally run words together — both left as-is; the dismiss button + the future explicit-edit feature cover these by hand.
+
+### New: dismiss-event feature (shipped with this batch)
+The admin "delete" button is now a **sticky soft-delete** (`Event#dismiss!`): a dismissed event drops out of every public listing **and is never resurrected by a re-scrape** (the scraper skips it), even though the source still lists it. This is what handles Bar 59's "Sommerpause" and any other junk — dismiss once, it stays gone. Hard delete is replaced; the row is kept (reachable via the admin `?status=dismissed` filter). Migration + model scopes + scraper guard + tests included.
 
 ---
 
@@ -32,9 +34,9 @@
 | Zent | Bern | HTML | 0→0 | ✅ empty now¹ |
 | Turnhalle | Bern | HTML (bee-flat) | 5→5 | ✅ |
 | Le Singe | Biel | **JSON** | 40→40 | ✅ |
-| Treibhaus | Luzern | HTML | 22→22 | ⚠️ no concert filter |
+| Treibhaus | Luzern | HTML | 22→3 | ✅ (concert-only) |
 | Neubad | Luzern | HTML + detail | 60→11 | ✅ (music-filtered) |
-| Bar 59 | Luzern | **JSON** (Firestore) | 37→37 | ⚠️ placeholders |
+| Bar 59 | Luzern | **JSON** (Firestore) | 37→37 | ✅ (dismiss handles junk) |
 | Südpol | Kriens | **JSON** (WP API) | 16→16 | ✅ (music-filtered) |
 | Kaserne | Basel | HTML | 5→5 | ✅ |
 | Volkshaus | Basel | HTML | 20→6 | ⚠️ comedy in "musik" |
@@ -116,10 +118,13 @@
 
 ---
 
-## When you're ready
-Decisions are all settled and applied. Remaining to ship:
-1. apply any of the 4 optional heads-up tweaks above (concert filters, drop placeholders) if you want them,
-2. capture golden fixtures + tests for the keepers,
-3. then it's ready to merge → live on the next nightly sweep.
+## Status: finalized & shipped
+Everything is done and committed:
+1. ✅ all decisions applied (genre policy, Südpol→Kriens, Turnhalle bee-flat, Treibhaus concert-only)
+2. ✅ dismiss-event feature built + tested
+3. ✅ golden fixtures + regression tests captured for all 14 (suite green, 0 skips)
+4. ✅ pushed to `main` → Render deploys (runs the migration); the **02:00 Frankfurt** cron ingests the new venues into prod
+
+**Note:** Zent's golden is empty (no upcoming events on its page right now); its selectors are validated against the archive and it'll populate when shows are scheduled.
 
 Nothing is pushed or in the database. The dry-run JSON for every venue is in `tmp/dry_run/`.

@@ -1,0 +1,11 @@
+<%# Run-level health pill: still running, or the worst per-scraper state. %>
+<%# locals: (run:) %>
+<% if run.running? %>
+  <span class="scrape-badge scrape-badge--running"><%= t('admin.scrape_runs.run_status.running') %></span>
+<% elsif run.scrapers_failed.positive? %>
+  <span class="scrape-badge scrape-badge--failed"><%= t('admin.scrape_runs.run_status.failed', count: run.scrapers_failed) %></span>
+<% elsif run.scrapers_empty.positive? %>
+  <span class="scrape-badge scrape-badge--empty"><%= t('admin.scrape_runs.run_status.empty', count: run.scrapers_empty) %></span>
+<% else %>
+  <span class="scrape-badge scrape-badge--ok"><%= t('admin.scrape_runs.run_status.ok') %></span>
+<% end %>

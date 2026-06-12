@@ -34,6 +34,12 @@ class Scrapers::GoldenTest < Minitest::Test
     def initialize(url) = @url = url
     def save! = nil
 
+    # process_events now branches on new_record? to tally created-vs-updated and
+    # collect created ids. The offline run never persists, so every capture reads
+    # as a brand-new record with no id — neither feeds the golden output.
+    def new_record? = true
+    def id = nil
+
     # Visibility is a DB-derived projection (Genre.hidden), not a parsing concern,
     # so the offline run treats every event as visible — mirroring the stubbed
     # event_styles. The real derivation is covered by EventTest.

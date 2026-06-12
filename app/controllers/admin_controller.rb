@@ -3,5 +3,6 @@ class AdminController < ApplicationController
 
   def index
     @event_tag_stats = EventTagStatsPresenter.new
+    @latest_scrape_run = ScrapeRun.recent.first
   end
 end

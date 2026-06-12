@@ -59,40 +59,30 @@ namespace :scrapers do
 
   # Run every scraper once, sequentially. This is the entrypoint for the daily
   # Render cron (see render.yaml) that replaced the in-Puma Solid Queue worker.
-  # Prints a per-scraper summary to stdout — which Render captures as the cron
-  # job's live log — and exits non-zero if any scraper failed, so Render's
-  # failure notification fires. A venue being unreachable raises out of #call
-  # (a per-event parse error is skipped and counted inside the scraper instead).
+  #
+  # Records the sweep into a ScrapeRun + per-scraper ScrapeResult rows (the
+  # /admin/scrape_runs oversight page reads these), stamps the events each
+  # scraper created with the run, prints a per-scraper summary to stdout (which
+  # Render captures as the cron job's live log), and exits non-zero ONLY if a
+  # scraper raised — so Render's failure notification fires for a site being
+  # down but NOT for a clean-but-empty run (those surface in-app instead). A
+  # per-event parse error is skipped and counted inside the scraper.
   #
   #   bin/rails scrapers:run_all
-  desc 'Run all scrapers once, logging a per-scraper summary (daily cron entrypoint)'
+  desc 'Run all scrapers once, recording a ScrapeRun and per-scraper summary (daily cron entrypoint)'
   task run_all: :environment do
-    failures = {}
-    overall_started = Time.current
+    run = Scrapers::Sweep.run!
 
-    Scrapers::All.scrapers.each do |name, klass|
-      slug = name.underscore
-      started = Time.current
-      before = Event.count
-      puts "[#{slug}] starting #{klass.url}"
-      klass.call
-      puts format('[%s] OK in %.1fs (%+d events net)', slug, Time.current - started, Event.count - before)
-    rescue StandardError => e
-      failures[slug] = "#{e.class}: #{e.message}"
-      puts format('[%s] FAILED in %.1fs — %s: %s', slug, Time.current - started, e.class, e.message)
-    end
-
-    # Refresh genre usage counts once after the full sweep so newly seen genres
-    # surface in the assignment queue (the old per-scraper job did this each time).
-    Genre.reconcile!
-
-    total = Scrapers::All.scrapers.size
-    elapsed = Time.current - overall_started
-    if failures.any?
-      puts format('scrapers:run_all: %d/%d FAILED (%s) in %.1fs', failures.size, total, failures.keys.join(', '), elapsed)
+    failed = run.scrape_results.failed.pluck(:scraper)
+    if failed.any?
+      puts format('scrapers:run_all: %d/%d FAILED (%s) in %.1fs',
+                  failed.size, run.scrapers_total, failed.join(', '), run.duration)
       abort('scrapers:run_all finished with failures')
+    elsif run.scrapers_empty.positive?
+      puts format('scrapers:run_all: all %d ran but %d produced no events in %.1fs — see /admin/scrape_runs',
+                  run.scrapers_total, run.scrapers_empty, run.duration)
     else
-      puts format('scrapers:run_all: all %d scrapers OK in %.1fs', total, elapsed)
+      puts format('scrapers:run_all: all %d scrapers OK in %.1fs', run.scrapers_total, run.duration)
     end
   end
 end

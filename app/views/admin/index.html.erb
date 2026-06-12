@@ -45,6 +45,27 @@
   </section>
 
   <section class="flex flex-col gap-small">
+    <h2><%= t('.scrapers_heading') %></h2>
+    <% if @latest_scrape_run %>
+      <dl class="flex flex-col gap-small">
+        <div class="stat">
+          <dt><%= t('.last_scrape') %></dt>
+          <span class="stat__leader"></span>
+          <dd class="muted">
+            <%= l(@latest_scrape_run.started_at) %>
+            <%= render 'admin/scrape_runs/run_badge', run: @latest_scrape_run %>
+          </dd>
+        </div>
+      </dl>
+    <% else %>
+      <p class="muted"><%= t('.no_scrapes') %></p>
+    <% end %>
+    <div class="flex gap-medium wrap">
+      <%= link_to t('.manage_scrapers'), admin_scrape_runs_path %>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-small">
     <h2><%= t('.accounts_heading') %></h2>
     <dl class="flex flex-col gap-small">
       <div class="stat">

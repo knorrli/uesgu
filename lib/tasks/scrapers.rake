@@ -85,4 +85,59 @@ namespace :scrapers do
       puts format('scrapers:run_all: all %d scrapers OK in %.1fs', run.scrapers_total, run.duration)
     end
   end
+
+  # REVIEW-ONLY dry run for vetting a draft scraper before it's wired in. Runs the
+  # scraper LIVE (real get/page/click) but mirrors build_event into a plain hash
+  # instead of an Event — so it never touches the DB, never mints genres, and never
+  # derives styles (raw genres are reported instead, which is what a human needs to
+  # eyeball date/title correctness). Writes tmp/dry_run/<slug>.json and prints a
+  # summary. NOT part of the nightly sweep.
+  #
+  #   bin/rails "scrapers:dry_run[Treibhaus]"   # by demodulized class name
+  desc 'Dry-run one scraper live and dump parsed events to tmp/dry_run/<slug>.json (no DB writes)'
+  task :dry_run, [:scraper] => :environment do |_task, args|
+    name = args[:scraper] or abort 'usage: scrapers:dry_run[ClassName]'
+    klass = Scrapers::All.scrapers[name] or abort "unknown scraper #{name.inspect} (have: #{Scrapers::All.scrapers.keys.sort.join(', ')})"
+
+    agent = klass.new
+    agent.get(klass.url)
+    rows = agent.send(:event_rows)
+
+    events = []
+    skipped = []
+    rows.each do |row|
+      agent.instance_variable_set(:@current_row, row)
+      next if agent.send(:skip_row?, row)
+
+      url = agent.send(:event_url, row)
+      next if url.blank?
+
+      # transact restores the agent's page after a click-into-detail scraper
+      # navigates away, exactly as build_event does — a no-op for list-page scrapers.
+      agent.transact do
+        content = agent.send(:event_content, row)
+        agent.send(:preprocess, content)
+        start_time = agent.send(:event_start_time, content)
+        genres = Array(agent.send(:event_genres, content)) +
+                 Array(agent.send(:event_consumption_genres, content))
+        events << {
+          url: url,
+          start_time: start_time&.iso8601,
+          start_date: start_time&.to_date&.iso8601,
+          title: agent.send(:event_title, content),
+          subtitle: agent.send(:event_subtitle, content),
+          genres: genres
+        }
+      end
+    rescue StandardError => e
+      skipped << { url: url, error: "#{e.class}: #{e.message}" }
+    end
+
+    dir = Rails.root.join('tmp/dry_run')
+    FileUtils.mkdir_p(dir)
+    out = dir.join("#{name.underscore}.json")
+    File.write(out, "#{JSON.pretty_generate(scraper: name, seen: rows.size, parsed: events.size, skipped: skipped, events: events)}\n")
+    puts "#{name}: #{rows.size} rows, #{events.size} parsed, #{skipped.size} skipped → #{out}"
+    puts "  skipped: #{skipped.first(3).map { |s| s[:error] }.join(' | ')}" if skipped.any?
+  end
 end

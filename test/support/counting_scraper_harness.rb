@@ -20,8 +20,8 @@ class CountingScraperHarness < Scrapers::Agent
   def event_start_time(_content) = Time.zone.local(2030, 1, 1, 20, 0)
 
   # A row flagged :bad yields a blank title so save! trips the presence
-  # validation — the per-event skip path.
-  def event_title(content) = content[:bad] ? nil : 'Synthetic Show'
+  # validation — the per-event skip path. A :title lets a re-scrape change data.
+  def event_title(content) = content[:bad] ? nil : (content[:title] || 'Synthetic Show')
 end
 
 Scrapers::All.scrapers.delete('CountingScraperHarness')

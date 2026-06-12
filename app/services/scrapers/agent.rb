@@ -24,7 +24,7 @@ module Scrapers
       end
 
       Result.new(seen: @seen, created: @created, updated: @updated,
-                 skipped: @failures, created_ids: @created_ids)
+                 unchanged: @unchanged, skipped: @failures, created_ids: @created_ids)
     end
 
     private
@@ -36,7 +36,7 @@ module Scrapers
       # Counters live here (not in #call) so the offline golden harness, which
       # drives #process_events directly, initializes them too. #call reads them
       # back into the returned Result.
-      @seen = @created = @updated = @failures = 0
+      @seen = @created = @updated = @unchanged = @failures = 0
       @created_ids = []
 
       get(self.class.url)
@@ -61,19 +61,36 @@ module Scrapers
         Rails.logger.info "Processing event URL #{url}"
         event = Event.find_or_initialize_by(url: url)
         was_new = event.new_record?
+        # Snapshot the persisted tags before build_event overwrites them, so we
+        # can tell a real re-scrape change from a no-op (every re-scrape saves
+        # the event, but most nights nothing actually changed).
+        tags_before = was_new ? nil : tag_snapshot(event)
         transact do
           build_event(event, row)
+          # Attribute changes (title/time/cancellation/…) come from Rails' dirty
+          # tracking; tag changes (genres/styles) don't dirty the model, so diff
+          # the snapshot separately.
+          changed = event.changed? || (tags_before && tag_snapshot(event) != tags_before)
           event.save!
           if was_new
             @created += 1
             @created_ids << event.id
-          else
+          elsif changed
             @updated += 1
+          else
+            @unchanged += 1
           end
         rescue StandardError => e
           record_failure(event, e)
         end
       end
+    end
+
+    # The event's tag lists, for comparing pre/post build_event. genres drive
+    # styles, but both are cheap and explicit; locations are a per-venue constant
+    # so they never change and aren't worth the extra load.
+    def tag_snapshot(event)
+      { genres: event.genre_list.sort, styles: event.style_list.sort }
     end
 
     # Assign every field from the event's content node. `event_content` is the row

@@ -191,6 +191,7 @@ en:
           seen: Seen
           new: New
           updated: Updated
+          unchanged: Unchanged
           skipped: Skipped
           history: History
       show:

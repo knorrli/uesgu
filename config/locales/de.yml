@@ -191,6 +191,7 @@ de:
           seen: Gesehen
           new: Neu
           updated: Aktualisiert
+          unchanged: Unverändert
           skipped: Übersprungen
           history: Verlauf
       show:

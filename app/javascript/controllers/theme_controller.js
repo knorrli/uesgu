@@ -59,6 +59,10 @@ export default class extends Controller {
     const dark = this.preference === "dark" ||
       (this.preference === "system" && this.media.matches)
     document.documentElement.dataset.theme = dark ? "dark" : "light"
+    // Keep the SVG tab favicon matching the resolved theme. The installed PWA
+    // icon is baked at install time and can't switch, so only the favicon here.
+    const favicon = document.getElementById("favicon-svg")
+    if (favicon) favicon.href = dark ? "/icon.svg" : "/icon-light.svg"
   }
 
   render() {

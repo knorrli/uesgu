@@ -27,8 +27,20 @@
 
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="icon" href="/icon.png" type="image/png" sizes="512x512">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link id="favicon-svg" rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+    <%# Point the SVG favicon at the light variant when the resolved theme is
+        light. Runs after the <link> above exists; data-theme is already set by
+        the pre-paint script. theme_controller.js keeps it in sync on toggle. %>
+    <script nonce="<%= content_security_policy_nonce %>">
+      (function () {
+        if (document.documentElement.dataset.theme === "light") {
+          var el = document.getElementById("favicon-svg")
+          if (el) el.href = "/icon-light.svg"
+        }
+      })()
+    </script>
 
     <%= combobox_style_tag %>
     <%= stylesheet_link_tag 'easepick.min.css', "data-turbo-track": "reload" %>

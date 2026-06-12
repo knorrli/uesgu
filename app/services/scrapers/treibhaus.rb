@@ -8,8 +8,12 @@ module Scrapers
       [location, 'Luzern', 'LU']
     end
 
+    # `?filter=konzerte` is server-rendered and keeps only live concerts (the
+    # unfiltered programme mixes in quiz nights, public-viewings, e-sports, etc.),
+    # so the music filter is done by URL — no per-event detail fetch needed. Club
+    # /DJ nights live under a separate `?filter=club` view (not included here).
     def self.url
-      URI.parse('https://www.treibhausluzern.ch/programm')
+      URI.parse('https://www.treibhausluzern.ch/programm?filter=konzerte')
     end
 
     def event_rows

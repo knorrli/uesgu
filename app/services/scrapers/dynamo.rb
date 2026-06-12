@@ -61,7 +61,9 @@ module Scrapers
       row.dig('attributes', 'field_title').to_s.squish
     end
 
-    def event_consumption_genres(row)
+    # Genres come from a fixed Drupal taxonomy (stable term ids → known names) — a
+    # clean structured source, so allowed to mint taxonomy (discovery).
+    def event_genres(row)
       category_tids(row).filter_map { |tid| GENRE_BY_TID[tid] }
     end
 

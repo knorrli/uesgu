@@ -49,9 +49,10 @@ module Scrapers
       row.dig('rf_event', 'subtitle').to_s.squish.presence
     end
 
-    # The venue exposes a fine genre facet (`tags`) but it is empty for current
-    # concerts; read it match-only so it works if they start populating it.
-    def event_consumption_genres(row)
+    # Fine genre facet (`tags`, a structured {id,name,slug} field) — clean by
+    # construction, so allowed to mint taxonomy (discovery). Empty for current
+    # concerts, so this is dormant until they populate it.
+    def event_genres(row)
       Array(row.dig('rf_event', 'tags')).map { |t| (t.is_a?(Hash) ? t['name'] : t).to_s.squish }.compact_blank
     end
   end

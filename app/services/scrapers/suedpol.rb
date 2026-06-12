@@ -11,7 +11,7 @@ module Scrapers
     end
 
     def self.locations
-      [location, 'Luzern', 'LU']
+      [location, 'Kriens', 'LU']
     end
 
     # Music category term ids: Konzert=4, Club=13, Sound=63.

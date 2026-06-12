@@ -57,11 +57,9 @@ module Scrapers
     end
 
     # The endpoint's `genres` is a curated, closed vocabulary maintained by the
-    # collective. It is clean enough to qualify as discovery, but as a freshly
-    # added, unvetted source we attach it match-only so it can't mint taxonomy from
-    # another venue's vocabulary (see scraper_review.md — flip to event_genres if
-    # you want it to seed new genres).
-    def event_consumption_genres(row)
+    # collective (with stable numeric genreIds) — a clean structured field, so it
+    # is allowed to mint taxonomy (discovery).
+    def event_genres(row)
       Array(row['genres']).map { |g| g.to_s.squish }.compact_blank
     end
 

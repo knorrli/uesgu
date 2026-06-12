@@ -5,12 +5,21 @@
 
 > **How "wiring up" works here — please read.** Scrapers self-register via `Registerable#inherited`, so simply *existing* in `app/services/scrapers/` enrolls them in the nightly sweep (`scrapers:run_all`). Nothing runs while this branch is unmerged. **Merging `auto-scrapers` → `main` is the wiring step** — at that point every venue below goes live in the daily Render cron. To activate only a subset, delete the scrapers you don't want before merging. I did **not** run any scraper against the database.
 
-## Decisions I need from you (everything else is just "looks good?")
+## Decisions — all resolved ✅
 
-1. **Turnhalle is ambiguous** — there's no Turnhalle site. Its concerts are booked by **bee-flat** (music-only, what I scraped) but the **PROGR house agenda** lists all Turnhalle events incl. football screenings & theatre. I went with bee-flat. OK, or do you want the PROGR agenda instead? (details below)
-2. **Genre minting:** all new JSON venues with clean genre fields (Le Singe, Bar 59, Südpol, Rote Fabrik, Dynamo) are wired as **consumption** (match-only — they can't add new genres to your curated vocabulary). If you'd rather a clean source *seed* taxonomy, say which and I'll flip it to discovery (one-line change). My default follows your taxonomy-hygiene "new sources → consumption" rule.
-3. **Südpol location** is declared `['Südpol', 'Luzern', 'LU']` though it's physically in Kriens. Keep "Luzern" (matches your grouping) or change to "Kriens"?
-4. **Mascotte (Zürich) deferred** — it's a two-step JSONP feed that's empty right now (summer break till 06.08). I can build it but couldn't validate it tonight. Want it?
+1. **Turnhalle** → keep **bee-flat** sourcing (music-only). ✓
+2. **Genre minting** → applied your rule (clean structured tags ⇒ may create; else consumption-only):
+   - **Create (discovery):** Le Singe (curated genre array + ids), Dynamo (Drupal taxonomy tids), Rote Fabrik (structured `tags` facet, dormant until populated).
+   - **Consumption-only:** Bar 59 (free-text string), Südpol (messy ACF `tags`).
+   - The other 9 expose no genre field → moot.
+3. **Südpol** → location changed to **`['Südpol', 'Kriens', 'LU']`**. ✓
+4. **Mascotte** → **dropped** for now (no code was ever written; revisit later).
+
+### Still worth a glance before merge (heads-ups, not blockers)
+- **Treibhaus** scrapes the whole programme incl. non-concerts (quiz nights) — concert-only filtering needs a per-event detail fetch; say the word.
+- **Bar 59** includes "Sommerpause" placeholder entries — filter them out?
+- **Volkshaus** `genre-musik` is coarse — swept in one comedy show (Daniel Sloss).
+- **Helsinki** titles are free-text and occasionally run words together.
 
 ---
 
@@ -21,18 +30,17 @@
 | Dampfzentrale | Bern | HTML (homepage) | 23→23 | ✅ |
 | Sous Soul | Bern | HTML + detail | 34→34 | ✅ |
 | Zent | Bern | HTML | 0→0 | ✅ empty now¹ |
-| Turnhalle | Bern | HTML (bee-flat) | 5→5 | ⚠️ source choice |
+| Turnhalle | Bern | HTML (bee-flat) | 5→5 | ✅ |
 | Le Singe | Biel | **JSON** | 40→40 | ✅ |
 | Treibhaus | Luzern | HTML | 22→22 | ⚠️ no concert filter |
 | Neubad | Luzern | HTML + detail | 60→11 | ✅ (music-filtered) |
 | Bar 59 | Luzern | **JSON** (Firestore) | 37→37 | ⚠️ placeholders |
-| Südpol | Luzern | **JSON** (WP API) | 16→16 | ✅ (music-filtered) |
+| Südpol | Kriens | **JSON** (WP API) | 16→16 | ✅ (music-filtered) |
 | Kaserne | Basel | HTML | 5→5 | ✅ |
 | Volkshaus | Basel | HTML | 20→6 | ⚠️ comedy in "musik" |
 | Rote Fabrik | Zürich | **JSON** | 13→13 | ✅ (music-filtered) |
 | Dynamo | Zürich | **JSON** (Drupal) | 50→44 | ✅ (music-filtered) |
 | Helsinki Klub | Zürich | HTML | 22→14 | ⚠️ messy titles |
-| ~~Mascotte~~ | Zürich | JSONP | — | ⏸ deferred |
 
 ¹ Zent's upcoming page is genuinely empty right now; I validated the selectors against its 85-event archive (parse clean, dates correct). It'll populate when they schedule shows.
 
@@ -60,14 +68,13 @@
 - **Source:** `https://restaurant-zent.ch/kulturprogramm` (the music side of the bimano complex; **not** bimano.ch).
 - **Notes:** clean `<time>DD.MM.YYYY</time>` with year. No start time (German prose only) → defaults to date midnight. No genres. Validated against `/kulturprogramm/archiv` (85 rows parse correctly).
 
-### ⚠️ Turnhalle — Bern · `turnhalle.rb`  *(needs your call — decision #1)*
-- **Source I chose:** bee-flat `https://www.bee-flat.ch/programm/aktuell/`, filtered to rows whose date block names "Turnhalle". Music-only, 5 upcoming.
-- **Alternative:** PROGR agenda `progr.ch/de/agenda` has cleaner ISO dates + year and a `span.venues` filter, **but** includes non-music Turnhalle events (football screenings etc.). Tell me which you want.
+### ✅ Turnhalle — Bern · `turnhalle.rb`  *(bee-flat, confirmed)*
+- **Source:** bee-flat `https://www.bee-flat.ch/programm/aktuell/`, filtered to rows whose date block names "Turnhalle". Music-only, 5 upcoming.
 - **Notes:** bee-flat dates have no year → inferred (next-occurrence). **Sample:** `2026-10-10 20:30 · Mammal Hands`
 
 ### ✅ Le Singe — Biel · `le_singe.rb`  *(JSON)*
 - **Source:** KartellCulturel `getEvents?…&location=1` JSON, paginated by `offset`. Clean ISO dates + curated genre arrays. Biel is canton BE.
-- **Notes:** genres wired **consumption** (decision #2). **Sample:** `2026-06-14 17:00 · Milonga · genres: Dance`
+- **Notes:** genres wired **discovery** (clean structured array + ids — may create taxonomy). **Sample:** `2026-06-14 17:00 · Milonga · genres: Dance`
 
 ### ⚠️ Treibhaus — Luzern · `treibhaus.rb`  *(verify scope)*
 - **Source:** `https://www.treibhausluzern.ch/programm`. German "Monat TT, JJJJ" in `<time datetime>` (year present); real time from the adjacent span.
@@ -82,9 +89,9 @@
 - **Heads-up:** (a) the collection includes summer-break **placeholder** entries titled "Sommerpause" — they'll appear as events; want them filtered? (b) no per-event page exists → events keyed on a synthetic `…/#event-<id>` URL. (c) relies on Firestore staying open-read (it is today). Genres are comma-split free text → consumption.
 - **Sample:** `2026-06-12 20:00 · B59 Latin Groove · genres: Salsa, Bachata, Reggaeton`
 
-### ✅ Südpol — Luzern · `suedpol.rb`  *(JSON, music-filtered)*
+### ✅ Südpol — Kriens · `suedpol.rb`  *(JSON, music-filtered)*
 - **Source:** headless-WordPress REST `cms.sudpol.ch/?rest_route=/wp/v2/events&categories=4,13,63` (Konzert/Club/Sound). The Nuxt site itself is unscrapable. WP can only sort by *post* date, so I page all music events and filter on the ACF event timestamp → upcoming only (16).
-- **Notes:** location declared "Luzern" (decision #3). Genres from ACF `tags` (consumption). **Sample:** `2026-06-12 23:00 · PLH · genres: Rap, Hip-Hop`
+- **Notes:** location `['Südpol', 'Kriens', 'LU']`. Genres from ACF `tags` — **consumption** (the field mixes real genres with promo prose). **Sample:** `2026-06-12 23:00 · PLH · genres: Rap, Hip-Hop`
 
 ### ✅ Kaserne — Basel · `kaserne.rb`
 - **Source:** `https://kaserne-basel.ch/de` (SvelteKit SSR). Filters `details.concert-type` (the venue also does dance/discourse). Title/ISO-date/time pulled from the `<add-to-calendar-button>` attributes (the visible title is an image).
@@ -96,10 +103,10 @@
 
 ### ✅ Rote Fabrik — Zürich · `rote_fabrik.rb`  *(JSON, music-filtered)*
 - **Source:** `https://kalender.rotefabrik.ch/api/events?categories=konzert` (clean public JSON; the site is a Vue SPA). 13 concerts, ISO dates + times.
-- **Notes:** genre `tags` facet exists but is empty for current concerts (wired consumption for when they populate it). **Sample:** `2026-06-23 19:00 · SUNN O))) · Support: Natasha Grujović…`
+- **Notes:** genre `tags` facet (structured) is empty for current concerts → wired **discovery**, dormant until they populate it. **Sample:** `2026-06-23 19:00 · SUNN O))) · Support: Natasha Grujović…`
 
 ### ✅ Dynamo — Zürich · `dynamo.rb`  *(JSON, music-filtered)*
-- **Source:** Drupal/NodeHive JSON:API `dynamo.nodehive.app/jsonapi/node/event`, date-filtered server-side; keeps `Konzert`-tagged events (50→44) and maps the finer category tids to genres (Metal/Hip-Hop/Elektro/…), consumption.
+- **Source:** Drupal/NodeHive JSON:API `dynamo.nodehive.app/jsonapi/node/event`, date-filtered server-side; keeps `Konzert`-tagged events (50→44) and maps the finer category tids to genres (Metal/Hip-Hop/Elektro/…) — **discovery** (fixed taxonomy).
 - **Sample:** `2026-06-14 19:00 · Siyhakal + Grotto + Defused · genres: Hardcore/Punk`
 
 ### ⚠️ Helsinki Klub — Zürich · `helsinki.rb`  *(verify titles)*
@@ -107,16 +114,12 @@
 - **Heads-up:** titles are free-text and occasionally run words together (e.g. "LIZARD & the DEERlive recording"). No genres, no per-event URL (keyed on block id). Functional but the messiest of the batch.
 - **Sample:** `2026-06-12 20:30 · Dino Brandão · + Shanice the Radish…`
 
-### ⏸ Mascotte — Zürich — *deferred, decision #4*
-- Rebranded to **Palais Mascotte**; events come from the **Nunight** platform via two-step JSONP (`event_widget_all_public` → ids, then `event_widget_single` per id, needs a `Referer` header). Currently only a "SOMMERPAUSE bis 06.08" placeholder, so I couldn't validate parsing. Ready to build on your word.
-
 ---
 
 ## When you're ready
-Tell me which venues are 👍 (and your calls on decisions #1–#4). Then I'll:
-1. apply any tweaks (concert filters, location strings, genre source, drop placeholders),
+Decisions are all settled and applied. Remaining to ship:
+1. apply any of the 4 optional heads-up tweaks above (concert filters, drop placeholders) if you want them,
 2. capture golden fixtures + tests for the keepers,
-3. delete any you don't want,
-4. and it's ready to merge → live on the next nightly sweep.
+3. then it's ready to merge → live on the next nightly sweep.
 
 Nothing is pushed or in the database. The dry-run JSON for every venue is in `tmp/dry_run/`.

@@ -61,7 +61,14 @@ module Scrapers
     end
 
     def event_genres(content)
-      content.css('.event_detail_header .event_title_info').text.split(/,|\s-\s|\s[au]nd\s/).compact_blank.map(&:squish)
+      # `event_title_info` is a structured "<event type> - <comma-separated genres>"
+      # field (e.g. "Konzert - Psychedelia, Funk, Jazz-Fusion"). Drop the leading
+      # type segment so "Konzert"/"Party" don't pollute the genre taxonomy, then
+      # split the remainder. Genres use non-spaced hyphens ("Jazz-Fusion"), so the
+      # spaced "\s-\s" only ever matches the type separator.
+      info = content.css('.event_detail_header .event_title_info').text.squish
+      genres = info[/\s-\s(.+)\z/, 1].to_s
+      genres.split(/,|\s[au]nd\s/).map(&:squish).compact_blank
     end
 
     private

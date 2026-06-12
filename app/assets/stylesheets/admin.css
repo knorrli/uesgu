@@ -1,3 +1,65 @@
+/* A section heading that doubles as a link to its management page. Keeps the
+   heading's normal colour (so it doesn't read as body-text link) and reveals a
+   trailing arrow + underline on hover/focus to signal it's clickable. */
+.heading-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.heading-link::after {
+  content: "\2192"; /* → */
+  margin-left: var(--gap-xsmall);
+  color: var(--theme-fg-muted);
+  opacity: 0;
+  transition: opacity 0.1s ease;
+}
+
+.heading-link:hover,
+.heading-link:focus-visible {
+  text-decoration: underline;
+}
+
+.heading-link:hover::after,
+.heading-link:focus-visible::after {
+  opacity: 1;
+}
+
+/* A dashboard stat whose label links to its catalogue (Events / Styles /
+   Locations → their index). Keeps the label in body colour and only underlines
+   on hover/focus, so the row still reads as a figure, not a link list. */
+.stat-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.stat-link:hover,
+.stat-link:focus-visible {
+  text-decoration: underline;
+}
+
+/* Shared chrome for the read-only catalogue browsers (admin events / styles /
+   locations), lifted from the genres index so the three feel identical. */
+.catalogue-filters .filter-divider {
+  align-self: center;
+  height: 1.2em;
+  border-left: var(--border-width) solid var(--theme-fg-muted);
+  margin-inline: var(--gap-xsmall);
+}
+
+.catalogue-sort-option {
+  text-decoration: none;
+}
+
+.catalogue-sort-option.active {
+  color: var(--theme-fg-color);
+  font-weight: bold;
+}
+
+/* The ×N usage figure trailing a catalogue row's name. */
+.catalogue-count {
+  font-variant-numeric: tabular-nums;
+}
+
 /* Stat rows on the admin dashboard: label and figure joined by a dotted leader
    so the eye can follow a row across the width to its number. */
 .stat {
@@ -111,6 +173,9 @@
 /* Status pill: ok = green, empty (ran but wrote nothing) = amber, failed = red. */
 .scrape-badge {
   display: inline-block;
+  /* Centre the pill against adjacent text instead of letting its padded box
+     sit on the text baseline (which makes it ride high next to the run date). */
+  vertical-align: middle;
   padding: 0 var(--gap-xsmall);
   border-radius: 3px;
   font-size: var(--font-size-small);

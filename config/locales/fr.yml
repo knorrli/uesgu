@@ -142,20 +142,15 @@ fr:
     back: "← Admin"
     index:
       title: Admin
-      assign_unassigned_genres: Assigner les genres
-      browse_genres: Tout parcourir
       assigned: Assignés
       unassigned: Non assignés
       ignored: Ignorés
       scrapers_heading: Scrapers
       last_scrape: Dernier passage
       no_scrapes: Aucun passage de scraper pour l'instant.
-      manage_scrapers: Voir les passages
       accounts_heading: Comptes et invitations
       users: Comptes
       open_invitations: Invitations ouvertes
-      manage_users: Gérer les comptes
-      manage_invitations: Gérer les invitations
     unknown: inconnu
     scrape_runs:
       status:
@@ -244,6 +239,49 @@ fr:
         revoke_confirm: Révoquer cette invitation ?
         redeemed_by: "Utilisé par %{username} le %{date}"
         empty: Aucune invitation pour l'instant.
+    events:
+      index:
+        title: Événements
+        status_all: Tous
+        status_visible: Visibles
+        status_hidden: Masqués
+        status_cancelled: Annulés
+        search: Rechercher des événements…
+        sort_by: Trier par
+        sort_date: date
+        sort_title: titre
+        cancelled_badge: annulé
+        hidden_badge: masqué
+        empty: Aucun événement correspondant.
+    styles:
+      index:
+        title: Styles
+        status_all: Tous
+        status_assigned: Assignés
+        status_unassigned: Non assignés
+        search: Rechercher des styles…
+        sort_by: Trier par
+        sort_name: nom
+        sort_count: usage
+        usage:
+          one: marque 1 événement
+          other: marque %{count} événements
+        genre_count:
+          one: associé par 1 genre
+          other: associé par %{count} genres
+        empty: Aucun style correspondant.
+    locations:
+      index:
+        title: Lieux
+        type_all: Tous
+        type_venue: Lieu
+        type_city: Ville
+        type_canton: Canton
+        search: Rechercher des lieux…
+        sort_by: Trier par
+        sort_name: nom
+        sort_count: usage
+        empty: Aucun lieu correspondant.
   activemodel:
     models:
       genre:

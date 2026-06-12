@@ -3,53 +3,49 @@
 
   <dl class="flex flex-col gap-small">
     <div class="stat">
-      <dt><%= Event.model_name.human(count: :many) %></dt>
+      <dt><%= link_to Event.model_name.human(count: :many), admin_events_path, class: 'stat-link' %></dt>
       <span class="stat__leader"></span>
       <dd class="muted"><%= Event.count %></dd>
     </div>
     <div class="stat">
-      <dt><%= Style.model_name.human(count: :many) %></dt>
+      <dt><%= link_to Style.model_name.human(count: :many), admin_styles_path, class: 'stat-link' %></dt>
       <span class="stat__leader"></span>
       <dd class="muted"><%= Style.count %></dd>
     </div>
     <div class="stat">
-      <dt><%= Location.model_name.human(count: :many) %></dt>
+      <dt><%= link_to Location.model_name.human(count: :many), admin_locations_path, class: 'stat-link' %></dt>
       <span class="stat__leader"></span>
       <dd class="muted"><%= @event_tag_stats.location_tags.count %></dd>
     </div>
   </dl>
 
   <section class="flex flex-col gap-small">
-    <h2><%= Genre.model_name.human(count: :many) %> <span class="muted"><%= @event_tag_stats.genre_tags.count %></span></h2>
+    <h2><%= link_to Genre.model_name.human(count: :many), genres_path, class: 'heading-link' %> <span class="muted"><%= @event_tag_stats.genre_tags.count %></span></h2>
     <dl class="flex flex-col gap-small">
       <div class="stat">
-        <dt><%= t('.assigned') %></dt>
+        <dt><%= link_to t('.assigned'), genres_path(status: 'assigned'), class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
         <dd class="muted"><%= @event_tag_stats.assigned_genre_tags.count %></dd>
       </div>
       <div class="stat">
-        <dt><%= t('.unassigned') %></dt>
+        <dt><%= link_to t('.unassigned'), genres_path(status: 'unassigned'), class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
         <dd class="muted"><%= @event_tag_stats.unassigned_genre_tags.count %></dd>
       </div>
       <div class="stat">
-        <dt><%= t('.ignored') %></dt>
+        <dt><%= link_to t('.ignored'), genres_path(status: 'ignored'), class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
         <dd class="muted"><%= @event_tag_stats.ignored_genre_tags.count %></dd>
       </div>
     </dl>
-    <div class="flex gap-medium wrap">
-      <%= link_to t('.assign_unassigned_genres'), queue_genres_path %>
-      <%= link_to t('.browse_genres'), genres_path %>
-    </div>
   </section>
 
   <section class="flex flex-col gap-small">
-    <h2><%= t('.scrapers_heading') %></h2>
+    <h2><%= link_to t('.scrapers_heading'), admin_scrape_runs_path, class: 'heading-link' %></h2>
     <% if @latest_scrape_run %>
       <dl class="flex flex-col gap-small">
         <div class="stat">
-          <dt><%= t('.last_scrape') %></dt>
+          <dt><%= link_to t('.last_scrape'), admin_scrape_run_path(@latest_scrape_run), class: 'stat-link' %></dt>
           <span class="stat__leader"></span>
           <dd class="muted">
             <%= l(@latest_scrape_run.started_at) %>
@@ -60,28 +56,21 @@
     <% else %>
       <p class="muted"><%= t('.no_scrapes') %></p>
     <% end %>
-    <div class="flex gap-medium wrap">
-      <%= link_to t('.manage_scrapers'), admin_scrape_runs_path %>
-    </div>
   </section>
 
   <section class="flex flex-col gap-small">
-    <h2><%= t('.accounts_heading') %></h2>
+    <h2><%= link_to t('.accounts_heading'), admin_users_path, class: 'heading-link' %></h2>
     <dl class="flex flex-col gap-small">
       <div class="stat">
-        <dt><%= t('.users') %></dt>
+        <dt><%= link_to t('.users'), admin_users_path, class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
         <dd class="muted"><%= User.count %></dd>
       </div>
       <div class="stat">
-        <dt><%= t('.open_invitations') %></dt>
+        <dt><%= link_to t('.open_invitations'), admin_invitations_path, class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
         <dd class="muted"><%= Invitation.available.count %></dd>
       </div>
     </dl>
-    <div class="flex gap-medium wrap">
-      <%= link_to t('.manage_users'), admin_users_path %>
-      <%= link_to t('.manage_invitations'), admin_invitations_path %>
-    </div>
   </section>
 </div>

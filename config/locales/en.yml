@@ -142,20 +142,15 @@ en:
     back: "← Admin"
     index:
       title: Admin
-      assign_unassigned_genres: Assign genres
-      browse_genres: Browse all
       assigned: Assigned
       unassigned: Unassigned
       ignored: Ignored
       scrapers_heading: Scrapers
       last_scrape: Last run
       no_scrapes: No scraper runs yet.
-      manage_scrapers: View scraper runs
       accounts_heading: Accounts & invitations
       users: Accounts
       open_invitations: Open invitations
-      manage_users: Manage accounts
-      manage_invitations: Manage invitations
     unknown: unknown
     scrape_runs:
       status:
@@ -244,6 +239,49 @@ en:
         revoke_confirm: Revoke this invitation?
         redeemed_by: "Redeemed by %{username} on %{date}"
         empty: No invitations yet.
+    events:
+      index:
+        title: Events
+        status_all: All
+        status_visible: Visible
+        status_hidden: Hidden
+        status_cancelled: Cancelled
+        search: Search events…
+        sort_by: Sort by
+        sort_date: date
+        sort_title: title
+        cancelled_badge: cancelled
+        hidden_badge: hidden
+        empty: No events match.
+    styles:
+      index:
+        title: Styles
+        status_all: All
+        status_assigned: Assigned
+        status_unassigned: Unassigned
+        search: Search styles…
+        sort_by: Sort by
+        sort_name: name
+        sort_count: usage
+        usage:
+          one: tags 1 event
+          other: tags %{count} events
+        genre_count:
+          one: mapped by 1 genre
+          other: mapped by %{count} genres
+        empty: No styles match.
+    locations:
+      index:
+        title: Locations
+        type_all: All
+        type_venue: Venue
+        type_city: City
+        type_canton: Canton
+        search: Search locations…
+        sort_by: Sort by
+        sort_name: name
+        sort_count: usage
+        empty: No locations match.
   activemodel:
     models:
       genre:

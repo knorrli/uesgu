@@ -1,0 +1,51 @@
+<div class="flex flex-col gap-large">
+  <%= render 'admin/back' %>
+  <h1><%= t('.title') %> <span class="muted"><%= @styles.total_count %></span></h1>
+
+  <div class="flex gap-small wrap align-baseline catalogue-filters">
+    <% %w[all assigned unassigned].each do |status| %>
+      <%= link_to t(".status_#{status}"),
+            admin_styles_path(status: (status == 'all' ? nil : status), q: params[:q].presence, sort: params[:sort].presence),
+            class: class_names(:tag, active: @status == status) %>
+    <% end %>
+  </div>
+
+  <%= form_with url: admin_styles_path, method: :get, data: { turbo_frame: '_top' } do %>
+    <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+    <div class="input-wrapper flex">
+      <%= text_field_tag :q, params[:q], placeholder: t('.search'), autocomplete: 'off' %>
+    </div>
+  <% end %>
+
+  <div class="flex gap-small align-baseline muted catalogue-sort">
+    <span><%= t('.sort_by') %></span>
+    <% %w[name count].each do |sort| %>
+      <%= link_to t(".sort_#{sort}"),
+            admin_styles_path(status: params[:status].presence, q: params[:q].presence, sort: sort),
+            class: class_names('catalogue-sort-option', active: @sort == sort) %>
+    <% end %>
+  </div>
+
+  <% if @styles.any? %>
+    <div class="flex flex-col gap-small">
+      <% @styles.each do |style| %>
+        <div class="flex align-baseline gap-medium wrap catalogue-row">
+          <%= link_to style.name, events_path(s: [style.name]) %>
+          <span class="muted catalogue-count" title="<%= t('.usage', count: @usage[style.name].to_i) %>"><%= @usage[style.name].to_i %>&times;</span>
+          <div class="flex gap-small wrap align-baseline">
+            <% if style.genres.any? %>
+              <span class="muted"><%= t('.genre_count', count: style.genres.size) %></span>
+            <% else %>
+              <span class="muted"><%= t('.status_unassigned') %></span>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex justify-center"><%= paginate @styles %></div>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

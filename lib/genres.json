@@ -58,7 +58,6 @@
     "otacore",
     "arab pop",
     "girl group",
-    "meme",
     "gen z singer-songwriter",
     "afropop",
     "k-pop boy group",
@@ -185,7 +184,6 @@
     "taiwan singer-songwriter",
     "bubblegum dance",
     "dark pop",
-    "acoustic cover",
     "synthwave",
     "p-pop",
     "j-acoustic",
@@ -1634,7 +1632,6 @@
     "post-metal",
     "american metalcore",
     "folk metal",
-    "metal cover",
     "symphonic power metal",
     "drone metal",
     "finnish metal",
@@ -2174,7 +2171,6 @@
     "stenchcore",
     "african metal",
     "portuguese death metal",
-    "1-a-grind",
     "death metal melodic",
     "doom",
     "doom rock",
@@ -2184,8 +2180,7 @@
     "metal industriel",
     "modern metal",
     "shamanic doom",
-    "sludge",
-    "space grind"
+    "sludge"
   ],
   "Electronic": [
     "electronic",
@@ -2717,12 +2712,10 @@
     "instrumental lullaby",
     "calming instrumental",
     "sleep",
-    "healing hz",
     "background music",
     "ocean",
     "binaural",
     "environmental",
-    "high vibe",
     "focus",
     "lullaby",
     "instrumental worship",
@@ -2756,7 +2749,6 @@
     "fourth world",
     "healing",
     "shush",
-    "solfeggio product",
     "instrumental acoustic guitar",
     "chill out",
     "lds",
@@ -2770,7 +2762,6 @@
     "ebm",
     "drift",
     "psychill",
-    "528hz",
     "pet calming",
     "steampunk",
     "fingerstyle",
@@ -2793,7 +2784,6 @@
     "sound effects",
     "dub techno",
     "ethereal wave",
-    "subliminal product",
     "musicas espiritas",
     "psalmen",
     "chant religieux",
@@ -3390,8 +3380,7 @@
     "vapor trap",
     "dungeon rap",
     "marathi hip hop",
-    "witch rap",
-    "empowering rap"
+    "witch rap"
   ],
   "Soul & R&B": [
     "r&b",
@@ -3509,7 +3498,6 @@
     "deep smooth r&b",
     "language",
     "deep southern soul",
-    "covers von funk",
     "urban"
   ],
   "Reggae & Ska": [
@@ -3807,7 +3795,6 @@
     "trad jazz catala",
     "salon music",
     "big band jazz",
-    "hot club",
     "hard swing",
     "mainstream jazz"
   ],
@@ -4471,7 +4458,6 @@
     "trap boricua",
     "modern salsa",
     "salsa colombiana",
-    "jazz cover",
     "cumbia santafesina",
     "salsa puertorriquena",
     "rap chileno",
@@ -4953,10 +4939,8 @@
     "folclore tucumano",
     "baile",
     "global perreo",
-    "latinclub",
     "música popular brasileira",
-    "perreorave",
-    "salsa namá"
+    "perreorave"
   ],
   "Classical": [
     "classical",
@@ -5368,7 +5352,6 @@
     "old west",
     "west end",
     "marimba orquesta",
-    "man's orchestra",
     "german soundtrack",
     "oceania soundtrack",
     "library music",

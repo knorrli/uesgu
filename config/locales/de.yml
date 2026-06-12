@@ -44,6 +44,12 @@ de:
     welcome: Willkommen bei üsgu!
     account_deleted: Dein Konto wurde gelöscht.
     invalid_invite: Dieser Einladungscode ist ungültig oder wurde bereits verwendet.
+  push:
+    digest:
+      title: Neue Veranstaltungen auf üsgu
+      body:
+        one: 1 neue Veranstaltung passt zu deinen Favoriten.
+        other: "%{count} neue Veranstaltungen passen zu deinen Favoriten."
   frequencies:
     daily: Täglich
     weekly: Wöchentlich
@@ -82,6 +88,18 @@ de:
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
     save: Einstellungen speichern
+    install_heading: Als App installieren
+    install_hint: Füge üsgu zum Startbildschirm hinzu — für Schnellzugriff und Mitteilungen.
+    install_button: App installieren
+    install_ios_hint: 'Auf iPhone/iPad: Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.'
+    push_heading: Mitteilungen auf diesem Gerät
+    push_hint: Erhalte auf diesem Gerät eine Mitteilung, wenn neue Veranstaltungen zu deinen Favoriten passen. Nutzt die oben gewählte Häufigkeit.
+    push_enable: Auf diesem Gerät aktivieren
+    push_disable: Auf diesem Gerät deaktivieren
+    push_status_on: Mitteilungen sind auf diesem Gerät aktiviert.
+    push_status_off: Mitteilungen sind auf diesem Gerät deaktiviert.
+    push_status_denied: Dein Browser blockiert Mitteilungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
+    push_unsupported: Dieser Browser unterstützt keine Push-Mitteilungen.
     delete_account_heading: Konto löschen
     delete_account_hint: Entfernt dein Konto und deine Favoriten endgültig.
     delete_account: Mein Konto löschen

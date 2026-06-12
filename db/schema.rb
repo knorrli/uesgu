@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_12_150000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_12_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -85,6 +85,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_12_150000) do
     t.index ["user_id", "period_end"], name: "index_notifications_on_user_id_and_period_end"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "push_subscriptions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "endpoint", null: false
+    t.string "p256dh_key", null: false
+    t.string "auth_key", null: false
+    t.string "user_agent"
+    t.datetime "last_pushed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
   end
 
   create_table "scrape_results", force: :cascade do |t|
@@ -188,6 +201,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_12_150000) do
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
   add_foreign_key "notifications", "users"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "scrape_results", "scrape_runs", on_delete: :cascade
   add_foreign_key "sessions", "users"
   add_foreign_key "taggings", "tags"

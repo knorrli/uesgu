@@ -44,6 +44,12 @@ en:
     welcome: Welcome to üsgu!
     account_deleted: Your account was deleted.
     invalid_invite: This invitation code is invalid or has already been used.
+  push:
+    digest:
+      title: New events on üsgu
+      body:
+        one: 1 new event matches your favorites.
+        other: "%{count} new events match your favorites."
   frequencies:
     daily: Daily
     weekly: Weekly
@@ -82,6 +88,18 @@ en:
     new_password: New password
     confirm_new_password: Confirm new password
     save: Save settings
+    install_heading: Install as app
+    install_hint: Add üsgu to your home screen for one-tap access and notifications.
+    install_button: Install app
+    install_ios_hint: 'On iPhone/iPad: tap the Share button, then “Add to Home Screen”.'
+    push_heading: Notifications on this device
+    push_hint: Get a notification on this device when new events match your favorites. Uses the frequency you set above.
+    push_enable: Enable on this device
+    push_disable: Disable on this device
+    push_status_on: Notifications are on for this device.
+    push_status_off: Notifications are off for this device.
+    push_status_denied: Your browser is blocking notifications. Allow them in your browser settings to turn this on.
+    push_unsupported: This browser doesn’t support push notifications.
     delete_account_heading: Delete account
     delete_account_hint: This permanently removes your account and favorites.
     delete_account: Delete my account

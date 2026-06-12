@@ -15,9 +15,10 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get 'up' => 'rails/health#show', as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+  # Render dynamic PWA files from app/views/pwa/* (manifest is linked in the
+  # layout head; the service worker is registered in application.js).
+  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
   root 'events#index'
@@ -30,6 +31,12 @@ Rails.application.routes.draw do
     post :toggle
   end
   resources :notifications, only: %i[index show]
+
+  # Web Push opt-in/out for the current device. Keyed by endpoint (in the body),
+  # not an id, so a singular-style pair of bare routes fits better than a
+  # resource collection.
+  post 'push_subscriptions' => 'push_subscriptions#create'
+  delete 'push_subscriptions' => 'push_subscriptions#destroy'
 
   resources :events, only: [:index, :destroy]
   resources :styles, only: [] do

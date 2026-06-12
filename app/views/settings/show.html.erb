@@ -42,6 +42,41 @@
     <%= form.submit t('settings.save') %>
   <% end %>
 
+  <%# Install the site as an app. The controller reveals the right affordance per
+      platform: a one-click button on Chrome/Android/desktop, an "Add to Home
+      Screen" hint on iOS, nothing once already installed. %>
+  <section class="flex flex-col gap-small" data-controller="install">
+    <h2><%= t('settings.install_heading') %></h2>
+    <p><%= t('settings.install_hint') %></p>
+    <button type="button" class="button" hidden
+            data-install-target="button" data-action="install#install">
+      <%= t('settings.install_button') %>
+    </button>
+    <p class="muted" hidden data-install-target="iosHint"><%= t('settings.install_ios_hint') %></p>
+  </section>
+
+  <%# Per-device push opt-in. Only shown when VAPID keys are configured; the
+      controller hides the button and shows the "unsupported" note on browsers
+      without the Push API. Cadence is the notification frequency set above. %>
+  <% if WebPushConfig.configured? %>
+    <section class="flex flex-col gap-small"
+             data-controller="push"
+             data-push-vapid-public-key-value="<%= WebPushConfig.public_key %>"
+             data-push-label-on-value="<%= t('settings.push_disable') %>"
+             data-push-label-off-value="<%= t('settings.push_enable') %>"
+             data-push-status-on-value="<%= t('settings.push_status_on') %>"
+             data-push-status-off-value="<%= t('settings.push_status_off') %>"
+             data-push-status-denied-value="<%= t('settings.push_status_denied') %>">
+      <h2><%= t('settings.push_heading') %></h2>
+      <p><%= t('settings.push_hint') %></p>
+      <p class="muted" data-push-target="status"><%= t('settings.push_status_off') %></p>
+      <button type="button" class="button" data-push-target="button" data-action="push#toggle">
+        <%= t('settings.push_enable') %>
+      </button>
+      <p class="muted" hidden data-push-target="unsupported"><%= t('settings.push_unsupported') %></p>
+    </section>
+  <% end %>
+
   <section class="flex flex-col gap-small">
     <h2><%= t('settings.delete_account_heading') %></h2>
     <p><%= t('settings.delete_account_hint') %></p>

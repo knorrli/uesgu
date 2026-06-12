@@ -44,6 +44,12 @@ fr:
     welcome: Bienvenue sur üsgu !
     account_deleted: Votre compte a été supprimé.
     invalid_invite: Ce code d'invitation est invalide ou a déjà été utilisé.
+  push:
+    digest:
+      title: Nouveaux événements sur üsgu
+      body:
+        one: 1 nouvel événement correspond à vos favoris.
+        other: "%{count} nouveaux événements correspondent à vos favoris."
   frequencies:
     daily: Quotidien
     weekly: Hebdomadaire
@@ -82,6 +88,18 @@ fr:
     new_password: Nouveau mot de passe
     confirm_new_password: Confirmer le nouveau mot de passe
     save: Enregistrer les paramètres
+    install_heading: Installer comme app
+    install_hint: Ajoutez üsgu à votre écran d'accueil pour un accès rapide et les notifications.
+    install_button: Installer l'app
+    install_ios_hint: 'Sur iPhone/iPad : touchez le bouton Partager, puis « Sur l''écran d''accueil ».'
+    push_heading: Notifications sur cet appareil
+    push_hint: Recevez une notification sur cet appareil quand de nouveaux événements correspondent à vos favoris. Utilise la fréquence définie ci-dessus.
+    push_enable: Activer sur cet appareil
+    push_disable: Désactiver sur cet appareil
+    push_status_on: Les notifications sont activées sur cet appareil.
+    push_status_off: Les notifications sont désactivées sur cet appareil.
+    push_status_denied: Votre navigateur bloque les notifications. Autorisez-les dans les paramètres du navigateur pour les activer.
+    push_unsupported: Ce navigateur ne prend pas en charge les notifications push.
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime définitivement votre compte et vos favoris.
     delete_account: Supprimer mon compte

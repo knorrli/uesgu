@@ -7,7 +7,11 @@ class GenerateNotificationsJob < ApplicationJob
 
   def perform
     User.find_each do |user|
-      Notification.generate_for(user)
+      created = Notification.generate_for(user)
+      # Fan the just-sealed digests out to the user's devices. Done here rather
+      # than inside generate_for so the lazy page-load path (which also calls
+      # generate_for) never triggers a push — only this background sweep does.
+      WebPushNotifier.deliver_digests(user, created) if created.any?
     end
   end
 end

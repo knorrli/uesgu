@@ -13,6 +13,8 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  # Web Push opt-ins, one per browser/device. Gone with the account.
+  has_many :push_subscriptions, dependent: :destroy
 
   # Invitations this user (an admin) minted. Gone with the account.
   has_many :sent_invitations, class_name: 'Invitation', foreign_key: :created_by_id, dependent: :destroy, inverse_of: :created_by

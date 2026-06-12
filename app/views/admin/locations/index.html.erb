@@ -1,0 +1,45 @@
+<div class="flex flex-col gap-large">
+  <%= render 'admin/back' %>
+  <h1><%= t('.title') %> <span class="muted"><%= @locations.total_count %></span></h1>
+
+  <div class="flex gap-small wrap align-baseline catalogue-filters">
+    <% %w[all venue city canton].each do |type| %>
+      <%= link_to t(".type_#{type}"),
+            admin_locations_path(type: (type == 'all' ? nil : type), q: params[:q].presence, sort: params[:sort].presence),
+            class: class_names(:tag, active: @type == type) %>
+    <% end %>
+  </div>
+
+  <%= form_with url: admin_locations_path, method: :get, data: { turbo_frame: '_top' } do %>
+    <%= hidden_field_tag :type, params[:type] if params[:type].present? %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+    <div class="input-wrapper flex">
+      <%= text_field_tag :q, params[:q], placeholder: t('.search'), autocomplete: 'off' %>
+    </div>
+  <% end %>
+
+  <div class="flex gap-small align-baseline muted catalogue-sort">
+    <span><%= t('.sort_by') %></span>
+    <% %w[name count].each do |sort| %>
+      <%= link_to t(".sort_#{sort}"),
+            admin_locations_path(type: params[:type].presence, q: params[:q].presence, sort: sort),
+            class: class_names('catalogue-sort-option', active: @sort == sort) %>
+    <% end %>
+  </div>
+
+  <% if @locations.any? %>
+    <div class="flex flex-col gap-small">
+      <% @locations.each do |loc| %>
+        <div class="flex align-baseline gap-medium wrap catalogue-row">
+          <%= link_to loc[:name], events_path(l: [loc[:name]]) %>
+          <span class="muted catalogue-count"><%= loc[:count] %>&times;</span>
+          <span class="tag"><%= t(".type_#{loc[:type]}") %></span>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex justify-center"><%= paginate @locations %></div>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

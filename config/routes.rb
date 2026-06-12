@@ -73,5 +73,14 @@ Rails.application.routes.draw do
     # Scraper run oversight: nightly sweep health + per-venue outcomes. create
     # triggers a full sweep on demand (runs in a background thread).
     resources :scrape_runs, only: %i[index show create]
+
+    # Read-only catalogue browsers reached from the dashboard stats: events
+    # (the scraped table), styles (the curated vocabulary), and locations
+    # (derived from the location tags). Each mirrors the genres index idiom —
+    # filter / sort / search / paginate. (Genres keep their own legacy scoped
+    # route above, with edit/queue actions these three don't need.)
+    resources :events, only: %i[index]
+    resources :styles, only: %i[index]
+    resources :locations, only: %i[index]
   end
 end

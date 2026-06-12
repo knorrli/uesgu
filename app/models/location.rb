@@ -34,6 +34,19 @@ class Location
     venue_names.include?(name.to_s)
   end
 
+  # Every location tag actually in use, as { name:, count:, type: } rows for the
+  # admin locations browser. Counts come from the taggings (a location has no
+  # table of its own); the type is the same scraper-derived classification as
+  # type_for. Tags that no event carries don't appear — this is "what's live".
+  def self.usage
+    ActsAsTaggableOn::Tagging
+      .where(context: 'locations', taggable_type: Event.name)
+      .joins(:tag)
+      .group('tags.name')
+      .count
+      .map { |name, count| { name: name, count: count, type: type_for(name) } }
+  end
+
   # Grouped tree for the favorites UI, derived from each scraper's locations array:
   #   { "BE" => { "Bern" => ["Dachstock", "Gaskessel", ...] }, ... }
   def self.hierarchy

@@ -1,0 +1,50 @@
+<div class="flex flex-col gap-large">
+  <%= render 'admin/back' %>
+  <h1><%= t('.title') %> <span class="muted"><%= @events.total_count %></span></h1>
+
+  <div class="flex gap-small wrap align-baseline catalogue-filters">
+    <% %w[all visible hidden cancelled].each do |status| %>
+      <%= link_to t(".status_#{status}"),
+            admin_events_path(status: (status == 'all' ? nil : status), q: params[:q].presence, sort: params[:sort].presence),
+            class: class_names(:tag, active: @status == status) %>
+    <% end %>
+  </div>
+
+  <%= form_with url: admin_events_path, method: :get, data: { turbo_frame: '_top' } do %>
+    <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+    <div class="input-wrapper flex">
+      <%= text_field_tag :q, params[:q], placeholder: t('.search'), autocomplete: 'off' %>
+    </div>
+  <% end %>
+
+  <div class="flex gap-small align-baseline muted catalogue-sort">
+    <span><%= t('.sort_by') %></span>
+    <% %w[date title].each do |sort| %>
+      <%= link_to t(".sort_#{sort}"),
+            admin_events_path(status: params[:status].presence, q: params[:q].presence, sort: sort),
+            class: class_names('catalogue-sort-option', active: @sort == sort) %>
+    <% end %>
+  </div>
+
+  <% if @events.any? %>
+    <div class="flex flex-col gap-small">
+      <% @events.each do |event| %>
+        <div class="flex align-baseline gap-medium wrap catalogue-row">
+          <span class="muted"><%= l(event.start_date) %></span>
+          <%= link_to event.title, event.url, target: '_blank', rel: 'noopener' %>
+          <div class="flex gap-small wrap align-baseline">
+            <% if event.venue %><span class="muted"><%= event.venue.name %></span><% end %>
+            <% event.styles.each do |style| %><span class="tag"><%= style.name %></span><% end %>
+            <% if event.cancelled? %><span class="tag"><%= t('.cancelled_badge') %></span><% end %>
+            <% if event.hidden? %><span class="muted"><%= t('.hidden_badge') %></span><% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex justify-center"><%= paginate @events %></div>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

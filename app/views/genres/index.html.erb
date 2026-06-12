@@ -5,10 +5,10 @@
     <%= link_to t('.queue_link'), queue_genres_path %>
   </div>
 
-  <%# Two groups: assignment status (all / unassigned / assigned), then the
+  <%# Two groups: assignment status (all / assigned / unassigned), then the
       parked dispositions (ignored / hidden / blocked) where Restore lives. %>
   <div class="flex gap-small wrap align-baseline genre-status-filters">
-    <% %w[all unassigned assigned].each do |status| %>
+    <% %w[all assigned unassigned].each do |status| %>
       <%= link_to t(".status_#{status}"),
             genres_path(status: (status == 'all' ? nil : status), q: params[:q].presence),
             class: class_names(:tag, active: @status == status) %>

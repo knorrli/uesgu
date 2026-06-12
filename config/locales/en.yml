@@ -286,9 +286,6 @@ en:
         empty: No locations match.
   activemodel:
     models:
-      genre:
-        one: Genre
-        other: Genres
       location:
         one: Location
         other: Locations
@@ -300,6 +297,9 @@ en:
       event:
         one: Event
         other: Events
+      genre:
+        one: Genre
+        other: Genres
       invitation:
         one: Invitation
         other: Invitations

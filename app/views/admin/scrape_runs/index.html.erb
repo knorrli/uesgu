@@ -1,0 +1,90 @@
+<div class="flex flex-col gap-large">
+  <%= render 'admin/back' %>
+
+  <div class="flex gap-medium wrap" style="align-items: baseline;">
+    <h1><%= t('.title') %></h1>
+    <% if @presenter.in_progress? %>
+      <span class="muted"><%= t('.in_progress') %></span>
+    <% else %>
+      <%= button_to t('.trigger'), admin_scrape_runs_path, class: 'button',
+            data: { turbo_confirm: t('.trigger_confirm') } %>
+    <% end %>
+  </div>
+
+  <% if (latest = @presenter.latest) %>
+    <section class="flex flex-col gap-small">
+      <h2 class="flex gap-small wrap">
+        <%= link_to l(latest.started_at), admin_scrape_run_path(latest) %>
+        <%= render 'admin/scrape_runs/run_badge', run: latest %>
+      </h2>
+      <p class="muted">
+        <%= t('.tally', total: latest.scrapers_total, ok: latest.scrapers_ok,
+                        empty: latest.scrapers_empty, failed: latest.scrapers_failed) %>
+        <% if latest.duration %> · <%= t('.took', seconds: latest.duration.round) %><% end %>
+      </p>
+
+      <div class="scrape-table-wrap">
+        <table class="scrape-table">
+          <thead>
+            <tr>
+              <th><%= t('.col.scraper') %></th>
+              <th><%= t('.col.status') %></th>
+              <th class="num"><%= t('.col.seen') %></th>
+              <th class="num"><%= t('.col.new') %></th>
+              <th class="num"><%= t('.col.updated') %></th>
+              <th class="num"><%= t('.col.skipped') %></th>
+              <th><%= t('.col.history') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @presenter.scrapers.each do |slug| %>
+              <% result = @presenter.latest_result(slug) %>
+              <tr>
+                <td><%= slug %></td>
+                <td><%= render 'admin/scrape_runs/status', result: result %></td>
+                <td class="num"><%= result&.rows_seen %></td>
+                <td class="num"><%= result&.created_count %></td>
+                <td class="num"><%= result&.updated_count %></td>
+                <td class="num"><%= result&.skipped_count %></td>
+                <td>
+                  <span class="scrape-history">
+                    <% @presenter.history(slug).each do |entry| %>
+                      <% if entry %>
+                        <%= link_to '', admin_scrape_run_path(entry.scrape_run),
+                              class: "scrape-dot scrape-dot--#{entry.status}",
+                              title: "#{l(entry.scrape_run.started_at)} · #{t("admin.scrape_runs.status.#{entry.status}")}" %>
+                      <% else %>
+                        <span class="scrape-dot scrape-dot--none"></span>
+                      <% end %>
+                    <% end %>
+                  </span>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.recent_runs') %></h2>
+      <ul class="admin-list">
+        <% @presenter.runs.each do |run| %>
+          <li class="admin-row">
+            <span class="admin-row__main">
+              <%= link_to l(run.started_at), admin_scrape_run_path(run) %>
+              <%= render 'admin/scrape_runs/run_badge', run: run %>
+            </span>
+            <span class="stat__leader"></span>
+            <span class="admin-row__meta muted">
+              <%= t('.counts', new: run.scrape_results.sum(&:created_count),
+                               updated: run.scrape_results.sum(&:updated_count)) %>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

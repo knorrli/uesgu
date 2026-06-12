@@ -147,15 +147,52 @@ en:
       assigned: Assigned
       unassigned: Unassigned
       ignored: Ignored
-      jobs_heading: Jobs
-      jobs_hint: Scraping and background tasks run as scheduled jobs.
-      job_queue: Job queue
+      scrapers_heading: Scrapers
+      last_scrape: Last run
+      no_scrapes: No scraper runs yet.
+      manage_scrapers: View scraper runs
       accounts_heading: Accounts & invitations
       users: Accounts
       open_invitations: Open invitations
       manage_users: Manage accounts
       manage_invitations: Manage invitations
     unknown: unknown
+    scrape_runs:
+      status:
+        ok: ok
+        empty: empty
+        failed: failed
+      run_status:
+        running: running
+        ok: all ok
+        empty: "%{count} empty"
+        failed: "%{count} failed"
+      create:
+        started: Scraper run started — refresh in a few minutes to see the results.
+        already_running: A scraper run is already in progress.
+      index:
+        title: Scraper runs
+        trigger: Run scrapers now
+        trigger_confirm: Run all scrapers now? This takes a few minutes.
+        in_progress: a run is in progress…
+        tally: "%{total} scrapers · %{ok} ok · %{empty} empty · %{failed} failed"
+        took: "%{seconds}s"
+        recent_runs: Recent runs
+        counts: "+%{new} new · ~%{updated} updated"
+        empty: No scraper runs recorded yet.
+        col:
+          scraper: Scraper
+          status: Status
+          seen: Seen
+          new: New
+          updated: Updated
+          skipped: Skipped
+          history: History
+      show:
+        back: ← All runs
+        duration: Time
+        created_events: Events created
+        no_created_events: This run created no new events.
     users:
       admin_badge: Admin
       cant_delete_self: You can't delete your own account here.

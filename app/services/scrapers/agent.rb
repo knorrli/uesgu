@@ -9,10 +9,12 @@ module Scrapers
       new.call
     end
 
+    # Returns a Scrapers::Result tallying what this run saw and wrote, so the
+    # orchestrator (scrapers:run_all) can persist a ScrapeResult and stamp the
+    # created events — without the Agent itself knowing about those tables.
     def call
       Rails.logger.info "Start processing #{self.class.location} at #{self.class.url}"
 
-      @failures = 0
       process_events
 
       if @failures.positive?
@@ -20,6 +22,9 @@ module Scrapers
       else
         Rails.logger.info "Finished processing #{self.class.location}"
       end
+
+      Result.new(seen: @seen, created: @created, updated: @updated,
+                 skipped: @failures, created_ids: @created_ids)
     end
 
     private
@@ -28,11 +33,19 @@ module Scrapers
     # specifics via the hooks below (event_rows / event_url + field extractors);
     # the fetch-iterate-find-build-save-skip skeleton lives here once.
     def process_events
+      # Counters live here (not in #call) so the offline golden harness, which
+      # drives #process_events directly, initializes them too. #call reads them
+      # back into the returned Result.
+      @seen = @created = @updated = @failures = 0
+      @created_ids = []
+
       get(self.class.url)
 
       event_rows.each do |row|
         @current_row = row
         next if skip_row?(row)
+
+        @seen += 1
 
         # event_url runs inside the per-event rescue too: a single row missing its
         # anchor (markup tweak, teaser/ad card) must skip that event, not raise out
@@ -47,9 +60,16 @@ module Scrapers
 
         Rails.logger.info "Processing event URL #{url}"
         event = Event.find_or_initialize_by(url: url)
+        was_new = event.new_record?
         transact do
           build_event(event, row)
           event.save!
+          if was_new
+            @created += 1
+            @created_ids << event.id
+          else
+            @updated += 1
+          end
         rescue StandardError => e
           record_failure(event, e)
         end

@@ -64,3 +64,98 @@
 .invite__status--expired {
   color: var(--theme-warn-color);
 }
+
+/* Scraper run oversight (/admin/scrape_runs). A per-scraper outcomes table plus
+   a colour-coded history strip so a newly-broken or flapping venue stands out. */
+.scrape-table-wrap {
+  overflow-x: auto;
+}
+
+.scrape-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.scrape-table th,
+.scrape-table td {
+  text-align: left;
+  padding: var(--gap-xsmall) var(--gap-small);
+  white-space: nowrap;
+}
+
+.scrape-table th {
+  font-weight: normal;
+  color: var(--theme-fg-muted);
+}
+
+.scrape-table .num {
+  text-align: right;
+}
+
+.scrape-table tbody tr {
+  border-top: 1px solid var(--theme-bg-muted);
+}
+
+/* Status pill: ok = green, empty (ran but wrote nothing) = amber, failed = red. */
+.scrape-badge {
+  display: inline-block;
+  padding: 0 var(--gap-xsmall);
+  border-radius: 3px;
+  font-size: var(--font-size-small);
+  color: var(--color-white);
+}
+
+.scrape-badge--ok {
+  background: var(--color-green);
+}
+
+.scrape-badge--empty {
+  background: var(--color-amber);
+}
+
+.scrape-badge--failed {
+  background: var(--color-red);
+}
+
+.scrape-badge--running {
+  background: var(--theme-fg-muted);
+}
+
+.scrape-history {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.scrape-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  background: var(--theme-fg-muted);
+}
+
+.scrape-dot--ok {
+  background: var(--color-green);
+}
+
+.scrape-dot--empty {
+  background: var(--color-amber);
+}
+
+.scrape-dot--failed {
+  background: var(--color-red);
+}
+
+/* A run where this scraper produced no result at all. */
+.scrape-dot--none {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--theme-fg-muted);
+}
+
+.scrape-error {
+  white-space: normal;
+  font-size: var(--font-size-small);
+  color: var(--theme-warn-color);
+}

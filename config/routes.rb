@@ -70,5 +70,8 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :users, only: %i[index show destroy]
     resources :invitations, only: %i[index create destroy]
+    # Scraper run oversight: nightly sweep health + per-venue outcomes. create
+    # triggers a full sweep on demand (runs in a background thread).
+    resources :scrape_runs, only: %i[index show create]
   end
 end

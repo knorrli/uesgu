@@ -147,15 +147,52 @@ de:
       assigned: Zugewiesen
       unassigned: Nicht zugewiesen
       ignored: Ignoriert
-      jobs_heading: Jobs
-      jobs_hint: Scraping und Hintergrundaufgaben laufen als geplante Jobs.
-      job_queue: Job-Warteschlange
+      scrapers_heading: Scraper
+      last_scrape: Letzter Lauf
+      no_scrapes: Noch keine Scraper-Läufe.
+      manage_scrapers: Scraper-Läufe ansehen
       accounts_heading: Konten & Einladungen
       users: Konten
       open_invitations: Offene Einladungen
       manage_users: Konten verwalten
       manage_invitations: Einladungen verwalten
     unknown: unbekannt
+    scrape_runs:
+      status:
+        ok: ok
+        empty: leer
+        failed: fehlgeschlagen
+      run_status:
+        running: läuft
+        ok: alles ok
+        empty: "%{count} leer"
+        failed: "%{count} fehlgeschlagen"
+      create:
+        started: Scraper-Lauf gestartet — in ein paar Minuten neu laden, um die Ergebnisse zu sehen.
+        already_running: Ein Scraper-Lauf läuft bereits.
+      index:
+        title: Scraper-Läufe
+        trigger: Scraper jetzt starten
+        trigger_confirm: Alle Scraper jetzt starten? Das dauert ein paar Minuten.
+        in_progress: ein Lauf ist im Gange…
+        tally: "%{total} Scraper · %{ok} ok · %{empty} leer · %{failed} fehlgeschlagen"
+        took: "%{seconds}s"
+        recent_runs: Letzte Läufe
+        counts: "+%{new} neu · ~%{updated} aktualisiert"
+        empty: Noch keine Scraper-Läufe erfasst.
+        col:
+          scraper: Scraper
+          status: Status
+          seen: Gesehen
+          new: Neu
+          updated: Aktualisiert
+          skipped: Übersprungen
+          history: Verlauf
+      show:
+        back: ← Alle Läufe
+        duration: Zeit
+        created_events: Erstellte Events
+        no_created_events: Dieser Lauf hat keine neuen Events erstellt.
     users:
       admin_badge: Admin
       cant_delete_self: Du kannst dein eigenes Konto hier nicht löschen.

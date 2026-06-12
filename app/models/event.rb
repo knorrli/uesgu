@@ -1,6 +1,12 @@
 class Event < ApplicationRecord
   acts_as_taggable_on :locations, :styles, :genres
 
+  # The scrape run that first created this event (nil for events predating run
+  # tracking, or whose run has since been pruned). Set once, on insert, by the
+  # orchestrator — re-scrapes that only update the event leave it untouched.
+  belongs_to :created_in_scrape_run, class_name: 'ScrapeRun', optional: true,
+                                     inverse_of: :created_events
+
   validates :title, :start_date, :url, presence: true
 
   # Public-facing events: non-music events (carrying a hidden genre, with no

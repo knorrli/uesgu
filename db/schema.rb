@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_10_180000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_12_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -25,6 +25,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_180000) do
     t.datetime "updated_at", null: false
     t.boolean "hidden", default: false, null: false
     t.datetime "cancelled_at"
+    t.bigint "created_in_scrape_run_id"
+    t.index ["created_in_scrape_run_id"], name: "index_events_on_created_in_scrape_run_id"
     t.index ["hidden"], name: "index_events_on_hidden"
     t.index ["start_date"], name: "index_events_on_start_date"
     t.index ["url"], name: "index_events_on_url", unique: true
@@ -80,6 +82,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_180000) do
     t.index ["user_id", "period_end"], name: "index_notifications_on_user_id_and_period_end"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "scrape_results", force: :cascade do |t|
+    t.bigint "scrape_run_id", null: false
+    t.string "scraper", null: false
+    t.string "status", null: false
+    t.datetime "started_at"
+    t.integer "duration_ms"
+    t.integer "rows_seen", default: 0, null: false
+    t.integer "created_count", default: 0, null: false
+    t.integer "updated_count", default: 0, null: false
+    t.integer "skipped_count", default: 0, null: false
+    t.string "error_class"
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scrape_run_id", "scraper"], name: "index_scrape_results_on_scrape_run_id_and_scraper"
+    t.index ["scrape_run_id"], name: "index_scrape_results_on_scrape_run_id"
+    t.index ["scraper"], name: "index_scrape_results_on_scraper"
+  end
+
+  create_table "scrape_runs", force: :cascade do |t|
+    t.datetime "started_at", null: false
+    t.datetime "finished_at"
+    t.string "status", default: "running", null: false
+    t.integer "scrapers_total", default: 0, null: false
+    t.integer "scrapers_ok", default: 0, null: false
+    t.integer "scrapers_empty", default: 0, null: false
+    t.integer "scrapers_failed", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["started_at"], name: "index_scrape_runs_on_started_at"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -143,12 +177,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_10_180000) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "events", "scrape_runs", column: "created_in_scrape_run_id", on_delete: :nullify
   add_foreign_key "genres", "genres", column: "canonical_id"
   add_foreign_key "genres_styles", "genres", on_delete: :cascade
   add_foreign_key "genres_styles", "styles", on_delete: :cascade
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
   add_foreign_key "notifications", "users"
+  add_foreign_key "scrape_results", "scrape_runs", on_delete: :cascade
   add_foreign_key "sessions", "users"
   add_foreign_key "taggings", "tags"
 end

@@ -1,0 +1,7 @@
+<%# Per-scraper status pill. nil = the scraper produced no result in this run. %>
+<%# locals: (result:) %>
+<% if result %>
+  <span class="scrape-badge scrape-badge--<%= result.status %>"><%= t("admin.scrape_runs.status.#{result.status}") %></span>
+<% else %>
+  <span class="muted">—</span>
+<% end %>

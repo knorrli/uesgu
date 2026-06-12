@@ -142,19 +142,15 @@ en:
     back: "← Admin"
     index:
       title: Admin
-      assign_unassigned_genres: Assign genres
-      browse_genres: Browse all
       assigned: Assigned
       unassigned: Unassigned
       ignored: Ignored
       scrapers_heading: Scrapers
       last_scrape: Last run
       no_scrapes: No scraper runs yet.
-      manage_scrapers: View scraper runs
       accounts_heading: Accounts & invitations
       users: Accounts
       open_invitations: Open invitations
-      manage_users: Manage accounts
       manage_invitations: Manage invitations
     unknown: unknown
     scrape_runs:

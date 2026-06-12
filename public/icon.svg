@@ -1,3 +1,9 @@
-<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="256" cy="256" r="256" fill="red"/>
+<svg viewBox="0 0 512 512" width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <!-- üsgu plain favicon fallback (no beams) · ü #3 Mid 210×207 -->
+  <rect width="512" height="512" fill="#17131a"/>
+  <rect x="151" y="199" width="70" height="207" rx="13" fill="#d4ced3"/>
+  <rect x="291" y="199" width="70" height="207" rx="13" fill="#d4ced3"/>
+  <rect x="151" y="336" width="210" height="70" rx="13" fill="#d4ced3"/>
+  <circle cx="186" cy="140" r="34" fill="#ec6f98"/>
+  <circle cx="326" cy="140" r="34" fill="#38c08a"/>
 </svg>

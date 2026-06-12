@@ -10,14 +10,32 @@ class Event < ApplicationRecord
   validates :title, :start_date, :url, presence: true
 
   # Public-facing events: non-music events (carrying a hidden genre, with no
-  # music style) are hidden. Admin/curation views deliberately skip this scope.
-  scope :visible, -> { where(hidden: false) }
+  # music style) are hidden, and dismissed events are gone for good. Admin/
+  # curation views deliberately skip this scope.
+  scope :visible, -> { kept.where(hidden: false) }
   scope :cancelled, -> { where.not(cancelled_at: nil) }
+
+  # Dismiss is a sticky, admin-driven soft-delete: a dismissed event drops out of
+  # every public listing AND is never resurrected by a re-scrape (the scraper
+  # skips it — see Scrapers::Agent#process_events), unlike `hidden`/`cancelled`
+  # which are re-derived from the source each run.
+  scope :kept, -> { where(dismissed_at: nil) }
+  scope :dismissed, -> { where.not(dismissed_at: nil) }
 
   # Cancelled events stay listed (with a marker) rather than vanishing, so a
   # follower sees the show was called off. Derived from the source each scrape.
   def cancelled?
     cancelled_at.present?
+  end
+
+  def dismissed?
+    dismissed_at.present?
+  end
+
+  # Soft-delete this event so it never reappears, even on re-scrape. Idempotent —
+  # re-dismissing keeps the original timestamp.
+  def dismiss!
+    update!(dismissed_at: Time.current) unless dismissed?
   end
 
   def self.ransackable_attributes(auth_object = nil)

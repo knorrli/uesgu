@@ -77,4 +77,27 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     get events_path(view: 'nonsense') # invalid falls back to list
     assert_equal 'list', u.reload.events_view
   end
+
+  test 'the admin delete button dismisses (soft-delete): gone from public, kept in DB' do
+    e = event(title: 'DismissMeShow', start_date: Date.current + 3.days)
+    sign_in_as user(admin: true)
+
+    delete event_path(e)
+    assert_redirected_to events_path
+
+    assert e.reload.dismissed?, 'event should be soft-deleted, not destroyed'
+    assert Event.exists?(e.id), 'row should remain in the DB'
+
+    get events_path
+    assert_not_includes @response.body, 'DismissMeShow'
+  end
+
+  test 'non-admins cannot dismiss events' do
+    e = event(title: 'KeepMeShow', start_date: Date.current + 3.days)
+    sign_in_as user(admin: false)
+
+    delete event_path(e)
+    assert_response :forbidden
+    refute e.reload.dismissed?
+  end
 end

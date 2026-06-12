@@ -29,6 +29,29 @@ class EventTest < ActiveSupport::TestCase
     assert_equal [called_off.id], Event.cancelled.map(&:id)
   end
 
+  test 'visible scope excludes dismissed events (even when not hidden)' do
+    shown = event(hidden: false)
+    gone = event(hidden: false)
+    gone.dismiss!
+
+    assert_includes Event.visible, shown
+    refute_includes Event.visible, gone
+    assert_equal [gone.id], Event.dismissed.map(&:id)
+    assert_equal [shown.id], Event.kept.map(&:id)
+  end
+
+  test 'dismiss! is sticky and idempotent' do
+    e = event
+    refute e.dismissed?
+
+    e.dismiss!
+    assert e.dismissed?
+    first_stamp = e.dismissed_at
+
+    e.dismiss!
+    assert_equal first_stamp, e.reload.dismissed_at
+  end
+
   test 'venue picks the venue tag out of the flat location list' do
     venue_name = Location.venue_names.first
     skip 'no scrapers registered' if venue_name.nil?

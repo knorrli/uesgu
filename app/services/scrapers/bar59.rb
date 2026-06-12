@@ -56,14 +56,15 @@ module Scrapers
     private
 
     def all_documents
-      docs = []
-      token = nil
-      loop do
-        url = token ? "#{BASE}&pageToken=#{token}" : BASE
-        body = JSON.parse(get(url).body)
-        docs.concat(body['documents'] || [])
+      # The base already fetched page 1 into `page`; start from it and follow
+      # nextPageToken for the rest (a no-op when there's only one page).
+      body = JSON.parse(page.body)
+      docs = Array(body['documents'])
+      token = body['nextPageToken']
+      while token.present? && (resp = get("#{BASE}&pageToken=#{token}"))
+        body = JSON.parse(resp.body)
+        docs.concat(Array(body['documents']))
         token = body['nextPageToken']
-        break if token.blank?
       end
       docs
     end

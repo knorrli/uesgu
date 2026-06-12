@@ -60,6 +60,10 @@ module Scrapers
 
         Rails.logger.info "Processing event URL #{url}"
         event = Event.find_or_initialize_by(url: url)
+        # A dismissed event was intentionally removed by an admin; leave it
+        # untouched so the re-scrape can't resurrect or update it back into view.
+        next if event.dismissed?
+
         was_new = event.new_record?
         # Snapshot the persisted tags before build_event overwrites them, so we
         # can tell a real re-scrape change from a no-op (every re-scrape saves

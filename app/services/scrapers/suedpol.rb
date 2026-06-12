@@ -75,7 +75,7 @@ module Scrapers
 
     def upcoming?(row)
       stamp = event_stamp(row)
-      stamp.present? && Time.zone.at(stamp.to_i) >= Time.current.beginning_of_day
+      stamp.present? && Time.zone.at(stamp.to_i).to_date >= Date.current
     end
   end
 end

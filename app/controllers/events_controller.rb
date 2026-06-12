@@ -42,9 +42,11 @@ class EventsController < ApplicationController
     end
   end
 
-  # DELETE /events/1
+  # DELETE /events/1 — a sticky soft-delete (see Event#dismiss!): the event drops
+  # out of every listing and stays gone across re-scrapes, rather than being hard-
+  # deleted and recreated by the next scrape of a source that still lists it.
   def destroy
-    @event.destroy!
+    @event.dismiss!
     redirect_to events_path, status: :see_other
   end
 

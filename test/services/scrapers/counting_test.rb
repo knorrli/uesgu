@@ -56,4 +56,23 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert_equal 2, result.created_ids.size
     assert_not Event.exists?(url: 'https://fixture.test/bad')
   end
+
+  test 'a dismissed event is not resurrected or updated by a re-scrape' do
+    url = 'https://fixture.test/dismissed'
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Original' }]
+    CountingScraperHarness.new.call
+    dismissed = Event.find_by(url: url)
+    dismissed.dismiss!
+
+    # Same url still in the source with changed data — the scraper must leave the
+    # dismissed event untouched rather than update it back into view.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Changed' }]
+    result = CountingScraperHarness.new.call
+
+    assert_equal 0, result.created
+    assert_equal 0, result.updated
+    assert_equal 0, result.unchanged
+    assert dismissed.reload.dismissed?
+    assert_equal 'Original', dismissed.title
+  end
 end

@@ -27,7 +27,11 @@ module Scrapers
     def event_rows
       events = data_from(page.body)
       offset = 10
-      while (batch = data_from(get(self.class.endpoint(offset)).body)).any?
+      # `get` returning nil (offline golden harness) ends pagination cleanly.
+      while (resp = get(self.class.endpoint(offset)))
+        batch = data_from(resp.body)
+        break if batch.empty?
+
         events.concat(batch)
         offset += 10
       end

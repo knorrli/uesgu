@@ -40,6 +40,10 @@ class Scrapers::GoldenTest < Minitest::Test
     def new_record? = true
     def id = nil
 
+    # Offline captures are never dismissed (no DB) — the scraper's dismissed-skip
+    # guard must read as false here.
+    def dismissed? = false
+
     # Visibility is a DB-derived projection (Genre.hidden), not a parsing concern,
     # so the offline run treats every event as visible — mirroring the stubbed
     # event_styles. The real derivation is covered by EventTest.

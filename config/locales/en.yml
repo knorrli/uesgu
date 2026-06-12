@@ -169,12 +169,17 @@ en:
         failed: "%{count} failed"
       create:
         started: Scraper run started — refresh in a few minutes to see the results.
+        started_one: "%{scraper} started — refresh in a few seconds to see the result."
         already_running: A scraper run is already in progress.
+        unknown_scraper: Unknown scraper.
       index:
         title: Scraper runs
         trigger: Run scrapers now
         trigger_confirm: Run all scrapers now? This takes a few minutes.
         in_progress: a run is in progress…
+        auto_refreshing: auto-refreshing every 5s…
+        run_one: Run
+        run_one_title: "Run only %{scraper}"
         tally: "%{total} scrapers · %{ok} ok · %{empty} empty · %{failed} failed"
         took: "%{seconds}s"
         recent_runs: Recent runs

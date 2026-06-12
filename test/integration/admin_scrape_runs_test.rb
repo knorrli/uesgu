@@ -41,6 +41,7 @@ class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select 'body', text: /bad_bonn/
     assert_select 'body', text: /Linked Show/
+    assert_select 'input[name=scraper][value=?]', 'bad_bonn' # a per-scraper re-run button
   end
 
   test 'non-admins cannot trigger a run' do
@@ -51,11 +52,12 @@ class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test 'triggering creates a run and hands it off to the background sweep' do
+  test 'triggering creates a run and hands the full registry to the sweep' do
     sign_in_as user(admin: true)
     handed_off = nil
+    handed_scrapers = nil
 
-    Scrapers::Sweep.stub(:enqueue, ->(run) { handed_off = run }) do
+    Scrapers::Sweep.stub(:enqueue, ->(run, scrapers:) { handed_off = run; handed_scrapers = scrapers }) do
       assert_difference -> { ScrapeRun.count }, 1 do
         post admin_scrape_runs_path
       end
@@ -63,13 +65,39 @@ class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to admin_scrape_runs_path
     assert handed_off.running?, 'the created run is handed to the sweep'
+    assert_equal Scrapers::All.scrapers.size, handed_scrapers.size, 'the whole registry runs'
+  end
+
+  test 'triggering a single scraper limits the sweep to just that one' do
+    sign_in_as user(admin: true)
+    handed_scrapers = nil
+
+    Scrapers::Sweep.stub(:enqueue, ->(_run, scrapers:) { handed_scrapers = scrapers }) do
+      assert_difference -> { ScrapeRun.count }, 1 do
+        post admin_scrape_runs_path, params: { scraper: 'bad_bonn' }
+      end
+    end
+
+    assert_equal ['bad_bonn'], handed_scrapers.keys.map(&:underscore)
+  end
+
+  test 'an unknown scraper slug is refused without starting a run' do
+    sign_in_as user(admin: true)
+
+    Scrapers::Sweep.stub(:enqueue, ->(_run, scrapers:) { flunk 'must not enqueue' }) do
+      assert_no_difference -> { ScrapeRun.count } do
+        post admin_scrape_runs_path, params: { scraper: 'no_such_venue' }
+      end
+    end
+
+    assert_redirected_to admin_scrape_runs_path
   end
 
   test 'a trigger is refused while a run is already in progress' do
     sign_in_as user(admin: true)
     ScrapeRun.create!(started_at: Time.current) # running + recent => in progress
 
-    Scrapers::Sweep.stub(:enqueue, ->(_run) { flunk 'must not enqueue a second run' }) do
+    Scrapers::Sweep.stub(:enqueue, ->(_run, scrapers:) { flunk 'must not enqueue a second run' }) do
       assert_no_difference -> { ScrapeRun.count } do
         post admin_scrape_runs_path
       end

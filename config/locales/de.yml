@@ -169,12 +169,17 @@ de:
         failed: "%{count} fehlgeschlagen"
       create:
         started: Scraper-Lauf gestartet — in ein paar Minuten neu laden, um die Ergebnisse zu sehen.
+        started_one: "%{scraper} gestartet — in ein paar Sekunden neu laden, um das Ergebnis zu sehen."
         already_running: Ein Scraper-Lauf läuft bereits.
+        unknown_scraper: Unbekannter Scraper.
       index:
         title: Scraper-Läufe
         trigger: Scraper jetzt starten
         trigger_confirm: Alle Scraper jetzt starten? Das dauert ein paar Minuten.
         in_progress: ein Lauf ist im Gange…
+        auto_refreshing: aktualisiert sich alle 5s…
+        run_one: Starten
+        run_one_title: "Nur %{scraper} starten"
         tally: "%{total} Scraper · %{ok} ok · %{empty} leer · %{failed} fehlgeschlagen"
         took: "%{seconds}s"
         recent_runs: Letzte Läufe

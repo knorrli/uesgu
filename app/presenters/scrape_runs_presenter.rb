@@ -18,6 +18,15 @@ class ScrapeRunsPresenter
     ScrapeRun.in_progress.exists?
   end
 
+  # Derived from the (eager-loaded) results rather than the denormalized
+  # scrapers_* columns, so the counts are live while a run is still going —
+  # finalize hasn't written the totals yet. Matches the show page.
+  def tally(run)
+    results = run.scrape_results
+    { total: results.size, ok: results.count(&:ok?),
+      empty: results.count(&:empty?), failed: results.count(&:failed?) }
+  end
+
   # Every known scraper slug, so a venue that produced no result at all (e.g. it
   # was added but never ran, or crashed before recording) still gets a row.
   def scrapers

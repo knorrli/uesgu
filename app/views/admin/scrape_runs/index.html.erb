@@ -1,4 +1,9 @@
 <div class="flex flex-col gap-large">
+  <%# While a sweep is running, poll so its per-scraper rows fill in live. %>
+  <% if @presenter.in_progress? %>
+    <div data-controller="refresh" data-refresh-interval-value="5000" hidden></div>
+  <% end %>
+
   <%= render 'admin/back' %>
 
   <div class="flex gap-medium wrap" style="align-items: baseline;">
@@ -18,9 +23,12 @@
         <%= render 'admin/scrape_runs/run_badge', run: latest %>
       </h2>
       <p class="muted">
-        <%= t('.tally', total: latest.scrapers_total, ok: latest.scrapers_ok,
-                        empty: latest.scrapers_empty, failed: latest.scrapers_failed) %>
-        <% if latest.duration %> · <%= t('.took', seconds: latest.duration.round) %><% end %>
+        <%= t('.tally', **@presenter.tally(latest)) %>
+        <% if latest.running? %>
+          · <%= t('.auto_refreshing') %>
+        <% elsif latest.duration %>
+          · <%= t('.took', seconds: latest.duration.round) %>
+        <% end %>
       </p>
 
       <div class="scrape-table-wrap">
@@ -34,6 +42,7 @@
               <th class="num"><%= t('.col.updated') %></th>
               <th class="num"><%= t('.col.skipped') %></th>
               <th><%= t('.col.history') %></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -59,6 +68,7 @@
                     <% end %>
                   </span>
                 </td>
+                <td><% unless @presenter.in_progress? %><%= render 'admin/scrape_runs/run_button', scraper: slug %><% end %></td>
               </tr>
             <% end %>
           </tbody>

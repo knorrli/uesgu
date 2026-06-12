@@ -63,9 +63,11 @@
     <div class="settings-subsection">
       <h3><%= t('settings.device_heading') %></h3>
 
-      <%# Install affordance: a one-click button on Chrome/Android/desktop, an
-          "Add to Home Screen" hint on iOS, nothing once already installed. %>
-      <div class="flex flex-col gap-small" data-controller="install">
+      <%# Install affordance. Hidden by default; the controller reveals it only
+          where install is actually possible — a one-click button on
+          Chromium (desktop/Android), the "Add to Home Screen" steps on iOS —
+          and leaves it hidden on browsers that can't install (e.g. Firefox). %>
+      <div class="flex flex-col gap-small" hidden data-controller="install">
         <p class="muted"><%= t('settings.install_hint') %></p>
         <button type="button" hidden data-install-target="button" data-action="install#install">
           <%= t('settings.install_button') %>
@@ -95,6 +97,10 @@
             </button>
           </div>
           <p class="muted" hidden data-push-target="unsupported"><%= t('settings.push_unsupported') %></p>
+          <%# iOS exposes the Push API only to an installed home-screen app, so
+              there we point the user at installing first rather than saying
+              "unsupported". %>
+          <p class="muted" hidden data-push-target="installFirst"><%= t('settings.push_install_first') %></p>
         </div>
       <% end %>
     </div>

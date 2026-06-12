@@ -98,7 +98,7 @@ fr:
     confirm_new_password: Confirmer le nouveau mot de passe
     save: Enregistrer les paramètres
     install_heading: Installer comme app
-    install_hint: Ajoutez üsgu à votre écran d'accueil pour un accès rapide et les notifications.
+    install_hint: Installez üsgu pour un accès rapide et les notifications.
     install_button: Installer l'app
     install_ios_hint: 'Sur iPhone/iPad : touchez le bouton Partager, puis « Sur l''écran d''accueil ».'
     push_heading: Notifications sur cet appareil
@@ -109,6 +109,7 @@ fr:
     push_status_off: Les notifications sont désactivées sur cet appareil.
     push_status_denied: Votre navigateur bloque les notifications. Autorisez-les dans les paramètres du navigateur pour les activer.
     push_unsupported: Ce navigateur ne prend pas en charge les notifications push.
+    push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoutez d'abord üsgu à votre écran d'accueil.
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime définitivement votre compte et vos favoris.
     delete_account: Supprimer mon compte

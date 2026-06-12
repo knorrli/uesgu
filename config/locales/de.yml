@@ -98,7 +98,7 @@ de:
     confirm_new_password: Neues Passwort bestätigen
     save: Einstellungen speichern
     install_heading: Als App installieren
-    install_hint: Füge üsgu zum Startbildschirm hinzu — für Schnellzugriff und Mitteilungen.
+    install_hint: Installiere üsgu für schnellen Zugriff und Mitteilungen.
     install_button: App installieren
     install_ios_hint: 'Auf iPhone/iPad: Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.'
     push_heading: Mitteilungen auf diesem Gerät
@@ -109,6 +109,7 @@ de:
     push_status_off: Mitteilungen sind auf diesem Gerät deaktiviert.
     push_status_denied: Dein Browser blockiert Mitteilungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
     push_unsupported: Dieser Browser unterstützt keine Push-Mitteilungen.
+    push_install_first: Um auf iPhone oder iPad Mitteilungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     delete_account_heading: Konto löschen
     delete_account_hint: Entfernt dein Konto und deine Favoriten endgültig.
     delete_account: Mein Konto löschen

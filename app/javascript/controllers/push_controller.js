@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // or unsubscribes (removing it both sides). The server stays authoritative; this
 // just keeps the button honest about *this* device.
 export default class extends Controller {
-  static targets = ["button", "status", "unsupported", "testButton"]
+  static targets = ["button", "status", "unsupported", "installFirst", "testButton"]
   static values = {
     vapidPublicKey: String,
     labelOn: String,
@@ -19,12 +19,21 @@ export default class extends Controller {
   }
 
   connect() {
-    if (!this.#supported) {
-      this.#show(this.unsupportedTarget)
-      this.#hide(this.buttonTarget)
+    if (this.#supported) {
+      this.#refresh()
       return
     }
-    this.#refresh()
+
+    // Push isn't available. On iOS that's because the Push API is exposed only
+    // to an installed home-screen app — so point the user at installing first
+    // rather than the dead-end "unsupported" message. Everywhere else it's a
+    // browser that genuinely lacks the Push API.
+    this.#hide(this.buttonTarget)
+    if (this.#isIos && !this.#isStandalone && this.hasInstallFirstTarget) {
+      this.#show(this.installFirstTarget)
+    } else {
+      this.#show(this.unsupportedTarget)
+    }
   }
 
   async toggle() {
@@ -97,6 +106,17 @@ export default class extends Controller {
 
   get #supported() {
     return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window
+  }
+
+  get #isStandalone() {
+    return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true
+  }
+
+  // iPadOS 13+ reports a desktop ("MacIntel") UA, so also treat a touch-capable
+  // Mac as iOS.
+  get #isIos() {
+    return /iphone|ipad|ipod/i.test(window.navigator.userAgent) ||
+      (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1)
   }
 
   async #send(method, body, path = "/push_subscriptions") {

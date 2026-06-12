@@ -98,7 +98,7 @@ en:
     confirm_new_password: Confirm new password
     save: Save settings
     install_heading: Install as app
-    install_hint: Add üsgu to your home screen for one-tap access and notifications.
+    install_hint: Install üsgu for quick access and notifications.
     install_button: Install app
     install_ios_hint: 'On iPhone/iPad: tap the Share button, then “Add to Home Screen”.'
     push_heading: Notifications on this device
@@ -109,6 +109,7 @@ en:
     push_status_off: Notifications are off for this device.
     push_status_denied: Your browser is blocking notifications. Allow them in your browser settings to turn this on.
     push_unsupported: This browser doesn’t support push notifications.
+    push_install_first: To get notifications on iPhone or iPad, add üsgu to your Home Screen first.
     delete_account_heading: Delete account
     delete_account_hint: This permanently removes your account and favorites.
     delete_account: Delete my account

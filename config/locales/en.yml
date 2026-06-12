@@ -145,6 +145,8 @@ en:
       assigned: Assigned
       unassigned: Unassigned
       ignored: Ignored
+      hidden: Hidden
+      blocked: Blocked
       scrapers_heading: Scrapers
       last_scrape: Last run
       no_scrapes: No scraper runs yet.

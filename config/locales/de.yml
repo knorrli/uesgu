@@ -145,6 +145,8 @@ de:
       assigned: Zugewiesen
       unassigned: Nicht zugewiesen
       ignored: Ignoriert
+      hidden: Verborgen
+      blocked: Blockiert
       scrapers_heading: Scraper
       last_scrape: Letzter Lauf
       no_scrapes: Noch keine Scraper-Läufe.

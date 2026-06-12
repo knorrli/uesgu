@@ -27,4 +27,12 @@ class EventTagStatsPresenter
   def ignored_genre_tags
     Genre.in_use.ignored
   end
+
+  def hidden_genre_tags
+    Genre.in_use.hidden
+  end
+
+  def blocked_genre_tags
+    Genre.in_use.blocked
+  end
 end

@@ -37,6 +37,16 @@
         <span class="stat__leader"></span>
         <dd class="muted"><%= @event_tag_stats.ignored_genre_tags.count %></dd>
       </div>
+      <div class="stat">
+        <dt><%= link_to t('.hidden'), genres_path(status: 'hidden'), class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= @event_tag_stats.hidden_genre_tags.count %></dd>
+      </div>
+      <div class="stat">
+        <dt><%= link_to t('.blocked'), genres_path(status: 'blocked'), class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= @event_tag_stats.blocked_genre_tags.count %></dd>
+      </div>
     </dl>
   </section>
 

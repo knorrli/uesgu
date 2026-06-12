@@ -56,11 +56,18 @@ match the dictionary only and cannot mint junk:
 bin/rails scrapers:run_all
 ```
 
-Step 4 — refresh each event's derived styles and hidden flag:
+Step 4 (optional here) — refresh each event's derived styles and hidden flag:
 
 ```bash
 bin/rails runner 'Event.find_each(&:recompute_styles!)'
 ```
+
+This is **redundant after a fresh scrape** — `Scrapers::Agent#build_event`
+already sets `style_list` and `hidden` from the freshly-seeded dictionary and
+saves them, and `recompute_styles!` runs the identical computation. You only need
+it when event styles go stale *without* a re-scrape: after editing dispositions
+or style mappings post-scrape (the Stage 2 tail), or in the targeted-cleanup
+alternative below.
 
 ## Stage 2 — Verify (this is the confirmation step)
 

@@ -21,9 +21,9 @@ module Scrapers
     # Queue was dropped — see render.yaml), so this is a plain thread with the
     # Rails executor managing the connection checkout. The seam the controller
     # calls, so tests can stub it instead of spawning real work.
-    def self.enqueue(run)
+    def self.enqueue(run, scrapers: All.scrapers)
       Thread.new do
-        Rails.application.executor.wrap { perform(run) }
+        Rails.application.executor.wrap { perform(run, scrapers: scrapers) }
       rescue StandardError => e
         Rails.logger.error("Background scrape run ##{run.id} crashed: #{e.class}: #{e.message}")
       end

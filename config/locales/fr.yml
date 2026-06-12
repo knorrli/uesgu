@@ -169,12 +169,17 @@ fr:
         failed: "%{count} échec(s)"
       create:
         started: Passage des scrapers lancé — actualisez dans quelques minutes pour voir les résultats.
+        started_one: "%{scraper} lancé — actualisez dans quelques secondes pour voir le résultat."
         already_running: Un passage des scrapers est déjà en cours.
+        unknown_scraper: Scraper inconnu.
       index:
         title: Passages des scrapers
         trigger: Lancer les scrapers
         trigger_confirm: Lancer tous les scrapers maintenant ? Cela prend quelques minutes.
         in_progress: un passage est en cours…
+        auto_refreshing: actualisation toutes les 5 s…
+        run_one: Lancer
+        run_one_title: "Lancer uniquement %{scraper}"
         tally: "%{total} scrapers · %{ok} ok · %{empty} vides · %{failed} échecs"
         took: "%{seconds}s"
         recent_runs: Passages récents

@@ -97,6 +97,17 @@
   border-top: 1px solid var(--theme-bg-muted);
 }
 
+/* Compact per-scraper "Run" button so a row of them stays scannable. button_to
+   wraps each in a form, so collapse the form's own box too. */
+.scrape-table form {
+  margin: 0;
+}
+
+.button--small {
+  padding: 0 var(--gap-small);
+  font-size: var(--font-size-small);
+}
+
 /* Status pill: ok = green, empty (ran but wrote nothing) = amber, failed = red. */
 .scrape-badge {
   display: inline-block;

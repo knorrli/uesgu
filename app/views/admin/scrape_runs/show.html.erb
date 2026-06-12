@@ -1,4 +1,9 @@
 <div class="flex flex-col gap-large">
+  <%# While this run is going, poll so its per-scraper rows fill in live. %>
+  <% if @run.running? %>
+    <div data-controller="refresh" data-refresh-interval-value="5000" hidden></div>
+  <% end %>
+
   <%= render 'admin/back', path: admin_scrape_runs_path, label: t('.back') %>
 
   <h1 class="flex gap-small wrap">
@@ -6,9 +11,15 @@
     <%= render 'admin/scrape_runs/run_badge', run: @run %>
   </h1>
   <p class="muted">
-    <%= t('admin.scrape_runs.index.tally', total: @run.scrapers_total, ok: @run.scrapers_ok,
-                                           empty: @run.scrapers_empty, failed: @run.scrapers_failed) %>
-    <% if @run.duration %> · <%= t('admin.scrape_runs.index.took', seconds: @run.duration.round) %><% end %>
+    <%# Derived from the loaded results so the counts are live during a run,
+        before finalize writes the denormalized totals. %>
+    <%= t('admin.scrape_runs.index.tally', total: @results.size, ok: @results.count(&:ok?),
+                                           empty: @results.count(&:empty?), failed: @results.count(&:failed?)) %>
+    <% if @run.running? %>
+      · <%= t('admin.scrape_runs.index.auto_refreshing') %>
+    <% elsif @run.duration %>
+      · <%= t('admin.scrape_runs.index.took', seconds: @run.duration.round) %>
+    <% end %>
   </p>
 
   <div class="scrape-table-wrap">
@@ -22,6 +33,7 @@
           <th class="num"><%= t('admin.scrape_runs.index.col.updated') %></th>
           <th class="num"><%= t('admin.scrape_runs.index.col.skipped') %></th>
           <th class="num"><%= t('.duration') %></th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -34,10 +46,11 @@
             <td class="num"><%= result.updated_count %></td>
             <td class="num"><%= result.skipped_count %></td>
             <td class="num"><%= number_with_precision(result.duration_ms.to_i / 1000.0, precision: 1) %>s</td>
+            <td><% unless @in_progress %><%= render 'admin/scrape_runs/run_button', scraper: result.scraper %><% end %></td>
           </tr>
           <% if result.failed? && result.error_message.present? %>
             <tr>
-              <td colspan="7" class="scrape-error"><%= result.error_class %>: <%= result.error_message %></td>
+              <td colspan="8" class="scrape-error"><%= result.error_class %>: <%= result.error_message %></td>
             </tr>
           <% end %>
         <% end %>

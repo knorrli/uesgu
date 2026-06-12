@@ -50,6 +50,9 @@ de:
       body:
         one: 1 neue Veranstaltung passt zu deinen Favoriten.
         other: "%{count} neue Veranstaltungen passen zu deinen Favoriten."
+    test:
+      title: üsgu
+      body: Dies ist eine Testmitteilung — Push funktioniert. 🎉
   frequencies:
     daily: Täglich
     weekly: Wöchentlich
@@ -69,6 +72,12 @@ de:
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.
+    account_heading: Konto
+    notifications_intro: Wähle, wie du über neue Veranstaltungen informiert werden möchtest.
+    device_heading: Auf diesem Gerät
+    save_account: Konto speichern
+    save_notifications: Mitteilungen speichern
+    push_test: Testmitteilung senden
     notifications_heading: Mitteilungen
     frequency_label: Wie oft sollen wir dich über neue Veranstaltungen informieren?
     language_heading: Sprache

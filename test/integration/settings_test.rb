@@ -25,4 +25,16 @@ class SettingsTest < ActionDispatch::IntegrationTest
     get settings_path
     assert_redirected_to new_session_path
   end
+
+  test 'settings page renders the account, notifications and delete sections' do
+    sign_in_as user
+    get settings_path
+
+    assert_response :success
+    assert_select 'section.settings-section', 3
+    # One save button per editable section (account + notifications).
+    assert_select 'input[type=submit]', 2
+    # The per-device "on this device" cluster (install / push).
+    assert_select '.settings-subsection'
+  end
 end

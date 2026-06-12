@@ -8,7 +8,7 @@ import { Controller } from "@hotwired/stimulus"
 // or unsubscribes (removing it both sides). The server stays authoritative; this
 // just keeps the button honest about *this* device.
 export default class extends Controller {
-  static targets = ["button", "status", "unsupported"]
+  static targets = ["button", "status", "unsupported", "testButton"]
   static values = {
     vapidPublicKey: String,
     labelOn: String,
@@ -62,6 +62,22 @@ export default class extends Controller {
     await subscription.unsubscribe()
   }
 
+  // Send a push to *this* device so the user can confirm it actually arrives.
+  async sendTest() {
+    const registration = await navigator.serviceWorker.ready
+    const subscription = await registration.pushManager.getSubscription()
+    if (!subscription) return
+
+    this.testButtonTarget.disabled = true
+    try {
+      await this.#send("POST", { endpoint: subscription.endpoint }, "/push_subscriptions/test")
+    } catch (error) {
+      console.error("Test push failed:", error)
+    } finally {
+      this.testButtonTarget.disabled = false
+    }
+  }
+
   // Paint the button + status from the current browser state.
   async #refresh() {
     const registration = await navigator.serviceWorker.ready
@@ -74,14 +90,17 @@ export default class extends Controller {
     this.buttonTarget.textContent = subscription ? this.labelOnValue : this.labelOffValue
     this.buttonTarget.dataset.state = state
     this.buttonTarget.disabled = denied
+
+    // The test button only makes sense once this device is actually subscribed.
+    if (this.hasTestButtonTarget) this.testButtonTarget.hidden = !subscription
   }
 
   get #supported() {
     return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window
   }
 
-  async #send(method, body) {
-    const response = await fetch("/push_subscriptions", {
+  async #send(method, body, path = "/push_subscriptions") {
+    const response = await fetch(path, {
       method,
       headers: {
         "Content-Type": "application/json",

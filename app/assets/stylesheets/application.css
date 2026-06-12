@@ -98,6 +98,51 @@ a {
   color: var(--theme-fg-color);
 }
 
+/* Settings page: three stacked sections (account / notifications / delete),
+   separated by a hairline rather than cards — the design uses square corners. */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+}
+
+.settings-section + .settings-section {
+  padding-top: var(--gap-large);
+  border-top: var(--border-width) solid var(--theme-bg-muted);
+}
+
+/* A labelled group within a section (password, email). Strip the native
+   fieldset chrome; the legend carries the label. */
+.settings-field {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.settings-field legend {
+  padding: 0;
+  font-weight: bold;
+}
+
+/* The "on this device" cluster (install + push) under Notifications. */
+.settings-subsection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+}
+
+.settings-subsection h3 {
+  font-weight: normal;
+  color: var(--theme-fg-muted);
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small);
+}
+
 /* Flash messages: a fixed toast at the bottom so they never push content down;
    auto-dismiss after a few seconds. */
 .flashes {

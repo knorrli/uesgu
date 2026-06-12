@@ -1,65 +1,82 @@
-<div class="flex flex-col gap-large">
+<div class="settings flex flex-col gap-large">
   <h1><%= t('settings.title') %></h1>
 
-  <%= form_with model: @user, url: settings_path, method: :patch, class: 'account-form flex flex-col gap-large' do |form| %>
-    <% if @user.errors.any? %>
-      <ul class="form-errors">
-        <% @user.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
+  <% if @user.errors.any? %>
+    <ul class="form-errors">
+      <% @user.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%# ── Account ─────────────────────────────────────────────────────────── %>
+  <section class="settings-section">
+    <h2><%= t('settings.account_heading') %></h2>
+
+    <%= form_with model: @user, url: settings_path, method: :patch, class: 'account-form flex flex-col gap-medium' do |form| %>
+      <div class="flex flex-col gap-small">
+        <span class="muted"><%= t('auth.username') %></span>
+        <span><%= @user.username %></span>
+      </div>
+
+      <label class="flex flex-col gap-small">
+        <span><%= t('settings.language_heading') %></span>
+        <%= form.select :locale,
+              I18n.available_locales.map { |l| [t("languages.#{l}"), l] },
+              include_blank: t('settings.language_auto') %>
+      </label>
+
+      <fieldset class="settings-field flex flex-col gap-small">
+        <legend><%= t('settings.password_heading') %></legend>
+        <p class="muted"><%= t('settings.password_hint') %></p>
+        <%= form.password_field :password, autocomplete: "new-password", placeholder: t('settings.new_password'), maxlength: 72 %>
+        <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: t('settings.confirm_new_password'), maxlength: 72 %>
+      </fieldset>
+
+      <%= form.submit t('settings.save_account') %>
     <% end %>
+  </section>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('settings.language_heading') %></h2>
-      <%= form.select :locale,
-            I18n.available_locales.map { |l| [t("languages.#{l}"), l] },
-            include_blank: t('settings.language_auto') %>
-    </section>
+  <%# ── Notifications ───────────────────────────────────────────────────── %>
+  <section class="settings-section">
+    <h2><%= t('settings.notifications_heading') %></h2>
+    <p class="muted"><%= t('settings.notifications_intro') %></p>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('settings.notifications_heading') %></h2>
+    <%= form_with model: @user, url: settings_path, method: :patch, class: 'account-form flex flex-col gap-medium' do |form| %>
       <label class="flex flex-col gap-small">
         <span><%= t('settings.frequency_label') %></span>
         <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [t("frequencies.#{f}"), f] } %>
       </label>
-    </section>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('settings.email_heading') %> <span class="muted"><%= t('settings.email_optional') %></span></h2>
-      <p><%= t('settings.email_hint') %></p>
-      <p class="muted"><%= t('settings.email_third_party') %></p>
-      <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
-    </section>
+      <fieldset class="settings-field flex flex-col gap-small">
+        <legend><%= t('settings.email_heading') %> <span class="muted"><%= t('settings.email_optional') %></span></legend>
+        <p class="muted"><%= t('settings.email_hint') %></p>
+        <p class="muted"><%= t('settings.email_third_party') %></p>
+        <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
+      </fieldset>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('settings.password_heading') %></h2>
-      <p><%= t('settings.password_hint') %></p>
-      <%= form.password_field :password, autocomplete: "new-password", placeholder: t('settings.new_password'), maxlength: 72 %>
-      <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: t('settings.confirm_new_password'), maxlength: 72 %>
-    </section>
+      <%= form.submit t('settings.save_notifications') %>
+    <% end %>
 
-    <%= form.submit t('settings.save') %>
-  <% end %>
+    <%# Device notifications: installing the app + per-device push. These post to
+        their own endpoints (not the @user form), so they live outside it. %>
+    <div class="settings-subsection">
+      <h3><%= t('settings.device_heading') %></h3>
 
-  <%# Install the site as an app. The controller reveals the right affordance per
-      platform: a one-click button on Chrome/Android/desktop, an "Add to Home
-      Screen" hint on iOS, nothing once already installed. %>
-  <section class="flex flex-col gap-small" data-controller="install">
-    <h2><%= t('settings.install_heading') %></h2>
-    <p><%= t('settings.install_hint') %></p>
-    <button type="button" class="button" hidden
-            data-install-target="button" data-action="install#install">
-      <%= t('settings.install_button') %>
-    </button>
-    <p class="muted" hidden data-install-target="iosHint"><%= t('settings.install_ios_hint') %></p>
-  </section>
+      <%# Install affordance: a one-click button on Chrome/Android/desktop, an
+          "Add to Home Screen" hint on iOS, nothing once already installed. %>
+      <div class="flex flex-col gap-small" data-controller="install">
+        <p class="muted"><%= t('settings.install_hint') %></p>
+        <button type="button" hidden data-install-target="button" data-action="install#install">
+          <%= t('settings.install_button') %>
+        </button>
+        <p class="muted" hidden data-install-target="iosHint"><%= t('settings.install_ios_hint') %></p>
+      </div>
 
-  <%# Per-device push opt-in. Only shown when VAPID keys are configured; the
-      controller hides the button and shows the "unsupported" note on browsers
-      without the Push API. Cadence is the notification frequency set above. %>
-  <% if WebPushConfig.configured? %>
-    <section class="flex flex-col gap-small"
+      <%# Per-device push opt-in + a self-test. Only rendered when VAPID keys are
+          configured; the controller handles the unsupported/denied states. %>
+      <% if WebPushConfig.configured? %>
+        <div class="flex flex-col gap-small"
              data-controller="push"
              data-push-vapid-public-key-value="<%= WebPushConfig.public_key %>"
              data-push-label-on-value="<%= t('settings.push_disable') %>"
@@ -67,17 +84,24 @@
              data-push-status-on-value="<%= t('settings.push_status_on') %>"
              data-push-status-off-value="<%= t('settings.push_status_off') %>"
              data-push-status-denied-value="<%= t('settings.push_status_denied') %>">
-      <h2><%= t('settings.push_heading') %></h2>
-      <p><%= t('settings.push_hint') %></p>
-      <p class="muted" data-push-target="status"><%= t('settings.push_status_off') %></p>
-      <button type="button" class="button" data-push-target="button" data-action="push#toggle">
-        <%= t('settings.push_enable') %>
-      </button>
-      <p class="muted" hidden data-push-target="unsupported"><%= t('settings.push_unsupported') %></p>
-    </section>
-  <% end %>
+          <p class="muted"><%= t('settings.push_hint') %></p>
+          <p class="muted" data-push-target="status"><%= t('settings.push_status_off') %></p>
+          <div class="settings-actions">
+            <button type="button" data-push-target="button" data-action="push#toggle">
+              <%= t('settings.push_enable') %>
+            </button>
+            <button type="button" hidden data-push-target="testButton" data-action="push#sendTest">
+              <%= t('settings.push_test') %>
+            </button>
+          </div>
+          <p class="muted" hidden data-push-target="unsupported"><%= t('settings.push_unsupported') %></p>
+        </div>
+      <% end %>
+    </div>
+  </section>
 
-  <section class="flex flex-col gap-small">
+  <%# ── Delete account ──────────────────────────────────────────────────── %>
+  <section class="settings-section">
     <h2><%= t('settings.delete_account_heading') %></h2>
     <p><%= t('settings.delete_account_hint') %></p>
     <%= button_to t('settings.delete_account'), registration_path, method: :delete, class: "button delete",

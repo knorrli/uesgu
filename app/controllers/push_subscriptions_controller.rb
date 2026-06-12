@@ -28,4 +28,16 @@ class PushSubscriptionsController < ApplicationController
     current_user.push_subscriptions.where(endpoint: params[:endpoint]).destroy_all
     head :no_content
   end
+
+  # test sends a push to the calling device so the user can confirm delivery.
+  def test
+    subscription = current_user.push_subscriptions.find_by(endpoint: params[:endpoint])
+    return head :not_found unless subscription
+
+    if subscription.deliver(title: t("push.test.title"), body: t("push.test.body"), path: notifications_path)
+      head :ok
+    else
+      head :unprocessable_entity
+    end
+  end
 end

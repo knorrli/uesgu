@@ -50,6 +50,9 @@ en:
       body:
         one: 1 new event matches your favorites.
         other: "%{count} new events match your favorites."
+    test:
+      title: üsgu
+      body: This is a test notification — push is working. 🎉
   frequencies:
     daily: Daily
     weekly: Weekly
@@ -69,6 +72,12 @@ en:
   settings:
     title: Settings
     saved: Settings saved.
+    account_heading: Account
+    notifications_intro: Choose how you'd like to hear about new events.
+    device_heading: On this device
+    save_account: Save account
+    save_notifications: Save notifications
+    push_test: Send a test notification
     notifications_heading: Notifications
     frequency_label: How often should we tell you about new events?
     language_heading: Language

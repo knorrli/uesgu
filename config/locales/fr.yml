@@ -50,6 +50,9 @@ fr:
       body:
         one: 1 nouvel événement correspond à vos favoris.
         other: "%{count} nouveaux événements correspondent à vos favoris."
+    test:
+      title: üsgu
+      body: Ceci est une notification de test — le push fonctionne. 🎉
   frequencies:
     daily: Quotidien
     weekly: Hebdomadaire
@@ -69,6 +72,12 @@ fr:
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.
+    account_heading: Compte
+    notifications_intro: Choisissez comment vous souhaitez être informé des nouveaux événements.
+    device_heading: Sur cet appareil
+    save_account: Enregistrer le compte
+    save_notifications: Enregistrer les notifications
+    push_test: Envoyer une notification de test
     notifications_heading: Notifications
     frequency_label: À quelle fréquence souhaitez-vous être informé des nouveaux événements ?
     language_heading: Langue

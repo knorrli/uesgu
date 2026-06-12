@@ -37,6 +37,8 @@ Rails.application.routes.draw do
   # resource collection.
   post 'push_subscriptions' => 'push_subscriptions#create'
   delete 'push_subscriptions' => 'push_subscriptions#destroy'
+  # Send a test push to the current device, so a user can verify it arrives.
+  post 'push_subscriptions/test' => 'push_subscriptions#test'
 
   resources :events, only: [:index, :destroy]
   resources :styles, only: [] do

@@ -397,6 +397,9 @@ fr:
       empty: Aucun événement ce jour-là.
       close: Fermer
     calendar:
+      events:
+        one: "%{count} événement"
+        other: "%{count} événements"
       more:
         one: +1 de plus
         other: "+%{count} de plus"

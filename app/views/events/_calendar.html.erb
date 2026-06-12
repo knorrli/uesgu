@@ -21,24 +21,19 @@
         <% day_keys = calendar_day_favorite_keys(day_events) %>
         <span class="day-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>"
               <%= 'hidden' unless day_keys.any? { |key| followed_keys.include?(key) } %>></span>
+        <%# Busyness as a solid meter pinned to the cell's bottom edge: the fill width
+            scales with the event count, so scanning a column compares days like a bar
+            chart. Neutral on purpose — green and the heart stay reserved for follows.
+            The full lineup is one tap away in the day drawer. %>
+        <div class="day-meter" aria-hidden="true">
+          <span class="day-meter-fill" style="width: <%= (calendar_day_load(day_events.size) * 100).round %>%"></span>
+        </div>
       <% end %>
       <div class="day-content">
         <div class="<%= number %>"><%= date.day %></div>
         <% if day_events.any? %>
-          <% venues = calendar_day_venues(day_events, favorites: @favorites) %>
-          <%# Wide screens: a glanceable, deduped venue summary (full detail on tap). %>
-          <ul class="day-venues">
-            <% venues.first(4).each do |venue| %>
-              <li class="day-venue">
-                <span class="day-venue-name"><%= venue.name %></span><% if venue.count > 1 %> <span class="day-venue-count">×<%= venue.count %></span><% end %>
-              </li>
-            <% end %>
-            <% if venues.size > 4 %>
-              <li class="day-venue more"><%= t('events.calendar.more', count: venues.size - 4) %></li>
-            <% end %>
-          </ul>
-          <%# Narrow screens: just a count — columns are too narrow for text. %>
-          <span class="day-count" aria-hidden="true"><%= day_events.size %></span>
+          <%# The exact count, the same on every width — no more desktop/mobile split. %>
+          <span class="day-count" aria-label="<%= t('events.calendar.events', count: day_events.size) %>"><%= day_events.size %></span>
         <% end %>
       </div>
     <% end %>

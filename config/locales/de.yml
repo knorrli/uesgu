@@ -397,6 +397,9 @@ de:
       empty: Keine Events an diesem Tag.
       close: Schliessen
     calendar:
+      events:
+        one: "%{count} Event"
+        other: "%{count} Events"
       more:
         one: +1 mehr
         other: "+%{count} mehr"

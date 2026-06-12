@@ -1,0 +1,77 @@
+[
+  {
+    "url": "https://kaserne-basel.ch/de/events/ebow",
+    "start_time": "2026-09-25T20:30:00+02:00",
+    "start_date": "2026-09-25",
+    "title": "Ebow",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Kaserne Basel",
+      "Basel",
+      "BS"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://kaserne-basel.ch/de/events/azymuth",
+    "start_time": "2026-10-19T19:00:00+02:00",
+    "start_date": "2026-10-19",
+    "title": "Azymuth",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Kaserne Basel",
+      "Basel",
+      "BS"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://kaserne-basel.ch/de/events/steinermadlaina",
+    "start_time": "2026-10-30T21:00:00+01:00",
+    "start_date": "2026-10-30",
+    "title": "Steiner & Madlaina",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Kaserne Basel",
+      "Basel",
+      "BS"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://kaserne-basel.ch/de/events/stress",
+    "start_time": "2026-11-28T20:00:00+01:00",
+    "start_date": "2026-11-28",
+    "title": "Stress",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Kaserne Basel",
+      "Basel",
+      "BS"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://kaserne-basel.ch/de/events/black-sea-dahu",
+    "start_time": "2026-12-04T21:00:00+01:00",
+    "start_date": "2026-12-04",
+    "title": "Black Sea Dahu",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Kaserne Basel",
+      "Basel",
+      "BS"
+    ],
+    "cancelled_at": false
+  }
+]

@@ -19,7 +19,9 @@ namespace :scrapers do
       'isc'           => 'a.event_preview',
       'kiff'          => '.FilterPage__FilterResults > .Card-Event .Card__Link',
       'nouveau_monde' => '.poster[data-tofilter*=concert]',
-      'sedel'         => '.programm ul > li a'
+      'sedel'         => '.programm ul > li a',
+      'sous_soul'     => '.event_item.w-dyn-item a.link-block',
+      'neubad'        => 'ul.liste li.zeile .views-field-title a'
     }
 
     only = args[:only]

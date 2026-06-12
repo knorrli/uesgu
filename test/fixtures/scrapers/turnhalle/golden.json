@@ -1,0 +1,77 @@
+[
+  {
+    "url": "https://www.bee-flat.ch/programm/aktuell/mammal-hands-5171/",
+    "start_time": "2026-10-10T20:30:00+02:00",
+    "start_date": "2026-10-10",
+    "title": "Mammal Hands",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Turnhalle",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bee-flat.ch/programm/aktuell/songhoy-blues-5165/",
+    "start_time": "2026-10-25T15:30:00+01:00",
+    "start_date": "2026-10-25",
+    "title": "Songhoy Blues",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Turnhalle",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bee-flat.ch/programm/aktuell/songhoy-blues-5159/",
+    "start_time": "2026-10-25T20:30:00+01:00",
+    "start_date": "2026-10-25",
+    "title": "Songhoy Blues",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Turnhalle",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bee-flat.ch/programm/aktuell/the-songs-of-joni-mitchell-5169/",
+    "start_time": "2026-11-01T20:30:00+01:00",
+    "start_date": "2026-11-01",
+    "title": "The Songs of Joni Mitchell",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Turnhalle",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bee-flat.ch/programm/aktuell/loewenzahnhonig-5167/",
+    "start_time": "2026-11-22T20:30:00+01:00",
+    "start_date": "2026-11-22",
+    "title": "Löwenzahnhonig",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Turnhalle",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  }
+]

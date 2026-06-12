@@ -1,0 +1,347 @@
+[
+  {
+    "url": "https://www.dampfzentrale.ch/event/entre_nous_25-26/",
+    "start_time": "2026-06-12T00:00:00+02:00",
+    "start_date": "2026-06-12",
+    "title": "Entre Nous",
+    "subtitle": "Das Schlachthaus Theater und die Dampfzentrale Bern spannen zusammen",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/taenzerische_einfuehrung_juni26/",
+    "start_time": "2026-06-12T19:00:00+02:00",
+    "start_date": "2026-06-12",
+    "title": "Tänzerische Einführung",
+    "subtitle": "mit Cosima Grand",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/nina-richard-feat-demi-jakob_arms_juni/",
+    "start_time": "2026-06-12T20:00:00+02:00",
+    "start_date": "2026-06-12",
+    "title": "Nina Richard feat. demi Jakob",
+    "subtitle": "arms (not weapons)",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/die-zentrale_19-10-25-2/",
+    "start_time": "2026-06-13T19:00:00+02:00",
+    "start_date": "2026-06-13",
+    "title": "Die Zentrale",
+    "subtitle": "Für alle von 10 bis 14 Jahren",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": true
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/nina-richard-feat-demi-jakob_arms_juni/",
+    "start_time": "2026-06-13T20:00:00+02:00",
+    "start_date": "2026-06-13",
+    "title": "Nina Richard feat. demi Jakob",
+    "subtitle": "arms (not weapons)",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/streik-foyer_16-6-26/",
+    "start_time": "2026-06-14T11:00:00+02:00",
+    "start_date": "2026-06-14",
+    "title": "Streik-Foyer",
+    "subtitle": "Vom Streik-Foyer der Dampfzentrale Bern zum Bundesplatz!",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/wild-card_juni_2026/",
+    "start_time": "2026-06-14T13:30:00+02:00",
+    "start_date": "2026-06-14",
+    "title": "Wild Card",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/hkb-maximum-tilt_juni_2026/",
+    "start_time": "2026-06-18T19:00:00+02:00",
+    "start_date": "2026-06-18",
+    "title": "maximum tilt",
+    "subtitle": "Contemporary Arts Practice HKB",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/ensemble_proton_bern_maerz_26/",
+    "start_time": "2026-06-23T19:30:00+02:00",
+    "start_date": "2026-06-23",
+    "title": "Ensemble Proton Bern",
+    "subtitle": "Versinken",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/variation_juni_2026/",
+    "start_time": "2026-06-26T20:00:00+02:00",
+    "start_date": "2026-06-26",
+    "title": "Variaton",
+    "subtitle": "Fallende Horizonte",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/variation_juni_2026/",
+    "start_time": "2026-06-27T20:00:00+02:00",
+    "start_date": "2026-06-27",
+    "title": "Variaton",
+    "subtitle": "Fallende Horizonte",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/zentralmarkt_2025-2/",
+    "start_time": "2026-06-28T10:00:00+02:00",
+    "start_date": "2026-06-28",
+    "title": "Zentralmarkt",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/variation_juni_2026/",
+    "start_time": "2026-06-28T18:00:00+02:00",
+    "start_date": "2026-06-28",
+    "title": "Variaton",
+    "subtitle": "Fallende Horizonte",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/aether_juli-2026/",
+    "start_time": "2026-07-04T18:00:00+02:00",
+    "start_date": "2026-07-04",
+    "title": "AETHER – a transcendental waveform market",
+    "subtitle": "Lauren Duffus / DJ Haram / Vica Pacheco / LA Timpa / Ciro Vitiello & Junge Eko / Loto Retina (DJ) / STREIKTHROUGH / Nina Emge (DJ) / Leef (DJ)",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/zentralmarkt_2025-2/",
+    "start_time": "2026-07-26T10:00:00+02:00",
+    "start_date": "2026-07-26",
+    "title": "Zentralmarkt",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/zentralmarkt_2025-2/",
+    "start_time": "2026-08-30T10:00:00+02:00",
+    "start_date": "2026-08-30",
+    "title": "Zentralmarkt",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/zentralmarkt_2025-2/",
+    "start_time": "2026-09-27T10:00:00+02:00",
+    "start_date": "2026-09-27",
+    "title": "Zentralmarkt",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/ensemble_proton_bern_september26/",
+    "start_time": "2026-09-29T19:30:00+02:00",
+    "start_date": "2026-09-29",
+    "title": "Ensemble Proton Bern",
+    "subtitle": "Brodel-Tage",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/barbara_bleisch_trifft_mirjana_spoljaric_egger_1-10-26/",
+    "start_time": "2026-10-01T20:00:00+02:00",
+    "start_date": "2026-10-01",
+    "title": "Barbara Bleisch trifft",
+    "subtitle": "Raúl Krauthausen",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/milena-patagonia_oktober_2026/",
+    "start_time": "2026-10-02T19:30:00+02:00",
+    "start_date": "2026-10-02",
+    "title": "Milena Patagônia & Band",
+    "subtitle": "Dijaspora Baby-Tourstart & Plattentaufe",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/stanislas-pili_mauricio-kagel_spielplan_oktober2026/",
+    "start_time": "2026-10-06T20:00:00+02:00",
+    "start_date": "2026-10-06",
+    "title": "Stanislas Pili, Andrea Zamengo, João Calado",
+    "subtitle": "Spielplan - Instrumentalmusik in Aktion (1970). Komposition: Mauricio Kagel",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/barbara_bleisch_trifft_adrian_daub_28-5-26/",
+    "start_time": "2026-12-10T20:00:00+01:00",
+    "start_date": "2026-12-10",
+    "title": "Barbara Bleisch trifft",
+    "subtitle": "Mirjana Spoljaric Egger",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.dampfzentrale.ch/event/ensemble_proton_bern_dezember26/",
+    "start_time": "2026-12-15T19:30:00+01:00",
+    "start_date": "2026-12-15",
+    "title": "Ensemble Proton Bern",
+    "subtitle": "Ausschweifen",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Dampfzentrale",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  }
+]

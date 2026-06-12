@@ -1,0 +1,47 @@
+[
+  {
+    "url": "https://www.treibhausluzern.ch/programm/bandnight-musikschule-luzern-130626",
+    "start_time": "2026-06-13T18:00:00+02:00",
+    "start_date": "2026-06-13",
+    "title": "Bandnight Musikschule Luzern",
+    "subtitle": "Showcase",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Treibhaus",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.treibhausluzern.ch/programm/aeon-kay-set-the-skies-aflame-release-in-concert-support-varidian-260626",
+    "start_time": "2026-06-26T19:30:00+02:00",
+    "start_date": "2026-06-26",
+    "title": "Aeon Kay | set the skies aflame - Release Concert | Support: Varidian",
+    "subtitle": "Release Concert",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Treibhaus",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.treibhausluzern.ch/programm/binary-sunset-albumtaufe-manic-pixxies-250926",
+    "start_time": "2026-09-25T19:30:00+02:00",
+    "start_date": "2026-09-25",
+    "title": "Binary Sunset Albumtaufe + Manic Pixxies",
+    "subtitle": "Gemeinsamer Konzertabend im Südpol",
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Treibhaus",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  }
+]

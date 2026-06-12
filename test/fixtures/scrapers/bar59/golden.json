@@ -1,0 +1,184 @@
+[
+  {
+    "url": "https://www.bar59.ch/#event-0kZj01P4YF1GqSqtrCkM",
+    "start_time": "2026-07-10T20:00:00+02:00",
+    "start_date": "2026-07-10",
+    "title": "Sommerpause",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-4BC42V15wfqZd7GnAa1A",
+    "start_time": "2026-07-04T20:00:00+02:00",
+    "start_date": "2026-07-04",
+    "title": "Sommerpause",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-4WfgfgMZUR7YtqUOXOhi",
+    "start_time": "2026-06-18T21:00:00+02:00",
+    "start_date": "2026-06-18",
+    "title": "Baraoke 59 - Karaoke",
+    "subtitle": null,
+    "genre_list": [
+      "Karaoke"
+    ],
+    "style_list": [
+      "Karaoke"
+    ],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-6glaLee3nqtCBnbBqHMQ",
+    "start_time": "2026-07-03T20:00:00+02:00",
+    "start_date": "2026-07-03",
+    "title": "Sommerpause",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-9y24s1SjKodaytiBKVyC",
+    "start_time": "2026-06-26T20:00:00+02:00",
+    "start_date": "2026-06-26",
+    "title": "B59 Tanznacht",
+    "subtitle": null,
+    "genre_list": [
+      "Open Format"
+    ],
+    "style_list": [
+      "Open Format"
+    ],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-ADXaVCp46MUrf7WUPqND",
+    "start_time": "2026-06-27T20:00:00+02:00",
+    "start_date": "2026-06-27",
+    "title": "B59 Royal Night",
+    "subtitle": null,
+    "genre_list": [
+      "Hip-Hop & Classics"
+    ],
+    "style_list": [
+      "Hip-Hop & Classics"
+    ],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-BpZ3cPOu2N5fGjTF2bo6",
+    "start_time": "2026-08-01T22:00:00+02:00",
+    "start_date": "2026-08-01",
+    "title": "B59 Party Tunes",
+    "subtitle": null,
+    "genre_list": [
+      "Open Format"
+    ],
+    "style_list": [
+      "Open Format"
+    ],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-CCWtJvYNn2W1vlaS8OFo",
+    "start_time": "2026-08-22T22:00:00+02:00",
+    "start_date": "2026-08-22",
+    "title": "B59 Latin Groove",
+    "subtitle": null,
+    "genre_list": [
+      "Salsa",
+      "Bachata",
+      "Reggaeton"
+    ],
+    "style_list": [
+      "Salsa",
+      "Bachata",
+      "Reggaeton"
+    ],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-DCzutn9AVFLgPkZIFFo8",
+    "start_time": "2026-08-21T22:00:00+02:00",
+    "start_date": "2026-08-21",
+    "title": "B59 Party Tunes",
+    "subtitle": null,
+    "genre_list": [
+      "Open Format"
+    ],
+    "style_list": [
+      "Open Format"
+    ],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://www.bar59.ch/#event-Db89Rf7AjLyFrlotYBqX",
+    "start_time": "2026-06-25T21:00:00+02:00",
+    "start_date": "2026-06-25",
+    "title": "Baraoke 59 - Karaoke",
+    "subtitle": null,
+    "genre_list": [
+      "Karaoke"
+    ],
+    "style_list": [
+      "Karaoke"
+    ],
+    "location_list": [
+      "Bar 59",
+      "Luzern",
+      "LU"
+    ],
+    "cancelled_at": false
+  }
+]

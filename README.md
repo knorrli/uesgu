@@ -70,4 +70,3 @@ Notes:
   event tags.
 - `Event#recompute_styles!` is only needed when dispositions or mappings change
   *without* a re-scrape; the scrape already derives each event's styles.
-```

@@ -46,6 +46,13 @@ module TagsHelper
     t("cantons.#{code}", default: code)
   end
 
+  # How a location tag reads to a human. Cities/venues are stored by name, but a
+  # canton tag is its code ("BE"), so localize that one to "Bern"/"Berne". Used by
+  # the mobile filter sheet's chips and tree so cantons never surface as raw codes.
+  def location_display(name)
+    Location.type_for(name) == :canton ? canton_name(name) : name
+  end
+
   # Location names in canton > city > venue order (each canton, then its cities,
   # then their venues, alphabetized within each level). Used to sort the filter
   # dropdown. Names not covered by the scraper hierarchy keep their order after.
@@ -60,5 +67,34 @@ module TagsHelper
     order = hierarchical_location_names.each_with_index.to_h
     available_tags(context: :locations, applied: applied)
       .sort_by { |tag| [order[tag.name] || Float::INFINITY, tag.name] }
+  end
+
+  # A canton > city > venue tree for the mobile "where" filter sheet, annotated
+  # with live event counts. Structure comes from the scraper-derived hierarchy
+  # (Location.hierarchy) but every node is pruned to what events actually carry
+  # right now (Location.usage), so the sheet never offers a venue with nothing on.
+  #
+  # Each node: { name:, value:, type:, count:, children: }. A canton filters by
+  # its CODE (the tag events carry, e.g. "BE") but is shown by its localized name,
+  # so name and value differ there; cities/venues tag by their own name.
+  def location_filter_tree
+    counts = Location.usage.to_h { |row| [row[:name], row[:count]] }
+
+    Location.hierarchy.sort.filter_map do |canton, cities|
+      city_nodes = cities.sort.filter_map do |city, venues|
+        venue_nodes = venues.uniq.sort.filter_map do |venue|
+          count = counts[venue].to_i
+          { name: venue, value: venue, type: :venue, count: count } if count.positive?
+        end
+        next if venue_nodes.empty? && counts[city].to_i.zero?
+
+        { name: city, value: city, type: :city,
+          count: counts[city] || venue_nodes.sum { |v| v[:count] }, children: venue_nodes }
+      end
+      next if city_nodes.empty? && counts[canton].to_i.zero?
+
+      { name: canton_name(canton), value: canton, type: :canton,
+        count: counts[canton] || city_nodes.sum { |c| c[:count] }, children: city_nodes }
+    end
   end
 end

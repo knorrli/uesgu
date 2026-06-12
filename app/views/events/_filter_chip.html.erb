@@ -1,0 +1,13 @@
+<%# An applied-filter chip in the mobile summary row. Tapping it removes that one
+    value (the controller unchecks the matching input and re-submits). `name` is
+    the param family (q/s/l/d), `value` the raw submitted value, `label` the human
+    text, `icon` a tag context. %>
+<button type="button" class="filter-chip"
+        data-action="filter-sheets#remove"
+        data-filter-sheets-name-param="<%= name %>"
+        data-filter-sheets-value-param="<%= value %>"
+        aria-label="<%= label %>">
+  <span class="filter-chip__icon <%= tag_icon_class(context: icon) %>"></span>
+  <span class="filter-chip__label"><%= label %></span>
+  <span class="filter-chip__remove ph ph-x" aria-hidden="true"></span>
+</button>

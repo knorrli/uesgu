@@ -411,6 +411,19 @@ en:
         venue: Venue
         city: City
         canton: Canton
+      sheet:
+        what: What
+        where: Where
+        when: When
+      search_where: "Search venues, cities, cantons…"
+      apply: Apply
+      clear: Clear
+      close: Close
+      free_text: free text
+      search_for: 'Search for “%{query}”'
+      custom_range: Custom range
+      date_from: From
+      date_to: To
   helpers:
     page_entries_info:
       more_pages:

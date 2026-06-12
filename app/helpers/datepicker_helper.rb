@@ -9,14 +9,21 @@ module DatepickerHelper
   end
 
   def datepicker_tag_content(date_range)
+    content_tag(:span, date_range_label(date_range))
+  end
+
+  # Plain-text label for a date range — a preset's localized name, a single
+  # localized date, or a localized "start - end" span. Shared by the date chip
+  # (datepicker_tag_content) and the mobile filter sheet's summary.
+  def date_range_label(date_range)
     if preset = Datepicker.preset[date_range]
-      content_tag(:span, preset[:label])
+      preset[:label]
     else
-      start_date, end_date = date_range.split(' - ').map { |date_string| Time.zone.parse(date_string).to_date.iso8601 }
+      start_date, end_date = date_range.split(' - ').map { |date_string| Time.zone.parse(date_string).to_date }
       if start_date == end_date
-        content_tag(:span, l(start_date.to_date, format: :default))
+        l(start_date, format: :default)
       else
-        content_tag(:span, "#{l(start_date.to_date, format: :default)} - #{l(end_date.to_date, format: :default)}")
+        "#{l(start_date, format: :default)} - #{l(end_date, format: :default)}"
       end
     end
   end

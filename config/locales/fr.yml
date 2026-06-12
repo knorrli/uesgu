@@ -411,6 +411,19 @@ fr:
         venue: Salle
         city: Ville
         canton: Canton
+      sheet:
+        what: Quoi
+        where: Où
+        when: Quand
+      search_where: "Rechercher salles, villes, cantons…"
+      apply: Appliquer
+      clear: Effacer
+      close: Fermer
+      free_text: texte libre
+      search_for: 'Rechercher « %{query} »'
+      custom_range: Période personnalisée
+      date_from: Du
+      date_to: Au
   helpers:
     page_entries_info:
       more_pages:

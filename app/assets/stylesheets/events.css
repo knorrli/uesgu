@@ -578,3 +578,349 @@
 .day-detail-close:focus-visible {
   color: var(--theme-fg-color);
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Mobile filter sheets (_filter_sheets.html.erb). Mobile-first: the sheet UI is
+   the default; the inline combobox filter (wrapped in .filter-desktop) takes over
+   at the tablet breakpoint — 600px, matching the calendar breakpoint above.
+   ───────────────────────────────────────────────────────────────────────── */
+.filter-desktop { display: none; }
+
+@media (min-width: 600px) {
+  .filter-desktop { display: block; }
+  .filter-sheets { display: none; }
+}
+
+/* ── Trigger bar ── three underlined rows echoing the inline filter, but each
+   whole row is a tap target opening its sheet. */
+.filter-sheets__bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+}
+
+.filter-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  width: 100%;
+  padding: var(--gap-small) 0;
+  border: 0;
+  border-bottom: var(--border-width) solid var(--theme-accent-color);
+  background: none;
+  color: var(--theme-fg-color);
+  font: inherit;
+  line-height: var(--filter-input-line-height);
+  text-align: left;
+  cursor: pointer;
+}
+
+.filter-trigger__icon {
+  font-size: var(--filter-icon-size);
+  color: var(--border-color);
+}
+
+.filter-trigger__label {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Empty field reads as a muted prompt — this is the search affordance for What. */
+.filter-trigger__label.is-empty { color: var(--theme-fg-muted); }
+
+.filter-trigger__more { color: var(--theme-fg-muted); }
+
+.filter-trigger__badge {
+  flex-shrink: 0;
+  min-width: 1.4em;
+  padding: 0 0.4em;
+  background: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.filter-trigger__chevron {
+  flex-shrink: 0;
+  color: var(--theme-fg-muted);
+}
+
+/* ── Applied-filter chips ── mirror the inline filter's .tag.active. */
+.filter-sheets__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small);
+  margin-top: var(--gap-medium);
+}
+
+.filter-sheets__summary:empty { display: none; }
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-small);
+  padding: 5px;
+  border: 0;
+  background: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+  font: inherit;
+  font-size: 75%;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.filter-chip__remove { font-size: 1.1em; }
+
+/* ── The sheet ── full-screen, slides up from the bottom. */
+body.filter-sheet-open { overflow: hidden; }
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-bg-color);
+  transform: translateY(100%);
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0.22s;
+}
+
+.sheet--open {
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.sheet__header {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: center;
+  gap: var(--gap-small);
+  padding: var(--gap-medium) var(--content-padding);
+  border-bottom: var(--border-width) solid var(--theme-accent-color);
+}
+
+.sheet__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: bold;
+  text-align: center;
+}
+
+.sheet__close {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme-fg-color);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sheet__clear {
+  justify-self: end;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme-fg-muted);
+  font: inherit;
+  font-size: var(--font-size-small);
+  cursor: pointer;
+}
+
+.sheet__search {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  padding: var(--gap-small) var(--content-padding);
+  border-bottom: var(--tag-border-width) solid var(--border-color);
+}
+
+.sheet__search-icon {
+  font-size: 1.3rem;
+  color: var(--border-color);
+}
+
+.sheet__search-input {
+  flex-grow: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+.sheet__search-input:focus { outline: none; }
+
+.sheet__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--gap-small) 0;
+}
+
+.sheet__footer {
+  padding: var(--gap-medium) var(--content-padding);
+  border-top: var(--tag-border-width) solid var(--border-color);
+}
+
+.sheet__apply {
+  width: 100%;
+  padding: var(--gap-medium);
+  border: 0;
+  background: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ── Option rows ── a checkable row; native box hidden, custom box drawn. */
+.opt {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-medium);
+  padding: var(--gap-medium) var(--content-padding);
+  cursor: pointer;
+}
+
+.opt--hidden { display: none; }
+
+/* `.opt { display: flex }` is an author rule, so it would beat the UA's
+   `[hidden] { display: none }` (equal specificity) and leave a `hidden` row
+   visible. Re-assert hiding at higher specificity so both the initial state and
+   the JS-toggled `hidden` (the free-text row) actually hide. */
+.opt[hidden] { display: none; }
+
+.opt input[type="checkbox"] {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.opt__box {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: var(--border-width) solid var(--border-color);
+}
+
+.opt input:checked ~ .opt__box {
+  background: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
+}
+
+.opt input:checked ~ .opt__box::before {
+  content: "";
+  width: 0.8rem;
+  height: 0.8rem;
+  background-color: var(--theme-bg-color);
+  -webkit-mask: var(--check-mask) center / contain no-repeat;
+  mask: var(--check-mask) center / contain no-repeat;
+}
+
+.opt__label {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.opt__type {
+  flex-shrink: 0;
+  color: var(--theme-fg-muted);
+  font-size: 75%;
+}
+
+.opt__count {
+  flex-shrink: 0;
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+/* Tree depth: cities indent one step, venues two; venues read a touch quieter. */
+.opt--city  { padding-left: calc(var(--content-padding) + 1.5rem); }
+.opt--venue { padding-left: calc(var(--content-padding) + 3rem); }
+.opt--venue .opt__label { font-size: var(--font-size-small); }
+
+/* ── Location group ── canton row + expand toggle; collapsed hides its body. */
+.loc-group--hidden { display: none; }
+
+.loc-group__head { display: flex; align-items: center; }
+
+.loc-group__head .opt { flex-grow: 1; }
+
+.loc-group__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  align-self: stretch;
+  padding: 0 var(--content-padding);
+  border: 0;
+  background: none;
+  color: var(--theme-fg-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.loc-group__count { font-size: var(--font-size-small); }
+
+.loc-group__chevron { transition: transform 0.15s ease; }
+
+.loc-group:not(.collapsed) .loc-group__chevron { transform: rotate(180deg); }
+
+.loc-group.collapsed .loc-group__body { display: none; }
+
+.loc-group__body { border-bottom: var(--tag-border-width) solid var(--theme-bg-muted); }
+
+/* ── Free-text "search for X" row ── the thing a fixed list can't do. */
+.opt--newquery {
+  width: 100%;
+  border: 0;
+  background: var(--theme-bg-muted);
+  font: inherit;
+  text-align: left;
+}
+
+.opt--newquery .opt__box {
+  border-color: var(--theme-accent-color);
+  color: var(--theme-accent-color);
+}
+
+.opt--newquery .opt__label { color: var(--theme-accent-color); }
+.opt--query .opt__type { color: var(--theme-accent-color); }
+
+/* ── Custom date range ── two native (OS) date pickers → one range. */
+.opt--custom {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--gap-small);
+  cursor: default;
+}
+
+.custom-range {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-medium);
+}
+
+.custom-range__input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--gap-small) 0;
+  border: 0;
+  border-bottom: var(--border-width) solid var(--border-color);
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+.custom-range__sep { color: var(--theme-fg-muted); }

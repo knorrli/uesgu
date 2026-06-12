@@ -411,6 +411,19 @@ de:
         venue: Lokal
         city: Stadt
         canton: Kanton
+      sheet:
+        what: Was
+        where: Wo
+        when: Wann
+      search_where: "Lokale, Städte, Kantone suchen…"
+      apply: Anwenden
+      clear: Zurücksetzen
+      close: Schliessen
+      free_text: Freitext
+      search_for: '„%{query}“ suchen'
+      custom_range: Eigener Zeitraum
+      date_from: Von
+      date_to: Bis
   helpers:
     page_entries_info:
       more_pages:

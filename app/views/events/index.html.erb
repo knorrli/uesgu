@@ -3,7 +3,12 @@
 <div class="flex flex-col gap-large align-stretch" data-controller="filter favorite"
      data-action="turbo:before-frame-render->favorite#beforeFrameRender turbo:frame-load->favorite#reapply"
      data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
-  <%= render 'filter', filter: @filter %>
+  <%# Two presentations of the same filter, CSS-toggled at 600px: the inline
+      combobox filter on wider screens, full-screen sheets on mobile. Each is an
+      independent GET form producing identical params; only the visible one is
+      interactive, so they never collide. %>
+  <div class="filter-desktop"><%= render 'filter', filter: @filter %></div>
+  <%= render 'filter_sheets' %>
 
   <%# Toggle row, above the content in both views (so the first bold header lines
       up across views). The left cluster holds the "my favorites" filter shortcut

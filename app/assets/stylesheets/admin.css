@@ -173,6 +173,9 @@
 /* Status pill: ok = green, empty (ran but wrote nothing) = amber, failed = red. */
 .scrape-badge {
   display: inline-block;
+  /* Centre the pill against adjacent text instead of letting its padded box
+     sit on the text baseline (which makes it ride high next to the run date). */
+  vertical-align: middle;
   padding: 0 var(--gap-xsmall);
   border-radius: 3px;
   font-size: var(--font-size-small);

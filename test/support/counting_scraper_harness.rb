@@ -22,6 +22,10 @@ class CountingScraperHarness < Scrapers::Agent
   # A row flagged :bad yields a blank title so save! trips the presence
   # validation — the per-event skip path. A :title lets a re-scrape change data.
   def event_title(content) = content[:bad] ? nil : (content[:title] || 'Synthetic Show')
+
+  # A second, independently-varying field — lets a test change one field while
+  # holding another, e.g. to prove an admin-locked field survives a re-scrape.
+  def event_subtitle(content) = content[:subtitle]
 end
 
 Scrapers::All.scrapers.delete('CountingScraperHarness')

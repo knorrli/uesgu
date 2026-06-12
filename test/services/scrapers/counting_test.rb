@@ -57,6 +57,41 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert_not Event.exists?(url: 'https://fixture.test/bad')
   end
 
+  test 'a locked field survives a re-scrape while other fields still update' do
+    url = 'https://fixture.test/locked'
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Real Title', subtitle: 'First Sub' }]
+    CountingScraperHarness.new.call
+    event = Event.find_by(url: url)
+    event.lock_field!(:title) # admin corrected the title
+
+    # Source changes both fields; the locked title must be preserved, the
+    # unlocked subtitle must track the source → a real change → updated.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Source Title', subtitle: 'Second Sub' }]
+    result = CountingScraperHarness.new.call
+
+    assert_equal 1, result.updated
+    assert_equal 0, result.unchanged
+    event.reload
+    assert_equal 'Real Title', event.title
+    assert_equal 'Second Sub', event.subtitle
+  end
+
+  test 'a re-scrape that only touches a locked field counts as unchanged' do
+    url = 'https://fixture.test/locked-only'
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Kept Title' }]
+    CountingScraperHarness.new.call
+    Event.find_by(url: url).lock_field!(:title)
+
+    # The only source change is the locked title → the event is effectively
+    # untouched, so it tallies as unchanged, not updated.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Ignored New Title' }]
+    result = CountingScraperHarness.new.call
+
+    assert_equal 0, result.updated
+    assert_equal 1, result.unchanged
+    assert_equal 'Kept Title', Event.find_by(url: url).title
+  end
+
   test 'a dismissed event is not resurrected or updated by a re-scrape' do
     url = 'https://fixture.test/dismissed'
     CountingScraperHarness.next_rows = [{ url: url, title: 'Original' }]

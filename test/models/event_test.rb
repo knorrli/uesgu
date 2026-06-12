@@ -75,6 +75,37 @@ class EventTest < ActiveSupport::TestCase
     assert_operator summary.length, :<, 200
   end
 
+  test 'lock_field! marks an overridable field, idempotently' do
+    e = event
+    refute e.overridden?(:title)
+
+    e.lock_field!(:title)
+    assert e.overridden?(:title)
+    assert_equal %w[title], e.reload.overridden_fields
+
+    e.lock_field!(:title)
+    assert_equal %w[title], e.reload.overridden_fields
+  end
+
+  test 'lock_field! ignores names outside OVERRIDABLE_FIELDS' do
+    e = event
+    e.lock_field!(:url)
+    e.lock_field!(:hidden)
+    assert_empty e.reload.overridden_fields
+  end
+
+  test 'release_field! clears a locked field, idempotently' do
+    e = event
+    e.lock_field!(:subtitle)
+    assert e.overridden?(:subtitle)
+
+    e.release_field!(:subtitle)
+    refute e.reload.overridden?(:subtitle)
+
+    e.release_field!(:subtitle) # no-op, no error
+    assert_empty e.reload.overridden_fields
+  end
+
   test 'ransackable allowlists expose only the intended fields' do
     assert_equal %w[title subtitle start_date].sort, Event.ransackable_attributes.sort
     assert_includes Event.ransackable_associations, 'locations'

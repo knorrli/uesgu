@@ -44,6 +44,10 @@ class Scrapers::GoldenTest < Minitest::Test
     # guard must read as false here.
     def dismissed? = false
 
+    # Likewise no admin field-overrides offline, so build_event's per-field
+    # override guard reads as false and every field is captured from source.
+    def overridden?(_field) = false
+
     # Visibility is a DB-derived projection (Genre.hidden), not a parsing concern,
     # so the offline run treats every event as visible — mirroring the stubbed
     # event_styles. The real derivation is covered by EventTest.

@@ -32,7 +32,10 @@
 
   <% if current_user&.admin? && interactive %>
     <div class="event-actions">
-      <%= button_to event, class: 'button event-delete', data: { turbo_method: :delete }, 'aria-label': t('events.delete_event') do %>
+      <%= link_to admin_event_path(event), class: 'icon-button', data: { turbo_frame: '_top' }, 'aria-label': t('events.edit_event') do %>
+        <span class="ph ph-gear"></span>
+      <% end %>
+      <%= button_to event, method: :delete, class: 'icon-button danger', 'aria-label': t('events.delete_event') do %>
         <span class="ph ph-trash"></span>
       <% end %>
     </div>

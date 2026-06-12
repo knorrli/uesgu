@@ -38,7 +38,9 @@ a {
   font-size: var(--font-size-small);
 }
 
-/* Unstyled icon/action buttons (e.g. event delete) — overrides controls.css */
+/* Flatten <button class="button"> back to bare (overrides controls.css). Inline
+   icon actions should instead use the shared .icon-button role in controls.css,
+   which flattens both <a> and <button> consistently. */
 .button {
   background: none;
   border: none;

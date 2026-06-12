@@ -1,0 +1,73 @@
+<div class="flex flex-col gap-large">
+  <%= render 'admin/back', path: admin_events_path, label: t('admin.events.show.back') %>
+
+  <div class="flex flex-col gap-small">
+    <h1><%= @event.title %></h1>
+    <div class="flex gap-small wrap align-baseline muted">
+      <span><%= l(@event.start_date) %></span>
+      <% if @event.venue %><span><%= @event.venue.name %></span><% end %>
+      <%= link_to t('.source_link'), @event.url, target: '_blank', rel: 'noopener' %>
+      <% if @event.cancelled? %><span class="tag"><%= t('admin.events.index.cancelled_badge') %></span><% end %>
+      <% if @event.hidden? %><span><%= t('admin.events.index.hidden_badge') %></span><% end %>
+    </div>
+  </div>
+
+  <%# Fields the scraper re-derives each run are read-only here; only the scalar
+      OVERRIDABLE_FIELDS are editable, and editing one locks it against re-scrape. %>
+  <p class="muted"><%= t('.intro') %></p>
+
+  <%= form_with url: admin_event_path(@event), method: :patch, class: 'account-form flex flex-col gap-medium' do %>
+    <label class="flex flex-col gap-small">
+      <span class="flex gap-small align-baseline">
+        <%= t('.title_label') %>
+        <% if @event.overridden?(:title) %><span class="tag"><%= t('.overridden_badge') %></span><% end %>
+      </span>
+      <%= text_field_tag 'event[title]', @event.title, autocomplete: 'off' %>
+    </label>
+
+    <label class="flex flex-col gap-small">
+      <span class="flex gap-small align-baseline">
+        <%= t('.subtitle_label') %>
+        <% if @event.overridden?(:subtitle) %><span class="tag"><%= t('.overridden_badge') %></span><% end %>
+      </span>
+      <%= text_field_tag 'event[subtitle]', @event.subtitle, autocomplete: 'off' %>
+    </label>
+
+    <div class="flex gap-medium wrap">
+      <label class="flex flex-col gap-small">
+        <span class="flex gap-small align-baseline">
+          <%= t('.date_label') %>
+          <% if @event.overridden?(:start_date) || @event.overridden?(:start_time) %>
+            <span class="tag"><%= t('.overridden_badge') %></span>
+          <% end %>
+        </span>
+        <%= date_field_tag 'event[date]', @event.start_date&.iso8601 %>
+      </label>
+      <label class="flex flex-col gap-small">
+        <span><%= t('.time_label') %></span>
+        <%= time_field_tag 'event[time]', @event.start_time&.strftime('%H:%M') %>
+      </label>
+    </div>
+
+    <%= submit_tag t('.save') %>
+  <% end %>
+
+  <% locked = @event.overridden_fields & Event::OVERRIDABLE_FIELDS %>
+  <% if locked.any? %>
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.overrides_heading') %></h2>
+      <p class="muted"><%= t('.overrides_intro') %></p>
+      <ul class="admin-list">
+        <%# Date and time release together, so show them as a single "schedule" row. %>
+        <% rows = locked.include?('start_date') || locked.include?('start_time') ? (locked - %w[start_date start_time]) + ['start_date'] : locked %>
+        <% rows.each do |field| %>
+          <li class="admin-row">
+            <span class="admin-row__main"><%= t(".field_#{field}") %></span>
+            <%= button_to t('.revert'), revert_admin_event_path(@event, field: field),
+                  method: :patch, class: 'button' %>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+  <% end %>
+</div>

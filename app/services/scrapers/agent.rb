@@ -104,10 +104,14 @@ module Scrapers
     def build_event(event, row)
       content = event_content(row)
       preprocess(content)
-      event.start_time    = event_start_time(content)
-      event.start_date    = event.start_time.to_date
-      event.title         = event_title(content)
-      event.subtitle      = event_subtitle(content)
+      # Skip any field an admin has manually edited and locked, so the re-scrape
+      # can't overwrite the correction (Event#overridden? — the field-level
+      # sibling of the dismissed-event skip above). start_date trails start_time
+      # unless independently locked, so a locked time keeps both consistent.
+      event.start_time    = event_start_time(content) unless event.overridden?(:start_time)
+      event.start_date    = event.start_time.to_date  unless event.overridden?(:start_date)
+      event.title         = event_title(content)      unless event.overridden?(:title)
+      event.subtitle      = event_subtitle(content)   unless event.overridden?(:subtitle)
       # Trusted (discovery) genres from a clean structured field may mint new
       # taxonomy; consumption genres from an unstable free-text source are
       # attached match-only, never creating a Genre row (see Genre.existing_only).

@@ -38,6 +38,36 @@ class Event < ApplicationRecord
     update!(dismissed_at: Time.current) unless dismissed?
   end
 
+  # Scalar fields an admin may edit and lock against the scraper. Tag-based
+  # fields (genres/styles, and the visibility/cancellation flags they derive)
+  # stay source-owned; `url` is the immutable upsert key, so neither is editable.
+  OVERRIDABLE_FIELDS = %w[title subtitle start_date start_time].freeze
+
+  # `overridden_fields` is the field-level sibling of `dismissed_at`: a name
+  # listed here is admin-owned, so the re-scrape leaves that column untouched
+  # (see Scrapers::Agent#build_event) instead of re-deriving it from source.
+  def overridden?(field)
+    overridden_fields.include?(field.to_s)
+  end
+
+  # Lock a field to its current (admin-edited) value. Idempotent; ignores any
+  # name outside OVERRIDABLE_FIELDS so the list can never hold a source-owned
+  # column.
+  def lock_field!(field)
+    field = field.to_s
+    return unless OVERRIDABLE_FIELDS.include?(field) && !overridden?(field)
+
+    update!(overridden_fields: overridden_fields + [field])
+  end
+
+  # Release a field back to the scraper; the next run refills it from source.
+  def release_field!(field)
+    field = field.to_s
+    return unless overridden?(field)
+
+    update!(overridden_fields: overridden_fields - [field])
+  end
+
   def self.ransackable_attributes(auth_object = nil)
     ['title', 'subtitle', 'start_date']
   end

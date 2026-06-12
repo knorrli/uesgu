@@ -263,13 +263,19 @@
   font-weight: normal;
 }
 
-/* Admin delete: a quiet line-icon, not a boxed button. */
-.event-delete {
-  color: var(--theme-fg-muted);
+/* Admin actions column: the edit gear and delete trash sit together, top-aligned
+   with the event title. The icons use the shared .icon-button role; the delete is
+   a button_to, so flatten its wrapping form to a zero-margin flex box that
+   shrink-wraps the button and lines up with the bare anchor gear. */
+.event-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-small);
 }
 
-.event-delete:hover {
-  color: var(--theme-warn-color);
+.event-actions form {
+  margin: 0;
+  display: flex;
 }
 
 /* Past events recede but stay legible. */

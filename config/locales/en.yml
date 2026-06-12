@@ -255,6 +255,27 @@ en:
         cancelled_badge: cancelled
         hidden_badge: hidden
         empty: No events match.
+        overridden_badge: edited
+      show:
+        back: Back to events
+        source_link: View source
+        intro: Correct bad source data below. A field you change is locked and won't be overwritten on the next scrape.
+        title_label: Title
+        subtitle_label: Subtitle
+        date_label: Date
+        time_label: Time
+        overridden_badge: manually edited
+        save: Save
+        overrides_heading: Manual overrides
+        overrides_intro: These fields are admin-owned and skipped by the scraper. Revert one to let the next scrape refill it from source.
+        revert: Revert to source
+        field_title: Title
+        field_subtitle: Subtitle
+        field_start_date: Date & time
+      update:
+        saved: Event updated.
+      revert:
+        reverted: Field reverted to source.
     styles:
       index:
         title: Styles
@@ -333,6 +354,7 @@ en:
   events:
     cancelled: Cancelled
     delete_event: Delete event
+    edit_event: Edit event
     edit_tag: Edit tag
     index:
       title: üsgu

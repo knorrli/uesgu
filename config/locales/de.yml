@@ -255,6 +255,27 @@ de:
         cancelled_badge: abgesagt
         hidden_badge: ausgeblendet
         empty: Keine passenden Veranstaltungen.
+        overridden_badge: bearbeitet
+      show:
+        back: Zurück zu Veranstaltungen
+        source_link: Quelle ansehen
+        intro: Korrigiere fehlerhafte Quelldaten unten. Ein geändertes Feld wird gesperrt und beim nächsten Scrape nicht überschrieben.
+        title_label: Titel
+        subtitle_label: Untertitel
+        date_label: Datum
+        time_label: Zeit
+        overridden_badge: manuell bearbeitet
+        save: Speichern
+        overrides_heading: Manuelle Überschreibungen
+        overrides_intro: Diese Felder gehören dem Admin und werden vom Scraper übersprungen. Setze eines zurück, damit der nächste Scrape es wieder aus der Quelle füllt.
+        revert: Auf Quelle zurücksetzen
+        field_title: Titel
+        field_subtitle: Untertitel
+        field_start_date: Datum & Zeit
+      update:
+        saved: Veranstaltung aktualisiert.
+      revert:
+        reverted: Feld auf Quelle zurückgesetzt.
     styles:
       index:
         title: Stile
@@ -333,6 +354,7 @@ de:
   events:
     cancelled: Abgesagt
     delete_event: Veranstaltung löschen
+    edit_event: Veranstaltung bearbeiten
     edit_tag: Tag bearbeiten
     index:
       title: üsgu

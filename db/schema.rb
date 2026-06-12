@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_12_140000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_12_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_12_140000) do
     t.datetime "cancelled_at"
     t.bigint "created_in_scrape_run_id"
     t.datetime "dismissed_at"
+    t.jsonb "overridden_fields", default: [], null: false
     t.index ["created_in_scrape_run_id"], name: "index_events_on_created_in_scrape_run_id"
     t.index ["dismissed_at"], name: "index_events_on_dismissed_at"
     t.index ["hidden"], name: "index_events_on_hidden"

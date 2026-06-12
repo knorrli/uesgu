@@ -100,4 +100,29 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     refute e.reload.dismissed?
   end
+
+  test 'the edit gear links to the admin event page, only for admins' do
+    e = event(start_date: Date.current + 3.days)
+
+    sign_in_as user(admin: true)
+    get events_path
+    assert_select "a.icon-button[href=?]", admin_event_path(e)
+
+    sign_in_as user(admin: false)
+    get events_path
+    assert_select 'a.icon-button', count: 0
+  end
+
+  test 'the delete button submits a real DELETE (method override present)' do
+    e = event(start_date: Date.current + 3.days)
+    sign_in_as user(admin: true)
+
+    get events_path
+    # button_to must emit the _method=delete override so the form routes to
+    # EventsController#destroy rather than a stray POST (which Turbo treats as a
+    # full navigation / "refresh").
+    assert_select "form[action=?][method=post]", event_path(e) do
+      assert_select "input[type=hidden][name=_method][value=delete]"
+    end
+  end
 end

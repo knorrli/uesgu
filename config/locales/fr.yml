@@ -191,6 +191,7 @@ fr:
           seen: Vus
           new: Nouveaux
           updated: Mis à jour
+          unchanged: Inchangés
           skipped: Ignorés
           history: Historique
       show:

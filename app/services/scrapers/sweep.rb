@@ -53,13 +53,16 @@ module Scrapers
       @out.puts "[#{slug}] starting #{klass.url}"
 
       result = klass.call
-      # ok = wrote at least one event; empty = ran clean but wrote none, the
-      # silent regression this whole feature exists to surface.
-      status = (result.created + result.updated).positive? ? :ok : :empty
+      # ok = processed at least one event (created/updated/unchanged); empty =
+      # ran clean but processed none, the silent regression this exists to catch.
+      # Unchanged counts as processed: a re-scrape that changed nothing is still
+      # a healthy run, not an empty one.
+      processed = result.created + result.updated + result.unchanged
+      status = processed.positive? ? :ok : :empty
       run.scrape_results.create!(
         scraper: slug, status: status, started_at: started, duration_ms: ms_since(started),
-        rows_seen: result.seen, created_count: result.created,
-        updated_count: result.updated, skipped_count: result.skipped
+        rows_seen: result.seen, created_count: result.created, updated_count: result.updated,
+        unchanged_count: result.unchanged, skipped_count: result.skipped
       )
       if result.created_ids.any?
         Event.where(id: result.created_ids).update_all(created_in_scrape_run_id: run.id)

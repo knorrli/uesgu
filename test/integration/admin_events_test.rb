@@ -41,6 +41,16 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_select 'a', text: 'Called Off', count: 0
   end
 
+  test 'the default date sort lists events chronologically (oldest first)' do
+    later = event(title: 'LaterShow', start_date: Date.current + 30.days)
+    sooner = event(title: 'SoonerShow', start_date: Date.current + 2.days)
+    sign_in_as user(admin: true)
+
+    get admin_events_path
+    assert_response :success
+    assert_operator @response.body.index('SoonerShow'), :<, @response.body.index('LaterShow')
+  end
+
   test 'the show page renders the edit form and surfaces locked fields' do
     e = event(title: 'Editable Show')
     e.lock_field!(:title)

@@ -20,24 +20,17 @@ button, a.button {
   }
 }
 
-/* Icon action buttons: a flat, boxless clickable icon (e.g. the admin edit/
-   delete controls on an event row). One shared role on both <a> and <button> so
-   every such control looks identical — the `a.`/`button.` qualifiers out-specify
-   the boxed button base above without depending on stylesheet order. Add the
-   `danger` modifier for a destructive (delete) hover tone. */
+/* Icon buttons: a flat, boxless, muted clickable icon — the single shared role
+   for every inline icon action (the admin event edit/delete on a row, the genre
+   tag edit gears, …), on either an <a> or a <button>. This is the chrome reset
+   only: no box, no link underline, muted with a hover lift. Layout — sizing,
+   padding, margins, glyph centring — belongs to the context that places them.
+   The `a.`/`button.` qualifiers out-specify the boxed button base above without
+   depending on stylesheet order. Add `danger` for a destructive (delete) tone. */
 a.icon-button,
 button.icon-button {
   cursor: pointer;
   text-decoration: none;
-  /* A tight centred box around the glyph, so an <a> and a <button> (with their
-     differing line-box metrics) place the icon identically and align in a row. */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  /* No box, but keep a small symmetric pad so the icon stays a comfortable tap
-     target on touch (matching the old delete button's hit area). */
-  padding: var(--gap-xsmall);
   border: 0;
   background: none;
   color: var(--theme-fg-muted);

@@ -215,9 +215,13 @@
   font-weight: bold;
 }
 
+/* The genre tag's inline edit gear (an .icon-button); only the inline layout is
+   local — colour, hover, and the underline reset come from the shared role. The
+   gear is a baseline-aligned icon glyph, so centre it to the text's middle
+   (otherwise it sits low, dipping below the tag's baseline). */
 .meta-edit {
   margin-left: 0.4ch;
-  color: var(--theme-fg-muted);
+  vertical-align: middle;
 }
 
 /* The follow heart trails its tag and inherits the tag's font-size, so the big
@@ -276,6 +280,17 @@
 .event-actions form {
   margin: 0;
   display: flex;
+}
+
+/* In the row-action column the gear (<a>) and trash (<button>) must line up, so
+   give each a tight centred box (the icon-button base is layout-free) plus a
+   small symmetric pad for a comfortable tap target. */
+.event-actions .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: var(--gap-xsmall);
 }
 
 /* Past events recede but stay legible. */

@@ -22,7 +22,11 @@ projects:
             plan: starter
             region: frankfurt
             buildCommand: "./bin/render-build.sh"
-            # preDeployCommand: "bundle exec rails db:migrate" # preDeployCommand only available on paid instance types
+            # Migrations run here (available on paid plans), AFTER a successful build
+            # and BEFORE the new release goes live — not in buildCommand, which runs on
+            # every build (incl. ones that never deploy) and ahead of cutover. This ties
+            # schema changes to actual deploys.
+            preDeployCommand: "bin/rails db:migrate"
             startCommand: "./bin/rails server"
             # Custom domains. üsgu.ch is the public, canonical web domain; it MUST be
             # listed in its punycode form (xn--sgu-goa.ch) — Render rejects raw umlauts.

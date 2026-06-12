@@ -14,10 +14,11 @@ module Admin
       'dismissed' => -> { Event.dismissed }
     }.freeze
 
-    # Newest first by default (the freshly scraped end of the table); 'title' is
-    # the alphabetical lookup.
+    # Chronological by default — oldest/nearest-term events first (the bulk of the
+    # table is upcoming, so this surfaces what's current rather than the furthest-
+    # out shows); 'title' is the alphabetical lookup.
     SORT_SCOPES = {
-      'date' => ->(scope) { scope.order(start_date: :desc) },
+      'date' => ->(scope) { scope.order(start_date: :asc, start_time: :asc) },
       'title' => ->(scope) { scope.order(:title) }
     }.freeze
 

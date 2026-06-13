@@ -104,6 +104,18 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_difference -> { u.notifications.count }, 1 do
       post fire_notification_rule_path(r)
     end
+    assert_redirected_to notification_path(u.notifications.last) # lands on the digest
+  end
+
+  test 'fire with no matches stays on the list with an empty notice' do
+    u = sign_in_as user
+    r = u.notification_rules.new(cadence: 'daily', time_of_day: 1, notify_push: false)
+    r.filter_attributes = { s: ['nothing-matches-this'] }
+    r.save!
+
+    assert_no_difference -> { u.notifications.count } do
+      post fire_notification_rule_path(r)
+    end
     assert_redirected_to notification_rules_path
   end
 

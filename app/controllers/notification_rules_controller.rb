@@ -45,8 +45,12 @@ class NotificationRulesController < ApplicationController
   # in-app digest (and any push/email) without waiting for the schedule.
   def fire
     notification = @rule.fire!(Time.current)
-    notice = notification ? t("notification_rules.fired", count: notification.events.size) : t("notification_rules.fired_empty")
-    redirect_to notification_rules_path, notice: notice
+    if notification
+      # Land straight on the digest it produced (created inline, so it's ready).
+      redirect_to notification_path(notification), notice: t("notification_rules.fired", count: notification.events.size)
+    else
+      redirect_to notification_rules_path, notice: t("notification_rules.fired_empty")
+    end
   end
 
   private

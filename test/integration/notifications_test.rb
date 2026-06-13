@@ -1,36 +1,39 @@
 require 'db_test_helper'
 
-# Locks the notifications endpoints: index lazily seals due digests, and show
-# marks the digest read.
+# Locks the notifications inbox: the index lists the user's digests with their
+# name + event count, and show marks a digest read. (Digests are created by
+# NotificationRule#fire!, not lazily on visit.)
 class NotificationsTest < ActionDispatch::IntegrationTest
-  test 'index lazily seals digests that came due since last visit' do
-    u = user(notification_frequency: 'daily', created_at: 2.days.ago)
-    event(created_at: 30.hours.ago)
-    sign_in_as u
-
-    assert_difference -> { u.notifications.count }, 1 do
-      get notifications_path
-    end
-    assert_response :success
-  end
-
-  test 'index shows the visible-event count per digest in one query' do
+  test 'index lists the users digests by name' do
     u = user
     sign_in_as u
-    digest = u.notifications.create!(period_start: 3.days.ago, period_end: 1.day.ago)
-    2.times { event(created_at: 2.days.ago) }
-    event(created_at: 5.days.ago) # outside the window — must not be counted
+    e = event(start_date: Date.current + 2)
+    u.notifications.create!(title: 'My alert', event_ids: [e.id],
+                            period_start: 1.week.ago, period_end: Time.current)
 
     get notifications_path
-
     assert_response :success
-    assert_select '.notification__meta', text: /2/
+    assert_select '.notification__name', text: /My alert/
+  end
+
+  test 'index shows each digests own event count' do
+    u = user
+    sign_in_as u
+    e1 = event(start_date: Date.current + 1)
+    e2 = event(start_date: Date.current + 2)
+    u.notifications.create!(title: 'D', event_ids: [e1.id, e2.id],
+                            period_start: 1.week.ago, period_end: Time.current)
+
+    get notifications_path
+    assert_response :success
+    assert_select '.notification__meta', text: /2 Veranstaltungen/
   end
 
   test 'show marks the digest read' do
     u = user
     sign_in_as u
-    digest = u.notifications.create!(period_start: 2.days.ago, period_end: 1.day.ago)
+    digest = u.notifications.create!(title: 'D', event_ids: [event.id],
+                                     period_start: 2.days.ago, period_end: Time.current)
 
     get notification_path(digest)
 

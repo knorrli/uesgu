@@ -13,11 +13,6 @@
       <dd class="muted"><%= @user.email_address.presence || t('.no_email') %></dd>
     </div>
     <div class="stat">
-      <dt><%= t('.frequency') %></dt>
-      <span class="stat__leader"></span>
-      <dd class="muted"><%= t("frequencies.#{@user.notification_frequency}") %></dd>
-    </div>
-    <div class="stat">
       <dt><%= t('.joined') %></dt>
       <span class="stat__leader"></span>
       <dd class="muted"><%= l(@user.created_at.to_date) %></dd>

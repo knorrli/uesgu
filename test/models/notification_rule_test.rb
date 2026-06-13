@@ -142,7 +142,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
   end
 
   test 'name auto-fills from the filter on save when blank, and is kept when given' do
-    auto = rule(user, filter: { l: ['Bern'], d: ['next_week'] })
+    auto = rule(user, filter: { l: ['Bern'], d: ['next_week'] }, weekday: 5) # next_week => weekly
     auto.save!
     assert auto.name.present?
     assert_equal auto.describe, auto.name
@@ -173,6 +173,42 @@ class NotificationRuleTest < ActiveSupport::TestCase
     r.update_column(:last_fired_at, 2.hours.ago)
     note = r.fire!(Time.current)
     assert_equal r.describe, note.title
+  end
+
+  # --- derive rhythm from window ---------------------------------------------
+
+  test 'a happening rule cadence is derived from its window, ignoring any chosen cadence' do
+    u = user
+    weekend = rule(u, filter: { d: ['this_weekend'] }, cadence: 'daily', weekday: 5)
+    weekend.save!
+    assert_equal 'weekly', weekend.cadence # the daily choice is overridden
+
+    month = rule(u, filter: { d: ['this_month'] }, cadence: 'daily', monthday: 1)
+    month.save!
+    assert_equal 'monthly', month.cadence
+
+    today = rule(u, filter: { d: ['today'] }, cadence: 'weekly', weekday: 5)
+    today.save!
+    assert_equal 'daily', today.cadence
+  end
+
+  test 'window_rhythm reflects the window; nil for added rules' do
+    assert_equal 'weekly', rule(user, filter: { d: ['this_weekend'] }).window_rhythm
+    assert_equal 'monthly', rule(user, filter: { d: ['next_month'] }).window_rhythm
+    assert_nil rule(user, filter: { s: ['Rock'] }).window_rhythm
+  end
+
+  # --- firehose guard --------------------------------------------------------
+
+  test 'track_favorites with no favorites matches nothing (no firehose)' do
+    u = user # follows nothing
+    event(created_at: 1.hour.ago, start_date: Date.current + 3)
+    r = u.notification_rules.new(track_favorites: true, cadence: 'daily', time_of_day: 1, notify_push: false)
+    r.filter_attributes = {}
+    r.save!
+    r.update_column(:last_fired_at, 2.hours.ago)
+
+    assert_empty r.matched_events(Time.current).to_a
   end
 
   test 'time_string parses to minutes-since-midnight' do

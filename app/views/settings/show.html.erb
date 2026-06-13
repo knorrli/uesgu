@@ -43,11 +43,6 @@
     <p class="muted"><%= t('settings.notifications_intro') %></p>
 
     <%= form_with model: @user, url: settings_path, method: :patch, class: 'account-form flex flex-col gap-medium' do |form| %>
-      <label class="flex flex-col gap-small">
-        <span><%= t('settings.frequency_label') %></span>
-        <%= form.select :notification_frequency, User::FREQUENCIES.map { |f| [t("frequencies.#{f}"), f] } %>
-      </label>
-
       <fieldset class="settings-field flex flex-col gap-small">
         <legend><%= t('settings.email_heading') %> <span class="muted"><%= t('settings.email_optional') %></span></legend>
         <p class="muted"><%= t('settings.email_hint') %></p>

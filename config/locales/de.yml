@@ -113,6 +113,11 @@ de:
       favorites: Meine Favoriten
       custom: Eigener Filter
     monthday_option: "Am %{day}."
+    rhythm_note: "Du wirst %{rhythm} benachrichtigt."
+    rhythm:
+      daily: täglich
+      weekly: wöchentlich
+      monthly: monatlich
     push_body:
       one: "%{name}: 1 neue Veranstaltung. Tippen zum Ansehen."
       other: "%{name}: %{count} neue Veranstaltungen. Tippen zum Ansehen."

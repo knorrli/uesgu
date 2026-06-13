@@ -16,6 +16,17 @@
 class NotificationRule < ApplicationRecord
   CADENCES = %w[daily weekly biweekly monthly].freeze
 
+  # For a "happening" rule the firing cadence is DERIVED from the window's period
+  # (a weekend/week window fires weekly, a month window monthly, today/tomorrow
+  # daily) — so cadence and window can never clash. "added" rules pick cadence
+  # freely; biweekly therefore only ever applies to "added" rules.
+  WINDOW_RHYTHM = {
+    "today" => "daily", "tomorrow" => "daily",
+    "this_week" => "weekly", "this_weekend" => "weekly",
+    "next_week" => "weekly", "next_weekend" => "weekly",
+    "this_month" => "monthly", "next_month" => "monthly"
+  }.freeze
+
   belongs_to :user
   has_many :notifications, dependent: :nullify
 
@@ -35,6 +46,9 @@ class NotificationRule < ApplicationRecord
   # alert form pre-fills the same proposal, so this also covers a cleared field
   # or API creation — the name can be overridden but never ends up blank.
   before_validation { self.name = describe if name.blank? }
+  # A happening rule's cadence is fixed by its window (see WINDOW_RHYTHM), so the
+  # form hides the cadence control and the user can't pick a clashing cadence.
+  before_validation { self.cadence = window_rhythm if happening? }
 
   def targets_something
     return if track_favorites?
@@ -79,6 +93,12 @@ class NotificationRule < ApplicationRecord
   def happening? = active_windows.any?
   def added? = !happening?
 
+  # The cadence implied by the (first) window — nil for an "added" rule. The form
+  # uses this to show the right firing-point control (weekday / day-of-month / —).
+  def window_rhythm
+    WINDOW_RHYTHM[active_windows.first]
+  end
+
   # ── Scheduling ─────────────────────────────────────────────────────────────
 
   def due?(now = Time.current)
@@ -115,6 +135,10 @@ class NotificationRule < ApplicationRecord
   # there's no date window); favorites get the live OR-match. "added" additionally
   # bounds by created_at since the last fire.
   def matched_events(now = Time.current)
+    # A live-favorites rule whose user has unfollowed everything must match
+    # nothing, not every event (no favorites → no OR group → would be a firehose).
+    return Event.none if track_favorites? && user.location_list.empty? && user.style_list.empty?
+
     rel = Event.visible
     rel = rel.where(created_at: coverage_floor...now) if added?
     rel.ransack(ransack_query(now)).result(distinct: true).order(:start_date, :start_time, :title)

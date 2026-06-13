@@ -24,19 +24,28 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test 'new carries the filter through and wires the schedule form' do
+  test 'new (added filter) carries the filter through and wires the cadence form' do
     sign_in_as user
-    get new_notification_rule_path(s: ['Rock'], l: ['Dachstock'], d: ['this_weekend'])
+    get new_notification_rule_path(s: ['Rock'], l: ['Dachstock']) # no date → added rule
 
     assert_response :success
-    assert_select 'form.rule-form[data-controller="rule-form"]'
     assert_select 'input[type=hidden][name="s[]"][value=?]', 'Rock'
     assert_select 'input[type=hidden][name="l[]"][value=?]', 'Dachstock'
-    assert_select 'input[type=hidden][name="d[]"][value=?]', 'this_weekend'
+    assert_select 'fieldset[data-controller="rule-form"]'
     assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"]'
     assert_select '[data-rule-form-target="weekday"]'
     # Name field is pre-filled with the auto-name (here: the Dachstock location).
     assert_select 'input[name="notification_rule[name]"][value*=?]', 'Dachstock'
+  end
+
+  test 'new (windowed filter) shows the derived-rhythm schedule, no cadence picker' do
+    sign_in_as user
+    get new_notification_rule_path(l: ['Bern'], d: ['this_weekend']) # weekly window
+
+    assert_response :success
+    assert_select 'input[type=hidden][name="d[]"][value=?]', 'this_weekend'
+    assert_select 'select[name="notification_rule[cadence]"]', false # rhythm is derived
+    assert_select 'select[name="notification_rule[weekday]"]'        # firing-day picker
   end
 
   test 'the sync checkbox appears only when the filter equals my favorites' do

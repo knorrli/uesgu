@@ -7,7 +7,7 @@
   </header>
 
   <%= form_with model: @rule, url: notification_rules_path, method: :post,
-        data: { controller: 'rule-form' }, class: 'rule-form account-form flex flex-col gap-medium' do |form| %>
+        class: 'rule-form account-form flex flex-col gap-medium' do |form| %>
     <% if @rule.errors.any? %>
       <ul class="form-errors">
         <% @rule.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
@@ -52,27 +52,54 @@
       <%= form.text_field :name, value: @rule.name.presence || @rule.describe, placeholder: t('notification_rules.fields.name_placeholder') %>
     </label>
 
-    <fieldset class="rule-fieldset flex flex-col gap-small">
-      <legend><%= t('notification_rules.section_when') %></legend>
-      <div class="rule-row flex gap-small">
-        <label class="flex flex-col gap-xsmall">
-          <span><%= t('notification_rules.fields.cadence') %></span>
-          <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' } %>
-        </label>
-        <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
-          <span><%= t('notification_rules.fields.weekday') %></span>
-          <%= form.select :weekday, rule_weekday_options %>
-        </label>
-        <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
-          <span><%= t('notification_rules.fields.monthday') %></span>
-          <%= form.select :monthday, rule_monthday_options %>
-        </label>
-        <label class="flex flex-col gap-xsmall">
-          <span><%= t('notification_rules.fields.time') %></span>
-          <%= form.time_field :time_string, value: @rule.time_string %>
-        </label>
-      </div>
-    </fieldset>
+    <% if @rule.happening? %>
+      <%# What's-on rule: the firing rhythm is fixed by the window, so there's no
+          cadence control — just the firing point within the period + time. %>
+      <fieldset class="rule-fieldset flex flex-col gap-small">
+        <legend><%= t('notification_rules.section_when') %></legend>
+        <p class="muted rule-hint"><%= t('notification_rules.rhythm_note', rhythm: t("notification_rules.rhythm.#{@rule.window_rhythm}")) %></p>
+        <div class="rule-row flex gap-small">
+          <% if @rule.window_rhythm == 'weekly' %>
+            <label class="flex flex-col gap-xsmall">
+              <span><%= t('notification_rules.fields.weekday') %></span>
+              <%= form.select :weekday, rule_weekday_options %>
+            </label>
+          <% elsif @rule.window_rhythm == 'monthly' %>
+            <label class="flex flex-col gap-xsmall">
+              <span><%= t('notification_rules.fields.monthday') %></span>
+              <%= form.select :monthday, rule_monthday_options %>
+            </label>
+          <% end %>
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.time') %></span>
+            <%= form.time_field :time_string, value: @rule.time_string %>
+          </label>
+        </div>
+      </fieldset>
+    <% else %>
+      <%# Newly-added rule: free cadence. weekday/monthday show per cadence (JS). %>
+      <fieldset class="rule-fieldset flex flex-col gap-small" data-controller="rule-form">
+        <legend><%= t('notification_rules.section_when') %></legend>
+        <div class="rule-row flex gap-small">
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.cadence') %></span>
+            <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' } %>
+          </label>
+          <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
+            <span><%= t('notification_rules.fields.weekday') %></span>
+            <%= form.select :weekday, rule_weekday_options %>
+          </label>
+          <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
+            <span><%= t('notification_rules.fields.monthday') %></span>
+            <%= form.select :monthday, rule_monthday_options %>
+          </label>
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.time') %></span>
+            <%= form.time_field :time_string, value: @rule.time_string %>
+          </label>
+        </div>
+      </fieldset>
+    <% end %>
 
     <fieldset class="rule-fieldset flex flex-col gap-small">
       <legend><%= t('notification_rules.section_channels') %></legend>

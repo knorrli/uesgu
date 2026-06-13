@@ -23,7 +23,7 @@ class SettingsController < ApplicationController
 
   def settings_params
     permitted = params.expect(
-      user: [:notification_frequency, :locale, :email_address, :password, :password_confirmation]
+      user: [:locale, :email_address, :password, :password_confirmation]
     )
 
     # Blank password means "leave it unchanged" rather than clearing it.

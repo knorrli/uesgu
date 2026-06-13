@@ -113,6 +113,11 @@ fr:
       favorites: Mes favoris
       custom: Filtre personnalisé
     monthday_option: "Le %{day}"
+    rhythm_note: "Tu seras averti %{rhythm}."
+    rhythm:
+      daily: chaque jour
+      weekly: chaque semaine
+      monthly: chaque mois
     push_body:
       one: "%{name} : 1 nouvel événement. Touche pour voir."
       other: "%{name} : %{count} nouveaux événements. Touche pour voir."

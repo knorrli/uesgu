@@ -43,7 +43,7 @@ projects:
                 fromDatabase:
                   name: uesgu-db
                   property: connectionString
-              - fromGroup: uesgu-secrets
+              - fromGroup: uesgu-env
               - key: WEB_CONCURRENCY
                 value: 1
               # Cap glibc's malloc arenas (default ~8 x CPU cores). Ruby's GVL
@@ -77,7 +77,7 @@ projects:
                 fromDatabase:
                   name: uesgu-db
                   property: connectionString
-              - fromGroup: uesgu-secrets
+              - fromGroup: uesgu-env
               - key: RAILS_ENV
                 value: production
             autoDeployTrigger: commit
@@ -86,7 +86,7 @@ projects:
           # within a quarter-hour of its chosen time; the rake task is idempotent
           # (skips rules whose scheduled moment hasn't passed / already fired), so
           # frequent runs are safe. Needs RAILS_MASTER_KEY (push VAPID + Resend
-          # key live in credentials) — supplied via the uesgu-secrets group.
+          # key live in credentials) — supplied via the uesgu-env group.
           - type: cron
             name: notify-due
             repo: https://github.com/knorrli/uesgu
@@ -101,7 +101,7 @@ projects:
                 fromDatabase:
                   name: uesgu-db
                   property: connectionString
-              - fromGroup: uesgu-secrets
+              - fromGroup: uesgu-env
               - key: RAILS_ENV
                 value: production
             autoDeployTrigger: commit
@@ -124,7 +124,7 @@ projects:
 # service — web and cron — needs it. Kept at the ROOT (workspace) level on
 # purpose: environment-scoped envVarGroups can't contain `sync: false` vars.
 envVarGroups:
-  - name: uesgu-secrets
+  - name: uesgu-env
     envVars:
       - key: RAILS_MASTER_KEY
         sync: false

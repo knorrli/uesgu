@@ -50,9 +50,10 @@ else live today already counts.
       today→daily), so it fires exactly once per window — no over-/under-notification,
       no event-dedup needed. The form hides the cadence picker for windowed rules.
 
-### §2 — Per-event saving
-- [ ] Save / unsave a single event (new primitive).
-- [ ] "My saved shows" view.
+### §2 — Per-event saving — ✅ DONE (commit `32eb6e0`)
+- [x] Save / unsave a single event — `EventSave` join + bookmark toggle on every
+      event (list / calendar / digest) for logged-in users.
+- [x] "My saved shows" view (`/saved_events`, upcoming saved events) + nav link.
 
 ### §3 — Email third-party disclaimer
 - [ ] Inline, opt-in disclosure at the email-entry point.

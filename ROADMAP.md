@@ -55,8 +55,10 @@ else live today already counts.
       event (list / calendar / digest) for logged-in users.
 - [x] "My saved shows" view (`/saved_events`, upcoming saved events) + nav link.
 
-### §3 — Email third-party disclaimer
-- [ ] Inline, opt-in disclosure at the email-entry point.
+### §3 — Email third-party disclaimer — ✅ DONE (already shipped `e516a2a`)
+- [x] Inline, opt-in `settings.email_third_party` disclosure (names Resend) above
+      the Settings email field — the only end-user email-entry point. de/en/fr.
+      The digest email's "Manage rules" footer link is the paired opt-out.
 
 ### §4 — Deploy
 - [ ] Optionally apply the review's pre-merge cleanups (below).

@@ -24,34 +24,19 @@ class TagsHelperTest < ActionView::TestCase
     assert_equal 'ZZ', canton_name('ZZ')
   end
 
-  test 'hierarchical_location_names lists cantons alphabetically with venues present' do
-    cantons = Location.hierarchy.keys
-    skip 'no scrapers registered' if cantons.empty?
-
-    names = hierarchical_location_names
-    positions = cantons.sort.map { |c| names.index(c) }
-
-    assert_equal positions, positions.sort, 'canton headers appear in alphabetical order'
-    assert (Location.venue_names.to_a & names).any?, 'venues are included in the ordering'
-  end
-
-  test 'ordered_location_tags sorts hierarchy venues ahead of unknown locations' do
+  # The locations filter dropdown is now a flat alphabetical list (matching the
+  # styles dropdown) via available_tags(context: :locations); the former
+  # hierarchical ordering helpers were removed with the flatten.
+  test 'available_tags(:locations) lists location tags alphabetically, excluding applied' do
     venue = Location.venue_names.first
     skip 'no scrapers registered' if venue.nil?
     event(location_list: [venue, 'Zzz Unknown Place'])
 
-    ordered = ordered_location_tags.map(&:name)
+    names = available_tags(context: :locations).map(&:name)
+    assert_equal names, names.sort, 'alphabetical'
+    assert_includes names, venue
+    assert_includes names, 'Zzz Unknown Place'
 
-    assert_includes ordered, venue
-    assert_includes ordered, 'Zzz Unknown Place'
-    assert_operator ordered.index(venue), :<, ordered.index('Zzz Unknown Place')
-  end
-
-  test 'ordered_location_tags excludes already-applied names' do
-    venue = Location.venue_names.first
-    skip 'no scrapers registered' if venue.nil?
-    event(location_list: [venue])
-
-    refute_includes ordered_location_tags(applied: [venue]).map(&:name), venue
+    refute_includes available_tags(context: :locations, applied: [venue]).map(&:name), venue
   end
 end

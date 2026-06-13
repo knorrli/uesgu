@@ -1,1 +1,2 @@
-<% type = Location.type_for(combobox_value) %><span class="loc-option loc-<%= type %>"><%= combobox_display %><span class="loc-type"> &middot; <%= t("events.filter.location_types.#{type}") %></span></span>
+<%# Flat alphabetical list (matching the styles dropdown): no hierarchy indent —
+    the "· Type" suffix carries canton/city/venue, so a name is never ambiguous. %><% type = Location.type_for(combobox_value) %><span class="loc-option"><%= combobox_display %><span class="loc-type"> &middot; <%= t("events.filter.location_types.#{type}") %></span></span>

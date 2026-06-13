@@ -53,22 +53,6 @@ module TagsHelper
     Location.type_for(name) == :canton ? canton_name(name) : name
   end
 
-  # Location names in canton > city > venue order (each canton, then its cities,
-  # then their venues, alphabetized within each level). Used to sort the filter
-  # dropdown. Names not covered by the scraper hierarchy keep their order after.
-  def hierarchical_location_names
-    Location.hierarchy.sort.flat_map do |canton, cities|
-      [canton] + cities.sort.flat_map { |city, venues| [city] + venues.sort }
-    end
-  end
-
-  # Available location tags ordered by the hierarchy (unknown tags appended A->Z).
-  def ordered_location_tags(applied: [])
-    order = hierarchical_location_names.each_with_index.to_h
-    available_tags(context: :locations, applied: applied)
-      .sort_by { |tag| [order[tag.name] || Float::INFINITY, tag.name] }
-  end
-
   # A canton > city > venue tree for the mobile "where" filter sheet, annotated
   # with live event counts. Structure comes from the scraper-derived hierarchy
   # (Location.hierarchy) but every node is pruned to what events actually carry

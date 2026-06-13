@@ -51,7 +51,7 @@
       <% end %>
 
       <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addLocation">
-        <%= f.combobox 'l[]', combobox_options(ordered_location_tags(applied: @filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name), placeholder: t('.where') do |combobox| %>
+        <%= f.combobox 'l[]', combobox_options(available_tags(context: :locations, applied: @filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name), placeholder: t('.where') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_hidden_field value: 'test', data: { filter_target: 'comboboxInput locationsInput', existing_values: @filter.location_list.to_json } %>
           <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>

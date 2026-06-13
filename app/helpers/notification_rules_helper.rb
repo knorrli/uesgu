@@ -1,18 +1,8 @@
 module NotificationRulesHelper
+  # --- form option lists (the schedule, on the new-alert page) ---------------
+
   def rule_cadence_options
     NotificationRule::CADENCES.map { |c| [t("notification_rules.cadences.#{c}"), c] }
-  end
-
-  def rule_content_type_options
-    NotificationRule::CONTENT_TYPES.map { |c| [t("notification_rules.content_types.#{c}"), c] }
-  end
-
-  def rule_scope_options
-    NotificationRule::SCOPES.map { |s| [t("notification_rules.scopes.#{s}"), s] }
-  end
-
-  def rule_window_options
-    NotificationRule::WINDOWS.map { |w| [t("datepicker.#{w}"), w] }
   end
 
   # Display Monday-first; values are Ruby wday (0=Sun..6=Sat) to match the column.
@@ -25,12 +15,40 @@ module NotificationRulesHelper
     (1..28).map { |day| [t("notification_rules.monthday_option", day: day), day] }
   end
 
-  # Human one-liner describing what a rule does, for the rule list.
-  def rule_summary(rule)
-    [cadence_phrase(rule), content_phrase(rule), scope_phrase(rule)].compact.join(" · ")
+  # --- alert descriptions (the read-only list + the new-alert preview) -------
+
+  # "Weekly on Friday at 17:30"
+  def rule_schedule_summary(rule)
+    day_names = I18n.t("date.day_names")
+    cadence =
+      case rule.cadence
+      when "daily"    then t("notification_rules.summary.daily")
+      when "weekly"   then t("notification_rules.summary.weekly", day: day_names[rule.weekday.to_i])
+      when "biweekly" then t("notification_rules.summary.biweekly", day: day_names[rule.weekday.to_i])
+      when "monthly"  then t("notification_rules.summary.monthly", day: rule.monthday)
+      end
+    t("notification_rules.summary.at_time", cadence: cadence, time: rule.time_string)
   end
 
-  # The channels a rule delivers on, as short labels (in-app is always present).
+  # What the alert is about — the saved filter rendered as text, or live favorites.
+  def rule_about(rule)
+    return t("notification_rules.favorites_live") if rule.track_favorites?
+
+    parts = []
+    parts << rule.style_list.join(", ") if rule.style_list.any?
+    parts << rule.location_list.join(", ") if rule.location_list.any?
+    parts << rule.queries.join(", ") if rule.queries.any?
+    windows = rule.active_windows.map { |w| t("datepicker.#{w}") }
+    parts << windows.join(", ") if windows.any?
+    parts.any? ? parts.join(" · ") : t("notification_rules.summary.scope_all")
+  end
+
+  # "New events" (added) vs "What's on" (happening) — the inferred digest type.
+  def rule_type_label(rule)
+    rule.happening? ? t("notification_rules.type.happening") : t("notification_rules.type.added")
+  end
+
+  # In-app is always present; push/email per rule.
   def rule_channels(rule)
     channels = [t("notification_rules.channels.in_app")]
     channels << t("notification_rules.channels.push") if rule.notify_push?
@@ -38,41 +56,8 @@ module NotificationRulesHelper
     channels
   end
 
-  private
-
-  def cadence_phrase(rule)
-    day_names = I18n.t("date.day_names")
-    base =
-      case rule.cadence
-      when "daily"    then t("notification_rules.summary.daily")
-      when "weekly"   then t("notification_rules.summary.weekly", day: day_names[rule.weekday.to_i])
-      when "biweekly" then t("notification_rules.summary.biweekly", day: day_names[rule.weekday.to_i])
-      when "monthly"  then t("notification_rules.summary.monthly", day: rule.monthday)
-      end
-    t("notification_rules.summary.at_time", cadence: base, time: rule.time_string)
-  end
-
-  def content_phrase(rule)
-    if rule.happening?
-      t("notification_rules.summary.happening", window: t("datepicker.#{rule.window}"))
-    else
-      t("notification_rules.summary.added")
-    end
-  end
-
-  def scope_phrase(rule)
-    case rule.scope
-    when "all"       then t("notification_rules.summary.scope_all")
-    when "favorites" then t("notification_rules.summary.scope_favorites")
-    when "custom"    then custom_scope_phrase(rule)
-    end
-  end
-
-  def custom_scope_phrase(rule)
-    bits = []
-    bits << Array(rule.filter["style_list"]).join(", ") if rule.filter["style_list"].present?
-    bits << Array(rule.filter["location_list"]).join(", ") if rule.filter["location_list"].present?
-    bits << Array(rule.filter["queries"]).join(", ") if rule.filter["queries"].present?
-    bits.any? ? t("notification_rules.summary.scope_custom", detail: bits.join(" / ")) : t("notification_rules.scopes.custom")
+  # Reopen this alert's filter on the events page (the "edit" affordance).
+  def rule_filter_path(rule)
+    events_path(q: rule.queries, l: rule.location_list, s: rule.style_list, d: rule.date_ranges)
   end
 end

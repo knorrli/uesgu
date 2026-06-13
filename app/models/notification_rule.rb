@@ -1,21 +1,20 @@
-# A user-defined notification "funnel": WHEN to fire · WHICH events · WHICH
-# filter · on WHICH channels. One user can have several. Every firing writes a
-# Notification (the in-app inbox + unread badge); push and/or email ride on top
-# per rule.
+# A saved landing-page filter + a schedule. The user builds a filter on the main
+# page ("Rock · Bern · this weekend") and attaches a cadence/time/channel to it —
+# there's no separate builder vocabulary.
 #
-# The two content types are the heart of it:
-#   - "added"     → events newly added to the site since this rule last fired
-#                   (by created_at). The discovery/"just posted" case.
-#   - "happening" → events taking place in a window like "this weekend" or
-#                   "next week" (by start_date), regardless of when they were
-#                   added. The going-out/"what's on" case. The window reuses the
-#                   same Datepicker presets as the main filter.
+# Whether it's a "what's newly added" or a "what's happening" digest is INFERRED,
+# not chosen:
+#   - filter has a relative date window (this_weekend, next_week, ...) → HAPPENING:
+#     events occurring in that window, re-resolved each time it fires.
+#   - filter has no date window → ADDED: events newly added (by created_at) since
+#     the rule last fired, future-dated only.
+#
+# The filter (queries/style_list/location_list/date_ranges) is frozen at save
+# time and matched exactly like the landing page (Filter#ransack_query). The one
+# exception is track_favorites: a favorites alert stays live, re-resolving the
+# user's followed locations/styles (OR-matched) at send time.
 class NotificationRule < ApplicationRecord
   CADENCES = %w[daily weekly biweekly monthly].freeze
-  CONTENT_TYPES = %w[added happening].freeze
-  SCOPES = %w[all favorites custom].freeze
-  # The Datepicker presets that make sense as a "happening" window.
-  WINDOWS = %w[today tomorrow this_week this_weekend next_week next_weekend this_month next_month].freeze
 
   belongs_to :user
   has_many :notifications, dependent: :nullify
@@ -23,35 +22,59 @@ class NotificationRule < ApplicationRecord
   scope :enabled, -> { where(enabled: true) }
 
   validates :cadence, inclusion: { in: CADENCES }
-  validates :content_type, inclusion: { in: CONTENT_TYPES }
-  validates :scope, inclusion: { in: SCOPES }
   validates :time_of_day, numericality: { in: 0..1439 }
   validates :weekday, inclusion: { in: 0..6 }, if: -> { cadence.in?(%w[weekly biweekly]) }
   validates :monthday, inclusion: { in: 1..28 }, if: -> { cadence == "monthly" }
-  validates :window, inclusion: { in: WINDOWS }, if: :happening?
+  # No unconstrained firehose: a rule must target *something* — some filter, or
+  # the live-favorites flag. (The "Notify me" button is also hidden on an empty
+  # filter; this is the backstop.)
+  validate :targets_something
 
-  # New rules start "caught up" so the first fire covers events from creation
-  # onward, never a backlog blast from the dawn of the account.
+  def targets_something
+    return if track_favorites?
+    return if queries.any? || style_list.any? || location_list.any? || date_ranges.any?
+
+    errors.add(:base, I18n.t("notification_rules.errors.empty_filter"))
+  end
+
   before_create { self.last_fired_at ||= Time.current }
 
-  # Fire every enabled rule that's due as of `now`. This is the per-user-due
-  # sweep the scheduler (Render cron, ~every 15 min) calls. Returns the
-  # Notifications created (empty digests fire nothing and are dropped).
+  # Fire every enabled rule that's due as of `now` — the per-user-due sweep the
+  # scheduler (Render cron, ~every 15 min) calls. Returns the Notifications
+  # created (empty digests fire nothing and are dropped).
   def self.run_due!(now = Time.current)
     enabled.includes(:user).find_each.filter_map do |rule|
       rule.fire!(now) if rule.due?(now)
     end
   end
 
-  def added? = content_type == "added"
-  def happening? = content_type == "happening"
-  def favorites? = scope == "favorites"
-  def custom? = scope == "custom"
+  # ── Filter (mirrors the landing-page params q/l/s/d) ───────────────────────
 
-  # ── Scheduling ────────────────────────────────────────────────────────────
+  def filter_attributes=(params)
+    self.filter = {
+      "queries" => clean(params[:q]),
+      "style_list" => clean(params[:s]),
+      "location_list" => clean(params[:l]),
+      "date_ranges" => clean(params[:d])
+    }
+  end
 
-  # Due when the most recent scheduled wall-clock moment has passed and we
-  # haven't already fired for it. Same gate for both content types.
+  def queries       = Array(filter["queries"])
+  def style_list    = Array(filter["style_list"])
+  def location_list = Array(filter["location_list"])
+  def date_ranges   = Array(filter["date_ranges"])
+
+  # Relative presets in the saved date filter (this_weekend, next_week, ...).
+  # Their presence flips the rule from "added" to "happening".
+  def active_windows
+    date_ranges.select { |range| Datepicker.preset.key?(range) }
+  end
+
+  def happening? = active_windows.any?
+  def added? = !happening?
+
+  # ── Scheduling ─────────────────────────────────────────────────────────────
+
   def due?(now = Time.current)
     return false unless enabled?
     moment = previous_scheduled_at(now)
@@ -63,38 +86,36 @@ class NotificationRule < ApplicationRecord
   def previous_scheduled_at(now = Time.current)
     case cadence
     when "daily"
-      at_time(now.to_date, now) { |t| t <= now ? t : at_time(now.to_date - 1, now) }
+      today = at_time(now.to_date)
+      today <= now ? today : at_time(now.to_date - 1)
     when "weekly", "biweekly"
       diff = (now.to_date.wday - weekday.to_i) % 7
-      candidate = at_time(now.to_date - diff, now)
+      candidate = at_time(now.to_date - diff)
       candidate -= 7.days if candidate > now
-      candidate -= 7.days if biweekly? && weeks_off_parity?(candidate)
+      candidate -= 7.days if biweekly? && off_parity?(candidate)
       candidate
     when "monthly"
       day = [(monthday || 1), 28].min
-      candidate = at_time(Date.new(now.year, now.month, day), now)
+      candidate = at_time(Date.new(now.year, now.month, day))
       candidate -= 1.month if candidate > now
       candidate
     end
   end
 
-  # ── Matching ──────────────────────────────────────────────────────────────
+  # ── Matching ───────────────────────────────────────────────────────────────
 
-  # The events this rule covers as of `now`: the filter (all/favorites/custom)
-  # intersected with either the "added since last fire" window or the
-  # "happening in this preset" window.
+  # Events this rule covers as of `now`. Non-favorites reuse the exact landing-
+  # page query (Filter#ransack_query, which also supplies the future floor when
+  # there's no date window); favorites get the live OR-match. "added" additionally
+  # bounds by created_at since the last fire.
   def matched_events(now = Time.current)
     rel = Event.visible
     rel = rel.where(created_at: coverage_floor...now) if added?
-    rel.ransack(g: ransack_groups(now)).result(distinct: true)
-       .order(:start_date, :start_time, :title)
+    rel.ransack(ransack_query(now)).result(distinct: true).order(:start_date, :start_time, :title)
   end
 
-  # ── Firing ────────────────────────────────────────────────────────────────
+  # ── Firing ─────────────────────────────────────────────────────────────────
 
-  # Build a digest, deliver it on the enabled channels, advance the cursor.
-  # Returns the created Notification, or nil when there was nothing to send.
-  # Empty digests are skipped on both types — we never buzz "0 events".
   def fire!(now = Time.current)
     events = matched_events(now).to_a
     notification =
@@ -117,8 +138,6 @@ class NotificationRule < ApplicationRecord
     name.presence || I18n.t("notification_rules.default_name", default: "Notification")
   end
 
-  # "HH:MM" accessors so a native <input type="time"> binds straight to the
-  # minutes-since-midnight column.
   def time_string
     format("%02d:%02d", time_of_day / 60, time_of_day % 60)
   end
@@ -131,69 +150,71 @@ class NotificationRule < ApplicationRecord
 
   private
 
+  def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
+
   def biweekly? = cadence == "biweekly"
 
-  # Two-week parity anchored to creation, so "every other Friday" stays on the
-  # same fortnight it started. (Approximate by design — good enough for a digest.)
-  def weeks_off_parity?(candidate)
+  def off_parity?(candidate)
     ((candidate.to_date - created_at.to_date).to_i / 7).odd?
   end
 
-  # A given date at this rule's time-of-day, in app TZ. Yields to allow the
-  # daily "today-or-yesterday" branch to compose cleanly.
-  def at_time(date, _now)
-    t = Time.zone.local(date.year, date.month, date.day) + time_of_day.minutes
-    block_given? ? yield(t) : t
+  def at_time(date)
+    Time.zone.local(date.year, date.month, date.day) + time_of_day.minutes
   end
 
   def coverage_floor = last_fired_at || created_at || Time.current
 
   def coverage_start(now)
-    happening? ? window_range&.first&.to_time : coverage_floor
+    happening? ? window_bounds.first.beginning_of_day : coverage_floor
   end
 
   def coverage_end(now)
-    happening? ? window_range&.last&.end_of_day : now
+    happening? ? window_bounds.last.end_of_day : now
   end
 
-  def window_range
-    preset = Datepicker.preset[window]
-    return nil unless preset
-    s, e = preset[:values]
-    Date.iso8601(s)..Date.iso8601(e)
+  def window_bounds
+    values = active_windows.map { |w| Datepicker.preset[w][:values] }
+    starts = values.map { |s, _| Date.iso8601(s) }
+    ends   = values.map { |_, e| Date.iso8601(e) }
+    [starts.min, ends.max]
   end
 
-  def ransack_groups(now)
-    groups = []
-
-    case scope
-    when "favorites"
+  def ransack_query(now)
+    if track_favorites?
+      groups = []
       locations = user.location_list
       styles = user.style_list
       if locations.any? || styles.any?
-        # Broad/discovery: a favorite location OR a favorite style.
         groups << { locations_name_in: locations.presence, styles_name_in: styles.presence, m: "or" }
       end
-    when "custom"
-      queries = Array(filter["queries"]).reject(&:blank?)
-      groups << { title_or_subtitle_or_styles_name_or_genres_name_cont_any: queries } if queries.any?
-      styles = Array(filter["style_list"]).reject(&:blank?)
-      groups << { styles_name_in: styles } if styles.any?
-      locations = Array(filter["location_list"]).reject(&:blank?)
-      groups << { locations_name_in: locations } if locations.any?
+      groups << favorites_date_group(now)
+      { g: groups }
+    else
+      to_filter.ransack_query
     end
+  end
 
-    if happening? && (preset = Datepicker.preset[window])
-      starts, ends = preset[:values]
-      groups << { start_date_gteq: starts, start_date_lteq: ends }
-    elsif added?
-      # Don't surface a freshly-scraped show that's already in the past. Anchored
-      # to the evaluation clock (not Date.current) so it stays consistent with
-      # the rest of the window logic.
-      groups << { start_date_gteq: now.beginning_of_day }
+  # Builds the same Filter the landing page uses, from the frozen params — so a
+  # saved custom filter matches identically (AND across what/where, date presets
+  # re-resolved, future floor when no date).
+  def to_filter
+    Filter.new.tap do |f|
+      f.queries = queries
+      f.style_list = style_list
+      f.location_list = location_list
+      f.date_ranges = date_ranges
     end
+  end
 
-    groups
+  # Date constraint for the favorites path (which can't reuse Filter — it needs
+  # OR across location/style). Mirrors Filter's date handling.
+  def favorites_date_group(now)
+    if active_windows.any?
+      ranges = active_windows.map { |w| s, e = Datepicker.preset[w][:values]; "#{s} - #{e}" }
+      { start_date_between_any: ranges }
+    else
+      { start_date_gteq: now.beginning_of_day }
+    end
   end
 
   def deliver(notification, events)

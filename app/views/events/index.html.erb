@@ -17,6 +17,7 @@
   <div class="flex justify-between align-baseline gap-medium">
     <div class="flex align-baseline gap-medium">
       <%= render 'favorites_filter' %>
+      <%= render 'notify_button' %>
       <span class="muted"><%= t('events.index.empty') if @events.empty? %></span>
     </div>
     <%= render 'view_switcher', view: @view %>

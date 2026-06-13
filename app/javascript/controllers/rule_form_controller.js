@@ -1,11 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="rule-form" on the new-rule form. Shows only the
-// fields relevant to the current choices: weekday (weekly/biweekly), monthday
-// (monthly), window (happening content type), and the custom-filter block
-// (custom scope).
+// Connects to data-controller="rule-form" on the new-alert schedule form. Shows
+// the weekday picker only for weekly/biweekly cadences, and the day-of-month
+// picker only for monthly. (The CSS that makes [hidden] win over .flex lives in
+// notification_rules.css.)
 export default class extends Controller {
-  static targets = ["cadence", "contentType", "scope", "weekday", "monthday", "window", "custom"]
+  static targets = ["cadence", "weekday", "monthday"]
 
   connect() {
     this.update()
@@ -13,13 +13,8 @@ export default class extends Controller {
 
   update() {
     const cadence = this.cadenceTarget.value
-    const content = this.contentTypeTarget.value
-    const scope = this.scopeTarget.value
-
     this.show(this.weekdayTarget, cadence === "weekly" || cadence === "biweekly")
     this.show(this.monthdayTarget, cadence === "monthly")
-    this.show(this.windowTarget, content === "happening")
-    this.show(this.customTarget, scope === "custom")
   }
 
   show(target, visible) {

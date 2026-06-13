@@ -1,87 +1,123 @@
 require 'db_test_helper'
 
-# Locks the web layer: auth gate, the index builder renders, and
-# create/fire/toggle/destroy behave. Email channel stays off so nothing is sent.
+# Locks the reframed web flow: the landing "Notify me" button (filter-gated), the
+# new-alert page (filter carried through + sync checkbox when it matches
+# favorites), create from filter params, the no-empty-firehose guard, the
+# read-only list, and fire/toggle/destroy. Email channel stays off.
 class NotificationRulesTest < ActionDispatch::IntegrationTest
-  test 'index requires authentication' do
-    get notification_rules_path
+  # --- landing-page button ---------------------------------------------------
+
+  test 'the Notify-me button shows only with an active filter' do
+    sign_in_as user
+
+    get events_path
+    assert_select 'a.notify-filter-link', false, 'no button on an empty filter'
+
+    get events_path(s: ['Rock'])
+    assert_select 'a.notify-filter-link'
+  end
+
+  # --- new -------------------------------------------------------------------
+
+  test 'new requires authentication' do
+    get new_notification_rule_path
     assert_redirected_to new_session_path
   end
 
-  test 'index renders the rule list and the builder' do
+  test 'new carries the filter through and wires the schedule form' do
     sign_in_as user
-    get notification_rules_path
+    get new_notification_rule_path(s: ['Rock'], l: ['Dachstock'], d: ['this_weekend'])
 
     assert_response :success
-    assert_select 'form.rule-form'
-    assert_select 'select[name="notification_rule[cadence]"]'
-    assert_select 'select[name="notification_rule[content_type]"]'
-    assert_select 'select[name="notification_rule[scope]"]'
-
-    # Conditional-field wiring for the rule-form Stimulus controller — the hooks
-    # that drive show/hide. (The CSS that makes [hidden] win over .flex lives in
-    # notification_rules.css.)
-    assert_select 'form[data-controller="rule-form"]'
-    assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"][data-action="rule-form#update"]'
+    assert_select 'form.rule-form[data-controller="rule-form"]'
+    assert_select 'input[type=hidden][name="s[]"][value=?]', 'Rock'
+    assert_select 'input[type=hidden][name="l[]"][value=?]', 'Dachstock'
+    assert_select 'input[type=hidden][name="d[]"][value=?]', 'this_weekend'
+    assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"]'
     assert_select '[data-rule-form-target="weekday"]'
-    assert_select '[data-rule-form-target="monthday"]'
-    assert_select '[data-rule-form-target="window"]'
-    assert_select '[data-rule-form-target="custom"]'
   end
 
-  test 'index renders an existing rule card with its summary and actions' do
+  test 'the sync checkbox appears only when the filter equals my favorites' do
     u = sign_in_as user
-    u.notification_rules.create!(name: 'My alert', cadence: 'weekly', weekday: 5,
-                                 content_type: 'happening', window: 'this_weekend',
-                                 scope: 'favorites', time_of_day: 1050)
-    get notification_rules_path
+    u.style_list = ['Techno']
+    u.save!
 
-    assert_response :success
-    assert_select '.rule-card .rule-card__name', text: 'My alert'
-    assert_select '.rule-card__summary'            # rule_summary helper rendered
-    assert_select '.rule-card__actions form'       # fire/toggle/delete buttons
+    get new_notification_rule_path(s: ['Techno'])
+    assert_select 'input[name="notification_rule[track_favorites]"]'
+
+    get new_notification_rule_path(s: ['Jazz'])
+    assert_select 'input[name="notification_rule[track_favorites]"]', false
   end
 
-  test 'create persists a rule and parses the time' do
+  # --- create ----------------------------------------------------------------
+
+  test 'create saves the filter + schedule and infers happening' do
     u = sign_in_as user
 
     assert_difference -> { u.notification_rules.count }, 1 do
-      post notification_rules_path, params: { notification_rule: {
-        name: 'Bern weekends', cadence: 'weekly', weekday: '5', content_type: 'happening',
-        window: 'this_weekend', scope: 'custom', filter_locations: 'Dachstock, Rössli',
-        time_string: '17:30', notify_push: '1', notify_email: '0'
-      } }
+      post notification_rules_path, params: {
+        notification_rule: { name: 'Bern weekends', cadence: 'weekly', weekday: '5',
+                             time_string: '17:30', notify_push: '1', notify_email: '0' },
+        l: ['Bern'], d: ['this_weekend']
+      }
     end
 
     assert_redirected_to notification_rules_path
-    rule = u.notification_rules.last
-    assert_equal 1050, rule.time_of_day
-    assert_equal 'happening', rule.content_type
-    assert_equal %w[Dachstock Rössli], rule.filter['location_list']
+    r = u.notification_rules.last
+    assert_equal 1050, r.time_of_day
+    assert_equal ['Bern'], r.location_list
+    assert_equal ['this_weekend'], r.date_ranges
+    assert r.happening?
+  end
+
+  test 'create rejects an empty firehose filter' do
+    u = sign_in_as user
+    assert_no_difference -> { u.notification_rules.count } do
+      post notification_rules_path, params: { notification_rule: { cadence: 'daily', time_string: '09:00' } }
+    end
+    assert_response :unprocessable_entity
+  end
+
+  # --- list + management -----------------------------------------------------
+
+  test 'index lists alerts read-only with their summary and actions' do
+    u = sign_in_as user
+    r = u.notification_rules.new(name: 'My alert', cadence: 'weekly', weekday: 5, time_of_day: 1050)
+    r.filter_attributes = { l: ['Dachstock'], d: ['this_weekend'] }
+    r.save!
+
+    get notification_rules_path
+    assert_response :success
+    assert_select '.rule-card .rule-card__name', /My alert/
+    assert_select '.rule-card__actions form' # fire/toggle/delete
+    assert_select 'a', text: I18n.t('notification_rules.edit_filter')
   end
 
   test 'fire now creates an in-app notification when there are matches' do
     u = sign_in_as user
-    event(created_at: 1.hour.ago, start_date: Date.current + 3)
-    rule = u.notification_rules.create!(cadence: 'daily', content_type: 'added', scope: 'all',
-                                        time_of_day: 1, notify_push: false, notify_email: false)
-    rule.update_column(:last_fired_at, 2.hours.ago)
+    event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['Rock'])
+    r = u.notification_rules.new(cadence: 'daily', time_of_day: 1, notify_push: false, notify_email: false)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
+    r.update_column(:last_fired_at, 2.hours.ago)
 
     assert_difference -> { u.notifications.count }, 1 do
-      post fire_notification_rule_path(rule)
+      post fire_notification_rule_path(r)
     end
     assert_redirected_to notification_rules_path
   end
 
   test 'toggle pauses and destroy removes' do
     u = sign_in_as user
-    rule = u.notification_rules.create!(cadence: 'daily', content_type: 'added', scope: 'all')
+    r = u.notification_rules.new(cadence: 'daily', time_of_day: 1)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
 
-    patch toggle_notification_rule_path(rule)
-    refute rule.reload.enabled?
+    patch toggle_notification_rule_path(r)
+    refute r.reload.enabled?
 
     assert_difference -> { u.notification_rules.count }, -1 do
-      delete notification_rule_path(rule)
+      delete notification_rule_path(r)
     end
   end
 end

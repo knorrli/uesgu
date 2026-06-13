@@ -108,10 +108,57 @@
   gap: var(--gap-xsmall);
 }
 
-/* The conditional builder fields (weekday / monthday / window / custom block)
-   carry .flex (display:flex), which overrides the UA `[hidden]` rule that the
-   rule-form Stimulus controller toggles — so without this they'd never hide.
-   Re-assert [hidden] at higher specificity (same trick as events.css). */
+/* The conditional schedule fields (weekday / monthday) carry .flex
+   (display:flex), which overrides the UA `[hidden]` rule that the rule-form
+   Stimulus controller toggles — so without this they'd never hide. Re-assert
+   [hidden] at higher specificity (same trick as events.css). */
 .rule-form [hidden] {
   display: none;
+}
+
+/* "Notify me about this" — flat accent link in the toggle row, sibling of the
+   favorites-filter shortcut. */
+.notify-filter-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-xsmall);
+  color: var(--theme-accent-color);
+  font-size: var(--font-size-small);
+}
+
+.notify-filter-link .ph {
+  font-size: 1.15em;
+}
+
+/* Chip variants: a window/date or live-favorites chip reads as accent; a type
+   badge ("New" / "What's on") is a quiet fill. */
+.chip--window {
+  border-color: var(--theme-accent-color);
+  background: var(--theme-accent-muted);
+}
+
+.chip--type {
+  border: 0;
+  background: var(--theme-bg-muted);
+  color: var(--theme-fg-muted);
+}
+
+/* Rule card name carries an inline type badge. */
+.rule-card__name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-small);
+  font-weight: bold;
+}
+
+.rule-about-label {
+  font-weight: bold;
+}
+
+/* The "keep in sync with favorites" opt-in gets a light accent ground so it
+   reads as the one special, optional choice on the page. */
+.rule-sync {
+  padding: var(--gap-small) var(--gap-medium);
+  background: var(--theme-accent-muted);
+  border-radius: 8px;
 }

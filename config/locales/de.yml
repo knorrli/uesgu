@@ -74,6 +74,24 @@ de:
     delete: Löschen
     delete_confirm: Diese Regel wirklich löschen?
     default_name: Mitteilung
+    edit_filter: Filter öffnen
+    empty_link: Filtere die Veranstaltungen
+    empty_html: Noch keine Alerts. %{link} auf der Startseite und tippe „Benachrichtigen“, um einen zu erstellen.
+    favorites_live: Meine Favoriten (automatisch aktuell)
+    track_favorites: Mit meinen Favoriten synchron halten
+    track_favorites_hint: berücksichtigt auch Orte/Stile, denen du später folgst
+    type:
+      added: Neu
+      happening: Was läuft
+    errors:
+      empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Favoriten.
+    new:
+      title: Benachrichtigung einrichten
+      intro: Lege fest, wie oft und wie du über diese Auswahl informiert wirst.
+      about_label: Benachrichtige mich über
+      hint_happening: Du wirst über Veranstaltungen in diesem Zeitraum informiert — jedes Mal neu berechnet.
+      hint_added: Du wirst über neu hinzugefügte passende Veranstaltungen informiert.
+      cancel: Abbrechen
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
     section_when: Wann
     section_what: Worüber
@@ -483,6 +501,7 @@ de:
         calendar: Kalender
       favorites_filter:
         label: Meine Favoriten
+      notify_filter: Benachrichtigen
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen

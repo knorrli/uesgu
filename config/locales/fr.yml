@@ -74,6 +74,24 @@ fr:
     delete: Supprimer
     delete_confirm: Vraiment supprimer cette règle ?
     default_name: Notification
+    edit_filter: Ouvrir le filtre
+    empty_link: Filtre les événements
+    empty_html: Aucune alerte pour l'instant. %{link} sur la page d'accueil et touche « M'avertir » pour en créer une.
+    favorites_live: Mes favoris (toujours à jour)
+    track_favorites: Garder synchronisé avec mes favoris
+    track_favorites_hint: inclut aussi les lieux/styles que tu suivras plus tard
+    type:
+      added: Nouveau
+      happening: À l'affiche
+    errors:
+      empty_filter: Choisis d'abord un filtre (style, lieu, date …) ou synchronise avec tes favoris.
+    new:
+      title: Configurer une notification
+      intro: Choisis à quelle fréquence et comment tu es averti de cette sélection.
+      about_label: M'avertir à propos de
+      hint_happening: Tu seras averti des événements dans cette période — recalculée à chaque fois.
+      hint_added: Tu seras averti des événements nouvellement ajoutés qui correspondent.
+      cancel: Annuler
     email_unavailable: ajoute une adresse e-mail dans les réglages
     section_when: Quand
     section_what: À propos de quoi
@@ -483,6 +501,7 @@ fr:
         calendar: Calendrier
       favorites_filter:
         label: Mes favoris
+      notify_filter: M'avertir
     day:
       empty: Aucun événement ce jour-là.
       close: Fermer

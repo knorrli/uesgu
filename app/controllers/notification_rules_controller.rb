@@ -1,21 +1,33 @@
-# The "list of notification rules" management screen. index renders the user's
-# rules plus an inline builder; create/destroy/toggle manage them; fire runs one
-# on demand so a rule can be tested without waiting for its schedule.
+# Notification rules = saved landing-page filters + a schedule.
+#
+# Creation starts on the events page ("Notify me about this"), which links here
+# with the current filter params (q/l/s/d). `new` shows the schedule form with
+# that filter pre-loaded; `create` saves it. `index` is the read-only "My alerts"
+# list; fire/toggle/destroy manage individual alerts.
 class NotificationRulesController < ApplicationController
   before_action :set_rule, only: %i[destroy toggle fire]
 
   def index
     @rules = current_user.notification_rules.order(:created_at)
-    @rule = current_user.notification_rules.new(default_attributes)
+  end
+
+  def new
+    @rule = current_user.notification_rules.new(default_schedule)
+    @rule.filter_attributes = filter_params
+    @filter = build_filter           # for the read-only "Notify me about:" chips
+    @matches_favorites = favorites_match?(@filter)
   end
 
   def create
     @rule = current_user.notification_rules.new(rule_params)
+    @rule.filter_attributes = filter_params
+
     if @rule.save
       redirect_to notification_rules_path, notice: t("notification_rules.created")
     else
-      @rules = current_user.notification_rules.order(:created_at)
-      render :index, status: :unprocessable_entity
+      @filter = build_filter
+      @matches_favorites = favorites_match?(@filter)
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -29,15 +41,11 @@ class NotificationRulesController < ApplicationController
     redirect_to notification_rules_path
   end
 
-  # "Fire now": run the rule immediately on the real channels, so you can see the
+  # "Fire now": run the rule immediately on its real channels so you can see the
   # in-app digest (and any push/email) without waiting for the schedule.
   def fire
     notification = @rule.fire!(Time.current)
-    notice = if notification
-               t("notification_rules.fired", count: notification.events.size)
-             else
-               t("notification_rules.fired_empty")
-             end
+    notice = notification ? t("notification_rules.fired", count: notification.events.size) : t("notification_rules.fired_empty")
     redirect_to notification_rules_path, notice: notice
   end
 
@@ -47,40 +55,37 @@ class NotificationRulesController < ApplicationController
     @rule = current_user.notification_rules.find(params[:id])
   end
 
-  def default_attributes
-    { cadence: "daily", content_type: "added", scope: "favorites",
-      time_of_day: 1080, weekday: 5, monthday: 1, window: "this_weekend",
-      notify_push: true, notify_email: false }
+  def default_schedule
+    { cadence: "daily", time_of_day: 1080, weekday: 5, monthday: 1, notify_push: true, notify_email: false }
   end
 
   def rule_params
-    raw = params.require(:notification_rule).permit(
-      :name, :cadence, :weekday, :monthday, :time_string, :content_type, :window,
-      :scope, :notify_push, :notify_email, :filter_queries, :filter_styles, :filter_locations
+    params.require(:notification_rule).permit(
+      :name, :cadence, :weekday, :monthday, :time_string, :notify_push, :notify_email, :track_favorites
     )
-
-    # Assemble the custom filter from three comma/newline-separated text fields.
-    if raw[:scope] == "custom"
-      raw[:filter] = {
-        "queries" => split_list(raw[:filter_queries]),
-        "style_list" => split_list(raw[:filter_styles]),
-        "location_list" => split_list(raw[:filter_locations])
-      }
-    end
-    raw.delete(:filter_queries)
-    raw.delete(:filter_styles)
-    raw.delete(:filter_locations)
-
-    # Null out fields that don't apply to the chosen cadence/content type so a
-    # stale hidden value can't fail validation.
-    raw[:weekday] = nil unless raw[:cadence].in?(%w[weekly biweekly])
-    raw[:monthday] = nil unless raw[:cadence] == "monthly"
-    raw[:window] = nil unless raw[:content_type] == "happening"
-
-    raw
   end
 
-  def split_list(value)
-    value.to_s.split(/[,\n]/).map(&:strip).reject(&:blank?)
+  # The landing-page filter, carried straight through (same keys as events#index).
+  def filter_params
+    params.permit(q: [], l: [], s: [], d: []).to_h.symbolize_keys
+  end
+
+  def build_filter
+    Filter.new.tap do |filter|
+      filter.queries = params[:q].compact_blank if params[:q].present?
+      filter.location_list = params[:l] if params[:l].present?
+      filter.style_list = params[:s] if params[:s].present?
+      filter.date_ranges = params[:d].compact_blank if params[:d].present?
+    end
+  end
+
+  # True when the filter's tags are exactly the user's favorites (and there's no
+  # extra free-text query) — the only case where "keep in sync" is meaningful.
+  def favorites_match?(filter)
+    return false if filter.queries.any?
+    return false unless current_user.location_list.any? || current_user.style_list.any?
+
+    Set.new(filter.location_list) == Set.new(current_user.location_list) &&
+      Set.new(filter.style_list) == Set.new(current_user.style_list)
   end
 end

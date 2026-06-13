@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_13_090000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_13_170000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -84,14 +84,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_090000) do
     t.integer "monthday"
     t.integer "time_of_day", default: 1080, null: false
     t.datetime "last_fired_at"
-    t.string "content_type", default: "added", null: false
-    t.string "window"
-    t.string "scope", default: "favorites", null: false
     t.jsonb "filter", default: {}, null: false
     t.boolean "notify_push", default: true, null: false
     t.boolean "notify_email", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "track_favorites", default: false, null: false
     t.index ["enabled", "cadence"], name: "index_notification_rules_on_enabled_and_cadence"
     t.index ["user_id"], name: "index_notification_rules_on_user_id"
   end

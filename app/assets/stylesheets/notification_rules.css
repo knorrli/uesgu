@@ -1,0 +1,109 @@
+/* Notification rules: the "list of funnels" management screen. Follows the
+   settings aesthetic — hairline separators, square-ish corners, accent green for
+   actions, raspberry only via the shared .danger role. */
+
+.rule-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rule-card {
+  padding: var(--gap-medium);
+  border: var(--border-width) solid var(--theme-bg-muted);
+}
+
+.rule-card--off {
+  opacity: 0.55;
+}
+
+.rule-card__name {
+  font-weight: bold;
+}
+
+.rule-card__chips,
+.rule-card__actions {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* button_to wraps each action in its own <form>; keep them inline + flush. */
+.rule-card__actions form {
+  margin: 0;
+}
+
+.chip {
+  font-size: var(--font-size-small);
+  padding: var(--gap-xsmall) var(--gap-small);
+  border: var(--border-width) solid var(--theme-accent-color);
+  color: var(--theme-accent-color);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.chip--muted {
+  border-color: var(--theme-fg-muted);
+  color: var(--theme-fg-muted);
+}
+
+/* Pill actions. .button-small is the filled accent; .button-ghost hollows it;
+   .danger recolours to the warn token (shared with the rest of the app). */
+.button-small {
+  font-size: var(--font-size-small);
+  padding: var(--gap-xsmall) var(--gap-medium);
+  border: var(--border-width) solid var(--theme-accent-color);
+  background: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.button-small.button-ghost {
+  background: none;
+  color: var(--theme-accent-color);
+}
+
+.button-small.danger {
+  background: none;
+  border-color: var(--theme-warn-color);
+  color: var(--theme-warn-color);
+}
+
+/* Builder form: reuse .account-form field styling; these add the grouping. */
+.rule-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.rule-fieldset legend {
+  padding: 0;
+  font-weight: bold;
+  margin-bottom: var(--gap-small);
+}
+
+.rule-row {
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.rule-row > label {
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+
+.rule-custom {
+  padding-left: var(--gap-medium);
+  border-left: var(--border-width) solid var(--theme-bg-muted);
+}
+
+.rule-check {
+  align-items: center;
+}
+
+/* The base flex utilities ship small/medium/large but not xsmall; define it so
+   the tight label/value stacks read as intended rather than collapsing to 0. */
+.gap-xsmall {
+  gap: var(--gap-xsmall);
+}

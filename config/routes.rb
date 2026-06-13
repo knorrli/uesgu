@@ -32,6 +32,16 @@ Rails.application.routes.draw do
   end
   resources :notifications, only: %i[index show]
 
+  # User-defined notification funnels (WHEN·WHICH·FILTER·CHANNEL). toggle flips
+  # enabled; fire runs the rule on demand ("Fire now" — test without waiting for
+  # the schedule).
+  resources :notification_rules, only: %i[index create destroy] do
+    member do
+      patch :toggle
+      post :fire
+    end
+  end
+
   # Web Push opt-in/out for the current device. Keyed by endpoint (in the body),
   # not an id, so a singular-style pair of bare routes fits better than a
   # resource collection.

@@ -1,0 +1,19 @@
+<%= @heading %>
+<%= t("notification_mailer.digest.intro", count: @events.size) %>
+
+<% @events.group_by(&:start_date).sort.each do |day, day_events| %>
+<%= l day, format: :detailed %>
+<% day_events.sort_by { |e| [e.start_time ? 0 : 1, e.start_time, e.title.to_s] }.each do |event| %>
+<% venue = event.venue %><% city = event.locations.to_a.reject { |loc| loc == venue }.map(&:name).first %>
+- <% if event.start_time.present? %><%= l event.start_time, format: :time %> <% end %><%= event.title %><% if event.cancelled? %> [<%= t('events.cancelled') %>]<% end %>
+  <% if venue %><%= venue.name %><% end %><% if venue && city %> · <% end %><% if city %><%= city %><% end %>
+  <% if event.styles.any? %><%= event.styles.map(&:name).join(" · ") %>
+  <% end %><%= event.url %>
+<% end %>
+<% end %>
+
+<%= t("notification_mailer.digest.cta") %>: <%= @notification_url %>
+
+—
+<%= t("notification_mailer.digest.footer_reason") %>
+<%= t("notification_mailer.digest.footer_manage") %>: <%= settings_url %>

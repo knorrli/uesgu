@@ -1,0 +1,139 @@
+<% content_for :title, t('notification_rules.title') %>
+
+<div class="notification-rules flex flex-col gap-large">
+  <header class="flex flex-col gap-small">
+    <h1><%= t('notification_rules.title') %></h1>
+    <p class="muted"><%= t('notification_rules.intro') %></p>
+  </header>
+
+  <%# ── Existing rules ──────────────────────────────────────────────── %>
+  <section class="flex flex-col gap-medium">
+    <h2><%= t('notification_rules.your_rules') %></h2>
+    <% if @rules.empty? %>
+      <p class="empty-state"><%= t('notification_rules.empty') %></p>
+    <% else %>
+      <ul class="rule-list flex flex-col gap-medium">
+        <% @rules.each do |rule| %>
+          <li class="<%= class_names('rule-card', 'flex', 'flex-col', 'gap-small', 'rule-card--off': !rule.enabled?) %>">
+            <div class="flex flex-col gap-xsmall">
+              <span class="rule-card__name"><%= rule.display_name %></span>
+              <span class="muted rule-card__summary"><%= rule_summary(rule) %></span>
+            </div>
+            <div class="rule-card__chips flex gap-xsmall">
+              <% rule_channels(rule).each do |label| %>
+                <span class="chip"><%= label %></span>
+              <% end %>
+              <% unless rule.enabled? %><span class="chip chip--muted"><%= t('notification_rules.disabled') %></span><% end %>
+            </div>
+            <div class="rule-card__actions flex gap-small">
+              <%= button_to t('notification_rules.fire_now'), fire_notification_rule_path(rule), class: 'button-small' %>
+              <%= button_to rule.enabled? ? t('notification_rules.disable') : t('notification_rules.enable'),
+                    toggle_notification_rule_path(rule), method: :patch, class: 'button-small button-ghost' %>
+              <%= button_to t('notification_rules.delete'), notification_rule_path(rule), method: :delete,
+                    class: 'button-small button-ghost danger', data: { turbo_confirm: t('notification_rules.delete_confirm') } %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </section>
+
+  <%# ── Add a rule (the WHEN · WHICH · FILTER · CHANNEL builder) ─────── %>
+  <section class="flex flex-col gap-medium">
+    <h2><%= t('notification_rules.add_rule') %></h2>
+
+    <%= form_with model: @rule, url: notification_rules_path, method: :post,
+          data: { controller: 'rule-form' }, class: 'rule-form account-form flex flex-col gap-medium' do |form| %>
+      <% if @rule.errors.any? %>
+        <ul class="form-errors">
+          <% @rule.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
+        </ul>
+      <% end %>
+
+      <label class="flex flex-col gap-xsmall">
+        <span><%= t('notification_rules.fields.name') %> <span class="muted">(<%= t('notification_rules.fields.name_optional') %>)</span></span>
+        <%= form.text_field :name, placeholder: t('notification_rules.fields.name_placeholder') %>
+      </label>
+
+      <fieldset class="rule-fieldset flex flex-col gap-small">
+        <legend><%= t('notification_rules.section_when') %></legend>
+        <div class="rule-row flex gap-small">
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.cadence') %></span>
+            <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' } %>
+          </label>
+          <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
+            <span><%= t('notification_rules.fields.weekday') %></span>
+            <%= form.select :weekday, rule_weekday_options %>
+          </label>
+          <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
+            <span><%= t('notification_rules.fields.monthday') %></span>
+            <%= form.select :monthday, rule_monthday_options %>
+          </label>
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.time') %></span>
+            <%= form.time_field :time_string, value: @rule.time_string %>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="rule-fieldset flex flex-col gap-small">
+        <legend><%= t('notification_rules.section_what') %></legend>
+        <div class="rule-row flex gap-small">
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.content_type') %></span>
+            <%= form.select :content_type, rule_content_type_options, {}, data: { 'rule-form-target': 'contentType', action: 'rule-form#update' } %>
+          </label>
+          <label class="flex flex-col gap-xsmall" data-rule-form-target="window">
+            <span><%= t('notification_rules.fields.window') %></span>
+            <%= form.select :window, rule_window_options %>
+          </label>
+        </div>
+        <p class="muted rule-hint"><%= t('notification_rules.content_hint') %></p>
+      </fieldset>
+
+      <fieldset class="rule-fieldset flex flex-col gap-small">
+        <legend><%= t('notification_rules.section_filter') %></legend>
+        <label class="flex flex-col gap-xsmall">
+          <span><%= t('notification_rules.fields.scope') %></span>
+          <%= form.select :scope, rule_scope_options, {}, data: { 'rule-form-target': 'scope', action: 'rule-form#update' } %>
+        </label>
+        <div data-rule-form-target="custom" class="rule-custom flex flex-col gap-small">
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.filter_styles') %></span>
+            <%= text_field_tag 'notification_rule[filter_styles]', @rule.filter['style_list']&.join(', '), placeholder: t('notification_rules.fields.filter_styles_ph') %>
+          </label>
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.filter_locations') %></span>
+            <%= text_field_tag 'notification_rule[filter_locations]', @rule.filter['location_list']&.join(', '), placeholder: t('notification_rules.fields.filter_locations_ph') %>
+          </label>
+          <label class="flex flex-col gap-xsmall">
+            <span><%= t('notification_rules.fields.filter_queries') %></span>
+            <%= text_field_tag 'notification_rule[filter_queries]', @rule.filter['queries']&.join(', '), placeholder: t('notification_rules.fields.filter_queries_ph') %>
+          </label>
+          <p class="muted rule-hint"><%= t('notification_rules.filter_hint') %></p>
+        </div>
+      </fieldset>
+
+      <fieldset class="rule-fieldset flex flex-col gap-small">
+        <legend><%= t('notification_rules.section_channels') %></legend>
+        <p class="muted rule-hint"><%= t('notification_rules.channels_hint') %></p>
+        <label class="rule-check flex gap-small">
+          <%= form.check_box :notify_push %>
+          <span><%= t('notification_rules.fields.notify_push') %></span>
+        </label>
+        <label class="rule-check flex gap-small">
+          <%= form.check_box :notify_email %>
+          <span>
+            <%= t('notification_rules.fields.notify_email') %>
+            <% unless MailConfig.configured? && current_user.email_address.present? %>
+              <span class="muted">— <%= t('notification_rules.email_unavailable') %></span>
+            <% end %>
+          </span>
+        </label>
+      </fieldset>
+
+      <%= form.submit t('notification_rules.create_button') %>
+    <% end %>
+  </section>
+</div>

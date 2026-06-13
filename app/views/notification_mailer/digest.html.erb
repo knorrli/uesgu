@@ -1,0 +1,91 @@
+<%# Self-contained digest: the matched events rendered inline, grouped by day,
+    plus a button back to the in-app notification page. Inline styles only —
+    email clients strip <style>/external CSS. %>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4eef1; padding:24px 12px;">
+  <tr>
+    <td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:#ffffff; border-radius:14px; overflow:hidden; border:1px solid #e7dde3;">
+
+        <%# ── Header ──────────────────────────────────────────────── %>
+        <tr>
+          <td style="background:#17131a; padding:22px 28px;">
+            <span style="font-size:22px; font-weight:700; letter-spacing:0.5px; color:#f4eef1;">üsgu</span>
+            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#0e8857; margin-left:2px;"></span>
+            <span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#c2185b; margin-left:3px;"></span>
+          </td>
+        </tr>
+
+        <%# ── Intro ───────────────────────────────────────────────── %>
+        <tr>
+          <td style="padding:26px 28px 8px;">
+            <p style="margin:0 0 6px; font-size:13px; color:#0e8857; font-weight:600; text-transform:uppercase; letter-spacing:0.6px;"><%= @heading %></p>
+            <h1 style="margin:0; font-size:20px; line-height:1.3; color:#1d1620;">
+              <%= t("notification_mailer.digest.intro", count: @events.size) %>
+            </h1>
+          </td>
+        </tr>
+
+        <%# ── Events, grouped by day ──────────────────────────────── %>
+        <tr>
+          <td style="padding:12px 28px 4px;">
+            <% @events.group_by(&:start_date).sort.each do |day, day_events| %>
+              <p style="margin:18px 0 8px; font-size:13px; font-weight:700; color:#7a6f78; text-transform:uppercase; letter-spacing:0.5px;">
+                <%= l day, format: :detailed %>
+              </p>
+
+              <% day_events.sort_by { |e| [e.start_time ? 0 : 1, e.start_time, e.title.to_s] }.each do |event| %>
+                <% venue = event.venue %>
+                <% city = event.locations.to_a.reject { |loc| loc == venue }.map(&:name).first %>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 10px; background:#faf7f8; border:1px solid #efe6eb; border-radius:10px;">
+                  <tr>
+                    <td style="padding:12px 14px;">
+                      <div style="font-size:16px; font-weight:600; line-height:1.35;">
+                        <% if event.start_time.present? %><span style="color:#0e8857;"><%= l event.start_time, format: :time %></span> <% end %>
+                        <% if event.cancelled? %><span style="color:#ef4444; font-weight:700;"><%= t('events.cancelled') %></span> <% end %>
+                        <a href="<%= event.url %>" style="color:#1d1620; text-decoration:none; border-bottom:1px solid #d8c7d1;"><%= event.title %> &#8599;</a>
+                      </div>
+                      <% if venue || city %>
+                        <div style="margin-top:4px; font-size:14px; color:#5b515a;">
+                          <% if venue %><strong style="font-weight:600; color:#3a323c;"><%= venue.name %></strong><% end %>
+                          <% if venue && city %> · <% end %>
+                          <% if city %><%= city %><% end %>
+                        </div>
+                      <% end %>
+                      <% if event.styles.any? %>
+                        <div style="margin-top:6px; font-size:12px; color:#7a6f78;">
+                          <%= event.styles.map(&:name).join("  ·  ") %>
+                        </div>
+                      <% end %>
+                    </td>
+                  </tr>
+                </table>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+
+        <%# ── CTA to the in-app page ──────────────────────────────── %>
+        <tr>
+          <td align="center" style="padding:14px 28px 30px;">
+            <a href="<%= @notification_url %>" style="display:inline-block; background:#0e8857; color:#ffffff; text-decoration:none; font-size:15px; font-weight:600; padding:12px 26px; border-radius:999px;">
+              <%= t("notification_mailer.digest.cta") %>
+            </a>
+          </td>
+        </tr>
+
+        <%# ── Footer ──────────────────────────────────────────────── %>
+        <tr>
+          <td style="padding:18px 28px 26px; border-top:1px solid #efe6eb;">
+            <p style="margin:0; font-size:12px; line-height:1.6; color:#9a8f97;">
+              <%= t("notification_mailer.digest.footer_reason") %><br>
+              <a href="<%= @browse_url %>" style="color:#0e8857; text-decoration:none;">üsgu.ch</a>
+              &nbsp;·&nbsp;
+              <a href="<%= settings_url %>" style="color:#9a8f97; text-decoration:underline;"><%= t("notification_mailer.digest.footer_manage") %></a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>

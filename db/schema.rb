@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_12_160000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_13_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -75,6 +75,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_12_160000) do
     t.index ["redeemed_by_id"], name: "index_invitations_on_redeemed_by_id"
   end
 
+  create_table "notification_rules", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.boolean "enabled", default: true, null: false
+    t.string "cadence", default: "weekly", null: false
+    t.integer "weekday"
+    t.integer "monthday"
+    t.integer "time_of_day", default: 1080, null: false
+    t.datetime "last_fired_at"
+    t.string "content_type", default: "added", null: false
+    t.string "window"
+    t.string "scope", default: "favorites", null: false
+    t.jsonb "filter", default: {}, null: false
+    t.boolean "notify_push", default: true, null: false
+    t.boolean "notify_email", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["enabled", "cadence"], name: "index_notification_rules_on_enabled_and_cadence"
+    t.index ["user_id"], name: "index_notification_rules_on_user_id"
+  end
+
   create_table "notifications", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.datetime "period_start", null: false
@@ -82,6 +103,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_12_160000) do
     t.datetime "read_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "notification_rule_id"
+    t.jsonb "event_ids", default: [], null: false
+    t.string "title"
+    t.index ["notification_rule_id"], name: "index_notifications_on_notification_rule_id"
     t.index ["user_id", "period_end"], name: "index_notifications_on_user_id_and_period_end"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
@@ -200,6 +225,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_12_160000) do
   add_foreign_key "genres_styles", "styles", on_delete: :cascade
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
+  add_foreign_key "notification_rules", "users"
+  add_foreign_key "notifications", "notification_rules"
   add_foreign_key "notifications", "users"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "scrape_results", "scrape_runs", on_delete: :cascade

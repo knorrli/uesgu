@@ -5,6 +5,7 @@ fr:
     notifications: Notifications
     unread_notifications: Notifications non lues
     favorites: Favoris
+    notification_rules: Règles de notification
     settings: Paramètres
     logout: Déconnexion
     login: Connexion
@@ -53,6 +54,95 @@ fr:
     test:
       title: üsgu
       body: Ceci est une notification de test — le push fonctionne. 🎉
+  notification_rules:
+    title: Règles de notification
+    intro: Crée tes propres « funnels » — choisis quand tu es notifié, à propos de quoi et sur quel canal. Tu peux avoir plusieurs règles à la fois.
+    your_rules: Tes règles
+    empty: Aucune règle pour l'instant. Crée ta première ci-dessous.
+    add_rule: Ajouter une règle
+    create_button: Créer la règle
+    created: Règle créée.
+    deleted: Règle supprimée.
+    fired:
+      one: Règle exécutée — 1 événement dans le digest.
+      other: "Règle exécutée — %{count} événements dans le digest."
+    fired_empty: Règle exécutée — aucun événement correspondant pour le moment.
+    fire_now: Tester
+    enable: Activer
+    disable: Mettre en pause
+    disabled: En pause
+    delete: Supprimer
+    delete_confirm: Vraiment supprimer cette règle ?
+    default_name: Notification
+    email_unavailable: ajoute une adresse e-mail dans les réglages
+    section_when: Quand
+    section_what: À propos de quoi
+    section_filter: Pour quoi
+    section_channels: Comment
+    content_hint: « Nouvellement ajoutés » t'alerte des événements fraîchement listés. « En cours » montre ce qui se passe sur une période (p. ex. ce week-end), peu importe quand c'était ajouté.
+    filter_hint: Sépare plusieurs valeurs par des virgules. Les noms doivent correspondre aux styles ou lieux du site.
+    channels_hint: Tu reçois toujours la notification dans l'app (la cloche). Push et e-mail s'ajoutent par règle.
+    cadences:
+      daily: Quotidien
+      weekly: Hebdomadaire
+      biweekly: Toutes les deux semaines
+      monthly: Mensuel
+    content_types:
+      added: Événements nouvellement ajoutés
+      happening: Événements sur une période
+    scopes:
+      all: Tous les événements
+      favorites: Mes favoris
+      custom: Filtre personnalisé
+    monthday_option: "Le %{day}"
+    push_body:
+      one: "%{name} : 1 nouvel événement. Touche pour voir."
+      other: "%{name} : %{count} nouveaux événements. Touche pour voir."
+    channels:
+      in_app: App
+      push: Push
+      email: E-mail
+    summary:
+      at_time: "%{cadence} à %{time}"
+      daily: Quotidien
+      weekly: "Chaque %{day}"
+      biweekly: "Toutes les deux semaines (%{day})"
+      monthly: "Mensuel le %{day}"
+      added: nouvellement ajoutés
+      happening: "en cours %{window}"
+      scope_all: tous
+      scope_favorites: tes favoris
+      scope_custom: "%{detail}"
+    fields:
+      name: Nom
+      name_optional: facultatif
+      name_placeholder: p. ex. Berne le week-end
+      cadence: Fréquence
+      weekday: Jour de la semaine
+      monthday: Jour du mois
+      time: Heure
+      content_type: Type
+      window: Période
+      scope: Filtre
+      filter_styles: Styles
+      filter_styles_ph: p. ex. Rock, Jazz
+      filter_locations: Lieux
+      filter_locations_ph: p. ex. Dachstock, Rössli
+      filter_queries: Termes de recherche
+      filter_queries_ph: p. ex. nom du groupe
+      notify_push: Push sur mes appareils
+      notify_email: M'envoyer un e-mail
+  notification_mailer:
+    digest:
+      subject:
+        one: üsgu · 1 nouvel événement
+        other: "üsgu · %{count} nouveaux événements"
+      intro:
+        one: Un événement pour toi.
+        other: "%{count} événements pour toi."
+      cta: Voir dans l'app
+      footer_reason: Tu reçois cet e-mail à cause d'une règle de notification que tu as créée.
+      footer_manage: Gérer les règles
   frequencies:
     daily: Quotidien
     weekly: Hebdomadaire

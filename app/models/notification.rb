@@ -1,15 +1,34 @@
-# A sealed per-user digest covering events added to the global list during
-# [period_start, period_end). The window is fixed at creation, so a digest stays
-# re-viewable forever; new events fall into the next period.
+# A per-user digest. Two flavours share this table:
+#   - Rule-based (notification_rule_id present): a NotificationRule fired and
+#     snapshotted the exact events it matched into event_ids. title holds a
+#     frozen label so the inbox reads well even if the rule is later renamed or
+#     deleted.
+#   - Legacy window-based (no rule): the original frequency digest covering
+#     events added during [period_start, period_end). Kept working so the old
+#     Notification.generate_for path is untouched.
+# Either way the window is fixed at creation, so a digest stays re-viewable.
 class Notification < ApplicationRecord
   belongs_to :user
+  belongs_to :notification_rule, optional: true
 
   scope :unread, -> { where(read_at: nil) }
   scope :ordered, -> { order(period_end: :desc) }
 
-  # Events added to the global list during this digest's window.
+  def rule_based?
+    notification_rule_id.present? || event_ids.present?
+  end
+
+  # The events in this digest, narrowed to what's *currently* visible (an event
+  # hidden after the fact drops out). Rule-based digests read their snapshot;
+  # legacy ones recompute from the created_at window.
   def events
-    Event.visible.where(created_at: period_start...period_end).order(start_date: :asc)
+    relation =
+      if rule_based?
+        Event.visible.where(id: event_ids)
+      else
+        Event.visible.where(created_at: period_start...period_end)
+      end
+    relation.order(start_date: :asc)
   end
 
   # Events in the window narrowed to the user's favorite locations OR styles.

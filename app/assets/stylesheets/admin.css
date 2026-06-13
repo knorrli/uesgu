@@ -60,6 +60,68 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Admin events list. A fixed date column + a stacked content block, with a
+   hairline between rows, so each event is one legible unit (the old single
+   wrapping line let a long title push the venue/genres onto the next line and
+   blur which info belonged to which event). */
+.event-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-row {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: var(--gap-xsmall) var(--gap-medium);
+  align-items: baseline;
+  padding-block: var(--gap-small);
+  border-bottom: var(--tag-border-width) solid var(--border-color);
+}
+
+.event-row__date {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.event-row__main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}
+
+.event-row__title {
+  overflow-wrap: anywhere;
+}
+
+/* Venue · genres · state flags as one muted meta line. Borderless info (a box
+   reads as clickable); middot separators keep the items distinct. */
+.event-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small);
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
+}
+
+.event-row__meta > span:not(:first-child)::before {
+  content: "·";
+  margin-right: var(--gap-small);
+}
+
+.event-row__flag-warn {
+  color: var(--theme-warn-color);
+}
+
+/* On narrow screens the date moves above the title (its own line) rather than
+   squeezing the 6.5rem column. */
+@media (max-width: 560px) {
+  .event-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
 /* Stat rows on the admin dashboard: label and figure joined by a dotted leader
    so the eye can follow a row across the width to its number. */
 .stat {

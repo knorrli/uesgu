@@ -28,17 +28,24 @@
   </div>
 
   <% if @events.any? %>
-    <div class="flex flex-col gap-small">
+    <div class="event-rows">
       <% @events.each do |event| %>
-        <div class="flex align-baseline gap-medium wrap catalogue-row">
-          <span class="muted"><%= l(event.start_date) %></span>
-          <%= link_to event.title, admin_event_path(event) %>
-          <div class="flex gap-small wrap align-baseline">
-            <% if event.venue %><span class="muted"><%= event.venue.name %></span><% end %>
-            <% event.styles.each do |style| %><span class="tag"><%= style.name %></span><% end %>
-            <% if event.cancelled? %><span class="tag"><%= t('.cancelled_badge') %></span><% end %>
-            <% if event.hidden? %><span class="muted"><%= t('.hidden_badge') %></span><% end %>
-            <% if event.overridden_fields.any? %><span class="tag"><%= t('.overridden_badge') %></span><% end %>
+        <%# A fixed date column + a stacked content block (title, then a muted
+            meta line) so each event reads as one clear unit — instead of one
+            wrapping line where a long title spills the venue/genres onto the next
+            row and blurs which info belongs to which event. Genres/badges are
+            borderless info text (a box would read as clickable). %>
+        <div class="event-row">
+          <span class="muted event-row__date"><%= l(event.start_date) %></span>
+          <div class="event-row__main">
+            <%= link_to event.title, admin_event_path(event), class: 'event-row__title' %>
+            <div class="event-row__meta">
+              <% if event.venue %><span><%= event.venue.name %></span><% end %>
+              <% event.styles.each do |style| %><span><%= style.name %></span><% end %>
+              <% if event.cancelled? %><span class="event-row__flag-warn"><%= t('.cancelled_badge') %></span><% end %>
+              <% if event.hidden? %><span><%= t('.hidden_badge') %></span><% end %>
+              <% if event.overridden_fields.any? %><span><%= t('.overridden_badge') %></span><% end %>
+            </div>
           </div>
         </div>
       <% end %>

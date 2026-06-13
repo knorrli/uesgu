@@ -34,18 +34,24 @@
 
 /* Squared to match the app (--border-radius: none); neutral chips stay quiet
    (muted hairline), accent is reserved for the window / favorites chips. */
+/* Info pills carry INFORMATION, never an action — so no border and no solid
+   fill (in this UI a border or fill reads as "interactive"). A faint tint keeps
+   them legible as units while making them unmistakably distinct from the
+   bordered/filled action buttons beside them. The governing rule for the page:
+   boxed (border/fill) = do something; borderless = just information. */
 .chip {
   font-size: var(--font-size-small);
   padding: var(--gap-xsmall) var(--gap-small);
-  border: var(--border-width) solid var(--theme-bg-muted);
+  border: 0;
   border-radius: var(--border-radius);
+  background: color-mix(in srgb, var(--theme-fg-color) 8%, transparent);
   color: var(--theme-fg-muted);
   white-space: nowrap;
 }
 
 .chip--muted {
-  border-color: var(--theme-fg-muted);
   color: var(--theme-fg-muted);
+  opacity: 0.75;
 }
 
 /* Pill actions. .button-small is the filled accent; .button-ghost hollows it;
@@ -67,6 +73,10 @@
   color: var(--theme-bg-color);
   border-radius: var(--border-radius);
   cursor: pointer;
+  /* A button is a box, never underlined — even when it's an <a> (the ghost
+     "Cancel" link-button). Navigation that should read as a link uses .text-link
+     instead. */
+  text-decoration: none;
 }
 
 .button-small[disabled] {
@@ -91,6 +101,19 @@
 .button-small.danger:focus-visible {
   background: var(--theme-warn-color);
   color: var(--theme-bg-color);
+}
+
+/* A text navigation link (underlined accent), NOT a button — for "go somewhere
+   else" sitting among in-place action buttons (e.g. "Open filter" reopens the
+   rule's filter on the events page). Borderless: it's a link, not a control box. */
+.text-link {
+  color: var(--theme-accent-color);
+  text-decoration: underline;
+  font-size: var(--font-size-small);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }
 
 /* Builder form: reuse .account-form field styling; these add the grouping. */

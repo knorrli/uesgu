@@ -30,12 +30,14 @@
           </div>
 
           <div class="rule-card__actions flex gap-small">
+            <%# Primary action filled; secondary actions ghost; danger ghost-warn;
+                "Open filter" navigates, so it's a text link, not a button. %>
             <%= button_to t('notification_rules.fire_now'), fire_notification_rule_path(rule), class: 'button-small' %>
-            <%= link_to t('notification_rules.edit_filter'), rule_filter_path(rule), class: 'button-small button-ghost' %>
             <%= button_to rule.enabled? ? t('notification_rules.disable') : t('notification_rules.enable'),
                   toggle_notification_rule_path(rule), method: :patch, class: 'button-small button-ghost' %>
             <%= button_to t('notification_rules.delete'), notification_rule_path(rule), method: :delete,
                   class: 'button-small button-ghost danger', data: { turbo_confirm: t('notification_rules.delete_confirm') } %>
+            <%= link_to t('notification_rules.edit_filter'), rule_filter_path(rule), class: 'text-link' %>
           </div>
         </li>
       <% end %>

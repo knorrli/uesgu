@@ -147,6 +147,14 @@
     </div>
 
     <div class="sg-row">
+      <div class="sg-specimen"><a href="#buttons" class="text-link">Open filter</a></div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Text link</span> · <code>.text-link</code>
+        <p class="sg-purpose">Navigation ("go somewhere else") rendered as an underlined accent link — distinct from in-place action buttons. Borderless: it's a link, not a control box.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
       <div class="sg-specimen"><button type="button" class="theme-toggle" aria-label="Theme"><span class="ph ph-circle-half-tilt"></span></button></div>
       <div class="sg-spec">
         <span class="sg-spec__name">Theme toggle</span> · <code>.theme-toggle</code>
@@ -183,7 +191,7 @@
   <%# ============================================================ PILLS %>
   <section class="sg-section" id="pills">
     <h2>Pills, badges &amp; chips</h2>
-    <p class="sg-section__intro">Five overlapping pill families exist. The distinction that matters: is it <b>read-only metadata</b>, a <b>count</b>, a <b>selectable token</b>, or a <b>removable applied filter</b>?</p>
+    <p class="sg-section__intro"><b>Governing rule: a box reads as clickable.</b> Buttons are the only bordered/filled boxes — so anything with a border or solid fill says "do something", and <b>information carries no border/fill</b> (a faint tint at most). That's how you tell a read-only channel pill from a ghost action button at a glance.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -195,6 +203,7 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Info chip</span> · <code>.chip</code> (<code>--window</code>, <code>--type</code>, <code>--muted</code>)
         <p class="sg-purpose">Read-only metadata that is never clickable (channels, windows, rule type, disabled state).</p>
+        <span class="sg-ok"><b>Audit #5 — resolved.</b> Now borderless (faint tint), so it no longer reads like a ghost action button. Border/fill is reserved for things you can click.</span>
       </div>
     </div>
 

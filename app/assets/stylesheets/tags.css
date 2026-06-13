@@ -1,3 +1,12 @@
+/* Two label roles, kept deliberately distinct (a box reads as clickable in this
+   UI, so the box is the interactivity cue):
+ *
+ *   .tag   — INTERACTIVE / selectable. Boxed (hairline border). A filter token,
+ *            a status filter link, a selectable style. `.active` fills it accent.
+ *   .chip  — READ-ONLY information. Borderless (faint tint). A badge that states
+ *            a fact (channel, type, status, a listed style/location) and is never
+ *            clickable. Lives here beside .tag so the contrast is one read.
+ */
 .tag {
   padding: 5px;
   font-size: 80%;
@@ -45,4 +54,35 @@ label.tag:has(input:checked) {
   background-color: var(--theme-accent-color);
   border-color: var(--theme-accent-color);
   color: var(--theme-bg-color);
+}
+
+/* Read-only info badge. Borderless + faint tint so it never reads as a clickable
+   tag/button — the counterpart to .tag. */
+.chip {
+  font-size: var(--font-size-small);
+  padding: var(--gap-xsmall) var(--gap-small);
+  border: 0;
+  border-radius: var(--border-radius);
+  background: color-mix(in srgb, var(--theme-fg-color) 8%, transparent);
+  color: var(--theme-fg-muted);
+  white-space: nowrap;
+}
+
+/* A quieter still (disabled/inactive) info chip. */
+.chip--muted {
+  color: var(--theme-fg-muted);
+  opacity: 0.75;
+}
+
+/* A date/window or "favorites live" chip: faintly accent-tinted to read as a
+   time/favorite fact (still borderless — it's information). */
+.chip--window {
+  background: var(--theme-accent-muted);
+  color: var(--theme-fg-color);
+}
+
+/* A category/type badge ("New" / "What's on"): neutral, same as the base chip. */
+.chip--type {
+  background: color-mix(in srgb, var(--theme-fg-color) 8%, transparent);
+  color: var(--theme-fg-muted);
 }

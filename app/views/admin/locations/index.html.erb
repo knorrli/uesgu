@@ -33,7 +33,7 @@
         <div class="flex align-baseline gap-medium wrap catalogue-row">
           <%= link_to loc[:name], events_path(l: [loc[:name]]) %>
           <span class="muted catalogue-count"><%= loc[:count] %>&times;</span>
-          <span class="tag"><%= t(".type_#{loc[:type]}") %></span>
+          <span class="chip"><%= t(".type_#{loc[:type]}") %></span>
         </div>
       <% end %>
     </div>

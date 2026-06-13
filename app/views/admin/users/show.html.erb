@@ -3,7 +3,7 @@
 
   <h1>
     <%= @user.username %>
-    <% if @user.admin? %><span class="tag"><%= t('admin.users.admin_badge') %></span><% end %>
+    <% if @user.admin? %><span class="chip"><%= t('admin.users.admin_badge') %></span><% end %>
   </h1>
 
   <dl class="flex flex-col gap-small">
@@ -40,7 +40,7 @@
     <h2><%= t('.favorite_locations') %></h2>
     <% if @user.location_list.any? %>
       <div class="flex gap-small wrap">
-        <% @user.location_list.each do |location| %><span class="tag"><%= location %></span><% end %>
+        <% @user.location_list.each do |location| %><span class="chip"><%= location %></span><% end %>
       </div>
     <% else %>
       <p class="muted">—</p>
@@ -51,7 +51,7 @@
     <h2><%= t('.favorite_styles') %></h2>
     <% if @user.style_list.any? %>
       <div class="flex gap-small wrap">
-        <% @user.style_list.each do |style| %><span class="tag"><%= style %></span><% end %>
+        <% @user.style_list.each do |style| %><span class="chip"><%= style %></span><% end %>
       </div>
     <% else %>
       <p class="muted">—</p>

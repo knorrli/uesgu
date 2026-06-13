@@ -7,7 +7,7 @@
       <span><%= l(@event.start_date) %></span>
       <% if @event.venue %><span><%= @event.venue.name %></span><% end %>
       <%= link_to t('.source_link'), @event.url, target: '_blank', rel: 'noopener' %>
-      <% if @event.cancelled? %><span class="tag"><%= t('admin.events.index.cancelled_badge') %></span><% end %>
+      <% if @event.cancelled? %><span class="chip"><%= t('admin.events.index.cancelled_badge') %></span><% end %>
       <% if @event.hidden? %><span><%= t('admin.events.index.hidden_badge') %></span><% end %>
     </div>
   </div>
@@ -20,7 +20,7 @@
     <label class="flex flex-col gap-small">
       <span class="flex gap-small align-baseline">
         <%= t('.title_label') %>
-        <% if @event.overridden?(:title) %><span class="tag"><%= t('.overridden_badge') %></span><% end %>
+        <% if @event.overridden?(:title) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
       <%= text_field_tag 'event[title]', @event.title, autocomplete: 'off' %>
     </label>
@@ -28,7 +28,7 @@
     <label class="flex flex-col gap-small">
       <span class="flex gap-small align-baseline">
         <%= t('.subtitle_label') %>
-        <% if @event.overridden?(:subtitle) %><span class="tag"><%= t('.overridden_badge') %></span><% end %>
+        <% if @event.overridden?(:subtitle) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
       <%= text_field_tag 'event[subtitle]', @event.subtitle, autocomplete: 'off' %>
     </label>
@@ -38,7 +38,7 @@
         <span class="flex gap-small align-baseline">
           <%= t('.date_label') %>
           <% if @event.overridden?(:start_date) || @event.overridden?(:start_time) %>
-            <span class="tag"><%= t('.overridden_badge') %></span>
+            <span class="chip"><%= t('.overridden_badge') %></span>
           <% end %>
         </span>
         <%= date_field_tag 'event[date]', @event.start_date&.iso8601 %>

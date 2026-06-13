@@ -57,7 +57,7 @@
             <%= button_to t('genres.queue.restore'), restore_genre_path(genre),
                   params: { return_to: genres_path(status: params[:status].presence, q: params[:q].presence, sort: params[:sort].presence) } %>
           <% elsif genre.styles.any? %>
-            <% genre.styles.each do |style| %><span class="tag"><%= style.name %></span><% end %>
+            <% genre.styles.each do |style| %><span class="chip"><%= style.name %></span><% end %>
           <% else %>
             <span class="muted"><%= t('.status_unassigned') %></span>
           <% end %>

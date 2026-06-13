@@ -32,27 +32,8 @@
   margin: 0;
 }
 
-/* Squared to match the app (--border-radius: none); neutral chips stay quiet
-   (muted hairline), accent is reserved for the window / favorites chips. */
-/* Info pills carry INFORMATION, never an action — so no border and no solid
-   fill (in this UI a border or fill reads as "interactive"). A faint tint keeps
-   them legible as units while making them unmistakably distinct from the
-   bordered/filled action buttons beside them. The governing rule for the page:
-   boxed (border/fill) = do something; borderless = just information. */
-.chip {
-  font-size: var(--font-size-small);
-  padding: var(--gap-xsmall) var(--gap-small);
-  border: 0;
-  border-radius: var(--border-radius);
-  background: color-mix(in srgb, var(--theme-fg-color) 8%, transparent);
-  color: var(--theme-fg-muted);
-  white-space: nowrap;
-}
-
-.chip--muted {
-  color: var(--theme-fg-muted);
-  opacity: 0.75;
-}
+/* The .chip info-label family now lives in tags.css (shared, beside .tag), since
+   it's used app-wide for read-only badges, not just here. */
 
 /* Pill actions. .button-small is the filled accent; .button-ghost hollows it;
    .danger recolours to the warn token (shared with the rest of the app). */
@@ -177,18 +158,6 @@
   font-size: 1.15em;
 }
 
-/* Chip variants: a window/date or live-favorites chip reads as accent; a type
-   badge ("New" / "What's on") is a quiet fill. */
-.chip--window {
-  border-color: var(--theme-accent-color);
-  background: var(--theme-accent-muted);
-}
-
-.chip--type {
-  border: 0;
-  background: var(--theme-bg-muted);
-  color: var(--theme-fg-muted);
-}
 
 /* Rule card name carries an inline type badge. */
 .rule-card__name {

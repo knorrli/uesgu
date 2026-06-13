@@ -107,3 +107,11 @@
 .gap-xsmall {
   gap: var(--gap-xsmall);
 }
+
+/* The conditional builder fields (weekday / monthday / window / custom block)
+   carry .flex (display:flex), which overrides the UA `[hidden]` rule that the
+   rule-form Stimulus controller toggles — so without this they'd never hide.
+   Re-assert [hidden] at higher specificity (same trick as events.css). */
+.rule-form [hidden] {
+  display: none;
+}

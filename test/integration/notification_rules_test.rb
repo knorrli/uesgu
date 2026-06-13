@@ -17,6 +17,16 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_select 'select[name="notification_rule[cadence]"]'
     assert_select 'select[name="notification_rule[content_type]"]'
     assert_select 'select[name="notification_rule[scope]"]'
+
+    # Conditional-field wiring for the rule-form Stimulus controller — the hooks
+    # that drive show/hide. (The CSS that makes [hidden] win over .flex lives in
+    # notification_rules.css.)
+    assert_select 'form[data-controller="rule-form"]'
+    assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"][data-action="rule-form#update"]'
+    assert_select '[data-rule-form-target="weekday"]'
+    assert_select '[data-rule-form-target="monthday"]'
+    assert_select '[data-rule-form-target="window"]'
+    assert_select '[data-rule-form-target="custom"]'
   end
 
   test 'index renders an existing rule card with its summary and actions' do

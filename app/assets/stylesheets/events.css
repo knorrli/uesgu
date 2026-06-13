@@ -649,17 +649,7 @@
 
 .filter-trigger__more { color: var(--theme-fg-muted); }
 
-.filter-trigger__badge {
-  flex-shrink: 0;
-  min-width: 1.4em;
-  padding: 0 0.4em;
-  background: var(--theme-accent-color);
-  color: var(--theme-bg-color);
-  font-size: 75%;
-  font-weight: bold;
-  line-height: 1.6;
-  text-align: center;
-}
+/* The applied-filter count uses the shared .badge (layout.css). */
 
 .filter-trigger__chevron {
   flex-shrink: 0;

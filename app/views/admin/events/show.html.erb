@@ -64,7 +64,7 @@
           <li class="admin-row">
             <span class="admin-row__main"><%= t(".field_#{field}") %></span>
             <%= button_to t('.revert'), revert_admin_event_path(@event, field: field),
-                  method: :patch, class: 'button' %>
+                  method: :patch, class: 'button-small button-ghost' %>
           </li>
         <% end %>
       </ul>

@@ -131,14 +131,22 @@
   font-size: var(--font-size-small);
 }
 
-/* Small count pill, e.g. unread notifications */
+/* The count pill: a small accent-filled number attached to something else —
+   unread notifications in the menu, the applied-filter count on a mobile filter
+   trigger. One definition for both (was duplicated as .filter-trigger__badge).
+   min-width + centring keep a single- and double-digit count the same shape;
+   flex-shrink:0 stops it collapsing inside the flex filter-trigger row. */
 .badge {
   display: inline-block;
-  padding: 0 var(--gap-xsmall);
+  flex-shrink: 0;
+  min-width: 1.5em;
+  padding: 0 0.4em;
   background-color: var(--theme-accent-color);
   color: var(--theme-bg-color);
   font-size: var(--font-size-small);
-  line-height: 1.4;
+  font-weight: bold;
+  line-height: 1.5;
+  text-align: center;
 }
 
 /* Unread-notifications dot on the account-menu trigger. */

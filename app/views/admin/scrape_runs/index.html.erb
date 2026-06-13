@@ -11,7 +11,7 @@
     <% if @presenter.in_progress? %>
       <span class="muted"><%= t('.in_progress') %></span>
     <% else %>
-      <%= button_to t('.trigger'), admin_scrape_runs_path, class: 'button',
+      <%= button_to t('.trigger'), admin_scrape_runs_path, class: 'button-small',
             data: { turbo_confirm: t('.trigger_confirm') } %>
     <% end %>
   </div>

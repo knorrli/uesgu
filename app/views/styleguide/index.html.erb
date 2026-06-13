@@ -215,7 +215,7 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Count badge</span> · <code>.badge</code>
         <p class="sg-purpose">A small accent count attached to something else (unread notifications, "+N more").</p>
-        <span class="sg-flag"><b>Audit #8 / #11.</b> Duplicated as <code>.filter-trigger__badge</code> with identical intent — should share one class.</span>
+        <span class="sg-ok"><b>Audit #8 — resolved.</b> The mobile filter trigger now uses this same <code>.badge</code>; the duplicate <code>.filter-trigger__badge</code> is gone.</span>
       </div>
     </div>
 
@@ -330,9 +330,9 @@
         </label>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Checkboxes</span> · native &nbsp;/&nbsp; <code>label.tag</code> &nbsp;/&nbsp; <code>.opt__box</code> (sheets)
-        <p class="sg-purpose">Confirm an opt-in. Native uses the accent <code>accent-color</code>; the chip fills accent when checked.</p>
-        <span class="sg-flag"><b>Audit #4.</b> Three checkbox styles; two are seen by one user (settings form + mobile sheets). Pick one or scope the difference deliberately.</span>
+        <span class="sg-spec__name">Checkboxes</span> · <code>input[type=checkbox]</code> &nbsp;/&nbsp; <code>label.tag</code> &nbsp;/&nbsp; <code>.opt__box</code> (sheets)
+        <p class="sg-purpose">Confirm an opt-in. One custom box (left) is used everywhere; the selectable chip fills accent when checked.</p>
+        <span class="sg-ok"><b>Audit #4 — resolved.</b> All standalone checkboxes now share one custom box (<code>appearance:none</code>, matching the sheet's <code>.opt__box</code>) — no more native-vs-custom split. The chip (<code>label.tag</code>) stays a distinct, deliberate selectable-chip pattern.</span>
       </div>
     </div>
   </section>

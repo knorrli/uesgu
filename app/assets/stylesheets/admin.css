@@ -227,11 +227,6 @@
   margin: 0;
 }
 
-.button--small {
-  padding: 0 var(--gap-small);
-  font-size: var(--font-size-small);
-}
-
 /* Status pill: ok = green, empty (ran but wrote nothing) = amber, failed = red. */
 .scrape-badge {
   display: inline-block;

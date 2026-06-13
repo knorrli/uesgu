@@ -89,7 +89,121 @@ input[type=submit] {
   }
 }
 
-input[type=checkbox],
+/* ── The button ladder ───────────────────────────────────────────────────────
+   One vocabulary, used app-wide. "A box reads as clickable", so every one of
+   these is a box (except .text-link, which is a navigation link):
+
+     PRIMARY      input[type=submit]            filled accent  (commit a form)
+     SECONDARY    .button-small                 filled accent pill (a smaller
+                                                 commit: Fire now, Trigger run)
+     TERTIARY     .button-small.button-ghost    hollow accent pill (Cancel,
+                                                 Enable/Disable, Run one)
+     DANGER       .button.delete / .button-small.danger
+                                                 hollow warn → fills on commit
+     ICON         .icon-button (+ .danger)      flat boxless inline icon action
+     LINK         .text-link                    underlined accent navigation
+     BARE         .button                        reset to text (view switcher,
+                                                 favorites shortcut — re-styled
+                                                 per context; see those files)
+
+   .button-small is the canonical small/secondary button (was duplicated as the
+   admin-only .button--small; consolidated here). Layout — where a button sits —
+   is the caller's job; this file owns the look. */
+.button-small {
+  /* inline-flex + a fixed line-height makes every pill the same height whether
+     it's an <a>, a <button> (via button_to), or an <input> — otherwise the <a>
+     inherits the body's 1.5 line-height and renders taller than the buttons'. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-small);
+  line-height: 1.2;
+  padding: var(--gap-small) var(--gap-medium);
+  border: var(--border-width) solid var(--theme-accent-color);
+  background: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button-small[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button-small.button-ghost {
+  background: none;
+  color: var(--theme-accent-color);
+}
+
+/* Destructive pill: hollow warn at rest, fills warn on commit — the same danger
+   language as .button.delete, just the small/pill size. */
+.button-small.danger {
+  background: none;
+  border-color: var(--theme-warn-color);
+  color: var(--theme-warn-color);
+}
+
+.button-small.danger:hover,
+.button-small.danger:focus-visible {
+  background: var(--theme-warn-color);
+  color: var(--theme-bg-color);
+}
+
+/* A text navigation link (underlined accent), NOT a button — for "go somewhere
+   else" sitting among in-place action buttons. Borderless: a link, not a box. */
+.text-link {
+  color: var(--theme-accent-color);
+  text-decoration: underline;
+  font-size: var(--font-size-small);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ── Checkbox ─────────────────────────────────────────────────────────────────
+   One custom box everywhere (forms, the favorites picker, …) so a native browser
+   checkbox never sneaks in beside it. appearance:none lets us draw the box on the
+   input itself — no sibling element, so no markup changes — matching the
+   filter-sheet .opt__box exactly. The full-row sheet option (.opt) and the
+   selectable .tag chip hide this input and draw their own affordance, but share
+   this visual language. */
+input[type=checkbox] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: inline-grid;
+  place-content: center;
+  border: var(--border-width) solid var(--border-color);
+  background: var(--theme-bg-color);
+  cursor: pointer;
+  vertical-align: -0.2em;
+}
+
+/* The tick: a masked Phosphor check, hidden (scaled to 0) until checked. */
+input[type=checkbox]::before {
+  content: "";
+  width: 0.8rem;
+  height: 0.8rem;
+  background-color: var(--theme-bg-color);
+  -webkit-mask: var(--check-mask) center / contain no-repeat;
+  mask: var(--check-mask) center / contain no-repeat;
+  transform: scale(0);
+}
+
+input[type=checkbox]:checked {
+  background: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
+}
+
+input[type=checkbox]:checked::before {
+  transform: scale(1);
+}
+
 input[type=radio] {
   accent-color: var(--theme-accent-color);
 }

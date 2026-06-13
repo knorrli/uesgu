@@ -7,6 +7,10 @@ class Event < ApplicationRecord
   belongs_to :created_in_scrape_run, class_name: 'ScrapeRun', optional: true,
                                      inverse_of: :created_events
 
+  # Users who bookmarked this event ("save this show"). class_name pinned because
+  # the inflector singularizes "saves" → "safe".
+  has_many :event_saves, class_name: 'EventSave', dependent: :destroy
+
   validates :title, :start_date, :url, presence: true
 
   # Public-facing events: non-music events (carrying a hidden genre, with no

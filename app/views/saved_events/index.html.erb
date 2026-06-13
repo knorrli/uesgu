@@ -1,0 +1,16 @@
+<% content_for :title, t('saved_events.title') %>
+
+<h1><%= t('saved_events.title') %></h1>
+
+<% if @events.empty? %>
+  <p class="empty-state"><%= t('saved_events.empty') %></p>
+<% else %>
+  <div class="event-list flex flex-col gap-xlarge">
+    <% @events.group_by(&:start_date).each do |date, events| %>
+      <div class="date-events flex flex-col gap-medium">
+        <h2 class="date"><%= l date, format: :detailed %></h2>
+        <%= render 'events/venue_groups', events: events, filter: nil, interactive: false %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

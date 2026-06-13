@@ -6,6 +6,7 @@ en:
     unread_notifications: Unread notifications
     favorites: Favorites
     notification_rules: Notification rules
+    saved: Saved
     settings: Settings
     logout: Log out
     login: Log in
@@ -54,6 +55,10 @@ en:
     test:
       title: üsgu
       body: This is a test notification — push is working. 🎉
+  saved_events:
+    title: Saved shows
+    empty: You haven't saved any shows yet. Tap the bookmark icon on an event.
+    toggle: Save show
   notification_rules:
     title: Notification rules
     intro: Build your own funnels — choose when you're notified, about what, and on which channel. You can run several rules at once.

@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_13_180000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_13_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "event_saves", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "event_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_event_saves_on_event_id"
+    t.index ["user_id", "event_id"], name: "index_event_saves_on_user_id_and_event_id", unique: true
+    t.index ["user_id"], name: "index_event_saves_on_user_id"
+  end
 
   create_table "events", force: :cascade do |t|
     t.string "title", null: false
@@ -215,6 +225,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_180000) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  add_foreign_key "event_saves", "events"
+  add_foreign_key "event_saves", "users"
   add_foreign_key "events", "scrape_runs", column: "created_in_scrape_run_id", on_delete: :nullify
   add_foreign_key "genres", "genres", column: "canonical_id"
   add_foreign_key "genres_styles", "genres", on_delete: :cascade

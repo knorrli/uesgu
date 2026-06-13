@@ -103,4 +103,30 @@ module EventsHelper
       Set.new(@filter.location_list) == followed_locations &&
       Set.new(@filter.style_list) == followed_styles
   end
+
+  # The current user's saved event ids, loaded once so the per-event save button
+  # doesn't N+1 across a list.
+  def saved_event_ids
+    @saved_event_ids ||= Set.new(current_user&.event_saves&.pluck(:event_id))
+  end
+
+  def event_saved?(event)
+    saved_event_ids.include?(event.id)
+  end
+
+  # The bookmark toggle on an event. Logged-in only; optimistic via the `save`
+  # Stimulus controller (one self-contained controller per button, no cross-sync).
+  def event_save_button(event)
+    return unless authenticated?
+
+    saved = event_saved?(event)
+    button_tag type: :button,
+               class: class_names('event-save', 'icon-button', saved: saved),
+               'aria-pressed': saved.to_s,
+               'aria-label': t('saved_events.toggle'),
+               data: { controller: 'save', action: 'save#toggle',
+                       save_event_id_value: event.id, save_saved_value: saved } do
+      content_tag(:span, '', class: 'ph ph-bookmark-simple', 'aria-hidden': true)
+    end
+  end
 end

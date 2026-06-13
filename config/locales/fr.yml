@@ -6,6 +6,7 @@ fr:
     unread_notifications: Notifications non lues
     favorites: Favoris
     notification_rules: Règles de notification
+    saved: Enregistré
     settings: Paramètres
     logout: Déconnexion
     login: Connexion
@@ -54,6 +55,10 @@ fr:
     test:
       title: üsgu
       body: Ceci est une notification de test — le push fonctionne. 🎉
+  saved_events:
+    title: Événements enregistrés
+    empty: Tu n'as pas encore enregistré d'événements. Touche l'icône signet sur un événement.
+    toggle: Enregistrer l'événement
   notification_rules:
     title: Règles de notification
     intro: Crée tes propres « funnels » — choisis quand tu es notifié, à propos de quoi et sur quel canal. Tu peux avoir plusieurs règles à la fois.

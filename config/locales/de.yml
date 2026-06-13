@@ -6,6 +6,7 @@ de:
     unread_notifications: Ungelesene Mitteilungen
     favorites: Favoriten
     notification_rules: Mitteilungs-Regeln
+    saved: Gespeichert
     settings: Einstellungen
     logout: Abmelden
     login: Anmelden
@@ -54,6 +55,10 @@ de:
     test:
       title: üsgu
       body: Dies ist eine Testmitteilung — Push funktioniert. 🎉
+  saved_events:
+    title: Gespeicherte Veranstaltungen
+    empty: Du hast noch keine Veranstaltungen gespeichert. Tippe das Lesezeichen-Symbol bei einer Veranstaltung.
+    toggle: Veranstaltung speichern
   notification_rules:
     title: Mitteilungs-Regeln
     intro: Erstelle eigene „Funnels“ — lege fest, wann du worüber und auf welchem Kanal informiert wirst. Du kannst mehrere Regeln gleichzeitig laufen lassen.

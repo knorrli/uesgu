@@ -45,7 +45,7 @@ class RegistrationsController < ApplicationController
   private
 
   def registration_params
-    params.expect(user: %i[ username password password_confirmation notification_frequency ])
+    params.expect(user: %i[ username password password_confirmation ])
   end
 
   # The code typed into the form (create / failed re-render) or carried in the

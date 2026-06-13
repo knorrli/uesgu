@@ -65,7 +65,7 @@ module TaxonomyFixtures
   end
 
   # A persisted User with a valid synthetic username + password. Pass attrs to
-  # set notification_frequency, last_notified_at, created_at, email_address, etc.
+  # set created_at, email_address, locale, admin, etc.
   def user(**attrs)
     n = TaxonomyFixtures.next_seq
     User.create!({ username: "user#{n}", password: PASSWORD }.merge(attrs))

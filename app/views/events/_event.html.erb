@@ -30,13 +30,16 @@
 
   </div>
 
-  <% if current_user&.admin? && interactive %>
+  <% if current_user %>
     <div class="event-actions">
-      <%= link_to admin_event_path(event), class: 'icon-button', data: { turbo_frame: '_top' }, 'aria-label': t('events.edit_event') do %>
-        <span class="ph ph-gear"></span>
-      <% end %>
-      <%= button_to event, method: :delete, class: 'icon-button danger', 'aria-label': t('events.delete_event') do %>
-        <span class="ph ph-trash"></span>
+      <%= event_save_button(event) %>
+      <% if current_user.admin? && interactive %>
+        <%= link_to admin_event_path(event), class: 'icon-button', data: { turbo_frame: '_top' }, 'aria-label': t('events.edit_event') do %>
+          <span class="ph ph-gear"></span>
+        <% end %>
+        <%= button_to event, method: :delete, class: 'icon-button danger', 'aria-label': t('events.delete_event') do %>
+          <span class="ph ph-trash"></span>
+        <% end %>
       <% end %>
     </div>
   <% end %>

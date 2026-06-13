@@ -81,6 +81,8 @@
                 <%= link_to notifications_path do %>
                   <%= t('nav.notifications') %><% if unread.positive? %> <span class="badge"><%= unread %></span><% end %>
                 <% end %>
+                <%= link_to t('nav.notification_rules'), notification_rules_path %>
+                <%= link_to t('nav.saved'), saved_events_path %>
                 <%= link_to t('nav.favorites'), favorites_path %>
                 <%= link_to t('nav.settings'), settings_path %>
                 <% if current_user.admin? %>

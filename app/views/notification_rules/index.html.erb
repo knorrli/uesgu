@@ -1,0 +1,44 @@
+<% content_for :title, t('notification_rules.title') %>
+
+<div class="notification-rules flex flex-col gap-large">
+  <header class="flex flex-col gap-small">
+    <h1><%= t('notification_rules.title') %></h1>
+    <p class="muted"><%= t('notification_rules.intro') %></p>
+  </header>
+
+  <% if @rules.empty? %>
+    <p class="empty-state"><%= t('notification_rules.empty_html', link: link_to(t('notification_rules.empty_link'), events_path)).html_safe %></p>
+  <% else %>
+    <ul class="rule-list flex flex-col gap-medium">
+      <% @rules.each do |rule| %>
+        <li class="<%= class_names('rule-card', 'flex', 'flex-col', 'gap-small', 'rule-card--off': !rule.enabled?) %>">
+          <div class="flex flex-col gap-xsmall">
+            <span class="rule-card__name">
+              <%= rule.display_name %>
+              <span class="chip chip--type"><%= rule_type_label(rule) %></span>
+            </span>
+            <span class="muted rule-card__summary"><%= rule_about(rule) %></span>
+            <span class="muted rule-card__summary"><%= rule_schedule_summary(rule) %></span>
+          </div>
+
+          <div class="rule-card__chips flex gap-xsmall">
+            <% rule_channels(rule).each do |label| %>
+              <span class="chip"><%= label %></span>
+            <% end %>
+            <% if rule.track_favorites? %><span class="chip chip--window"><%= t('notification_rules.favorites_live') %></span><% end %>
+            <% unless rule.enabled? %><span class="chip chip--muted"><%= t('notification_rules.disabled') %></span><% end %>
+          </div>
+
+          <div class="rule-card__actions flex gap-small">
+            <%= button_to t('notification_rules.fire_now'), fire_notification_rule_path(rule), class: 'button-small' %>
+            <%= link_to t('notification_rules.edit_filter'), rule_filter_path(rule), class: 'button-small button-ghost' %>
+            <%= button_to rule.enabled? ? t('notification_rules.disable') : t('notification_rules.enable'),
+                  toggle_notification_rule_path(rule), method: :patch, class: 'button-small button-ghost' %>
+            <%= button_to t('notification_rules.delete'), notification_rule_path(rule), method: :delete,
+                  class: 'button-small button-ghost danger', data: { turbo_confirm: t('notification_rules.delete_confirm') } %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

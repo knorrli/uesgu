@@ -1,18 +1,13 @@
 class User < ApplicationRecord
-  FREQUENCIES = %w[daily weekly biweekly monthly never].freeze
-
-  # Digest cadence per frequency. "never" has no interval (notifications off).
-  # "daily" is mainly for testing the delivery pipeline.
-  FREQUENCY_INTERVALS = {
-    'daily' => 1.day,
-    'weekly' => 1.week,
-    'biweekly' => 2.weeks,
-    'monthly' => 1.month
-  }.freeze
-
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  # User-defined notification funnels (the WHEN·WHICH·FILTER·CHANNEL rules).
+  has_many :notification_rules, dependent: :destroy
+  # Bookmarked individual events ("save this show"). class_name pinned because the
+  # inflector singularizes "saves" → "safe".
+  has_many :event_saves, class_name: 'EventSave', dependent: :destroy
+  has_many :saved_events, through: :event_saves, source: :event
   # Web Push opt-ins, one per browser/device. Gone with the account.
   has_many :push_subscriptions, dependent: :destroy
 
@@ -27,23 +22,14 @@ class User < ApplicationRecord
 
   normalizes :username, with: ->(u) { u.strip.downcase }
   normalizes :email_address, with: ->(e) { e.strip.downcase.presence }
-  # Opt-in: a blank selection (the signup prompt left untouched) means no
-  # notifications, not an error.
-  normalizes :notification_frequency, with: ->(f) { f.presence || 'never' }
 
   validates :username, presence: true, uniqueness: true, length: { in: 2..30 },
                        format: { with: /\A[a-z0-9_.-]+\z/, message: 'may only contain letters, numbers, and . _ -' }
   validates :email_address, uniqueness: true, allow_nil: true
-  validates :notification_frequency, inclusion: { in: FREQUENCIES }
   validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }, allow_blank: true
   validates :events_view, inclusion: { in: %w[list calendar] }, allow_nil: true
 
   def admin?
     admin
-  end
-
-  # Digest interval for this user's frequency, or nil when notifications are off.
-  def notification_interval
-    FREQUENCY_INTERVALS[notification_frequency]
   end
 end

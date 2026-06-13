@@ -5,6 +5,8 @@ en:
     notifications: Notifications
     unread_notifications: Unread notifications
     favorites: Favorites
+    notification_rules: Notification rules
+    saved: Saved
     settings: Settings
     logout: Log out
     login: Log in
@@ -53,6 +55,122 @@ en:
     test:
       title: üsgu
       body: This is a test notification — push is working. 🎉
+  saved_events:
+    title: Saved shows
+    empty: You haven't saved any shows yet. Tap the bookmark icon on an event.
+    toggle: Save show
+  notification_rules:
+    title: Notification rules
+    intro: Build your own funnels — choose when you're notified, about what, and on which channel. You can run several rules at once.
+    your_rules: Your rules
+    empty: No rules yet. Create your first one below.
+    add_rule: Add a rule
+    create_button: Create rule
+    created: Rule created.
+    deleted: Rule deleted.
+    fired:
+      one: Rule run — 1 event in the digest.
+      other: "Rule run — %{count} events in the digest."
+    fired_empty: Rule run — no matching events right now.
+    fire_now: Test now
+    enable: Enable
+    disable: Pause
+    disabled: Paused
+    delete: Delete
+    delete_confirm: Really delete this rule?
+    default_name: Notification
+    edit_filter: Open filter
+    empty_link: Filter the events
+    empty_html: No alerts yet. %{link} on the home page and tap “Notify me”, to create one.
+    favorites_live: My favorites (kept current)
+    track_favorites: Keep in sync with my favorites
+    track_favorites_hint: also includes venues/styles you follow later
+    type:
+      added: New
+      happening: What's on
+    errors:
+      empty_filter: Pick a filter first (style, location, date …) or sync with your favorites.
+    new:
+      title: Set up a notification
+      intro: Choose how often and how you're notified about this selection.
+      about_label: Notify me about
+      hint_happening: You'll be notified about events in this window — recomputed each time.
+      hint_added: You'll be notified about newly added events that match.
+      cancel: Cancel
+    email_unavailable: add an email address in settings
+    section_when: When
+    section_what: About what
+    section_filter: For what
+    section_channels: How
+    content_hint: "“Newly added” alerts you to freshly listed events. “Happening” shows what's on in a window (e.g. this weekend), no matter when it was added."
+    filter_hint: Separate several values with commas. Names must match the style or location names used on the site.
+    channels_hint: You always get the in-app notification (the bell). Push and email are added per rule.
+    cadences:
+      daily: Daily
+      weekly: Weekly
+      biweekly: Every two weeks
+      monthly: Monthly
+    content_types:
+      added: Newly added events
+      happening: Events in a window
+    scopes:
+      all: All events
+      favorites: My favorites
+      custom: Custom filter
+    monthday_option: "On the %{day}."
+    rhythm_note: "You'll be notified %{rhythm}."
+    rhythm:
+      daily: daily
+      weekly: weekly
+      monthly: monthly
+    push_body:
+      one: "%{name}: 1 new event. Tap to view."
+      other: "%{name}: %{count} new events. Tap to view."
+    channels:
+      in_app: App
+      push: Push
+      email: Email
+    summary:
+      at_time: "%{cadence} at %{time}"
+      daily: Daily
+      weekly: "Every %{day}"
+      biweekly: "Every two weeks (%{day})"
+      monthly: "Monthly on the %{day}."
+      added: newly added
+      happening: "happening %{window}"
+      scope_all: all
+      scope_favorites: your favorites
+      scope_custom: "%{detail}"
+    fields:
+      name: Name
+      name_optional: optional
+      name_placeholder: e.g. Bern on the weekend
+      cadence: Frequency
+      weekday: Weekday
+      monthday: Day of month
+      time: Time
+      content_type: Type
+      window: Window
+      scope: Filter
+      filter_styles: Styles
+      filter_styles_ph: e.g. Rock, Jazz
+      filter_locations: Locations
+      filter_locations_ph: e.g. Dachstock, Rössli
+      filter_queries: Search terms
+      filter_queries_ph: e.g. band name
+      notify_push: Push to my devices
+      notify_email: Email me
+  notification_mailer:
+    digest:
+      subject:
+        one: üsgu · 1 new event
+        other: "üsgu · %{count} new events"
+      intro:
+        one: One event for you.
+        other: "%{count} events for you."
+      cta: View in the app
+      footer_reason: You're getting this email because of a notification rule you created.
+      footer_manage: Manage rules
   frequencies:
     daily: Daily
     weekly: Weekly
@@ -119,6 +237,10 @@ en:
       title: Notifications
       empty: No notifications yet. We'll round up newly added events for you here.
       unread_badge: New
+      fallback_name: Notification
+      event_count:
+        one: 1 event
+        other: "%{count} events"
       new_events:
         one: 1 new event
         other: "%{count} new events"
@@ -393,6 +515,7 @@ en:
         calendar: Calendar
       favorites_filter:
         label: My favorites
+      notify_filter: Notify me
     day:
       empty: No events on this day.
       close: Close

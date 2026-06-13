@@ -924,3 +924,16 @@ body.filter-sheet-open { overflow: hidden; }
 }
 
 .custom-range__sep { color: var(--theme-fg-muted); }
+
+/* "Save this show" bookmark toggle in the event-actions cluster. Muted at rest,
+   accent when saved (or hovered) — colour = "yours", matching the favorite heart.
+   (A filled bookmark glyph is left for the UI-polish pass; Phosphor here is
+   outline-only.) */
+.event-save .ph {
+  color: var(--theme-fg-muted);
+}
+
+.event-save:hover .ph,
+.event-save.saved .ph {
+  color: var(--theme-accent-color);
+}

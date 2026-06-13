@@ -5,6 +5,8 @@ de:
     notifications: Mitteilungen
     unread_notifications: Ungelesene Mitteilungen
     favorites: Favoriten
+    notification_rules: Mitteilungs-Regeln
+    saved: Gespeichert
     settings: Einstellungen
     logout: Abmelden
     login: Anmelden
@@ -53,6 +55,122 @@ de:
     test:
       title: üsgu
       body: Dies ist eine Testmitteilung — Push funktioniert. 🎉
+  saved_events:
+    title: Gespeicherte Veranstaltungen
+    empty: Du hast noch keine Veranstaltungen gespeichert. Tippe das Lesezeichen-Symbol bei einer Veranstaltung.
+    toggle: Veranstaltung speichern
+  notification_rules:
+    title: Mitteilungs-Regeln
+    intro: Erstelle eigene „Funnels“ — lege fest, wann du worüber und auf welchem Kanal informiert wirst. Du kannst mehrere Regeln gleichzeitig laufen lassen.
+    your_rules: Deine Regeln
+    empty: Noch keine Regeln. Erstelle unten deine erste.
+    add_rule: Regel hinzufügen
+    create_button: Regel erstellen
+    created: Regel erstellt.
+    deleted: Regel gelöscht.
+    fired:
+      one: Regel ausgeführt — 1 Veranstaltung im Digest.
+      other: "Regel ausgeführt — %{count} Veranstaltungen im Digest."
+    fired_empty: Regel ausgeführt — derzeit keine passenden Veranstaltungen.
+    fire_now: Jetzt testen
+    enable: Aktivieren
+    disable: Pausieren
+    disabled: Pausiert
+    delete: Löschen
+    delete_confirm: Diese Regel wirklich löschen?
+    default_name: Mitteilung
+    edit_filter: Filter öffnen
+    empty_link: Filtere die Veranstaltungen
+    empty_html: Noch keine Alerts. %{link} auf der Startseite und tippe „Benachrichtigen“, um einen zu erstellen.
+    favorites_live: Meine Favoriten (automatisch aktuell)
+    track_favorites: Mit meinen Favoriten synchron halten
+    track_favorites_hint: berücksichtigt auch Orte/Stile, denen du später folgst
+    type:
+      added: Neu
+      happening: Was läuft
+    errors:
+      empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Favoriten.
+    new:
+      title: Benachrichtigung einrichten
+      intro: Lege fest, wie oft und wie du über diese Auswahl informiert wirst.
+      about_label: Benachrichtige mich über
+      hint_happening: Du wirst über Veranstaltungen in diesem Zeitraum informiert — jedes Mal neu berechnet.
+      hint_added: Du wirst über neu hinzugefügte passende Veranstaltungen informiert.
+      cancel: Abbrechen
+    email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
+    section_when: Wann
+    section_what: Worüber
+    section_filter: Wofür
+    section_channels: Wie
+    content_hint: „Neu hinzugefügt“ meldet frisch eingetragene Veranstaltungen. „Findet statt“ zeigt, was in einem Zeitraum (z. B. dieses Wochenende) läuft — egal, wann es eingetragen wurde.
+    filter_hint: Mehrere Werte mit Komma trennen. Namen müssen den Stil- bzw. Ortsnamen auf der Seite entsprechen.
+    channels_hint: Die App-Mitteilung (Glocke) bekommst du immer. Push und E-Mail kommen pro Regel dazu.
+    cadences:
+      daily: Täglich
+      weekly: Wöchentlich
+      biweekly: Alle zwei Wochen
+      monthly: Monatlich
+    content_types:
+      added: Neu hinzugefügte Veranstaltungen
+      happening: Veranstaltungen in einem Zeitraum
+    scopes:
+      all: Alle Veranstaltungen
+      favorites: Meine Favoriten
+      custom: Eigener Filter
+    monthday_option: "Am %{day}."
+    rhythm_note: "Du wirst %{rhythm} benachrichtigt."
+    rhythm:
+      daily: täglich
+      weekly: wöchentlich
+      monthly: monatlich
+    push_body:
+      one: "%{name}: 1 neue Veranstaltung. Tippen zum Ansehen."
+      other: "%{name}: %{count} neue Veranstaltungen. Tippen zum Ansehen."
+    channels:
+      in_app: App
+      push: Push
+      email: E-Mail
+    summary:
+      at_time: "%{cadence} um %{time}"
+      daily: Täglich
+      weekly: "Jeden %{day}"
+      biweekly: "Alle zwei Wochen (%{day})"
+      monthly: "Monatlich am %{day}."
+      added: neu hinzugefügt
+      happening: "läuft %{window}"
+      scope_all: alle
+      scope_favorites: deine Favoriten
+      scope_custom: "%{detail}"
+    fields:
+      name: Name
+      name_optional: optional
+      name_placeholder: z. B. Bern am Wochenende
+      cadence: Häufigkeit
+      weekday: Wochentag
+      monthday: Tag im Monat
+      time: Uhrzeit
+      content_type: Art
+      window: Zeitraum
+      scope: Filter
+      filter_styles: Stile
+      filter_styles_ph: z. B. Rock, Jazz
+      filter_locations: Orte
+      filter_locations_ph: z. B. Dachstock, Rössli
+      filter_queries: Suchbegriffe
+      filter_queries_ph: z. B. Bandname
+      notify_push: Push auf meine Geräte
+      notify_email: E-Mail an mich
+  notification_mailer:
+    digest:
+      subject:
+        one: üsgu · 1 neue Veranstaltung
+        other: "üsgu · %{count} neue Veranstaltungen"
+      intro:
+        one: Eine Veranstaltung für dich.
+        other: "%{count} Veranstaltungen für dich."
+      cta: In der App ansehen
+      footer_reason: Du erhältst diese E-Mail wegen einer von dir erstellten Mitteilungs-Regel.
+      footer_manage: Regeln verwalten
   frequencies:
     daily: Täglich
     weekly: Wöchentlich
@@ -119,6 +237,10 @@ de:
       title: Mitteilungen
       empty: Noch keine Mitteilungen. Neu hinzugefügte Veranstaltungen fassen wir hier für dich zusammen.
       unread_badge: Neu
+      fallback_name: Mitteilung
+      event_count:
+        one: 1 Veranstaltung
+        other: "%{count} Veranstaltungen"
       new_events:
         one: 1 neue Veranstaltung
         other: "%{count} neue Veranstaltungen"
@@ -393,6 +515,7 @@ de:
         calendar: Kalender
       favorites_filter:
         label: Meine Favoriten
+      notify_filter: Benachrichtigen
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen

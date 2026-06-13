@@ -3,19 +3,17 @@ require 'db_test_helper'
 # Locks the settings update: persists preferences, and treats a blank password
 # as "leave unchanged" rather than clearing it.
 class SettingsTest < ActionDispatch::IntegrationTest
-  test 'update persists notification frequency and locale' do
-    u = sign_in_as user(notification_frequency: 'never')
-    patch settings_path, params: { user: { notification_frequency: 'weekly', locale: 'en' } }
+  test 'update persists the locale' do
+    u = sign_in_as user
+    patch settings_path, params: { user: { locale: 'en' } }
     assert_redirected_to settings_path
 
-    u.reload
-    assert_equal 'weekly', u.notification_frequency
-    assert_equal 'en', u.locale
+    assert_equal 'en', u.reload.locale
   end
 
   test 'a blank password leaves the existing password intact' do
     u = sign_in_as user
-    patch settings_path, params: { user: { notification_frequency: 'daily', password: '' } }
+    patch settings_path, params: { user: { locale: 'de', password: '' } }
     assert_redirected_to settings_path
 
     assert u.reload.authenticate(PASSWORD), 'old password still works'

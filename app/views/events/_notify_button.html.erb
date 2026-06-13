@@ -1,0 +1,13 @@
+<%# "Notify me about this" — turns the current filter into a saved alert. Shown
+    only to logged-in users, and only when a filter is actually active: an empty
+    filter would be an "all new events" firehose we deliberately don't offer
+    (the schedule lives on the linked new-alert page, keeping this row light). %>
+<% if current_user.present? &&
+      (@filter.queries.any? || @filter.style_list.any? || @filter.location_list.any? || @filter.date_ranges.any?) %>
+  <%= link_to new_notification_rule_path(q: @filter.queries, l: @filter.location_list,
+                                         s: @filter.style_list, d: @filter.date_ranges),
+        class: 'button notify-filter-link' do %>
+    <span class="ph ph-bell" aria-hidden="true"></span>
+    <span><%= t('events.index.notify_filter') %></span>
+  <% end %>
+<% end %>

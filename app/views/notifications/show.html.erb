@@ -1,21 +1,15 @@
-<% content_for :title, t('notifications.show.title') %>
+<% name = @notification.notification_rule&.display_name.presence || @notification.title.presence || t('notifications.show.title') %>
+<% content_for :title, name %>
 
 <%= link_to t('notifications.show.back'), notifications_path, class: "back-link" %>
 
 <header class="page-header">
-  <h1><%= t('notifications.show.title') %></h1>
+  <h1><%= name %></h1>
   <p class="muted"><%= l @notification.period_start.to_date %> – <%= l @notification.period_end.to_date %></p>
 </header>
 
-<div class="segmented">
-  <%= link_to t('notifications.show.all'), notification_path(@notification), class: class_names(active: !@only_relevant) %>
-  <%= link_to t('notifications.show.relevant'), notification_path(@notification, relevant: 1), class: class_names(active: @only_relevant) %>
-</div>
-
 <% if @events.none? %>
-  <p class="empty-state">
-    <%= @only_relevant ? t('notifications.show.empty_relevant') : t('notifications.show.empty_all') %>
-  </p>
+  <p class="empty-state"><%= t('notifications.show.empty_all') %></p>
 <% else %>
   <div class="event-list flex flex-col gap-xlarge">
     <% @events.group_by(&:start_date).each do |date, events| %>

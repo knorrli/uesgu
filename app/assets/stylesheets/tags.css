@@ -32,6 +32,14 @@ button.tag {
   color: var(--theme-fg-color);
 }
 
+/* The × on a removable APPLIED-FILTER token (the inline filter's active chips):
+   the whole tag is the remove button, the × is the affordance that says so. This
+   is what distinguishes a removable applied filter from a selected/current
+   .tag.active (status/nav filters), which carry no ×. */
+.tag__remove {
+  opacity: 0.7;
+}
+
 .filter .tag {
   font-size: 75%;
   line-height: 1;

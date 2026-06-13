@@ -5,18 +5,20 @@
         <div class="chips flex flex-row wrap gap-small">
           <% @filter.style_list.each do |style| %>
             <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeStyle', filter_value_param: style.to_s } do %>
-              <div class="flex gap-small">
+              <div class="flex gap-small align-center">
                 <span class="<%= tag_icon_class(context: 'styles') %>"></span>
                 <span><%= style %></span>
+                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
               </div>
             <% end %>
           <% end %>
 
           <% @filter.queries.each do |query| %>
             <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeQuery', filter_value_param: query.to_s } do %>
-              <div class="flex gap-small">
+              <div class="flex gap-small align-center">
                 <span class="<%= tag_icon_class(context: 'query') %>"></span>
                 <span><%= query %></span>
+                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
               </div>
             <% end %>
           <% end %>
@@ -41,9 +43,10 @@
         <div class="chips flex flex-row wrap gap-small">
           <% @filter.location_list.each do |location| %>
             <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeLocation', filter_value_param: location.to_s } do %>
-              <div class="flex gap-small">
+              <div class="flex gap-small align-center">
                 <span class="<%= tag_icon_class(context: Location.type_for(location)) %>"></span>
                 <span><%= location %></span>
+                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
               </div>
             <% end %>
           <% end %>
@@ -64,9 +67,10 @@
         <div class="chips flex flex-row wrap gap-small">
           <% @filter.date_ranges.each do |date_range| %>
             <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeDateRange', filter_value_param: date_range.to_s } do %>
-              <div class="flex gap-small">
+              <div class="flex gap-small align-center">
                 <span class="<%= tag_icon_class(context: 'date') %>"></span>
                 <span><%= datepicker_tag_content(date_range) %></span>
+                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
               </div>
             <% end %>
           <% end %>

@@ -93,6 +93,7 @@ input[type=submit] {
    One vocabulary, used app-wide. "A box reads as clickable", so every one of
    these is a box (except .text-link, which is a navigation link):
 
+     NEUTRAL      .button / <button>            full-size muted boxed button
      PRIMARY      input[type=submit]            filled accent  (commit a form)
      SECONDARY    .button-small                 filled accent pill (a smaller
                                                  commit: Fire now, Trigger run)
@@ -102,13 +103,13 @@ input[type=submit] {
                                                  hollow warn → fills on commit
      ICON         .icon-button (+ .danger)      flat boxless inline icon action
      LINK         .text-link                    underlined accent navigation
-     BARE         .button                        reset to text (view switcher,
-                                                 favorites shortcut — re-styled
-                                                 per context; see those files)
 
-   .button-small is the canonical small/secondary button (was duplicated as the
-   admin-only .button--small; consolidated here). Layout — where a button sits —
-   is the caller's job; this file owns the look. */
+   Flat-text controls that AREN'T buttons (the view switcher, the favorites/notify
+   shortcuts) have their own domain classes (.view-switch__item,
+   .favorites-filter-link, .notify-filter-link) — they no longer borrow .button.
+   .button-small is the canonical small button (was duplicated as the admin-only
+   .button--small). Layout — where a button sits — is the caller's job; this file
+   owns the look. */
 .button-small {
   /* inline-flex + a fixed line-height makes every pill the same height whether
      it's an <a>, a <button> (via button_to), or an <input> — otherwise the <a>

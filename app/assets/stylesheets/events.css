@@ -320,11 +320,12 @@
 }
 
 /* List / Calendar as a plain text toggle, not filled buttons: the active view
-   is bold accent, the other a muted link. */
+   is bold accent, the other a muted link. Its own class (was the generic
+   .button, which now means a real boxed button). */
 .view-switcher {
   gap: var(--gap-medium);
 
-  .button {
+  .view-switch__item {
     border: 0;
     padding: 0;
     background: none;
@@ -332,11 +333,11 @@
     text-decoration: none;
   }
 
-  .button:hover {
+  .view-switch__item:hover {
     text-decoration: underline;
   }
 
-  .button.active {
+  .view-switch__item.active {
     color: var(--theme-accent-color);
     font-weight: bold;
     background: none;
@@ -344,11 +345,11 @@
 }
 
 /* "My favorites" filter shortcut, sitting in the view-switcher row. A flat, muted
-   text link with a leading heart (the .button.* specificity matches the view
-   switcher's, beating the boxed a.button base). The heart is outline + muted when
-   off; when the favorites filter is applied the label bolds and the heart fills
-   in the favorite accent — echoing the follow-heart language used elsewhere. */
-.button.favorites-filter-link {
+   text link with a leading heart (its own class — was .button.favorites-filter-link,
+   borrowing the bare .button). The heart is outline + muted when off; when the
+   favorites filter is applied the label bolds and the heart fills in the favorite
+   accent — echoing the follow-heart language used elsewhere. */
+.favorites-filter-link {
   display: inline-flex;
   align-items: center;
   gap: 0.4ch;
@@ -361,11 +362,11 @@
 
 /* The display above overrides the UA [hidden] rule, so re-assert it (at matching
    specificity) — the shortcut renders hidden until the user follows something. */
-.button.favorites-filter-link[hidden] {
+.favorites-filter-link[hidden] {
   display: none;
 }
 
-.button.favorites-filter-link:hover {
+.favorites-filter-link:hover {
   text-decoration: underline;
 }
 
@@ -373,7 +374,7 @@
   margin-left: 0;
 }
 
-.button.favorites-filter-link.active {
+.favorites-filter-link.active {
   color: var(--theme-favorite-color);
   font-weight: bold;
 }

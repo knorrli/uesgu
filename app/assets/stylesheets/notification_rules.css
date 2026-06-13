@@ -87,13 +87,15 @@
 }
 
 /* "Notify me about this" — flat accent link in the toggle row, sibling of the
-   favorites-filter shortcut. */
+   favorites-filter shortcut. Its own class (was .button notify-filter-link); the
+   text-decoration reset is now explicit since it no longer borrows a.button. */
 .notify-filter-link {
   display: inline-flex;
   align-items: center;
   gap: var(--gap-xsmall);
   color: var(--theme-accent-color);
   font-size: var(--font-size-small);
+  text-decoration: none;
 }
 
 .notify-filter-link .ph {

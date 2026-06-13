@@ -38,20 +38,11 @@ a {
   font-size: var(--font-size-small);
 }
 
-/* Flatten <button class="button"> back to bare (overrides controls.css). Inline
-   icon actions should instead use the shared .icon-button role in controls.css,
-   which flattens both <a> and <button> consistently. */
-.button {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-/* The delete-account button matches the form submit buttons: full width, and a
-   matching border so its height lines up (the .button reset removes borders). */
+/* The account-delete / user-delete / revoke buttons are full-width danger
+   buttons. `.button` is the real boxed button (controls.css) and `.delete` is its
+   danger variant (hollow warn → fills); this only adds the full-width sizing. */
 .button.delete {
   width: 100%;
-  border: var(--border-width) solid var(--theme-warn-color);
 }
 
 /* Account / auth form fields: underline inputs, matching the events filter bar.

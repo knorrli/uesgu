@@ -139,7 +139,7 @@
     </div>
 
     <div class="sg-row">
-      <div class="sg-specimen"><a href="#buttons" class="button notify-filter-link"><span class="ph ph-bell"></span> Notify me about this</a></div>
+      <div class="sg-specimen"><a href="#buttons" class="notify-filter-link"><span class="ph ph-bell"></span> Notify me about this</a></div>
       <div class="sg-spec">
         <span class="sg-spec__name">Notify link</span> · <code>.notify-filter-link</code>
         <p class="sg-purpose">A flat accent text link with a leading glyph — promotes turning the current filter into a notification rule.</p>
@@ -164,13 +164,16 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <a href="#buttons" class="button">List</a>
-        <a href="#buttons" class="button" aria-current="true"><b>Calendar</b></a>
+        <button type="button" class="button">Neutral</button>
+        <span class="view-switcher" style="display:inline-flex; gap:var(--gap-medium);">
+          <a href="#buttons" class="view-switch__item">List</a>
+          <a href="#buttons" class="view-switch__item active"><b>Calendar</b></a>
+        </span>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Bare button</span> · <code>.button</code> (reset to text)
-        <p class="sg-purpose">Currently used as a flat text toggle (view switcher, favorites shortcut).</p>
-        <span class="sg-flag"><b>Audit #6 — open.</b> <code>.button</code> is defined as a box, then stripped bare, then re-styled per screen — it telegraphs nothing. Renaming to domain classes (e.g. <code>.view-switch__item</code>) is a markup change left for a later step.</span>
+        <span class="sg-spec__name">Neutral button + view switcher</span> · <code>.button</code> / <code>.view-switch__item</code>
+        <p class="sg-purpose"><code>.button</code> is a full-size muted boxed button. The List/Calendar toggle is flat text (<code>.view-switch__item</code>; active = bold accent).</p>
+        <span class="sg-ok"><b>Audit #6 — resolved.</b> <code>.button</code> is now a real boxed button (no more bare-reset cascade); the flat-text controls (view switcher, favorites + notify shortcuts) use their own domain classes.</span>
       </div>
     </div>
 
@@ -203,7 +206,7 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Info chip</span> · <code>.chip</code> (<code>--window</code>, <code>--type</code>, <code>--muted</code>)
         <p class="sg-purpose">Read-only metadata that is never clickable (channels, windows, rule type, disabled state).</p>
-        <span class="sg-ok"><b>Audit #5 — resolved.</b> Now borderless (faint tint), so it no longer reads like a ghost action button. Border/fill is reserved for things you can click.</span>
+        <span class="sg-ok"><b>Resolved.</b> Now borderless (faint tint), so it no longer reads like a ghost action button. Border/fill is reserved for things you can click.</span>
       </div>
     </div>
 
@@ -227,8 +230,8 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Selectable tag</span> · <code>.tag</code>, <code>.tag.active</code>, <code>button.tag</code>
-        <p class="sg-purpose">A style/query token. <code>.active</code> (filled accent) = currently selected.</p>
-        <span class="sg-flag"><b>Audit #5.</b> <code>.tag.active</code> looks identical to the removable <code>.filter-chip</code> below but behaves differently — selected vs removable should read distinctly.</span>
+        <p class="sg-purpose">A style/query token. <code>.active</code> (filled accent) = the currently-selected / current option (e.g. a status filter). <b>No ×</b> — it's a state, not removable.</p>
+        <span class="sg-ok"><b>Audit #5 — resolved.</b> Removable applied-filters now carry a trailing × (<code>.tag__remove</code>, like the filter chip below); a selected-state <code>.tag.active</code> has none. The × is the tell: <b>× = remove me</b>, no × = current selection.</span>
       </div>
     </div>
 
@@ -244,7 +247,7 @@
         <span class="sg-spec__name">Applied filter chip</span> · <code>.filter-chip</code>
         <p class="sg-purpose">An active filter on the mobile summary row; tapping it removes that one value.</p>
         <span class="sg-ok"><b>Audit #12 — resolved.</b> Now dims on hover/focus to signal the "× to remove" affordance.</span>
-        <span class="sg-flag"><b>Audit #5 — open.</b> Still shares the filled-accent look with <code>.tag.active</code>; distinguishing selected-token vs removable-filter is a further step.</span>
+        <span class="sg-ok"><b>Audit #5 — resolved.</b> The inline desktop filter's applied tokens now carry the same trailing × — so removable filters read consistently across desktop and mobile, and distinctly from a selected-state <code>.tag.active</code>.</span>
       </div>
     </div>
 
@@ -408,11 +411,13 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <a href="#nav" class="button">List</a>
-        <a href="#nav" class="button" aria-current="true"><b>Calendar</b></a>
+        <span class="view-switcher" style="display:inline-flex; gap:var(--gap-medium);">
+          <a href="#nav" class="view-switch__item">List</a>
+          <a href="#nav" class="view-switch__item active"><b>Calendar</b></a>
+        </span>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">View switcher</span> · <code>.view-switcher</code>
+        <span class="sg-spec__name">View switcher</span> · <code>.view-switcher</code> / <code>.view-switch__item</code>
         <p class="sg-purpose">Flat text toggle between the list and calendar views; active = bold accent.</p>
       </div>
     </div>

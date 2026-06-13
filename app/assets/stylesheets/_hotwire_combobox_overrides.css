@@ -99,14 +99,11 @@ body {
   }
 
   /* The Where list is a flat, alphabetical list (matching the styles dropdown).
-     Each option carries a quiet "· Venue/City/Canton" suffix so the mix of three
-     location kinds stays unambiguous — an icon can't express "canton", a word
-     can. The suffix is render-only (not part of the filterable/autocomplete
-     text), so typing still matches the name. */
-  .loc-option {
-    display: inline-block;
-  }
-
+     Each option is bare text + a quiet "· Venue/City/Canton" suffix (no wrapper
+     span, so it shares the styles options' row box exactly — equal heights). The
+     suffix keeps the mix of three location kinds unambiguous and is render-only
+     (not part of the filterable/autocomplete text), so typing still matches the
+     name. */
   .loc-type {
     color: var(--theme-fg-muted);
     font-size: 0.85em;

@@ -1,40 +1,75 @@
-/* Canton > city > venue favorites picker, fully expanded. Mobile-first. */
+/* Canton > city > venue favorites picker, fully expanded. Mobile-first.
+   Goal: a calm, scannable tree. Hierarchy reads from neutral left-rules + indent
+   and a type step (canton bold > city > venue), NOT from colour. Venues flow into
+   an aligned grid so a city with a dozen venues stays tidy instead of
+   ragged-wrapping. */
 
 .location-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+}
+
+/* Neutral left-rules convey canton > city nesting (was a greenish accent-muted;
+   structure is neutral now — green stays an interaction/state signal). */
+.loc-canton {
+  border-left: var(--border-width) solid var(--border-color);
+  padding-left: var(--gap-medium);
   display: flex;
   flex-direction: column;
   gap: var(--gap-xsmall);
 }
 
-/* Nested left rules convey the canton > city hierarchy. */
-.loc-canton,
 .loc-city {
-  border-left: var(--border-width) solid var(--theme-accent-muted);
-  padding-left: var(--gap-small);
-}
-
-.loc-city {
+  border-left: var(--tag-border-width) solid var(--border-color);
   margin-left: var(--gap-medium);
+  padding-left: var(--gap-medium);
   margin-block: var(--gap-xsmall);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
 }
 
+/* A row: checkbox + name, vertically centred (was baseline, which left the box
+   floating above the text). The whole label is the hit target. */
 .loc-option {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--gap-small);
   padding: var(--gap-xsmall) 0;
   cursor: pointer;
-}
-
-.loc-region {
-  margin: 0;
-}
-
-/* Venues sit indented beneath their city heading. */
-.loc-venue {
-  margin-left: var(--gap-medium);
+  min-width: 0;
 }
 
 .loc-option input {
   flex-shrink: 0;
+}
+
+.loc-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Canton + city heads share the base size; the venue grid steps down. */
+.loc-canton-head,
+.loc-city-head {
+  font-size: var(--font-size-base);
+}
+
+.loc-other-head {
+  margin: 0;
+  padding: var(--gap-xsmall) 0;
+}
+
+/* Venues: an aligned, auto-filling grid so many venues read as tidy columns
+   rather than a ragged wrap. Columns are wide enough for a venue name and
+   collapse to one column on narrow screens. */
+.loc-venues {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0 var(--gap-medium);
+}
+
+.loc-venue {
+  font-size: var(--font-size-small);
 }

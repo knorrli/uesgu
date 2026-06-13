@@ -126,7 +126,9 @@ module EventsHelper
                'aria-label': t('saved_events.toggle'),
                data: { controller: 'save', action: 'save#toggle',
                        save_event_id_value: event.id, save_saved_value: saved } do
-      content_tag(:span, '', class: 'ph ph-bookmark-simple', 'aria-hidden': true)
+      # A masked bookmark (not the ph font glyph) so the saved state can fill
+      # solid, mirroring the follow heart's outline→fill — see .save-bookmark.
+      content_tag(:span, '', class: 'save-bookmark', 'aria-hidden': true)
     end
   end
 end

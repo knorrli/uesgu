@@ -51,8 +51,17 @@
 /* Pill actions. .button-small is the filled accent; .button-ghost hollows it;
    .danger recolours to the warn token (shared with the rest of the app). */
 .button-small {
+  /* inline-flex + a fixed line-height makes every pill the same height whether
+     it's an <a> (Open filter), a <button> (Test now / Pause / Delete, via
+     button_to), or an <input>. Without this, the <a> inherits the body's 1.5
+     line-height and renders taller than the buttons' 1.1, so the row looked
+     ragged. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: var(--font-size-small);
-  padding: var(--gap-xsmall) var(--gap-medium);
+  line-height: 1.2;
+  padding: var(--gap-small) var(--gap-medium);
   border: var(--border-width) solid var(--theme-accent-color);
   background: var(--theme-accent-color);
   color: var(--theme-bg-color);

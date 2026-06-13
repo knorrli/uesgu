@@ -948,15 +948,34 @@ body.filter-sheet-open { overflow: hidden; }
 
 .custom-range__sep { color: var(--theme-fg-muted); }
 
-/* "Save this show" bookmark toggle in the event-actions cluster. Muted at rest,
-   accent when saved (or hovered) — colour = "yours", matching the favorite heart.
-   (A filled bookmark glyph is left for the UI-polish pass; Phosphor here is
-   outline-only.) */
-.event-save .ph {
-  color: var(--theme-fg-muted);
+/* "Save this show" bookmark toggle in the event-actions cluster. Mirrors the
+   follow heart's language: a faint outline at rest, a SOLID fill when saved — so
+   "saved" reads the same way "followed" does (fill = active), just in the save
+   colour (accent) rather than the favorite colour. Masked SVG, like .fav-heart,
+   because Phosphor Regular has no fill weight. */
+.save-bookmark {
+  display: inline-block;
+  line-height: 0;
 }
 
-.event-save:hover .ph,
-.event-save.saved .ph {
-  color: var(--theme-accent-color);
+.save-bookmark::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  background-color: var(--theme-fg-muted);
+  -webkit-mask: var(--bookmark-outline) center / contain no-repeat;
+  mask: var(--bookmark-outline) center / contain no-repeat;
+}
+
+.event-save:hover .save-bookmark::before {
+  background-color: var(--theme-accent-color);
+}
+
+/* Saved: solid fill, accent — the bookmark counterpart to a filled heart. */
+.event-save.saved .save-bookmark::before {
+  background-color: var(--theme-accent-color);
+  -webkit-mask-image: var(--bookmark-fill);
+  mask-image: var(--bookmark-fill);
 }

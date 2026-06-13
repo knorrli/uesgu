@@ -1,0 +1,373 @@
+<% content_for :title, "Styleguide — üsgu" %>
+
+<div class="sg">
+  <h1>üsgu styleguide</h1>
+  <p class="sg-lede">
+    A living reference: every specimen below is the real shared element class,
+    rendered with the same bundled CSS as the rest of the app — so it stays in
+    sync as the styles change. Each entry states the <b>one purpose</b> the
+    element should telegraph. Amber notes flag where an element currently drifts
+    from that purpose; numbers cross-reference <code>docs/ui-audit.md</code>.
+  </p>
+
+  <nav class="sg-toc">
+    <a href="#colours">Colour intent</a>
+    <a href="#buttons">Buttons &amp; actions</a>
+    <a href="#pills">Pills, badges &amp; chips</a>
+    <a href="#dropdowns">Dropdowns &amp; selects</a>
+    <a href="#inputs">Form inputs</a>
+    <a href="#icons">Icons</a>
+    <a href="#nav">Navigation</a>
+  </nav>
+
+  <%# ============================================================ COLOURS %>
+  <section class="sg-section" id="colours">
+    <h2>Colour intent</h2>
+    <p class="sg-section__intro">
+      Each semantic token should carry exactly one meaning. Swatches read live
+      from the theme tokens (toggle the theme to see dark values).
+    </p>
+    <ul class="sg-swatches">
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--accent"></div>
+        <p class="sg-swatch__label"><b>Accent</b> · <code>--theme-accent-color</code><br>Interactive / primary / active / link</p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--accent-mut"></div>
+        <p class="sg-swatch__label"><b>Accent muted</b> · <code>--theme-accent-muted</code><br>Quiet accent ground (window chips)</p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--favorite"></div>
+        <p class="sg-swatch__label"><b>Favorite</b> · <code>--theme-favorite-color</code><br>"Yours" — a followed item only</p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--warn"></div>
+        <p class="sg-swatch__label"><b>Warn</b> · <code>--theme-warn-color</code><br>Destructive / error only</p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--amber"></div>
+        <p class="sg-swatch__label"><b>Amber</b> · <code>--color-amber</code><br>Neutral "empty / nothing here" status</p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--bg"></div>
+        <p class="sg-swatch__label"><b>Background</b> · <code>--theme-bg-color</code></p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--bg-mut"></div>
+        <p class="sg-swatch__label"><b>Background muted</b> · <code>--theme-bg-muted</code><br>Hairlines, neutral fills</p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--fg"></div>
+        <p class="sg-swatch__label"><b>Foreground</b> · <code>--theme-fg-color</code></p>
+      </li>
+      <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--fg-mut"></div>
+        <p class="sg-swatch__label"><b>Foreground muted</b> · <code>--theme-fg-muted</code><br>Secondary text, at-rest chrome/icons</p>
+      </li>
+    </ul>
+    <p class="sg-flag">
+      <b>Audit #1 / #10.</b> Green is currently also the default
+      <code>--border-color</code> (header/footer rules, calendar grid, nav-menu
+      panel), every passive form underline, the global <code>input</code> text
+      colour, and the leading filter-handle icon. Intent: reserve green for
+      interactive/active; give structural borders + passive chrome a neutral token.
+    </p>
+  </section>
+
+  <%# ============================================================ BUTTONS %>
+  <section class="sg-section" id="buttons">
+    <h2>Buttons &amp; actions</h2>
+    <p class="sg-section__intro">Today there are three parallel button vocabularies. The intended ladder: primary → secondary → tertiary → danger, plus the flat icon action.</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen"><input type="submit" value="Save"></div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Primary submit</span> · <code>input[type=submit]</code>
+        <p class="sg-purpose">Commit the main action of a form (Save, Log in, Sign up, Create rule).</p>
+        <span class="sg-flag"><b>Audit #7.</b> Only this filled-accent treatment exists for "primary"; <code>&lt;button&gt;</code>/<code>&lt;a&gt;</code> have no matching primary look.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen"><button type="button" class="button-small">Fire now</button></div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Secondary pill</span> · <code>.button-small</code>
+        <p class="sg-purpose">A secondary commit that isn't the form's main action (Fire now, Trigger run).</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen"><button type="button" class="button-small button-ghost">Edit filter</button></div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Tertiary / ghost pill</span> · <code>.button-small.button-ghost</code>
+        <p class="sg-purpose">A low-emphasis option beside a primary/secondary one (Cancel, Enable/Disable, Edit filter).</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <button type="button" class="button-small danger">Delete rule</button>
+        <span class="account-form"><button type="button" class="button delete">Delete account</button></span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Danger</span> · <code>.button-small.danger</code> &nbsp;/&nbsp; <code>.button.delete</code>
+        <p class="sg-purpose">A destructive, hard-to-undo action.</p>
+        <span class="sg-flag"><b>Audit #2.</b> Two unrelated looks for the same meaning — a small hollow pill vs a full-width red-bordered button. Intend one <code>danger</code> role that scales by size.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <a href="#buttons" class="icon-button" aria-label="Edit"><span class="ph ph-gear"></span></a>
+        <button type="button" class="icon-button danger" aria-label="Delete"><span class="ph ph-trash"></span></button>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Icon button</span> · <code>.icon-button</code>, <code>.icon-button.danger</code>
+        <p class="sg-purpose">A flat, boxless inline icon action on a row (edit gear, delete trash). Muted at rest → foreground on hover; danger → warn on hover.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen"><a href="#buttons" class="button notify-filter-link"><span class="ph ph-bell"></span> Notify me about this</a></div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Notify link</span> · <code>.notify-filter-link</code>
+        <p class="sg-purpose">A flat accent text link with a leading glyph — promotes turning the current filter into a notification rule.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen"><button type="button" class="theme-toggle" aria-label="Theme"><span class="ph ph-circle-half-tilt"></span></button></div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Theme toggle</span> · <code>.theme-toggle</code>
+        <p class="sg-purpose">Icon-only accent button; cycles system → light → dark.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <a href="#buttons" class="button">List</a>
+        <a href="#buttons" class="button" aria-current="true"><b>Calendar</b></a>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Bare button</span> · <code>.button</code> (reset to text)
+        <p class="sg-purpose">Currently used as a flat text toggle (view switcher, favorites shortcut).</p>
+        <span class="sg-flag"><b>Audit #6.</b> <code>.button</code> is defined as a box, then stripped bare, then re-styled per screen — it telegraphs nothing. Intend domain classes (e.g. <code>.view-switch__item</code>) and reserve <code>.button</code> for a real button look, or drop it.</span>
+      </div>
+    </div>
+  </section>
+
+  <%# ============================================================ PILLS %>
+  <section class="sg-section" id="pills">
+    <h2>Pills, badges &amp; chips</h2>
+    <p class="sg-section__intro">Five overlapping pill families exist. The distinction that matters: is it <b>read-only metadata</b>, a <b>count</b>, a <b>selectable token</b>, or a <b>removable applied filter</b>?</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="chip">In-app</span>
+        <span class="chip chip--window">Mon–Sun</span>
+        <span class="chip chip--type">New events</span>
+        <span class="chip chip--muted">Disabled</span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Info chip</span> · <code>.chip</code> (<code>--window</code>, <code>--type</code>, <code>--muted</code>)
+        <p class="sg-purpose">Read-only metadata that is never clickable (channels, windows, rule type, disabled state).</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="badge">3</span>
+        <span class="badge">+2 more</span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Count badge</span> · <code>.badge</code>
+        <p class="sg-purpose">A small accent count attached to something else (unread notifications, "+N more").</p>
+        <span class="sg-flag"><b>Audit #8 / #11.</b> Duplicated as <code>.filter-trigger__badge</code> with identical intent — should share one class.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="tag">Techno</span>
+        <span class="tag active">Jazz</span>
+        <button type="button" class="tag">Ambient</button>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Selectable tag</span> · <code>.tag</code>, <code>.tag.active</code>, <code>button.tag</code>
+        <p class="sg-purpose">A style/query token. <code>.active</code> (filled accent) = currently selected.</p>
+        <span class="sg-flag"><b>Audit #5.</b> <code>.tag.active</code> looks identical to the removable <code>.filter-chip</code> below but behaves differently — selected vs removable should read distinctly.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <button type="button" class="filter-chip">
+          <span class="filter-chip__icon ph ph-music-notes"></span>
+          <span class="filter-chip__label">Jazz</span>
+          <span class="filter-chip__remove ph ph-x" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Applied filter chip</span> · <code>.filter-chip</code>
+        <p class="sg-purpose">An active filter on the mobile summary row; tapping it removes that one value.</p>
+        <span class="sg-flag"><b>Audit #5 / #12.</b> No <code>:hover</code> state, and the filled-accent look doesn't obviously read as "tap to remove".</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="scrape-badge scrape-badge--ok">OK</span>
+        <span class="scrape-badge scrape-badge--empty">No results</span>
+        <span class="scrape-badge scrape-badge--failed">2 failed</span>
+        <span class="scrape-badge scrape-badge--running">Running</span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Status badge</span> · <code>.scrape-badge--{ok,empty,failed,running}</code>
+        <p class="sg-purpose">Scrape outcome, encoded by hue (green/amber/red/grey). The one place a solid green pill means "success" rather than "primary/selected".</p>
+      </div>
+    </div>
+  </section>
+
+  <%# ============================================================ DROPDOWNS %>
+  <section class="sg-section" id="dropdowns">
+    <h2>Dropdowns &amp; selects</h2>
+    <p class="sg-section__intro">Disclosure indicators currently use three different glyph systems (audit #3). Specimens shown with the real account-form treatment.</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="account-form">
+          <select aria-label="Language">
+            <option value="" selected>Choose a language…</option>
+            <option>German</option><option>French</option><option>English</option>
+          </select>
+        </span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Styled select</span> · <code>.account-form select</code>
+        <p class="sg-purpose">An underline field with a prominent chevron, matching the form fields.</p>
+        <span class="sg-flag"><b>Audit #3 / #11.</b> The chevron is a hand-inlined SVG with a hard-coded <code>#0e8857</code> that ignores the theme token and won't recolour in dark mode. Intend a Phosphor caret on <code>currentColor</code>.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <details class="nav-menu">
+          <summary>account</summary>
+          <div class="nav-menu__items">
+            <a href="#nav">Settings</a>
+            <a href="#nav">Log out</a>
+          </div>
+        </details>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Menu dropdown</span> · <code>.nav-menu</code> (<code>&lt;details&gt;</code>)
+        <p class="sg-purpose">Collapses account links into a bordered panel; the summary is the trigger.</p>
+        <span class="sg-flag"><b>Audit #3.</b> Uses a Unicode <code>▾</code> marker rather than the Phosphor caret used everywhere else.</span>
+      </div>
+    </div>
+  </section>
+
+  <%# ============================================================ INPUTS %>
+  <section class="sg-section" id="inputs">
+    <h2>Form inputs</h2>
+    <p class="sg-section__intro">Two intentional field skins — underline (forms) and borderless-grow (filter bar) — plus three checkbox implementations (audit #4).</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="account-form" style="display:flex; gap:var(--gap-medium); flex-wrap:wrap;">
+          <input type="text" placeholder="Username" aria-label="Username">
+          <input type="password" placeholder="Password" aria-label="Password">
+        </span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Account / auth field</span> · <code>.account-form input</code>
+        <p class="sg-purpose">Underline-only field; accent bottom border, shifts to foreground on focus.</p>
+        <span class="sg-flag"><b>Audit #1.</b> Underline + global <code>input{color:accent}</code> make passive fields read very green.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <label style="display:inline-flex; gap:var(--gap-small); align-items:center;">
+          <input type="checkbox" checked> Native checkbox
+        </label>
+        <label class="tag">
+          <input type="checkbox" checked> Chip checkbox
+        </label>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Checkboxes</span> · native &nbsp;/&nbsp; <code>label.tag</code> &nbsp;/&nbsp; <code>.opt__box</code> (sheets)
+        <p class="sg-purpose">Confirm an opt-in. Native uses the accent <code>accent-color</code>; the chip fills accent when checked.</p>
+        <span class="sg-flag"><b>Audit #4.</b> Three checkbox styles; two are seen by one user (settings form + mobile sheets). Pick one or scope the difference deliberately.</span>
+      </div>
+    </div>
+  </section>
+
+  <%# ============================================================ ICONS %>
+  <section class="sg-section" id="icons">
+    <h2>Icons</h2>
+    <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); hearts are masked SVGs. Clickable icons use <code>.icon-button</code>; there is no shared display-only icon role yet (audit #9).</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen" style="font-size:1.4rem;">
+        <span class="ph ph-gear" title="ph-gear"></span>
+        <span class="ph ph-trash" title="ph-trash"></span>
+        <span class="ph ph-bell" title="ph-bell"></span>
+        <span class="ph ph-x" title="ph-x"></span>
+        <span class="ph ph-magnifying-glass" title="ph-magnifying-glass"></span>
+        <span class="ph ph-caret-down" title="ph-caret-down"></span>
+        <span class="ph ph-map-pin" title="ph-map-pin"></span>
+        <span class="ph ph-house" title="ph-house"></span>
+        <span class="ph ph-map-trifold" title="ph-map-trifold"></span>
+        <span class="ph ph-music-notes" title="ph-music-notes"></span>
+        <span class="ph ph-tag" title="ph-tag"></span>
+        <span class="ph ph-calendar-dots" title="ph-calendar-dots"></span>
+        <span class="ph ph-bookmark-simple" title="ph-bookmark-simple"></span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Glyph set</span> · <code>.ph .ph-*</code>
+        <p class="sg-purpose">Hover a glyph to see its name. Edit, delete, notify, close/remove, search, disclosure, city/venue/canton, style/genre, date, save.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="event-tag fav"><span class="fav-heart" aria-hidden="true"></span></span>
+        <span class="event-tag fav followed"><span class="fav-heart" aria-hidden="true"></span></span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Favorite heart</span> · <code>.fav-heart</code>
+        <p class="sg-purpose">The sole "you can follow this" signal. Faint outline = followable; solid raspberry = followed.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# ============================================================ NAV %>
+  <section class="sg-section" id="nav">
+    <h2>Navigation</h2>
+    <p class="sg-section__intro">Header/footer chrome and the responsive filter (inline ≥600px, full-screen sheets &lt;600px) are composed from the elements above; the live versions surround this page.</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <a href="#nav" class="button">List</a>
+        <a href="#nav" class="button" aria-current="true"><b>Calendar</b></a>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">View switcher</span> · <code>.view-switcher</code>
+        <p class="sg-purpose">Flat text toggle between the list and calendar views; active = bold accent.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <span class="unread-dot" role="img" aria-label="Unread"></span>
+        <span>username</span>
+        <span class="badge">3</span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Unread signal</span> · <code>.unread-dot</code> + <code>.badge</code>
+        <p class="sg-purpose">A dot on the menu trigger flags unread at a glance; the count badge sits beside the Notifications item inside the menu.</p>
+      </div>
+    </div>
+  </section>
+</div>

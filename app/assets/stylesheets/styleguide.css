@@ -1,0 +1,147 @@
+/* Living styleguide page (/styleguide, admin-only). Everything here is scoped
+ * under `.sg` so it never leaks into the rest of the app. The point of the page
+ * is to render the REAL shared element classes (button, .tag, .chip, .badge,
+ * .icon-button, …) using the real bundled CSS; this file only adds the
+ * scaffolding around those specimens. See docs/ui-audit.md. */
+
+.sg {
+  max-width: 60rem;
+}
+
+.sg-lede {
+  color: var(--theme-fg-muted);
+  margin-bottom: var(--gap-large);
+}
+
+/* Table of contents */
+.sg-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small) var(--gap-medium);
+  padding: var(--gap-medium) 0;
+  margin-bottom: var(--gap-large);
+  border-top: var(--border-width) solid var(--theme-bg-muted);
+  border-bottom: var(--border-width) solid var(--theme-bg-muted);
+  font-size: var(--font-size-small);
+}
+
+/* A top-level element category. */
+.sg-section {
+  padding-top: var(--gap-large);
+  margin-top: var(--gap-large);
+  border-top: var(--border-width) solid var(--theme-bg-muted);
+}
+
+.sg-section > h2 {
+  margin-bottom: var(--gap-xsmall);
+}
+
+.sg-section__intro {
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+  margin-bottom: var(--gap-medium);
+}
+
+/* One specimen row: the live element(s) on the left, the spec on the right.
+ * Stacks on narrow viewports — the page itself is mobile-first like the app. */
+.sg-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap-small) var(--gap-large);
+  padding: var(--gap-medium) 0;
+  border-bottom: var(--tag-border-width) solid var(--theme-bg-muted);
+  align-items: start;
+}
+
+@media (min-width: 600px) {
+  .sg-row {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+}
+
+/* The neutral stage the element sits on. */
+.sg-specimen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--gap-medium);
+  min-height: 2.5rem;
+}
+
+.sg-spec {
+  font-size: var(--font-size-small);
+}
+
+.sg-spec__name {
+  font-weight: bold;
+}
+
+.sg-spec code {
+  font-size: 0.9em;
+  color: var(--theme-fg-muted);
+}
+
+.sg-purpose {
+  margin: var(--gap-xsmall) 0 0;
+}
+
+/* Inline "this drifts from its purpose" callout, cross-referenced to the audit
+ * inconsistency numbers. Amber = attention, not error. */
+.sg-flag {
+  display: block;
+  margin-top: var(--gap-xsmall);
+  padding-left: var(--gap-small);
+  border-left: var(--border-width) solid var(--color-amber);
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+.sg-flag b {
+  color: var(--color-amber);
+}
+
+/* Colour token swatches — driven by the live tokens, so recolouring the theme
+ * recolours these automatically. */
+.sg-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-medium);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sg-swatch {
+  width: 8.5rem;
+}
+
+.sg-swatch__chip {
+  height: 3rem;
+  border: var(--tag-border-width) solid var(--theme-fg-muted);
+}
+
+.sg-swatch__chip--accent     { background: var(--theme-accent-color); }
+.sg-swatch__chip--accent-mut { background: var(--theme-accent-muted); }
+.sg-swatch__chip--favorite   { background: var(--theme-favorite-color); }
+.sg-swatch__chip--warn       { background: var(--theme-warn-color); }
+.sg-swatch__chip--amber      { background: var(--color-amber); }
+.sg-swatch__chip--bg         { background: var(--theme-bg-color); }
+.sg-swatch__chip--bg-mut     { background: var(--theme-bg-muted); }
+.sg-swatch__chip--fg         { background: var(--theme-fg-color); }
+.sg-swatch__chip--fg-mut     { background: var(--theme-fg-muted); }
+
+.sg-swatch__label {
+  font-size: var(--font-size-small);
+  margin-top: var(--gap-xsmall);
+}
+
+.sg-swatch__label code {
+  color: var(--theme-fg-muted);
+}
+
+/* A small dark/light stage so we can show a specimen against the opposite
+ * ground without leaving the page (the favorite heart, for instance). */
+.sg-frame {
+  padding: var(--gap-medium);
+  border: var(--tag-border-width) dashed var(--theme-bg-muted);
+}

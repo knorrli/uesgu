@@ -132,6 +132,38 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert rule(user, filter: { s: ['x'] }).valid?, 'any filter is valid'
   end
 
+  # --- auto-naming -----------------------------------------------------------
+
+  test 'describe auto-names from the filter, localized' do
+    r = rule(user, filter: { s: ['Rock'], l: ['Dachstock'], d: ['this_weekend'] })
+    assert_includes r.describe, 'Rock'
+    assert_includes r.describe, 'Dachstock'
+    I18n.with_locale(:en) { assert_includes r.describe, I18n.t('datepicker.this_weekend') }
+  end
+
+  test 'display_name uses the name when set, else describe' do
+    unnamed = rule(user, filter: { s: ['Rock'] })
+    assert_equal unnamed.describe, unnamed.display_name
+    named = rule(user, filter: { s: ['Rock'] }, name: 'Mein Ding')
+    assert_equal 'Mein Ding', named.display_name
+  end
+
+  test 'describe for a live-favorites alert' do
+    r = user.notification_rules.new(track_favorites: true, cadence: 'daily', time_of_day: 1)
+    r.filter_attributes = {}
+    assert_equal I18n.t('notification_rules.favorites_live'), r.describe
+  end
+
+  test 'a fired notification snapshots the auto-name as its title' do
+    u = user
+    event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['Rock'])
+    r = rule(u, filter: { s: ['Rock'] }, time_of_day: 1)
+    r.save!
+    r.update_column(:last_fired_at, 2.hours.ago)
+    note = r.fire!(Time.current)
+    assert_equal r.describe, note.title
+  end
+
   test 'time_string parses to minutes-since-midnight' do
     r = NotificationRule.new
     r.time_string = '17:30'

@@ -227,6 +227,10 @@ en:
       title: Notifications
       empty: No notifications yet. We'll round up newly added events for you here.
       unread_badge: New
+      fallback_name: Notification
+      event_count:
+        one: 1 event
+        other: "%{count} events"
       new_events:
         one: 1 new event
         other: "%{count} new events"

@@ -9,11 +9,12 @@
     <% @notifications.each do |notification| %>
       <li class="<%= class_names('notification', unread: !notification.read?) %>">
         <%= link_to notification_path(notification) do %>
-          <span class="notification__period">
-            <%= l notification.period_start.to_date %> – <%= l notification.period_end.to_date %>
-          </span>
+          <% name = notification.notification_rule&.display_name.presence || notification.title.presence || t('notifications.index.fallback_name') %>
+          <span class="notification__name"><%= name %></span>
           <span class="notification__meta">
-            <%= t('notifications.index.new_events', count: @event_counts[notification.id]) %>
+            <%= l notification.period_start.to_date %> – <%= l notification.period_end.to_date %>
+            <span class="sep" aria-hidden="true">·</span>
+            <%= t('notifications.index.event_count', count: @event_counts[notification.id]) %>
             <% unless notification.read? %><span class="badge"><%= t('notifications.index.unread_badge') %></span><% end %>
           </span>
         <% end %>

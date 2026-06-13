@@ -35,12 +35,12 @@
   color: inherit;
 }
 
-.notification__period {
+.notification__name {
   font-weight: bold;
 }
 
-/* Unread is signalled by the accent period + badge, not a heavy border. */
-.notification.unread .notification__period {
+/* Unread is signalled by the accent name + badge, not a heavy border. */
+.notification.unread .notification__name {
   color: var(--theme-accent-color);
 }
 

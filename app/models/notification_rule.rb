@@ -135,7 +135,21 @@ class NotificationRule < ApplicationRecord
   end
 
   def display_name
-    name.presence || I18n.t("notification_rules.default_name", default: "Notification")
+    name.presence || describe
+  end
+
+  # Human "what this alert is about" — the auto-name when the user didn't set
+  # one, the title snapshotted onto each fired notification, and the summary in
+  # the alerts list.
+  def describe
+    return describe_favorites if track_favorites?
+
+    parts = []
+    parts << style_list.join(", ") if style_list.any?
+    parts << location_list.join(", ") if location_list.any?
+    parts << queries.join(", ") if queries.any?
+    parts << window_labels.join(", ") if active_windows.any?
+    parts.presence&.join(" · ") || I18n.t("notification_rules.summary.scope_all")
   end
 
   def time_string
@@ -151,6 +165,15 @@ class NotificationRule < ApplicationRecord
   private
 
   def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
+
+  def describe_favorites
+    label = I18n.t("notification_rules.favorites_live")
+    active_windows.any? ? "#{label} · #{window_labels.join(', ')}" : label
+  end
+
+  def window_labels
+    active_windows.map { |w| I18n.t("datepicker.#{w}") }
+  end
 
   def biweekly? = cadence == "biweekly"
 

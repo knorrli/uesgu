@@ -227,6 +227,10 @@ de:
       title: Mitteilungen
       empty: Noch keine Mitteilungen. Neu hinzugefügte Veranstaltungen fassen wir hier für dich zusammen.
       unread_badge: Neu
+      fallback_name: Mitteilung
+      event_count:
+        one: 1 Veranstaltung
+        other: "%{count} Veranstaltungen"
       new_events:
         one: 1 neue Veranstaltung
         other: "%{count} neue Veranstaltungen"

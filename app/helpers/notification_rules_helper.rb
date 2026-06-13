@@ -30,17 +30,9 @@ module NotificationRulesHelper
     t("notification_rules.summary.at_time", cadence: cadence, time: rule.time_string)
   end
 
-  # What the alert is about — the saved filter rendered as text, or live favorites.
+  # What the alert is about — the saved filter as text, or live favorites.
   def rule_about(rule)
-    return t("notification_rules.favorites_live") if rule.track_favorites?
-
-    parts = []
-    parts << rule.style_list.join(", ") if rule.style_list.any?
-    parts << rule.location_list.join(", ") if rule.location_list.any?
-    parts << rule.queries.join(", ") if rule.queries.any?
-    windows = rule.active_windows.map { |w| t("datepicker.#{w}") }
-    parts << windows.join(", ") if windows.any?
-    parts.any? ? parts.join(" · ") : t("notification_rules.summary.scope_all")
+    rule.describe
   end
 
   # "New events" (added) vs "What's on" (happening) — the inferred digest type.

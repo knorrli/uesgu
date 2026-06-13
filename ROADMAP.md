@@ -37,19 +37,18 @@ else live today already counts.
 
 ## Punch list (ordered toward functional completeness)
 
-### §1 — Notifications close-out (from the code review)
-- [ ] **Wire the scheduler** — `notification_rules:tick` as a ~15-min Render cron
-      (mirrors `scrape-all`). Without this, nothing fires automatically.
-- [ ] **Retire / gate the legacy digest system** — `Notification.generate_for` +
-      `notification_frequency` still run on every inbox visit, intermixing
-      window-digests with rule digests. Rules supersede them — decide to remove.
-- [ ] **Drop the "only my favorites" toggle** for rule-based digests — incoherent
-      (the rule already defines relevance; re-narrowing by current favorites yields
-      empty/wrong results).
-- [ ] **Firehose guard** — a `track_favorites` rule whose user later unfollowed
-      everything matches *all* future events; send nothing instead.
-- [ ] **Daily "what's-on" behavior** — decide whether a happening-rule on a short
-      cadence re-sends the same window's events each tick (dedup vs. accept).
+### §1 — Notifications close-out (from the code review) — ✅ DONE (commit `132390a`)
+- [x] **Wire the scheduler** — `notify-due` Render cron (`*/15`) runs `notification_rules:tick`.
+- [x] **Retire the legacy digest system** — dropped `notification_frequency` +
+      `last_notified_at`, `Notification.generate_for`, `WebPushNotifier`,
+      `GenerateNotificationsJob`, and the frequency selectors (signup/settings/admin).
+      Rules are the sole notification mechanism.
+- [x] **Drop the "only my favorites" toggle** on the digest page (rule defines relevance).
+- [x] **Firehose guard** — a `track_favorites` rule with no current favorites matches nothing.
+- [x] **Cadence/window clash → solved structurally:** a what's-on rule's cadence is
+      *derived* from its window (`WINDOW_RHYTHM`: weekend/week→weekly, month→monthly,
+      today→daily), so it fires exactly once per window — no over-/under-notification,
+      no event-dedup needed. The form hides the cadence picker for windowed rules.
 
 ### §2 — Per-event saving
 - [ ] Save / unsave a single event (new primitive).

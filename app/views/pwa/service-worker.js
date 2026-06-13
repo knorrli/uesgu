@@ -18,20 +18,23 @@ self.addEventListener("notificationclick", (event) => {
   event.notification.close()
 
   const path = event.notification.data?.path || "/"
+  const url = new URL(path, self.location.origin).href
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      // Prefer focusing a tab already on the target path.
+      // Prefer focusing a tab already sitting on the target path.
       for (const client of clientList) {
         if (new URL(client.url).pathname === path && "focus" in client) {
           return client.focus()
         }
       }
-      // Otherwise focus any open tab and navigate it, or open a fresh window.
-      if (clientList.length > 0 && "navigate" in clientList[0]) {
-        return clientList[0].focus().then((client) => client.navigate(path))
-      }
-      if (clients.openWindow) return clients.openWindow(path)
+      // Otherwise open the target. We deliberately do NOT use WindowClient.navigate():
+      // on iOS, a standalone PWA has a single window whose web-content process iOS
+      // suspends/evicts when backgrounded. The service worker still holds a stale
+      // WindowClient for it, and navigate() resurrects the window chrome without
+      // reloading the dead process — the blank white screen. openWindow() forces a
+      // real load (and on iOS standalone reuses the one window rather than spawning).
+      if (clients.openWindow) return clients.openWindow(url)
     })
   )
 })

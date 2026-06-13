@@ -29,6 +29,12 @@ class NotificationRule < ApplicationRecord
   # the live-favorites flag. (The "Notify me" button is also hidden on an empty
   # filter; this is the backstop.)
   validate :targets_something
+  validates :name, presence: true
+
+  # Always have a name: auto-fill it from the filter when left blank. The new-
+  # alert form pre-fills the same proposal, so this also covers a cleared field
+  # or API creation — the name can be overridden but never ends up blank.
+  before_validation { self.name = describe if name.blank? }
 
   def targets_something
     return if track_favorites?

@@ -46,8 +46,10 @@
     <% end %>
 
     <label class="flex flex-col gap-xsmall">
-      <span><%= t('notification_rules.fields.name') %> <span class="muted">(<%= t('notification_rules.fields.name_optional') %>)</span></span>
-      <%= form.text_field :name, placeholder: t('notification_rules.fields.name_placeholder') %>
+      <span><%= t('notification_rules.fields.name') %></span>
+      <%# Pre-filled with the auto-name; the user can override it but not blank it
+          (the model re-fills a blank on save). %>
+      <%= form.text_field :name, value: @rule.name.presence || @rule.describe, placeholder: t('notification_rules.fields.name_placeholder') %>
     </label>
 
     <fieldset class="rule-fieldset flex flex-col gap-small">

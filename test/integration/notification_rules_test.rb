@@ -35,6 +35,8 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_select 'input[type=hidden][name="d[]"][value=?]', 'this_weekend'
     assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"]'
     assert_select '[data-rule-form-target="weekday"]'
+    # Name field is pre-filled with the auto-name (here: the Dachstock location).
+    assert_select 'input[name="notification_rule[name]"][value*=?]', 'Dachstock'
   end
 
   test 'the sync checkbox appears only when the filter equals my favorites' do

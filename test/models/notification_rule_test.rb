@@ -141,6 +141,17 @@ class NotificationRuleTest < ActiveSupport::TestCase
     I18n.with_locale(:en) { assert_includes r.describe, I18n.t('datepicker.this_weekend') }
   end
 
+  test 'name auto-fills from the filter on save when blank, and is kept when given' do
+    auto = rule(user, filter: { l: ['Bern'], d: ['next_week'] })
+    auto.save!
+    assert auto.name.present?
+    assert_equal auto.describe, auto.name
+
+    given = rule(user, filter: { s: ['Rock'] }, name: 'Keep me')
+    given.save!
+    assert_equal 'Keep me', given.name
+  end
+
   test 'display_name uses the name when set, else describe' do
     unnamed = rule(user, filter: { s: ['Rock'] })
     assert_equal unnamed.describe, unnamed.display_name

@@ -68,6 +68,9 @@ else live today already counts.
 - Notification-rules card visual hierarchy — info chips vs. action buttons vs.
   links vs. destructive currently all read as similar squares.
 - Monthly day-of-month picker on the new-alert form.
+- Constrain the notify-time input to 15-min steps (`step="900"`) — the `notify-due`
+  cron ticks at :00/:15/:30/:45, so finer granularity implies precision we don't
+  deliver (a rule fires at the first tick ≥ its time).
 - General mobile-first pass (e.g. `/favorites` flagged as rough).
 - Review cleanup/efficiency: inbox-count N+1, duplicated `build_filter` across two
   controllers, duplicated favorites-OR query, dead `display_name` fallback,

@@ -8,7 +8,17 @@ body {
   --border-width: 2px;
   --tag-border-width: 1px;
   --calendar-border-width: 1px;
-  --border-color: var(--theme-accent-color);
+  /* Structural rules / hairlines are NEUTRAL, not green. Green is reserved for
+     interaction (links, focus, active, primary actions), state (today, selected),
+     and follows — so it reads as a signal, not as the default border colour.
+     A foreground-derived tint adapts to both themes automatically. */
+  --border-color: color-mix(in srgb, var(--theme-fg-color) 22%, transparent);
+  /* A more emphatic neutral for prominent CONTENT dividers (date headings, the
+     calendar weekday rule, the day drawer frame) — visible as structure without
+     reaching for the interactive green. */
+  --rule-color: color-mix(in srgb, var(--theme-fg-color) 45%, transparent);
+  /* The focus indicator: the one place we deliberately spend green on chrome. */
+  --focus-ring: var(--theme-accent-color);
 
   --theme-bg-color: var(--color-background);
   --theme-fg-color: var(--color-text);
@@ -50,6 +60,9 @@ html[data-theme="dark"] body {
   color-scheme: dark;
 }
 
+/* Typed text is foreground, not green — green is an interaction signal, not the
+   default text colour for a passive field. The accent now appears on a field
+   only when it's focused (see the field underline rules). */
 input {
-  color: var(--theme-accent-color);
+  color: var(--theme-fg-color);
 }

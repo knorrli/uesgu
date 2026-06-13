@@ -2,16 +2,24 @@
    a form line, consistent with the de-boxed list below. */
 .input-wrapper {
   padding: var(--gap-small) 0;
-  border-bottom: var(--border-width) solid var(--theme-accent-color);
+  border-bottom: var(--border-width) solid var(--border-color);
   line-height: var(--filter-input-line-height);
   position: relative;
 }
 
+/* Neutral at rest; the underline lights accent when the field is focused — same
+   language as the account-form fields. */
+.input-wrapper:focus-within {
+  border-bottom-color: var(--theme-accent-color);
+}
+
+/* Leading handle glyph: a display-only icon, so muted (was green via
+   --border-color, which competed with the interactive signal). */
 .filter-icon {
   font-size: 1.5rem;
   display: flex;
   align-items: center;
-  color: var(--border-color);
+  color: var(--theme-fg-muted);
 }
 
 .filter-button {
@@ -33,7 +41,7 @@
   color: var(--theme-fg-color);
   font-weight: bold;
   padding-bottom: var(--gap-small);
-  border-bottom: var(--calendar-border-width) solid var(--theme-accent-color);
+  border-bottom: var(--border-width) solid var(--rule-color);
 }
 
 /* A heart before a list date that holds a followed venue/style — the list-view
@@ -399,15 +407,16 @@
     text-align: center;
     font-weight: normal;
     color: var(--theme-fg-muted);
-    /* A thicker accent rule under the weekday header, mirroring the list date. */
-    border-bottom: var(--border-width) solid var(--theme-accent-color);
+    /* A neutral rule under the weekday header, mirroring the list date divider
+       (both now use the prominent neutral --rule-color, not green). */
+    border-bottom: var(--border-width) solid var(--rule-color);
   }
 
   /* A defined hairline grid (no fills) keeps cells distinguishable without the
      heavy filled boxes of before. */
   .day {
     position: relative;
-    border: var(--calendar-border-width) solid var(--theme-accent-color);
+    border: var(--calendar-border-width) solid var(--border-color);
     /* Minimum height; busy cells grow to fit their in-flow .day-content. */
     height: 7rem;
     vertical-align: top;
@@ -528,7 +537,7 @@
      out of the calendar grid, rather than blending in as just another cell. */
   .day-detail-row td {
     border: 0;
-    border-block: var(--border-width) solid var(--theme-accent-color);
+    border-block: var(--border-width) solid var(--rule-color);
     /* Full-width horizontally so the drawer's events line up with the List view
        (same partial) and the page's left/right edges; the bold accent rules and
        lighter background still read it as lifted out of the grid. */
@@ -539,7 +548,7 @@
 }
 
 .day-detail {
-  border-top: var(--border-width) solid var(--theme-accent-color);
+  border-top: var(--border-width) solid var(--rule-color);
   padding-top: var(--gap-medium);
 }
 
@@ -606,7 +615,7 @@
   width: 100%;
   padding: var(--gap-small) 0;
   border: 0;
-  border-bottom: var(--border-width) solid var(--theme-accent-color);
+  border-bottom: var(--border-width) solid var(--border-color);
   background: none;
   color: var(--theme-fg-color);
   font: inherit;
@@ -615,9 +624,16 @@
   cursor: pointer;
 }
 
+/* Accent underline when the trigger is focused (keyboard) — matches the inline
+   filter fields' focus language. */
+.filter-trigger:focus-visible {
+  outline: none;
+  border-bottom-color: var(--theme-accent-color);
+}
+
 .filter-trigger__icon {
   font-size: var(--filter-icon-size);
-  color: var(--border-color);
+  color: var(--theme-fg-muted);
 }
 
 .filter-trigger__label {
@@ -674,6 +690,13 @@
   cursor: pointer;
 }
 
+/* Tapping/clicking the chip removes that filter — give it a hover/focus cue so
+   the "× to remove" affordance reads (it had none before). */
+.filter-chip:hover,
+.filter-chip:focus-visible {
+  opacity: 0.82;
+}
+
 .filter-chip__remove { font-size: 1.1em; }
 
 /* ── The sheet ── full-screen, slides up from the bottom. */
@@ -702,7 +725,7 @@ body.filter-sheet-open { overflow: hidden; }
   align-items: center;
   gap: var(--gap-small);
   padding: var(--gap-medium) var(--content-padding);
-  border-bottom: var(--border-width) solid var(--theme-accent-color);
+  border-bottom: var(--border-width) solid var(--rule-color);
 }
 
 .sheet__title {
@@ -744,7 +767,7 @@ body.filter-sheet-open { overflow: hidden; }
 
 .sheet__search-icon {
   font-size: 1.3rem;
-  color: var(--border-color);
+  color: var(--theme-fg-muted);
 }
 
 .sheet__search-input {

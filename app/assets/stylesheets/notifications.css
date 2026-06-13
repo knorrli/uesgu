@@ -21,7 +21,7 @@
 }
 
 .notification {
-  border-bottom: var(--calendar-border-width) solid var(--theme-accent-color);
+  border-bottom: var(--border-width) solid var(--border-color);
 }
 
 .notification a {

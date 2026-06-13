@@ -62,17 +62,20 @@ a {
 .account-form select {
   padding: var(--gap-small) 0;
   border: 0;
-  border-bottom: var(--border-width) solid var(--theme-accent-color);
+  border-bottom: var(--border-width) solid var(--border-color);
   background: var(--theme-bg-color);
   color: inherit;
   font: inherit;
   max-width: 100%;
 }
 
+/* Neutral at rest, accent underline on focus — green now signals "this field is
+   active", rather than decorating every passive field. The outline is suppressed
+   in favour of the underline (the field's own focus affordance). */
 .account-form input:focus,
 .account-form select:focus {
   outline: none;
-  border-bottom-color: var(--theme-fg-color);
+  border-bottom-color: var(--theme-accent-color);
 }
 
 /* Make the select read unmistakably as a dropdown: strip the native chrome and
@@ -82,7 +85,10 @@ a {
   -webkit-appearance: none;
   cursor: pointer;
   padding-right: 1.8em;
-  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='9'%20viewBox='0%200%2014%209'%3E%3Cpath%20d='M1%201l6%206%206-6'%20fill='none'%20stroke='%230e8857'%20stroke-width='2'/%3E%3C/svg%3E");
+  /* Neutral mid-grey chevron (was a hard-coded accent green that ignored the
+     theme and stayed green in dark mode). Mid-grey reads on both grounds; the
+     caret is field chrome, so it's neutral like the underline. */
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='9'%20viewBox='0%200%2014%209'%3E%3Cpath%20d='M1%201l6%206%206-6'%20fill='none'%20stroke='%23808080'%20stroke-width='2'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.2em center;
   background-size: 0.85em;

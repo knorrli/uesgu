@@ -1,7 +1,7 @@
 /* Site header, primary nav, footer. Mobile-first. */
 
 .site-header {
-  border-bottom: var(--border-width) solid var(--theme-accent-color);
+  border-bottom: var(--border-width) solid var(--border-color);
 }
 
 .site-header__inner,
@@ -87,13 +87,23 @@
   display: none;
 }
 
+/* The shared Phosphor caret (mask + currentColor) instead of a Unicode ▾, so the
+   disclosure glyph matches the select and the filter triggers. Rotates on open. */
 .nav-menu > summary::after {
-  content: "\25BE"; /* ▾ */
+  content: "";
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
   margin-left: 0.5ch;
+  vertical-align: -0.05em;
+  background-color: currentColor;
+  -webkit-mask: var(--caret-mask) center / contain no-repeat;
+  mask: var(--caret-mask) center / contain no-repeat;
+  transition: transform 0.15s ease;
 }
 
 .nav-menu[open] > summary::after {
-  content: "\25B4"; /* ▴ */
+  transform: rotate(180deg);
 }
 
 .nav-menu__items {
@@ -106,14 +116,14 @@
   flex-direction: column;
   gap: var(--gap-small);
   padding: var(--gap-medium);
-  border: var(--border-width) solid var(--theme-accent-color);
+  border: var(--border-width) solid var(--border-color);
   background-color: var(--theme-bg-color);
   white-space: nowrap;
 }
 
 .site-footer {
   flex-shrink: 0;
-  border-top: var(--border-width) solid var(--theme-accent-color);
+  border-top: var(--border-width) solid var(--border-color);
 }
 
 .site-footer__inner {

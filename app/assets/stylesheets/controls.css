@@ -1,21 +1,40 @@
+/* One focus indicator for every interactive element. Zero-specificity :where()
+   so any component can still override placement without fighting this rule. The
+   ring is the one deliberate spend of green on chrome (see --focus-ring). */
+:where(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--border-width) solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
 button, a.button {
   text-align: center;
   align-content: center;
   cursor: pointer;
   text-decoration: none;
   padding: 5px;
-  border: var(--border-width) solid var(--theme-bg-muted);
+  border: var(--border-width) solid var(--border-color);
   border-radius: var(--border-radius);
   background-color: var(--theme-bg-muted);
   color: var(--theme-fg-color);
 
+  /* Destructive: hollow warn at rest, fills warn on commit (hover/focus) — the
+     single danger language, shared with .button-small.danger (scales by size,
+     not by a different look). */
   &.delete {
     border-color: var(--theme-warn-color);
+    background-color: transparent;
+    color: var(--theme-warn-color);
+  }
+
+  &.delete:hover,
+  &.delete:focus-visible {
     background-color: var(--theme-warn-color);
+    color: var(--theme-bg-color);
   }
 
   &[disabled] {
     cursor: not-allowed;
+    opacity: 0.5;
     background-color: var(--theme-bg-color);
   }
 }
@@ -43,6 +62,15 @@ button.icon-button:hover {
 
 .icon-button.danger:hover {
   color: var(--theme-warn-color);
+}
+
+/* Display-only icon: a non-interactive glyph (a field's leading handle, a search
+   affordance, a metadata marker) — the counterpart to the clickable .icon-button.
+   Muted, no hover lift, no cursor change. Centralises what was ad-hoc per context
+   (.filter-icon, .sheet__search-icon, …). */
+.icon {
+  color: var(--theme-fg-muted);
+  line-height: 1;
 }
 
 input[type=submit] {

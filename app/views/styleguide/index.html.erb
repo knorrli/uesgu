@@ -6,8 +6,18 @@
     A living reference: every specimen below is the real shared element class,
     rendered with the same bundled CSS as the rest of the app — so it stays in
     sync as the styles change. Each entry states the <b>one purpose</b> the
-    element should telegraph. Amber notes flag where an element currently drifts
-    from that purpose; numbers cross-reference <code>docs/ui-audit.md</code>.
+    element should telegraph. Numbers cross-reference <code>docs/ui-audit.md</code>;
+    amber notes flag a remaining drift, green notes mark what this
+    <b>experimental redesign</b> branch resolved.
+  </p>
+  <p class="sg-lede">
+    Branch direction: <b>green is reserved for interaction</b> (links, focus,
+    active, primary actions), <b>state</b> (today, selected) and <b>follows</b>;
+    all structural rules use a neutral hairline (<code>--border-color</code>) or
+    a neutral content divider (<code>--rule-color</code>). One <code>danger</code>
+    language (hollow → fills), one Phosphor disclosure caret, a baseline
+    <code>:focus-visible</code> ring, and a display-only <code>.icon</code> role
+    beside the clickable <code>.icon-button</code>.
   </p>
 
   <nav class="sg-toc">
@@ -65,12 +75,13 @@
         <p class="sg-swatch__label"><b>Foreground muted</b> · <code>--theme-fg-muted</code><br>Secondary text, at-rest chrome/icons</p>
       </li>
     </ul>
-    <p class="sg-flag">
-      <b>Audit #1 / #10.</b> Green is currently also the default
-      <code>--border-color</code> (header/footer rules, calendar grid, nav-menu
-      panel), every passive form underline, the global <code>input</code> text
-      colour, and the leading filter-handle icon. Intent: reserve green for
-      interactive/active; give structural borders + passive chrome a neutral token.
+    <p class="sg-ok">
+      <b>Audit #1 / #10 — resolved.</b> Structural borders, the calendar grid,
+      the nav-menu panel, passive form underlines, raw <code>input</code> text,
+      and the filter-handle icon are now neutral (<code>--border-color</code> /
+      <code>--rule-color</code> / <code>--theme-fg-muted</code>). Green appears on
+      a field only on focus, and otherwise only for links, active state, primary
+      actions, and follows.
     </p>
   </section>
 
@@ -111,8 +122,8 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Danger</span> · <code>.button-small.danger</code> &nbsp;/&nbsp; <code>.button.delete</code>
-        <p class="sg-purpose">A destructive, hard-to-undo action.</p>
-        <span class="sg-flag"><b>Audit #2.</b> Two unrelated looks for the same meaning — a small hollow pill vs a full-width red-bordered button. Intend one <code>danger</code> role that scales by size.</span>
+        <p class="sg-purpose">A destructive, hard-to-undo action. Hollow warn at rest; fills warn on hover/focus.</p>
+        <span class="sg-ok"><b>Audit #2 — resolved.</b> Both now share one danger language (hollow → fills); the only difference is size (full-width vs pill). Hover a specimen to see the fill.</span>
       </div>
     </div>
 
@@ -151,7 +162,20 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Bare button</span> · <code>.button</code> (reset to text)
         <p class="sg-purpose">Currently used as a flat text toggle (view switcher, favorites shortcut).</p>
-        <span class="sg-flag"><b>Audit #6.</b> <code>.button</code> is defined as a box, then stripped bare, then re-styled per screen — it telegraphs nothing. Intend domain classes (e.g. <code>.view-switch__item</code>) and reserve <code>.button</code> for a real button look, or drop it.</span>
+        <span class="sg-flag"><b>Audit #6 — open.</b> <code>.button</code> is defined as a box, then stripped bare, then re-styled per screen — it telegraphs nothing. Renaming to domain classes (e.g. <code>.view-switch__item</code>) is a markup change left for a later step.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <input type="submit" value="Disabled" disabled>
+        <button type="button" class="button-small" disabled>Disabled</button>
+        <a href="#buttons" class="button-small">Focus me (Tab)</a>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">States</span> · <code>:disabled</code>, <code>:focus-visible</code>
+        <p class="sg-purpose">Disabled = 0.5 opacity + not-allowed cursor. Tab to any control to see the shared accent focus ring.</p>
+        <span class="sg-ok"><b>Audit #12 — resolved.</b> Baseline <code>:focus-visible</code> ring on all interactive elements; <code>:disabled</code> on buttons and pills.</span>
       </div>
     </div>
   </section>
@@ -210,7 +234,8 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Applied filter chip</span> · <code>.filter-chip</code>
         <p class="sg-purpose">An active filter on the mobile summary row; tapping it removes that one value.</p>
-        <span class="sg-flag"><b>Audit #5 / #12.</b> No <code>:hover</code> state, and the filled-accent look doesn't obviously read as "tap to remove".</span>
+        <span class="sg-ok"><b>Audit #12 — resolved.</b> Now dims on hover/focus to signal the "× to remove" affordance.</span>
+        <span class="sg-flag"><b>Audit #5 — open.</b> Still shares the filled-accent look with <code>.tag.active</code>; distinguishing selected-token vs removable-filter is a further step.</span>
       </div>
     </div>
 
@@ -244,8 +269,8 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Styled select</span> · <code>.account-form select</code>
-        <p class="sg-purpose">An underline field with a prominent chevron, matching the form fields.</p>
-        <span class="sg-flag"><b>Audit #3 / #11.</b> The chevron is a hand-inlined SVG with a hard-coded <code>#0e8857</code> that ignores the theme token and won't recolour in dark mode. Intend a Phosphor caret on <code>currentColor</code>.</span>
+        <p class="sg-purpose">An underline field with a chevron, matching the form fields. Neutral underline at rest, accent on focus.</p>
+        <span class="sg-ok"><b>Audit #3 / #11 — resolved.</b> The chevron is now a neutral mid-grey that reads on both themes (was a hard-coded <code>#0e8857</code> that stayed green in dark mode).</span>
       </div>
     </div>
 
@@ -262,7 +287,7 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Menu dropdown</span> · <code>.nav-menu</code> (<code>&lt;details&gt;</code>)
         <p class="sg-purpose">Collapses account links into a bordered panel; the summary is the trigger.</p>
-        <span class="sg-flag"><b>Audit #3.</b> Uses a Unicode <code>▾</code> marker rather than the Phosphor caret used everywhere else.</span>
+        <span class="sg-ok"><b>Audit #3 — resolved.</b> Now uses the shared Phosphor caret (mask + <code>currentColor</code>) that rotates on open — same glyph as the select and filter triggers (was a Unicode <code>▾</code>).</span>
       </div>
     </div>
   </section>
@@ -281,8 +306,8 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Account / auth field</span> · <code>.account-form input</code>
-        <p class="sg-purpose">Underline-only field; accent bottom border, shifts to foreground on focus.</p>
-        <span class="sg-flag"><b>Audit #1.</b> Underline + global <code>input{color:accent}</code> make passive fields read very green.</span>
+        <p class="sg-purpose">Underline-only field; neutral bottom border, lights accent on focus. Typed text is foreground.</p>
+        <span class="sg-ok"><b>Audit #1 — resolved.</b> Resting underline is neutral and the global <code>input</code> colour is foreground; green now appears only when the field is focused.</span>
       </div>
     </div>
 
@@ -306,7 +331,20 @@
   <%# ============================================================ ICONS %>
   <section class="sg-section" id="icons">
     <h2>Icons</h2>
-    <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); hearts are masked SVGs. Clickable icons use <code>.icon-button</code>; there is no shared display-only icon role yet (audit #9).</p>
+    <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); hearts are masked SVGs. Clickable icons use <code>.icon-button</code>; display-only icons use the new <code>.icon</code> role (audit #9, resolved).</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen" style="font-size:1.4rem;">
+        <span class="icon ph ph-magnifying-glass"></span>
+        <span class="icon ph ph-map-pin"></span>
+        <span class="icon ph ph-calendar-dots"></span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Display icon</span> · <code>.icon</code>
+        <p class="sg-purpose">A non-interactive glyph — a field's leading handle, a search affordance, a metadata marker. Muted, no hover lift, no cursor change.</p>
+        <span class="sg-ok"><b>Audit #9 — resolved.</b> The counterpart to <code>.icon-button</code>; replaces the ad-hoc per-context colours (<code>.filter-icon</code>, <code>.sheet__search-icon</code>) — all now muted.</span>
+      </div>
+    </div>
 
     <div class="sg-row">
       <div class="sg-specimen" style="font-size:1.4rem;">

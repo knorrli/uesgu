@@ -60,15 +60,28 @@
   cursor: pointer;
 }
 
+.button-small[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .button-small.button-ghost {
   background: none;
   color: var(--theme-accent-color);
 }
 
+/* Destructive pill: hollow warn at rest, fills warn on commit — the same danger
+   language as .button.delete, just the small/pill size. */
 .button-small.danger {
   background: none;
   border-color: var(--theme-warn-color);
   color: var(--theme-warn-color);
+}
+
+.button-small.danger:hover,
+.button-small.danger:focus-visible {
+  background: var(--theme-warn-color);
+  color: var(--theme-bg-color);
 }
 
 /* Builder form: reuse .account-form field styling; these add the grouping. */

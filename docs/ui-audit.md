@@ -153,4 +153,27 @@ Other colours are well-behaved: raspberry is used *only* for followed/favorite m
 
 ---
 
-*Next: the living styleguide at `/styleguide` renders each element above with the real CSS and states a single intended purpose per element. Phase 4 (applying the unified styles) is held for review.*
+*The living styleguide at `/styleguide` renders each element above with the real CSS and states a single intended purpose per element.*
+
+---
+
+## Resolution status — `experimental-ui-redesign` branch
+
+An experimental redesign on this branch implements the central thesis: **green is reserved for interaction (links, focus, active, primary actions), state (today, selected) and follows; all structural chrome uses neutral tokens.** Status against the ranked list:
+
+| # | Item | Status on branch |
+|---|---|---|
+| 1 | Green overloaded (borders, underlines, input text, icons) | **Resolved** — new neutral `--border-color` (hairlines) + `--rule-color` (content dividers); header/footer/nav-panel/calendar-grid/form-underlines/notification-dividers all neutral; `input` text → foreground; underlines light accent only on focus |
+| 2 | Two destructive looks | **Resolved** — one danger language (hollow → fills on hover/focus), shared by `.button.delete` and `.button-small.danger`, differing only in size |
+| 3 | Three disclosure glyphs | **Resolved** — shared Phosphor caret (`--caret-mask`) for the nav menu; neutral chevron for the select; (filter triggers already Phosphor) |
+| 9 | No display-only icon role | **Resolved** — added `.icon` (muted, non-interactive) beside `.icon-button`; `.filter-icon`/`.sheet__search-icon`/`.filter-trigger__icon` now muted |
+| 10 | `.filter-icon` green | **Resolved** — muted |
+| 11 | Hard-coded `#0e8857` chevron | **Resolved** — neutral mid-grey, theme-safe |
+| 12 | Missing states | **Resolved** — baseline `:focus-visible` ring on all interactive elements; `:disabled` on buttons/pills; `.filter-chip:hover` cue |
+| 4 | Three checkbox implementations | **Open** — deferred (needs markup work) |
+| 5 | `.tag.active` vs `.filter-chip` identical | **Open** — both still filled-accent; distinguishing needs a design call |
+| 6 | `.button` telegraphs nothing | **Open** — renaming to domain classes is a markup change, left for a follow-up |
+| 7 | Three button vocabularies | **Partially** — unified states/danger; a full primary/secondary/tertiary rename is a larger markup change |
+| 8 | Duplicate count badge | **Open** — `.badge` vs `.filter-trigger__badge` left as-is (visually identical) |
+
+Changes are CSS/token-only (no view markup changed except the styleguide page itself), so the redesign is low-risk to evaluate and easy to revert per-file.

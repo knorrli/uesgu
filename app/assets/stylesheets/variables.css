@@ -41,4 +41,10 @@
   /* Checkmark (Phosphor check): paints the tick inside a checked filter-sheet
      option box via mask-image + background-color, so it inherits a theme colour. */
   --check-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z'/%3E%3C/svg%3E");
+
+  /* Disclosure caret (Phosphor caret-down): the single dropdown/expand glyph.
+     Painted via mask-image + background-color so it inherits currentColor /
+     a theme token, replacing the old hard-coded-green select SVG and the
+     Unicode ▾ in the nav menu. */
+  --caret-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'/%3E%3C/svg%3E");
 }

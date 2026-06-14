@@ -17,7 +17,7 @@ require 'test_helper'
 class Scrapers::GoldenTest < Minitest::Test
   FIXTURE_ROOT = File.expand_path('../../fixtures/scrapers', __dir__)
   # Click-into-detail scrapers: a stubbed `click` returns the saved detail page.
-  SHAPE_B = %w[bad_bonn kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad].freeze
+  SHAPE_B = %w[bad_bonn kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken].freeze
   CAPTURING = ENV['CAPTURE_GOLDEN'] == '1'
   # Pin the clock to when the fixtures were captured so year-inferring scrapers
   # stay deterministic regardless of when the suite runs (ISC reads Date.current

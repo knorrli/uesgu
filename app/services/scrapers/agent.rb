@@ -5,6 +5,20 @@ module Scrapers
   class Agent < Mechanize
     include Registerable
 
+    # Identify the crawler honestly and obey robots.txt. Mechanize defaults
+    # robots to false; we opt in so every scraper respects a venue's wishes.
+    # We match the generic `User-agent: *` group — we are a personal events
+    # reader, not ClaudeBot/GPTBot, so AI-crawler blocks don't apply to us.
+    # A disallowed listing page raises Mechanize::RobotsDisallowedError out of
+    # `get`, surfacing the venue as a failed run rather than silently scraping.
+    USER_AGENT = 'uesgu/1.0 (+https://uesgu.ch; personal event aggregator)'.freeze
+
+    def initialize
+      super
+      self.user_agent = USER_AGENT
+      self.robots = true
+    end
+
     def self.call
       new.call
     end

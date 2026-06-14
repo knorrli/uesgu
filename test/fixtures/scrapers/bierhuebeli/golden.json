@@ -1,0 +1,1732 @@
+[
+  {
+    "url": "https://bierhuebeli.ch/event/creedence-clearwater-revived/",
+    "start_time": "2027-03-05T20:00:00+01:00",
+    "start_date": "2027-03-05",
+    "title": "CREEDENCE CLEARWATER REVIVED",
+    "subtitle": null,
+    "genre_list": [
+      "Southern Rock",
+      "Classic Rock"
+    ],
+    "style_list": [
+      "Southern Rock",
+      "Classic Rock"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/femmetastique-dezember/",
+    "start_time": "2026-12-05T18:00:00+01:00",
+    "start_date": "2026-12-05",
+    "title": "FEMMEtastique",
+    "subtitle": null,
+    "genre_list": [
+      "Party für Frauen"
+    ],
+    "style_list": [
+      "Party für Frauen"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/femmetastique-oktober/",
+    "start_time": "2026-10-31T18:00:00+01:00",
+    "start_date": "2026-10-31",
+    "title": "FEMMEtastique",
+    "subtitle": null,
+    "genre_list": [
+      "Party für Frauen"
+    ],
+    "style_list": [
+      "Party für Frauen"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/best-of-2000er-party-september/",
+    "start_time": "2026-09-19T23:00:00+02:00",
+    "start_date": "2026-09-19",
+    "title": "BEST OF 2000ER PARTY",
+    "subtitle": null,
+    "genre_list": [
+      "Mashup",
+      "Allstyle"
+    ],
+    "style_list": [
+      "Mashup",
+      "Allstyle"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/pearls-of-the-80ies/",
+    "start_time": "2026-09-11T23:00:00+02:00",
+    "start_date": "2026-09-11",
+    "title": "Pearls of the 80ies",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/femmetastique-september/",
+    "start_time": "2026-09-12T18:00:00+02:00",
+    "start_date": "2026-09-12",
+    "title": "FEMMEtastique",
+    "subtitle": null,
+    "genre_list": [
+      "Party für Frauen"
+    ],
+    "style_list": [
+      "Party für Frauen"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/auf-der-couch-mit-felizitas-ambauen/",
+    "start_time": "2027-04-25T19:00:00+02:00",
+    "start_date": "2027-04-25",
+    "title": "AUF DER COUCH MIT FELIZITAS AMBAUEN",
+    "subtitle": null,
+    "genre_list": [
+      "PsychologieLive"
+    ],
+    "style_list": [
+      "PsychologieLive"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/streusel-on-top/",
+    "start_time": "2026-09-26T19:30:00+02:00",
+    "start_date": "2026-09-26",
+    "title": "STREUSEL ON TOP",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/wm-finale/",
+    "start_time": "2026-07-19T21:00:00+02:00",
+    "start_date": "2026-07-19",
+    "title": "FINALE",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/halbfinale-15-juli/",
+    "start_time": "2026-07-15T21:00:00+02:00",
+    "start_date": "2026-07-15",
+    "title": "Halbfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/halbfinale-14-juli/",
+    "start_time": "2026-07-14T21:00:00+02:00",
+    "start_date": "2026-07-14",
+    "title": "Halbfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/viertelfinale-11-juli/",
+    "start_time": "2026-07-11T23:00:00+02:00",
+    "start_date": "2026-07-11",
+    "title": "Viertelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/viertelfinale-10-juli/",
+    "start_time": "2026-07-10T21:00:00+02:00",
+    "start_date": "2026-07-10",
+    "title": "Viertelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/viertelfinale-9-juli/",
+    "start_time": "2026-07-09T22:00:00+02:00",
+    "start_date": "2026-07-09",
+    "title": "Viertelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/achtelfinale-7-juli/",
+    "start_time": "2026-07-07T18:00:00+02:00",
+    "start_date": "2026-07-07",
+    "title": "Achtelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/achtelfinale/",
+    "start_time": "2026-07-06T21:00:00+02:00",
+    "start_date": "2026-07-06",
+    "title": "Achtelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale-3-juli/",
+    "start_time": "2026-07-03T20:00:00+02:00",
+    "start_date": "2026-07-03",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [
+      "IM GUSTAV"
+    ],
+    "style_list": [
+      "IM GUSTAV"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale-2-juli/",
+    "start_time": "2026-07-02T21:00:00+02:00",
+    "start_date": "2026-07-02",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [
+      "IM GUSTAV"
+    ],
+    "style_list": [
+      "IM GUSTAV"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale-22-00/",
+    "start_time": "2026-07-01T22:00:00+02:00",
+    "start_date": "2026-07-01",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale-18-00/",
+    "start_time": "2026-07-01T18:00:00+02:00",
+    "start_date": "2026-07-01",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale-23-00/",
+    "start_time": "2026-06-30T23:00:00+02:00",
+    "start_date": "2026-06-30",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [
+      "IM GUSTAV"
+    ],
+    "style_list": [
+      "IM GUSTAV"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/der-bund-im-gespraech/",
+    "start_time": "2026-09-22T18:30:00+02:00",
+    "start_date": "2026-09-22",
+    "title": "«DER BUND» IM GESPRÄCH",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/massimo-rocchi/",
+    "start_time": "2026-09-30T20:00:00+02:00",
+    "start_date": "2026-09-30",
+    "title": "MASSIMO ROCCHI",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/pub-quiz-history-special/",
+    "start_time": "2027-05-05T19:00:00+02:00",
+    "start_date": "2027-05-05",
+    "title": "PUB QUIZ",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/pub-quiz-nerd-special-ii/",
+    "start_time": "2027-02-09T19:00:00+01:00",
+    "start_date": "2027-02-09",
+    "title": "PUB QUIZ",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/pub-quiz-nerd-special/",
+    "start_time": "2027-02-02T19:00:00+01:00",
+    "start_date": "2027-02-02",
+    "title": "PUB QUIZ",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/offizielle-bernpride-afterparty/",
+    "start_time": "2026-07-25T23:00:00+02:00",
+    "start_date": "2026-07-25",
+    "title": "Offizielle BernPride Afterparty",
+    "subtitle": null,
+    "genre_list": [
+      "Afterparty"
+    ],
+    "style_list": [
+      "Afterparty"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/hazel-brugger-nachmittagsvorstellung/",
+    "start_time": "2027-04-04T14:00:00+02:00",
+    "start_date": "2027-04-04",
+    "title": "HAZEL BRUGGER",
+    "subtitle": null,
+    "genre_list": [
+      "Comedy"
+    ],
+    "style_list": [
+      "Comedy"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/hazel-brugger-abendvorstellung/",
+    "start_time": "2027-04-04T19:00:00+02:00",
+    "start_date": "2027-04-04",
+    "title": "HAZEL BRUGGER",
+    "subtitle": null,
+    "genre_list": [
+      "Comedy"
+    ],
+    "style_list": [
+      "Comedy"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/pub-quiz-zusatzshow/",
+    "start_time": "2026-08-11T19:00:00+02:00",
+    "start_date": "2026-08-11",
+    "title": "PUB QUIZ",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/best-of-2000er-party-bierhuebeli/",
+    "start_time": "2026-06-20T23:00:00+02:00",
+    "start_date": "2026-06-20",
+    "title": "BEST OF 2000ER PARTY",
+    "subtitle": null,
+    "genre_list": [
+      "Mashup",
+      "Allstyle"
+    ],
+    "style_list": [
+      "Mashup",
+      "Allstyle"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale_gustav/",
+    "start_time": "2026-06-30T19:00:00+02:00",
+    "start_date": "2026-06-30",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [
+      "IM GUSTAV"
+    ],
+    "style_list": [
+      "IM GUSTAV"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/england-ghana/",
+    "start_time": "2026-06-23T22:00:00+02:00",
+    "start_date": "2026-06-23",
+    "title": "ENGLAND – GHANA",
+    "subtitle": null,
+    "genre_list": [
+      "IM GUSTAV"
+    ],
+    "style_list": [
+      "IM GUSTAV"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/mexico-suedafrika/",
+    "start_time": "2026-06-11T21:00:00+02:00",
+    "start_date": "2026-06-11",
+    "title": "MEXICO – SÜDAFRIKA",
+    "subtitle": null,
+    "genre_list": [
+      "IM GUSTAV"
+    ],
+    "style_list": [
+      "IM GUSTAV"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale-29-6/",
+    "start_time": "2026-06-29T19:00:00+02:00",
+    "start_date": "2026-06-29",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sechzehntelfinale/",
+    "start_time": "2026-06-28T21:00:00+02:00",
+    "start_date": "2026-06-28",
+    "title": "Sechzehntelfinale",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/schweiz-kanada/",
+    "start_time": "2026-06-24T21:00:00+02:00",
+    "start_date": "2026-06-24",
+    "title": "SCHWEIZ – KANADA",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/portugal-usbekistan/",
+    "start_time": "2026-06-23T19:00:00+02:00",
+    "start_date": "2026-06-23",
+    "title": "PORTUGAL – USBEKISTAN",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/argentinien-oesterreich/",
+    "start_time": "2026-06-22T19:00:00+02:00",
+    "start_date": "2026-06-22",
+    "title": "ARGENTINIEN – ÖSTERREICH",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/deutschland-elfenbeinkueste/",
+    "start_time": "2026-06-20T22:00:00+02:00",
+    "start_date": "2026-06-20",
+    "title": "DEUTSCHLAND – ELFENBEINKÜSTE",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/niederlande-schweden/",
+    "start_time": "2026-06-20T19:00:00+02:00",
+    "start_date": "2026-06-20",
+    "title": "NIEDERLANDE – SCHWEDEN",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/usa-australien/",
+    "start_time": "2026-06-19T21:00:00+02:00",
+    "start_date": "2026-06-19",
+    "title": "USA – AUSTRALIEN",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/schweiz-bosnien-und-herzegowina/",
+    "start_time": "2026-06-18T21:00:00+02:00",
+    "start_date": "2026-06-18",
+    "title": "SCHWEIZ – BOSNIEN UND HERZEGOWINA",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/tschechien-suedafrika/",
+    "start_time": "2026-06-18T18:00:00+02:00",
+    "start_date": "2026-06-18",
+    "title": "TSCHECHIEN – SÜDAFRIKA",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/england-kroatien/",
+    "start_time": "2026-06-17T22:00:00+02:00",
+    "start_date": "2026-06-17",
+    "title": "ENGLAND – KROATIEN",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/portugal-dr-kongo/",
+    "start_time": "2026-06-17T19:00:00+02:00",
+    "start_date": "2026-06-17",
+    "title": "PORTUGAL – DR KONGO",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/frankreich-senegal/",
+    "start_time": "2026-06-16T21:00:00+02:00",
+    "start_date": "2026-06-16",
+    "title": "FRANKREICH – SENEGAL",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/belgien-aegypten/",
+    "start_time": "2026-06-15T21:00:00+02:00",
+    "start_date": "2026-06-15",
+    "title": "BELGIEN – ÄGYPTEN",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/spanien-kap-verde/",
+    "start_time": "2026-06-15T18:00:00+02:00",
+    "start_date": "2026-06-15",
+    "title": "SPANIEN – KAP VERDE",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/deutschlang-curacao/",
+    "start_time": "2026-06-14T19:00:00+02:00",
+    "start_date": "2026-06-14",
+    "title": "DEUTSCHLAND – CURAÇAO",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/katar-schweiz/",
+    "start_time": "2026-06-13T21:00:00+02:00",
+    "start_date": "2026-06-13",
+    "title": "KATAR – SCHWEIZ",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/jon-cleary/",
+    "start_time": "2026-11-16T20:00:00+01:00",
+    "start_date": "2026-11-16",
+    "title": "JON CLEARY",
+    "subtitle": null,
+    "genre_list": [
+      "Soul"
+    ],
+    "style_list": [
+      "Soul"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/matt-hansen-live-in-bern/",
+    "start_time": "2026-10-25T20:00:00+01:00",
+    "start_date": "2026-10-25",
+    "title": "MATT HANSEN",
+    "subtitle": null,
+    "genre_list": [
+      "Pop"
+    ],
+    "style_list": [
+      "Pop"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/generations-herbst/",
+    "start_time": "2026-10-13T21:00:00+02:00",
+    "start_date": "2026-10-13",
+    "title": "Generations",
+    "subtitle": null,
+    "genre_list": [
+      "All-Style"
+    ],
+    "style_list": [
+      "All-Style"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/strictly-90ies/",
+    "start_time": "2026-10-10T23:00:00+02:00",
+    "start_date": "2026-10-10",
+    "title": "STRICTLY 90IES",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/generations-dez/",
+    "start_time": "2026-12-12T21:00:00+01:00",
+    "start_date": "2026-12-12",
+    "title": "Generations",
+    "subtitle": null,
+    "genre_list": [
+      "All-Style"
+    ],
+    "style_list": [
+      "All-Style"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/bravo-hits-party-sommer/",
+    "start_time": "2026-07-11T23:00:00+02:00",
+    "start_date": "2026-07-11",
+    "title": "BRAVO HITS PARTY",
+    "subtitle": null,
+    "genre_list": [
+      "Bravohits only"
+    ],
+    "style_list": [
+      "Bravohits only"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/made-in-2010-party-im-bierhuebeli/",
+    "start_time": "2026-06-27T23:00:00+02:00",
+    "start_date": "2026-06-27",
+    "title": "Made in 2010",
+    "subtitle": null,
+    "genre_list": [
+      "Ab 16 Jahren"
+    ],
+    "style_list": [
+      "Ab 16 Jahren"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/cavalera-metal-in-bern/",
+    "start_time": "2026-07-08T20:00:00+02:00",
+    "start_date": "2026-07-08",
+    "title": "CAVALERA",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/viva-la-vida/",
+    "start_time": "2026-06-06T23:00:00+02:00",
+    "start_date": "2026-06-06",
+    "title": "Viva la Vida",
+    "subtitle": null,
+    "genre_list": [
+      "Salsa",
+      "Reaggaeton"
+    ],
+    "style_list": [
+      "Salsa",
+      "Reaggaeton"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/berner-gourmet-gala-2026/",
+    "start_time": "2026-10-17T16:30:00+02:00",
+    "start_date": "2026-10-17",
+    "title": "Berner Gourmet Gala 2026",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/charles-nguela-comedy-in-bern/",
+    "start_time": "2026-11-25T20:00:00+01:00",
+    "start_date": "2026-11-25",
+    "title": "CHARLES NGUELA",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/blanco-white/",
+    "start_time": "2027-03-08T20:00:00+01:00",
+    "start_date": "2027-03-08",
+    "title": "BLANCO WHITE",
+    "subtitle": null,
+    "genre_list": [
+      "Indie-Folk"
+    ],
+    "style_list": [
+      "Indie-Folk"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/eivor-nordic-folk/",
+    "start_time": "2027-03-13T20:00:00+01:00",
+    "start_date": "2027-03-13",
+    "title": "EIVØR",
+    "subtitle": null,
+    "genre_list": [
+      "Electronica"
+    ],
+    "style_list": [
+      "Electronica"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sven-ivanic-comedy-in-bern/",
+    "start_time": "2027-02-03T20:00:00+01:00",
+    "start_date": "2027-02-03",
+    "title": "SVEN IVANIĆ",
+    "subtitle": null,
+    "genre_list": [
+      "Stand-up"
+    ],
+    "style_list": [
+      "Stand-up"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/mattiu/",
+    "start_time": "2026-12-12T19:00:00+01:00",
+    "start_date": "2026-12-12",
+    "title": "MATTIU",
+    "subtitle": null,
+    "genre_list": [
+      "Indie",
+      "Singer-Songwriter"
+    ],
+    "style_list": [
+      "Indie",
+      "Singer-Songwriter"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/kwam-e/",
+    "start_time": "2026-12-01T20:00:00+01:00",
+    "start_date": "2026-12-01",
+    "title": "KWAM.E",
+    "subtitle": null,
+    "genre_list": [
+      "Rap"
+    ],
+    "style_list": [
+      "Rap"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/ramon-clau/",
+    "start_time": "2026-05-12T19:30:00+02:00",
+    "start_date": "2026-05-12",
+    "title": "RAMON CLAU",
+    "subtitle": null,
+    "genre_list": [
+      "Pop",
+      "Indie"
+    ],
+    "style_list": [
+      "Pop",
+      "Indie"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/the-beatles-factory/",
+    "start_time": "2027-03-13T20:00:00+01:00",
+    "start_date": "2027-03-13",
+    "title": "THE BEATLES FACTORY",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/bad-taste-party-mai/",
+    "start_time": "2026-05-30T23:00:00+02:00",
+    "start_date": "2026-05-30",
+    "title": "Bad Taste Party",
+    "subtitle": null,
+    "genre_list": [
+      "Gratis wenn dein Outfit stimmt"
+    ],
+    "style_list": [
+      "Gratis wenn dein Outfit stimmt"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/fuse-party-afrobeats-dancehall-in-bern/",
+    "start_time": "2026-05-22T23:00:00+02:00",
+    "start_date": "2026-05-22",
+    "title": "FUSE PARTY",
+    "subtitle": null,
+    "genre_list": [
+      "Dancehall",
+      "Trap"
+    ],
+    "style_list": [
+      "Dancehall",
+      "Trap"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/jojo-mayer/",
+    "start_time": "2026-11-08T20:00:00+01:00",
+    "start_date": "2026-11-08",
+    "title": "JOJO MAYER",
+    "subtitle": null,
+    "genre_list": [
+      "Jazz",
+      "Ambient"
+    ],
+    "style_list": [
+      "Jazz",
+      "Ambient"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/made-in-2010-mai/",
+    "start_time": "2026-05-14T23:00:00+02:00",
+    "start_date": "2026-05-14",
+    "title": "Made in 2010",
+    "subtitle": null,
+    "genre_list": [
+      "Ab 16 Jahren"
+    ],
+    "style_list": [
+      "Ab 16 Jahren"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/bierhuebeli-pfingst-party-in-bern/",
+    "start_time": "2026-05-24T23:00:00+02:00",
+    "start_date": "2026-05-24",
+    "title": "BIERHÜBELI PFINGST PARTY",
+    "subtitle": null,
+    "genre_list": [
+      "Pfingstvergnügen"
+    ],
+    "style_list": [
+      "Pfingstvergnügen"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/queer-tea-dance-queeralternbern/",
+    "start_time": "2026-05-13T18:00:00+02:00",
+    "start_date": "2026-05-13",
+    "title": "Queer Tea Dance",
+    "subtitle": null,
+    "genre_list": [
+      "Pop Classics"
+    ],
+    "style_list": [
+      "Pop Classics"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/nyna-dubois-jonas-zahnd/",
+    "start_time": "2026-05-20T18:30:00+02:00",
+    "start_date": "2026-05-20",
+    "title": "NYNA DUBOIS & JONAS ZAHND",
+    "subtitle": null,
+    "genre_list": [
+      "Soul"
+    ],
+    "style_list": [
+      "Soul"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/dub-inc-reggae-hip-hop-in-bern/",
+    "start_time": "2027-03-18T20:00:00+01:00",
+    "start_date": "2027-03-18",
+    "title": "DUB INC",
+    "subtitle": null,
+    "genre_list": [
+      "Hip-Hop",
+      "Dub"
+    ],
+    "style_list": [
+      "Hip-Hop",
+      "Dub"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/versus-party/",
+    "start_time": "2026-05-13T23:00:00+02:00",
+    "start_date": "2026-05-13",
+    "title": "VERSUS PARTY",
+    "subtitle": null,
+    "genre_list": [
+      "Boyband"
+    ],
+    "style_list": [
+      "Boyband"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/pub-quiz-musik-special/",
+    "start_time": "2026-08-12T19:00:00+02:00",
+    "start_date": "2026-08-12",
+    "title": "PUB QUIZ",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/pub-quiz-80s-special/",
+    "start_time": "2026-11-03T19:00:00+01:00",
+    "start_date": "2026-11-03",
+    "title": "PUB QUIZ",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/steff-la-cheffe-november/",
+    "start_time": "2027-04-10T20:00:00+02:00",
+    "start_date": "2027-04-10",
+    "title": "STEFF LA CHEFFE",
+    "subtitle": null,
+    "genre_list": [
+      "Mundart"
+    ],
+    "style_list": [
+      "Mundart"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/queerhuebeli/",
+    "start_time": "2026-11-13T23:00:00+01:00",
+    "start_date": "2026-11-13",
+    "title": "QUEERHÜBELI",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/gustav-x-matte-5-gaenge-fuer-5-jahre/",
+    "start_time": "2026-04-16T18:00:00+02:00",
+    "start_date": "2026-04-16",
+    "title": "Gustav x Matte",
+    "subtitle": null,
+    "genre_list": [
+      "Gustav"
+    ],
+    "style_list": [
+      "Gustav"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/bravo-hits-party-bierhuebeli-bern/",
+    "start_time": "2026-05-15T23:00:00+02:00",
+    "start_date": "2026-05-15",
+    "title": "BRAVO HITS PARTY",
+    "subtitle": null,
+    "genre_list": [
+      "Bravohits only"
+    ],
+    "style_list": [
+      "Bravohits only"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/eurovision-public-viewing-party/",
+    "start_time": "2026-05-16T21:00:00+02:00",
+    "start_date": "2026-05-16",
+    "title": "EuroVision Public Viewing Party",
+    "subtitle": null,
+    "genre_list": [
+      "Pop"
+    ],
+    "style_list": [
+      "Pop"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/bierhuebeli-merchandising-day-2026/",
+    "start_time": "2026-05-30T16:00:00+02:00",
+    "start_date": "2026-05-30",
+    "title": "BIERHÜBELI MERCHANDISING DAY 2026",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/gavin-degraw/",
+    "start_time": "2026-10-16T20:00:00+02:00",
+    "start_date": "2026-10-16",
+    "title": "GAVIN DEGRAW",
+    "subtitle": null,
+    "genre_list": [
+      "Rock"
+    ],
+    "style_list": [
+      "Rock"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/marc-sway-unplugged/",
+    "start_time": "2026-10-28T20:00:00+01:00",
+    "start_date": "2026-10-28",
+    "title": "MARC SWAY",
+    "subtitle": null,
+    "genre_list": [
+      "Soul"
+    ],
+    "style_list": [
+      "Soul"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/trentemoller/",
+    "start_time": "2027-03-02T20:00:00+01:00",
+    "start_date": "2027-03-02",
+    "title": "TRENTEMØLLER",
+    "subtitle": null,
+    "genre_list": [
+      "Dream-Pop",
+      "Darkwave"
+    ],
+    "style_list": [
+      "Dream-Pop",
+      "Darkwave"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/super-bowl-party/",
+    "start_time": "2026-04-02T23:00:00+02:00",
+    "start_date": "2026-04-02",
+    "title": "SUPER BOWL – 32nd Edition",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/klangfarbenrausch/",
+    "start_time": "2026-05-15T18:30:00+02:00",
+    "start_date": "2026-05-15",
+    "title": "KLANGFARBENRAUSCH",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/veronica-fusaro/",
+    "start_time": "2026-12-16T20:00:00+01:00",
+    "start_date": "2026-12-16",
+    "title": "VERONICA FUSARO",
+    "subtitle": null,
+    "genre_list": [
+      "Soul",
+      "Rock"
+    ],
+    "style_list": [
+      "Soul",
+      "Rock"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/starsailor/",
+    "start_time": "2026-10-12T20:00:00+02:00",
+    "start_date": "2026-10-12",
+    "title": "STARSAILOR",
+    "subtitle": null,
+    "genre_list": [
+      "Alternative Rock"
+    ],
+    "style_list": [
+      "Alternative Rock"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/angelique-kidjo/",
+    "start_time": "2026-09-21T20:00:00+02:00",
+    "start_date": "2026-09-21",
+    "title": "ANGÉLIQUE KIDJO",
+    "subtitle": null,
+    "genre_list": [
+      "Afrobeat",
+      "Funk"
+    ],
+    "style_list": [
+      "Afrobeat",
+      "Funk"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/kruder-dorfmeister/",
+    "start_time": "2026-09-04T20:30:00+02:00",
+    "start_date": "2026-09-04",
+    "title": "KRUDER & DORFMEISTER",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/sean-koch-indie-folk/",
+    "start_time": "2026-10-18T20:00:00+02:00",
+    "start_date": "2026-10-18",
+    "title": "SEAN KOCH",
+    "subtitle": null,
+    "genre_list": [
+      "Indie-Folk",
+      "Reggae"
+    ],
+    "style_list": [
+      "Indie-Folk",
+      "Reggae"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/kaizers-orchestra-alternative-rock-im-bern/",
+    "start_time": "2026-10-13T20:00:00+02:00",
+    "start_date": "2026-10-13",
+    "title": "KAIZERS ORCHESTRA",
+    "subtitle": null,
+    "genre_list": [
+      "Alternative"
+    ],
+    "style_list": [
+      "Alternative"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/ready-to-roll/",
+    "start_time": "2026-05-06T19:30:00+02:00",
+    "start_date": "2026-05-06",
+    "title": "READY TO ROLL",
+    "subtitle": null,
+    "genre_list": [
+      "Rock"
+    ],
+    "style_list": [
+      "Rock"
+    ],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/notte-italiana-im-bierhubeli/",
+    "start_time": "2026-05-09T23:00:00+02:00",
+    "start_date": "2026-05-09",
+    "title": "NOTTE ITALIANA",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  },
+  {
+    "url": "https://bierhuebeli.ch/event/schiller/",
+    "start_time": "2026-09-19T20:00:00+02:00",
+    "start_date": "2026-09-19",
+    "title": "SCHILLER",
+    "subtitle": null,
+    "genre_list": [],
+    "style_list": [],
+    "location_list": [
+      "Bierhübeli",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  }
+]

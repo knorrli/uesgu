@@ -2,11 +2,11 @@
 fr:
   nav:
     admin: Admin
-    notifications: Notifications
+    notifications: Inbox
     unread_notifications: Notifications non lues
     favorites: Favoris
     notification_rules: Règles de notification
-    saved: Enregistré
+    saved: À voir
     settings: Paramètres
     logout: Déconnexion
     login: Connexion
@@ -69,8 +69,12 @@ fr:
     test:
       title: üsgu
       body: Ceci est une notification de test — le push fonctionne. 🎉
+  inbox:
+    title: Inbox
+    tab_messages: Messages
+    tab_rules: Règles
   saved_events:
-    title: Événements enregistrés
+    title: À voir
     empty: Rien d'enregistré — touche le signet sur un événement.
     toggle: Enregistrer l'événement
   notification_rules:
@@ -234,6 +238,9 @@ fr:
     push_status_denied: Ton navigateur bloque les notifications. Autorise-les dans les paramètres du navigateur pour les activer.
     push_unsupported: Ce navigateur ne prend pas en charge les notifications push.
     push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoute d'abord üsgu à ton écran d'accueil.
+    signout_heading: Déconnexion
+    signout_hint: Se déconnecter sur cet appareil.
+    signout_button: Se déconnecter
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime ton compte et tes favoris définitivement.
     delete_account: Supprimer mon compte

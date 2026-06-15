@@ -2,11 +2,11 @@
 en:
   nav:
     admin: Admin
-    notifications: Notifications
+    notifications: Inbox
     unread_notifications: Unread notifications
     favorites: Favorites
     notification_rules: Notification rules
-    saved: Saved
+    saved: Watchlist
     settings: Settings
     logout: Log out
     login: Log in
@@ -69,8 +69,12 @@ en:
     test:
       title: üsgu
       body: This is a test notification — push is working. 🎉
+  inbox:
+    title: Inbox
+    tab_messages: Messages
+    tab_rules: Rules
   saved_events:
-    title: Saved shows
+    title: Watchlist
     empty: Nothing saved yet — tap the bookmark on any show.
     toggle: Save show
   notification_rules:
@@ -234,6 +238,9 @@ en:
     push_status_denied: Your browser is blocking notifications. Allow them in your browser settings to turn this on.
     push_unsupported: This browser doesn’t support push notifications.
     push_install_first: To get notifications on iPhone or iPad, add üsgu to your Home Screen first.
+    signout_heading: Sign out
+    signout_hint: Sign out on this device.
+    signout_button: Sign out
     delete_account_heading: Delete account
     delete_account_hint: Wipes your account and favorites for good.
     delete_account: Delete my account

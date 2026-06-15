@@ -1,0 +1,14 @@
+<%# Inbox sub-navigation: received messages vs the rules that generate them.
+    Two controllers (notifications#index, notification_rules#index), one
+    conceptual area — these tabs are what tie them together. Reuses the
+    .segmented text-switch idiom (same as the list/calendar switcher). %>
+<nav class="segmented inbox-tabs" aria-label="<%= t('inbox.title') %>">
+  <% messages_here = current_page?(notifications_path) %>
+  <% rules_here = current_page?(notification_rules_path) %>
+  <%= link_to t('inbox.tab_messages'), notifications_path,
+        class: class_names(active: messages_here),
+        aria: { current: messages_here ? 'page' : nil } %>
+  <%= link_to t('inbox.tab_rules'), notification_rules_path,
+        class: class_names(active: rules_here),
+        aria: { current: rules_here ? 'page' : nil } %>
+</nav>

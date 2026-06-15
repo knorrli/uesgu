@@ -21,4 +21,13 @@ class HeaderTest < ActionDispatch::IntegrationTest
     assert_select '.nav-menu__items a[href=?]', notifications_path, 1
     assert_select '.site-nav > a[href=?]', notifications_path, false
   end
+
+  test 'the account menu drops the rules and logout rows (folded into Inbox / Settings)' do
+    sign_in_as user
+    get root_path
+    # Notification rules are now a tab inside the Inbox, not a menu row.
+    assert_select '.nav-menu__items a[href=?]', notification_rules_path, false
+    # Logout moved to the Settings page.
+    assert_select '.nav-menu__items a[href=?]', session_path, false
+  end
 end

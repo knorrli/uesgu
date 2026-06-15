@@ -2,11 +2,11 @@
 de:
   nav:
     admin: Admin
-    notifications: Mitteilungen
+    notifications: Inbox
     unread_notifications: Ungelesene Mitteilungen
     favorites: Favoriten
     notification_rules: Mitteilungs-Regeln
-    saved: Gespeichert
+    saved: Merkliste
     settings: Einstellungen
     logout: Abmelden
     login: Anmelden
@@ -69,8 +69,12 @@ de:
     test:
       title: üsgu
       body: Dies ist eine Testmitteilung — Push funktioniert. 🎉
+  inbox:
+    title: Inbox
+    tab_messages: Nachrichten
+    tab_rules: Regeln
   saved_events:
-    title: Gespeicherte Veranstaltungen
+    title: Merkliste
     empty: Noch nichts gespeichert — tippe das Lesezeichen bei einer Veranstaltung.
     toggle: Veranstaltung speichern
   notification_rules:
@@ -234,6 +238,9 @@ de:
     push_status_denied: Dein Browser blockiert Mitteilungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
     push_unsupported: Dieser Browser unterstützt keine Push-Mitteilungen.
     push_install_first: Um auf iPhone oder iPad Mitteilungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
+    signout_heading: Abmelden
+    signout_hint: Auf diesem Gerät abmelden.
+    signout_button: Abmelden
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und deine Favoriten endgültig.
     delete_account: Mein Konto löschen

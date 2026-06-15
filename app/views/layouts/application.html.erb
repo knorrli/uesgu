@@ -82,17 +82,32 @@
             <details class="nav-menu" data-controller="menu" data-action="toggle->menu#toggle">
               <summary><%= current_user.username %><% if unread.positive? %> <span class="unread-dot" role="img" aria-label="<%= t('nav.unread_notifications') %>"></span><% end %></summary>
               <div class="nav-menu__items">
-                <%= link_to notifications_path do %>
-                  <%= t('nav.notifications') %><% if unread.positive? %> <span class="badge"><%= unread %></span><% end %>
+                <%# Reused icons (bell/bookmark/heart/gear) so the labels scan at a
+                    glance — the heart/bookmark in particular tell the Favoriten and
+                    Merkliste rows apart. Notification rules now live as a tab inside
+                    the Inbox; logout moved to Settings. %>
+                <%= link_to notifications_path, class: 'nav-menu__item' do %>
+                  <span class="ph ph-bell" aria-hidden="true"></span>
+                  <span><%= t('nav.notifications') %></span><% if unread.positive? %> <span class="badge"><%= unread %></span><% end %>
                 <% end %>
-                <%= link_to t('nav.notification_rules'), notification_rules_path %>
-                <%= link_to t('nav.saved'), saved_events_path %>
-                <%= link_to t('nav.favorites'), favorites_path %>
-                <%= link_to t('nav.settings'), settings_path %>
+                <%= link_to saved_events_path, class: 'nav-menu__item' do %>
+                  <span class="ph ph-bookmark-simple" aria-hidden="true"></span>
+                  <span><%= t('nav.saved') %></span>
+                <% end %>
+                <%= link_to favorites_path, class: 'nav-menu__item' do %>
+                  <span class="fav-heart" aria-hidden="true"></span>
+                  <span><%= t('nav.favorites') %></span>
+                <% end %>
+                <%= link_to settings_path, class: 'nav-menu__item' do %>
+                  <span class="ph ph-gear" aria-hidden="true"></span>
+                  <span><%= t('nav.settings') %></span>
+                <% end %>
                 <% if current_user.admin? %>
-                  <%= link_to t('nav.admin'), admin_path %>
+                  <%= link_to admin_path, class: 'nav-menu__item' do %>
+                    <span class="ph ph-wrench" aria-hidden="true"></span>
+                    <span><%= t('nav.admin') %></span>
+                  <% end %>
                 <% end %>
-                <%= link_to t('nav.logout'), session_path, data: { turbo_method: :delete } %>
               </div>
             </details>
           <% else %>

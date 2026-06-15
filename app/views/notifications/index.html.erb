@@ -1,11 +1,15 @@
-<% content_for :title, t('notifications.index.title') %>
+<% content_for :title, t('inbox.title') %>
 
-<h1><%= t('notifications.index.title') %></h1>
+<div class="flex flex-col gap-large">
+  <header class="flex flex-col gap-small">
+    <h1><%= t('inbox.title') %></h1>
+    <%= render 'shared/inbox_tabs' %>
+  </header>
 
-<% if @notifications.empty? %>
-  <p class="empty-state"><%= t('notifications.index.empty') %></p>
-<% else %>
-  <ul class="notifications">
+  <% if @notifications.empty? %>
+    <p class="empty-state"><%= t('notifications.index.empty') %></p>
+  <% else %>
+    <ul class="notifications">
     <% @notifications.each do |notification| %>
       <li class="<%= class_names('notification', unread: !notification.read?) %>">
         <%= link_to notification_path(notification) do %>
@@ -25,4 +29,5 @@
       </li>
     <% end %>
   </ul>
-<% end %>
+  <% end %>
+</div>

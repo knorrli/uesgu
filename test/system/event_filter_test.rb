@@ -68,4 +68,38 @@ class EventFilterTest < ApplicationSystemTestCase
     end
     assert_selector ".filter-desktop .filter-searchfor", text: "Rock"
   end
+
+  # Enter in the What field commits what you TYPED as a free-text query — even
+  # when it's a prefix of a style ("Bl" → Blues) — rather than the gem hijacking
+  # it to that style. (autocomplete: :list + tag-picker#commitOnEnter.) Clicking
+  # the input first locks focus so Enter lands on it, not the body.
+  test "Enter on a prefix of a style commits the typed text as free text" do
+    event(start_date: Date.current + 3, style_list: ["Blues"])
+
+    visit events_path
+    what = find(".filter-desktop input[role='combobox']", match: :first)
+    what.click
+    what.send_keys("Bl", :enter)
+
+    assert_selector ".filter-desktop .chips input[name='q[]'][value='Bl']", visible: :all
+    assert_no_selector ".filter-desktop .chips input[name='s[]']", visible: :all
+  end
+
+  test "Enter selects the style when the text names it exactly, or you arrow to it" do
+    event(start_date: Date.current + 3, style_list: ["Blues"])
+
+    # Exact name → the style.
+    visit events_path
+    exact = find(".filter-desktop input[role='combobox']", match: :first)
+    exact.click
+    exact.send_keys("Blues", :enter)
+    assert_selector ".filter-desktop .chips input[name='s[]'][value='Blues']", visible: :all
+
+    # Arrow down to the option, then Enter → the style (not free text).
+    visit events_path
+    arrowed = find(".filter-desktop input[role='combobox']", match: :first)
+    arrowed.click
+    arrowed.send_keys("Bl", :down, :enter)
+    assert_selector ".filter-desktop .chips input[name='s[]'][value='Blues']", visible: :all
+  end
 end

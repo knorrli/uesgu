@@ -45,6 +45,9 @@ export default class extends Controller {
     if (this.styleInput && this.onStyleInput) {
       this.styleInput.removeEventListener("input", this.onStyleInput)
     }
+    if (this.styleInput && this.onWhatKeydown) {
+      this.styleInput.removeEventListener("keydown", this.onWhatKeydown, true)
+    }
   }
 
   // hw-combobox:selection fires for both an existing pick and a committed
@@ -163,9 +166,62 @@ export default class extends Controller {
     // open/close and scroll and sits above the options, like the mobile sheet.
     this.styleListbox.prepend(this.searchForTarget)
 
-    this.onStyleInput = () => this.#refreshSearchFor()
+    // Snapshot every style name (lowercase → canonical) up front, so Enter can
+    // tell "exact style name" from "free text" without querying the live listbox
+    // — its filtered options race the keypress and made the match flaky.
+    this.styleByName = new Map(
+      [...this.styleListbox.querySelectorAll('[role="option"]')]
+        .map((o) => (o.dataset.value ?? "").trim())
+        .filter(Boolean)
+        .map((name) => [name.toLowerCase(), name])
+    )
+
+    this.onStyleInput = () => { this.navigated = false; this.#refreshSearchFor() }
     this.styleInput.addEventListener("input", this.onStyleInput)
+
+    // Own the What field's Enter entirely (capture phase, before the gem). We
+    // commit a style chip when the user navigated to an option or typed its exact
+    // name, and a free-text query otherwise — so a query that's merely a prefix
+    // of a style ("Bl" → Blues) is reachable instead of being hijacked. We do the
+    // commit ourselves because our _lockInSelection patch stops the gem from
+    // finalizing on close. Arrow keys are tracked so navigation still picks the
+    // option, not free text.
+    this.onWhatKeydown = (event) => this.#commitOnEnter(event)
+    this.styleInput.addEventListener("keydown", this.onWhatKeydown, true)
+
     this.#refreshSearchFor() // show the blank "type to search" hint up front
+  }
+
+  #commitOnEnter(event) {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      this.navigated = true // an explicit pick — commit that option as a style
+      return
+    }
+    if (event.key !== "Enter") return
+
+    const value = this.styleInput.value.trim()
+    const style = this.#styleToCommit(value)
+    if (!style && !value) return // nothing typed or navigated → let the gem close
+
+    event.preventDefault()
+    event.stopImmediatePropagation()
+    if (style) this.#addChip("s[]", style)
+    else this.#addChip("q[]", value)
+
+    this.navigated = false
+    this.styleInput.value = ""
+    this.styleInput.dispatchEvent(new Event("input", { bubbles: true }))
+  }
+
+  // The style to commit on Enter: the arrow-navigated option, or one whose name
+  // the text matches exactly (checked against the connect-time snapshot, not the
+  // racing live list). Null means the text should become a free-text query.
+  #styleToCommit(value) {
+    if (this.navigated) {
+      const active = document.getElementById(this.styleInput.getAttribute("aria-activedescendant") || "")
+      if (active?.dataset.value) return active.dataset.value
+    }
+    return value ? (this.styleByName.get(value.toLowerCase()) ?? null) : null
   }
 
   #refreshSearchFor() {

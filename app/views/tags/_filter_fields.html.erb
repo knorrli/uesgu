@@ -14,8 +14,12 @@
   <div class="input-wrapper flex flex-row gap-small"
        data-action="hw-combobox:selection->tag-picker#add"
        data-tag-picker-field-param="s[]" data-tag-picker-query-field-param="q[]">
+    <%# autocomplete: :list (not the default :both) disables the inline pre-fill, so
+        the input holds exactly what was typed — letting tag-picker's Enter handler
+        treat a query that's a prefix of a style ("Bl") as free text rather than
+        the gem hijacking it to the style ("Blues"). %>
     <%= combobox_tag "#{id_prefix}_what", combobox_options(available_tags(context: :styles, applied: filter.style_list), render_in: { partial: 'tags/chip' }, value: :name),
-          name_when_new: 'query', placeholder: t('events.filter.what') do |combobox| %>
+          name_when_new: 'query', autocomplete: :list, placeholder: t('events.filter.what') do |combobox| %>
       <% combobox.customize_fieldset class: 'flex-grow' %>
       <%# Lead with the magnifying glass (not the styles glyph): the field's
           superpower is free-text search over acts/styles/genres. %>

@@ -48,8 +48,11 @@ gem 'kaminari'
 # Support for iCalendar exports
 gem 'icalendar'
 
-# Combobox UI element for filters
-gem "hotwire_combobox"
+# Combobox UI element for filters. Pinned: we lean on internal markup/behaviour
+# (a custom free-text row in the listbox, two prototype overrides in
+# filter_controller.js), so a minor bump could break us silently. Bump
+# deliberately, not via a stray `bundle update`.
+gem "hotwire_combobox", "~> 0.4.0"
 
 # Soft delete
 gem 'discard'

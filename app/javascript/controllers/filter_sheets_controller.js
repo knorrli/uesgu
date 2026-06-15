@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { searchForSuggestion } from "lib/search_for"
 
 // Connects to data-controller="filter-sheets"
 //
@@ -83,7 +84,7 @@ export default class extends Controller {
       }
     })
 
-    this.#updateNewQuery(sheet, raw, query)
+    this.#updateNewQuery(sheet, raw)
   }
 
   // Free-text "Search for X" row → a checked q[] row.
@@ -128,17 +129,17 @@ export default class extends Controller {
     this.#submit()
   }
 
-  #updateNewQuery(sheet, raw, query) {
+  #updateNewQuery(sheet, raw) {
     const row = sheet.querySelector(".opt--newquery")
     if (!row) return
 
-    const exactMatch = [...sheet.querySelectorAll(".opt:not(.opt--newquery) .opt__label")]
-      .some((label) => label.textContent.trim().toLowerCase() === query)
+    const labels = [...sheet.querySelectorAll(".opt:not(.opt--newquery) .opt__label")]
+      .map((label) => label.textContent)
+    const suggestion = searchForSuggestion(raw, labels, this.searchForTemplateValue)
 
-    if (query !== "" && !exactMatch) {
-      row.querySelector("[data-newquery-label]").textContent =
-        this.searchForTemplateValue.replaceAll("%{query}", raw)
-      row.dataset.value = raw
+    if (suggestion.show) {
+      row.querySelector("[data-newquery-label]").textContent = suggestion.label
+      row.dataset.value = suggestion.value
       row.hidden = false
     } else {
       row.hidden = true

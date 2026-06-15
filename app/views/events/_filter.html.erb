@@ -36,6 +36,21 @@
           <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
         <% end %>
       </div>
+
+      <%# Free-text "Search for «X»" affordance, mirroring the mobile sheet. The
+          combobox accepts free text (name_when_new) but gives no hint; filter#connect
+          moves this row into the dropdown and reveals it (shared search_for logic)
+          when the typed text matches no style. Hidden + no filterable attribute, so
+          the gem never treats it as an option. %>
+      <button type="button" hidden
+              class="hw-combobox__option filter-searchfor"
+              data-filter-target="searchFor"
+              data-search-for-template="<%= t('events.filter.search_for', query: '%{query}') %>"
+              data-action="filter#addSearchQuery">
+        <span class="filter-searchfor__icon <%= tag_icon_class(context: 'query') %>" aria-hidden="true"></span>
+        <span class="filter-searchfor__label" data-search-for-label></span>
+        <span class="filter-searchfor__type"><%= t('events.filter.free_text') %></span>
+      </button>
     </div>
 
     <div class="filter-field flex flex-col gap-small">

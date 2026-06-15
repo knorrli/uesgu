@@ -927,6 +927,41 @@ body.filter-sheet-open { overflow: hidden; }
 .opt--newquery .opt__label { color: var(--theme-accent-color); }
 .opt--query .opt__type { color: var(--theme-accent-color); }
 
+/* Desktop counterpart of .opt--newquery: the free-text "search for «X»" row at
+   the foot of the What dropdown. Reuses the gem's .hw-combobox__option base
+   (padding + hover); this lays out the icon / label / type and accents it. */
+.filter-searchfor {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  width: 100%;
+  border: 0;
+  border-top: var(--border-width) solid var(--border-color);
+  background: var(--theme-bg-muted);
+  color: var(--theme-accent-color);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.filter-searchfor[hidden] { display: none; }
+
+.filter-searchfor__icon { color: var(--theme-accent-color); }
+
+.filter-searchfor__label {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-searchfor__type {
+  flex-shrink: 0;
+  color: var(--theme-fg-muted);
+  font-size: 75%;
+}
+
 /* ── Custom date range ── two native (OS) date pickers → one range. */
 .opt--custom {
   flex-direction: column;

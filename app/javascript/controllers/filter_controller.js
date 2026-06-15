@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { searchForSuggestion } from "lib/search_for"
 
 // Override "lock-in" functionality of hotwire combobox
 // That way, it feels more like a select tag...
@@ -25,8 +26,24 @@ export default class extends Controller {
     'queriesInput',
     'stylesInput',
     'locationsInput',
-    'dateRangesInput'
+    'dateRangesInput',
+    'searchFor'
   ];
+
+  // The "What" combobox already accepts free text (name_when_new: 'query'), but
+  // the gem shows no hint that you can. Mirror the mobile sheet: drop a
+  // "Search for «X»" row into the styles dropdown and reveal it (via the same
+  // shared logic) when the typed text matches no style. The row carries no
+  // filterable attribute, so the gem never treats it as a real option.
+  connect() {
+    this.#setupSearchFor()
+  }
+
+  disconnect() {
+    if (this.styleInput && this.onStyleInput) {
+      this.styleInput.removeEventListener('input', this.onStyleInput)
+    }
+  }
 
   addStyleOrQuery(event) {
     if (event.detail.fieldName == event.target.dataset.hwComboboxNameWhenNewValue) {
@@ -63,6 +80,49 @@ export default class extends Controller {
 
   removeDateRange(event) {
     this.#removeComboboxValue(event.params.value, this.dateRangesInputTarget);
+  }
+
+  // Commit the "Search for «X»" row as a free-text query. Same destination as
+  // typing the text and pressing enter (which the gem's name_when_new flow
+  // already handles for keyboard users) — this is just the pointer affordance.
+  addSearchQuery() {
+    const value = this.searchForTarget.dataset.value;
+    if (value) this.#addComboboxValue(value, this.queriesInputTarget);
+  }
+
+  #setupSearchFor() {
+    if (!this.hasSearchForTarget || !this.hasStylesInputTarget) return;
+
+    const fieldset = this.stylesInputTarget.closest('fieldset');
+    this.styleListbox = fieldset?.querySelector('[role="listbox"]');
+    this.styleInput = fieldset?.querySelector('input[role="combobox"]');
+    if (!this.styleListbox || !this.styleInput) return;
+
+    // Move the row to the top of the dropdown so it rides the listbox's
+    // open/close and scroll, and sits above the options — matching the mobile
+    // sheet, where the free-text row is the first item.
+    this.styleListbox.prepend(this.searchForTarget);
+
+    this.onStyleInput = () => this.#refreshSearchFor();
+    this.styleInput.addEventListener('input', this.onStyleInput);
+  }
+
+  #refreshSearchFor() {
+    const labels = [...this.styleListbox.querySelectorAll('[role="option"][data-value]')]
+      .map((option) => option.dataset.value);
+    const suggestion = searchForSuggestion(
+      this.styleInput.value,
+      labels,
+      this.searchForTarget.dataset.searchForTemplate
+    );
+
+    if (suggestion.show) {
+      this.searchForTarget.querySelector('[data-search-for-label]').textContent = suggestion.label;
+      this.searchForTarget.dataset.value = suggestion.value;
+      this.searchForTarget.hidden = false;
+    } else {
+      this.searchForTarget.hidden = true;
+    }
   }
 
   #clearComboboxInput(comboboxId) {

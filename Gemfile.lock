@@ -399,7 +399,7 @@ DEPENDENCIES
   brakeman
   debug
   discard
-  hotwire_combobox
+  hotwire_combobox (~> 0.4.0)
   icalendar
   importmap-rails
   kamal

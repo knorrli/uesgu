@@ -44,7 +44,7 @@ Rails.application.routes.draw do
   # User-defined notification funnels (WHEN·WHICH·FILTER·CHANNEL). toggle flips
   # enabled; fire runs the rule on demand ("Fire now" — test without waiting for
   # the schedule).
-  resources :notification_rules, only: %i[index new create destroy] do
+  resources :notification_rules, only: %i[index new create edit update destroy] do
     member do
       patch :toggle
       post :fire

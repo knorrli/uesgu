@@ -84,7 +84,9 @@ en:
     empty: No rules yet — make your first one below.
     add_rule: Add a rule
     create_button: Create rule
+    save_button: Save
     created: Rule created.
+    updated: Rule updated.
     deleted: Rule deleted.
     fired:
       one: Rule run — 1 event in the digest.
@@ -97,7 +99,8 @@ en:
     delete: Delete
     delete_confirm: Really delete this rule?
     default_name: Notification
-    edit_filter: Open filter
+    edit_button: Edit
+    change_filter: Change filter
     empty_link: Filter the events
     empty_html: No alerts yet. %{link} on the home page, then tap “Notify me”.
     favorites_live: My favorites (kept current)
@@ -115,6 +118,9 @@ en:
       hint_happening: What's on in this window — recomputed each time.
       hint_added: New matching events, as they're listed.
       cancel: Cancel
+    edit:
+      title: Edit notification
+      intro: Frequency, time and channels — change the filter via “Change filter”.
     email_unavailable: add an email address in settings
     section_when: When
     section_what: About what
@@ -529,6 +535,8 @@ en:
       favorites_filter:
         label: My favorites
       notify_filter: Notify me
+      save_filter: Save filter
+      cancel_edit: Cancel
     day:
       empty: No events on this day.
       close: Close

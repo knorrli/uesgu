@@ -42,7 +42,7 @@
                   toggle_notification_rule_path(rule), method: :patch, class: 'button-small button-ghost' %>
             <%= button_to t('notification_rules.delete'), notification_rule_path(rule), method: :delete,
                   class: 'button-small button-ghost danger', data: { turbo_confirm: t('notification_rules.delete_confirm') } %>
-            <%= link_to t('notification_rules.edit_filter'), rule_filter_path(rule), class: 'text-link' %>
+            <%= link_to t('notification_rules.edit_button'), edit_notification_rule_path(rule), class: 'text-link' %>
           </div>
         </li>
       <% end %>

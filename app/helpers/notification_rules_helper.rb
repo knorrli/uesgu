@@ -47,9 +47,4 @@ module NotificationRulesHelper
     channels << t("notification_rules.channels.email") if rule.notify_email?
     channels
   end
-
-  # Reopen this alert's filter on the events page (the "edit" affordance).
-  def rule_filter_path(rule)
-    events_path(q: rule.queries, l: rule.location_list, s: rule.style_list, d: rule.date_ranges)
-  end
 end

@@ -1,9 +1,9 @@
-<% content_for :title, t('notification_rules.new.title') %>
+<% content_for :title, t('notification_rules.edit.title') %>
 
 <div class="notification-rules flex flex-col gap-large">
   <header class="flex flex-col gap-small">
-    <h1><%= t('notification_rules.new.title') %></h1>
-    <p class="muted"><%= t('notification_rules.new.intro') %></p>
+    <h1><%= t('notification_rules.edit.title') %></h1>
+    <p class="muted"><%= t('notification_rules.edit.intro') %></p>
   </header>
 
   <%= render 'form', rule: @rule, filter: @filter, matches_favorites: @matches_favorites %>

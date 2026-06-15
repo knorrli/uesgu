@@ -84,7 +84,9 @@ de:
     empty: Noch keine Regeln — erstell unten deine erste.
     add_rule: Regel hinzufügen
     create_button: Regel erstellen
+    save_button: Speichern
     created: Regel erstellt.
+    updated: Regel aktualisiert.
     deleted: Regel gelöscht.
     fired:
       one: Regel ausgeführt — 1 Veranstaltung im Digest.
@@ -97,7 +99,8 @@ de:
     delete: Löschen
     delete_confirm: Diese Regel wirklich löschen?
     default_name: Mitteilung
-    edit_filter: Filter öffnen
+    edit_button: Bearbeiten
+    change_filter: Filter ändern
     empty_link: Filtere die Veranstaltungen
     empty_html: Noch keine Alerts. %{link} auf der Startseite, dann tippe „Benachrichtigen“.
     favorites_live: Meine Favoriten (automatisch aktuell)
@@ -115,6 +118,9 @@ de:
       hint_happening: Was in diesem Zeitraum läuft — jedes Mal neu berechnet.
       hint_added: Neue passende Veranstaltungen, sobald sie eingetragen sind.
       cancel: Abbrechen
+    edit:
+      title: Benachrichtigung bearbeiten
+      intro: Häufigkeit, Uhrzeit und Kanäle — den Filter änderst du über „Filter ändern“.
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
     section_when: Wann
     section_what: Worüber
@@ -529,6 +535,8 @@ de:
       favorites_filter:
         label: Meine Favoriten
       notify_filter: Benachrichtigen
+      save_filter: Filter speichern
+      cancel_edit: Abbrechen
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen

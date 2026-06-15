@@ -1,5 +1,7 @@
 <section class="filter flex flex-col gap-medium" >
   <%= form_with url: events_path, method: :get, id: 'filter-form', class: 'flex flex-col gap-medium', html: { autocomplete: 'off' }, data: { filter_target: 'form', turbo_frame: '_top' } do |f| %>
+    <%# Keep "edit this alert's filter" mode alive across filter changes. %>
+    <% if params[:rule_id].present? %><%= hidden_field_tag :rule_id, params[:rule_id] %><% end %>
     <div class="filter-field flex flex-col gap-small">
       <% if @filter.style_list.present? || @filter.queries.present? %>
         <div class="chips flex flex-row wrap gap-small">

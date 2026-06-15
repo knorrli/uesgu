@@ -89,6 +89,89 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  # --- edit / update ---------------------------------------------------------
+
+  test 'edit shows the rule schedule + its saved filter, with a Change-filter round-trip link' do
+    u = sign_in_as user
+    r = u.notification_rules.new(name: 'My alert', cadence: 'weekly', weekday: 5, time_of_day: 1050)
+    r.filter_attributes = { l: ['Dachstock'], s: ['Rock'] }
+    r.save!
+
+    get edit_notification_rule_path(r)
+    assert_response :success
+    # Filter carried as hidden fields (so a plain save preserves it).
+    assert_select 'input[type=hidden][name="l[]"][value=?]', 'Dachstock'
+    assert_select 'input[type=hidden][name="s[]"][value=?]', 'Rock'
+    # The Change-filter link round-trips to the events page tagged with this rule.
+    assert_select "a[href=?]", events_path(q: [], l: ['Dachstock'], s: ['Rock'], d: [], rule_id: r.id)
+    assert_select 'input[name="notification_rule[name]"][value=?]', 'My alert'
+  end
+
+  test 'update changes the schedule + channels without touching the filter' do
+    u = sign_in_as user
+    r = u.notification_rules.new(cadence: 'weekly', weekday: 5, time_of_day: 1050, notify_email: false)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
+
+    patch notification_rule_path(r), params: {
+      notification_rule: { name: 'Renamed', cadence: 'weekly', weekday: '2', time_string: '08:15', notify_push: '1', notify_email: '1' },
+      s: ['Rock']
+    }
+
+    assert_redirected_to notification_rules_path
+    r.reload
+    assert_equal 'Renamed', r.name
+    assert_equal 2, r.weekday
+    assert_equal 495, r.time_of_day
+    assert r.notify_email?
+    assert_equal ['Rock'], r.style_list # filter untouched
+  end
+
+  test 'update with a windowed filter flips an added rule to happening' do
+    u = sign_in_as user
+    r = u.notification_rules.new(cadence: 'weekly', weekday: 5, time_of_day: 1050)
+    r.filter_attributes = { s: ['Rock'] } # no date → added
+    r.save!
+    assert r.added?
+
+    # Round-trip back from the events page with a date window added.
+    patch notification_rule_path(r), params: {
+      notification_rule: { cadence: 'weekly', weekday: '5', time_string: '17:30' },
+      s: ['Rock'], d: ['this_weekend']
+    }
+
+    assert_redirected_to notification_rules_path
+    r.reload
+    assert_equal ['this_weekend'], r.date_ranges
+    assert r.happening?
+  end
+
+  test "edit only reaches the current user's own rules" do
+    other = User.create!(username: 'someone', password: 'password12345')
+    foreign = other.notification_rules.new(cadence: 'daily', time_of_day: 60)
+    foreign.filter_attributes = { s: ['Rock'] }
+    foreign.save!
+
+    sign_in_as user
+    get edit_notification_rule_path(foreign)
+    assert_response :not_found
+  end
+
+  test 'the events page in edit mode offers "save filter" back to the rule' do
+    u = sign_in_as user
+    r = u.notification_rules.new(cadence: 'daily', time_of_day: 60)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
+
+    get events_path(s: ['Jazz'], rule_id: r.id)
+    assert_response :success
+    # The notify row points at update (edit page), carrying the adjusted filter.
+    assert_select "a.notify-filter-link[href=?]", edit_notification_rule_path(r, q: [], l: [], s: ['Jazz'], d: [])
+    assert_select "a", text: I18n.t('events.index.save_filter')
+    # rule_id rides along so changing the filter keeps edit mode.
+    assert_select 'form#filter-form input[type=hidden][name=rule_id][value=?]', r.id.to_s
+  end
+
   # --- list + management -----------------------------------------------------
 
   test 'index lists alerts read-only with their summary and actions' do
@@ -101,7 +184,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select '.rule-card .rule-card__name', /My alert/
     assert_select '.rule-card__actions form' # fire/toggle/delete
-    assert_select 'a', text: I18n.t('notification_rules.edit_filter')
+    assert_select ".rule-card__actions a[href=?]", edit_notification_rule_path(r), text: I18n.t('notification_rules.edit_button')
   end
 
   test 'fire now creates an in-app notification when there are matches' do

@@ -12,8 +12,22 @@ de:
     login: Anmelden
     signup: Registrieren
     theme: Erscheinungsbild
+    install: App installieren
   footer:
     tagline: üsgu — Konzärt für Fründe
+  install:
+    title: App installieren
+    heading: üsgu als App installieren
+    intro: Füge üsgu zu deinem Startbildschirm hinzu — wie eine richtige App, mit einem Tipp geöffnet und bereit für Mitteilungen.
+    hint: Installiere üsgu für schnellen Zugriff und Mitteilungen.
+    button: App installieren
+    done: üsgu ist installiert — du kannst es vom Startbildschirm öffnen.
+    steps_ios: 'Auf iPhone/iPad (Safari): Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.'
+    steps_firefox: 'In Firefox: Menü (⋮ oben rechts) öffnen, dann „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
+    steps_generic: 'Öffne das Browser-Menü und wähle „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
+    benefit_quick: Mit einem Tipp geöffnet, ohne den Browser
+    benefit_notify: Mitteilungen zu neuen Veranstaltungen deiner Favoriten
+    benefit_home: Eigenes Symbol auf deinem Startbildschirm
   languages:
     de: Deutsch
     fr: Französisch
@@ -215,10 +229,6 @@ de:
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
     save: Einstellungen speichern
-    install_heading: Als App installieren
-    install_hint: Installiere üsgu für schnellen Zugriff und Mitteilungen.
-    install_button: App installieren
-    install_ios_hint: 'Auf iPhone/iPad: Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.'
     push_heading: Mitteilungen auf diesem Gerät
     push_hint: Erhalte auf diesem Gerät eine Mitteilung, wenn neue Veranstaltungen zu deinen Favoriten passen. Nutzt die oben gewählte Häufigkeit.
     push_enable: Auf diesem Gerät aktivieren

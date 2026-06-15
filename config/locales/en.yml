@@ -12,8 +12,22 @@ en:
     login: Log in
     signup: Sign up
     theme: Theme
+    install: Install app
   footer:
     tagline: üsgu — Concerts for friends
+  install:
+    title: Install app
+    heading: Install üsgu as an app
+    intro: Add üsgu to your home screen — like a real app, opened with one tap and ready for notifications.
+    hint: Install üsgu for quick access and notifications.
+    button: Install app
+    done: üsgu is installed — you can open it from your home screen.
+    steps_ios: 'On iPhone/iPad (Safari): tap the Share button, then “Add to Home Screen”.'
+    steps_firefox: 'In Firefox: open the menu (⋮, top right), then “Install” / “Add to Home screen”.'
+    steps_generic: 'Open your browser menu and choose “Install app” / “Add to Home screen”.'
+    benefit_quick: Opens with one tap, no browser
+    benefit_notify: Notifications for new events from your favorites
+    benefit_home: Its own icon on your home screen
   languages:
     de: German
     fr: French
@@ -215,10 +229,6 @@ en:
     new_password: New password
     confirm_new_password: Confirm new password
     save: Save settings
-    install_heading: Install as app
-    install_hint: Install üsgu for quick access and notifications.
-    install_button: Install app
-    install_ios_hint: 'On iPhone/iPad: tap the Share button, then “Add to Home Screen”.'
     push_heading: Notifications on this device
     push_hint: Get a notification on this device when new events match your favorites. Uses the frequency you set above.
     push_enable: Enable on this device

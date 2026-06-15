@@ -1,0 +1,65 @@
+/* Public install page + the shared install block (also used in settings).
+   Mobile-first; installing is the primary call to action, so the button reads
+   large and full-width on small screens. */
+
+.install-page {
+  max-width: 32rem;
+}
+
+.install-page > header h1 {
+  margin-bottom: 0;
+}
+
+/* The actionable block: the one-tap button (Chromium) or the written steps.
+   Whichever the controller reveals, give it a touch of breathing room. */
+.install-block {
+  margin-block: var(--gap-small);
+}
+
+/* The install button carries an icon + label; align them as a centred row. */
+.install-block .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5ch;
+}
+
+/* On the dedicated page the install button is the hero action: full-width,
+   comfortably tappable, and filled accent (primary-action language) so it can't
+   be missed. In settings it stays the neutral inline button. */
+.install-page .install-block .button {
+  width: 100%;
+  font-size: var(--font-size-lg);
+  padding-block: var(--gap-medium);
+  border-color: var(--theme-accent-color);
+  background-color: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+}
+
+/* "You're all set" confirmation — accent, with the check glyph. */
+.install-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4ch;
+  color: var(--theme-accent-color);
+  font-weight: bold;
+}
+
+/* Why-install list: no bullets, a leading muted icon per line. */
+.install-benefits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.install-benefits li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6ch;
+}
+
+/* Header shortcut: a touch bolder than the surrounding nav links so the most
+   important action stands out without shouting. */
+.nav-install {
+  font-weight: bold;
+}

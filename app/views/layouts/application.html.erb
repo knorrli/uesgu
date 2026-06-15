@@ -70,6 +70,10 @@
           </button>
         </div>
         <nav class="site-nav">
+          <%# Install shortcut, visible signed in or out (installing needs no
+              account). The standalone controller hides it once the app is
+              already installed, so it only shows when there's something to do. %>
+          <%= link_to t('nav.install'), install_path, class: 'nav-install', data: { controller: 'standalone' } %>
           <% if authenticated? %>
             <% unread = current_user.notifications.unread.count %>
             <%# Personal/account links collapse into one menu to keep the bar light.

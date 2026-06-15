@@ -58,16 +58,12 @@
     <div class="settings-subsection">
       <h3><%= t('settings.device_heading') %></h3>
 
-      <%# Install affordance. Hidden by default; the controller reveals it only
-          where install is actually possible — a one-click button on
-          Chromium (desktop/Android), the "Add to Home Screen" steps on iOS —
-          and leaves it hidden on browsers that can't install (e.g. Firefox). %>
-      <div class="flex flex-col gap-small" hidden data-controller="install">
-        <p class="muted"><%= t('settings.install_hint') %></p>
-        <button type="button" hidden data-install-target="button" data-action="install#install">
-          <%= t('settings.install_button') %>
-        </button>
-        <p class="muted" hidden data-install-target="iosHint"><%= t('settings.install_ios_hint') %></p>
+      <%# Install affordance. The shared block always shows something actionable —
+          a one-tap button on Chromium, written steps on iOS/Firefox/other, or a
+          confirmation once installed (see install_controller.js). %>
+      <div class="flex flex-col gap-small">
+        <p class="muted"><%= t('install.hint') %></p>
+        <%= render 'shared/install_block' %>
       </div>
 
       <%# Per-device push opt-in + a self-test. Only rendered when VAPID keys are

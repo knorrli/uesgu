@@ -1,0 +1,16 @@
+<% content_for :title, t('install.title') %>
+
+<div class="install-page flex flex-col gap-large">
+  <header class="flex flex-col gap-small">
+    <h1><%= t('install.heading') %></h1>
+    <p><%= t('install.intro') %></p>
+  </header>
+
+  <%= render 'shared/install_block' %>
+
+  <ul class="install-benefits muted flex flex-col gap-small">
+    <li><span class="ph ph-lightning" aria-hidden="true"></span> <%= t('install.benefit_quick') %></li>
+    <li><span class="ph ph-bell" aria-hidden="true"></span> <%= t('install.benefit_notify') %></li>
+    <li><span class="ph ph-device-mobile" aria-hidden="true"></span> <%= t('install.benefit_home') %></li>
+  </ul>
+</div>

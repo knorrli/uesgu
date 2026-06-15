@@ -1,0 +1,22 @@
+<%# The actionable install affordance, shared by the public /install page and the
+    "On this device" settings section. install_controller.js reveals exactly one
+    of these depending on the browser: a one-tap button on Chromium, written
+    steps on iOS / Firefox / other browsers, or a confirmation once installed. %>
+<div class="install-block flex flex-col gap-small" data-controller="install">
+  <%# Chromium: one-tap native install. Hidden until beforeinstallprompt fires. %>
+  <button type="button" class="button" hidden data-install-target="button" data-action="install#install">
+    <span class="ph ph-download-simple" aria-hidden="true"></span>
+    <%= t('install.button') %>
+  </button>
+
+  <%# Already installed → reassurance. %>
+  <p class="install-done" hidden data-install-target="installed">
+    <span class="ph ph-check-circle" aria-hidden="true"></span>
+    <%= t('install.done') %>
+  </p>
+
+  <%# Manual steps; the controller reveals the one matching the browser. %>
+  <p class="muted" hidden data-install-target="ios"><%= t('install.steps_ios') %></p>
+  <p class="muted" hidden data-install-target="firefox"><%= t('install.steps_firefox') %></p>
+  <p class="muted" hidden data-install-target="generic"><%= t('install.steps_generic') %></p>
+</div>

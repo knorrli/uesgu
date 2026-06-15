@@ -23,6 +23,10 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root 'events#index'
 
+  # Public "add üsgu to your phone" page — no account required (installing is the
+  # most important first step for users). Linked from the header.
+  get 'install', to: 'install#show', as: :install
+
   resource :session
   resource :registration, only: %i[new create destroy]
   get 'signup', to: 'registrations#new'

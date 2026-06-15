@@ -212,6 +212,12 @@ export default class extends Controller {
     const items = this.#navItems()
     if (!items.length) return
     this.navIndex = ((this.navIndex % items.length) + items.length) % items.length // wrap
+    // Clear the gem's soft-select highlight (it lights the first match on type) so
+    // ours is the only one — removing the class, not suppressing it in CSS, keeps
+    // that option hoverable/navigable.
+    this.styleListbox
+      .querySelectorAll(".hw-combobox__option--selected, .hw-combobox__option--navigated")
+      .forEach((o) => o.classList.remove("hw-combobox__option--selected", "hw-combobox__option--navigated"))
     items.forEach((el, i) => {
       const active = i === this.navIndex
       const cls = el === this.searchForTarget ? "filter-searchfor--active" : "hw-combobox__option--nav-active"

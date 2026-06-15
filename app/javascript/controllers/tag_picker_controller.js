@@ -258,8 +258,17 @@ export default class extends Controller {
     }
 
     this.navIndex = 0
-    this.styleInput.value = ""
-    this.styleInput.dispatchEvent(new Event("input", { bubbles: true }))
+    // On the auto-submit filter the chip add already kicked off a navigation, so
+    // re-filtering the field here would briefly flash the full option list open
+    // (empty query → all options, first one auto-highlit) before the page swaps.
+    // Just drop the dropdown instead. The rule form has no reload, so there we do
+    // clear + re-filter to ready the field for the next pick.
+    if (this.autoSubmitValue) {
+      this.styleInput.blur()
+    } else {
+      this.styleInput.value = ""
+      this.styleInput.dispatchEvent(new Event("input", { bubbles: true }))
+    }
   }
 
   #refreshSearchFor() {

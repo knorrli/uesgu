@@ -58,7 +58,7 @@
           <div class="input-wrapper flex flex-row gap-small"
                data-action="hw-combobox:selection->tag-picker#add"
                data-tag-picker-field-param="l[]">
-            <%= combobox_tag 'location_pick', combobox_options(available_tags(context: :locations, applied: filter.location_list), value: :name),
+            <%= combobox_tag 'location_pick', combobox_options(available_tags(context: :locations, applied: filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name),
                   id: "rule_where_#{rule.id || 'new'}",
                   placeholder: t('events.filter.where') do |combobox| %>
               <% combobox.customize_fieldset class: 'flex-grow' %>

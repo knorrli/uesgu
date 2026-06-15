@@ -964,7 +964,7 @@ body.filter-sheet-open { overflow: hidden; }
    paint our active row instead. Hover stays (mouse feedback, one at a time). */
 .filter-field:has(.filter-searchfor) .hw-combobox__option--selected,
 .filter-field:has(.filter-searchfor) .hw-combobox__option--navigated {
-  background-color: transparent;
+  background-color: var(--hw-option-bg-color); /* drop the highlight, keep it opaque */
 }
 
 .filter-searchfor--active,

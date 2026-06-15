@@ -85,6 +85,11 @@ body {
      denser rows, slightly smaller type — without abandoning the terminal box. */
   .hw-combobox__listbox {
     border-width: var(--tag-border-width);
+    /* Float opaque over the page content. The gem leaves the listbox itself
+       transparent and relies on each option's background; give it a solid ground
+       so a transparent row (the free-text row, or an un-highlighted option) never
+       lets the field below show through. */
+    background-color: var(--theme-bg-color);
     /* Sit flush against the field's underline. The gem's 0.2rem nudge is
        measured from the inner combobox box, which leaves the popup overlapping
        up into the field; offset instead by the wrapper's padding-bottom +

@@ -83,12 +83,8 @@ en:
     your_rules: Your rules
     empty: No rules yet — make your first one below.
     add_rule: Add a rule
-    create_button: Create rule
     save_button: Save
-    done: Done
     window_none: No window (new events)
-    created: Rule created.
-    updated: Rule updated.
     deleted: Rule deleted.
     fired:
       one: Rule run — 1 event in the digest.
@@ -115,10 +111,6 @@ en:
     new:
       title: Set up a notification
       intro: How often and how you hear about this.
-      about_label: Notify me about
-      hint_happening: What's on in this window — recomputed each time.
-      hint_added: New matching events, as they're listed.
-      cancel: Cancel
     edit:
       title: Edit notification
       intro: What it watches, when, and how you're notified.

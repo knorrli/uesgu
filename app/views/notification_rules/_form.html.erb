@@ -146,11 +146,12 @@
     </label>
   </fieldset>
 
-  <%# No Save — the editor autosaves. "Fertig" just returns to the list; "Löschen"
-      removes the rule (a link, not button_to, so it doesn't nest a <form> inside
-      this one). Both break out of the editor's turbo frame to navigate. %>
+  <%# The editor autosaves, so "Save" really just confirms and returns to the list
+      (the changes are already persisted); "Löschen" removes the rule. Both are
+      links (not button_to, which would nest a <form>) that break out of the
+      editor's turbo frame to navigate. %>
   <div class="flex gap-small rule-actions">
-    <%= link_to t('notification_rules.done'), notification_rules_path, class: 'button-small', data: { turbo_frame: '_top' } %>
+    <%= link_to t('notification_rules.save_button'), notification_rules_path, class: 'button-small', data: { turbo_frame: '_top' } %>
     <% if rule.persisted? %>
       <%= link_to t('notification_rules.delete'), notification_rule_path(rule),
             class: 'button-small button-ghost danger',

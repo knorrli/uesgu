@@ -83,12 +83,8 @@ de:
     your_rules: Deine Regeln
     empty: Noch keine Regeln — erstell unten deine erste.
     add_rule: Regel hinzufügen
-    create_button: Regel erstellen
     save_button: Speichern
-    done: Fertig
     window_none: Kein Zeitraum (neue Events)
-    created: Regel erstellt.
-    updated: Regel aktualisiert.
     deleted: Regel gelöscht.
     fired:
       one: Regel ausgeführt — 1 Veranstaltung im Digest.
@@ -115,10 +111,6 @@ de:
     new:
       title: Benachrichtigung einrichten
       intro: Wie oft und wie du davon erfährst.
-      about_label: Benachrichtige mich über
-      hint_happening: Was in diesem Zeitraum läuft — jedes Mal neu berechnet.
-      hint_added: Neue passende Veranstaltungen, sobald sie eingetragen sind.
-      cancel: Abbrechen
     edit:
       title: Benachrichtigung bearbeiten
       intro: Worüber, wann und wie du benachrichtigt wirst.

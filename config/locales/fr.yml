@@ -83,12 +83,8 @@ fr:
     your_rules: Tes règles
     empty: Aucune règle — crée ta première ci-dessous.
     add_rule: Ajouter une règle
-    create_button: Créer la règle
     save_button: Enregistrer
-    done: Terminé
     window_none: Sans période (nouveautés)
-    created: Règle créée.
-    updated: Règle mise à jour.
     deleted: Règle supprimée.
     fired:
       one: Règle exécutée — 1 événement dans le digest.
@@ -115,10 +111,6 @@ fr:
     new:
       title: Configurer une notification
       intro: À quelle fréquence et comment tu es prévenu.
-      about_label: M'avertir à propos de
-      hint_happening: Ce qui se passe dans cette période — recalculé à chaque fois.
-      hint_added: Les nouveaux événements correspondants, dès qu'ils sont listés.
-      cancel: Annuler
     edit:
       title: Modifier la notification
       intro: Ce qu'elle surveille, quand et comment tu es prévenu.

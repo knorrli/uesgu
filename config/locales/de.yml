@@ -18,8 +18,8 @@ de:
   install:
     title: App installieren
     heading: üsgu als App installieren
-    intro: Füge üsgu zu deinem Startbildschirm hinzu — wie eine richtige App, mit einem Tipp geöffnet und bereit für Mitteilungen.
-    hint: Installiere üsgu für schnellen Zugriff und Mitteilungen.
+    intro: Leg üsgu auf deinen Startbildschirm — mit einem Tipp offen, bereit für Mitteilungen.
+    hint: Leg üsgu auf den Startbildschirm — ein Tipp, plus Mitteilungen.
     button: App installieren
     done: üsgu ist installiert — du kannst es vom Startbildschirm öffnen.
     steps_ios: 'Auf iPhone/iPad (Safari): Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.'
@@ -59,7 +59,7 @@ de:
   registrations:
     welcome: Willkommen bei üsgu!
     account_deleted: Dein Konto wurde gelöscht.
-    invalid_invite: Dieser Einladungscode ist ungültig oder wurde bereits verwendet.
+    invalid_invite: Dieser Einladungscode ist ungültig oder schon benutzt.
   push:
     digest:
       title: Neue Veranstaltungen auf üsgu
@@ -71,13 +71,13 @@ de:
       body: Dies ist eine Testmitteilung — Push funktioniert. 🎉
   saved_events:
     title: Gespeicherte Veranstaltungen
-    empty: Du hast noch keine Veranstaltungen gespeichert. Tippe das Lesezeichen-Symbol bei einer Veranstaltung.
+    empty: Noch nichts gespeichert — tippe das Lesezeichen bei einer Veranstaltung.
     toggle: Veranstaltung speichern
   notification_rules:
     title: Mitteilungs-Regeln
-    intro: Erstelle eigene „Funnels“ — lege fest, wann du worüber und auf welchem Kanal informiert wirst. Du kannst mehrere Regeln gleichzeitig laufen lassen.
+    intro: Bau dir eigene Alerts — was, wann und wie du es erfährst. Lass so viele laufen, wie du willst.
     your_rules: Deine Regeln
-    empty: Noch keine Regeln. Erstelle unten deine erste.
+    empty: Noch keine Regeln — erstell unten deine erste.
     add_rule: Regel hinzufügen
     create_button: Regel erstellen
     created: Regel erstellt.
@@ -95,7 +95,7 @@ de:
     default_name: Mitteilung
     edit_filter: Filter öffnen
     empty_link: Filtere die Veranstaltungen
-    empty_html: Noch keine Alerts. %{link} auf der Startseite und tippe „Benachrichtigen“, um einen zu erstellen.
+    empty_html: Noch keine Alerts. %{link} auf der Startseite, dann tippe „Benachrichtigen“.
     favorites_live: Meine Favoriten (automatisch aktuell)
     track_favorites: Mit meinen Favoriten synchron halten
     track_favorites_hint: berücksichtigt auch Orte/Stile, denen du später folgst
@@ -106,10 +106,10 @@ de:
       empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Favoriten.
     new:
       title: Benachrichtigung einrichten
-      intro: Lege fest, wie oft und wie du über diese Auswahl informiert wirst.
+      intro: Wie oft und wie du davon erfährst.
       about_label: Benachrichtige mich über
-      hint_happening: Du wirst über Veranstaltungen in diesem Zeitraum informiert — jedes Mal neu berechnet.
-      hint_added: Du wirst über neu hinzugefügte passende Veranstaltungen informiert.
+      hint_happening: Was in diesem Zeitraum läuft — jedes Mal neu berechnet.
+      hint_added: Neue passende Veranstaltungen, sobald sie eingetragen sind.
       cancel: Abbrechen
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
     section_when: Wann
@@ -117,8 +117,8 @@ de:
     section_filter: Wofür
     section_channels: Wie
     content_hint: „Neu hinzugefügt“ meldet frisch eingetragene Veranstaltungen. „Findet statt“ zeigt, was in einem Zeitraum (z. B. dieses Wochenende) läuft — egal, wann es eingetragen wurde.
-    filter_hint: Mehrere Werte mit Komma trennen. Namen müssen den Stil- bzw. Ortsnamen auf der Seite entsprechen.
-    channels_hint: Die App-Mitteilung (Glocke) bekommst du immer. Push und E-Mail kommen pro Regel dazu.
+    filter_hint: Werte mit Komma trennen. Namen müssen denen auf der Seite entsprechen.
+    channels_hint: Die Glocke in der App ist immer an. Push und E-Mail kommen pro Regel dazu.
     cadences:
       daily: Täglich
       weekly: Wöchentlich
@@ -183,7 +183,7 @@ de:
         one: Eine Veranstaltung für dich.
         other: "%{count} Veranstaltungen für dich."
       cta: In der App ansehen
-      footer_reason: Du erhältst diese E-Mail wegen einer von dir erstellten Mitteilungs-Regel.
+      footer_reason: Du bekommst das wegen einer Mitteilungs-Regel, die du erstellt hast.
       footer_manage: Regeln verwalten
   frequencies:
     daily: Täglich
@@ -197,7 +197,7 @@ de:
     next: Weiter
   favorites:
     title: Favoriten
-    intro: Wähle die Locations und Stile, denen du folgst – passende Tage werden im Kalender mit einem Herz markiert und bestimmen deine Mitteilungen.
+    intro: Folge Locations und Stilen — passende Tage bekommen ein Herz und bestimmen deine Mitteilungen.
     saved: Favoriten gespeichert.
     save: Favoriten speichern
     toggle: '%{name} folgen oder entfolgen'
@@ -205,11 +205,7 @@ de:
     title: Einstellungen
     saved: Einstellungen gespeichert.
     account_heading: Konto
-    notifications_intro: Wähle, wie du über neue Veranstaltungen informiert werden möchtest.
-    device_heading: Auf diesem Gerät
-    save_account: Konto speichern
-    save_notifications: Mitteilungen speichern
-    push_test: Testmitteilung senden
+    push_test: Test senden
     notifications_heading: Mitteilungen
     frequency_label: Wie oft sollen wir dich über neue Veranstaltungen informieren?
     language_heading: Sprache
@@ -221,31 +217,31 @@ de:
     favorite_styles_heading: Lieblings-Stile
     email_heading: E-Mail
     email_optional: (optional)
-    email_hint: Nur nötig, falls du später E-Mail-Updates zu neuen Veranstaltungen möchtest.
-    email_third_party: Deine Adresse wird nur an unseren E-Mail-Anbieter Resend weitergegeben, um dir die gewünschten Updates zu schicken — sonst nichts.
+    email_hint: Optional — nur falls du Updates per E-Mail willst.
+    email_third_party: Geht nur an unseren Mail-Dienst Resend, um sie zu verschicken. Sonst nichts.
     email_placeholder: du@beispiel.ch
     password_heading: Passwort ändern
-    password_hint: Leer lassen, um das aktuelle Passwort zu behalten.
+    password_hint: Leer lassen, um es zu behalten.
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
     save: Einstellungen speichern
     push_heading: Mitteilungen auf diesem Gerät
-    push_hint: Erhalte auf diesem Gerät eine Mitteilung, wenn neue Veranstaltungen zu deinen Favoriten passen. Nutzt die oben gewählte Häufigkeit.
+    push_hint: Wir pingen dich hier an, sobald neue Veranstaltungen zu deinen Favoriten passen.
     push_enable: Auf diesem Gerät aktivieren
     push_disable: Auf diesem Gerät deaktivieren
-    push_status_on: Mitteilungen sind auf diesem Gerät aktiviert.
-    push_status_off: Mitteilungen sind auf diesem Gerät deaktiviert.
+    push_status_on: Auf diesem Gerät an.
+    push_status_off: Auf diesem Gerät aus.
     push_status_denied: Dein Browser blockiert Mitteilungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
     push_unsupported: Dieser Browser unterstützt keine Push-Mitteilungen.
     push_install_first: Um auf iPhone oder iPad Mitteilungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     delete_account_heading: Konto löschen
-    delete_account_hint: Entfernt dein Konto und deine Favoriten endgültig.
+    delete_account_hint: Löscht dein Konto und deine Favoriten endgültig.
     delete_account: Mein Konto löschen
     delete_account_confirm: Konto endgültig löschen? Das kann nicht rückgängig gemacht werden.
   notifications:
     index:
       title: Mitteilungen
-      empty: Noch keine Mitteilungen. Neu hinzugefügte Veranstaltungen fassen wir hier für dich zusammen.
+      empty: Noch nichts da — neue Veranstaltungen landen hier.
       unread_badge: Neu
       fallback_name: Mitteilung
       event_count:
@@ -260,7 +256,7 @@ de:
       all: Alle neuen Veranstaltungen
       relevant: Nur meine Favoriten
       empty_all: Keine neuen Veranstaltungen in diesem Zeitraum.
-      empty_relevant: In diesem Zeitraum passten keine neuen Veranstaltungen zu deinen Lieblings-Locations oder -Stilen.
+      empty_relevant: In diesem Zeitraum passte nichts zu deinen Favoriten.
   actions:
     assign: Zuweisen
     save: Speichern

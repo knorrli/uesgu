@@ -9,7 +9,10 @@
     </ul>
   <% end %>
 
-  <%# ── Account ─────────────────────────────────────────────────────────── %>
+  <%# ── Account ─────────────────────────────────────────────────────────────
+      One form covers everything stored on the user: language, email and
+      password. The controller permits all of these in a single update, so a
+      single Save button keeps the page from sprouting a button per block. %>
   <section class="settings-section">
     <h2><%= t('settings.account_heading') %></h2>
 
@@ -27,37 +30,32 @@
       </label>
 
       <fieldset class="settings-field flex flex-col gap-small">
+        <legend><%= t('settings.email_heading') %> <span class="muted"><%= t('settings.email_optional') %></span></legend>
+        <p class="muted"><%= t('settings.email_hint') %></p>
+        <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
+        <%# Disclosure stays inline at the entry point: the address goes to a
+            third-party mail provider. Kept short, below the field. %>
+        <p class="muted"><%= t('settings.email_third_party') %></p>
+      </fieldset>
+
+      <fieldset class="settings-field flex flex-col gap-small">
         <legend><%= t('settings.password_heading') %></legend>
         <p class="muted"><%= t('settings.password_hint') %></p>
         <%= form.password_field :password, autocomplete: "new-password", placeholder: t('settings.new_password'), maxlength: 72 %>
         <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: t('settings.confirm_new_password'), maxlength: 72 %>
       </fieldset>
 
-      <%= form.submit t('settings.save_account') %>
+      <%= form.submit t('settings.save') %>
     <% end %>
   </section>
 
-  <%# ── Notifications ───────────────────────────────────────────────────── %>
+  <%# ── Notifications on this device ─────────────────────────────────────────
+      Install + per-device push. These post to their own endpoints (not the
+      @user form above), so they live outside it. %>
   <section class="settings-section">
     <h2><%= t('settings.notifications_heading') %></h2>
-    <p class="muted"><%= t('settings.notifications_intro') %></p>
 
-    <%= form_with model: @user, url: settings_path, method: :patch, class: 'account-form flex flex-col gap-medium' do |form| %>
-      <fieldset class="settings-field flex flex-col gap-small">
-        <legend><%= t('settings.email_heading') %> <span class="muted"><%= t('settings.email_optional') %></span></legend>
-        <p class="muted"><%= t('settings.email_hint') %></p>
-        <p class="muted"><%= t('settings.email_third_party') %></p>
-        <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
-      </fieldset>
-
-      <%= form.submit t('settings.save_notifications') %>
-    <% end %>
-
-    <%# Device notifications: installing the app + per-device push. These post to
-        their own endpoints (not the @user form), so they live outside it. %>
-    <div class="settings-subsection">
-      <h3><%= t('settings.device_heading') %></h3>
-
+    <div class="settings-subsection flex flex-col gap-medium">
       <%# Install affordance. The shared block always shows something actionable —
           a one-tap button on Chromium, written steps on iOS/Firefox/other, or a
           confirmation once installed (see install_controller.js). %>

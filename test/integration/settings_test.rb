@@ -30,8 +30,8 @@ class SettingsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select 'section.settings-section', 3
-    # One save button per editable section (account + notifications).
-    assert_select 'input[type=submit]', 2
+    # Language, email and password share a single form, so one save button.
+    assert_select 'input[type=submit]', 1
     # The per-device "on this device" cluster (install / push).
     assert_select '.settings-subsection'
   end

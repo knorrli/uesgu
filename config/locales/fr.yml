@@ -12,8 +12,22 @@ fr:
     login: Connexion
     signup: Inscription
     theme: Thème
+    install: Installer l'app
   footer:
     tagline: üsgu — Des concerts entre amis
+  install:
+    title: Installer l'app
+    heading: Installer üsgu comme app
+    intro: Ajoute üsgu à ton écran d'accueil — ouvert d'un tap, prêt pour les notifications.
+    hint: Ajoute üsgu à ton écran d'accueil — un tap, plus les notifications.
+    button: Installer l'app
+    done: üsgu est installé — ouvre-le depuis ton écran d'accueil.
+    steps_ios: 'Sur iPhone/iPad (Safari) : touche le bouton Partager, puis « Sur l''écran d''accueil ».'
+    steps_firefox: 'Dans Firefox : ouvre le menu (⋮, en haut à droite), puis « Installer » / « Ajouter à l''écran d''accueil ».'
+    steps_generic: 'Ouvre le menu du navigateur et choisis « Installer l''app » / « Ajouter à l''écran d''accueil ».'
+    benefit_quick: Ouvert d'un tap, sans navigateur
+    benefit_notify: Notifications pour les nouveaux événements de tes favoris
+    benefit_home: Sa propre icône sur ton écran d'accueil
   languages:
     de: Allemand
     fr: Français
@@ -34,36 +48,36 @@ fr:
     login_submit: Se connecter
     signup_submit: Créer un compte
     no_account_html: Pas encore de compte ? %{link}.
-    have_account_html: Vous avez déjà un compte ? %{link}.
+    have_account_html: Tu as déjà un compte ? %{link}.
     sign_up_link: S'inscrire
     log_in_link: Se connecter
-    invalid_credentials: Essayez un autre nom d'utilisateur ou mot de passe.
-    rate_limited: Réessayez plus tard.
+    invalid_credentials: Essaie un autre nom d'utilisateur ou mot de passe.
+    rate_limited: Réessaie plus tard.
     notify_label: Ne pas m'informer des nouveaux événements
     invite_label: Code d'invitation
     invite_hint: L'inscription se fait uniquement sur invitation.
   registrations:
     welcome: Bienvenue sur üsgu !
-    account_deleted: Votre compte a été supprimé.
-    invalid_invite: Ce code d'invitation est invalide ou a déjà été utilisé.
+    account_deleted: Ton compte a été supprimé.
+    invalid_invite: Ce code d'invitation est invalide ou déjà utilisé.
   push:
     digest:
       title: Nouveaux événements sur üsgu
       body:
-        one: 1 nouvel événement correspond à vos favoris.
-        other: "%{count} nouveaux événements correspondent à vos favoris."
+        one: 1 nouvel événement correspond à tes favoris.
+        other: "%{count} nouveaux événements correspondent à tes favoris."
     test:
       title: üsgu
       body: Ceci est une notification de test — le push fonctionne. 🎉
   saved_events:
     title: Événements enregistrés
-    empty: Tu n'as pas encore enregistré d'événements. Touche l'icône signet sur un événement.
+    empty: Rien d'enregistré — touche le signet sur un événement.
     toggle: Enregistrer l'événement
   notification_rules:
     title: Règles de notification
-    intro: Crée tes propres « funnels » — choisis quand tu es notifié, à propos de quoi et sur quel canal. Tu peux avoir plusieurs règles à la fois.
+    intro: Crée tes propres alertes — quoi, quand et comment tu es prévenu. Lances-en autant que tu veux.
     your_rules: Tes règles
-    empty: Aucune règle pour l'instant. Crée ta première ci-dessous.
+    empty: Aucune règle — crée ta première ci-dessous.
     add_rule: Ajouter une règle
     create_button: Créer la règle
     created: Règle créée.
@@ -81,7 +95,7 @@ fr:
     default_name: Notification
     edit_filter: Ouvrir le filtre
     empty_link: Filtre les événements
-    empty_html: Aucune alerte pour l'instant. %{link} sur la page d'accueil et touche « M'avertir » pour en créer une.
+    empty_html: Aucune alerte. %{link} sur la page d'accueil, puis touche « M'avertir ».
     favorites_live: Mes favoris (toujours à jour)
     track_favorites: Garder synchronisé avec mes favoris
     track_favorites_hint: inclut aussi les lieux/styles que tu suivras plus tard
@@ -92,10 +106,10 @@ fr:
       empty_filter: Choisis d'abord un filtre (style, lieu, date …) ou synchronise avec tes favoris.
     new:
       title: Configurer une notification
-      intro: Choisis à quelle fréquence et comment tu es averti de cette sélection.
+      intro: À quelle fréquence et comment tu es prévenu.
       about_label: M'avertir à propos de
-      hint_happening: Tu seras averti des événements dans cette période — recalculée à chaque fois.
-      hint_added: Tu seras averti des événements nouvellement ajoutés qui correspondent.
+      hint_happening: Ce qui se passe dans cette période — recalculé à chaque fois.
+      hint_added: Les nouveaux événements correspondants, dès qu'ils sont listés.
       cancel: Annuler
     email_unavailable: ajoute une adresse e-mail dans les réglages
     section_when: Quand
@@ -103,8 +117,8 @@ fr:
     section_filter: Pour quoi
     section_channels: Comment
     content_hint: « Nouvellement ajoutés » t'alerte des événements fraîchement listés. « En cours » montre ce qui se passe sur une période (p. ex. ce week-end), peu importe quand c'était ajouté.
-    filter_hint: Sépare plusieurs valeurs par des virgules. Les noms doivent correspondre aux styles ou lieux du site.
-    channels_hint: Tu reçois toujours la notification dans l'app (la cloche). Push et e-mail s'ajoutent par règle.
+    filter_hint: Sépare les valeurs par des virgules. Les noms doivent correspondre à ceux du site.
+    channels_hint: La cloche dans l'app est toujours active. Ajoute push et e-mail par règle.
     cadences:
       daily: Quotidien
       weekly: Hebdomadaire
@@ -169,7 +183,7 @@ fr:
         one: Un événement pour toi.
         other: "%{count} événements pour toi."
       cta: Voir dans l'app
-      footer_reason: Tu reçois cet e-mail à cause d'une règle de notification que tu as créée.
+      footer_reason: Tu reçois ceci à cause d'une règle de notification que tu as créée.
       footer_manage: Gérer les règles
   frequencies:
     daily: Quotidien
@@ -183,7 +197,7 @@ fr:
     next: Suivant
   favorites:
     title: Favoris
-    intro: Choisissez les lieux et styles que vous suivez — les jours correspondants sont marqués d'un cœur dans le calendrier et déterminent vos notifications.
+    intro: Suis des lieux et des styles — les jours correspondants reçoivent un cœur et orientent tes notifications.
     saved: Favoris enregistrés.
     save: Enregistrer les favoris
     toggle: 'Suivre ou ne plus suivre %{name}'
@@ -191,51 +205,43 @@ fr:
     title: Paramètres
     saved: Paramètres enregistrés.
     account_heading: Compte
-    notifications_intro: Choisissez comment vous souhaitez être informé des nouveaux événements.
-    device_heading: Sur cet appareil
-    save_account: Enregistrer le compte
-    save_notifications: Enregistrer les notifications
-    push_test: Envoyer une notification de test
+    push_test: Envoyer un test
     notifications_heading: Notifications
-    frequency_label: À quelle fréquence souhaitez-vous être informé des nouveaux événements ?
+    frequency_label: À quelle fréquence veux-tu être informé des nouveaux événements ?
     language_heading: Langue
     language_auto: Automatique (navigateur)
     favorite_locations_heading: Lieux favoris
-    favorite_locations_hint: Recevez des notifications pour les événements dans ces lieux.
+    favorite_locations_hint: Reçois des notifications pour les événements dans ces lieux.
     follow_all: Tout %{name}
     other_locations: Autres lieux
     favorite_styles_heading: Styles favoris
     email_heading: E-mail
     email_optional: (facultatif)
-    email_hint: Nécessaire uniquement si vous souhaitez recevoir des e-mails sur les nouveaux événements plus tard.
-    email_third_party: Votre adresse est transmise à notre prestataire d'e-mail, Resend, uniquement pour vous envoyer les mises à jour demandées — rien d'autre.
-    email_placeholder: vous@exemple.ch
+    email_hint: Facultatif — uniquement si tu veux des mises à jour par e-mail.
+    email_third_party: Transmise uniquement à notre service e-mail Resend pour les envoyer. Rien d'autre.
+    email_placeholder: toi@exemple.ch
     password_heading: Changer le mot de passe
-    password_hint: Laissez vide pour conserver votre mot de passe actuel.
+    password_hint: Laisse vide pour le garder.
     new_password: Nouveau mot de passe
     confirm_new_password: Confirmer le nouveau mot de passe
     save: Enregistrer les paramètres
-    install_heading: Installer comme app
-    install_hint: Installez üsgu pour un accès rapide et les notifications.
-    install_button: Installer l'app
-    install_ios_hint: 'Sur iPhone/iPad : touchez le bouton Partager, puis « Sur l''écran d''accueil ».'
     push_heading: Notifications sur cet appareil
-    push_hint: Recevez une notification sur cet appareil quand de nouveaux événements correspondent à vos favoris. Utilise la fréquence définie ci-dessus.
+    push_hint: On te notifie ici dès que de nouveaux événements correspondent à tes favoris.
     push_enable: Activer sur cet appareil
     push_disable: Désactiver sur cet appareil
-    push_status_on: Les notifications sont activées sur cet appareil.
-    push_status_off: Les notifications sont désactivées sur cet appareil.
-    push_status_denied: Votre navigateur bloque les notifications. Autorisez-les dans les paramètres du navigateur pour les activer.
+    push_status_on: Activé sur cet appareil.
+    push_status_off: Désactivé sur cet appareil.
+    push_status_denied: Ton navigateur bloque les notifications. Autorise-les dans les paramètres du navigateur pour les activer.
     push_unsupported: Ce navigateur ne prend pas en charge les notifications push.
-    push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoutez d'abord üsgu à votre écran d'accueil.
+    push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoute d'abord üsgu à ton écran d'accueil.
     delete_account_heading: Supprimer le compte
-    delete_account_hint: Supprime définitivement votre compte et vos favoris.
+    delete_account_hint: Supprime ton compte et tes favoris définitivement.
     delete_account: Supprimer mon compte
-    delete_account_confirm: Supprimer définitivement votre compte ? Cette action est irréversible.
+    delete_account_confirm: Supprimer définitivement ton compte ? Cette action est irréversible.
   notifications:
     index:
       title: Notifications
-      empty: Aucune notification pour l'instant. Nous regrouperons ici les événements récemment ajoutés.
+      empty: Rien pour l'instant — les nouveaux événements arriveront ici.
       unread_badge: Nouveau
       fallback_name: Notification
       event_count:
@@ -250,7 +256,7 @@ fr:
       all: Tous les nouveaux événements
       relevant: Seulement mes favoris
       empty_all: Aucun nouvel événement durant cette période.
-      empty_relevant: Aucun nouvel événement ne correspondait à vos lieux ou styles favoris durant cette période.
+      empty_relevant: Rien ne correspondait à tes favoris durant cette période.
   actions:
     assign: Assigner
     save: Enregistrer

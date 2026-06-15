@@ -178,8 +178,6 @@ en:
       scope: Filter
       filter_styles: Styles
       filter_styles_ph: e.g. Rock, Jazz
-      filter_locations: Places
-      filter_locations: Locations
       filter_locations_ph: e.g. Dachstock, Rössli
       filter_queries: Search terms
       filter_queries_ph: e.g. band name

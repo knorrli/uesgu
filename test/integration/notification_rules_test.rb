@@ -35,8 +35,9 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_select 'form[data-controller="rule-form"]'
     assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"]'
     assert_select '[data-rule-form-target="weekday"]'
-    # Name field is pre-filled with the auto-name (here: the Dachstock location).
-    assert_select 'input[name="notification_rule[name]"][value*=?]', 'Dachstock'
+    # No name field — the name is derived; shown as a live preview in the title.
+    assert_select 'input[name="notification_rule[name]"]', false
+    assert_select '[data-rule-name-target="preview"]', text: /Dachstock/
   end
 
   test 'new (windowed filter) preselects the window and shows the firing-day picker' do
@@ -106,22 +107,27 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_select 'input[name="s[]"][value=?]', 'Rock'
     assert_select 'input[name="l[]"][value=?]', 'Dachstock'
     assert_select 'select[name="d[]"]'
-    assert_select 'input[name="notification_rule[name]"][value=?]', 'My alert'
+    # No name field; the derived name shows as a live preview in the title.
+    assert_select 'input[name="notification_rule[name]"]', false
+    assert_select '[data-rule-name-target="preview"]', text: /Rock/
   end
 
-  test 'update accepts the inline multiselect comma-joined values' do
+  test 'update saves picked styles and free-text queries from the what field separately' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'daily', time_of_day: 60)
     r.filter_attributes = { s: ['Rock'] }
     r.save!
 
+    # The "what" tag-picker submits styles as s[] and free text as q[].
     patch notification_rule_path(r), params: {
       notification_rule: { cadence: 'daily', time_string: '09:00' },
-      s: ['Rock,Jazz'], l: [''], d: ['']
+      s: %w[Rock Jazz], q: ['Radiohead'], l: [''], d: ['']
     }
 
     assert_redirected_to notification_rules_path
-    assert_equal %w[Rock Jazz], r.reload.style_list
+    r.reload
+    assert_equal %w[Rock Jazz], r.style_list
+    assert_equal ['Radiohead'], r.queries
   end
 
   test 'update changes the schedule + channels without touching the filter' do
@@ -131,13 +137,12 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     r.save!
 
     patch notification_rule_path(r), params: {
-      notification_rule: { name: 'Renamed', cadence: 'weekly', weekday: '2', time_string: '08:15', notify_push: '1', notify_email: '1' },
+      notification_rule: { cadence: 'weekly', weekday: '2', time_string: '08:15', notify_push: '1', notify_email: '1' },
       s: ['Rock']
     }
 
     assert_redirected_to notification_rules_path
     r.reload
-    assert_equal 'Renamed', r.name
     assert_equal 2, r.weekday
     assert_equal 495, r.time_of_day
     assert r.notify_email?
@@ -178,13 +183,14 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
 
   test 'index lists alerts read-only with their summary and actions' do
     u = sign_in_as user
-    r = u.notification_rules.new(name: 'My alert', cadence: 'weekly', weekday: 5, time_of_day: 1050)
+    r = u.notification_rules.new(cadence: 'weekly', weekday: 5, time_of_day: 1050)
     r.filter_attributes = { l: ['Dachstock'], d: ['this_weekend'] }
     r.save!
 
     get notification_rules_path
     assert_response :success
-    assert_select '.rule-card .rule-card__name', /My alert/
+    # The name is the derived filter description (no custom names).
+    assert_select '.rule-card .rule-card__name', /Dachstock/
     assert_select '.rule-card__actions form' # fire/toggle/delete
     assert_select ".rule-card__actions a[href=?]", edit_notification_rule_path(r), text: I18n.t('notification_rules.edit_button')
   end

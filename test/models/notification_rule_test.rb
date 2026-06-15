@@ -42,12 +42,6 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert r.added?
   end
 
-  test 'comma-joined multiselect picks are split into separate tags' do
-    assert_equal %w[Rock Jazz Folk], rule(user, filter: { s: ['Rock,Jazz,Folk'] }).style_list
-    # a real array (events-filter shape) still works
-    assert_equal %w[Rock Jazz], rule(user, filter: { s: %w[Rock Jazz] }).style_list
-  end
-
   # --- matched_events: added -------------------------------------------------
 
   # Real-current dates here: the non-favorites path delegates to
@@ -161,22 +155,27 @@ class NotificationRuleTest < ActiveSupport::TestCase
     I18n.with_locale(:en) { assert_includes r.describe, I18n.t('datepicker.this_weekend') }
   end
 
-  test 'name auto-fills from the filter on save when blank, and is kept when given' do
-    auto = rule(user, filter: { l: ['Bern'], d: ['next_week'] }, weekday: 5) # next_week => weekly
-    auto.save!
-    assert auto.name.present?
-    assert_equal auto.describe, auto.name
+  test 'the name always mirrors the filter on save (no custom names)' do
+    r = rule(user, filter: { l: ['Bern'], d: ['next_week'] }, weekday: 5) # next_week => weekly
+    r.save!
+    assert_equal r.describe, r.name
 
+    # A name passed in is ignored — re-derived from the filter on save.
     given = rule(user, filter: { s: ['Rock'] }, name: 'Keep me')
     given.save!
-    assert_equal 'Keep me', given.name
+    assert_equal given.describe, given.name
+    refute_equal 'Keep me', given.name
   end
 
-  test 'display_name uses the name when set, else describe' do
-    unnamed = rule(user, filter: { s: ['Rock'] })
-    assert_equal unnamed.describe, unnamed.display_name
-    named = rule(user, filter: { s: ['Rock'] }, name: 'Mein Ding')
-    assert_equal 'Mein Ding', named.display_name
+  test 'name re-derives when the filter changes' do
+    r = rule(user, filter: { s: ['Rock'] }, weekday: 5) # weekday set for the weekly window below
+    r.save!
+    before = r.name
+
+    r.filter_attributes = { l: ['Bern'], d: ['this_weekend'] }
+    r.save!
+    assert_equal r.describe, r.name
+    refute_equal before, r.name
   end
 
   test 'describe for a live-favorites alert' do

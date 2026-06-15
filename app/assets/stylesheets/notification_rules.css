@@ -72,6 +72,20 @@
   align-items: center;
 }
 
+/* A channel whose prerequisite is missing (e-mail with no address saved) is
+   disabled; dim it so it reads as unavailable. */
+.rule-check--disabled {
+  opacity: 0.55;
+}
+
+/* The form is an .account-form, which underlines bare text inputs — but the
+   what/where comboboxes already carry their own .input-wrapper underline, so
+   strip the account-form one off the combobox input to avoid a double line. */
+.account-form .input-wrapper .hw-combobox__input {
+  border-bottom: 0;
+  padding: 0;
+}
+
 /* The base flex utilities ship small/medium/large but not xsmall; define it so
    the tight label/value stacks read as intended rather than collapsing to 0. */
 .gap-xsmall {

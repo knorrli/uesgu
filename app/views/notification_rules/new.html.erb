@@ -1,8 +1,13 @@
 <% content_for :title, t('notification_rules.new.title') %>
 
-<div class="notification-rules flex flex-col gap-large">
+<%# Name is always the filter description; show it live as the page title so the
+    filter you carried over (and any edits) are reflected in real time. %>
+<div class="notification-rules flex flex-col gap-large" data-controller="rule-name"
+     data-rule-name-fallback-value="<%= t('notification_rules.summary.scope_all') %>"
+     data-action="tag-picker:change->rule-name#refresh change->rule-name#refresh">
   <header class="flex flex-col gap-small">
-    <h1><%= t('notification_rules.new.title') %></h1>
+    <p class="muted rule-kicker"><%= t('notification_rules.new.title') %></p>
+    <h1 data-rule-name-target="preview"><%= @rule.display_name %></h1>
     <p class="muted"><%= t('notification_rules.new.intro') %></p>
   </header>
 

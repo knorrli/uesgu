@@ -42,10 +42,9 @@ class NotificationRule < ApplicationRecord
   validate :targets_something
   validates :name, presence: true
 
-  # Always have a name: auto-fill it from the filter when left blank. The new-
-  # alert form pre-fills the same proposal, so this also covers a cleared field
-  # or API creation — the name can be overridden but never ends up blank.
-  before_validation { self.name = describe if name.blank? }
+  # The name always mirrors the filter — there are no custom names. Re-derived on
+  # every save so it tracks edits; the form shows it as a live, read-only preview.
+  before_validation { self.name = describe }
   # A happening rule's cadence is fixed by its window (see WINDOW_RHYTHM), so the
   # form hides the cadence control and the user can't pick a clashing cadence.
   before_validation { self.cadence = window_rhythm if happening? }
@@ -73,8 +72,8 @@ class NotificationRule < ApplicationRecord
   def filter_attributes=(params)
     self.filter = {
       "queries" => clean(params[:q]),
-      "style_list" => split_tags(params[:s]),
-      "location_list" => split_tags(params[:l]),
+      "style_list" => clean(params[:s]),
+      "location_list" => clean(params[:l]),
       # Rules only do relative windows (re-resolved each fire); a fixed absolute
       # range makes no sense for a recurring alert (and would silently die once
       # past), so drop non-presets — the rule falls back to "new events".
@@ -198,10 +197,6 @@ class NotificationRule < ApplicationRecord
   private
 
   def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
-
-  # Multiselect comboboxes submit their picks as one comma-joined string; the
-  # events filter submits a real array. Accept either → a clean array of names.
-  def split_tags(value) = Array(value).flat_map { |v| v.to_s.split(",") }.map(&:strip).reject(&:blank?)
 
   def describe_favorites
     label = I18n.t("notification_rules.favorites_live")

@@ -1,0 +1,8 @@
+<%# An applied filter chip in the rule form: a removable tag carrying its own
+    hidden field (param = s[]/q[]/l[]), so it submits with the form. The
+    tag-picker controller adds/removes these client-side (no navigation). %>
+<span class="tag active" data-tag-chip>
+  <%= hidden_field_tag param, value, id: nil %>
+  <span><%= value %></span>
+  <button type="button" class="tag__remove ph ph-x" aria-label="<%= value %>" data-action="tag-picker#remove"></button>
+</span>

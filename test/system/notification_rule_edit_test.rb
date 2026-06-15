@@ -14,16 +14,26 @@ class NotificationRuleEditTest < ApplicationSystemTestCase
     sign_in_as @user
   end
 
-  test "renaming a rule on the edit form persists" do
+  test "the title preview is the derived name and updates live as the filter changes" do
+    event(start_date: Date.current + 4, style_list: ["Jazz"])
     visit notification_rules_path
     find(".rule-card__actions a[href='#{edit_notification_rule_path(@rule)}']").click
 
-    assert_field "notification_rule[name]", with: "My alert"
-    fill_in "notification_rule[name]", with: "Renamed alert"
-    find("input[type=submit]").click
+    preview = find("[data-rule-name-target='preview']")
+    assert_equal "Rock", preview.text.strip      # derived from the saved filter
 
+    # Add a style → the preview rebuilds live (no save needed).
+    all("input[role='combobox']").first.send_keys("Jazz")
+    find("[role=option]", text: "Jazz", match: :first).click
+    assert_match "Jazz", preview.text
+
+    # Pick a window → it joins the preview too.
+    find("select[name='d[]'] option[value='this_weekend']").select_option
+    assert_match(/·/, preview.text)
+
+    find("input[type=submit]").click
     assert_current_path notification_rules_path
-    assert_text "Renamed alert"
+    assert_includes @rule.reload.style_list, "Jazz"
   end
 
   test "the inline filter shows the saved selection and a window select" do
@@ -31,6 +41,29 @@ class NotificationRuleEditTest < ApplicationSystemTestCase
 
     assert_selector "select[name='d[]']"                 # window select present
     assert_selector "input[name='s[]'][value='Rock']", visible: :all  # styles pre-filled
+  end
+
+  test "the what field takes a free-text query and a picked style; email is disabled without an address" do
+    event(start_date: Date.current + 4, style_list: ["Jazz"])
+    visit edit_notification_rule_path(@rule)
+
+    what = all("input[role='combobox']").first
+    what.send_keys("Radiohead")
+    what.send_keys(:enter)
+    assert_selector "[data-tag-chip] input[name='q[]'][value='Radiohead']", visible: :all
+
+    what.send_keys("Jazz")
+    find("[role=option]", text: "Jazz", match: :first).click
+    assert_selector "[data-tag-chip] input[name='s[]'][value='Jazz']", visible: :all
+
+    # No email address saved → the email channel is disabled.
+    assert_selector "input[name='notification_rule[notify_email]'][disabled]", visible: :all
+
+    find("input[type=submit]").click
+    assert_current_path notification_rules_path
+    @rule.reload
+    assert_includes @rule.queries, "Radiohead"   # free text → query
+    assert_includes @rule.style_list, "Jazz"     # pick → style
   end
 
   test "selecting a window flips the rule to happening and hides the cadence picker" do

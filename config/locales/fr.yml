@@ -104,7 +104,7 @@ fr:
     track_favorites: Garder synchronisé avec mes favoris
     track_favorites_hint: inclut aussi les lieux/styles que tu suivras plus tard
     type:
-      added: Nouveau
+      added: Nouveautés
       happening: À l'affiche
     errors:
       empty_filter: Choisis d'abord un filtre (style, lieu, date …) ou synchronise avec tes favoris.

@@ -18,7 +18,11 @@
               <%= rule.display_name %>
               <span class="chip chip--type"><%= rule_type_label(rule) %></span>
             </span>
-            <span class="muted rule-card__summary"><%= rule_about(rule) %></span>
+            <%# Only when a custom name differs from the auto-description — otherwise
+                the name line above already says exactly this. %>
+            <% unless rule.display_name == rule.describe %>
+              <span class="muted rule-card__summary"><%= rule_about(rule) %></span>
+            <% end %>
             <span class="muted rule-card__summary"><%= rule_schedule_summary(rule) %></span>
           </div>
 

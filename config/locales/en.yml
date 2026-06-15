@@ -104,7 +104,7 @@ en:
     track_favorites: Keep in sync with my favorites
     track_favorites_hint: also includes venues/styles you follow later
     type:
-      added: New
+      added: New events
       happening: What's on
     errors:
       empty_filter: Pick a filter first (style, location, date …) or sync with your favorites.

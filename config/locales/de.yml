@@ -104,7 +104,7 @@ de:
     track_favorites: Mit meinen Favoriten synchron halten
     track_favorites_hint: berücksichtigt auch Orte/Stile, denen du später folgst
     type:
-      added: Neu
+      added: Neue Events
       happening: Was läuft
     errors:
       empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Favoriten.

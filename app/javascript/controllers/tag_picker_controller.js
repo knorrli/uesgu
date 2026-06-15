@@ -115,9 +115,15 @@ export default class extends Controller {
   // Built with text nodes (never innerHTML) so a free-text value can't inject
   // markup. Mirrors tags/_filter_chip.html.erb.
   #chip(param, value, label) {
-    const chip = document.createElement("span")
+    // The whole chip is the remove control (a <button>); the × is a decorative
+    // glyph. A type=hidden input is non-interactive, so it nests in the button
+    // and still submits. Mirrors tags/_filter_chip.html.erb.
+    const chip = document.createElement("button")
+    chip.type = "button"
     chip.className = "tag active"
     chip.dataset.tagChip = ""
+    chip.setAttribute("aria-label", value)
+    chip.dataset.action = "tag-picker#remove"
 
     const input = document.createElement("input")
     input.type = "hidden"
@@ -131,11 +137,9 @@ export default class extends Controller {
     const text = document.createElement("span")
     text.textContent = label
 
-    const remove = document.createElement("button")
-    remove.type = "button"
+    const remove = document.createElement("span")
     remove.className = "tag__remove ph ph-x"
-    remove.setAttribute("aria-label", value)
-    remove.dataset.action = "tag-picker#remove"
+    remove.setAttribute("aria-hidden", "true")
 
     chip.append(input, icon, text, remove)
     return chip

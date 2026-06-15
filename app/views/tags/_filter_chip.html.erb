@@ -1,8 +1,10 @@
 <%# A removable applied-filter chip, shared by the events filter and the rule
     form so the two read identically. Carries its own hidden field (param =
     s[]/q[]/l[]/d[]) so it submits with the surrounding form; the leading icon is
-    derived from that param. The remove button dispatches to the tag-picker
-    controller, which strips the chip (and, on the events filter, re-submits).
+    derived from that param. The whole chip is the remove control — a <button>
+    that dispatches to the tag-picker controller, which strips the chip (and, on
+    the events filter, re-submits); the × is a decorative affordance. A type=hidden
+    input is non-interactive, so it nests in the button and still submits.
 
     Locals: param, value, and an optional label (date chips show a localized
     label while submitting the raw range value). The tag-picker controller builds
@@ -12,9 +14,11 @@
     rule form's window tag, where the <select> already carries d[]. remove_action
     overrides the × handler for that case (clear the select rather than drop a
     chip). %>
-<span class="tag active" data-tag-chip>
+<button type="button" class="tag active" data-tag-chip
+        aria-label="<%= value %>"
+        data-action="<%= local_assigns.fetch(:remove_action, 'tag-picker#remove') %>">
   <% if local_assigns.fetch(:input, true) %><%= hidden_field_tag param, value, id: nil %><% end %>
   <span class="<%= filter_chip_icon(param) %>" aria-hidden="true"></span>
   <span><%= local_assigns.fetch(:label, value) %></span>
-  <button type="button" class="tag__remove ph ph-x" aria-label="<%= value %>" data-action="<%= local_assigns.fetch(:remove_action, 'tag-picker#remove') %>"></button>
-</span>
+  <span class="tag__remove ph ph-x" aria-hidden="true"></span>
+</button>

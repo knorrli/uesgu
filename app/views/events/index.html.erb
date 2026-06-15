@@ -15,13 +15,16 @@
       and — when the filter comes up empty — the empty message, both riding on the
       left of this same always-present row so nothing below it jumps. %>
   <div class="events-toolbar flex justify-between align-baseline gap-medium">
-    <div class="events-toolbar__left flex align-baseline gap-medium">
+    <div class="events-toolbar__left flex align-center gap-medium">
       <%= render 'favorites_filter' %>
       <%= render 'notify_button' %>
-      <span class="muted"><%= t('events.index.empty') if @events.empty? %></span>
     </div>
     <%= render 'view_switcher', view: @view %>
   </div>
+
+  <% if @events.empty? %>
+    <p class="muted events-empty"><%= t('events.index.empty') %></p>
+  <% end %>
 
   <% if @view == 'calendar' %>
     <%= render 'calendar', events: @events %>

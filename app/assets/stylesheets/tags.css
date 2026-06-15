@@ -43,17 +43,12 @@ button.tag {
 
 /* The × on a removable APPLIED-FILTER token: the affordance that says the chip is
    removable, distinguishing it from a selected/current .tag.active (status/nav
-   filters), which carry no ×. It's a real <button> now (its own click target, so
-   the chip needn't be one) — strip the boxed button chrome so it reads as a plain
-   inline glyph, not a nested button. */
+   filters), which carry no ×. The whole chip is the <button> click target now, so
+   the × is a decorative glyph (no nested button) — bigger touch surface, and the
+   same one-tap remove whether you hit the label or the ×. */
 .tag__remove {
   opacity: 0.7;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
   line-height: 1;
-  cursor: pointer;
 }
 
 .filter .tag {

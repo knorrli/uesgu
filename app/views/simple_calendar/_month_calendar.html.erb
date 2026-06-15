@@ -5,12 +5,12 @@
   <%# Month title + nav only; the list/calendar switcher lives on its own row in
       index.html.erb so it stays put and the month title aligns with the list's
       first date header. %>
-  <div class="calendar-heading flex align-baseline wrap gap-medium">
+  <div class="calendar-heading flex align-baseline wrap justify-between gap-medium">
     <time datetime="<%= start_date.strftime('%Y-%m') %>" class="calendar-title"><%= t('date.month_names')[start_date.month] %> <%= start_date.year %></time>
     <nav class="flex gap-medium">
-      <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar_nav_path(calendar.url_for_previous_view) %>
-      <%= link_to t('simple_calendar.today', default: 'Today'), calendar_nav_path(calendar.url_for_today_view) %>
-      <%= link_to t('simple_calendar.next', default: 'Next'), calendar_nav_path(calendar.url_for_next_view) %>
+      <%= link_to t('simple_calendar.previous', default: 'Previous'), calendar_nav_path(calendar.url_for_previous_view), class: 'text-link' %>
+      <%= link_to t('simple_calendar.today', default: 'Today'), calendar_nav_path(calendar.url_for_today_view), class: 'text-link' %>
+      <%= link_to t('simple_calendar.next', default: 'Next'), calendar_nav_path(calendar.url_for_next_view), class: 'text-link' %>
     </nav>
   </div>
 

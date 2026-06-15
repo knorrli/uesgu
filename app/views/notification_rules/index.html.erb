@@ -29,8 +29,9 @@
           </div>
 
           <div class="rule-card__actions flex gap-small">
-            <%# Primary action filled; secondary actions ghost; danger ghost-warn;
-                "Open filter" navigates, so it's a text link, not a button. %>
+            <%# In-place actions are buttons (the ladder: secondary pill / ghost /
+                ghost-warn); Bearbeiten navigates to the edit page, so it's a
+                text link, not a button. %>
             <%= button_to t('notification_rules.fire_now'), fire_notification_rule_path(rule), class: 'button-small' %>
             <%= button_to rule.enabled? ? t('notification_rules.disable') : t('notification_rules.enable'),
                   toggle_notification_rule_path(rule), method: :patch, class: 'button-small button-ghost' %>

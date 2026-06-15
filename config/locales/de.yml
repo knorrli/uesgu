@@ -2,10 +2,10 @@
 de:
   nav:
     admin: Admin
-    notifications: Inbox
-    unread_notifications: Ungelesene Mitteilungen
+    notifications: Benachrichtigungen
+    unread_notifications: Ungelesene Benachrichtigungen
     favorites: Favoriten
-    notification_rules: Mitteilungs-Regeln
+    notification_rules: Benachrichtigungen
     saved: Merkliste
     settings: Einstellungen
     logout: Abmelden
@@ -13,20 +13,22 @@ de:
     signup: Registrieren
     theme: Erscheinungsbild
     install: App installieren
-  footer:
-    tagline: üsgu — Konzärt für Fründe
+  cookie_notice:
+    label: Cookie-Hinweis
+    body: "Kurz zu Cookies: genau zwei — einer hält dich eingeloggt, einer merkt sich dein Theme. Kein Tracking, keine Werbung, niemand schaut zu."
+    dismiss: Alles klar
   install:
     title: App installieren
     heading: üsgu als App installieren
-    intro: Leg üsgu auf deinen Startbildschirm — mit einem Tipp offen, bereit für Mitteilungen.
-    hint: Leg üsgu auf den Startbildschirm — ein Tipp, plus Mitteilungen.
+    intro: Leg üsgu auf deinen Startbildschirm — mit einem Tipp offen, bereit für Benachrichtigungen.
+    hint: Leg üsgu auf den Startbildschirm — ein Tipp, plus Benachrichtigungen.
     button: App installieren
     done: üsgu ist installiert — du kannst es vom Startbildschirm öffnen.
     steps_ios: 'Auf iPhone/iPad (Safari): Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.'
     steps_firefox: 'In Firefox: Menü (⋮ oben rechts) öffnen, dann „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
     steps_generic: 'Öffne das Browser-Menü und wähle „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
     benefit_quick: Mit einem Tipp geöffnet, ohne den Browser
-    benefit_notify: Mitteilungen zu neuen Veranstaltungen deiner Favoriten
+    benefit_notify: Benachrichtigungen zu neuen Veranstaltungen deiner Favoriten
     benefit_home: Eigenes Symbol auf deinem Startbildschirm
   languages:
     de: Deutsch
@@ -68,18 +70,18 @@ de:
         other: "%{count} neue Veranstaltungen passen zu deinen Favoriten."
     test:
       title: üsgu
-      body: Dies ist eine Testmitteilung — Push funktioniert. 🎉
+      body: Dies ist eine Test-Benachrichtigung — Push funktioniert. 🎉
   inbox:
-    title: Inbox
-    tab_messages: Nachrichten
+    title: Benachrichtigungen
+    tab_messages: Eingang
     tab_rules: Regeln
   saved_events:
     title: Merkliste
     empty: Noch nichts gespeichert — tippe das Lesezeichen bei einer Veranstaltung.
     toggle: Veranstaltung speichern
   notification_rules:
-    title: Mitteilungs-Regeln
-    intro: Bau dir eigene Alerts — was, wann und wie du es erfährst. Lass so viele laufen, wie du willst.
+    title: Benachrichtigungen
+    intro: Bau dir eigene Benachrichtigungen — was, wann und wie du es erfährst. Lass so viele laufen, wie du willst.
     your_rules: Deine Regeln
     empty: Noch keine Regeln — erstell unten deine erste.
     add_rule: Regel hinzufügen
@@ -96,10 +98,10 @@ de:
     disabled: Pausiert
     delete: Löschen
     delete_confirm: Diese Regel wirklich löschen?
-    default_name: Mitteilung
+    default_name: Benachrichtigung
     edit_button: Bearbeiten
     empty_link: Filtere die Veranstaltungen
-    empty_html: Noch keine Alerts. %{link} auf der Startseite, dann tippe „Benachrichtigen“.
+    empty_html: Noch keine Benachrichtigungen. %{link} auf der Startseite, dann tippe „Benachrichtige mich“.
     favorites_live: Meine Favoriten (automatisch aktuell)
     track_favorites: Mit meinen Favoriten synchron halten
     track_favorites_hint: berücksichtigt auch Orte/Stile, denen du später folgst
@@ -185,8 +187,8 @@ de:
         one: Eine Veranstaltung für dich.
         other: "%{count} Veranstaltungen für dich."
       cta: In der App ansehen
-      footer_reason: Du bekommst das wegen einer Mitteilungs-Regel, die du erstellt hast.
-      footer_manage: Regeln verwalten
+      footer_reason: Du bekommst das wegen einer Benachrichtigung, die du erstellt hast.
+      footer_manage: Benachrichtigungen verwalten
   frequencies:
     daily: Täglich
     weekly: Wöchentlich
@@ -199,7 +201,7 @@ de:
     next: Weiter
   favorites:
     title: Favoriten
-    intro: Folge Locations und Stilen — passende Tage bekommen ein Herz und bestimmen deine Mitteilungen.
+    intro: Folge Locations und Stilen — passende Tage bekommen ein Herz und bestimmen deine Benachrichtigungen.
     saved: Favoriten gespeichert.
     save: Favoriten speichern
     toggle: '%{name} folgen oder entfolgen'
@@ -208,12 +210,12 @@ de:
     saved: Einstellungen gespeichert.
     account_heading: Konto
     push_test: Test senden
-    notifications_heading: Mitteilungen
+    notifications_heading: Benachrichtigungen
     frequency_label: Wie oft sollen wir dich über neue Veranstaltungen informieren?
     language_heading: Sprache
     language_auto: Automatisch (Browser)
     favorite_locations_heading: Lieblings-Locations
-    favorite_locations_hint: Erhalte Mitteilungen zu Veranstaltungen an diesen Orten.
+    favorite_locations_hint: Erhalte Benachrichtigungen zu Veranstaltungen an diesen Orten.
     follow_all: Alle in %{name}
     other_locations: Weitere Orte
     favorite_styles_heading: Lieblings-Stile
@@ -227,15 +229,15 @@ de:
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
     save: Einstellungen speichern
-    push_heading: Mitteilungen auf diesem Gerät
+    push_heading: Benachrichtigungen auf diesem Gerät
     push_hint: Wir pingen dich hier an, sobald neue Veranstaltungen zu deinen Favoriten passen.
     push_enable: Auf diesem Gerät aktivieren
     push_disable: Auf diesem Gerät deaktivieren
     push_status_on: Auf diesem Gerät an.
     push_status_off: Auf diesem Gerät aus.
-    push_status_denied: Dein Browser blockiert Mitteilungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
-    push_unsupported: Dieser Browser unterstützt keine Push-Mitteilungen.
-    push_install_first: Um auf iPhone oder iPad Mitteilungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
+    push_status_denied: Dein Browser blockiert Benachrichtigungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
+    push_unsupported: Dieser Browser unterstützt keine Push-Benachrichtigungen.
+    push_install_first: Um auf iPhone oder iPad Benachrichtigungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     signout_heading: Abmelden
     signout_hint: Auf diesem Gerät abmelden.
     signout_button: Abmelden
@@ -245,10 +247,10 @@ de:
     delete_account_confirm: Konto endgültig löschen? Das kann nicht rückgängig gemacht werden.
   notifications:
     index:
-      title: Mitteilungen
+      title: Benachrichtigungen
       empty: Noch nichts da — neue Veranstaltungen landen hier.
       unread_badge: Neu
-      fallback_name: Mitteilung
+      fallback_name: Benachrichtigung
       event_count:
         one: 1 Veranstaltung
         other: "%{count} Veranstaltungen"
@@ -256,7 +258,7 @@ de:
         one: 1 neue Veranstaltung
         other: "%{count} neue Veranstaltungen"
     show:
-      back: ← Alle Mitteilungen
+      back: ← Alle Benachrichtigungen
       title: Neue Veranstaltungen
       all: Alle neuen Veranstaltungen
       relevant: Nur meine Favoriten
@@ -368,7 +370,7 @@ de:
         back: ← Alle Konten
         email: E-Mail
         no_email: keine
-        frequency: Mitteilungen
+        frequency: Benachrichtigungen
         joined: Beigetreten
         sessions: Aktive Sitzungen
         invited_by: Eingeladen von
@@ -526,7 +528,7 @@ de:
         calendar: Kalender
       favorites_filter:
         label: Meine Favoriten
-      notify_filter: Benachrichtigen
+      notify_filter: Benachrichtige mich
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen

@@ -1,11 +1,10 @@
-/* Site header, primary nav, footer. Mobile-first. */
+/* Site header and primary nav. Mobile-first. */
 
 .site-header {
   border-bottom: var(--border-width) solid var(--border-color);
 }
 
-.site-header__inner,
-.site-footer__inner {
+.site-header__inner {
   width: 100%;
   max-width: var(--content-max-width);
   margin-inline: auto;
@@ -149,14 +148,29 @@
   background-color: currentColor;
 }
 
-.site-footer {
-  flex-shrink: 0;
+/* Cookie courtesy notice — fixed to the bottom, non-blocking, shown once on
+   first visit. Sits below the mobile filter sheets (z 1000) so a sheet covers
+   it. Dismissal lives in localStorage, so it adds no cookie of its own. */
+.cookie-notice {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 900;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-small) var(--gap-large);
+  padding: var(--gap-medium) var(--content-padding);
+  background: var(--theme-bg-color);
   border-top: var(--border-width) solid var(--border-color);
+  color: var(--theme-fg-color);
+  font-size: var(--font-size-small);
 }
 
-.site-footer__inner {
-  color: var(--theme-fg-muted);
-  font-size: var(--font-size-small);
+.cookie-notice__text {
+  margin: 0;
+  max-width: 64ch;
 }
 
 /* The count pill: a small accent-filled number attached to something else —

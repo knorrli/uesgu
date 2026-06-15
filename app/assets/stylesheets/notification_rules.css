@@ -114,9 +114,12 @@
   display: inline-flex;
   align-items: center;
   gap: var(--gap-xsmall);
-  color: var(--theme-accent-color);
-  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
   text-decoration: none;
+}
+
+.notify-filter-link:hover {
+  text-decoration: underline;
 }
 
 .notify-filter-link .ph {

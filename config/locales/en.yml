@@ -2,7 +2,7 @@
 en:
   nav:
     admin: Admin
-    notifications: Inbox
+    notifications: Notifications
     unread_notifications: Unread notifications
     favorites: Favorites
     notification_rules: Notification rules
@@ -13,8 +13,10 @@ en:
     signup: Sign up
     theme: Theme
     install: Install app
-  footer:
-    tagline: üsgu — Concerts for friends
+  cookie_notice:
+    label: Cookie notice
+    body: "Quick word on cookies: just two — one keeps you logged in, one remembers your theme. No tracking, no ads, nobody watching."
+    dismiss: Got it
   install:
     title: Install app
     heading: Install üsgu as an app
@@ -70,8 +72,8 @@ en:
       title: üsgu
       body: This is a test notification — push is working. 🎉
   inbox:
-    title: Inbox
-    tab_messages: Messages
+    title: Notifications
+    tab_messages: Inbox
     tab_rules: Rules
   saved_events:
     title: Watchlist

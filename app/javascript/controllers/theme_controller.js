@@ -2,76 +2,49 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="theme" on the header toggle button.
 //
-// Stores the user's *preference* (system | light | dark) in localStorage and
-// resolves it to a concrete light|dark value on <html data-theme>. "system"
-// follows the OS via prefers-color-scheme and re-resolves live when it changes.
-// The pre-paint resolution lives inline in the <head> to avoid a flash of the
-// wrong theme on first load; this controller keeps the button label in sync and
-// handles clicks.
-const ORDER = ["system", "light", "dark"]
-const LABELS = { system: "Auto", light: "Light", dark: "Dark" }
-// Phosphor glyphs (sit on the ph base class on the icon span).
-const ICONS = { system: "ph-circle-half-tilt", light: "ph-sun", dark: "ph-moon" }
-const KEY = "theme"
+// Binary light ↔ dark, stored in a `theme` cookie (per-device) so the SERVER can
+// render <html data-theme> and the matching favicon up-front — no flash. The
+// first-visit default (no cookie yet) is resolved from the OS inline in <head>.
+// This controller only handles the click and keeps the button icon/label in
+// sync; it no longer follows the OS live (that was the old "system" preference,
+// now dropped).
+const LABELS = { light: "Light", dark: "Dark" }
+const ICONS = { light: "ph-sun", dark: "ph-moon" }
+const ONE_YEAR = 60 * 60 * 24 * 365
 
 export default class extends Controller {
   static targets = ["label", "icon"]
 
   connect() {
-    this.media = window.matchMedia("(prefers-color-scheme: dark)")
-    this.onMediaChange = () => { if (this.preference === "system") this.apply() }
-    this.media.addEventListener("change", this.onMediaChange)
-    this.apply()
     this.render()
   }
 
-  disconnect() {
-    this.media.removeEventListener("change", this.onMediaChange)
+  // The cookie is the source of truth; fall back to whatever the inline head
+  // script resolved onto <html> (covers the click before a cookie round-trips).
+  get theme() {
+    const m = document.cookie.match(/(?:^|;\s*)theme=(light|dark)/)
+    if (m) return m[1]
+    return document.documentElement.dataset.theme === "dark" ? "dark" : "light"
   }
 
-  get preference() {
-    // localStorage can throw (Safari private mode, storage disabled) — fall back
-    // to "system" so the toggle keeps working in-memory rather than dying.
-    try {
-      return localStorage.getItem(KEY) || "system"
-    } catch {
-      return "system"
-    }
+  set theme(value) {
+    document.cookie = `theme=${value};path=/;max-age=${ONE_YEAR};samesite=lax`
   }
 
-  set preference(value) {
-    try {
-      localStorage.setItem(KEY, value)
-    } catch {
-      // Storage unavailable; the choice just won't persist across reloads.
-    }
-  }
-
-  // Advance system → light → dark → system.
-  cycle() {
-    this.preference = ORDER[(ORDER.indexOf(this.preference) + 1) % ORDER.length]
-    this.apply()
-    this.render()
-  }
-
-  // Resolve the preference to a concrete theme on <html>.
-  apply() {
-    const dark = this.preference === "dark" ||
-      (this.preference === "system" && this.media.matches)
-    document.documentElement.dataset.theme = dark ? "dark" : "light"
-    // Keep the SVG tab favicon matching the resolved theme. The installed PWA
-    // icon is baked at install time and can't switch, so only the favicon here.
+  toggle() {
+    const next = this.theme === "dark" ? "light" : "dark"
+    this.theme = next
+    document.documentElement.dataset.theme = next
     const favicon = document.getElementById("favicon-svg")
-    if (favicon) favicon.href = dark ? "/icon.svg" : "/icon-light.svg"
+    if (favicon) favicon.href = next === "light" ? "/icon-light.svg" : "/icon.svg"
+    this.render()
   }
 
   render() {
-    const label = LABELS[this.preference]
-    if (this.hasLabelTarget) this.labelTarget.textContent = label
-    if (this.hasIconTarget) {
-      this.iconTarget.className = `ph ${ICONS[this.preference]}`
-    }
-    this.element.title = `Theme: ${label}`
-    this.element.setAttribute("aria-label", `Theme: ${label} (click to change)`)
+    const t = this.theme
+    if (this.hasLabelTarget) this.labelTarget.textContent = LABELS[t]
+    if (this.hasIconTarget) this.iconTarget.className = `ph ${ICONS[t]}`
+    this.element.title = `Theme: ${LABELS[t]}`
+    this.element.setAttribute("aria-label", `Theme: ${LABELS[t]} (click to change)`)
   }
 }

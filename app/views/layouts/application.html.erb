@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<% theme = cookies[:theme].presence_in(%w[light dark]) %>
+<html<%= " data-theme=\"#{theme}\"".html_safe if theme %>>
   <head>
     <title><%= content_for(:title) || "üsgu" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -8,37 +9,33 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%# Resolve the saved theme preference before first paint to avoid a flash
-        of the wrong theme. Mirrors the logic in theme_controller.js. %>
-    <script nonce="<%= content_security_policy_nonce %>">
-      (function () {
-        var pref = "system"
-        try { pref = localStorage.getItem("theme") || "system" } catch (e) {}
-        var dark = pref === "dark" ||
-          (pref === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
-        document.documentElement.dataset.theme = dark ? "dark" : "light"
-      })()
-    </script>
-
     <%= yield :head %>
 
     <%# PWA manifest makes the app installable; routes enabled in config/routes.rb. %>
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
+    <%# Canonical set: the theme-aware SVG is what modern browsers use; the .ico
+        (sizes="any") is the legacy fallback they skip when an SVG is present. The
+        512px PNG is intentionally NOT a <link rel=icon> — it's a dark raster that
+        Chrome would prefer from cache over the SVG (favicon flashes light, then
+        flips dark). The PWA manifest still references it for the installed app. %>
     <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="icon" href="/icon.png" type="image/png" sizes="512x512">
-    <link id="favicon-svg" rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link id="favicon-svg" rel="icon" href="<%= theme == 'light' ? '/icon-light.svg' : '/icon.svg' %>" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-    <%# Point the SVG favicon at the light variant when the resolved theme is
-        light. Runs after the <link> above exists; data-theme is already set by
-        the pre-paint script. theme_controller.js keeps it in sync on toggle. %>
+    <%# The server set <html data-theme> and the favicon above from the `theme`
+        cookie. On the very first visit there's no cookie yet, so it's unset:
+        resolve from the OS, set the favicon, and persist a cookie so every later
+        request renders the right theme + icon with no flash. Pre-paint (still in
+        <head>), so no visible theme flash. %>
     <script nonce="<%= content_security_policy_nonce %>">
       (function () {
-        if (document.documentElement.dataset.theme === "light") {
-          var el = document.getElementById("favicon-svg")
-          if (el) el.href = "/icon-light.svg"
-        }
+        if (document.documentElement.dataset.theme) return
+        var t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+        document.documentElement.dataset.theme = t
+        document.cookie = "theme=" + t + ";path=/;max-age=31536000;samesite=lax"
+        var el = document.getElementById("favicon-svg")
+        if (el) el.href = t === "light" ? "/icon-light.svg" : "/icon.svg"
       })()
     </script>
 
@@ -65,8 +62,8 @@
         <div class="site-header__brand">
           <%= link_to 'üsgu', root_path, class: 'site-brand' %>
           <button type="button" class="theme-toggle" aria-label="<%= t('nav.theme') %>"
-                  data-controller="theme" data-action="theme#cycle">
-            <span class="ph ph-circle-half-tilt" data-theme-target="icon" aria-hidden="true"></span>
+                  data-controller="theme" data-action="theme#toggle">
+            <span class="ph <%= theme == 'light' ? 'ph-sun' : 'ph-moon' %>" data-theme-target="icon" aria-hidden="true"></span>
           </button>
         </div>
         <nav class="site-nav">
@@ -122,10 +119,6 @@
       <%= yield %>
     </main>
 
-    <footer class="site-footer">
-      <div class="site-footer__inner">
-        <%= t('footer.tagline') %>
-      </div>
-    </footer>
+    <%= render 'shared/cookie_notice' %>
   </body>
 </html>

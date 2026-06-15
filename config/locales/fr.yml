@@ -2,7 +2,7 @@
 fr:
   nav:
     admin: Admin
-    notifications: Inbox
+    notifications: Notifications
     unread_notifications: Notifications non lues
     favorites: Favoris
     notification_rules: Règles de notification
@@ -13,8 +13,10 @@ fr:
     signup: Inscription
     theme: Thème
     install: Installer l'app
-  footer:
-    tagline: üsgu — Des concerts entre amis
+  cookie_notice:
+    label: Note sur les cookies
+    body: "Petit mot sur les cookies : deux, pas plus — un pour te garder connecté, un pour retenir ton thème. Pas de pistage, pas de pub, personne qui te regarde."
+    dismiss: Compris
   install:
     title: Installer l'app
     heading: Installer üsgu comme app
@@ -70,8 +72,8 @@ fr:
       title: üsgu
       body: Ceci est une notification de test — le push fonctionne. 🎉
   inbox:
-    title: Inbox
-    tab_messages: Messages
+    title: Notifications
+    tab_messages: Reçues
     tab_rules: Règles
   saved_events:
     title: À voir

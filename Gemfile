@@ -74,6 +74,13 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 end
 
+group :test do
+  # Browser-driven system tests. Cuprite drives the system Chrome over CDP via
+  # Ferrum — no chromedriver/Selenium binary or downloaded browser to manage.
+  gem "capybara"
+  gem "cuprite"
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"

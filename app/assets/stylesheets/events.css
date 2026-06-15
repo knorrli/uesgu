@@ -940,7 +940,7 @@ body.filter-sheet-open { overflow: hidden; }
   width: 100%;
   border: 0;
   border-top: var(--border-width) solid var(--border-color);
-  background: var(--theme-bg-muted);
+  background: none;
   color: var(--theme-fg-color);
   font: inherit;
   text-align: left;
@@ -957,10 +957,19 @@ body.filter-sheet-open { overflow: hidden; }
   white-space: nowrap;
 }
 
-.filter-searchfor__type {
-  flex-shrink: 0;
-  color: var(--theme-fg-muted);
-  font-size: 75%;
+/* The What field drives its OWN single keyboard highlight across the free-text row
+   and the options (tag_picker_controller#applyNav) — typing lights the free-text
+   row, arrowing moves it into the list. Suppress the gem's auto-highlight of the
+   soft-selected option here (it shares the same tint, so both lit at once), and
+   paint our active row instead. Hover stays (mouse feedback, one at a time). */
+.filter-field:has(.filter-searchfor) .hw-combobox__option--selected,
+.filter-field:has(.filter-searchfor) .hw-combobox__option--navigated {
+  background-color: transparent;
+}
+
+.filter-searchfor--active,
+.hw-combobox__option--nav-active {
+  background-color: var(--hw-active-bg-color);
 }
 
 /* ── Custom date range ── two native (OS) date pickers → one range. */

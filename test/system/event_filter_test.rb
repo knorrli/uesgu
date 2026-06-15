@@ -102,4 +102,19 @@ class EventFilterTest < ApplicationSystemTestCase
     arrowed.send_keys("Bl", :down, :enter)
     assert_selector ".filter-desktop .chips input[name='s[]'][value='Blues']", visible: :all
   end
+
+  # The free-text row is part of the keyboard nav: arrowing down to the option and
+  # back up returns to the free-text row, so Enter commits the typed text. (Without
+  # this, once you arrowed into the options you were stuck on them.)
+  test "arrowing down to an option and back up returns to the free-text row" do
+    event(start_date: Date.current + 3, style_list: ["Blues"])
+
+    visit events_path
+    what = find(".filter-desktop input[role='combobox']", match: :first)
+    what.click
+    what.send_keys("Bl", :down, :up, :enter)
+
+    assert_selector ".filter-desktop .chips input[name='q[]'][value='Bl']", visible: :all
+    assert_no_selector ".filter-desktop .chips input[name='s[]']", visible: :all
+  end
 end

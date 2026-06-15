@@ -176,52 +176,80 @@ export default class extends Controller {
         .map((name) => [name.toLowerCase(), name])
     )
 
-    this.onStyleInput = () => { this.navigated = false; this.#refreshSearchFor() }
+    this.onStyleInput = () => this.#onInput()
     this.styleInput.addEventListener("input", this.onStyleInput)
 
-    // Own the What field's Enter entirely (capture phase, before the gem). We
-    // commit a style chip when the user navigated to an option or typed its exact
-    // name, and a free-text query otherwise — so a query that's merely a prefix
-    // of a style ("Bl" → Blues) is reachable instead of being hijacked. We do the
-    // commit ourselves because our _lockInSelection patch stops the gem from
-    // finalizing on close. Arrow keys are tracked so navigation still picks the
-    // option, not free text.
-    this.onWhatKeydown = (event) => this.#commitOnEnter(event)
+    // Own the What field's keyboard nav (capture, before the gem): Arrow keys move
+    // ONE highlight across [free-text row, …visible options]; Enter commits the
+    // highlighted one — a style chip for an option (or an exact-name match), a
+    // free-text query otherwise. This makes the free-text row reachable by keyboard
+    // and keeps exactly one row lit (the gem's own auto-highlight is suppressed in
+    // CSS for this field, see events.css). We commit ourselves because our
+    // _lockInSelection patch stops the gem finalizing on close.
+    this.onWhatKeydown = (event) => this.#onKeydown(event)
     this.styleInput.addEventListener("keydown", this.onWhatKeydown, true)
 
+    this.navIndex = 0
     this.#refreshSearchFor() // show the blank "type to search" hint up front
+    this.#applyNav()
   }
 
-  #commitOnEnter(event) {
+  #onInput() {
+    this.navIndex = 0 // typing returns the highlight to the free-text row
+    this.#refreshSearchFor()
+    this.#applyNav()
+  }
+
+  // The virtual list the arrows walk: the free-text row, then the options the gem
+  // currently shows. navIndex 0 is always the free-text row.
+  #navItems() {
+    const options = [...this.styleListbox.querySelectorAll('[role="option"]')]
+      .filter((o) => !o.hidden && !o.closest("[hidden]"))
+    return [this.searchForTarget, ...options]
+  }
+
+  #applyNav() {
+    const items = this.#navItems()
+    if (!items.length) return
+    this.navIndex = ((this.navIndex % items.length) + items.length) % items.length // wrap
+    items.forEach((el, i) => {
+      const active = i === this.navIndex
+      const cls = el === this.searchForTarget ? "filter-searchfor--active" : "hw-combobox__option--nav-active"
+      el.classList.toggle(cls, active)
+    })
+    const current = items[this.navIndex]
+    if (current && current !== this.searchForTarget) current.scrollIntoView({ block: "nearest" })
+  }
+
+  #onKeydown(event) {
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      this.navigated = true // an explicit pick — commit that option as a style
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      this.navIndex += event.key === "ArrowDown" ? 1 : -1
+      this.#applyNav()
       return
     }
     if (event.key !== "Enter") return
 
+    const current = this.#navItems()[this.navIndex]
     const value = this.styleInput.value.trim()
-    const style = this.#styleToCommit(value)
-    if (!style && !value) return // nothing typed or navigated → let the gem close
 
-    event.preventDefault()
-    event.stopImmediatePropagation()
-    if (style) this.#addChip("s[]", style)
-    else this.#addChip("q[]", value)
+    if (!current || current === this.searchForTarget) {
+      if (!value) return // blank hint → let the gem close the dropdown
+      // An exact style name still commits the style; anything else is free text.
+      const style = this.styleByName.get(value.toLowerCase())
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      this.#addChip(style ? "s[]" : "q[]", style ?? value)
+    } else {
+      event.preventDefault()
+      event.stopImmediatePropagation()
+      this.#addChip("s[]", current.dataset.value ?? current.textContent.trim())
+    }
 
-    this.navigated = false
+    this.navIndex = 0
     this.styleInput.value = ""
     this.styleInput.dispatchEvent(new Event("input", { bubbles: true }))
-  }
-
-  // The style to commit on Enter: the arrow-navigated option, or one whose name
-  // the text matches exactly (checked against the connect-time snapshot, not the
-  // racing live list). Null means the text should become a free-text query.
-  #styleToCommit(value) {
-    if (this.navigated) {
-      const active = document.getElementById(this.styleInput.getAttribute("aria-activedescendant") || "")
-      if (active?.dataset.value) return active.dataset.value
-    }
-    return value ? (this.styleByName.get(value.toLowerCase()) ?? null) : null
   }
 
   #refreshSearchFor() {
@@ -234,8 +262,5 @@ export default class extends Controller {
     this.searchForTarget.querySelector("[data-search-for-label]").textContent = suggestion.label
     this.searchForTarget.dataset.value = suggestion.value
     this.searchForTarget.hidden = false
-    // The "free text" tag labels a committable query; hide it for the blank hint.
-    const type = this.searchForTarget.querySelector(".filter-searchfor__type")
-    if (type) type.hidden = suggestion.blank
   }
 }

@@ -140,9 +140,6 @@ export default class extends Controller {
     row.querySelector("[data-newquery-label]").textContent = suggestion.label
     row.dataset.value = suggestion.value
     row.hidden = false
-    // The "free text" tag labels a committable query; hide it for the blank hint.
-    const type = row.querySelector(".opt__type")
-    if (type) type.hidden = suggestion.blank
   }
 
   #queryRow(value) {

@@ -1,28 +1,13 @@
 <%# "Notify me about this" — turns the current filter into a saved alert. Shown
     only to logged-in users, and only when a filter is actually active: an empty
     filter would be an "all new events" firehose we deliberately don't offer
-    (the schedule lives on the linked new-alert page, keeping this row light).
-
-    When arriving from a rule's "Filter ändern" (params[:rule_id]), the same row
-    flips to "save the adjusted filter back onto that rule" instead — the round
-    trip that lets you edit an existing alert's filter with the real filter UI. %>
+    (the schedule + filter editing live on the linked new-alert page). %>
 <% if current_user.present? &&
       (@filter.queries.any? || @filter.style_list.any? || @filter.location_list.any? || @filter.date_ranges.any?) %>
-  <% editing_rule = current_user.notification_rules.find_by(id: params[:rule_id]) if params[:rule_id].present? %>
-  <% if editing_rule %>
-    <%= link_to edit_notification_rule_path(editing_rule, q: @filter.queries, l: @filter.location_list,
-                                            s: @filter.style_list, d: @filter.date_ranges),
-          class: 'notify-filter-link' do %>
-      <span class="ph ph-bell" aria-hidden="true"></span>
-      <span><%= t('events.index.save_filter') %></span>
-    <% end %>
-    <%= link_to t('events.index.cancel_edit'), edit_notification_rule_path(editing_rule), class: 'text-link' %>
-  <% else %>
-    <%= link_to new_notification_rule_path(q: @filter.queries, l: @filter.location_list,
-                                           s: @filter.style_list, d: @filter.date_ranges),
-          class: 'notify-filter-link' do %>
-      <span class="ph ph-bell" aria-hidden="true"></span>
-      <span><%= t('events.index.notify_filter') %></span>
-    <% end %>
+  <%= link_to new_notification_rule_path(q: @filter.queries, l: @filter.location_list,
+                                         s: @filter.style_list, d: @filter.date_ranges),
+        class: 'notify-filter-link' do %>
+    <span class="ph ph-bell" aria-hidden="true"></span>
+    <span><%= t('events.index.notify_filter') %></span>
   <% end %>
 <% end %>

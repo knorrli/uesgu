@@ -24,28 +24,30 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test 'new (added filter) carries the filter through and wires the cadence form' do
+  test 'new (added filter) carries the filter through and wires the schedule form' do
     sign_in_as user
     get new_notification_rule_path(s: ['Rock'], l: ['Dachstock']) # no date → added rule
 
     assert_response :success
-    assert_select 'input[type=hidden][name="s[]"][value=?]', 'Rock'
-    assert_select 'input[type=hidden][name="l[]"][value=?]', 'Dachstock'
-    assert_select 'fieldset[data-controller="rule-form"]'
+    # Filter pre-filled inline (combobox hidden fields), window as a select.
+    assert_select 'input[name="s[]"][value=?]', 'Rock'
+    assert_select 'input[name="l[]"][value=?]', 'Dachstock'
+    assert_select 'form[data-controller="rule-form"]'
     assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"]'
     assert_select '[data-rule-form-target="weekday"]'
     # Name field is pre-filled with the auto-name (here: the Dachstock location).
     assert_select 'input[name="notification_rule[name]"][value*=?]', 'Dachstock'
   end
 
-  test 'new (windowed filter) shows the derived-rhythm schedule, no cadence picker' do
+  test 'new (windowed filter) preselects the window and shows the firing-day picker' do
     sign_in_as user
     get new_notification_rule_path(l: ['Bern'], d: ['this_weekend']) # weekly window
 
     assert_response :success
-    assert_select 'input[type=hidden][name="d[]"][value=?]', 'this_weekend'
-    assert_select 'select[name="notification_rule[cadence]"]', false # rhythm is derived
-    assert_select 'select[name="notification_rule[weekday]"]'        # firing-day picker
+    assert_select "select[name='d[]'] option[value='this_weekend'][selected='selected']"
+    # The cadence picker is always in the DOM (hidden client-side when windowed);
+    # the firing-day picker is present for the weekly rhythm.
+    assert_select 'select[name="notification_rule[weekday]"]'
   end
 
   test 'the sync checkbox appears only when the filter equals my favorites' do
@@ -91,7 +93,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
 
   # --- edit / update ---------------------------------------------------------
 
-  test 'edit shows the rule schedule + its saved filter, with a Change-filter round-trip link' do
+  test 'edit shows the rule schedule + its saved filter inline' do
     u = sign_in_as user
     r = u.notification_rules.new(name: 'My alert', cadence: 'weekly', weekday: 5, time_of_day: 1050)
     r.filter_attributes = { l: ['Dachstock'], s: ['Rock'] }
@@ -99,12 +101,27 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
 
     get edit_notification_rule_path(r)
     assert_response :success
-    # Filter carried as hidden fields (so a plain save preserves it).
-    assert_select 'input[type=hidden][name="l[]"][value=?]', 'Dachstock'
-    assert_select 'input[type=hidden][name="s[]"][value=?]', 'Rock'
-    # The Change-filter link round-trips to the events page tagged with this rule.
-    assert_select "a[href=?]", events_path(q: [], l: ['Dachstock'], s: ['Rock'], d: [], rule_id: r.id)
+    # Filter pre-filled inline: the multiselect combobox hidden field carries the
+    # current values, the window is a <select>.
+    assert_select 'input[name="s[]"][value=?]', 'Rock'
+    assert_select 'input[name="l[]"][value=?]', 'Dachstock'
+    assert_select 'select[name="d[]"]'
     assert_select 'input[name="notification_rule[name]"][value=?]', 'My alert'
+  end
+
+  test 'update accepts the inline multiselect comma-joined values' do
+    u = sign_in_as user
+    r = u.notification_rules.new(cadence: 'daily', time_of_day: 60)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
+
+    patch notification_rule_path(r), params: {
+      notification_rule: { cadence: 'daily', time_string: '09:00' },
+      s: ['Rock,Jazz'], l: [''], d: ['']
+    }
+
+    assert_redirected_to notification_rules_path
+    assert_equal %w[Rock Jazz], r.reload.style_list
   end
 
   test 'update changes the schedule + channels without touching the filter' do
@@ -134,7 +151,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     r.save!
     assert r.added?
 
-    # Round-trip back from the events page with a date window added.
+    # Selecting a window in the inline form flips the rule to happening.
     patch notification_rule_path(r), params: {
       notification_rule: { cadence: 'weekly', weekday: '5', time_string: '17:30' },
       s: ['Rock'], d: ['this_weekend']
@@ -155,21 +172,6 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     sign_in_as user
     get edit_notification_rule_path(foreign)
     assert_response :not_found
-  end
-
-  test 'the events page in edit mode offers "save filter" back to the rule' do
-    u = sign_in_as user
-    r = u.notification_rules.new(cadence: 'daily', time_of_day: 60)
-    r.filter_attributes = { s: ['Rock'] }
-    r.save!
-
-    get events_path(s: ['Jazz'], rule_id: r.id)
-    assert_response :success
-    # The notify row points at update (edit page), carrying the adjusted filter.
-    assert_select "a.notify-filter-link[href=?]", edit_notification_rule_path(r, q: [], l: [], s: ['Jazz'], d: [])
-    assert_select "a", text: I18n.t('events.index.save_filter')
-    # rule_id rides along so changing the filter keeps edit mode.
-    assert_select 'form#filter-form input[type=hidden][name=rule_id][value=?]', r.id.to_s
   end
 
   # --- list + management -----------------------------------------------------

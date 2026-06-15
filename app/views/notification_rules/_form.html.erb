@@ -1,39 +1,70 @@
 <%# Shared by new + edit. form_with infers POST (create) vs PATCH (update) from
-    the record. The filter (q/l/s/d) is carried as top-level hidden fields (read by
-    the controller's filter_params, not nested under notification_rule) and edited
-    by round-tripping to the events page via "Filter ändern". %>
-<%= form_with model: rule, class: 'rule-form account-form flex flex-col gap-medium' do |form| %>
+    the record. The filter (q/l/s/d) posts as top-level fields (read by the
+    controller's filter_params, not nested under notification_rule) via inline
+    multiselect comboboxes + a window select. The rule-form Stimulus controller
+    keys the schedule off the window (windowed → derived cadence; none → free
+    cadence); rhythms-value carries WINDOW_RHYTHM so it can pick the right
+    firing-point control client-side. %>
+<%= form_with model: rule, class: 'rule-form account-form flex flex-col gap-medium',
+      data: { controller: 'rule-form', 'rule-form-rhythms-value': NotificationRule::WINDOW_RHYTHM.to_json } do |form| %>
   <% if rule.errors.any? %>
     <ul class="form-errors">
       <% rule.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
     </ul>
   <% end %>
 
-  <% filter.queries.each { |v| %><%= hidden_field_tag 'q[]', v %><% } %>
-  <% filter.location_list.each { |v| %><%= hidden_field_tag 'l[]', v %><% } %>
-  <% filter.style_list.each { |v| %><%= hidden_field_tag 's[]', v %><% } %>
-  <% filter.date_ranges.each { |v| %><%= hidden_field_tag 'd[]', v %><% } %>
+  <%# What this alert watches. Styles/locations are native multiselect comboboxes
+      (chips rendered by tags#chips, the same endpoint the genre editor uses) and
+      the window is a preset select — no events-page round-trip. Free-text queries
+      aren't editable here (no fixed option to chip), but any carried from the
+      events "Notify me" button are preserved + shown read-only. %>
+  <fieldset class="rule-fieldset flex flex-col gap-medium">
+    <legend><%= t('notification_rules.section_filter') %></legend>
 
-  <%# Read-only preview of what this alert is about. "Filter ändern" opens the
-      events page with this filter to adjust it; saving there comes back here. %>
-  <section class="rule-fieldset flex flex-col gap-small">
-    <div class="flex justify-between align-baseline gap-small">
-      <span class="rule-about-label"><%= t('notification_rules.new.about_label') %></span>
-      <%= link_to t('notification_rules.change_filter'),
-            events_path(q: filter.queries, l: filter.location_list, s: filter.style_list,
-                        d: filter.date_ranges, rule_id: (rule.id if rule.persisted?)),
-            class: 'text-link' %>
-    </div>
-    <div class="rule-card__chips flex gap-xsmall">
-      <% filter.style_list.each { |s| %><span class="chip"><%= s %></span><% } %>
-      <% filter.location_list.each { |l| %><span class="chip"><%= l %></span><% } %>
-      <% filter.queries.each { |q| %><span class="chip">“<%= q %>”</span><% } %>
-      <% filter.date_ranges.each { |d| %><span class="chip chip--window"><%= Datepicker.preset[d]&.dig(:label) || d %></span><% } %>
-    </div>
+    <% filter.queries.each { |q| %><%= hidden_field_tag 'q[]', q %><% } %>
+    <% if filter.queries.any? %>
+      <div class="rule-card__chips flex gap-xsmall">
+        <% filter.queries.each { |q| %><span class="chip">“<%= q %>”</span><% } %>
+      </div>
+    <% end %>
+
+    <label class="flex flex-col gap-xsmall">
+      <span><%= t('notification_rules.fields.filter_styles') %></span>
+      <div class="input-wrapper flex flex-grow">
+        <%= combobox_tag 's[]', combobox_options(available_tags(context: :styles), render_in: { partial: 'tags/chip' }, value: :name),
+              value: filter.style_list.join(','),
+              id: "rule_styles_#{rule.id || 'new'}",
+              multiselect_chip_src: chips_tags_path(context: 'styles'),
+              placeholder: t('events.filter.what') do |combobox| %>
+          <% combobox.customize_fieldset class: 'flex-grow' %>
+        <% end %>
+      </div>
+    </label>
+
+    <label class="flex flex-col gap-xsmall">
+      <span><%= t('notification_rules.fields.filter_locations') %></span>
+      <div class="input-wrapper flex flex-grow">
+        <%= combobox_tag 'l[]', combobox_options(available_tags(context: :locations), render_in: { partial: 'tags/location_chip' }, value: :name),
+              value: filter.location_list.join(','),
+              id: "rule_locations_#{rule.id || 'new'}",
+              multiselect_chip_src: chips_tags_path(context: 'locations'),
+              placeholder: t('events.filter.where') do |combobox| %>
+          <% combobox.customize_fieldset class: 'flex-grow' %>
+        <% end %>
+      </div>
+    </label>
+
+    <label class="flex flex-col gap-xsmall">
+      <span><%= t('notification_rules.fields.window') %></span>
+      <%= select_tag 'd[]', options_for_select(rule_window_options, filter.date_ranges.first),
+            include_blank: t('notification_rules.window_none'),
+            data: { 'rule-form-target': 'window', action: 'rule-form#update' } %>
+    </label>
+
     <p class="muted rule-hint">
       <% if filter.date_ranges.any? %><%= t('notification_rules.new.hint_happening') %><% else %><%= t('notification_rules.new.hint_added') %><% end %>
     </p>
-  </section>
+  </fieldset>
 
   <% if matches_favorites %>
     <label class="rule-check rule-sync flex gap-small">
@@ -52,54 +83,30 @@
     <%= form.text_field :name, value: rule.name.presence || rule.describe, placeholder: t('notification_rules.fields.name_placeholder') %>
   </label>
 
-  <% if rule.happening? %>
-    <%# What's-on rule: the firing rhythm is fixed by the window, so there's no
-        cadence control — just the firing point within the period + time. %>
-    <fieldset class="rule-fieldset flex flex-col gap-small">
-      <legend><%= t('notification_rules.section_when') %></legend>
-      <p class="muted rule-hint"><%= t('notification_rules.rhythm_note', rhythm: t("notification_rules.rhythm.#{rule.window_rhythm}")) %></p>
-      <div class="rule-row flex gap-small">
-        <% if rule.window_rhythm == 'weekly' %>
-          <label class="flex flex-col gap-xsmall">
-            <span><%= t('notification_rules.fields.weekday') %></span>
-            <%= form.select :weekday, rule_weekday_options %>
-          </label>
-        <% elsif rule.window_rhythm == 'monthly' %>
-          <label class="flex flex-col gap-xsmall">
-            <span><%= t('notification_rules.fields.monthday') %></span>
-            <%= form.select :monthday, rule_monthday_options %>
-          </label>
-        <% end %>
-        <label class="flex flex-col gap-xsmall">
-          <span><%= t('notification_rules.fields.time') %></span>
-          <%= form.time_field :time_string, value: rule.time_string %>
-        </label>
-      </div>
-    </fieldset>
-  <% else %>
-    <%# Newly-added rule: free cadence. weekday/monthday show per cadence (JS). %>
-    <fieldset class="rule-fieldset flex flex-col gap-small" data-controller="rule-form">
-      <legend><%= t('notification_rules.section_when') %></legend>
-      <div class="rule-row flex gap-small">
-        <label class="flex flex-col gap-xsmall">
-          <span><%= t('notification_rules.fields.cadence') %></span>
-          <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' } %>
-        </label>
-        <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
-          <span><%= t('notification_rules.fields.weekday') %></span>
-          <%= form.select :weekday, rule_weekday_options %>
-        </label>
-        <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
-          <span><%= t('notification_rules.fields.monthday') %></span>
-          <%= form.select :monthday, rule_monthday_options %>
-        </label>
-        <label class="flex flex-col gap-xsmall">
-          <span><%= t('notification_rules.fields.time') %></span>
-          <%= form.time_field :time_string, value: rule.time_string %>
-        </label>
-      </div>
-    </fieldset>
-  <% end %>
+  <%# One schedule block, reactive to the window select (above): with a window the
+      cadence is derived (picker hidden, model forces it), without one the user
+      picks freely. weekday shows for weekly/biweekly, monthday for monthly. %>
+  <fieldset class="rule-fieldset flex flex-col gap-small">
+    <legend><%= t('notification_rules.section_when') %></legend>
+    <div class="rule-row flex gap-small">
+      <label class="flex flex-col gap-xsmall" data-rule-form-target="cadenceField">
+        <span><%= t('notification_rules.fields.cadence') %></span>
+        <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' } %>
+      </label>
+      <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
+        <span><%= t('notification_rules.fields.weekday') %></span>
+        <%= form.select :weekday, rule_weekday_options %>
+      </label>
+      <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
+        <span><%= t('notification_rules.fields.monthday') %></span>
+        <%= form.select :monthday, rule_monthday_options %>
+      </label>
+      <label class="flex flex-col gap-xsmall">
+        <span><%= t('notification_rules.fields.time') %></span>
+        <%= form.time_field :time_string, value: rule.time_string %>
+      </label>
+    </div>
+  </fieldset>
 
   <fieldset class="rule-fieldset flex flex-col gap-small">
     <legend><%= t('notification_rules.section_channels') %></legend>

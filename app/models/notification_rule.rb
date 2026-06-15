@@ -73,9 +73,12 @@ class NotificationRule < ApplicationRecord
   def filter_attributes=(params)
     self.filter = {
       "queries" => clean(params[:q]),
-      "style_list" => clean(params[:s]),
-      "location_list" => clean(params[:l]),
-      "date_ranges" => clean(params[:d])
+      "style_list" => split_tags(params[:s]),
+      "location_list" => split_tags(params[:l]),
+      # Rules only do relative windows (re-resolved each fire); a fixed absolute
+      # range makes no sense for a recurring alert (and would silently die once
+      # past), so drop non-presets — the rule falls back to "new events".
+      "date_ranges" => clean(params[:d]).select { |range| Datepicker.preset.key?(range) }
     }
   end
 
@@ -196,6 +199,10 @@ class NotificationRule < ApplicationRecord
 
   def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
 
+  # Multiselect comboboxes submit their picks as one comma-joined string; the
+  # events filter submits a real array. Accept either → a clean array of names.
+  def split_tags(value) = Array(value).flat_map { |v| v.to_s.split(",") }.map(&:strip).reject(&:blank?)
+
   def describe_favorites
     label = I18n.t("notification_rules.favorites_live")
     active_windows.any? ? "#{label} · #{window_labels.join(', ')}" : label
@@ -255,7 +262,10 @@ class NotificationRule < ApplicationRecord
       f.queries = queries
       f.style_list = style_list
       f.location_list = location_list
-      f.date_ranges = date_ranges
+      # Presets only — never a stored absolute range (see filter_attributes=).
+      # active_windows also covers any legacy rule that still has one stored, so
+      # it falls back to the new-events floor rather than a dead past range.
+      f.date_ranges = active_windows
     end
   end
 

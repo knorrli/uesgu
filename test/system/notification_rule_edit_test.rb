@@ -1,14 +1,14 @@
 require "application_system_test_case"
 
-# Editing an alert (Point 2): the edit form changes schedule/name in place, and
-# "Filter ändern" round-trips through the events page to adjust the filter and
-# save it back onto the same rule. Selectors/hrefs are used instead of
+# Editing an alert (Point 2, inline): the whole rule — schedule, channels, name,
+# and the filter (multiselect comboboxes + a window select) — is edited on one
+# form, no events-page round-trip. Selectors/option-values are used instead of
 # translated labels so the test doesn't care which locale renders.
 class NotificationRuleEditTest < ApplicationSystemTestCase
   def setup
     @user = user
     @rule = @user.notification_rules.new(name: "My alert", cadence: "weekly", weekday: 5, time_of_day: 1050)
-    @rule.filter_attributes = { s: ["Rock"] }
+    @rule.filter_attributes = { s: ["Rock"] } # no window → "added"
     @rule.save!
     event(start_date: Date.current + 3, style_list: ["Rock"])
     sign_in_as @user
@@ -26,21 +26,27 @@ class NotificationRuleEditTest < ApplicationSystemTestCase
     assert_text "Renamed alert"
   end
 
-  test "Filter ändern round-trips through the events page and saves back to the rule" do
+  test "the inline filter shows the saved selection and a window select" do
     visit edit_notification_rule_path(@rule)
 
-    # The filter is shown read-only with a round-trip link to the events page.
-    change_link = find("a[href*='rule_id=#{@rule.id}']")
-    change_link.click
+    assert_selector "select[name='d[]']"                 # window select present
+    assert_selector "input[name='s[]'][value='Rock']", visible: :all  # styles pre-filled
+  end
 
-    # On the events page in edit mode, the notify row offers "save filter" back
-    # to this rule (link points at the rule's update/edit path).
-    save = find("a.notify-filter-link[href*='/notification_rules/#{@rule.id}/edit']")
-    save.click
+  test "selecting a window flips the rule to happening and hides the cadence picker" do
+    visit edit_notification_rule_path(@rule)
 
-    # Back on the edit form; saving completes the round trip.
-    assert_field "notification_rule[name]", with: "My alert"
+    # added rule → cadence picker visible to start
+    assert_selector "[data-rule-form-target='cadenceField']"
+    # pick a window by value (locale-independent); the schedule reacts
+    find("select[name='d[]'] option[value='this_weekend']").select_option
+    assert_no_selector "[data-rule-form-target='cadenceField']", visible: true
+
     find("input[type=submit]").click
     assert_current_path notification_rules_path
+
+    @rule.reload
+    assert @rule.happening?
+    assert_equal ["this_weekend"], @rule.date_ranges
   end
 end

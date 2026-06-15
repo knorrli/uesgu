@@ -85,6 +85,7 @@ fr:
     add_rule: Ajouter une règle
     create_button: Créer la règle
     save_button: Enregistrer
+    window_none: Sans période (nouveautés)
     created: Règle créée.
     updated: Règle mise à jour.
     deleted: Règle supprimée.
@@ -100,7 +101,6 @@ fr:
     delete_confirm: Vraiment supprimer cette règle ?
     default_name: Notification
     edit_button: Modifier
-    change_filter: Modifier le filtre
     empty_link: Filtre les événements
     empty_html: Aucune alerte. %{link} sur la page d'accueil, puis touche « M'avertir ».
     favorites_live: Mes favoris (toujours à jour)
@@ -120,7 +120,7 @@ fr:
       cancel: Annuler
     edit:
       title: Modifier la notification
-      intro: Fréquence, heure et canaux — modifie le filtre via « Modifier le filtre ».
+      intro: Ce qu'elle surveille, quand et comment tu es prévenu.
     email_unavailable: ajoute une adresse e-mail dans les réglages
     section_when: Quand
     section_what: À propos de quoi
@@ -178,6 +178,7 @@ fr:
       scope: Filtre
       filter_styles: Styles
       filter_styles_ph: p. ex. Rock, Jazz
+      filter_locations: Lieux
       filter_locations: Lieux
       filter_locations_ph: p. ex. Dachstock, Rössli
       filter_queries: Termes de recherche
@@ -535,8 +536,6 @@ fr:
       favorites_filter:
         label: Mes favoris
       notify_filter: M'avertir
-      save_filter: Enregistrer le filtre
-      cancel_edit: Annuler
     day:
       empty: Aucun événement ce jour-là.
       close: Fermer

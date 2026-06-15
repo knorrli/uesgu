@@ -15,6 +15,12 @@ module NotificationRulesHelper
     (1..28).map { |day| [t("notification_rules.monthday_option", day: day), day] }
   end
 
+  # The relative windows offerable on a rule (blank = none → "new events"). Only
+  # presets — a rule never takes an absolute range (see NotificationRule).
+  def rule_window_options
+    NotificationRule::WINDOW_RHYTHM.keys.map { |key| [t("datepicker.#{key}"), key] }
+  end
+
   # --- alert descriptions (the read-only list + the new-alert preview) -------
 
   # "Weekly on Friday at 17:30"

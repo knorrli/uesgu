@@ -85,6 +85,7 @@ en:
     add_rule: Add a rule
     create_button: Create rule
     save_button: Save
+    window_none: No window (new events)
     created: Rule created.
     updated: Rule updated.
     deleted: Rule deleted.
@@ -100,7 +101,6 @@ en:
     delete_confirm: Really delete this rule?
     default_name: Notification
     edit_button: Edit
-    change_filter: Change filter
     empty_link: Filter the events
     empty_html: No alerts yet. %{link} on the home page, then tap “Notify me”.
     favorites_live: My favorites (kept current)
@@ -120,7 +120,7 @@ en:
       cancel: Cancel
     edit:
       title: Edit notification
-      intro: Frequency, time and channels — change the filter via “Change filter”.
+      intro: What it watches, when, and how you're notified.
     email_unavailable: add an email address in settings
     section_when: When
     section_what: About what
@@ -178,6 +178,7 @@ en:
       scope: Filter
       filter_styles: Styles
       filter_styles_ph: e.g. Rock, Jazz
+      filter_locations: Places
       filter_locations: Locations
       filter_locations_ph: e.g. Dachstock, Rössli
       filter_queries: Search terms
@@ -535,8 +536,6 @@ en:
       favorites_filter:
         label: My favorites
       notify_filter: Notify me
-      save_filter: Save filter
-      cancel_edit: Cancel
     day:
       empty: No events on this day.
       close: Close

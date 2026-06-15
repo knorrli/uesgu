@@ -28,6 +28,26 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert rule(u, filter: { l: ['Some Venue'] }).added?
   end
 
+  test 'a custom absolute date range is dropped on save (falls back to new events)' do
+    r = rule(user, filter: { s: ['some-style'], d: ['2030-06-20 - 2030-06-25'] })
+    assert_empty r.date_ranges, 'the absolute range is not stored as a window'
+    assert r.added?
+  end
+
+  test 'a legacy stored custom range is ignored as a window (no dead past range)' do
+    r = rule(user, filter: { s: ['some-style'] })
+    # Simulate an old row that stored an absolute range directly in the jsonb.
+    r.filter = r.filter.merge('date_ranges' => ['2020-01-01 - 2020-01-02'])
+    assert_empty r.active_windows
+    assert r.added?
+  end
+
+  test 'comma-joined multiselect picks are split into separate tags' do
+    assert_equal %w[Rock Jazz Folk], rule(user, filter: { s: ['Rock,Jazz,Folk'] }).style_list
+    # a real array (events-filter shape) still works
+    assert_equal %w[Rock Jazz], rule(user, filter: { s: %w[Rock Jazz] }).style_list
+  end
+
   # --- matched_events: added -------------------------------------------------
 
   # Real-current dates here: the non-favorites path delegates to

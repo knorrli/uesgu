@@ -85,6 +85,7 @@ de:
     add_rule: Regel hinzufügen
     create_button: Regel erstellen
     save_button: Speichern
+    window_none: Kein Zeitraum (neue Events)
     created: Regel erstellt.
     updated: Regel aktualisiert.
     deleted: Regel gelöscht.
@@ -100,7 +101,6 @@ de:
     delete_confirm: Diese Regel wirklich löschen?
     default_name: Mitteilung
     edit_button: Bearbeiten
-    change_filter: Filter ändern
     empty_link: Filtere die Veranstaltungen
     empty_html: Noch keine Alerts. %{link} auf der Startseite, dann tippe „Benachrichtigen“.
     favorites_live: Meine Favoriten (automatisch aktuell)
@@ -120,7 +120,7 @@ de:
       cancel: Abbrechen
     edit:
       title: Benachrichtigung bearbeiten
-      intro: Häufigkeit, Uhrzeit und Kanäle — den Filter änderst du über „Filter ändern“.
+      intro: Worüber, wann und wie du benachrichtigt wirst.
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
     section_when: Wann
     section_what: Worüber
@@ -178,6 +178,7 @@ de:
       scope: Filter
       filter_styles: Stile
       filter_styles_ph: z. B. Rock, Jazz
+      filter_locations: Orte
       filter_locations: Orte
       filter_locations_ph: z. B. Dachstock, Rössli
       filter_queries: Suchbegriffe
@@ -535,8 +536,6 @@ de:
       favorites_filter:
         label: Meine Favoriten
       notify_filter: Benachrichtigen
-      save_filter: Filter speichern
-      cancel_edit: Abbrechen
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen

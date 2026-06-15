@@ -31,12 +31,9 @@ class NotificationRulesController < ApplicationController
     end
   end
 
-  # The schedule/channels/name live on this form; the filter is edited by
-  # round-tripping to the events page ("Filter ändern" → save back here). So the
-  # filter shown comes from the round-trip params when present, else the rule's
-  # own saved filter.
+  # The whole rule (schedule, channels, name, and the filter via inline
+  # multiselect comboboxes + a window select) is edited on this one form.
   def edit
-    @rule.filter_attributes = filter_params if filter_present?
     @filter = filter_for(@rule)
     @matches_favorites = favorites_match?(@filter)
   end
@@ -106,14 +103,7 @@ class NotificationRulesController < ApplicationController
     end
   end
 
-  # True when the request carries a landing-page filter (q/l/s/d) — i.e. we're
-  # arriving back from the events page after "Filter ändern".
-  def filter_present?
-    %i[q l s d].any? { |key| params[key].present? }
-  end
-
-  # The read-only filter shown on the form, built from the rule (after edit/update
-  # may have re-applied round-trip params onto it).
+  # The filter shown on the edit form, built from the rule's saved filter.
   def filter_for(rule)
     Filter.new.tap do |filter|
       filter.queries = rule.queries

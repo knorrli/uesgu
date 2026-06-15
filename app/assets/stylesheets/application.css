@@ -62,8 +62,13 @@ a {
 
 /* Neutral at rest, accent underline on focus — green now signals "this field is
    active", rather than decorating every passive field. The outline is suppressed
-   in favour of the underline (the field's own focus affordance). */
-.account-form input:focus,
+   in favour of the underline (the field's own focus affordance). Scoped to the
+   same text-like inputs as the styling above: a checkbox/radio is an <input>
+   too, and the bare `input:focus` form gave a focused checkbox a green
+   bottom-border (visible in Firefox) while killing its real focus ring. */
+.account-form input[type="text"]:focus,
+.account-form input[type="email"]:focus,
+.account-form input[type="password"]:focus,
 .account-form select:focus {
   outline: none;
   border-bottom-color: var(--theme-accent-color);

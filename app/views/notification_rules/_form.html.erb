@@ -19,7 +19,7 @@
       aren't editable here (no fixed option to chip), but any carried from the
       events "Notify me" button are preserved + shown read-only. %>
   <fieldset class="rule-fieldset flex flex-col gap-medium">
-    <legend><%= t('notification_rules.section_filter') %></legend>
+    <legend><%= t('notification_rules.section_what') %></legend>
 
     <%# "What" — styles AND free text in one field, like the landing-page filter:
         a pick matches a style, free text becomes a query. Locations are a second
@@ -76,22 +76,22 @@
       picks freely. weekday shows for weekly/biweekly, monthday for monthly. %>
   <fieldset class="rule-fieldset flex flex-col gap-small">
     <legend><%= t('notification_rules.section_when') %></legend>
+    <%# No per-field labels — the values speak for themselves (matching the
+        filter's placeholder-only style); aria-label keeps each control named for
+        assistive tech. The time steps in 15-min increments (the scheduler runs
+        quarter-hourly, so finer times would just round up and confuse). %>
     <div class="rule-row flex gap-small">
       <label class="flex flex-col gap-xsmall" data-rule-form-target="cadenceField">
-        <span><%= t('notification_rules.fields.cadence') %></span>
-        <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' } %>
+        <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' }, 'aria-label': t('notification_rules.fields.cadence') %>
       </label>
       <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
-        <span><%= t('notification_rules.fields.weekday') %></span>
-        <%= form.select :weekday, rule_weekday_options %>
+        <%= form.select :weekday, rule_weekday_options, {}, 'aria-label': t('notification_rules.fields.weekday') %>
       </label>
       <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
-        <span><%= t('notification_rules.fields.monthday') %></span>
-        <%= form.select :monthday, rule_monthday_options %>
+        <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('notification_rules.fields.monthday') %>
       </label>
       <label class="flex flex-col gap-xsmall">
-        <span><%= t('notification_rules.fields.time') %></span>
-        <%= form.time_field :time_string, value: rule.time_string %>
+        <%= form.time_field :time_string, value: rule.time_string, step: 900, 'aria-label': t('notification_rules.fields.time') %>
       </label>
     </div>
   </fieldset>

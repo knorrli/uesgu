@@ -48,6 +48,10 @@ class NotificationRule < ApplicationRecord
   # A happening rule's cadence is fixed by its window (see WINDOW_RHYTHM), so the
   # form hides the cadence control and the user can't pick a clashing cadence.
   before_validation { self.cadence = window_rhythm if happening? }
+  # The scheduler sweeps quarter-hourly, so a rule only ever fires at
+  # :00/:15/:30/:45 — snap the chosen time to the nearest quarter so the saved
+  # time matches when it actually fires (the form's input also steps by 15 min).
+  before_validation :snap_time_to_quarter
 
   def targets_something
     return if track_favorites?
@@ -200,6 +204,13 @@ class NotificationRule < ApplicationRecord
   private
 
   def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
+
+  def snap_time_to_quarter
+    return if time_of_day.blank?
+    snapped = (time_of_day / 15.0).round * 15
+    snapped -= 15 if snapped >= 1440 # keep a late time on the same day (→ 23:45)
+    self.time_of_day = snapped
+  end
 
   def describe_favorites
     "#{I18n.t('notification_rules.favorites_live')} · #{temporal_label}"

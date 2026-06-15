@@ -249,4 +249,15 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert_equal 1050, r.time_of_day
     assert_equal '17:30', r.time_string
   end
+
+  test 'time snaps to the quarter hour on save (the scheduler runs quarterly)' do
+    r = rule(user, filter: { s: ['Rock'] })
+    r.time_string = '17:03'
+    r.save!
+    assert_equal((17 * 60), r.time_of_day) # 17:03 → 17:00
+
+    r.time_string = '17:08'
+    r.save!
+    assert_equal((17 * 60) + 15, r.time_of_day) # 17:08 → 17:15
+  end
 end

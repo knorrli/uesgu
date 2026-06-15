@@ -78,8 +78,10 @@
     <legend><%= t('notification_rules.section_when') %></legend>
     <%# No per-field labels — the values speak for themselves (matching the
         filter's placeholder-only style); aria-label keeps each control named for
-        assistive tech. The time steps in 15-min increments (the scheduler runs
-        quarter-hourly, so finer times would just round up and confuse). %>
+        assistive tech. The time snaps to the quarter hour on blur (rule-form#
+        snapTime), since the scheduler runs quarter-hourly — done with JS rather
+        than step= so an off-quarter entry quietly rounds instead of blocking
+        submit with a validation error. %>
     <div class="rule-row flex gap-small">
       <label class="flex flex-col gap-xsmall" data-rule-form-target="cadenceField">
         <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' }, 'aria-label': t('notification_rules.fields.cadence') %>
@@ -91,7 +93,7 @@
         <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('notification_rules.fields.monthday') %>
       </label>
       <label class="flex flex-col gap-xsmall">
-        <%= form.time_field :time_string, value: rule.time_string, step: 900, 'aria-label': t('notification_rules.fields.time') %>
+        <%= form.time_field :time_string, value: rule.time_string, 'aria-label': t('notification_rules.fields.time'), data: { action: 'change->rule-form#snapTime' } %>
       </label>
     </div>
   </fieldset>

@@ -36,6 +36,22 @@ class NotificationRuleEditTest < ApplicationSystemTestCase
     assert_includes @rule.reload.style_list, "Jazz"
   end
 
+  test "an off-quarter time snaps to the nearest quarter on change (no validation block)" do
+    visit edit_notification_rule_path(@rule)
+
+    time = find("input[type=time]")
+    # No step= constraint, so an off-quarter value is accepted, then snapped.
+    page.execute_script(<<~JS)
+      const t = document.querySelector("input[type=time]")
+      t.value = "18:04"
+      t.dispatchEvent(new Event("change", { bubbles: true }))
+    JS
+    assert_equal "18:00", time.value
+
+    find("input[type=submit]").click
+    assert_current_path notification_rules_path
+  end
+
   test "the inline filter shows the saved selection and a window select" do
     visit edit_notification_rule_path(@rule)
 

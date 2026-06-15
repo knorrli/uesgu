@@ -1,107 +1,79 @@
-<section class="filter flex flex-col gap-medium" >
-  <%= form_with url: events_path, method: :get, id: 'filter-form', class: 'flex flex-col gap-medium', html: { autocomplete: 'off' }, data: { filter_target: 'form', turbo_frame: '_top' } do |f| %>
-    <div class="filter-field flex flex-col gap-small">
-      <% if @filter.style_list.present? || @filter.queries.present? %>
-        <div class="chips flex flex-row wrap gap-small">
-          <% @filter.style_list.each do |style| %>
-            <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeStyle', filter_value_param: style.to_s } do %>
-              <div class="flex gap-small align-center">
-                <span class="<%= tag_icon_class(context: 'styles') %>"></span>
-                <span><%= style %></span>
-                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
-              </div>
-            <% end %>
-          <% end %>
+<%# The events filter. Three stacked fields (what / where / when) feed the shared
+    tag-picker collector; every applied filter shows as a chip in one combined row
+    below them (compact, and identical to the rule form). auto-submit is on, so
+    each add/remove re-runs the filter and the chips come back server-rendered. %>
+<section class="filter flex flex-col gap-medium">
+  <%= form_with url: events_path, method: :get, id: 'filter-form',
+        class: 'filter-form flex flex-col gap-medium', html: { autocomplete: 'off' },
+        data: { controller: 'tag-picker', 'tag-picker-auto-submit-value': true, turbo_frame: '_top' } do |f| %>
 
-          <% @filter.queries.each do |query| %>
-            <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeQuery', filter_value_param: query.to_s } do %>
-              <div class="flex gap-small align-center">
-                <span class="<%= tag_icon_class(context: 'query') %>"></span>
-                <span><%= query %></span>
-                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
-              </div>
-            <% end %>
+    <div class="filter-fields flex flex-col">
+      <%# What — styles AND free text in one field: a pick matches a style, free
+          text becomes a query. The combobox name is a throwaway (only the chips'
+          s[]/q[] hidden fields submit). The "Search for «X»" row lives here too. %>
+      <div class="filter-field" data-tag-picker-target="whatField">
+        <div class="input-wrapper flex flex-row gap-small"
+             data-action="hw-combobox:selection->tag-picker#add"
+             data-tag-picker-field-param="s[]" data-tag-picker-query-field-param="q[]">
+          <%= f.combobox('what', combobox_options(available_tags(context: :styles, applied: @filter.style_list), render_in: { partial: 'tags/chip' }, value: :name), name_when_new: 'query', placeholder: t('.what')) do |combobox| %>
+            <% combobox.customize_fieldset class: 'flex-grow' %>
+            <%# Lead with the magnifying glass (not the styles glyph): the field's
+                superpower is free-text search over acts/styles/genres, which a
+                static styles icon hid. A persistent search icon advertises it. %>
+            <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
           <% end %>
         </div>
-      <% end %>
 
-      <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addStyleOrQuery">
-        <%= f.hidden_field 'q[]', value: '', data: { filter_target: 'comboboxInput queriesInput', existing_values: @filter.queries.to_json } %>
-        <%= f.combobox('s[]', combobox_options(available_tags(context: :styles, applied: @filter.style_list), render_in: { partial: 'tags/chip' }, value: :name), name_when_new: 'query', placeholder: t('.what')) do |combobox| %>
-          <% combobox.customize_fieldset class: 'flex-grow' %>
-          <% combobox.customize_hidden_field data: { filter_target: 'comboboxInput stylesInput', existing_values: @filter.style_list.to_json } %>
-          <%# Lead with the magnifying glass (not the styles glyph): the field's
-              superpower is free-text search over acts/styles/genres, which a static
-              styles icon hid. A persistent search icon advertises it at rest. %>
-          <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
-        <% end %>
+        <%# Free-text "Search for «X»" affordance. The combobox accepts free text
+            (name_when_new) but gives no hint; tag-picker#connect moves this row
+            into the dropdown and reveals it when the typed text matches no style.
+            Hidden + no filterable attribute, so the gem never treats it as an
+            option. %>
+        <button type="button" hidden
+                class="hw-combobox__option filter-searchfor"
+                data-tag-picker-target="searchFor"
+                data-search-for-template="<%= t('events.filter.search_for', query: '%{query}') %>"
+                data-action="tag-picker#addSearchQuery">
+          <span class="filter-searchfor__icon <%= tag_icon_class(context: 'query') %>" aria-hidden="true"></span>
+          <span class="filter-searchfor__label" data-search-for-label></span>
+          <span class="filter-searchfor__type"><%= t('events.filter.free_text') %></span>
+        </button>
       </div>
 
-      <%# Free-text "Search for «X»" affordance, mirroring the mobile sheet. The
-          combobox accepts free text (name_when_new) but gives no hint; filter#connect
-          moves this row into the dropdown and reveals it (shared search_for logic)
-          when the typed text matches no style. Hidden + no filterable attribute, so
-          the gem never treats it as an option. %>
-      <button type="button" hidden
-              class="hw-combobox__option filter-searchfor"
-              data-filter-target="searchFor"
-              data-search-for-template="<%= t('events.filter.search_for', query: '%{query}') %>"
-              data-action="filter#addSearchQuery">
-        <span class="filter-searchfor__icon <%= tag_icon_class(context: 'query') %>" aria-hidden="true"></span>
-        <span class="filter-searchfor__label" data-search-for-label></span>
-        <span class="filter-searchfor__type"><%= t('events.filter.free_text') %></span>
-      </button>
-    </div>
-
-    <div class="filter-field flex flex-col gap-small">
-      <% if @filter.location_list.any? %>
-        <div class="chips flex flex-row wrap gap-small">
-          <% @filter.location_list.each do |location| %>
-            <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeLocation', filter_value_param: location.to_s } do %>
-              <div class="flex gap-small align-center">
-                <span class="<%= tag_icon_class(context: Location.type_for(location)) %>"></span>
-                <span><%= location %></span>
-                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
-              </div>
-            <% end %>
+      <div class="filter-field">
+        <div class="input-wrapper flex flex-row gap-small"
+             data-action="hw-combobox:selection->tag-picker#add"
+             data-tag-picker-field-param="l[]">
+          <%= f.combobox 'where', combobox_options(available_tags(context: :locations, applied: @filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name), placeholder: t('.where') do |combobox| %>
+            <% combobox.customize_fieldset class: 'flex-grow' %>
+            <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
           <% end %>
         </div>
-      <% end %>
-
-      <div class="input-wrapper flex flex-row gap-small" data-action="hw-combobox:selection->filter#addLocation">
-        <%= f.combobox 'l[]', combobox_options(available_tags(context: :locations, applied: @filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name), placeholder: t('.where') do |combobox| %>
-          <% combobox.customize_fieldset class: 'flex-grow' %>
-          <% combobox.customize_hidden_field value: 'test', data: { filter_target: 'comboboxInput locationsInput', existing_values: @filter.location_list.to_json } %>
-          <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
-        <% end %>
       </div>
-    </div>
 
-    <div class="filter-field flex flex-col gap-small">
-      <% if @filter.date_ranges.any? %>
-        <div class="chips flex flex-row wrap gap-small">
-          <% @filter.date_ranges.each do |date_range| %>
-            <%= button_tag type: :button, class: class_names(:tag, :active), data: { action: 'filter#removeDateRange', filter_value_param: date_range.to_s } do %>
-              <div class="flex gap-small align-center">
-                <span class="<%= tag_icon_class(context: 'date') %>"></span>
-                <span><%= datepicker_tag_content(date_range) %></span>
-                <span class="ph ph-x tag__remove" aria-hidden="true"></span>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-      <% end %>
-
-      <div class="datepicker input-wrapper flex flex-row gap-small" data-controller="datepicker" data-datepicker-date-range-value="" data-datepicker-date-ranges-value="<%= @filter.date_ranges.to_json %>" data-datepicker-lang-value="<%= I18n.locale %>" data-datepicker-preset-value="<%= Datepicker.preset.to_json %>" data-action="datepicker:selection->filter#addDateRange datepicker:removal->filter#removeDateRange" data-datepicker-target="wrapper">
-        <%= f.hidden_field 'd[]', id: 'd[]-hidden-input', data: { filter_target: 'comboboxInput dateRangesInput', existing_values: @filter.date_ranges.to_json } %>
-        <div class="flex-grow">
-          <div class="hw-combobox__main__wrapper flex flex-grow">
-            <%= text_field_tag '', nil, id: 'd[]', readonly: true, placeholder: t('.when'), data: { datepicker_target: 'input' } %>
-            <span class="datepicker-handle filter-icon <%= tag_icon_class(context: 'date') %>" data-action="click->datepicker#toggle"></span>
+      <div class="filter-field">
+        <div class="datepicker input-wrapper flex flex-row gap-small" data-controller="datepicker"
+             data-datepicker-date-range-value="" data-datepicker-date-ranges-value="<%= @filter.date_ranges.to_json %>"
+             data-datepicker-lang-value="<%= I18n.locale %>" data-datepicker-preset-value="<%= Datepicker.preset.to_json %>"
+             data-action="datepicker:selection->tag-picker#addRange" data-datepicker-target="wrapper"
+             data-tag-picker-field-param="d[]">
+          <div class="flex-grow">
+            <div class="hw-combobox__main__wrapper flex flex-grow">
+              <%= text_field_tag '', nil, id: 'd[]', readonly: true, placeholder: t('.when'), data: { datepicker_target: 'input' } %>
+              <span class="datepicker-handle filter-icon <%= tag_icon_class(context: 'date') %>" data-action="click->datepicker#toggle"></span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <%# One combined chips row for every applied filter (what · where · when),
+        below all three fields — compact, icons disambiguate the category. %>
+    <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
+      <% @filter.style_list.each { |style| %><%= render 'tags/filter_chip', param: 's[]', value: style %><% } %>
+      <% @filter.queries.each { |query| %><%= render 'tags/filter_chip', param: 'q[]', value: query %><% } %>
+      <% @filter.location_list.each { |location| %><%= render 'tags/filter_chip', param: 'l[]', value: location %><% } %>
+      <% @filter.date_ranges.each { |date_range| %><%= render 'tags/filter_chip', param: 'd[]', value: date_range.to_s, label: date_range_label(date_range) %><% } %>
+    </div>
   <% end %>
 </section>
-

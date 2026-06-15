@@ -1,5 +1,5 @@
 // Shared "search for «X»" free-text logic for the event filter — the one piece
-// of behaviour the desktop combobox (filter_controller) and the mobile sheets
+// of behaviour the desktop combobox (tag_picker_controller) and the mobile sheets
 // (filter_sheets_controller) must agree on. Both fields accept a free-text query
 // alongside the fixed style options; this decides when to offer it.
 //

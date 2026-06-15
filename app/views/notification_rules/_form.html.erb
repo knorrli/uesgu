@@ -21,38 +21,57 @@
   <fieldset class="rule-fieldset flex flex-col gap-medium">
     <legend><%= t('notification_rules.section_what') %></legend>
 
-    <%# "What" — styles AND free text in one field, like the landing-page filter:
-        a pick matches a style, free text becomes a query. Locations are a second
-        multiselect. Chips (incl. free text) render via tags#chips. Labels are
-        dropped in favour of the placeholders, matching the main filter. %>
-    <%# "What" — pick styles or type free text (→ a query), like the landing page.
-        The tag-picker controller routes each into its own chip (s[] vs q[]). %>
-    <div class="filter-field flex flex-col gap-small" data-controller="tag-picker"
-         data-tag-picker-param-value="s[]" data-tag-picker-query-param-value="q[]">
-      <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
-        <% filter.style_list.each { |s| %><%= render 'chip', param: 's[]', value: s %><% } %>
-        <% filter.queries.each { |q| %><%= render 'chip', param: 'q[]', value: q %><% } %>
-      </div>
-      <div class="input-wrapper flex flex-grow" data-action="hw-combobox:selection->tag-picker#add">
-        <%= combobox_tag 'style_pick', combobox_options(available_tags(context: :styles), value: :name),
-              name_when_new: 'query', id: "rule_what_#{rule.id || 'new'}",
-              placeholder: t('events.filter.what') do |combobox| %>
-          <% combobox.customize_fieldset class: 'flex-grow' %>
-        <% end %>
-      </div>
-    </div>
+    <%# Same layout as the events filter (app/views/events/_filter.html.erb): the
+        what + where fields stacked, then one combined chips row below, all driven
+        by the shared tag-picker collector. The only differences are deliberate —
+        no auto-submit (chips wait for Save) and "when" is a preset window select,
+        since a recurring alert has no custom date range. %>
+    <div data-controller="tag-picker">
+      <div class="filter-fields flex flex-col">
+        <%# "What" — pick a style or type free text (→ a query), like the events
+            filter. tag-picker routes each into its own chip (s[] vs q[]); the
+            "Search for «X»" row hints at the free-text path. %>
+        <div class="filter-field" data-tag-picker-target="whatField">
+          <div class="input-wrapper flex flex-row gap-small"
+               data-action="hw-combobox:selection->tag-picker#add"
+               data-tag-picker-field-param="s[]" data-tag-picker-query-field-param="q[]">
+            <%= combobox_tag 'style_pick', combobox_options(available_tags(context: :styles), value: :name),
+                  name_when_new: 'query', id: "rule_what_#{rule.id || 'new'}",
+                  placeholder: t('events.filter.what') do |combobox| %>
+              <% combobox.customize_fieldset class: 'flex-grow' %>
+              <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
+            <% end %>
+          </div>
 
-    <div class="filter-field flex flex-col gap-small" data-controller="tag-picker"
-         data-tag-picker-param-value="l[]">
-      <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
-        <% filter.location_list.each { |l| %><%= render 'chip', param: 'l[]', value: l %><% } %>
+          <button type="button" hidden
+                  class="hw-combobox__option filter-searchfor"
+                  data-tag-picker-target="searchFor"
+                  data-search-for-template="<%= t('events.filter.search_for', query: '%{query}') %>"
+                  data-action="tag-picker#addSearchQuery">
+            <span class="filter-searchfor__icon <%= tag_icon_class(context: 'query') %>" aria-hidden="true"></span>
+            <span class="filter-searchfor__label" data-search-for-label></span>
+            <span class="filter-searchfor__type"><%= t('events.filter.free_text') %></span>
+          </button>
+        </div>
+
+        <div class="filter-field">
+          <div class="input-wrapper flex flex-row gap-small"
+               data-action="hw-combobox:selection->tag-picker#add"
+               data-tag-picker-field-param="l[]">
+            <%= combobox_tag 'location_pick', combobox_options(available_tags(context: :locations), value: :name),
+                  id: "rule_where_#{rule.id || 'new'}",
+                  placeholder: t('events.filter.where') do |combobox| %>
+              <% combobox.customize_fieldset class: 'flex-grow' %>
+              <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
+            <% end %>
+          </div>
+        </div>
       </div>
-      <div class="input-wrapper flex flex-grow" data-action="hw-combobox:selection->tag-picker#add">
-        <%= combobox_tag 'location_pick', combobox_options(available_tags(context: :locations), value: :name),
-              id: "rule_where_#{rule.id || 'new'}",
-              placeholder: t('events.filter.where') do |combobox| %>
-          <% combobox.customize_fieldset class: 'flex-grow' %>
-        <% end %>
+
+      <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
+        <% filter.style_list.each { |s| %><%= render 'tags/filter_chip', param: 's[]', value: s %><% } %>
+        <% filter.queries.each { |q| %><%= render 'tags/filter_chip', param: 'q[]', value: q %><% } %>
+        <% filter.location_list.each { |l| %><%= render 'tags/filter_chip', param: 'l[]', value: l %><% } %>
       </div>
     </div>
 

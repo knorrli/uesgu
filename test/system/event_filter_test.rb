@@ -1,15 +1,34 @@
 require "application_system_test_case"
 
-# The desktop free-text affordance (filter_controller + lib/search_for): a
-# "search for «X»" row appears in the What dropdown when the typed text matches
-# no style, and clicking it commits a free-text query. Mirrors the mobile sheet.
+# The desktop free-text affordance (tag-picker + lib/search_for): a "search for
+# «X»" row appears in the What dropdown when the typed text matches no style, and
+# clicking it commits a free-text query. Mirrors the mobile sheet.
 class EventFilterTest < ApplicationSystemTestCase
+  # The shared tag-picker collector drives the desktop filter with auto-submit:
+  # every pick/removal re-runs the filter and the chips come back server-rendered.
+  test "picking a style auto-submits, and removing the chip auto-submits" do
+    event(start_date: Date.current + 3, style_list: ["Rock"])
+
+    visit events_path
+    within ".filter-desktop" do
+      find('input[role="combobox"]', match: :first).send_keys("Rock")
+    end
+    find("[role=option]", text: "Rock", match: :first).click
+
+    assert_current_path(/s%5B%5D=Rock/)
+    assert_selector ".filter-desktop .chips .tag", text: "Rock"
+
+    find(".filter-desktop .chips .tag", text: "Rock").find(".tag__remove").click
+    assert_no_selector ".filter-desktop .chips .tag", text: "Rock"
+    assert_no_current_path(/s%5B%5D=Rock/)
+  end
+
   test "desktop What field reveals a free-text row and commits it as a query" do
     event(start_date: Date.current + 3, style_list: ["Rock"])
 
     visit events_path
 
-    # Wait for filter#connect to have moved the (hidden) search-for row into the
+    # Wait for tag-picker#connect to have moved the (hidden) search-for row into the
     # listbox before typing — otherwise the first keystrokes can race the
     # controller connecting and the input listener misses them.
     assert_selector ".filter-desktop .filter-searchfor", visible: :all

@@ -4,7 +4,7 @@ module TagsHelper
 
   # The Phosphor glyph class for a tag context, without the ICON_BASE weight,
   # e.g. 'ph-house'. Kept separate so JS can swap a single glyph class on an
-  # element that already carries ICON_BASE (see filter_controller.js).
+  # element that already carries ICON_BASE (see style_picker_controller.js).
   def tag_icon_glyph(context:)
     case context.to_s
     when 'query'
@@ -29,6 +29,22 @@ module TagsHelper
   # Full icon class incl. the Phosphor weight, e.g. 'ph ph-house'.
   def tag_icon_class(context:)
     "#{ICON_BASE} #{tag_icon_glyph(context: context)}"
+  end
+
+  # The leading icon on an applied-filter chip, derived from its param so the
+  # events filter and the rule form (and the tag-picker controller, which mirrors
+  # this map in JS) render the same glyph for the same kind of token. Locations
+  # use one neutral pin here rather than the venue/city/canton split — the chip
+  # says "where", the dropdown row still carries the precise type.
+  FILTER_CHIP_GLYPH = {
+    's[]' => 'ph-music-notes',
+    'q[]' => 'ph-magnifying-glass',
+    'l[]' => 'ph-map-pin',
+    'd[]' => 'ph-calendar-dots'
+  }.freeze
+
+  def filter_chip_icon(param)
+    "#{ICON_BASE} #{FILTER_CHIP_GLYPH.fetch(param, 'ph-lightning')}"
   end
 
   def available_tags(context:, applied: [])

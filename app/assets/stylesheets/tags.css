@@ -32,12 +32,28 @@ button.tag {
   color: var(--theme-fg-color);
 }
 
-/* The × on a removable APPLIED-FILTER token (the inline filter's active chips):
-   the whole tag is the remove button, the × is the affordance that says so. This
-   is what distinguishes a removable applied filter from a selected/current
-   .tag.active (status/nav filters), which carry no ×. */
+/* An applied-filter chip (tags/_filter_chip, shared by the events filter and the
+   rule form; tag-picker builds the same shape in JS): icon · label · × laid out
+   inline. */
+.tag[data-tag-chip] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-xsmall);
+}
+
+/* The × on a removable APPLIED-FILTER token: the affordance that says the chip is
+   removable, distinguishing it from a selected/current .tag.active (status/nav
+   filters), which carry no ×. It's a real <button> now (its own click target, so
+   the chip needn't be one) — strip the boxed button chrome so it reads as a plain
+   inline glyph, not a nested button. */
 .tag__remove {
   opacity: 0.7;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  line-height: 1;
+  cursor: pointer;
 }
 
 .filter .tag {

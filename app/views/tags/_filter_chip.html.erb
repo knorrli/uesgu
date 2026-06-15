@@ -1,0 +1,15 @@
+<%# A removable applied-filter chip, shared by the events filter and the rule
+    form so the two read identically. Carries its own hidden field (param =
+    s[]/q[]/l[]/d[]) so it submits with the surrounding form; the leading icon is
+    derived from that param. The remove button dispatches to the tag-picker
+    controller, which strips the chip (and, on the events filter, re-submits).
+
+    Locals: param, value, and an optional label (date chips show a localized
+    label while submitting the raw range value). The tag-picker controller builds
+    the same markup client-side for picks made without a round-trip. %>
+<span class="tag active" data-tag-chip>
+  <%= hidden_field_tag param, value, id: nil %>
+  <span class="<%= filter_chip_icon(param) %>" aria-hidden="true"></span>
+  <span><%= local_assigns.fetch(:label, value) %></span>
+  <button type="button" class="tag__remove ph ph-x" aria-label="<%= value %>" data-action="tag-picker#remove"></button>
+</span>

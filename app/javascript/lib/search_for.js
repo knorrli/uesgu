@@ -1,23 +1,20 @@
 // Shared "search for «X»" free-text logic for the event filter — the one piece
 // of behaviour the desktop combobox (tag_picker_controller) and the mobile sheets
 // (filter_sheets_controller) must agree on. Both fields accept a free-text query
-// alongside the fixed style options; this decides when to offer it.
+// alongside the fixed style options; this decides what the affordance row reads.
 //
-// Given the raw typed text and the labels already offered as options, returns
-// { show: false } when the text is blank or exactly matches an existing option,
-// otherwise { show: true, value, label } — `value` is the query to submit and
-// `label` is the localized "Search for «X»" string (template's %{query} filled).
+// The row is ALWAYS shown (a constant cue that typing searches everything, not
+// just the dropdown — the placeholder alone didn't convey it). Given the raw
+// typed text it returns { value, label, blank }:
+//   - blank input → { value: "", label: <blankLabel>, blank: true }  (a hint;
+//     value is empty so callers' commit guards make it a no-op)
+//   - typed text  → { value, label: "<verb> «query»", blank: false } (committable)
 //
 // Keeping this in one place is what lets the two UIs stay aligned instead of
-// drifting (the desktop affordance was missing precisely because this lived only
-// in the mobile controller).
-export function searchForSuggestion(raw, existingLabels, template) {
+// drifting.
+export function searchForSuggestion(raw, template, blankLabel) {
   const value = (raw || "").trim()
-  if (value === "") return { show: false }
+  if (value === "") return { value: "", label: blankLabel, blank: true }
 
-  const needle = value.toLowerCase()
-  const exactMatch = existingLabels.some((label) => label.trim().toLowerCase() === needle)
-  if (exactMatch) return { show: false }
-
-  return { show: true, value, label: template.replaceAll("%{query}", value) }
+  return { value, label: template.replaceAll("%{query}", value), blank: false }
 }

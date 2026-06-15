@@ -554,7 +554,8 @@ de:
       clear: Zurücksetzen
       close: Schliessen
       free_text: Freitext
-      search_for: '„%{query}“ suchen'
+      search_for: 'Suchen nach „%{query}“'
+      search_anything: Tippe, um nach allem zu suchen
       custom_range: Eigener Zeitraum
       date_from: Von
       date_to: Bis

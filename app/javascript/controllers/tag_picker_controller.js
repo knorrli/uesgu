@@ -165,23 +165,21 @@ export default class extends Controller {
 
     this.onStyleInput = () => this.#refreshSearchFor()
     this.styleInput.addEventListener("input", this.onStyleInput)
+    this.#refreshSearchFor() // show the blank "type to search" hint up front
   }
 
   #refreshSearchFor() {
-    const labels = [...this.styleListbox.querySelectorAll('[role="option"][data-value]')]
-      .map((option) => option.dataset.value)
     const suggestion = searchForSuggestion(
       this.styleInput.value,
-      labels,
-      this.searchForTarget.dataset.searchForTemplate
+      this.searchForTarget.dataset.searchForTemplate,
+      this.searchForTarget.dataset.searchAnything
     )
 
-    if (suggestion.show) {
-      this.searchForTarget.querySelector("[data-search-for-label]").textContent = suggestion.label
-      this.searchForTarget.dataset.value = suggestion.value
-      this.searchForTarget.hidden = false
-    } else {
-      this.searchForTarget.hidden = true
-    }
+    this.searchForTarget.querySelector("[data-search-for-label]").textContent = suggestion.label
+    this.searchForTarget.dataset.value = suggestion.value
+    this.searchForTarget.hidden = false
+    // The "free text" tag labels a committable query; hide it for the blank hint.
+    const type = this.searchForTarget.querySelector(".filter-searchfor__type")
+    if (type) type.hidden = suggestion.blank
   }
 }

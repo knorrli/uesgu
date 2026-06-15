@@ -23,6 +23,7 @@
 <div class="filter-sheets"
      data-controller="filter-sheets"
      data-filter-sheets-search-for-template-value="<%= t('events.filter.search_for', query: '%{query}') %>"
+     data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>"
      data-filter-sheets-free-text-value="<%= t('events.filter.free_text') %>">
   <%= form_with url: events_path, method: :get, class: 'filter-sheets__form',
         html: { autocomplete: 'off' },

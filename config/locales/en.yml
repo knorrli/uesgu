@@ -555,6 +555,7 @@ en:
       close: Close
       free_text: free text
       search_for: 'Search for “%{query}”'
+      search_anything: Type to search for anything
       custom_range: Custom range
       date_from: From
       date_to: To

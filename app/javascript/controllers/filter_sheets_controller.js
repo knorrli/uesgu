@@ -14,7 +14,7 @@ import { searchForSuggestion } from "lib/search_for"
 // untouched sheet closes instantly with no reload.
 export default class extends Controller {
   static targets = ["form", "sheet", "queries", "group", "customStart", "customEnd", "customValue"]
-  static values = { searchForTemplate: String, freeText: String }
+  static values = { searchForTemplate: String, freeText: String, searchAnything: String }
 
   connect() {
     this.onKeydown = (event) => { if (event.key === "Escape") this.#closeOpenSheet() }
@@ -43,6 +43,9 @@ export default class extends Controller {
     // close button — never the search field, so opening a sheet never summons the
     // on-screen keyboard. preventScroll keeps the page from jumping.
     sheet.querySelector(".sheet__close")?.focus({ preventScroll: true })
+    // Show the free-text affordance straight away (blank "type to search" hint
+    // on the What sheet; a no-op on sheets without the row).
+    this.#updateNewQuery(sheet, sheet.querySelector(".sheet__search-input")?.value.trim() || "")
   }
 
   // × and Apply both commit (see class comment). Distinct labels, same behaviour.
@@ -133,17 +136,13 @@ export default class extends Controller {
     const row = sheet.querySelector(".opt--newquery")
     if (!row) return
 
-    const labels = [...sheet.querySelectorAll(".opt:not(.opt--newquery) .opt__label")]
-      .map((label) => label.textContent)
-    const suggestion = searchForSuggestion(raw, labels, this.searchForTemplateValue)
-
-    if (suggestion.show) {
-      row.querySelector("[data-newquery-label]").textContent = suggestion.label
-      row.dataset.value = suggestion.value
-      row.hidden = false
-    } else {
-      row.hidden = true
-    }
+    const suggestion = searchForSuggestion(raw, this.searchForTemplateValue, this.searchAnythingValue)
+    row.querySelector("[data-newquery-label]").textContent = suggestion.label
+    row.dataset.value = suggestion.value
+    row.hidden = false
+    // The "free text" tag labels a committable query; hide it for the blank hint.
+    const type = row.querySelector(".opt__type")
+    if (type) type.hidden = suggestion.blank
   }
 
   #queryRow(value) {

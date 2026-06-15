@@ -555,6 +555,7 @@ fr:
       close: Fermer
       free_text: texte libre
       search_for: 'Rechercher « %{query} »'
+      search_anything: Tape pour tout rechercher
       custom_range: Période personnalisée
       date_from: Du
       date_to: Au

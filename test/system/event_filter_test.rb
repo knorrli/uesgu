@@ -1,8 +1,9 @@
 require "application_system_test_case"
 
 # The desktop free-text affordance (tag-picker + lib/search_for): a "search for
-# «X»" row appears in the What dropdown when the typed text matches no style, and
-# clicking it commits a free-text query. Mirrors the mobile sheet.
+# «X»" row is ALWAYS present in the open What dropdown — a "type to search" hint
+# when blank, the typed query once you start — and clicking it commits a
+# free-text query. Mirrors the mobile sheet.
 class EventFilterTest < ApplicationSystemTestCase
   # The shared tag-picker collector drives the desktop filter with auto-submit:
   # every pick/removal re-runs the filter and the chips come back server-rendered.
@@ -49,15 +50,22 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_selector ".filter-desktop .chips .tag", text: "zzqx"
   end
 
-  test "an exact style match does not offer the free-text row" do
+  test "the free-text row is always offered, even for an exact style match" do
     event(start_date: Date.current + 3, style_list: ["Rock"])
 
     visit events_path
     assert_selector ".filter-desktop .filter-searchfor", visible: :all # controller connected
+
+    # Open the dropdown without typing: the blank hint shows and isn't committable.
+    find(".filter-desktop input[role='combobox']", match: :first).click
+    assert_selector ".filter-desktop .filter-searchfor", visible: true
+    assert_equal "", find(".filter-desktop .filter-searchfor", visible: true)["data-value"]
+
+    # Typing an exact style name still offers the row (free text is a distinct
+    # action — it was previously suppressed on an exact match).
     within ".filter-desktop" do
       find('input[role="combobox"]', match: :first).send_keys("Rock")
     end
-
-    assert_no_selector ".filter-searchfor:not([hidden])"
+    assert_selector ".filter-desktop .filter-searchfor", text: "Rock"
   end
 end

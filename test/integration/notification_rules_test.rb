@@ -32,12 +32,12 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     # Filter pre-filled inline (combobox hidden fields), window as a select.
     assert_select 'input[name="s[]"][value=?]', 'Rock'
     assert_select 'input[name="l[]"][value=?]', 'Dachstock'
-    assert_select 'form[data-controller="rule-form"]'
+    assert_select 'form[data-controller~="rule-form"]'
     assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"]'
     assert_select '[data-rule-form-target="weekday"]'
-    # No name field — the name is derived; shown as a live preview in the title.
+    # No name field — the name is the derived filter description, in the title.
     assert_select 'input[name="notification_rule[name]"]', false
-    assert_select '[data-rule-name-target="preview"]', text: /Dachstock/
+    assert_select 'h1', text: /Dachstock/
   end
 
   test 'new (windowed filter) preselects the window and shows the firing-day picker' do
@@ -65,7 +65,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
 
   # --- create ----------------------------------------------------------------
 
-  test 'create saves the filter + schedule and infers happening' do
+  test 'create saves the filter and lands on the live editor' do
     u = sign_in_as user
 
     assert_difference -> { u.notification_rules.count }, 1 do
@@ -76,12 +76,28 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
       }
     end
 
-    assert_redirected_to notification_rules_path
     r = u.notification_rules.last
+    assert_redirected_to edit_notification_rule_path(r) # create-on-click → live editor
     assert_equal 1050, r.time_of_day
     assert_equal ['Bern'], r.location_list
     assert_equal ['this_weekend'], r.date_ranges
     assert r.happening?
+  end
+
+  test 'create from a click uses safe defaults — push/email off' do
+    u = sign_in_as user
+
+    # The "Benachrichtigen" button POSTs only the filter (no notification_rule
+    # params); the rule is created on the in-app bell only.
+    assert_difference -> { u.notification_rules.count }, 1 do
+      post notification_rules_path, params: { s: ['Rock'] }
+    end
+
+    r = u.notification_rules.last
+    assert_redirected_to edit_notification_rule_path(r)
+    refute r.notify_push?
+    refute r.notify_email?
+    assert r.enabled?
   end
 
   test 'create rejects an empty firehose filter' do
@@ -89,7 +105,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_no_difference -> { u.notification_rules.count } do
       post notification_rules_path, params: { notification_rule: { cadence: 'daily', time_string: '09:00' } }
     end
-    assert_response :unprocessable_entity
+    assert_redirected_to events_path # bounced back, nothing created
   end
 
   # --- edit / update ---------------------------------------------------------
@@ -107,9 +123,9 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_select 'input[name="s[]"][value=?]', 'Rock'
     assert_select 'input[name="l[]"][value=?]', 'Dachstock'
     assert_select 'select[name="d[]"]'
-    # No name field; the derived name shows as a live preview in the title.
+    # No name field; the derived name is the (server-rendered) page title.
     assert_select 'input[name="notification_rule[name]"]', false
-    assert_select '[data-rule-name-target="preview"]', text: /Rock/
+    assert_select 'h1', text: /Rock/
   end
 
   test 'update saves picked styles and free-text queries from the what field separately' do
@@ -124,7 +140,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
       s: %w[Rock Jazz], q: ['Radiohead'], l: [''], d: ['']
     }
 
-    assert_redirected_to notification_rules_path
+    assert_response :success # autosave re-renders the editor in place
     r.reload
     assert_equal %w[Rock Jazz], r.style_list
     assert_equal ['Radiohead'], r.queries
@@ -141,7 +157,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
       s: ['Rock']
     }
 
-    assert_redirected_to notification_rules_path
+    assert_response :success # autosave re-renders the editor in place
     r.reload
     assert_equal 2, r.weekday
     assert_equal 495, r.time_of_day
@@ -162,7 +178,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
       s: ['Rock'], d: ['this_weekend']
     }
 
-    assert_redirected_to notification_rules_path
+    assert_response :success # autosave re-renders the editor in place
     r.reload
     assert_equal ['this_weekend'], r.date_ranges
     assert r.happening?

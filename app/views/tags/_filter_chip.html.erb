@@ -6,10 +6,15 @@
 
     Locals: param, value, and an optional label (date chips show a localized
     label while submitting the raw range value). The tag-picker controller builds
-    the same markup client-side for picks made without a round-trip. %>
+    the same markup client-side for picks made without a round-trip.
+
+    input: false renders a display-only chip with no hidden field — used for the
+    rule form's window tag, where the <select> already carries d[]. remove_action
+    overrides the × handler for that case (clear the select rather than drop a
+    chip). %>
 <span class="tag active" data-tag-chip>
-  <%= hidden_field_tag param, value, id: nil %>
+  <% if local_assigns.fetch(:input, true) %><%= hidden_field_tag param, value, id: nil %><% end %>
   <span class="<%= filter_chip_icon(param) %>" aria-hidden="true"></span>
   <span><%= local_assigns.fetch(:label, value) %></span>
-  <button type="button" class="tag__remove ph ph-x" aria-label="<%= value %>" data-action="tag-picker#remove"></button>
+  <button type="button" class="tag__remove ph ph-x" aria-label="<%= value %>" data-action="<%= local_assigns.fetch(:remove_action, 'tag-picker#remove') %>"></button>
 </span>

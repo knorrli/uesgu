@@ -28,6 +28,14 @@ export default class extends Controller {
     if (target) target.hidden = !visible
   }
 
+  // The × on the window's green tag clears the select; dispatching change lets
+  // the autosave controller persist it (and the schedule reacts via #update).
+  clearWindow() {
+    if (!this.hasWindowTarget) return
+    this.windowTarget.value = ""
+    this.windowTarget.dispatchEvent(new Event("change", { bubbles: true }))
+  }
+
   // Snap the entered time to the nearest quarter hour on blur — the scheduler
   // sweeps quarter-hourly, so finer times would just fire late. Mirrors the
   // server-side snap; here it gives immediate feedback (18:04 → 18:00) instead

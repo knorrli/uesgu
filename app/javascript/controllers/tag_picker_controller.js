@@ -99,7 +99,7 @@ export default class extends Controller {
     if (this.autoSubmitValue) this.element.closest("form")?.requestSubmit()
   }
 
-  // Let an outer controller (the rule-name live preview) react to chip changes.
+  // Let an outer controller (the rule editor's autosave) react to chip changes.
   #announce() {
     this.dispatch("change", { bubbles: true })
   }

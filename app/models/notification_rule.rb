@@ -179,8 +179,9 @@ class NotificationRule < ApplicationRecord
   # the alerts list.
   # Fixed template: <what> · [<where> ·] <window | "new events">. "what" is the
   # styles + free-text queries, or "Alle Events" when none; the last part is the
-  # time window for a happening rule, else the new-events label. The form mirrors
-  # this live in the title (rule-name controller).
+  # time window for a happening rule, else the new-events label. The editor
+  # autosaves, so the title re-renders from this on every change (server-side, no
+  # client mirror).
   def describe
     return describe_favorites if track_favorites?
 

@@ -14,41 +14,48 @@ class NotificationRulesController < ApplicationController
   def new
     @rule = current_user.notification_rules.new(default_schedule)
     @rule.filter_attributes = filter_params
-    @filter = build_filter           # for the read-only "Notify me about:" chips
+    @filter = filter_for(@rule)
     @matches_favorites = favorites_match?(@filter)
   end
 
+  # "Benachrichtigen" creates the rule immediately (it's only offered with an
+  # active filter, so it always targets something) and lands on the live editor —
+  # there's no draft step. Push/e-mail start OFF (in-app bell only, see
+  # default_schedule), so an abandoned rule does nothing intrusive; the user opts
+  # those channels in deliberately. Schedule params only arrive from the rare
+  # direct-to-/new flow.
   def create
-    @rule = current_user.notification_rules.new(rule_params)
+    @rule = current_user.notification_rules.new(default_schedule)
+    @rule.assign_attributes(rule_params) if params[:notification_rule].present?
     @rule.filter_attributes = filter_params
 
     if @rule.save
-      redirect_to notification_rules_path, notice: t("notification_rules.created")
+      redirect_to edit_notification_rule_path(@rule)
     else
-      @filter = build_filter
-      @matches_favorites = favorites_match?(@filter)
-      render :new, status: :unprocessable_entity
+      redirect_to events_path, alert: @rule.errors.full_messages.to_sentence
     end
   end
 
   # The whole rule (schedule, channels, name, and the filter via inline
-  # multiselect comboboxes + a window select) is edited on this one form.
+  # multiselect comboboxes + a window select) is edited on this one form. It
+  # autosaves: every change submits and the form re-renders inside its turbo
+  # frame, so there's no Save button. See #update.
   def edit
     @filter = filter_for(@rule)
     @matches_favorites = favorites_match?(@filter)
   end
 
+  # Autosave target: re-render the editor frame with the canonical server state
+  # (chips sorted + deduped, dropdowns excluding picks, window as a tag, derived
+  # name refreshed) instead of redirecting. Stays put — the user is still editing.
   def update
-    @rule.assign_attributes(rule_params)
+    @rule.assign_attributes(rule_params) if params[:notification_rule].present?
     @rule.filter_attributes = filter_params
+    @rule.save
 
-    if @rule.save
-      redirect_to notification_rules_path, notice: t("notification_rules.updated")
-    else
-      @filter = filter_for(@rule)
-      @matches_favorites = favorites_match?(@filter)
-      render :edit, status: :unprocessable_entity
-    end
+    @filter = filter_for(@rule)
+    @matches_favorites = favorites_match?(@filter)
+    render :edit, status: (@rule.errors.any? ? :unprocessable_entity : :ok)
   end
 
   def destroy
@@ -79,8 +86,11 @@ class NotificationRulesController < ApplicationController
     @rule = current_user.notification_rules.find(params[:id])
   end
 
+  # A new rule starts on the in-app bell only — push and e-mail are opt-in, so a
+  # rule created by clicking "Benachrichtigen" (and maybe abandoned) never sends
+  # anything intrusive until the user turns those channels on.
   def default_schedule
-    { cadence: "daily", time_of_day: 1080, weekday: 5, monthday: 1, notify_push: true, notify_email: false }
+    { cadence: "daily", time_of_day: 1080, weekday: 5, monthday: 1, notify_push: false, notify_email: false }
   end
 
   def rule_params
@@ -92,15 +102,6 @@ class NotificationRulesController < ApplicationController
   # The landing-page filter, carried straight through (same keys as events#index).
   def filter_params
     params.permit(q: [], l: [], s: [], d: []).to_h.symbolize_keys
-  end
-
-  def build_filter
-    Filter.new.tap do |filter|
-      filter.queries = params[:q].compact_blank if params[:q].present?
-      filter.location_list = params[:l] if params[:l].present?
-      filter.style_list = params[:s] if params[:s].present?
-      filter.date_ranges = params[:d].compact_blank if params[:d].present?
-    end
   end
 
   # The filter shown on the edit form, built from the rule's saved filter.

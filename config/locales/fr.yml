@@ -85,6 +85,7 @@ fr:
     add_rule: Ajouter une règle
     create_button: Créer la règle
     save_button: Enregistrer
+    done: Terminé
     window_none: Sans période (nouveautés)
     created: Règle créée.
     updated: Règle mise à jour.

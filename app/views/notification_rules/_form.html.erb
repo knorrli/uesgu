@@ -28,44 +28,8 @@
 
     <div class="tag-picker-group flex flex-col gap-medium" data-controller="tag-picker">
       <div class="filter-fields flex flex-col">
-        <%# "What" — pick a style or type free text (→ a query), like the events
-            filter. tag-picker routes each into its own chip (s[] vs q[]); the
-            "Search for «X»" row hints at the free-text path. %>
-        <div class="filter-field" data-tag-picker-target="whatField">
-          <div class="input-wrapper flex flex-row gap-small"
-               data-action="hw-combobox:selection->tag-picker#add"
-               data-tag-picker-field-param="s[]" data-tag-picker-query-field-param="q[]">
-            <%= combobox_tag 'style_pick', combobox_options(available_tags(context: :styles, applied: filter.style_list), value: :name),
-                  name_when_new: 'query', id: "rule_what_#{rule.id || 'new'}",
-                  placeholder: t('events.filter.what') do |combobox| %>
-              <% combobox.customize_fieldset class: 'flex-grow' %>
-              <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
-            <% end %>
-          </div>
-
-          <button type="button" hidden
-                  class="hw-combobox__option filter-searchfor"
-                  data-tag-picker-target="searchFor"
-                  data-search-for-template="<%= t('events.filter.search_for', query: '%{query}') %>"
-                  data-action="tag-picker#addSearchQuery">
-            <span class="filter-searchfor__icon <%= tag_icon_class(context: 'query') %>" aria-hidden="true"></span>
-            <span class="filter-searchfor__label" data-search-for-label></span>
-            <span class="filter-searchfor__type"><%= t('events.filter.free_text') %></span>
-          </button>
-        </div>
-
-        <div class="filter-field">
-          <div class="input-wrapper flex flex-row gap-small"
-               data-action="hw-combobox:selection->tag-picker#add"
-               data-tag-picker-field-param="l[]">
-            <%= combobox_tag 'location_pick', combobox_options(available_tags(context: :locations, applied: filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name),
-                  id: "rule_where_#{rule.id || 'new'}",
-                  placeholder: t('events.filter.where') do |combobox| %>
-              <% combobox.customize_fieldset class: 'flex-grow' %>
-              <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
-            <% end %>
-          </div>
-        </div>
+        <%# What + Where shared with the events filter (tags/_filter_fields). %>
+        <%= render 'tags/filter_fields', filter: filter, id_prefix: "rule_#{rule.id || 'new'}" %>
 
         <%# "When" — a preset window select (no custom ranges for a recurring
             alert). It carries d[]; on change the schedule reacts (rule-form) and
@@ -75,13 +39,11 @@
               data: { 'rule-form-target': 'window', action: 'rule-form#update' } %>
       </div>
 
-      <%# Combined chips row, below all fields (mirrors the events filter). The
-          window shows as a display-only green tag (the select above carries d[]),
-          its × clears the select via rule-form#clearWindow. %>
+      <%# Combined chips row, below all fields (mirrors the events filter): shared
+          What/Where chips, then the window as a display-only green tag (the select
+          above carries d[]), its × clears the select via rule-form#clearWindow. %>
       <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
-        <% filter.style_list.each { |s| %><%= render 'tags/filter_chip', param: 's[]', value: s %><% } %>
-        <% filter.queries.each { |q| %><%= render 'tags/filter_chip', param: 'q[]', value: q %><% } %>
-        <% filter.location_list.each { |l| %><%= render 'tags/filter_chip', param: 'l[]', value: l %><% } %>
+        <%= render 'tags/filter_chips', filter: filter %>
         <% if (window = filter.date_ranges.first) %>
           <%= render 'tags/filter_chip', param: 'd[]', value: window, label: date_range_label(window),
                 input: false, remove_action: 'rule-form#clearWindow' %>

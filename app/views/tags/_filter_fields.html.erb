@@ -1,0 +1,52 @@
+<%# Shared What + Where fields for the events filter (app/views/events/_filter)
+    and the rule editor (app/views/notification_rules/_form), so the two stay in
+    parity by rendering ONE partial. Each page supplies the rest: the form wrapper
+    (events = GET + auto-submit; rule = PATCH + autosave), the tag-picker element,
+    the "when" control (datepicker vs window select), and the chips row (it adds
+    the when-chips after tags/_filter_chips). Only What/Where + the free-text row
+    live here.
+
+    Locals: filter (for the applied lists, so picks drop out of the dropdowns),
+    id_prefix (unique combobox ids per page). The combobox names are throwaways —
+    only the chips' s[]/q[]/l[] hidden fields submit. %>
+<div class="filter-field" data-tag-picker-target="whatField">
+  <%# "What" — a style pick matches s[]; free text (name_when_new) becomes q[]. %>
+  <div class="input-wrapper flex flex-row gap-small"
+       data-action="hw-combobox:selection->tag-picker#add"
+       data-tag-picker-field-param="s[]" data-tag-picker-query-field-param="q[]">
+    <%= combobox_tag "#{id_prefix}_what", combobox_options(available_tags(context: :styles, applied: filter.style_list), render_in: { partial: 'tags/chip' }, value: :name),
+          name_when_new: 'query', placeholder: t('events.filter.what') do |combobox| %>
+      <% combobox.customize_fieldset class: 'flex-grow' %>
+      <%# Lead with the magnifying glass (not the styles glyph): the field's
+          superpower is free-text search over acts/styles/genres. %>
+      <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
+    <% end %>
+  </div>
+
+  <%# Free-text "Search for «X»" affordance. The combobox accepts free text but
+      gives no hint; tag-picker#connect moves this row into the dropdown and
+      reveals it when the typed text matches no style. Hidden + no filterable
+      attribute, so the gem never treats it as an option. %>
+  <button type="button" hidden
+          class="hw-combobox__option filter-searchfor"
+          data-tag-picker-target="searchFor"
+          data-search-for-template="<%= t('events.filter.search_for', query: '%{query}') %>"
+          data-action="tag-picker#addSearchQuery">
+    <span class="filter-searchfor__icon <%= tag_icon_class(context: 'query') %>" aria-hidden="true"></span>
+    <span class="filter-searchfor__label" data-search-for-label></span>
+    <span class="filter-searchfor__type"><%= t('events.filter.free_text') %></span>
+  </button>
+</div>
+
+<div class="filter-field">
+  <%# "Where" — locations as l[]; options carry a muted "· Kanton/Stadt/Lokal". %>
+  <div class="input-wrapper flex flex-row gap-small"
+       data-action="hw-combobox:selection->tag-picker#add"
+       data-tag-picker-field-param="l[]">
+    <%= combobox_tag "#{id_prefix}_where", combobox_options(available_tags(context: :locations, applied: filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name),
+          placeholder: t('events.filter.where') do |combobox| %>
+      <% combobox.customize_fieldset class: 'flex-grow' %>
+      <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
+    <% end %>
+  </div>
+</div>

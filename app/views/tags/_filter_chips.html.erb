@@ -1,0 +1,7 @@
+<%# The What/Where applied-filter chips (styles, free-text queries, locations) in
+    one fixed order, shared by the events filter and the rule editor. The "when"
+    chips differ per page (date ranges vs a single window tag), so each caller
+    appends those after this partial, inside the same .chips row. Local: filter. %>
+<% filter.style_list.each { |style| %><%= render 'tags/filter_chip', param: 's[]', value: style %><% } %>
+<% filter.queries.each { |query| %><%= render 'tags/filter_chip', param: 'q[]', value: query %><% } %>
+<% filter.location_list.each { |location| %><%= render 'tags/filter_chip', param: 'l[]', value: location %><% } %>

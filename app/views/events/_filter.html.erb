@@ -1,56 +1,20 @@
 <%# The events filter. Three stacked fields (what / where / when) feed the shared
     tag-picker collector; every applied filter shows as a chip in one combined row
-    below them (compact, and identical to the rule form). auto-submit is on, so
-    each add/remove re-runs the filter and the chips come back server-rendered. %>
+    below them. auto-submit is on, so each add/remove re-runs the filter and the
+    chips come back server-rendered. What/Where + the chips loop are shared with
+    the rule editor (tags/_filter_fields, tags/_filter_chips); only the form
+    wrapper and the "when" control (an easepick datepicker, since the events list
+    allows custom ranges) are page-specific. %>
 <section class="filter flex flex-col gap-medium">
   <%= form_with url: events_path, method: :get, id: 'filter-form',
         class: 'filter-form flex flex-col gap-medium', html: { autocomplete: 'off' },
-        data: { controller: 'tag-picker', 'tag-picker-auto-submit-value': true, turbo_frame: '_top' } do |f| %>
+        data: { controller: 'tag-picker', 'tag-picker-auto-submit-value': true, turbo_frame: '_top' } do %>
 
     <div class="filter-fields flex flex-col">
-      <%# What — styles AND free text in one field: a pick matches a style, free
-          text becomes a query. The combobox name is a throwaway (only the chips'
-          s[]/q[] hidden fields submit). The "Search for «X»" row lives here too. %>
-      <div class="filter-field" data-tag-picker-target="whatField">
-        <div class="input-wrapper flex flex-row gap-small"
-             data-action="hw-combobox:selection->tag-picker#add"
-             data-tag-picker-field-param="s[]" data-tag-picker-query-field-param="q[]">
-          <%= f.combobox('what', combobox_options(available_tags(context: :styles, applied: @filter.style_list), render_in: { partial: 'tags/chip' }, value: :name), name_when_new: 'query', placeholder: t('.what')) do |combobox| %>
-            <% combobox.customize_fieldset class: 'flex-grow' %>
-            <%# Lead with the magnifying glass (not the styles glyph): the field's
-                superpower is free-text search over acts/styles/genres, which a
-                static styles icon hid. A persistent search icon advertises it. %>
-            <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
-          <% end %>
-        </div>
+      <%= render 'tags/filter_fields', filter: @filter, id_prefix: 'filter' %>
 
-        <%# Free-text "Search for «X»" affordance. The combobox accepts free text
-            (name_when_new) but gives no hint; tag-picker#connect moves this row
-            into the dropdown and reveals it when the typed text matches no style.
-            Hidden + no filterable attribute, so the gem never treats it as an
-            option. %>
-        <button type="button" hidden
-                class="hw-combobox__option filter-searchfor"
-                data-tag-picker-target="searchFor"
-                data-search-for-template="<%= t('events.filter.search_for', query: '%{query}') %>"
-                data-action="tag-picker#addSearchQuery">
-          <span class="filter-searchfor__icon <%= tag_icon_class(context: 'query') %>" aria-hidden="true"></span>
-          <span class="filter-searchfor__label" data-search-for-label></span>
-          <span class="filter-searchfor__type"><%= t('events.filter.free_text') %></span>
-        </button>
-      </div>
-
-      <div class="filter-field">
-        <div class="input-wrapper flex flex-row gap-small"
-             data-action="hw-combobox:selection->tag-picker#add"
-             data-tag-picker-field-param="l[]">
-          <%= f.combobox 'where', combobox_options(available_tags(context: :locations, applied: @filter.location_list), render_in: { partial: 'tags/location_chip' }, value: :name), placeholder: t('.where') do |combobox| %>
-            <% combobox.customize_fieldset class: 'flex-grow' %>
-            <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
-          <% end %>
-        </div>
-      </div>
-
+      <%# "When" — easepick datepicker (presets + custom ranges). A selection
+          dispatches datepicker:selection → tag-picker#addRange. %>
       <div class="filter-field">
         <div class="datepicker input-wrapper flex flex-row gap-small" data-controller="datepicker"
              data-datepicker-date-range-value="" data-datepicker-date-ranges-value="<%= @filter.date_ranges.to_json %>"
@@ -68,11 +32,9 @@
     </div>
 
     <%# One combined chips row for every applied filter (what · where · when),
-        below all three fields — compact, icons disambiguate the category. %>
+        below all three fields. Shared What/Where chips, then the date chips. %>
     <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
-      <% @filter.style_list.each { |style| %><%= render 'tags/filter_chip', param: 's[]', value: style %><% } %>
-      <% @filter.queries.each { |query| %><%= render 'tags/filter_chip', param: 'q[]', value: query %><% } %>
-      <% @filter.location_list.each { |location| %><%= render 'tags/filter_chip', param: 'l[]', value: location %><% } %>
+      <%= render 'tags/filter_chips', filter: @filter %>
       <% @filter.date_ranges.each { |date_range| %><%= render 'tags/filter_chip', param: 'd[]', value: date_range.to_s, label: date_range_label(date_range) %><% } %>
     </div>
   <% end %>

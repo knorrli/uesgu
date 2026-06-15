@@ -14,8 +14,8 @@
       up across views). The left cluster holds the "my favorites" filter shortcut
       and — when the filter comes up empty — the empty message, both riding on the
       left of this same always-present row so nothing below it jumps. %>
-  <div class="flex justify-between align-baseline gap-medium">
-    <div class="flex align-baseline gap-medium">
+  <div class="events-toolbar flex justify-between align-baseline gap-medium">
+    <div class="events-toolbar__left flex align-baseline gap-medium">
       <%= render 'favorites_filter' %>
       <%= render 'notify_button' %>
       <span class="muted"><%= t('events.index.empty') if @events.empty? %></span>

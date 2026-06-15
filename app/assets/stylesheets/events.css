@@ -319,6 +319,21 @@
   color: var(--theme-warn-color);
 }
 
+/* Toolbar row above the programme: the favorites/notify shortcuts and the empty
+   message on the left, the view switcher on the right. Allow it to wrap so a
+   visible "Meine Favoriten" shortcut (plus the view switcher) doesn't overflow on
+   narrow screens, and let the left cluster shrink so a long empty message flows
+   onto the next line instead of pushing the row past the viewport. */
+.events-toolbar {
+  flex-wrap: wrap;
+}
+
+.events-toolbar__left {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
 /* List / Calendar as a plain text toggle, not filled buttons: the active view
    is bold accent, the other a muted link. Its own class (was the generic
    .button, which now means a real boxed button). */

@@ -209,6 +209,14 @@ input[type=radio] {
   accent-color: var(--theme-accent-color);
 }
 
+/* Placeholder text. The UA default is a low-opacity tint of the text colour,
+   which washes out to poor contrast against our backgrounds; pin it to the muted
+   foreground token at full opacity so it stays clearly legible in both themes. */
+::placeholder {
+  color: var(--theme-fg-muted);
+  opacity: 1;
+}
+
 input[type=text] {
   background-color: inherit;
   color: inherit;

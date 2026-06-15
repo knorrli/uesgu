@@ -919,17 +919,20 @@ body.filter-sheet-open { overflow: hidden; }
   text-align: left;
 }
 
+/* The search-glyph box marks this as a search action, not a checkable option;
+   keep it neutral (green = selection/state in this UI, which this row is not). */
 .opt--newquery .opt__box {
-  border-color: var(--theme-accent-color);
-  color: var(--theme-accent-color);
+  border-color: var(--border-color);
+  color: var(--theme-fg-muted);
 }
 
-.opt--newquery .opt__label { color: var(--theme-accent-color); }
 .opt--query .opt__type { color: var(--theme-accent-color); }
 
 /* Desktop counterpart of .opt--newquery: the free-text "search for «X»" row at
    the foot of the What dropdown. Reuses the gem's .hw-combobox__option base
-   (padding + hover); this lays out the icon / label / type and accents it. */
+   (padding + hover). It reads like the plain options now — neutral text, no
+   leading icon — distinguished only by its label ("Search for «X»") and the muted
+   "free text" tag; the faint ground sets it apart as the one action row. */
 .filter-searchfor {
   display: flex;
   align-items: center;
@@ -938,15 +941,13 @@ body.filter-sheet-open { overflow: hidden; }
   border: 0;
   border-top: var(--border-width) solid var(--border-color);
   background: var(--theme-bg-muted);
-  color: var(--theme-accent-color);
+  color: var(--theme-fg-color);
   font: inherit;
   text-align: left;
   cursor: pointer;
 }
 
 .filter-searchfor[hidden] { display: none; }
-
-.filter-searchfor__icon { color: var(--theme-accent-color); }
 
 .filter-searchfor__label {
   flex-grow: 1;

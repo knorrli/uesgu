@@ -86,6 +86,13 @@
   padding: 0;
 }
 
+/* Give the window select the same line metrics as the what/where comboboxes so
+   all three filter fields are exactly the same height in every browser (some
+   render a bare <select> shorter by default). */
+.rule-form select[name="d[]"] {
+  line-height: var(--filter-input-line-height);
+}
+
 /* The base flex utilities ship small/medium/large but not xsmall; define it so
    the tight label/value stacks read as intended rather than collapsing to 0. */
 .gap-xsmall {

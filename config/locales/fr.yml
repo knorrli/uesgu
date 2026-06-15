@@ -162,7 +162,7 @@ fr:
       monthly: "Mensuel le %{day}"
       added: nouvellement ajoutés
       happening: "en cours %{window}"
-      scope_all: tous
+      scope_all: Tous les events
       scope_favorites: tes favoris
       scope_custom: "%{detail}"
     fields:

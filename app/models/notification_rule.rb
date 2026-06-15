@@ -173,15 +173,18 @@ class NotificationRule < ApplicationRecord
   # Human "what this alert is about" — the auto-name when the user didn't set
   # one, the title snapshotted onto each fired notification, and the summary in
   # the alerts list.
+  # Fixed template: <what> · [<where> ·] <window | "new events">. "what" is the
+  # styles + free-text queries, or "Alle Events" when none; the last part is the
+  # time window for a happening rule, else the new-events label. The form mirrors
+  # this live in the title (rule-name controller).
   def describe
     return describe_favorites if track_favorites?
 
-    parts = []
-    parts << style_list.join(", ") if style_list.any?
+    what = (style_list + queries).join(", ")
+    parts = [what.presence || I18n.t("notification_rules.summary.scope_all")]
     parts << location_list.join(", ") if location_list.any?
-    parts << queries.join(", ") if queries.any?
-    parts << window_labels.join(", ") if active_windows.any?
-    parts.presence&.join(" · ") || I18n.t("notification_rules.summary.scope_all")
+    parts << temporal_label
+    parts.join(" · ")
   end
 
   def time_string
@@ -199,8 +202,13 @@ class NotificationRule < ApplicationRecord
   def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
 
   def describe_favorites
-    label = I18n.t("notification_rules.favorites_live")
-    active_windows.any? ? "#{label} · #{window_labels.join(', ')}" : label
+    "#{I18n.t('notification_rules.favorites_live')} · #{temporal_label}"
+  end
+
+  # The trailing part of the name: the window label (happening) or the new-events
+  # label (added) — always present, so every name reads the same way.
+  def temporal_label
+    happening? ? window_labels.join(", ") : I18n.t("notification_rules.type.added")
   end
 
   def window_labels

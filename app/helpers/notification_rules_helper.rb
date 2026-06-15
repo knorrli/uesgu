@@ -36,16 +36,6 @@ module NotificationRulesHelper
     t("notification_rules.summary.at_time", cadence: cadence, time: rule.time_string)
   end
 
-  # What the alert is about — the saved filter as text, or live favorites.
-  def rule_about(rule)
-    rule.describe
-  end
-
-  # "New events" (added) vs "What's on" (happening) — the inferred digest type.
-  def rule_type_label(rule)
-    rule.happening? ? t("notification_rules.type.happening") : t("notification_rules.type.added")
-  end
-
   # In-app is always present; push/email per rule.
   def rule_channels(rule)
     channels = [t("notification_rules.channels.in_app")]

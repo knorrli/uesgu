@@ -9,6 +9,11 @@ class EventFilterTest < ApplicationSystemTestCase
 
     visit events_path
 
+    # Wait for filter#connect to have moved the (hidden) search-for row into the
+    # listbox before typing — otherwise the first keystrokes can race the
+    # controller connecting and the input listener misses them.
+    assert_selector ".filter-desktop .filter-searchfor", visible: :all
+
     within ".filter-desktop" do
       # Per-char typing (real key events) so the combobox + our input listener
       # behave as for a user; .set() writes the value in one shot and fights the
@@ -29,6 +34,7 @@ class EventFilterTest < ApplicationSystemTestCase
     event(start_date: Date.current + 3, style_list: ["Rock"])
 
     visit events_path
+    assert_selector ".filter-desktop .filter-searchfor", visible: :all # controller connected
     within ".filter-desktop" do
       find('input[role="combobox"]', match: :first).send_keys("Rock")
     end

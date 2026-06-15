@@ -59,10 +59,6 @@
     <%= select_tag 'd[]', options_for_select(rule_window_options, filter.date_ranges.first),
           include_blank: t('notification_rules.window_none'),
           data: { 'rule-form-target': 'window', action: 'rule-form#update' } %>
-
-    <p class="muted rule-hint">
-      <% if filter.date_ranges.any? %><%= t('notification_rules.new.hint_happening') %><% else %><%= t('notification_rules.new.hint_added') %><% end %>
-    </p>
   </fieldset>
 
   <% if matches_favorites %>

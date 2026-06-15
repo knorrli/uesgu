@@ -155,6 +155,18 @@ class NotificationRuleTest < ActiveSupport::TestCase
     I18n.with_locale(:en) { assert_includes r.describe, I18n.t('datepicker.this_weekend') }
   end
 
+  test 'describe is <what> · [where] · <temporal>, with all-events and new-events fallbacks' do
+    all = I18n.t('notification_rules.summary.scope_all')
+    added = I18n.t('notification_rules.type.added')
+    # no what → "Alle Events" leads; location-only still leads with it
+    assert_equal "#{all} · Bern · #{added}", rule(user, filter: { l: ['Bern'] }).describe
+    # added rule always ends with the new-events label
+    assert_equal "Rock · #{added}", rule(user, filter: { s: ['Rock'] }).describe
+    # happening rule ends with the window label
+    assert_equal "Rock · Bern · #{I18n.t('datepicker.this_week')}",
+                 rule(user, filter: { s: ['Rock'], l: ['Bern'], d: ['this_week'] }, weekday: 5).describe
+  end
+
   test 'the name always mirrors the filter on save (no custom names)' do
     r = rule(user, filter: { l: ['Bern'], d: ['next_week'] }, weekday: 5) # next_week => weekly
     r.save!
@@ -181,7 +193,8 @@ class NotificationRuleTest < ActiveSupport::TestCase
   test 'describe for a live-favorites alert' do
     r = user.notification_rules.new(track_favorites: true, cadence: 'daily', time_of_day: 1)
     r.filter_attributes = {}
-    assert_equal I18n.t('notification_rules.favorites_live'), r.describe
+    # Favorites alert + the temporal suffix (no window → new events).
+    assert_equal "#{I18n.t('notification_rules.favorites_live')} · #{I18n.t('notification_rules.type.added')}", r.describe
   end
 
   test 'a fired notification snapshots the auto-name as its title' do

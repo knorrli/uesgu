@@ -6,6 +6,7 @@
     window), listening for their change events. %>
 <div class="notification-rules flex flex-col gap-large" data-controller="rule-name"
      data-rule-name-fallback-value="<%= t('notification_rules.summary.scope_all') %>"
+     data-rule-name-added-value="<%= t('notification_rules.type.added') %>"
      data-action="tag-picker:change->rule-name#refresh change->rule-name#refresh">
   <header class="flex flex-col gap-small">
     <p class="muted rule-kicker"><%= t('notification_rules.edit.title') %></p>

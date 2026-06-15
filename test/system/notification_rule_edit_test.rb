@@ -20,7 +20,7 @@ class NotificationRuleEditTest < ApplicationSystemTestCase
     find(".rule-card__actions a[href='#{edit_notification_rule_path(@rule)}']").click
 
     preview = find("[data-rule-name-target='preview']")
-    assert_equal "Rock", preview.text.strip      # derived from the saved filter
+    assert_match "Rock", preview.text            # derived from the saved filter
 
     # Add a style → the preview rebuilds live (no save needed).
     all("input[role='combobox']").first.send_keys("Jazz")

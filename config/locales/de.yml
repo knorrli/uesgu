@@ -162,7 +162,7 @@ de:
       monthly: "Monatlich am %{day}."
       added: neu hinzugefügt
       happening: "läuft %{window}"
-      scope_all: alle
+      scope_all: Alle Events
       scope_favorites: deine Favoriten
       scope_custom: "%{detail}"
     fields:

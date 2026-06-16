@@ -20,8 +20,17 @@ module CalendarHelper
   # trap); the full agenda is one tap away. All in-memory over the day's already-
   # loaded events. Venue (not title) — titles vary wildly and truncate uselessly.
   def calendar_day_headline_venue(events)
-    relevant = events.find { |event| event_saved?(event) } ||
-               events.find { |event| event_matches_follow?(event) }
+    # Saved wins. With saved shows at several distinct venues, name the first and
+    # append "+N" so the day is honest about the others without listing them all
+    # (the noise trap) — e.g. "Kofmehl +1". Same venue twice → no suffix.
+    saved = events.select { |event| event_saved?(event) }
+    if saved.any?
+      venues = saved.filter_map { |event| event.venue&.name || event.locations.first&.name }.uniq
+      extra = venues.size - 1
+      return extra.positive? ? "#{venues.first} +#{extra}" : venues.first
+    end
+
+    relevant = events.find { |event| event_matches_follow?(event) }
     relevant&.venue&.name || relevant&.locations&.first&.name
   end
 

@@ -505,15 +505,18 @@
   .calendar-day-number {
     display: block;
     text-align: left;
-    font-size: var(--font-size-small);
+    /* The cell's anchor: a step larger than the muted venue line below it, so the
+       date clearly leads and the cell doesn't read as two competing small numbers. */
+    font-size: var(--font-size-base);
+    font-weight: bold;
 
-    /* No events that day: a muted date reads as "nothing here" (and the cell has
-       no click target). A full-weight date = "something's on, tap me" — so the
-       date's own prominence is the affordance, no count needed. Declared before
-       &.today so today keeps its badge even on an empty day (same specificity,
-       later rule wins). */
+    /* No events that day: fade the date right back (and the cell has no click
+       target). Full date = "something's on, tap me", faded = "nothing here" — a
+       strong opacity contrast, not a subtle colour shift, so clickable days are
+       obvious. Declared before &.today so today keeps its badge even when empty. */
     &.empty {
-      color: var(--theme-fg-muted);
+      opacity: 0.35;
+      font-weight: normal;
     }
 
     /* Today: a filled accent badge so it can't get lost in the grid. Stays
@@ -579,8 +582,10 @@
      controller can flip it live. */
   .day-favorite-marker {
     display: block;
-    width: 0.9rem;
-    height: 0.9rem;
+    /* Smaller than the saved heart: interest is the frequent signal, so a field of
+       these should stay quiet; the rarer heart is left a touch larger to pop. */
+    width: 0.6rem;
+    height: 0.6rem;
     background-color: var(--theme-accent-color);
     -webkit-mask: var(--star-fill) center / contain no-repeat;
     mask: var(--star-fill) center / contain no-repeat;

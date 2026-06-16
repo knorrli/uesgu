@@ -257,8 +257,6 @@ de:
     push_status_denied: Dein Browser blockiert Benachrichtigungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
     push_unsupported: Dieser Browser unterstützt keine Push-Benachrichtigungen.
     push_install_first: Um auf iPhone oder iPad Benachrichtigungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
-    signout_heading: Abmelden
-    signout_hint: Auf diesem Gerät abmelden.
     signout_button: Abmelden
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und deine Interessen endgültig.

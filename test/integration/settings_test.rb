@@ -24,17 +24,17 @@ class SettingsTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test 'settings page renders the account, notifications, sign-out and delete sections' do
+  test 'settings page renders the account, notifications and delete sections' do
     sign_in_as user
     get settings_path
 
     assert_response :success
-    assert_select 'section.settings-section', 4
+    assert_select 'section.settings-section', 3
     # Language, email and password share a single form, so one save button.
     assert_select 'input[type=submit]', 1
     # The per-device "on this device" cluster (install / push).
     assert_select '.settings-subsection'
-    # Logout moved here from the header menu.
+    # Logout is a page-level action in the header (no longer its own section).
     assert_select 'form[action=?][method=post] button', session_path
   end
 end

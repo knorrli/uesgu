@@ -16,12 +16,16 @@
   margin-block: var(--gap-small);
 }
 
-/* The install button carries an icon + label; align them as a centred row. */
+/* The install button carries an icon + label; align them as a centred row.
+   align-self keeps it from stretching to full width inside the .install-block
+   flex column (in Settings it's an inline auto-width action; the dedicated
+   /install page re-widens it to the hero size below). */
 .install-block .button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5ch;
+  align-self: flex-start;
 }
 
 /* On the dedicated page the install button is the hero action: full-width,

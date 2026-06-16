@@ -45,6 +45,15 @@ a {
   width: 100%;
 }
 
+/* In Settings, delete-account is auto-width and left-aligned like the other
+   standalone actions (install, push, logout) — only the account form's Save is
+   full-width. A destructive action that isn't a giant button also suits the
+   anti-dark-pattern stance: clearly available, not over-emphasised. (Admin
+   delete/revoke keep the full-width treatment above.) */
+.settings-section .button.delete {
+  width: auto;
+}
+
 /* Account / auth form fields: underline inputs, matching the events filter bar.
  * Scoped so the events filter comboboxes keep their own treatment. */
 .account-form input[type="text"],
@@ -100,14 +109,20 @@ a {
   color: var(--theme-fg-color);
 }
 
-/* Settings page: three stacked sections (account / notifications / delete),
-   separated by a hairline rather than cards — the design uses square corners. */
+/* Settings page: stacked sections (account / notifications / delete), separated
+   by a hairline rather than cards — the design uses square corners. */
 .settings-section {
   display: flex;
   flex-direction: column;
   gap: var(--gap-medium);
 }
 
+/* RULE: a section hairline marks a boundary between INDEPENDENT sections —
+   distinct concerns with their own forms/actions (here: the account form, the
+   per-device notification controls, account deletion). It is NOT used between
+   sub-parts of a single form: e.g. the Interessen page's Stile/Orte share one
+   form + one Save, so they're separated by whitespace + headings only, never a
+   divider (which would falsely imply they're independent). */
 .settings-section + .settings-section {
   padding-top: var(--gap-large);
   border-top: var(--border-width) solid var(--theme-bg-muted);

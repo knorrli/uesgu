@@ -1,5 +1,10 @@
 <div class="settings flex flex-col gap-large">
-  <h1><%= t('settings.title') %></h1>
+  <%# Logout is a page-level action (top-right), not its own section — rare
+      account plumbing, one tap, no heading/hint needed. %>
+  <div class="flex justify-between align-center wrap gap-medium">
+    <h1><%= t('settings.title') %></h1>
+    <%= button_to t('settings.signout_button'), session_path, method: :delete, class: "button-small button-ghost" %>
+  </div>
 
   <% if @user.errors.any? %>
     <ul class="form-errors">
@@ -92,15 +97,6 @@
         </div>
       <% end %>
     </div>
-  </section>
-
-  <%# ── Sign out ───────────────────────────────────────────────────────── %>
-  <%# Logout lives here rather than in the header menu — it's rare account
-      plumbing, not something you reach for often enough to spend a menu row on. %>
-  <section class="settings-section">
-    <h2><%= t('settings.signout_heading') %></h2>
-    <p class="muted"><%= t('settings.signout_hint') %></p>
-    <%= button_to t('settings.signout_button'), session_path, method: :delete, class: "button" %>
   </section>
 
   <%# ── Delete account ──────────────────────────────────────────────────── %>

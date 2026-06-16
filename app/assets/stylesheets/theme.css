@@ -25,9 +25,25 @@ body {
   --theme-accent-color: var(--color-accent);
   --theme-warn-color: var(--color-warn);
   --theme-favorite-color: var(--color-favorite);
-  --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l + 30));
+  /* Text/glyphs painted ON the accent fill (primary buttons, badges, the today
+     badge, checked-box ticks, chips). The old code reused --theme-bg-color here,
+     which is pink-on-green in light / plum-on-green in dark — both low-contrast.
+     A dedicated token lets each theme pick a legible on-accent colour: white on
+     the dark light-theme green, the dark plum on the brighter dark-theme green. */
+  --theme-on-accent: var(--color-white);
+  /* +24 (was +30) lifts secondary text contrast against the saturated grounds
+     without letting muted info compete with primary text. */
+  --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l + 24));
   --theme-bg-muted: hsl(from var(--theme-bg-color) h s calc(l - 10));
   --theme-accent-muted: hsl(from var(--theme-accent-color) h calc(s - 60) calc(l + 15));
+  /* An interactive field's resting underline. More present than a structural
+     hairline (--border-color, 22%) so an empty input reads as fillable rather
+     than blending into the ground — the login/settings fields were near-invisible
+     at 22% on the saturated grounds. Derived from fg so it adapts to both themes. */
+  --field-border-color: color-mix(in srgb, var(--theme-fg-color) 40%, transparent);
+  /* The calendar grid: visible enough to read as a grid on the saturated pink,
+     still lighter than a content rule. (22% washed out against the rose ground.) */
+  --calendar-border-color: color-mix(in srgb, var(--theme-fg-color) 30%, transparent);
 
   color-scheme: light;
   background-color: var(--theme-bg-color);
@@ -50,10 +66,13 @@ html[data-theme="dark"] body {
   --color-warn: #f0837a;
   --color-favorite: #ec6f98;
 
+  /* On the brighter dark-theme green, the dark plum ground reads far better than
+     white (which glares). */
+  --theme-on-accent: var(--color-background);
+
   /* Muted recalcs run opposite to light: dim the bright fg, lift the dark bg.
-     -25 keeps secondary text comfortably readable (not as dim as the fg drop
-     alone would make it). */
-  --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l - 25));
+     -20 keeps secondary text comfortably readable against the dark ground. */
+  --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l - 20));
   --theme-bg-muted: hsl(from var(--theme-bg-color) h s calc(l + 5));
   --theme-accent-muted: hsl(from var(--theme-accent-color) h calc(s - 35) calc(l - 12));
 

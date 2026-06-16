@@ -47,6 +47,10 @@
         <p class="sg-swatch__label"><b>Accent muted</b> · <code>--theme-accent-muted</code><br>Quiet accent ground (window chips)</p>
       </li>
       <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--on-accent"></div>
+        <p class="sg-swatch__label"><b>On accent</b> · <code>--theme-on-accent</code><br>Text/glyphs painted ON the accent fill (primary buttons, badges, today, ticks). Never <code>--theme-bg-color</code> — that's low-contrast on green in both themes.</p>
+      </li>
+      <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--favorite"></div>
         <p class="sg-swatch__label"><b>Favorite</b> · <code>--theme-favorite-color</code><br>"Yours" — a followed item only</p>
       </li>
@@ -76,12 +80,15 @@
       </li>
     </ul>
     <p class="sg-ok">
-      <b>Audit #1 / #10 — resolved.</b> Structural borders, the calendar grid,
-      the nav-menu panel, passive form underlines, raw <code>input</code> text,
-      and the filter-handle icon are now neutral (<code>--border-color</code> /
-      <code>--rule-color</code> / <code>--theme-fg-muted</code>). Green appears on
-      a field only on focus, and otherwise only for links, active state, primary
-      actions, and follows.
+      <b>Audit #1 / #10 — resolved.</b> Structural borders, the nav-menu panel,
+      raw <code>input</code> text, and the filter-handle icon are neutral
+      (<code>--border-color</code> / <code>--rule-color</code> /
+      <code>--theme-fg-muted</code>). Field underlines use a more present neutral
+      (<code>--field-border-color</code>) so an empty input reads as fillable, and
+      the calendar grid its own (<code>--calendar-border-color</code>) so it reads
+      as a grid on the saturated ground — both still neutral, derived from the
+      foreground. Green appears on a field only on focus, and otherwise only for
+      links, active state, primary actions, and follows.
     </p>
   </section>
 

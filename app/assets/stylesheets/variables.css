@@ -20,6 +20,9 @@
 
   /* layout */
   --content-max-width: 720px;
+  /* Wider measure for pages whose content is a wide artifact (the calendar). Kept
+     bounded so it frames nicely on large monitors rather than sprawling. */
+  --content-max-width-wide: 1080px;
   --content-padding: var(--gap-medium);
 
   /* type scale */

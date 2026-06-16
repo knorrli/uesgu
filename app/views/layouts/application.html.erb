@@ -47,7 +47,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="<%= class_names(yield(:body_class)) %>">
     <% if notice.present? || alert.present? %>
       <div class="flashes" role="status" aria-live="polite">
         <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>

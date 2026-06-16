@@ -2,7 +2,7 @@
    a form line, consistent with the de-boxed list below. */
 .input-wrapper {
   padding: var(--gap-small) 0;
-  border-bottom: var(--border-width) solid var(--border-color);
+  border-bottom: var(--border-width) solid var(--field-border-color);
   line-height: var(--filter-input-line-height);
   position: relative;
 }
@@ -438,7 +438,7 @@
      heavy filled boxes of before. */
   .day {
     position: relative;
-    border: var(--calendar-border-width) solid var(--border-color);
+    border: var(--calendar-border-width) solid var(--calendar-border-color);
     /* Minimum height; busy cells grow to fit their in-flow .day-content. */
     height: 7rem;
     vertical-align: top;
@@ -491,7 +491,7 @@
       width: fit-content;
       font-weight: bold;
       padding: 0 0.45em;
-      color: var(--theme-bg-color);
+      color: var(--theme-on-accent);
       background-color: var(--theme-accent-color);
     }
   }
@@ -663,7 +663,7 @@
   width: 100%;
   padding: var(--gap-small) 0;
   border: 0;
-  border-bottom: var(--border-width) solid var(--border-color);
+  border-bottom: var(--border-width) solid var(--field-border-color);
   background: none;
   color: var(--theme-fg-color);
   font: inherit;
@@ -721,7 +721,7 @@
   padding: 5px;
   border: 0;
   background: var(--theme-accent-color);
-  color: var(--theme-bg-color);
+  color: var(--theme-on-accent);
   font: inherit;
   font-size: 75%;
   line-height: 1;
@@ -836,7 +836,7 @@ body.filter-sheet-open { overflow: hidden; }
   padding: var(--gap-medium);
   border: 0;
   background: var(--theme-accent-color);
-  color: var(--theme-bg-color);
+  color: var(--theme-on-accent);
   font: inherit;
   font-weight: bold;
   cursor: pointer;
@@ -885,7 +885,7 @@ body.filter-sheet-open { overflow: hidden; }
   content: "";
   width: 0.8rem;
   height: 0.8rem;
-  background-color: var(--theme-bg-color);
+  background-color: var(--theme-on-accent);
   -webkit-mask: var(--check-mask) center / contain no-repeat;
   mask: var(--check-mask) center / contain no-repeat;
 }
@@ -1019,7 +1019,7 @@ body.filter-sheet-open { overflow: hidden; }
   min-width: 0;
   padding: var(--gap-small) 0;
   border: 0;
-  border-bottom: var(--border-width) solid var(--border-color);
+  border-bottom: var(--border-width) solid var(--field-border-color);
   background: none;
   color: inherit;
   font: inherit;

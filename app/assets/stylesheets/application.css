@@ -23,6 +23,23 @@ main.content {
   flex: 1 0 auto;
 }
 
+/* Wide pages (set per-view via content_for :body_class). A 720px measure is right
+   for prose and forms, but starves wide artifacts — the 7-column calendar in
+   particular. These pages widen the shared column (header + content stay aligned
+   because both read --content-max-width). */
+body.layout-wide {
+  --content-max-width: var(--content-max-width-wide);
+}
+
+/* The cookie notice is fixed to the bottom; on a tall page (the calendar) the
+   last content row scrolled under it. Reserve clearance ONLY while the notice is
+   actually visible — the controller drops the `hidden` attr to show it and
+   removes the element entirely on dismiss / for returning visitors, so the space
+   is reclaimed the moment it's gone. */
+body:has(.cookie-notice:not([hidden])) main.content {
+  padding-bottom: calc(var(--gap-large) + 3.5rem);
+}
+
 /* Base typography */
 h1 { font-size: var(--font-size-xl); }
 h2 { font-size: var(--font-size-lg); }
@@ -59,14 +76,24 @@ a {
 .account-form input[type="text"],
 .account-form input[type="email"],
 .account-form input[type="password"],
+.account-form input[type="time"],
 .account-form select {
   padding: var(--gap-small) 0;
   border: 0;
-  border-bottom: var(--border-width) solid var(--border-color);
+  border-bottom: var(--border-width) solid var(--field-border-color);
   background: var(--theme-bg-color);
   color: inherit;
   font: inherit;
   max-width: 100%;
+}
+
+/* The native time picker ships as a bordered, opaque-white box that ignored the
+   underline treatment entirely (a stark white rectangle beside the underline
+   selects on the rule form). Strip the box to match, and let its picker glyph
+   follow the theme. */
+.account-form input[type="time"] {
+  background: none;
+  color-scheme: light dark;
 }
 
 /* Neutral at rest, accent underline on focus — green now signals "this field is
@@ -78,6 +105,7 @@ a {
 .account-form input[type="text"]:focus,
 .account-form input[type="email"]:focus,
 .account-form input[type="password"]:focus,
+.account-form input[type="time"]:focus,
 .account-form select:focus {
   outline: none;
   border-bottom-color: var(--theme-accent-color);

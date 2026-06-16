@@ -241,15 +241,13 @@ en:
     other_locations: Other locations
     favorite_styles_heading: Styles
     email_heading: Email
-    email_optional: (optional)
-    email_hint: Optional — only if you want event updates by email.
-    email_third_party: Goes only to our mail provider, Resend, to send them. Nothing else.
+    email_hint: Optional — only for email updates. Goes to our mail service resend.com, nothing else.
     email_placeholder: you@example.com
     password_heading: Change password
     password_hint: Leave blank to keep it.
     new_password: New password
     confirm_new_password: Confirm new password
-    save: Save settings
+    save: Save
     push_heading: Notifications on this device
     push_hint: Get pinged here when new events match your interests.
     push_enable: Enable on this device

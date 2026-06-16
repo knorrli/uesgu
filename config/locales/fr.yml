@@ -241,15 +241,13 @@ fr:
     other_locations: Autres lieux
     favorite_styles_heading: Styles
     email_heading: E-mail
-    email_optional: (facultatif)
-    email_hint: Facultatif — uniquement si tu veux des mises à jour par e-mail.
-    email_third_party: Transmise uniquement à notre service e-mail Resend pour les envoyer. Rien d'autre.
+    email_hint: Facultatif — seulement pour des mises à jour par e-mail. Va à notre service e-mail resend.com, rien d'autre.
     email_placeholder: toi@exemple.ch
     password_heading: Changer le mot de passe
     password_hint: Laisse vide pour le garder.
     new_password: Nouveau mot de passe
     confirm_new_password: Confirmer le nouveau mot de passe
-    save: Enregistrer les paramètres
+    save: Enregistrer
     push_heading: Notifications sur cet appareil
     push_hint: On te notifie ici dès que de nouveaux événements correspondent à tes intérêts.
     push_enable: Activer sur cet appareil

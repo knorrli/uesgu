@@ -122,9 +122,15 @@ a {
   min-width: 0;
 }
 
+/* Form field label: bold at base size — ONE consistent style for every field
+   label in a section, whether it's a <span> over a value/select or a fieldset
+   <legend>. Bold keeps the label distinct from the normal-weight value/input
+   below it (and from the muted+small hint); the section's h2 is larger, so it
+   stays the heading. Documented in the styleguide Inputs section. */
+.account-form .field-label,
 .settings-field legend {
-  padding: 0;
   font-weight: bold;
+  padding: 0;
 }
 
 /* The "on this device" cluster (install + push) under Notifications. */

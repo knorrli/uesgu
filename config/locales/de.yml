@@ -241,15 +241,13 @@ de:
     other_locations: Weitere Orte
     favorite_styles_heading: Stile
     email_heading: E-Mail
-    email_optional: (optional)
-    email_hint: Optional — nur falls du Updates per E-Mail willst.
-    email_third_party: Geht nur an unseren Mail-Dienst Resend, um sie zu verschicken. Sonst nichts.
+    email_hint: Optional — nur für Updates per Mail. Geht an unseren Mail-Dienst resend.com, sonst nichts.
     email_placeholder: du@beispiel.ch
     password_heading: Passwort ändern
     password_hint: Leer lassen, um es zu behalten.
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
-    save: Einstellungen speichern
+    save: Speichern
     push_heading: Benachrichtigungen auf diesem Gerät
     push_hint: Wir pingen dich hier an, sobald neue Veranstaltungen zu deinen Interessen passen.
     push_enable: Auf diesem Gerät aktivieren

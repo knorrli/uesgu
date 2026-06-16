@@ -42,10 +42,27 @@ class Event < ApplicationRecord
     update!(dismissed_at: Time.current) unless dismissed?
   end
 
-  # Scalar fields an admin may edit and lock against the scraper. Tag-based
-  # fields (genres/styles, and the visibility/cancellation flags they derive)
-  # stay source-owned; `url` is the immutable upsert key, so neither is editable.
+  # Lift a dismissal: the event reappears in public listings AND re-scrapes
+  # resume updating it from source. Idempotent — a no-op on a kept event.
+  def undismiss!
+    update!(dismissed_at: nil) if dismissed?
+  end
+
+  # Scalar fields an admin may edit and lock against the scraper. Tracked by
+  # ActiveRecord dirty-checking, so the controller locks exactly what changed.
+  # `url` is the immutable upsert key, so it's deliberately absent.
   OVERRIDABLE_FIELDS = %w[title subtitle start_date start_time].freeze
+
+  # Tag lists an admin may pin against the scraper. Not real columns (so they
+  # never show up in `changed`), but they sit in overridden_fields alongside the
+  # scalars and gate the scrape the same way (see Scrapers::Agent#build_event).
+  # A pinned genre list keeps its derived styles/visibility, recomputed from it
+  # — styles and the `hidden`/`cancelled` flags stay source-derived projections.
+  OVERRIDABLE_TAG_FIELDS = %w[genres].freeze
+
+  # Everything an admin may pin: the allowlist lock_field! guards and the set the
+  # admin UI lists as revertible.
+  LOCKABLE_FIELDS = (OVERRIDABLE_FIELDS + OVERRIDABLE_TAG_FIELDS).freeze
 
   # `overridden_fields` is the field-level sibling of `dismissed_at`: a name
   # listed here is admin-owned, so the re-scrape leaves that column untouched
@@ -55,11 +72,11 @@ class Event < ApplicationRecord
   end
 
   # Lock a field to its current (admin-edited) value. Idempotent; ignores any
-  # name outside OVERRIDABLE_FIELDS so the list can never hold a source-owned
+  # name outside LOCKABLE_FIELDS so the list can never hold a source-owned
   # column.
   def lock_field!(field)
     field = field.to_s
-    return unless OVERRIDABLE_FIELDS.include?(field) && !overridden?(field)
+    return unless LOCKABLE_FIELDS.include?(field) && !overridden?(field)
 
     update!(overridden_fields: overridden_fields + [field])
   end
@@ -70,6 +87,15 @@ class Event < ApplicationRecord
     return unless overridden?(field)
 
     update!(overridden_fields: overridden_fields - [field])
+  end
+
+  # Genre-model ids matching this event's current genre tags (by fingerprint) —
+  # the selection the admin override combobox shows. ensure! guarantees a Genre
+  # row per tagged genre on every scrape (Scrapers::Agent#event_styles), so this
+  # never silently drops one. The matching setter lives in the controller, which
+  # maps the submitted ids back to names through genre_list=.
+  def override_genre_ids
+    Genre.where(fingerprint: genre_list.map { |name| Genre.fingerprint_for(name) }).pluck(:id)
   end
 
   def self.ransackable_attributes(auth_object = nil)

@@ -453,6 +453,7 @@ fr:
         status_visible: Visibles
         status_hidden: Masqués
         status_cancelled: Annulés
+        status_dismissed: Retirés
         search: Rechercher des événements…
         sort_by: Trier par
         sort_date: date
@@ -461,26 +462,40 @@ fr:
         hidden_badge: masqué
         empty: Aucun événement correspondant.
         overridden_badge: modifié
+        restore: Restaurer
       show:
         back: Retour aux événements
         source_link: Voir la source
-        intro: Corrigez les données source erronées ci-dessous. Un champ modifié est verrouillé et ne sera pas écrasé au prochain scrape.
+        intro: Corrige les données source erronées ci-dessous. Un champ modifié est verrouillé et ne sera pas écrasé au prochain scrape.
         title_label: Titre
         subtitle_label: Sous-titre
         date_label: Date
         time_label: Heure
+        genres_label: Genres
+        genres_hint: Choisis dans la taxonomie existante. La modification épingle la liste — le scraper n'y touche plus, et les styles + la visibilité en sont redérivés.
+        dismissed_badge: retiré
         overridden_badge: modifié manuellement
         save: Enregistrer
         overrides_heading: Remplacements manuels
-        overrides_intro: Ces champs appartiennent à l'admin et sont ignorés par le scraper. Réinitialisez-en un pour que le prochain scrape le remplisse depuis la source.
+        overrides_intro: Ces champs appartiennent à l'admin et sont ignorés par le scraper. Réinitialises-en un pour que le prochain scrape le remplisse depuis la source.
         revert: Réinitialiser à la source
         field_title: Titre
         field_subtitle: Sous-titre
         field_start_date: Date et heure
+        field_genres: Genres
+        dismiss_heading: Visibilité
+        dismiss_intro: Retire cet événement de toutes les listes publiques pour de bon. Il reste en base et n'est jamais ressuscité par un scrape — annulable à tout moment.
+        dismiss: Retirer l'événement
+        dismissed_intro: Cet événement est retiré — masqué de toutes les listes publiques et ignoré par le scraper. Restaure-le pour le faire revenir.
+        restore: Restaurer l'événement
       update:
         saved: Événement mis à jour.
       revert:
         reverted: Champ réinitialisé à la source.
+      destroy:
+        dismissed: Événement retiré.
+      undismiss:
+        restored: Événement restauré.
     styles:
       index:
         title: Styles

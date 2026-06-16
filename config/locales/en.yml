@@ -453,6 +453,7 @@ en:
         status_visible: Visible
         status_hidden: Hidden
         status_cancelled: Cancelled
+        status_dismissed: Dismissed
         search: Search events…
         sort_by: Sort by
         sort_date: date
@@ -461,6 +462,7 @@ en:
         hidden_badge: hidden
         empty: No events match.
         overridden_badge: edited
+        restore: Restore
       show:
         back: Back to events
         source_link: View source
@@ -469,6 +471,9 @@ en:
         subtitle_label: Subtitle
         date_label: Date
         time_label: Time
+        genres_label: Genres
+        genres_hint: Pick from the existing taxonomy. Editing pins the list — the scraper won't touch it, and styles + visibility re-derive from it.
+        dismissed_badge: dismissed
         overridden_badge: manually edited
         save: Save
         overrides_heading: Manual overrides
@@ -477,10 +482,20 @@ en:
         field_title: Title
         field_subtitle: Subtitle
         field_start_date: Date & time
+        field_genres: Genres
+        dismiss_heading: Visibility
+        dismiss_intro: Dismiss to remove this event from every public listing for good. It stays in the database and is never resurrected by a re-scrape — undo this anytime.
+        dismiss: Dismiss event
+        dismissed_intro: This event is dismissed — hidden from every public listing and skipped by the scraper. Restore it to bring it back.
+        restore: Restore event
       update:
         saved: Event updated.
       revert:
         reverted: Field reverted to source.
+      destroy:
+        dismissed: Event dismissed.
+      undismiss:
+        restored: Event restored.
     styles:
       index:
         title: Styles

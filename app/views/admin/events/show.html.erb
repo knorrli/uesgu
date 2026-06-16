@@ -9,14 +9,15 @@
       <%= link_to t('.source_link'), @event.url, target: '_blank', rel: 'noopener' %>
       <% if @event.cancelled? %><span class="chip"><%= t('admin.events.index.cancelled_badge') %></span><% end %>
       <% if @event.hidden? %><span><%= t('admin.events.index.hidden_badge') %></span><% end %>
+      <% if @event.dismissed? %><span class="chip"><%= t('.dismissed_badge') %></span><% end %>
     </div>
   </div>
 
-  <%# Fields the scraper re-derives each run are read-only here; only the scalar
-      OVERRIDABLE_FIELDS are editable, and editing one locks it against re-scrape. %>
+  <%# Editing any field here locks it against the next re-scrape; styles and the
+      hidden/cancelled flags stay read-only (they re-derive from the genres). %>
   <p class="muted"><%= t('.intro') %></p>
 
-  <%= form_with url: admin_event_path(@event), method: :patch, class: 'account-form flex flex-col gap-medium' do %>
+  <%= form_with model: @event, url: admin_event_path(@event), method: :patch, class: 'account-form flex flex-col gap-medium' do |f| %>
     <label class="flex flex-col gap-small">
       <span class="flex gap-small align-baseline">
         <%= t('.title_label') %>
@@ -49,10 +50,29 @@
       </label>
     </div>
 
+    <label class="flex flex-col gap-small">
+      <span class="flex gap-small align-baseline">
+        <%= t('.genres_label') %>
+        <% if @event.overridden?(:genres) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
+      </span>
+      <div class="input-wrapper flex">
+        <%# Multiselect over the assignable taxonomy; submits comma-joined Genre
+            ids the controller maps back to names. %>
+        <%= f.combobox :override_genre_ids, Genre.listable.by_name,
+              value: @event.override_genre_ids.join(','),
+              multiselect_chip_src: chips_genres_path,
+              placeholder: t('.genres_label') do |combobox| %>
+          <% combobox.customize_fieldset class: 'flex-grow' %>
+          <% combobox.customize_input class: 'flex-grow' %>
+        <% end %>
+      </div>
+      <span class="muted"><%= t('.genres_hint') %></span>
+    </label>
+
     <%= submit_tag t('.save') %>
   <% end %>
 
-  <% locked = @event.overridden_fields & Event::OVERRIDABLE_FIELDS %>
+  <% locked = @event.overridden_fields & Event::LOCKABLE_FIELDS %>
   <% if locked.any? %>
     <section class="flex flex-col gap-small">
       <h2><%= t('.overrides_heading') %></h2>
@@ -70,4 +90,15 @@
       </ul>
     </section>
   <% end %>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.dismiss_heading') %></h2>
+    <% if @event.dismissed? %>
+      <p class="muted"><%= t('.dismissed_intro') %></p>
+      <%= button_to t('.restore'), undismiss_admin_event_path(@event), method: :patch, class: 'button-small' %>
+    <% else %>
+      <p class="muted"><%= t('.dismiss_intro') %></p>
+      <%= button_to t('.dismiss'), admin_event_path(@event), method: :delete, class: 'button-small button-ghost' %>
+    <% end %>
+  </section>
 </div>

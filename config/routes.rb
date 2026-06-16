@@ -101,6 +101,8 @@ Rails.application.routes.draw do
       end
       collection do
         get :queue
+        # Selection chips for the per-event genre-override combobox (admin only).
+        post :chips
       end
     end
   end
@@ -121,9 +123,13 @@ Rails.application.routes.draw do
     # search / paginate. (Genres keep their own legacy scoped route above, with
     # edit/queue actions these three don't need.) Events additionally get
     # show/update for per-event manual correction; revert releases one locked
-    # field back to the scraper.
-    resources :events, only: %i[index show update] do
-      member { patch :revert }
+    # field back to the scraper; destroy dismisses (soft-deletes) it and undismiss
+    # restores it.
+    resources :events, only: %i[index show update destroy] do
+      member do
+        patch :revert
+        patch :undismiss
+      end
     end
     resources :styles, only: %i[index]
     resources :locations, only: %i[index]

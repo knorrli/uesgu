@@ -453,6 +453,7 @@ de:
         status_visible: Sichtbar
         status_hidden: Ausgeblendet
         status_cancelled: Abgesagt
+        status_dismissed: Entfernt
         search: Veranstaltungen suchen…
         sort_by: Sortieren nach
         sort_date: Datum
@@ -461,6 +462,7 @@ de:
         hidden_badge: ausgeblendet
         empty: Keine passenden Veranstaltungen.
         overridden_badge: bearbeitet
+        restore: Wiederherstellen
       show:
         back: Zurück zu Veranstaltungen
         source_link: Quelle ansehen
@@ -469,6 +471,9 @@ de:
         subtitle_label: Untertitel
         date_label: Datum
         time_label: Zeit
+        genres_label: Genres
+        genres_hint: Aus dem bestehenden Vokabular wählen. Beim Bearbeiten wird die Liste gepinnt – der Scraper lässt sie in Ruhe, und Styles + Sichtbarkeit werden daraus neu abgeleitet.
+        dismissed_badge: entfernt
         overridden_badge: manuell bearbeitet
         save: Speichern
         overrides_heading: Manuelle Überschreibungen
@@ -477,10 +482,20 @@ de:
         field_title: Titel
         field_subtitle: Untertitel
         field_start_date: Datum & Zeit
+        field_genres: Genres
+        dismiss_heading: Sichtbarkeit
+        dismiss_intro: Entferne die Veranstaltung dauerhaft aus allen öffentlichen Listen. Sie bleibt in der Datenbank und wird von keinem Scrape wieder hervorgeholt – jederzeit rückgängig machbar.
+        dismiss: Veranstaltung entfernen
+        dismissed_intro: Diese Veranstaltung ist entfernt – aus allen öffentlichen Listen ausgeblendet und vom Scraper übersprungen. Stelle sie wieder her, um sie zurückzuholen.
+        restore: Veranstaltung wiederherstellen
       update:
         saved: Veranstaltung aktualisiert.
       revert:
         reverted: Feld auf Quelle zurückgesetzt.
+      destroy:
+        dismissed: Veranstaltung entfernt.
+      undismiss:
+        restored: Veranstaltung wiederhergestellt.
     styles:
       index:
         title: Stile

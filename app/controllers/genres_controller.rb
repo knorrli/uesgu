@@ -49,6 +49,13 @@ class GenresController < ApplicationController
     redirect_to return_to
   end
 
+  # Selection chips for the per-event genre-override combobox (admin/events#show).
+  # Mirrors StylesController#chips but admin-gated (require_admin above).
+  def chips
+    @genres = Genre.where(id: params[:combobox_values].to_s.split(',')).distinct.by_name
+    render turbo_stream: helpers.combobox_selection_chips_for(@genres)
+  end
+
   def ignore
     Genre.find(params[:id]).ignore!
     redirect_to return_to

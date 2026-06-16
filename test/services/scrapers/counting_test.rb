@@ -110,4 +110,37 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert dismissed.reload.dismissed?
     assert_equal 'Original', dismissed.title
   end
+
+  test 'an undismissed event is updated again by the next re-scrape' do
+    url = 'https://fixture.test/undismissed'
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Original' }]
+    CountingScraperHarness.new.call
+    event = Event.find_by(url: url)
+    event.dismiss!
+    event.undismiss!
+
+    # No longer dismissed → the scraper resumes updating it from source.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Changed' }]
+    result = CountingScraperHarness.new.call
+
+    assert_equal 1, result.updated
+    assert_equal 'Changed', event.reload.title
+  end
+
+  test 'a re-scrape leaves an admin-pinned genre list alone but re-derives styles' do
+    url = 'https://fixture.test/pinned-genres'
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Show', genres: ['Aaa'] }]
+    CountingScraperHarness.new.call
+    event = Event.find_by(url: url)
+    event.genre_list = ['Bbb']
+    event.lock_field!(:genres)
+    event.save!
+
+    # Source still says "Aaa" — but genres are pinned, so the re-scrape keeps
+    # "Bbb" rather than overwriting it.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Show', genres: ['Aaa'] }]
+    CountingScraperHarness.new.call
+
+    assert_equal ['Bbb'], event.reload.genre_list
+  end
 end

@@ -123,6 +123,54 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     refute e.overridden?(:start_time)
   end
 
+  test 'editing genres pins the list and re-derives styles, revertible like a scalar' do
+    e = event(title: 'Genre Show')
+    g1 = genre(name: 'aaa')
+    g2 = genre(name: 'bbb')
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: 'Genre Show', subtitle: '', date: e.start_date.iso8601, time: '',
+      override_genre_ids: "#{g1.id},#{g2.id}"
+    } }
+    assert_redirected_to admin_event_path(e)
+
+    e.reload
+    assert_equal [g1.name, g2.name].sort, e.genre_list.sort
+    assert e.overridden?(:genres)
+
+    # Pinned genres surface in the manual-overrides list with a revert form.
+    get admin_event_path(e)
+    assert_select 'form[action=?]', revert_admin_event_path(e, field: 'genres')
+
+    patch revert_admin_event_path(e, field: 'genres')
+    refute e.reload.overridden?(:genres)
+  end
+
+  test 'an admin can dismiss an event and restore it' do
+    e = event(title: 'Bin Me')
+    sign_in_as user(admin: true)
+
+    delete admin_event_path(e)
+    assert_redirected_to admin_events_path(status: 'dismissed')
+    assert e.reload.dismissed?
+
+    patch undismiss_admin_event_path(e)
+    assert_redirected_to admin_event_path(e)
+    refute e.reload.dismissed?
+  end
+
+  test 'guests and non-admins cannot dismiss events' do
+    e = event(title: 'Safe')
+    delete admin_event_path(e)
+    assert_redirected_to new_session_path
+
+    sign_in_as user(admin: false)
+    delete admin_event_path(e)
+    assert_response :forbidden
+    refute e.reload.dismissed?
+  end
+
   test 'guests and non-admins cannot edit events' do
     e = event(title: 'Untouched')
     patch admin_event_path(e), params: { event: { title: 'Hacked', date: e.start_date.iso8601 } }

@@ -35,18 +35,22 @@ module Admin
       @event = Event.find(params.expect(:id))
     end
 
-    # Manual correction of an event's scalar fields. Locking is implicit on edit:
-    # any overridable field whose value the admin actually changed is added to
+    # Manual correction of an event's fields. Locking is implicit on edit: any
+    # overridable field whose value the admin actually changed is added to
     # overridden_fields, so the next re-scrape leaves it alone. Date + time are
     # locked as a pair (either change locks both) so start_time's date can never
-    # diverge from start_date.
+    # diverge from start_date. A genre edit also re-derives the styles/visibility
+    # that hang off the genres.
     def update
       @event = Event.find(params.expect(:id))
-      assign_edits(@event)
+      attrs = params.expect(event: %i[title subtitle date time override_genre_ids])
+      assign_scalars(@event, attrs)
       locked = @event.changed & Event::OVERRIDABLE_FIELDS
       locked |= SCHEDULE_FIELDS if locked.intersect?(SCHEDULE_FIELDS)
+      locked << 'genres' if assign_genres(@event, attrs)
       @event.overridden_fields = (@event.overridden_fields + locked).uniq
       @event.save!
+      @event.recompute_styles! if locked.include?('genres')
       redirect_to admin_event_path(@event), notice: t('.saved')
     end
 
@@ -59,14 +63,29 @@ module Admin
       redirect_to admin_event_path(event), notice: t('.reverted')
     end
 
+    # Soft-delete: the event drops out of every public listing and is never
+    # resurrected by a re-scrape (Scrapers::Agent skips dismissed events).
+    # Reversible via #undismiss — not a hard delete.
+    def destroy
+      event = Event.find(params.expect(:id))
+      event.dismiss!
+      redirect_to admin_events_path(status: 'dismissed'), notice: t('.dismissed')
+    end
+
+    # Lift a dismissal so the event reappears and re-scrapes resume updating it.
+    def undismiss
+      event = Event.find(params.expect(:id))
+      event.undismiss!
+      redirect_to admin_event_path(event), notice: t('.restored')
+    end
+
     private
 
     # start_date + start_time move together: the form edits a date and a
     # time-of-day, and a change to either locks both.
     SCHEDULE_FIELDS = %w[start_date start_time].freeze
 
-    def assign_edits(event)
-      attrs = params.expect(event: %i[title subtitle date time])
+    def assign_scalars(event, attrs)
       event.title = attrs[:title]
       event.subtitle = attrs[:subtitle].presence
       date = attrs[:date].present? ? Date.parse(attrs[:date]) : event.start_date
@@ -76,6 +95,19 @@ module Admin
           hour, minute = attrs[:time].split(':').map(&:to_i)
           Time.zone.local(date.year, date.month, date.day, hour, minute)
         end
+    end
+
+    # Pin the genre list to the admin's combobox selection (comma-joined Genre
+    # ids; mapped back to names, which Event's genre_list= setter canonicalizes
+    # and de-blocks). A missing field is left alone; an empty selection clears the
+    # list. Returns whether it actually changed, so the caller knows to lock it.
+    def assign_genres(event, attrs)
+      return false unless attrs.key?(:override_genre_ids)
+
+      ids = attrs[:override_genre_ids].to_s.split(',').map(&:strip).reject(&:blank?)
+      before = event.genre_list.sort
+      event.genre_list = Genre.where(id: ids).pluck(:name)
+      event.genre_list.sort != before
     end
   end
 end

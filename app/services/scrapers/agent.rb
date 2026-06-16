@@ -137,12 +137,20 @@ module Scrapers
       # Trusted (discovery) genres from a clean structured field may mint new
       # taxonomy; consumption genres from an unstable free-text source are
       # attached match-only, never creating a Genre row (see Genre.existing_only).
-      event.genre_list    = Array(event_genres(content)) +
+      # Skip when an admin has pinned the list (Event#overridden?(:genres)) so the
+      # re-scrape can't overwrite the correction — the field-level genre sibling
+      # of the scalar skips above.
+      unless event.overridden?(:genres)
+        event.genre_list  = Array(event_genres(content)) +
                             Genre.existing_only(event_consumption_genres(content))
+      end
+      # Styles + visibility are a derived projection of whatever genres now stand
+      # — scraped or admin-pinned — so a pinned genre list still gets correct
+      # styles/hidden. Re-derived from source each scrape, mirroring
+      # Event#recompute_styles! — otherwise a freshly-scraped non-music event
+      # (hidden genre, no style) would stay publicly visible until a later
+      # disposition/recompute touched it.
       event.style_list    = event_styles(genres: event.genre_list)
-      # Derive visibility from source each scrape, mirroring Event#recompute_styles!
-      # — otherwise a freshly-scraped non-music event (hidden genre, no style) would
-      # stay publicly visible until a later disposition/recompute touched it.
       event.hidden        = event.hidden_by_genre?
       event.location_list = self.class.locations
       postprocess(event)

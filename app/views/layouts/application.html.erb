@@ -68,9 +68,10 @@
         </div>
         <nav class="site-nav">
           <%# Install shortcut, visible signed in or out (installing needs no
-              account). The standalone controller hides it once the app is
-              already installed, so it only shows when there's something to do. %>
-          <%= link_to t('nav.install'), install_path, class: 'nav-install', data: { controller: 'standalone' } %>
+              account). Ships hidden; the install-link controller reveals it only
+              where the PWA can actually be installed (not when already installed,
+              and not on Firefox desktop). %>
+          <%= link_to t('nav.install'), install_path, class: 'nav-install', hidden: true, data: { controller: 'install-link' } %>
           <% if authenticated? %>
             <% unread = current_user.notifications.unread.count %>
             <%# Personal/account links collapse into one menu to keep the bar light.

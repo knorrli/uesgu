@@ -1,7 +1,12 @@
 body {
   --color-text: var(--color-black);
-  --color-background: var(--color-pink);
-  --color-accent: var(--color-green);
+  /* Dirty-cream ground + mid-deep green. A muted, slightly greyed sand (not a
+     bright near-white) so the light theme is easy on the eyes. The green reads
+     clearly as green for links/text on it, AND is dark enough that the cream
+     on-accent text punches out of the button fill. --theme-bg-muted (this minus
+     10% L) is the sand highlight reused by both the dropdown and calendar hover. */
+  --color-background: #e8e1cd;
+  --color-accent: #0e7a4a;
   --color-warn: var(--color-red);
   --color-favorite: var(--color-raspberry);
 
@@ -26,11 +31,11 @@ body {
   --theme-warn-color: var(--color-warn);
   --theme-favorite-color: var(--color-favorite);
   /* Text/glyphs painted ON the accent fill (primary buttons, badges, the today
-     badge, checked-box ticks, chips). The old code reused --theme-bg-color here,
-     which is pink-on-green in light / plum-on-green in dark — both low-contrast.
-     A dedicated token lets each theme pick a legible on-accent colour: white on
-     the dark light-theme green, the dark plum on the brighter dark-theme green. */
-  --theme-on-accent: var(--color-white);
+     badge, checked-box ticks, chips). The on-accent colour matches the page
+     background — the "punched out" look — and stays legible in both themes
+     because each pairs a light ground with a dark-enough green (cream on green in
+     light, dark plum on the brighter green in dark). */
+  --theme-on-accent: var(--color-background);
   /* +24 (was +30) lifts secondary text contrast against the saturated grounds
      without letting muted info compete with primary text. */
   --theme-fg-muted: hsl(from var(--theme-fg-color) h s calc(l + 24));

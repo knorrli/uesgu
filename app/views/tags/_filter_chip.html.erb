@@ -18,7 +18,7 @@
         aria-label="<%= value %>"
         data-action="<%= local_assigns.fetch(:remove_action, 'tag-picker#remove') %>">
   <% if local_assigns.fetch(:input, true) %><%= hidden_field_tag param, value, id: nil %><% end %>
-  <span class="<%= filter_chip_icon(param) %>" aria-hidden="true"></span>
+  <span class="<%= filter_chip_icon(param, value) %>" aria-hidden="true"></span>
   <span><%= local_assigns.fetch(:label, value) %></span>
   <span class="tag__remove ph ph-x" aria-hidden="true"></span>
 </button>

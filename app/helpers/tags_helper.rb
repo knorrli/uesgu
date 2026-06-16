@@ -32,18 +32,19 @@ module TagsHelper
   end
 
   # The leading icon on an applied-filter chip, derived from its param so the
-  # events filter and the rule form (and the tag-picker controller, which mirrors
-  # this map in JS) render the same glyph for the same kind of token. Locations
-  # use one neutral pin here rather than the venue/city/canton split — the chip
-  # says "where", the dropdown row still carries the precise type.
+  # events filter and the rule form render the same glyph for the same kind of
+  # token. Locations (l[]) resolve PER-TYPE from the value (canton/city/venue),
+  # matching the mobile filter sheet and the dropdown — so a location chip's icon
+  # tells you which kind of place it is, not a flat "where" pin.
   FILTER_CHIP_GLYPH = {
     's[]' => 'ph-music-notes',
     'q[]' => 'ph-magnifying-glass',
-    'l[]' => 'ph-map-pin',
     'd[]' => 'ph-calendar-dots'
   }.freeze
 
-  def filter_chip_icon(param)
+  def filter_chip_icon(param, value = nil)
+    return tag_icon_class(context: Location.type_for(value)) if param == 'l[]' && value.present?
+
     "#{ICON_BASE} #{FILTER_CHIP_GLYPH.fetch(param, 'ph-lightning')}"
   end
 

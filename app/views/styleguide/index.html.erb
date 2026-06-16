@@ -260,6 +260,19 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
+        <span class="tag active" data-tag-chip><span class="ph ph-map-trifold" aria-hidden="true"></span><span>BE</span><span class="tag__remove ph ph-x" aria-hidden="true"></span></span>
+        <span class="tag active" data-tag-chip><span class="ph ph-map-pin" aria-hidden="true"></span><span>Bern</span><span class="tag__remove ph ph-x" aria-hidden="true"></span></span>
+        <span class="tag active" data-tag-chip><span class="ph ph-house" aria-hidden="true"></span><span>Dachstock</span><span class="tag__remove ph ph-x" aria-hidden="true"></span></span>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Applied location chip (desktop)</span> · <code>.tag[data-tag-chip]</code>
+        <p class="sg-purpose">A removable location filter (inline desktop filter + rule editor). The leading icon is <b>per type</b> — canton <code>map-trifold</code> / city <code>map-pin</code> / venue <code>house</code> — not a flat pin, matching the dropdown and mobile sheet.</p>
+        <span class="sg-ok"><b>Resolved.</b> The × inherits the label colour (no longer pre-dimmed); the whole chip dims on hover/focus to telegraph "tap to remove". Resolved server-side (<code>filter_chip_icon</code> reads the value's type) — no location list shipped to JS.</span>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
         <span class="scrape-badge scrape-badge--ok">OK</span>
         <span class="scrape-badge scrape-badge--empty">No results</span>
         <span class="scrape-badge scrape-badge--failed">2 failed</span>
@@ -368,14 +381,13 @@
 
     <div class="sg-row">
       <div class="sg-specimen" style="font-size:1.4rem;">
-        <span class="icon ph ph-magnifying-glass"></span>
-        <span class="icon ph ph-map-pin"></span>
         <span class="icon ph ph-calendar-dots"></span>
+        <span class="icon ph ph-map-pin"></span>
+        <span class="filter-icon ph ph-magnifying-glass"></span>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Display icon</span> · <code>.icon</code>
-        <p class="sg-purpose">A non-interactive glyph — a field's leading handle, a search affordance, a metadata marker. Muted, no hover lift, no cursor change.</p>
-        <span class="sg-ok"><b>Audit #9 — resolved.</b> The counterpart to <code>.icon-button</code>; replaces the ad-hoc per-context colours (<code>.filter-icon</code>, <code>.sheet__search-icon</code>) — all now muted.</span>
+        <span class="sg-spec__name">Display icon</span> · <code>.icon</code> (muted) · <code>.filter-icon</code> (green)
+        <p class="sg-purpose">A non-interactive metadata glyph is muted (<code>.icon</code>, the counterpart to the clickable <code>.icon-button</code>). <b>Exception:</b> a filter field's leading handle (<code>.filter-icon</code> / <code>.filter-trigger__icon</code>, the green one) is accent-green — the field opens a dropdown/picker, so the glyph reads as an interactive affordance, not passive decoration.</p>
       </div>
     </div>
 

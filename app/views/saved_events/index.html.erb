@@ -3,7 +3,12 @@
     Turbo's snapshot cache so the saved view never flickers between views. %>
 <% content_for :head do %><meta name="turbo-cache-control" content="no-cache"><% end %>
 
-<div class="flex flex-col gap-large">
+<%# data-controller="favorite": the venue/style tags are follow-toggles (same as
+    the main programme), so this wrapper hosts the favorite controller + the
+    followed set, and re-syncs follow state when the calendar frame swaps in. %>
+<div class="flex flex-col gap-large" data-controller="favorite"
+     data-action="turbo:before-frame-render->favorite#beforeFrameRender turbo:frame-load->favorite#reapply"
+     data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
   <%# The view switcher only appears once there's something to look at — a brand
       new shelf just shows the empty state, nothing to toggle between. %>
   <div class="flex justify-between align-baseline wrap gap-medium">
@@ -25,7 +30,10 @@
       <% @events.group_by(&:start_date).each do |date, events| %>
         <div class="date-events flex flex-col gap-medium">
           <h2 class="date"><%= l date, format: :detailed %></h2>
-          <%= render 'events/venue_groups', events: events, filter: nil, interactive: false %>
+          <%# interactive: the venue/style tags are follow-toggles here too, same as
+              the main programme — clicking a name follows/unfollows it (not a filter
+              link), so the behaviour is consistent everywhere. %>
+          <%= render 'events/venue_groups', events: events, filter: nil, interactive: true %>
         </div>
       <% end %>
     </div>

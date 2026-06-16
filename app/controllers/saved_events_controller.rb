@@ -7,9 +7,10 @@ class SavedEventsController < ApplicationController
   def index
     @any_saved = current_user.event_saves.exists?
     @view = resolve_view(session_key: :saved_events_view, account_attr: :saved_events_view)
-    # The saved list shows plain tags (it's your own shelf, not a place to follow
-    # things), so both views render read-only.
-    @calendar_interactive = false
+    # The venue/style tags are follow-toggles here too, same as the main programme,
+    # so clicking a name follows/unfollows it (consistent everywhere) rather than
+    # behaving differently on this one page.
+    @calendar_interactive = true
 
     scope = current_user.saved_events.includes(:locations, :styles, :genres)
     if @view == 'calendar'

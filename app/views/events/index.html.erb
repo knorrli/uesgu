@@ -1,7 +1,10 @@
 <% content_for :title, t('events.index.title') %>
-<%# The calendar is a wide artifact — give it the wide measure; the list keeps the
-    720px reading column. %>
-<% content_for :body_class, 'layout-wide' if @view == 'calendar' %>
+<%# This page renders list OR calendar for the SAME url depending on the saved
+    view preference (session/account) — which Turbo's url-keyed snapshot cache
+    can't represent, so a cached snapshot of the other view flashes on navigation
+    (the list↔calendar flicker, e.g. after switching view then tapping "My
+    interests"). Opt out of the snapshot cache so every visit renders fresh. %>
+<% content_for :head do %><meta name="turbo-cache-control" content="no-cache"><% end %>
 
 <div class="flex flex-col gap-large align-stretch" data-controller="favorite"
      data-action="turbo:before-frame-render->favorite#beforeFrameRender turbo:frame-load->favorite#reapply"

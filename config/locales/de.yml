@@ -256,7 +256,6 @@ de:
     language_heading: Sprache
     language_auto: Automatisch (Browser)
     favorite_locations_heading: Orte
-    favorite_locations_hint: Orte, die dich interessieren — so behältst du ihre Veranstaltungen im Blick.
     follow_all: Alle in %{name}
     other_locations: Weitere Orte
     favorite_styles_heading: Stile

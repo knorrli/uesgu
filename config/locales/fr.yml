@@ -256,7 +256,6 @@ fr:
     language_heading: Langue
     language_auto: Automatique (navigateur)
     favorite_locations_heading: Lieux
-    favorite_locations_hint: Des lieux qui t'intéressent — pour garder un œil sur leurs événements.
     follow_all: Tout %{name}
     other_locations: Autres lieux
     favorite_styles_heading: Styles

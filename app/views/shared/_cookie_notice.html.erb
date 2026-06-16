@@ -8,7 +8,7 @@
     two cookies" stays literally true. %>
 <aside class="cookie-notice" data-controller="cookie-notice" aria-label="<%= t('cookie_notice.label') %>" hidden>
   <p class="cookie-notice__text">
-    <span aria-hidden="true">🍪</span> <%= t('cookie_notice.body') %>
+    <span class="ph ph-cookie cookie-notice__icon" aria-hidden="true"></span> <%= t('cookie_notice.body') %>
   </p>
   <button type="button" class="button-small" data-action="cookie-notice#dismiss">
     <%= t('cookie_notice.dismiss') %>

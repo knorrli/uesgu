@@ -13,13 +13,14 @@
   border-bottom-color: var(--theme-accent-color);
 }
 
-/* Leading handle glyph: a display-only icon, so muted (was green via
-   --border-color, which competed with the interactive signal). */
+/* Filter field handle glyph (search / where / when): GREEN — each field opens a
+   dropdown/picker, so the glyph reads as an interactive affordance ("click to
+   open"), consistent with green = interaction. */
 .filter-icon {
   font-size: 1.5rem;
   display: flex;
   align-items: center;
-  color: var(--theme-fg-muted);
+  color: var(--theme-accent-color);
 }
 
 .filter-button {
@@ -690,7 +691,9 @@
 
 .filter-trigger__icon {
   font-size: var(--filter-icon-size);
-  color: var(--theme-fg-muted);
+  /* Green: the trigger opens a sheet — an interactive affordance (matches the
+     inline .filter-icon). */
+  color: var(--theme-accent-color);
 }
 
 .filter-trigger__label {

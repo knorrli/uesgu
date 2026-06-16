@@ -1,5 +1,7 @@
 <% content_for :title, t('saved_events.title') %>
-<% content_for :body_class, 'layout-wide' if @view == 'calendar' %>
+<%# Same list/calendar-per-session-state caveat as the main programme: opt out of
+    Turbo's snapshot cache so the saved view never flickers between views. %>
+<% content_for :head do %><meta name="turbo-cache-control" content="no-cache"><% end %>
 
 <div class="flex flex-col gap-large">
   <%# The view switcher only appears once there's something to look at — a brand

@@ -23,14 +23,6 @@ main.content {
   flex: 1 0 auto;
 }
 
-/* Wide pages (set per-view via content_for :body_class). A 720px measure is right
-   for prose and forms, but starves wide artifacts — the 7-column calendar in
-   particular. These pages widen the shared column (header + content stay aligned
-   because both read --content-max-width). */
-body.layout-wide {
-  --content-max-width: var(--content-max-width-wide);
-}
-
 /* The cookie notice is fixed to the bottom; on a tall page (the calendar) the
    last content row scrolled under it. Reserve clearance ONLY while the notice is
    actually visible — the controller drops the `hidden` attr to show it and

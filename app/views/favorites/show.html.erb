@@ -15,19 +15,19 @@
 
     <section class="flex flex-col gap-small">
       <h2><%= t('settings.favorite_styles_heading') %></h2>
-      <%# Same checkbox control as the location picker below (label.loc-option), so
-          Styles and Places read as one consistent boolean paradigm — just a flat
-          wrapping row here vs. the hierarchical tree there. %>
-      <div class="flex flex-row wrap gap-medium">
+      <%# Same checkbox control AND the same vertical-column layout as the location
+          picker's venue lists (.loc-venues = column-major CSS columns), so Styles
+          and Places read as one consistent paradigm and the list fills top-to-bottom
+          down each column rather than wrapping left-to-right. %>
+      <div class="loc-venues">
         <%= form.collection_check_boxes :style_list, Style.order(name: :asc), :name, :name do |b| %>
-          <label class="loc-option"><%= b.check_box %> <span class="loc-name"><%= b.text %></span></label>
+          <label class="loc-option loc-venue"><%= b.check_box %> <span class="loc-name"><%= b.text %></span></label>
         <% end %>
       </div>
     </section>
 
     <section class="flex flex-col gap-small">
       <h2><%= t('settings.favorite_locations_heading') %></h2>
-      <p class="muted"><%= t('settings.favorite_locations_hint') %></p>
       <div class="location-picker"><%= render 'location_picker', user: @user %></div>
     </section>
 

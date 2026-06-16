@@ -139,9 +139,10 @@
   font-weight: bold;
 }
 
-/* The "keep in sync with favorites" opt-in gets a light accent ground so it
-   reads as the one special, optional choice on the page. */
+/* The "keep in sync with favorites" opt-in gets a subtle neutral sand ground
+   (the shared --theme-bg-muted highlight) so it reads as a distinct optional
+   choice — without the muddy muted-green wash it used to carry. */
 .rule-sync {
   padding: var(--gap-small) var(--gap-medium);
-  background: var(--theme-accent-muted);
+  background: var(--theme-bg-muted);
 }

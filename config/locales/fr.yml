@@ -111,6 +111,13 @@ fr:
     remove: Supprimer le lien
     created: Lien d'abonnement prêt.
     removed: Lien d'abonnement supprimé.
+  event_reminder:
+    title:
+      one: 1 événement enregistré arrive
+      other: "%{count} événements enregistrés arrivent"
+    push_body:
+      one: 1 événement enregistré arrive
+      other: "%{count} événements enregistrés arrivent"
   notification_rules:
     title: Règles de notification
     intro: Crée tes propres alertes — quoi, quand et comment tu es prévenu. Lances-en autant que tu veux.
@@ -273,6 +280,9 @@ fr:
     calendar_feed_hint_off: Abonne-toi à tes événements enregistrés dans n'importe quelle app calendrier — crée un lien privé pour commencer.
     calendar_feed_hint_on: Ajoute ce lien dans ton app calendrier (Google Agenda, Apple Calendrier…). Il se met à jour tout seul ; les événements disparaissent un jour après.
     calendar_feed_url_label: Lien d'abonnement
+    reminders_heading: Rappels
+    reminders_label: Me rappeler mes événements enregistrés
+    reminders_hint: Un rappel vers midi le jour de l'événement enregistré — dans ta boîte de réception, et par push ou e-mail si tu les as configurés.
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime ton compte et toutes tes données définitivement.
     delete_account: Supprimer mon compte

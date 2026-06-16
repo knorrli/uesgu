@@ -111,6 +111,13 @@ en:
     remove: Remove link
     created: Subscription link ready.
     removed: Subscription link removed.
+  event_reminder:
+    title:
+      one: 1 saved show coming up
+      other: "%{count} saved shows coming up"
+    push_body:
+      one: 1 saved show coming up
+      other: "%{count} saved shows coming up"
   notification_rules:
     title: Notification rules
     intro: Build your own alerts — pick what, when, and how you hear about it. Run as many as you like.
@@ -273,6 +280,9 @@ en:
     calendar_feed_hint_off: Subscribe to your saved shows in any calendar app — create a private link to get started.
     calendar_feed_hint_on: Add this link in your calendar app (Google Calendar, Apple Calendar …). It updates on its own; shows drop off a day after they happen.
     calendar_feed_url_label: Subscription link
+    reminders_heading: Reminders
+    reminders_label: Remind me about my saved shows
+    reminders_hint: A nudge around midday on the day of each saved show — in your inbox, and by push or email if you've set those up.
     delete_account_heading: Delete account
     delete_account_hint: Wipes your account and all your data for good.
     delete_account: Delete my account

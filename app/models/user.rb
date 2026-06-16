@@ -29,6 +29,8 @@ class User < ApplicationRecord
   validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }, allow_blank: true
   validates :events_view, inclusion: { in: %w[list calendar] }, allow_nil: true
   validates :saved_events_view, inclusion: { in: %w[list calendar] }, allow_nil: true
+  validates :reminder_time, numericality: { in: 0..1439 }
+  validates :reminder_lead_days, numericality: { in: 0..7 }
 
   def admin?
     admin

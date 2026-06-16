@@ -24,6 +24,17 @@ class SettingsTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
+  test 'update toggles saved-show reminders (part of the one Save form)' do
+    u = sign_in_as user
+    refute u.event_reminders?
+
+    patch settings_path, params: { user: { locale: 'de', event_reminders: '1' } }
+    assert u.reload.event_reminders?
+
+    patch settings_path, params: { user: { locale: 'de', event_reminders: '0' } }
+    refute u.reload.event_reminders?
+  end
+
   test 'settings page renders the account and delete sections, logout in the header' do
     sign_in_as user
     get settings_path

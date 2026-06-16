@@ -111,6 +111,13 @@ de:
     remove: Link entfernen
     created: Abo-Link bereit.
     removed: Abo-Link entfernt.
+  event_reminder:
+    title:
+      one: 1 gespeicherte Veranstaltung steht an
+      other: "%{count} gespeicherte Veranstaltungen stehen an"
+    push_body:
+      one: 1 gespeicherte Veranstaltung steht an
+      other: "%{count} gespeicherte Veranstaltungen stehen an"
   notification_rules:
     title: Benachrichtigungen
     intro: Bau dir eigene Benachrichtigungen — was, wann und wie du es erfährst. Lass so viele laufen, wie du willst.
@@ -273,6 +280,9 @@ de:
     calendar_feed_hint_off: Abonniere deine gespeicherten Veranstaltungen in jeder Kalender-App — erstelle dafür einen privaten Link.
     calendar_feed_hint_on: Füge diesen Link in deiner Kalender-App ein (Google Kalender, Apple Kalender …). Er aktualisiert sich von selbst; Veranstaltungen verschwinden einen Tag nach dem Termin.
     calendar_feed_url_label: Abo-Link
+    reminders_heading: Erinnerungen
+    reminders_label: An gespeicherte Veranstaltungen erinnern
+    reminders_hint: Ein Hinweis um die Mittagszeit am Tag der gespeicherten Veranstaltung — in deinem Posteingang, und per Push oder E-Mail, falls eingerichtet.
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
     delete_account: Mein Konto löschen

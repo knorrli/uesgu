@@ -4,14 +4,18 @@ namespace :notification_rules do
   # hour of its chosen time-of-day. Idempotent: a rule whose scheduled moment
   # hasn't passed (or already fired) is skipped, so re-running is harmless.
   #
-  # NOT YET WIRED INTO render.yaml — this is the experimental branch. To go live,
-  # add a cron service mirroring scrape-all with `schedule: "*/15 * * * *"` and
-  # `startCommand: bin/rails notification_rules:tick`.
-  desc "Fire all due notification rules (run frequently from cron)"
+  # Wired into render.yaml as the `notify-due` cron (schedule "*/15 * * * *").
+  # Also runs the saved-show reminder sweep (EventReminder) — both share this one
+  # cron since both are idempotent via their own per-fire guards.
+  desc 'Fire all due notification rules + saved-show reminders (run frequently from cron)'
   task tick: :environment do
     now = Time.current
     sent = NotificationRule.run_due!(now)
-    Rails.logger.info("[notification_rules] tick #{now.iso8601}: #{sent.size} digest(s) sent")
-    puts "[notification_rules] tick #{now.iso8601}: #{sent.size} digest(s) sent"
+    # Saved-show reminders ride the same quarter-hourly sweep (both are idempotent
+    # via their own per-fire guards), so no second cron is needed.
+    reminders = EventReminder.run_due!(now)
+    line = "[notification_rules] tick #{now.iso8601}: #{sent.size} digest(s), #{reminders.size} reminder(s) sent"
+    Rails.logger.info(line)
+    puts line
   end
 end

@@ -89,6 +89,41 @@
     </section>
   <% end %>
 
+  <%# ── Calendar subscription ─────────────────────────────────────────────
+      An ICS feed of the saved shows, subscribable in any calendar app. Opt-in:
+      no link exists until the user creates one (the token is a URL-borne
+      credential, so we don't mint it unasked). Rotating revokes the old URL. %>
+  <section class="settings-section">
+    <h2><%= t('settings.calendar_feed_heading') %></h2>
+
+    <% if @user.calendar_feed_token.present? %>
+      <div class="flex flex-col gap-small" data-controller="clipboard"
+           data-clipboard-copied-value="<%= t('calendar_feed.copied') %>">
+        <p class="muted"><%= t('settings.calendar_feed_hint_on') %></p>
+        <label class="flex flex-col gap-small">
+          <span class="field-label"><%= t('settings.calendar_feed_url_label') %></span>
+          <input type="text" readonly data-clipboard-target="source"
+                 data-action="focus->clipboard#select"
+                 value="<%= public_calendar_feed_url(@user.calendar_feed_token, format: :ics) %>">
+        </label>
+        <div class="settings-actions flex gap-small wrap">
+          <button type="button" data-clipboard-target="button" data-action="clipboard#copy">
+            <%= t('calendar_feed.copy') %>
+          </button>
+          <%= button_to t('calendar_feed.regenerate'), calendar_feed_path, method: :post,
+                class: "button-ghost",
+                data: { turbo_confirm: t('calendar_feed.regenerate_confirm') } %>
+          <%= button_to t('calendar_feed.remove'), calendar_feed_path, method: :delete, class: "button-ghost" %>
+        </div>
+      </div>
+    <% else %>
+      <p class="muted"><%= t('settings.calendar_feed_hint_off') %></p>
+      <div class="settings-actions">
+        <%= button_to t('calendar_feed.create'), calendar_feed_path, method: :post %>
+      </div>
+    <% end %>
+  </section>
+
   <%# ── Delete account ──────────────────────────────────────────────────── %>
   <section class="settings-section">
     <h2><%= t('settings.delete_account_heading') %></h2>

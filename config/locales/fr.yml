@@ -100,6 +100,17 @@ fr:
     empty: Rien d'enregistré — touche le signet sur un événement.
     none_upcoming: Rien à venir — tes enregistrements passés sont dans le calendrier.
     toggle: Enregistrer l'événement
+  calendar_feed:
+    name: üsgu — à voir
+    cancelled_prefix: "Annulé : %{title}"
+    copy: Copier
+    copied: Copié !
+    create: Créer le lien d'abonnement
+    regenerate: Nouveau lien
+    regenerate_confirm: Remplacer le lien ? Ton app calendrier aura besoin du nouveau.
+    remove: Supprimer le lien
+    created: Lien d'abonnement prêt.
+    removed: Lien d'abonnement supprimé.
   notification_rules:
     title: Règles de notification
     intro: Crée tes propres alertes — quoi, quand et comment tu es prévenu. Lances-en autant que tu veux.
@@ -258,6 +269,10 @@ fr:
     push_unsupported: Ce navigateur ne prend pas en charge les notifications push.
     push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoute d'abord üsgu à ton écran d'accueil.
     signout_button: Se déconnecter
+    calendar_feed_heading: Abonnement calendrier
+    calendar_feed_hint_off: Abonne-toi à tes événements enregistrés dans n'importe quelle app calendrier — crée un lien privé pour commencer.
+    calendar_feed_hint_on: Ajoute ce lien dans ton app calendrier (Google Agenda, Apple Calendrier…). Il se met à jour tout seul ; les événements disparaissent un jour après.
+    calendar_feed_url_label: Lien d'abonnement
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime ton compte et toutes tes données définitivement.
     delete_account: Supprimer mon compte

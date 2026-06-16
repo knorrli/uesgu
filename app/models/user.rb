@@ -33,4 +33,22 @@ class User < ApplicationRecord
   def admin?
     admin
   end
+
+  # Mint (or rotate) the bearer token behind the subscribable ICS feed. Rotating
+  # silently invalidates any old subscription URL — the way to revoke one.
+  def regenerate_calendar_feed_token!
+    update!(calendar_feed_token: self.class.generate_calendar_feed_token)
+  end
+
+  # Drop the feed link entirely (the feed 404s afterwards).
+  def clear_calendar_feed_token!
+    update!(calendar_feed_token: nil)
+  end
+
+  def self.generate_calendar_feed_token
+    loop do
+      token = SecureRandom.urlsafe_base64(24)
+      break token unless exists?(calendar_feed_token: token)
+    end
+  end
 end

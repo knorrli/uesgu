@@ -100,6 +100,17 @@ en:
     empty: Nothing saved yet — tap the bookmark on any show.
     none_upcoming: Nothing coming up — your past saves are on the calendar.
     toggle: Save show
+  calendar_feed:
+    name: üsgu — saved shows
+    cancelled_prefix: "Cancelled: %{title}"
+    copy: Copy
+    copied: Copied!
+    create: Create subscription link
+    regenerate: New link
+    regenerate_confirm: Replace the link? Your calendar app will need the new one.
+    remove: Remove link
+    created: Subscription link ready.
+    removed: Subscription link removed.
   notification_rules:
     title: Notification rules
     intro: Build your own alerts — pick what, when, and how you hear about it. Run as many as you like.
@@ -258,6 +269,10 @@ en:
     push_unsupported: This browser doesn’t support push notifications.
     push_install_first: To get notifications on iPhone or iPad, add üsgu to your Home Screen first.
     signout_button: Sign out
+    calendar_feed_heading: Calendar subscription
+    calendar_feed_hint_off: Subscribe to your saved shows in any calendar app — create a private link to get started.
+    calendar_feed_hint_on: Add this link in your calendar app (Google Calendar, Apple Calendar …). It updates on its own; shows drop off a day after they happen.
+    calendar_feed_url_label: Subscription link
     delete_account_heading: Delete account
     delete_account_hint: Wipes your account and all your data for good.
     delete_account: Delete my account

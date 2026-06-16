@@ -41,6 +41,14 @@ Rails.application.routes.draw do
     post :toggle, on: :collection
   end
 
+  # Subscribable ICS feed of the user's saved shows. The public feed is keyed by
+  # an unguessable token (no session); create/destroy mint and revoke it.
+  resource :calendar_feed, only: %i[create destroy]
+  # format: true keeps the ".ics" extension in the URL (some calendar clients
+  # insist on it); the token segment has no dots, so it never swallows it.
+  get "calendar/:token", to: "calendar_feeds#show", as: :public_calendar_feed,
+      constraints: { format: "ics" }, format: true
+
   # User-defined notification funnels (WHEN·WHICH·FILTER·CHANNEL). toggle flips
   # enabled; fire runs the rule on demand ("Fire now" — test without waiting for
   # the schedule).

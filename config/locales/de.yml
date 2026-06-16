@@ -100,6 +100,17 @@ de:
     empty: Noch nichts gespeichert — tippe das Lesezeichen bei einer Veranstaltung.
     none_upcoming: Nichts Anstehendes — vergangene Einträge findest du im Kalender.
     toggle: Veranstaltung speichern
+  calendar_feed:
+    name: üsgu — Merkliste
+    cancelled_prefix: "Abgesagt: %{title}"
+    copy: Kopieren
+    copied: Kopiert!
+    create: Abo-Link erstellen
+    regenerate: Neuer Link
+    regenerate_confirm: Link ersetzen? Deine Kalender-App braucht dann den neuen.
+    remove: Link entfernen
+    created: Abo-Link bereit.
+    removed: Abo-Link entfernt.
   notification_rules:
     title: Benachrichtigungen
     intro: Bau dir eigene Benachrichtigungen — was, wann und wie du es erfährst. Lass so viele laufen, wie du willst.
@@ -258,6 +269,10 @@ de:
     push_unsupported: Dieser Browser unterstützt keine Push-Benachrichtigungen.
     push_install_first: Um auf iPhone oder iPad Benachrichtigungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     signout_button: Abmelden
+    calendar_feed_heading: Kalender-Abo
+    calendar_feed_hint_off: Abonniere deine gespeicherten Veranstaltungen in jeder Kalender-App — erstelle dafür einen privaten Link.
+    calendar_feed_hint_on: Füge diesen Link in deiner Kalender-App ein (Google Kalender, Apple Kalender …). Er aktualisiert sich von selbst; Veranstaltungen verschwinden einen Tag nach dem Termin.
+    calendar_feed_url_label: Abo-Link
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
     delete_account: Mein Konto löschen

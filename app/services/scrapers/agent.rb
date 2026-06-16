@@ -13,10 +13,18 @@ module Scrapers
     # `get`, surfacing the venue as a failed run rather than silently scraping.
     USER_AGENT = 'uesgu/1.0 (+https://uesgu.ch; personal event aggregator)'.freeze
 
+    # Per-venue escape hatch. Mechanize's single `robots` flag gates BOTH the
+    # robots.txt check and the page-level `noindex, nofollow` meta tag. Some
+    # venues ship one of these as an unconsidered CMS/site-builder default, not
+    # a deliberate crawl ban — for those we opt out here, with a comment in the
+    # scraper explaining why. The default stays strict: a scraper respects
+    # robots unless it sets `self.respect_robots = false`.
+    class_attribute :respect_robots, instance_writer: false, default: true
+
     def initialize
       super
       self.user_agent = USER_AGENT
-      self.robots = true
+      self.robots = respect_robots
     end
 
     def self.call

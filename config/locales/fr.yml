@@ -24,7 +24,9 @@ fr:
     button: Installer l'app
     done: üsgu est installé — ouvre-le depuis ton écran d'accueil.
     steps_ios: 'Sur iPhone/iPad (Safari) : touche le bouton Partager, puis « Sur l''écran d''accueil ».'
-    steps_firefox: 'Dans Firefox : ouvre le menu (⋮, en haut à droite), puis « Installer » / « Ajouter à l''écran d''accueil ».'
+    steps_firefox: 'Dans Firefox (Android) : ouvre le menu (⋮), puis « Installer » / « Ajouter à l''écran d''accueil ».'
+    steps_firefox_desktop: 'Firefox sur ordinateur ne peut pas installer üsgu comme app — mais tout marche dans le navigateur. Pour installer, ouvre üsgu dans Chrome, Edge ou Brave.'
+    steps_safari_desktop: 'Dans Safari : Fichier → Ajouter au Dock (Safari 17+). Sinon, ça tourne dans le navigateur.'
     steps_generic: 'Ouvre le menu du navigateur et choisis « Installer l''app » / « Ajouter à l''écran d''accueil ».'
     benefit_quick: Ouvert d'un tap, sans navigateur
     benefit_notify: Notifications pour les nouveaux événements de tes intérêts

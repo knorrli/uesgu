@@ -1,7 +1,8 @@
-<%# The actionable install affordance, shared by the public /install page and the
-    "On this device" settings section. install_controller.js reveals exactly one
-    of these depending on the browser: a one-tap button on Chromium, written
-    steps on iOS / Firefox / other browsers, or a confirmation once installed. %>
+<%# The actionable install affordance on the public /install page.
+    install_controller.js reveals exactly one of these depending on the browser:
+    a one-tap button on Chromium, written steps on iOS / Firefox-Android / other,
+    an honest "can't install here" note on Firefox-desktop / old Safari, or a
+    confirmation once installed. %>
 <div class="install-block flex flex-col gap-small" data-controller="install">
   <%# Chromium: one-tap native install. Hidden until beforeinstallprompt fires. %>
   <button type="button" class="button" hidden data-install-target="button" data-action="install#install">
@@ -15,8 +16,12 @@
     <%= t('install.done') %>
   </p>
 
-  <%# Manual steps; the controller reveals the one matching the browser. %>
+  <%# Manual steps; the controller reveals the one matching the browser. The
+      firefox/safari split matters: Firefox *desktop* and pre-17 Safari can't
+      install a PWA, so they get an honest note instead of impossible steps. %>
   <p class="muted" hidden data-install-target="ios"><%= t('install.steps_ios') %></p>
   <p class="muted" hidden data-install-target="firefox"><%= t('install.steps_firefox') %></p>
+  <p class="muted" hidden data-install-target="firefoxDesktop"><%= t('install.steps_firefox_desktop') %></p>
+  <p class="muted" hidden data-install-target="safariDesktop"><%= t('install.steps_safari_desktop') %></p>
   <p class="muted" hidden data-install-target="generic"><%= t('install.steps_generic') %></p>
 </div>

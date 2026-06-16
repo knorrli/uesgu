@@ -24,7 +24,9 @@ en:
     button: Install app
     done: üsgu is installed — you can open it from your home screen.
     steps_ios: 'On iPhone/iPad (Safari): tap the Share button, then “Add to Home Screen”.'
-    steps_firefox: 'In Firefox: open the menu (⋮, top right), then “Install” / “Add to Home screen”.'
+    steps_firefox: 'In Firefox (Android): open the menu (⋮), then “Install” / “Add to Home screen”.'
+    steps_firefox_desktop: 'Firefox on desktop can’t install üsgu as an app — it works fine in the browser, though. To install, open üsgu in Chrome, Edge, or Brave.'
+    steps_safari_desktop: 'In Safari: File → Add to Dock (Safari 17+). Otherwise it just runs in the browser.'
     steps_generic: 'Open your browser menu and choose “Install app” / “Add to Home screen”.'
     benefit_quick: Opens with one tap, no browser
     benefit_notify: Notifications for new events from your interests

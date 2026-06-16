@@ -355,6 +355,7 @@ de:
       scrapers_heading: Scraper
       last_scrape: Letzter Lauf
       no_scrapes: Noch keine Scraper-Läufe.
+      discard_rules: Filterregeln
       accounts_heading: Konten & Einladungen
       users: Konten
       open_invitations: Offene Einladungen
@@ -453,6 +454,7 @@ de:
         status_visible: Sichtbar
         status_hidden: Ausgeblendet
         status_cancelled: Abgesagt
+        status_discarded: Gefiltert
         status_dismissed: Entfernt
         search: Veranstaltungen suchen…
         sort_by: Sortieren nach
@@ -460,6 +462,7 @@ de:
         sort_title: Titel
         cancelled_badge: abgesagt
         hidden_badge: ausgeblendet
+        discarded_badge: "gefiltert: %{pattern}"
         empty: Keine passenden Veranstaltungen.
         overridden_badge: bearbeitet
         restore: Wiederherstellen
@@ -525,6 +528,51 @@ de:
         sort_name: Name
         sort_count: Nutzung
         empty: Keine passenden Orte.
+    discard_rules:
+      index:
+        title: Filterregeln
+        intro: Filtere Junk-Veranstaltungen automatisch per Text. Eine gefilterte Veranstaltung verschwindet aus allen öffentlichen Listen und wird bei jedem Scrape neu geprüft – entferne die Regel und sie kommt zurück. Anders als das manuelle Entfernen einer einzelnen Veranstaltung.
+        new_rule: Neue Regel
+        inactive: inaktiv
+        all_venues: Alle Orte
+        catches:
+          zero: trifft keine Veranstaltungen
+          one: trifft 1 Veranstaltung
+          other: trifft %{count} Veranstaltungen
+        edit: Bearbeiten
+        delete: Löschen
+        delete_confirm: Diese Regel löschen? Gefilterte Veranstaltungen erscheinen beim nächsten Scrape wieder.
+        empty: Noch keine Filterregeln.
+      new:
+        title: Neue Filterregel
+      edit:
+        title: Filterregel bearbeiten
+      form:
+        pattern_label: Textmuster
+        pattern_hint: Gross-/Kleinschreibung egal. Trifft, wenn es irgendwo im Titel oder Untertitel vorkommt (z. B. „Tschütte“, „Grossleinwand“).
+        scraper_label: Ort
+        all_venues: Alle Orte
+        note_label: Notiz (optional)
+        active_label: Aktiv
+        save: Regel speichern
+        preview_heading: Vorschau
+        preview_intro: Veranstaltungen, die diese Regel gerade trifft. Prüfe auf Fehltreffer, bevor du speicherst.
+      preview:
+        summary:
+          zero: Trifft keine Veranstaltungen.
+          one: Trifft 1 Veranstaltung.
+          other: Trifft %{count} Veranstaltungen.
+        saved:
+          one: 1 gemerkt
+          other: "%{count} gemerkt"
+        view: Ansehen
+        truncated: "%{shown} von %{total} angezeigt."
+      create:
+        created: Filterregel erstellt.
+      update:
+        updated: Filterregel aktualisiert.
+      destroy:
+        deleted: Filterregel gelöscht.
   activemodel:
     models:
       location:

@@ -155,6 +155,24 @@ module Scrapers
       event.location_list = self.class.locations
       postprocess(event)
       mark_cancellation(event, content)
+      mark_discarded(event)
+    end
+
+    # Re-derive the admin discard-rule flag from the current active rules, like
+    # mark_cancellation derives the cancellation flag — so a junk event (e.g. a
+    # football viewing with no genre) drops out of public listings on every
+    # scrape, and clears again the moment its rule is removed. The matching here
+    # mirrors DiscardRule#matching_events (its single source of truth).
+    def mark_discarded(event)
+      rule = discard_rules.detect do |r|
+        r.matches?(title: event.title, subtitle: event.subtitle, location: self.class.location)
+      end
+      event.discarded_by_rule_id = rule&.id
+    end
+
+    # Active discard rules, loaded once per run.
+    def discard_rules
+      @discard_rules ||= DiscardRule.active.by_recency.to_a
     end
 
     # Cancellation markers in German / French / Italian / English. Letter-bounded

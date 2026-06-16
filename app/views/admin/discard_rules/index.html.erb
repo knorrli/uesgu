@@ -1,0 +1,34 @@
+<div class="flex flex-col gap-large">
+  <%= render 'admin/back' %>
+  <h1><%= t('.title') %> <span class="muted"><%= @rules.size %></span></h1>
+  <p class="muted"><%= t('.intro') %></p>
+
+  <%= link_to t('.new_rule'), new_admin_discard_rule_path, class: 'button-small' %>
+
+  <% if @rules.any? %>
+    <ul class="admin-list">
+      <% @rules.each do |rule| %>
+        <li class="admin-row">
+          <div class="admin-row__main flex flex-col gap-small">
+            <div class="flex gap-small wrap align-baseline">
+              <code><%= rule.pattern %></code>
+              <% unless rule.active? %><span class="chip"><%= t('.inactive') %></span><% end %>
+            </div>
+            <span class="muted">
+              <%= rule.scraper.presence || t('.all_venues') %>
+              &middot; <%= t('.catches', count: rule.matching_events.count) %>
+              <% if rule.note.present? %>&middot; <%= rule.note %><% end %>
+            </span>
+          </div>
+          <div class="flex gap-small">
+            <%= link_to t('.edit'), edit_admin_discard_rule_path(rule), class: 'button-small button-ghost' %>
+            <%= button_to t('.delete'), admin_discard_rule_path(rule), method: :delete,
+                  class: 'button-small button-ghost', data: { turbo_confirm: t('.delete_confirm') } %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

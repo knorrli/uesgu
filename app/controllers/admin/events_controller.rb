@@ -11,6 +11,7 @@ module Admin
       'visible' => -> { Event.visible },
       'hidden' => -> { Event.kept.where(hidden: true) },
       'cancelled' => -> { Event.kept.cancelled },
+      'discarded' => -> { Event.discarded },
       'dismissed' => -> { Event.dismissed }
     }.freeze
 
@@ -28,7 +29,7 @@ module Admin
       # "all" means all kept events — dismissed ones are reached via their filter.
       scope = @status == 'all' ? Event.kept : STATUS_SCOPES[@status].call
       scope = scope.where('title ILIKE ?', "%#{params[:q]}%") if params[:q].present?
-      @events = SORT_SCOPES[@sort].call(scope).includes(:locations, :styles).page(params[:page]).per(50)
+      @events = SORT_SCOPES[@sort].call(scope).includes(:locations, :styles, :discarded_by_rule).page(params[:page]).per(50)
     end
 
     def show

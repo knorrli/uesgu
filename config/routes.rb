@@ -133,5 +133,12 @@ Rails.application.routes.draw do
     end
     resources :styles, only: %i[index]
     resources :locations, only: %i[index]
+
+    # Admin-authored rules that auto-discard junk scraped events by text match.
+    # preview is a live, save-less lookup of the events a (possibly unsaved) rule
+    # would target, for spotting false positives before committing.
+    resources :discard_rules, except: %i[show] do
+      collection { get :preview }
+    end
   end
 end

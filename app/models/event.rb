@@ -11,12 +11,19 @@ class Event < ApplicationRecord
   # the inflector singularizes "saves" → "safe".
   has_many :event_saves, class_name: 'EventSave', dependent: :destroy
 
+  # The admin discard rule (if any) currently filtering this event from public
+  # listings. Re-derived each scrape + on rule changes; nullified if the rule is
+  # deleted (see DiscardRule). nil = not discarded.
+  belongs_to :discarded_by_rule, class_name: 'DiscardRule', optional: true,
+                                 inverse_of: :discarded_events
+
   validates :title, :start_date, :url, presence: true
 
   # Public-facing events: non-music events (carrying a hidden genre, with no
-  # music style) are hidden, and dismissed events are gone for good. Admin/
-  # curation views deliberately skip this scope.
-  scope :visible, -> { kept.where(hidden: false) }
+  # music style) are hidden, events matched by an admin discard rule are filtered
+  # out, and dismissed events are gone for good. Admin/curation views skip this.
+  scope :visible, -> { kept.where(hidden: false, discarded_by_rule_id: nil) }
+  scope :discarded, -> { kept.where.not(discarded_by_rule_id: nil) }
   scope :cancelled, -> { where.not(cancelled_at: nil) }
 
   # Dismiss is a sticky, admin-driven soft-delete: a dismissed event drops out of
@@ -34,6 +41,12 @@ class Event < ApplicationRecord
 
   def dismissed?
     dismissed_at.present?
+  end
+
+  # Filtered out by an admin discard rule (re-derived, reversible) — distinct
+  # from the sticky, per-event dismiss above.
+  def discarded?
+    discarded_by_rule_id.present?
   end
 
   # Soft-delete this event so it never reappears, even on re-scrape. Idempotent —

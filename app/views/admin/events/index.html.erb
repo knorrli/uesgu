@@ -3,7 +3,7 @@
   <h1><%= t('.title') %> <span class="muted"><%= @events.total_count %></span></h1>
 
   <div class="flex gap-small wrap align-baseline catalogue-filters">
-    <% %w[all visible hidden cancelled dismissed].each do |status| %>
+    <% %w[all visible hidden cancelled discarded dismissed].each do |status| %>
       <%= link_to t(".status_#{status}"),
             admin_events_path(status: (status == 'all' ? nil : status), q: params[:q].presence, sort: params[:sort].presence),
             class: class_names(:tag, active: @status == status) %>
@@ -44,6 +44,7 @@
               <% event.styles.each do |style| %><span><%= style.name %></span><% end %>
               <% if event.cancelled? %><span class="event-row__flag-warn"><%= t('.cancelled_badge') %></span><% end %>
               <% if event.hidden? %><span><%= t('.hidden_badge') %></span><% end %>
+              <% if event.discarded? %><span><%= t('.discarded_badge', pattern: event.discarded_by_rule&.pattern) %></span><% end %>
               <% if event.overridden_fields.any? %><span><%= t('.overridden_badge') %></span><% end %>
             </div>
           </div>

@@ -10,10 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_16_100200) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_100400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "discard_rules", force: :cascade do |t|
+    t.string "pattern", null: false
+    t.string "scraper"
+    t.boolean "active", default: true, null: false
+    t.string "note"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "event_saves", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -38,7 +47,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_100200) do
     t.bigint "created_in_scrape_run_id"
     t.datetime "dismissed_at"
     t.jsonb "overridden_fields", default: [], null: false
+    t.bigint "discarded_by_rule_id"
     t.index ["created_in_scrape_run_id"], name: "index_events_on_created_in_scrape_run_id"
+    t.index ["discarded_by_rule_id"], name: "index_events_on_discarded_by_rule_id"
     t.index ["dismissed_at"], name: "index_events_on_dismissed_at"
     t.index ["hidden"], name: "index_events_on_hidden"
     t.index ["start_date"], name: "index_events_on_start_date"
@@ -234,6 +245,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_16_100200) do
 
   add_foreign_key "event_saves", "events"
   add_foreign_key "event_saves", "users"
+  add_foreign_key "events", "discard_rules", column: "discarded_by_rule_id", on_delete: :nullify
   add_foreign_key "events", "scrape_runs", column: "created_in_scrape_run_id", on_delete: :nullify
   add_foreign_key "genres", "genres", column: "canonical_id"
   add_foreign_key "genres_styles", "genres", on_delete: :cascade

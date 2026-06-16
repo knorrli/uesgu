@@ -355,6 +355,7 @@ en:
       scrapers_heading: Scrapers
       last_scrape: Last run
       no_scrapes: No scraper runs yet.
+      discard_rules: Discard rules
       accounts_heading: Accounts & invitations
       users: Accounts
       open_invitations: Open invitations
@@ -453,6 +454,7 @@ en:
         status_visible: Visible
         status_hidden: Hidden
         status_cancelled: Cancelled
+        status_discarded: Discarded
         status_dismissed: Dismissed
         search: Search events…
         sort_by: Sort by
@@ -460,6 +462,7 @@ en:
         sort_title: title
         cancelled_badge: cancelled
         hidden_badge: hidden
+        discarded_badge: "discarded: %{pattern}"
         empty: No events match.
         overridden_badge: edited
         restore: Restore
@@ -525,6 +528,51 @@ en:
         sort_name: name
         sort_count: usage
         empty: No locations match.
+    discard_rules:
+      index:
+        title: Discard rules
+        intro: Auto-filter junk scraped events by text. A discarded event drops out of every public listing and is re-checked on each scrape — remove the rule and it returns. Different from dismissing a single event by hand.
+        new_rule: New rule
+        inactive: inactive
+        all_venues: All venues
+        catches:
+          zero: catches no events
+          one: catches 1 event
+          other: catches %{count} events
+        edit: Edit
+        delete: Delete
+        delete_confirm: Delete this rule? Events it filters will reappear on the next scrape.
+        empty: No discard rules yet.
+      new:
+        title: New discard rule
+      edit:
+        title: Edit discard rule
+      form:
+        pattern_label: Text pattern
+        pattern_hint: Case-insensitive. Matches if it appears anywhere in the title or subtitle (e.g. “Tschütte”, “Grossleinwand”).
+        scraper_label: Venue
+        all_venues: All venues
+        note_label: Note (optional)
+        active_label: Active
+        save: Save rule
+        preview_heading: Preview
+        preview_intro: Events this rule matches right now. Check for false positives before saving.
+      preview:
+        summary:
+          zero: Matches no events.
+          one: Matches 1 event.
+          other: Matches %{count} events.
+        saved:
+          one: 1 saved
+          other: "%{count} saved"
+        view: View
+        truncated: Showing %{shown} of %{total}.
+      create:
+        created: Discard rule created.
+      update:
+        updated: Discard rule updated.
+      destroy:
+        deleted: Discard rule deleted.
   activemodel:
     models:
       location:

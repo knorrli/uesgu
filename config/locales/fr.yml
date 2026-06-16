@@ -355,6 +355,7 @@ fr:
       scrapers_heading: Scrapers
       last_scrape: Dernier passage
       no_scrapes: Aucun passage de scraper pour l'instant.
+      discard_rules: Règles de filtrage
       accounts_heading: Comptes et invitations
       users: Comptes
       open_invitations: Invitations ouvertes
@@ -453,6 +454,7 @@ fr:
         status_visible: Visibles
         status_hidden: Masqués
         status_cancelled: Annulés
+        status_discarded: Filtrés
         status_dismissed: Retirés
         search: Rechercher des événements…
         sort_by: Trier par
@@ -460,6 +462,7 @@ fr:
         sort_title: titre
         cancelled_badge: annulé
         hidden_badge: masqué
+        discarded_badge: "filtré : %{pattern}"
         empty: Aucun événement correspondant.
         overridden_badge: modifié
         restore: Restaurer
@@ -525,6 +528,51 @@ fr:
         sort_name: nom
         sort_count: usage
         empty: Aucun lieu correspondant.
+    discard_rules:
+      index:
+        title: Règles de filtrage
+        intro: Filtre automatiquement les événements indésirables par texte. Un événement filtré disparaît de toutes les listes publiques et est revérifié à chaque scrape — supprime la règle et il revient. Différent du retrait manuel d'un événement isolé.
+        new_rule: Nouvelle règle
+        inactive: inactive
+        all_venues: Tous les lieux
+        catches:
+          zero: ne touche aucun événement
+          one: touche 1 événement
+          other: touche %{count} événements
+        edit: Modifier
+        delete: Supprimer
+        delete_confirm: Supprimer cette règle ? Les événements filtrés réapparaîtront au prochain scrape.
+        empty: Aucune règle de filtrage pour l'instant.
+      new:
+        title: Nouvelle règle de filtrage
+      edit:
+        title: Modifier la règle de filtrage
+      form:
+        pattern_label: Motif texte
+        pattern_hint: Insensible à la casse. Correspond s'il apparaît n'importe où dans le titre ou le sous-titre (p. ex. « Tschütte », « Grossleinwand »).
+        scraper_label: Lieu
+        all_venues: Tous les lieux
+        note_label: Note (facultatif)
+        active_label: Active
+        save: Enregistrer la règle
+        preview_heading: Aperçu
+        preview_intro: Les événements que cette règle touche en ce moment. Vérifie les faux positifs avant d'enregistrer.
+      preview:
+        summary:
+          zero: Ne correspond à aucun événement.
+          one: Correspond à 1 événement.
+          other: Correspond à %{count} événements.
+        saved:
+          one: 1 enregistré
+          other: "%{count} enregistrés"
+        view: Voir
+        truncated: "%{shown} sur %{total} affichés."
+      create:
+        created: Règle de filtrage créée.
+      update:
+        updated: Règle de filtrage mise à jour.
+      destroy:
+        deleted: Règle de filtrage supprimée.
   activemodel:
     models:
       location:

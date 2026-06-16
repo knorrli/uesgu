@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-large"
+     data-controller="preview"
+     data-preview-url-value="<%= preview_admin_discard_rules_path %>">
+  <%= form_with model: [:admin, @rule], class: 'account-form flex flex-col gap-medium' do |f| %>
+    <% if @rule.errors.any? %>
+      <ul class="form-errors">
+        <% @rule.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+      </ul>
+    <% end %>
+
+    <label class="flex flex-col gap-small">
+      <span><%= t('.pattern_label') %></span>
+      <%= f.text_field :pattern, autocomplete: 'off',
+            data: { preview_target: 'field', preview_param: 'pattern', action: 'input->preview#schedule' } %>
+      <span class="muted"><%= t('.pattern_hint') %></span>
+    </label>
+
+    <label class="flex flex-col gap-small">
+      <span><%= t('.scraper_label') %></span>
+      <%= f.select :scraper, DiscardRule.venue_options, { include_blank: t('.all_venues') },
+            data: { preview_target: 'field', preview_param: 'scraper', action: 'change->preview#schedule' } %>
+    </label>
+
+    <label class="flex flex-col gap-small">
+      <span><%= t('.note_label') %></span>
+      <%= f.text_field :note, autocomplete: 'off' %>
+    </label>
+
+    <label class="flex gap-small align-baseline">
+      <%= f.check_box :active %>
+      <span><%= t('.active_label') %></span>
+    </label>
+
+    <%= f.submit t('.save') %>
+  <% end %>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.preview_heading') %></h2>
+    <p class="muted"><%= t('.preview_intro') %></p>
+    <%= turbo_frame_tag 'discard_rule_preview', data: { preview_target: 'frame' } %>
+  </section>
+</div>

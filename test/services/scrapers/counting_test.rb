@@ -127,6 +127,21 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert_equal 'Changed', event.reload.title
   end
 
+  test 'a scraped event matching an active discard rule is flagged, and cleared when the rule goes' do
+    url = 'https://fixture.test/discard'
+    DiscardRule.create!(pattern: 'Tschütte')
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Tschütte live' }]
+    CountingScraperHarness.new.call
+    event = Event.find_by(url: url)
+    assert event.discarded?, 'event should be flagged by the matching rule'
+
+    # Rule gone → next scrape re-derives the flag to nil (not sticky).
+    DiscardRule.destroy_all
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Tschütte live' }]
+    CountingScraperHarness.new.call
+    refute event.reload.discarded?
+  end
+
   test 'a re-scrape leaves an admin-pinned genre list alone but re-derives styles' do
     url = 'https://fixture.test/pinned-genres'
     CountingScraperHarness.next_rows = [{ url: url, title: 'Show', genres: ['Aaa'] }]

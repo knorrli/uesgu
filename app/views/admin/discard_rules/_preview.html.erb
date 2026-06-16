@@ -1,0 +1,28 @@
+<%= turbo_frame_tag 'discard_rule_preview' do %>
+  <div class="flex flex-col gap-small">
+    <span class="muted"><%= t('.summary', count: total) %></span>
+    <% if events.any? %>
+      <ul class="admin-list">
+        <% events.each do |event| %>
+          <li class="admin-row">
+            <div class="admin-row__main flex flex-col gap-small">
+              <span><%= event.title %></span>
+              <span class="muted">
+                <%= l(event.start_date) %>
+                <% if event.venue %>&middot; <%= event.venue.name %><% end %>
+                <% saves = event.event_saves.size %>
+                <% if saves.positive? %>
+                  &middot; <span class="preview-saved">★ <%= t('.saved', count: saves) %></span>
+                <% end %>
+              </span>
+            </div>
+            <%= link_to t('.view'), admin_event_path(event), class: 'button-small button-ghost' %>
+          </li>
+        <% end %>
+      </ul>
+      <% if total > events.size %>
+        <span class="muted"><%= t('.truncated', shown: events.size, total: total) %></span>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

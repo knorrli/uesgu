@@ -2,8 +2,14 @@
   <h1><%= t('auth.login_title') %></h1>
 
   <%= form_with url: session_path, class: 'account-form flex flex-col align-stretch gap-medium' do |form| %>
-    <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", placeholder: t('auth.username'), value: params[:username] %>
-    <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: t('auth.password'), maxlength: 72 %>
+    <label class="flex flex-col gap-small">
+      <span class="field-label"><%= t('auth.username') %></span>
+      <%= form.text_field :username, required: true, autofocus: true, autocomplete: "username", value: params[:username] %>
+    </label>
+    <label class="flex flex-col gap-small">
+      <span class="field-label"><%= t('auth.password') %></span>
+      <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72 %>
+    </label>
     <%= form.submit t('auth.login_submit') %>
   <% end %>
 

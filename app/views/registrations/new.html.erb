@@ -10,14 +10,27 @@
       </ul>
     <% end %>
 
-    <%= text_field_tag :invitation_code, @invite_code, required: true, autocomplete: "off",
-          autocapitalize: "characters", spellcheck: false, placeholder: t('auth.invite_label'),
-          aria: { label: t('auth.invite_label') } %>
-    <p class="muted"><%= t('auth.invite_hint') %></p>
+    <div class="flex flex-col gap-small">
+      <label class="flex flex-col gap-small">
+        <span class="field-label"><%= t('auth.invite_label') %></span>
+        <%= text_field_tag :invitation_code, @invite_code, required: true, autocomplete: "off",
+              autocapitalize: "characters", spellcheck: false %>
+      </label>
+      <p class="muted"><%= t('auth.invite_hint') %></p>
+    </div>
 
-    <%= form.text_field :username, required: true, autofocus: @invite_code.blank?, autocomplete: "username", placeholder: t('auth.username') %>
-    <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: t('auth.password'), maxlength: 72 %>
-    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: t('auth.password_confirmation'), maxlength: 72 %>
+    <label class="flex flex-col gap-small">
+      <span class="field-label"><%= t('auth.username') %></span>
+      <%= form.text_field :username, required: true, autofocus: @invite_code.blank?, autocomplete: "username" %>
+    </label>
+    <label class="flex flex-col gap-small">
+      <span class="field-label"><%= t('auth.password') %></span>
+      <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72 %>
+    </label>
+    <label class="flex flex-col gap-small">
+      <span class="field-label"><%= t('auth.password_confirmation') %></span>
+      <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72 %>
+    </label>
 
     <%= form.submit t('auth.signup_submit') %>
   <% end %>

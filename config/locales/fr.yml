@@ -21,7 +21,6 @@ fr:
     title: Installer l'app
     heading: Installer üsgu comme app
     intro: Ajoute üsgu à ton écran d'accueil — ouvert d'un tap, prêt pour les notifications.
-    hint: Ajoute üsgu à ton écran d'accueil — un tap, plus les notifications.
     button: Installer l'app
     done: üsgu est installé — ouvre-le depuis ton écran d'accueil.
     steps_ios: 'Sur iPhone/iPad (Safari) : touche le bouton Partager, puis « Sur l''écran d''accueil ».'
@@ -259,7 +258,7 @@ fr:
     push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoute d'abord üsgu à ton écran d'accueil.
     signout_button: Se déconnecter
     delete_account_heading: Supprimer le compte
-    delete_account_hint: Supprime ton compte et tes intérêts définitivement.
+    delete_account_hint: Supprime ton compte et toutes tes données définitivement.
     delete_account: Supprimer mon compte
     delete_account_confirm: Supprimer définitivement ton compte ? Cette action est irréversible.
   notifications:

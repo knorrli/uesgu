@@ -24,17 +24,20 @@ class SettingsTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test 'settings page renders the account, notifications and delete sections' do
+  test 'settings page renders the account and delete sections, logout in the header' do
     sign_in_as user
     get settings_path
 
     assert_response :success
-    assert_select 'section.settings-section', 3
-    # Language, email and password share a single form, so one save button.
+    # Account section + its single save form (language/email/password share one
+    # form), and the delete-account section. The per-device notifications section
+    # only renders when web push is configured, so it's absent here.
+    assert_select 'h2', text: I18n.t('settings.account_heading')
     assert_select 'input[type=submit]', 1
-    # The per-device "on this device" cluster (install / push).
-    assert_select '.settings-subsection'
+    assert_select 'h2', text: I18n.t('settings.delete_account_heading')
     # Logout is a page-level action in the header (no longer its own section).
     assert_select 'form[action=?][method=post] button', session_path
+    # Install moved to the top nav — it's not on the settings page anymore.
+    assert_select '.install-block', false
   end
 end

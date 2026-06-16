@@ -21,7 +21,6 @@ en:
     title: Install app
     heading: Install üsgu as an app
     intro: Add üsgu to your home screen — opens in one tap, ready for notifications.
-    hint: Add üsgu to your home screen — one tap, plus notifications.
     button: Install app
     done: üsgu is installed — you can open it from your home screen.
     steps_ios: 'On iPhone/iPad (Safari): tap the Share button, then “Add to Home Screen”.'
@@ -259,7 +258,7 @@ en:
     push_install_first: To get notifications on iPhone or iPad, add üsgu to your Home Screen first.
     signout_button: Sign out
     delete_account_heading: Delete account
-    delete_account_hint: Wipes your account and interests for good.
+    delete_account_hint: Wipes your account and all your data for good.
     delete_account: Delete my account
     delete_account_confirm: Permanently delete your account? This cannot be undone.
   notifications:

@@ -5,6 +5,14 @@
   box-sizing: border-box;
 }
 
+/* The `hidden` attribute must always win. A class with a `display` rule (e.g.
+   .install-block .button, .install-done) otherwise out-ranks the UA
+   [hidden]{display:none} and the element shows even when JS marks it hidden —
+   which is how the install block stacked all its states at once. */
+[hidden] {
+  display: none !important;
+}
+
 /* Prevent font size inflation */
 html {
   -moz-text-size-adjust: none;

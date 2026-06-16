@@ -54,50 +54,40 @@
   </section>
 
   <%# ── Notifications on this device ─────────────────────────────────────────
-      Install + per-device push. These post to their own endpoints (not the
-      @user form above), so they live outside it. %>
-  <section class="settings-section">
-    <h2><%= t('settings.notifications_heading') %></h2>
+      Per-device web push opt-in + a self-test. Installing the app now lives in
+      the top nav (it targets logged-out users too), so it's no longer here. The
+      whole section renders only when VAPID keys are configured; the push
+      controller handles the unsupported / denied / needs-install states. %>
+  <% if WebPushConfig.configured? %>
+    <section class="settings-section">
+      <h2><%= t('settings.notifications_heading') %></h2>
 
-    <div class="settings-subsection flex flex-col gap-medium">
-      <%# Install affordance. The shared block always shows something actionable —
-          a one-tap button on Chromium, written steps on iOS/Firefox/other, or a
-          confirmation once installed (see install_controller.js). %>
-      <div class="flex flex-col gap-small">
-        <p class="muted"><%= t('install.hint') %></p>
-        <%= render 'shared/install_block' %>
-      </div>
-
-      <%# Per-device push opt-in + a self-test. Only rendered when VAPID keys are
-          configured; the controller handles the unsupported/denied states. %>
-      <% if WebPushConfig.configured? %>
-        <div class="flex flex-col gap-small"
-             data-controller="push"
-             data-push-vapid-public-key-value="<%= WebPushConfig.public_key %>"
-             data-push-label-on-value="<%= t('settings.push_disable') %>"
-             data-push-label-off-value="<%= t('settings.push_enable') %>"
-             data-push-status-on-value="<%= t('settings.push_status_on') %>"
-             data-push-status-off-value="<%= t('settings.push_status_off') %>"
-             data-push-status-denied-value="<%= t('settings.push_status_denied') %>">
-          <p class="muted"><%= t('settings.push_hint') %></p>
-          <p class="muted" data-push-target="status"><%= t('settings.push_status_off') %></p>
-          <div class="settings-actions">
-            <button type="button" data-push-target="button" data-action="push#toggle">
-              <%= t('settings.push_enable') %>
-            </button>
-            <button type="button" hidden data-push-target="testButton" data-action="push#sendTest">
-              <%= t('settings.push_test') %>
-            </button>
-          </div>
-          <p class="muted" hidden data-push-target="unsupported"><%= t('settings.push_unsupported') %></p>
-          <%# iOS exposes the Push API only to an installed home-screen app, so
-              there we point the user at installing first rather than saying
-              "unsupported". %>
-          <p class="muted" hidden data-push-target="installFirst"><%= t('settings.push_install_first') %></p>
+      <div class="flex flex-col gap-small"
+           data-controller="push"
+           data-push-vapid-public-key-value="<%= WebPushConfig.public_key %>"
+           data-push-label-on-value="<%= t('settings.push_disable') %>"
+           data-push-label-off-value="<%= t('settings.push_enable') %>"
+           data-push-status-on-value="<%= t('settings.push_status_on') %>"
+           data-push-status-off-value="<%= t('settings.push_status_off') %>"
+           data-push-status-denied-value="<%= t('settings.push_status_denied') %>">
+        <p class="muted"><%= t('settings.push_hint') %></p>
+        <p class="muted" data-push-target="status"><%= t('settings.push_status_off') %></p>
+        <div class="settings-actions">
+          <button type="button" data-push-target="button" data-action="push#toggle">
+            <%= t('settings.push_enable') %>
+          </button>
+          <button type="button" hidden data-push-target="testButton" data-action="push#sendTest">
+            <%= t('settings.push_test') %>
+          </button>
         </div>
-      <% end %>
-    </div>
-  </section>
+        <p class="muted" hidden data-push-target="unsupported"><%= t('settings.push_unsupported') %></p>
+        <%# iOS exposes the Push API only to an installed home-screen app, so
+            there we point the user at installing first rather than saying
+            "unsupported". %>
+        <p class="muted" hidden data-push-target="installFirst"><%= t('settings.push_install_first') %></p>
+      </div>
+    </section>
+  <% end %>
 
   <%# ── Delete account ──────────────────────────────────────────────────── %>
   <section class="settings-section">

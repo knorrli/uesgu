@@ -21,7 +21,6 @@ de:
     title: App installieren
     heading: üsgu als App installieren
     intro: Leg üsgu auf deinen Startbildschirm — mit einem Tipp offen, bereit für Benachrichtigungen.
-    hint: Leg üsgu auf den Startbildschirm — ein Tipp, plus Benachrichtigungen.
     button: App installieren
     done: üsgu ist installiert — du kannst es vom Startbildschirm öffnen.
     steps_ios: 'Auf iPhone/iPad (Safari): Teilen-Symbol antippen, dann „Zum Home-Bildschirm“.'
@@ -259,7 +258,7 @@ de:
     push_install_first: Um auf iPhone oder iPad Benachrichtigungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     signout_button: Abmelden
     delete_account_heading: Konto löschen
-    delete_account_hint: Löscht dein Konto und deine Interessen endgültig.
+    delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
     delete_account: Mein Konto löschen
     delete_account_confirm: Konto endgültig löschen? Das kann nicht rückgängig gemacht werden.
   notifications:

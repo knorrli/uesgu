@@ -15,9 +15,12 @@
 
     <section class="flex flex-col gap-small">
       <h2><%= t('settings.favorite_styles_heading') %></h2>
-      <div class="chips flex flex-row wrap gap-small">
+      <%# Same checkbox control as the location picker below (label.loc-option), so
+          Styles and Places read as one consistent boolean paradigm — just a flat
+          wrapping row here vs. the hierarchical tree there. %>
+      <div class="flex flex-row wrap gap-medium">
         <%= form.collection_check_boxes :style_list, Style.order(name: :asc), :name, :name do |b| %>
-          <label class="tag"><%= b.check_box %> <%= b.text %></label>
+          <label class="loc-option"><%= b.check_box %> <span class="loc-name"><%= b.text %></span></label>
         <% end %>
       </div>
     </section>

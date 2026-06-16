@@ -136,7 +136,8 @@
 
 .sg-swatch__chip--accent     { background: var(--theme-accent-color); }
 .sg-swatch__chip--accent-mut { background: var(--theme-accent-muted); }
-.sg-swatch__chip--favorite   { background: var(--theme-favorite-color); }
+.sg-swatch__chip--on-accent  { background: var(--theme-on-accent); }
+.sg-swatch__chip--favorite   { background: var(--theme-saved-color); }
 .sg-swatch__chip--warn       { background: var(--theme-warn-color); }
 .sg-swatch__chip--amber      { background: var(--color-amber); }
 .sg-swatch__chip--bg         { background: var(--theme-bg-color); }

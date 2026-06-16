@@ -97,7 +97,7 @@ de:
     tab_rules: Regeln
   saved_events:
     title: Merkliste
-    empty: Noch nichts gespeichert — tippe das Lesezeichen bei einer Veranstaltung.
+    empty: Noch nichts gespeichert — tippe das Herz bei einer Veranstaltung.
     none_upcoming: Nichts Anstehendes — vergangene Einträge findest du im Kalender.
     toggle: Veranstaltung speichern
   copy_field:
@@ -241,7 +241,7 @@ de:
     next: Weiter
   favorites:
     title: Interessen
-    intro: Wähle Stile und Orte, die dich interessieren — passende Tage bekommen ein Herz, und du filterst das Programm auf deine Interessen.
+    intro: Wähle Stile und Orte, die dich interessieren — passende Tage bekommen einen Stern, und du filterst das Programm auf deine Interessen.
     canton_label: "Kanton %{code}"
     saved: Interessen gespeichert.
     save: Interessen speichern

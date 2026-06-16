@@ -130,7 +130,7 @@
 }
 
 .nav-menu__item .ph,
-.nav-menu__item .fav-heart {
+.nav-menu__item .fav-star {
   flex-shrink: 0;
   width: 1em;
   text-align: center;
@@ -140,11 +140,11 @@
    glyph: it inherits the link's colour like the Phosphor icons beside it
    (rather than the raspberry follow-state colour) and stays an outline to
    match their weight. Reset the trailing margin it carries as an event-tag. */
-.nav-menu__item .fav-heart {
+.nav-menu__item .fav-star {
   margin-left: 0;
 }
 
-.nav-menu__item .fav-heart::before {
+.nav-menu__item .fav-star::before {
   background-color: currentColor;
 }
 
@@ -184,7 +184,7 @@
   min-width: 1.5em;
   padding: 0 0.4em;
   background-color: var(--theme-accent-color);
-  color: var(--theme-bg-color);
+  color: var(--theme-on-accent);
   font-size: var(--font-size-small);
   font-weight: bold;
   line-height: 1.5;

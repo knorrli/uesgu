@@ -66,7 +66,7 @@ module EventsHelper
                data: { action: 'favorite#toggle', favorite_type_param: type, favorite_value_param: value } do
       safe_join([
         content_tag(:span, label, class: 'fav-label'),
-        content_tag(:span, '', class: 'fav-heart', 'aria-hidden': true)
+        content_tag(:span, '', class: 'fav-star', 'aria-hidden': true)
       ])
     end
   end
@@ -135,8 +135,8 @@ module EventsHelper
                data: { controller: 'save', action: 'save#toggle',
                        save_event_id_value: event.id, save_saved_value: saved } do
       # A masked bookmark (not the ph font glyph) so the saved state can fill
-      # solid, mirroring the follow heart's outline→fill — see .save-bookmark.
-      content_tag(:span, '', class: 'save-bookmark', 'aria-hidden': true)
+      # solid, mirroring the follow heart's outline→fill — see .save-heart.
+      content_tag(:span, '', class: 'save-heart', 'aria-hidden': true)
     end
   end
 end

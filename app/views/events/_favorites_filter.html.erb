@@ -15,7 +15,7 @@
         'aria-pressed': favorites_filter_active?.to_s,
         hidden: !favorites_filter_available?,
         data: { favorite_target: 'favoritesFilter' }) do %>
-    <span class="fav-heart" aria-hidden="true"></span>
+    <span class="fav-star" aria-hidden="true"></span>
     <span><%= t('events.index.favorites_filter.label') %></span>
   <% end %>
 <% end %>

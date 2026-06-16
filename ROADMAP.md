@@ -62,6 +62,18 @@ The bounded set where the tool serves daily use. All three pieces shipped to
 - [x] Merged `notification-rules` → `main`, pushed (auto-deploys to Render).
 
 ## After functional: UI polish pass (required for "complete")
+
+> **Direction (2026-06-16):** this is a *systemic* pass, not value tweaks. Pass-1
+> on `ui-design-pass` fixed contrast/borders/calendar-width but read as
+> "checklist-sync against an isolated styleguide." The real goal is enforcing a
+> few **visual invariants** across the live app: (1) what's clickable is
+> unambiguous; (2) every element has ONE visual representation (collapse the
+> button/boolean/link variants); (3) **green only ever means "interested"**
+> (decouple it from active-state + links; give "interested" its own non-green
+> icon, reserve the heart for saved shows). Don't sand off identity (the
+> "punched-out" plum-on-green button). See memory `project-screenshot-design-review`.
+> The items below are symptoms of these, not an independent checklist.
+
 - Notification-rules card visual hierarchy — info chips vs. action buttons vs.
   links vs. destructive currently all read as similar squares.
 - Monthly day-of-month picker on the new-alert form.

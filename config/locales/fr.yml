@@ -97,7 +97,7 @@ fr:
     tab_rules: Règles
   saved_events:
     title: À voir
-    empty: Rien d'enregistré — touche le signet sur un événement.
+    empty: Rien d'enregistré — touche le cœur sur un événement.
     none_upcoming: Rien à venir — tes enregistrements passés sont dans le calendrier.
     toggle: Enregistrer l'événement
   copy_field:
@@ -241,7 +241,7 @@ fr:
     next: Suivant
   favorites:
     title: Intérêts
-    intro: Choisis les styles et les lieux qui t'intéressent — les jours correspondants reçoivent un cœur, et tu peux filtrer le programme sur tes intérêts.
+    intro: Choisis les styles et les lieux qui t'intéressent — les jours correspondants reçoivent une étoile, et tu peux filtrer le programme sur tes intérêts.
     canton_label: "Canton %{code}"
     saved: Intérêts enregistrés.
     save: Enregistrer les intérêts

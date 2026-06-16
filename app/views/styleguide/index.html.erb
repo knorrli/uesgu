@@ -11,13 +11,17 @@
     <b>experimental redesign</b> branch resolved.
   </p>
   <p class="sg-lede">
-    Branch direction: <b>green is reserved for interaction</b> (links, focus,
-    active, primary actions), <b>state</b> (today, selected) and <b>follows</b>;
-    all structural rules use a neutral hairline (<code>--border-color</code>) or
-    a neutral content divider (<code>--rule-color</code>). One <code>danger</code>
-    language (hollow → fills), one Phosphor disclosure caret, a baseline
-    <code>:focus-visible</code> ring, and a display-only <code>.icon</code> role
-    beside the clickable <code>.icon-button</code>.
+    Palette: a <b>dirty-cream ground + green</b> (light theme; dark theme keeps the
+    aubergine ground + brighter green). On-accent text matches the background for a
+    "punched out" button. <b>Green is the dominant accent</b> — interaction (links,
+    focus, primary), state (today, selected) <b>and follows</b> (the green star) —
+    so it's present everywhere. <b>Raspberry is rare</b>: the "saved show" heart
+    only. The two personal signals differ in colour AND shape (green star = follow,
+    raspberry heart = saved), never colour alone. Structural rules use a neutral
+    hairline (<code>--border-color</code>) or content divider (<code>--rule-color</code>).
+    One <code>danger</code> language (hollow → fills), one Phosphor disclosure caret,
+    a baseline <code>:focus-visible</code> ring, and a display-only <code>.icon</code>
+    role beside the clickable <code>.icon-button</code>.
   </p>
 
   <nav class="sg-toc">
@@ -40,15 +44,19 @@
     <ul class="sg-swatches">
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--accent"></div>
-        <p class="sg-swatch__label"><b>Accent</b> · <code>--theme-accent-color</code><br>Interactive / primary / active / link</p>
+        <p class="sg-swatch__label"><b>Accent</b> · <code>--theme-accent-color</code><br>The dominant accent: interaction (links, focus, primary), state (today, selected), <b>and follows</b> (the green star + followed tags)</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--accent-mut"></div>
         <p class="sg-swatch__label"><b>Accent muted</b> · <code>--theme-accent-muted</code><br>Quiet accent ground (window chips)</p>
       </li>
       <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--on-accent"></div>
+        <p class="sg-swatch__label"><b>On accent</b> · <code>--theme-on-accent</code><br>Text/glyphs painted ON the accent fill (primary buttons, badges, today, ticks). Set to the page background (<code>--theme-bg-color</code>) for the "punched out" look — legible because each theme pairs a light-ish ground with a dark-enough green (cream-on-green in light, plum-on-green in dark).</p>
+      </li>
+      <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--favorite"></div>
-        <p class="sg-swatch__label"><b>Favorite</b> · <code>--theme-favorite-color</code><br>"Yours" — a followed item only</p>
+        <p class="sg-swatch__label"><b>Saved</b> · <code>--theme-saved-color</code><br>Raspberry — the rare, powerful "saved show" highlight (the heart) only. NOT follows (those are green). One emphatic colour, used sparingly.</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--warn"></div>
@@ -64,7 +72,7 @@
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--bg-mut"></div>
-        <p class="sg-swatch__label"><b>Background muted</b> · <code>--theme-bg-muted</code><br>Hairlines, neutral fills</p>
+        <p class="sg-swatch__label"><b>Background muted</b> · <code>--theme-bg-muted</code><br>Neutral fills + the sand highlight wash shared by dropdown options and the calendar day hover/selected</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--fg"></div>
@@ -76,19 +84,22 @@
       </li>
     </ul>
     <p class="sg-ok">
-      <b>Audit #1 / #10 — resolved.</b> Structural borders, the calendar grid,
-      the nav-menu panel, passive form underlines, raw <code>input</code> text,
-      and the filter-handle icon are now neutral (<code>--border-color</code> /
-      <code>--rule-color</code> / <code>--theme-fg-muted</code>). Green appears on
-      a field only on focus, and otherwise only for links, active state, primary
-      actions, and follows.
+      <b>Audit #1 / #10 — resolved.</b> Structural borders, the nav-menu panel,
+      raw <code>input</code> text, and the filter-handle icon are neutral
+      (<code>--border-color</code> / <code>--rule-color</code> /
+      <code>--theme-fg-muted</code>). Field underlines use a more present neutral
+      (<code>--field-border-color</code>) so an empty input reads as fillable, and
+      the calendar grid its own (<code>--calendar-border-color</code>) so it reads
+      as a grid on the saturated ground — both still neutral, derived from the
+      foreground. Green appears on a field only on focus, and otherwise only for
+      links, active state, primary actions, and follows.
     </p>
   </section>
 
   <%# ============================================================ BUTTONS %>
   <section class="sg-section" id="buttons">
     <h2>Buttons &amp; actions</h2>
-    <p class="sg-section__intro">Today there are three parallel button vocabularies. The intended ladder: primary → secondary → tertiary → danger, plus the flat icon action.</p>
+    <p class="sg-section__intro">One ladder, used app-wide: primary → secondary → tertiary → danger, plus the flat icon action and the text link. A box reads as clickable; only <code>.text-link</code> is borderless.</p>
 
     <div class="sg-row">
       <div class="sg-specimen"><input type="submit" value="Save"></div>
@@ -357,7 +368,7 @@
   <%# ============================================================ ICONS %>
   <section class="sg-section" id="icons">
     <h2>Icons</h2>
-    <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); hearts are masked SVGs. Clickable icons use <code>.icon-button</code>; display-only icons use the new <code>.icon</code> role (audit #9, resolved).</p>
+    <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); the follow <b>star</b> and saved <b>heart</b> are masked SVGs (outline→fill for off/on state). Clickable icons use <code>.icon-button</code>; display-only icons use the <code>.icon</code> role (audit #9, resolved).</p>
 
     <div class="sg-row">
       <div class="sg-specimen" style="font-size:1.4rem;">
@@ -386,34 +397,33 @@
         <span class="ph ph-music-notes" title="ph-music-notes"></span>
         <span class="ph ph-tag" title="ph-tag"></span>
         <span class="ph ph-calendar-dots" title="ph-calendar-dots"></span>
-        <span class="ph ph-bookmark-simple" title="ph-bookmark-simple"></span>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Glyph set</span> · <code>.ph .ph-*</code>
-        <p class="sg-purpose">Hover a glyph to see its name. Edit, delete, notify, close/remove, search, disclosure, city/venue/canton, style/genre, date, save.</p>
+        <p class="sg-purpose">Hover a glyph to see its name. Edit, delete, notify, close/remove, search, disclosure, city/venue/canton, style/genre, date. (Follow/save use the masked star/heart below, not a font glyph.)</p>
       </div>
     </div>
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <span class="event-tag fav"><span class="fav-heart" aria-hidden="true"></span></span>
-        <span class="event-tag fav followed"><span class="fav-heart" aria-hidden="true"></span></span>
+        <span class="event-tag fav"><span class="fav-star" aria-hidden="true"></span></span>
+        <span class="event-tag fav followed"><span class="fav-star" aria-hidden="true"></span></span>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Favorite heart</span> · <code>.fav-heart</code>
-        <p class="sg-purpose">The sole "you can follow this" signal. Faint outline = followable; solid raspberry = followed.</p>
+        <span class="sg-spec__name">Interest star</span> · <code>.fav-star</code>
+        <p class="sg-purpose">The "you can follow this" signal (interest = star). Faint outline = followable; solid <b>green</b> = followed. Frequent, so it carries the dominant accent.</p>
       </div>
     </div>
 
     <div class="sg-row">
       <div class="sg-specimen" style="font-size:1.4rem;">
-        <button type="button" class="event-save icon-button" aria-label="Save"><span class="save-bookmark"></span></button>
-        <button type="button" class="event-save icon-button saved" aria-label="Saved"><span class="save-bookmark"></span></button>
+        <button type="button" class="event-save icon-button" aria-label="Save"><span class="save-heart"></span></button>
+        <button type="button" class="event-save icon-button saved" aria-label="Saved"><span class="save-heart"></span></button>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Save bookmark</span> · <code>.save-bookmark</code>
-        <p class="sg-purpose">"Save this show". Faint outline = not saved; solid accent = saved.</p>
-        <span class="sg-ok"><b>Resolved.</b> Now mirrors the heart's outline→fill language (was outline-only, recoloured to green). Fill = active for both; the bookmark fills accent (save), the heart fills raspberry (follow).</span>
+        <span class="sg-spec__name">Save heart</span> · <code>.save-heart</code>
+        <p class="sg-purpose">"Save this show" — the rare, powerful signal. Faint outline = not saved; solid <b>raspberry</b> = saved.</p>
+        <span class="sg-ok"><b>The two personal signals:</b> follow = green <b>star</b> (frequent), save = raspberry <b>heart</b> (rare). Distinct in colour AND shape, so neither relies on colour alone. Both use outline→fill for off/on.</span>
       </div>
     </div>
   </section>

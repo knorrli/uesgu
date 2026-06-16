@@ -1,4 +1,7 @@
 <% content_for :title, t('events.index.title') %>
+<%# The calendar is a wide artifact — give it the wide measure; the list keeps the
+    720px reading column. %>
+<% content_for :body_class, 'layout-wide' if @view == 'calendar' %>
 
 <div class="flex flex-col gap-large align-stretch" data-controller="favorite"
      data-action="turbo:before-frame-render->favorite#beforeFrameRender turbo:frame-load->favorite#reapply"

@@ -119,12 +119,20 @@ projects:
             postgresMajorVersion: "18"
             diskSizeGB: 1
 
-# Shared secrets entered ONCE and referenced by every service via `fromGroup`.
-# RAILS_MASTER_KEY decrypts credentials.yml.enc (secret_key_base etc.), so every
-# service — web and cron — needs it. Kept at the ROOT (workspace) level on
-# purpose: environment-scoped envVarGroups can't contain `sync: false` vars.
+# Shared secrets + config entered ONCE and referenced by every service via
+# `fromGroup`. RAILS_MASTER_KEY decrypts credentials.yml.enc (secret_key_base
+# etc.), so every service — web and cron — needs it. Kept at the ROOT (workspace)
+# level on purpose: environment-scoped envVarGroups can't contain `sync: false`
+# vars. PUBLIC_HOST / CODE_HOST make the two production domains explicit here
+# (they back AppHost::PUBLIC / CODE in config/application.rb, whose defaults
+# already match these) so a future domain move is a one-place change that every
+# link- and email-emitting service picks up at once.
 envVarGroups:
   - name: uesgu-env
     envVars:
       - key: RAILS_MASTER_KEY
         sync: false
+      - key: PUBLIC_HOST
+        value: xn--sgu-goa.ch
+      - key: CODE_HOST
+        value: uesgu.ch

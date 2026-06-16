@@ -534,10 +534,14 @@
   /* Personal markers tucked into the cell's top-right corner: a saved-show
      bookmark and/or a followed-tag dot, laid out in one slot. Decorative and
      click-through, so the full-cell day link underneath still receives the tap. */
+  /* Mobile: the marker sits BOTTOM-right so it never crowds the date's top row —
+     the today badge (a padded green pill) otherwise collides with it on a narrow
+     cell. Desktop moves it back up to top-right (see the breakpoint block), where
+     the wider cell has room beside the date. */
   .day-markers {
     position: absolute;
     z-index: 3;
-    top: var(--gap-small);
+    bottom: var(--gap-small);
     right: var(--gap-small);
     display: flex;
     align-items: center;
@@ -678,6 +682,8 @@
   .simple-calendar .day { height: 7rem; }
   /* Room for the venue headline only at desktop width. */
   .simple-calendar .day-headline { display: block; }
+  /* Wider cell: the marker rides up beside the date (no today-badge crowding here). */
+  .simple-calendar .day-markers { top: var(--gap-small); bottom: auto; }
 }
 
 /* ── Trigger bar ── three underlined rows echoing the inline filter, but each

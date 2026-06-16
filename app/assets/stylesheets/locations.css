@@ -10,11 +10,10 @@
   gap: var(--gap-medium);
 }
 
-/* Neutral left-rules convey canton > city nesting (was a greenish accent-muted;
-   structure is neutral now — green stays an interaction/state signal). */
+/* The canton is the top level — flush left, no rule (the outer border added
+   nothing; only the city > venue nesting needs a guide line). A neutral left-rule
+   on the city conveys the one nesting step that matters. */
 .loc-canton {
-  border-left: var(--border-width) solid var(--border-color);
-  padding-left: var(--gap-medium);
   display: flex;
   flex-direction: column;
   gap: var(--gap-xsmall);
@@ -61,15 +60,17 @@
   padding: var(--gap-xsmall) 0;
 }
 
-/* Venues: an aligned, auto-filling grid so many venues read as tidy columns
-   rather than a ragged wrap. Columns are wide enough for a venue name and
-   collapse to one column on narrow screens. */
+/* Venues: auto-filling COLUMNS that read top-to-bottom (column-major), so a long
+   list scans down each column in alphabetical order instead of snaking left to
+   right. Multi-column (not grid) is what gives the vertical fill; break-inside
+   keeps each label whole. Columns are wide enough for a venue name and collapse
+   to one on narrow screens. */
 .loc-venues {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-  gap: 0 var(--gap-medium);
+  columns: 11rem auto;
+  column-gap: var(--gap-medium);
 }
 
 .loc-venue {
   font-size: var(--font-size-small);
+  break-inside: avoid;
 }

@@ -4,7 +4,7 @@ de:
     admin: Admin
     notifications: Benachrichtigungen
     unread_notifications: Ungelesene Benachrichtigungen
-    favorites: Favoriten
+    favorites: Interessen
     notification_rules: Benachrichtigungen
     saved: Merkliste
     settings: Einstellungen
@@ -28,7 +28,7 @@ de:
     steps_firefox: 'In Firefox: Menü (⋮ oben rechts) öffnen, dann „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
     steps_generic: 'Öffne das Browser-Menü und wähle „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
     benefit_quick: Mit einem Tipp geöffnet, ohne den Browser
-    benefit_notify: Benachrichtigungen zu neuen Veranstaltungen deiner Favoriten
+    benefit_notify: Benachrichtigungen zu neuen Veranstaltungen aus deinen Interessen
     benefit_home: Eigenes Symbol auf deinem Startbildschirm
   languages:
     de: Deutsch
@@ -36,11 +36,31 @@ de:
     en: Englisch
   cantons:
     AG: Aargau
+    AI: Appenzell Innerrhoden
+    AR: Appenzell Ausserrhoden
     BE: Bern
+    BL: Basel-Landschaft
+    BS: Basel-Stadt
     FR: Freiburg
+    GE: Genf
+    GL: Glarus
+    GR: Graubünden
+    JU: Jura
     LU: Luzern
+    NE: Neuenburg
+    NW: Nidwalden
+    OW: Obwalden
+    SG: St. Gallen
+    SH: Schaffhausen
     SO: Solothurn
+    SZ: Schwyz
+    TG: Thurgau
+    TI: Tessin
+    UR: Uri
     VD: Waadt
+    VS: Wallis
+    ZG: Zug
+    ZH: Zürich
   auth:
     login_title: Anmelden
     signup_title: Registrieren
@@ -66,8 +86,8 @@ de:
     digest:
       title: Neue Veranstaltungen auf üsgu
       body:
-        one: 1 neue Veranstaltung passt zu deinen Favoriten.
-        other: "%{count} neue Veranstaltungen passen zu deinen Favoriten."
+        one: 1 neue Veranstaltung passt zu deinen Interessen.
+        other: "%{count} neue Veranstaltungen passen zu deinen Interessen."
     test:
       title: üsgu
       body: Dies ist eine Test-Benachrichtigung — Push funktioniert. 🎉
@@ -102,14 +122,14 @@ de:
     edit_button: Bearbeiten
     empty_link: Filtere die Veranstaltungen
     empty_html: Noch keine Benachrichtigungen. %{link} auf der Startseite, dann tippe „Benachrichtige mich“.
-    favorites_live: Meine Favoriten (automatisch aktuell)
-    track_favorites: Mit meinen Favoriten synchron halten
-    track_favorites_hint: berücksichtigt auch Orte/Stile, denen du später folgst
+    favorites_live: Meine Interessen (automatisch aktuell)
+    track_favorites: Mit meinen Interessen synchron halten
+    track_favorites_hint: berücksichtigt auch Orte/Stile, die dich später interessieren
     type:
       added: Neue Events
       happening: Was läuft
     errors:
-      empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Favoriten.
+      empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Interessen.
     new:
       title: Benachrichtigung einrichten
       intro: Wie oft und wie du davon erfährst.
@@ -134,7 +154,7 @@ de:
       happening: Veranstaltungen in einem Zeitraum
     scopes:
       all: Alle Veranstaltungen
-      favorites: Meine Favoriten
+      favorites: Meine Interessen
       custom: Eigener Filter
     monthday_option: "Am %{day}."
     rhythm_note: "Du wirst %{rhythm} benachrichtigt."
@@ -158,7 +178,7 @@ de:
       added: neu hinzugefügt
       happening: "läuft %{window}"
       scope_all: Alle Events
-      scope_favorites: deine Favoriten
+      scope_favorites: deine Interessen
       scope_custom: "%{detail}"
     fields:
       name: Name
@@ -200,11 +220,12 @@ de:
     today: Heute
     next: Weiter
   favorites:
-    title: Favoriten
-    intro: Folge Locations und Stilen — passende Tage bekommen ein Herz und bestimmen deine Benachrichtigungen.
-    saved: Favoriten gespeichert.
-    save: Favoriten speichern
-    toggle: '%{name} folgen oder entfolgen'
+    title: Interessen
+    intro: Wähle Stile und Orte, die dich interessieren — passende Tage bekommen ein Herz, und du filterst das Programm auf deine Interessen.
+    canton_label: "Kanton %{code}"
+    saved: Interessen gespeichert.
+    save: Interessen speichern
+    toggle: '%{name} zu deinen Interessen hinzufügen oder entfernen'
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.
@@ -214,11 +235,11 @@ de:
     frequency_label: Wie oft sollen wir dich über neue Veranstaltungen informieren?
     language_heading: Sprache
     language_auto: Automatisch (Browser)
-    favorite_locations_heading: Lieblings-Locations
-    favorite_locations_hint: Erhalte Benachrichtigungen zu Veranstaltungen an diesen Orten.
+    favorite_locations_heading: Orte
+    favorite_locations_hint: Orte, die dich interessieren — so behältst du ihre Veranstaltungen im Blick.
     follow_all: Alle in %{name}
     other_locations: Weitere Orte
-    favorite_styles_heading: Lieblings-Stile
+    favorite_styles_heading: Stile
     email_heading: E-Mail
     email_optional: (optional)
     email_hint: Optional — nur falls du Updates per E-Mail willst.
@@ -230,7 +251,7 @@ de:
     confirm_new_password: Neues Passwort bestätigen
     save: Einstellungen speichern
     push_heading: Benachrichtigungen auf diesem Gerät
-    push_hint: Wir pingen dich hier an, sobald neue Veranstaltungen zu deinen Favoriten passen.
+    push_hint: Wir pingen dich hier an, sobald neue Veranstaltungen zu deinen Interessen passen.
     push_enable: Auf diesem Gerät aktivieren
     push_disable: Auf diesem Gerät deaktivieren
     push_status_on: Auf diesem Gerät an.
@@ -242,7 +263,7 @@ de:
     signout_hint: Auf diesem Gerät abmelden.
     signout_button: Abmelden
     delete_account_heading: Konto löschen
-    delete_account_hint: Löscht dein Konto und deine Favoriten endgültig.
+    delete_account_hint: Löscht dein Konto und deine Interessen endgültig.
     delete_account: Mein Konto löschen
     delete_account_confirm: Konto endgültig löschen? Das kann nicht rückgängig gemacht werden.
   notifications:
@@ -261,9 +282,9 @@ de:
       back: ← Alle Benachrichtigungen
       title: Neue Veranstaltungen
       all: Alle neuen Veranstaltungen
-      relevant: Nur meine Favoriten
+      relevant: Nur meine Interessen
       empty_all: Keine neuen Veranstaltungen in diesem Zeitraum.
-      empty_relevant: In diesem Zeitraum passte nichts zu deinen Favoriten.
+      empty_relevant: In diesem Zeitraum passte nichts zu deinen Interessen.
   actions:
     assign: Zuweisen
     save: Speichern
@@ -374,10 +395,10 @@ de:
         joined: Beigetreten
         sessions: Aktive Sitzungen
         invited_by: Eingeladen von
-        favorite_locations: Lieblings-Locations
-        favorite_styles: Lieblings-Stile
+        favorite_locations: Interessen – Orte
+        favorite_styles: Interessen – Stile
         delete_heading: Konto löschen
-        delete_hint: Entfernt dieses Konto und seine Favoriten endgültig.
+        delete_hint: Entfernt dieses Konto und seine Interessen endgültig.
         delete: Konto löschen
         delete_confirm: "Konto %{username} endgültig löschen?"
     invitations:
@@ -527,7 +548,7 @@ de:
         list: Liste
         calendar: Kalender
       favorites_filter:
-        label: Meine Favoriten
+        label: Meine Interessen
       notify_filter: Benachrichtige mich
     day:
       empty: Keine Events an diesem Tag.

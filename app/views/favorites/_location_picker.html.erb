@@ -7,7 +7,7 @@
   <div class="loc-canton">
     <label class="loc-option loc-canton-head">
       <%= check_box_tag "user[location_list][]", canton, user.location_list.include?(canton), id: "loc-#{canton.parameterize}" %>
-      <span class="loc-name"><strong><%= canton_name(canton) %></strong> <span class="muted">(<%= canton %>)</span></span>
+      <span class="loc-name"><strong><%= t('favorites.canton_label', code: canton) %></strong></span>
     </label>
 
     <% cities.sort.each do |city, venues| %>

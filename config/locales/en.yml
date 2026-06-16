@@ -4,7 +4,7 @@ en:
     admin: Admin
     notifications: Notifications
     unread_notifications: Unread notifications
-    favorites: Favorites
+    favorites: Interests
     notification_rules: Notification rules
     saved: Watchlist
     settings: Settings
@@ -28,7 +28,7 @@ en:
     steps_firefox: 'In Firefox: open the menu (⋮, top right), then “Install” / “Add to Home screen”.'
     steps_generic: 'Open your browser menu and choose “Install app” / “Add to Home screen”.'
     benefit_quick: Opens with one tap, no browser
-    benefit_notify: Notifications for new events from your favorites
+    benefit_notify: Notifications for new events from your interests
     benefit_home: Its own icon on your home screen
   languages:
     de: German
@@ -36,11 +36,31 @@ en:
     en: English
   cantons:
     AG: Aargau
+    AI: Appenzell Innerrhoden
+    AR: Appenzell Ausserrhoden
     BE: Bern
+    BL: Basel-Landschaft
+    BS: Basel-Stadt
     FR: Fribourg
+    GE: Geneva
+    GL: Glarus
+    GR: Graubünden
+    JU: Jura
     LU: Lucerne
+    NE: Neuchâtel
+    NW: Nidwalden
+    OW: Obwalden
+    SG: St. Gallen
+    SH: Schaffhausen
     SO: Solothurn
+    SZ: Schwyz
+    TG: Thurgau
+    TI: Ticino
+    UR: Uri
     VD: Vaud
+    VS: Valais
+    ZG: Zug
+    ZH: Zurich
   auth:
     login_title: Log in
     signup_title: Sign up
@@ -66,8 +86,8 @@ en:
     digest:
       title: New events on üsgu
       body:
-        one: 1 new event matches your favorites.
-        other: "%{count} new events match your favorites."
+        one: 1 new event matches your interests.
+        other: "%{count} new events match your interests."
     test:
       title: üsgu
       body: This is a test notification — push is working. 🎉
@@ -102,14 +122,14 @@ en:
     edit_button: Edit
     empty_link: Filter the events
     empty_html: No alerts yet. %{link} on the home page, then tap “Notify me”.
-    favorites_live: My favorites (kept current)
-    track_favorites: Keep in sync with my favorites
-    track_favorites_hint: also includes venues/styles you follow later
+    favorites_live: My interests (kept current)
+    track_favorites: Keep in sync with my interests
+    track_favorites_hint: also includes venues/styles that interest you later
     type:
       added: New events
       happening: What's on
     errors:
-      empty_filter: Pick a filter first (style, location, date …) or sync with your favorites.
+      empty_filter: Pick a filter first (style, location, date …) or sync with your interests.
     new:
       title: Set up a notification
       intro: How often and how you hear about this.
@@ -134,7 +154,7 @@ en:
       happening: Events in a window
     scopes:
       all: All events
-      favorites: My favorites
+      favorites: My interests
       custom: Custom filter
     monthday_option: "On the %{day}."
     rhythm_note: "You'll be notified %{rhythm}."
@@ -158,7 +178,7 @@ en:
       added: newly added
       happening: "happening %{window}"
       scope_all: All events
-      scope_favorites: your favorites
+      scope_favorites: your interests
       scope_custom: "%{detail}"
     fields:
       name: Name
@@ -200,11 +220,12 @@ en:
     today: Today
     next: Next
   favorites:
-    title: Favorites
-    intro: Follow venues and styles — matching days get a heart, and they shape your notifications.
-    saved: Favorites saved.
-    save: Save favorites
-    toggle: 'Follow or unfollow %{name}'
+    title: Interests
+    intro: Pick the styles and places that interest you — matching days get a heart, and you can filter the programme down to your interests.
+    canton_label: "Canton %{code}"
+    saved: Interests saved.
+    save: Save interests
+    toggle: 'Add or remove %{name} from your interests'
   settings:
     title: Settings
     saved: Settings saved.
@@ -214,11 +235,11 @@ en:
     frequency_label: How often should we tell you about new events?
     language_heading: Language
     language_auto: Automatic (browser)
-    favorite_locations_heading: Favorite locations
-    favorite_locations_hint: Get notified about events at these places.
+    favorite_locations_heading: Places
+    favorite_locations_hint: Places that interest you — so you keep their events on your radar.
     follow_all: All of %{name}
     other_locations: Other locations
-    favorite_styles_heading: Favorite styles
+    favorite_styles_heading: Styles
     email_heading: Email
     email_optional: (optional)
     email_hint: Optional — only if you want event updates by email.
@@ -230,7 +251,7 @@ en:
     confirm_new_password: Confirm new password
     save: Save settings
     push_heading: Notifications on this device
-    push_hint: Get pinged here when new events match your favorites.
+    push_hint: Get pinged here when new events match your interests.
     push_enable: Enable on this device
     push_disable: Disable on this device
     push_status_on: On for this device.
@@ -242,7 +263,7 @@ en:
     signout_hint: Sign out on this device.
     signout_button: Sign out
     delete_account_heading: Delete account
-    delete_account_hint: Wipes your account and favorites for good.
+    delete_account_hint: Wipes your account and interests for good.
     delete_account: Delete my account
     delete_account_confirm: Permanently delete your account? This cannot be undone.
   notifications:
@@ -261,9 +282,9 @@ en:
       back: ← All notifications
       title: New events
       all: All new events
-      relevant: Only my favorites
+      relevant: Only my interests
       empty_all: No new events this period.
-      empty_relevant: Nothing matched your favorites this period.
+      empty_relevant: Nothing matched your interests this period.
   actions:
     assign: Assign
     save: Save
@@ -374,10 +395,10 @@ en:
         joined: Joined
         sessions: Active sessions
         invited_by: Invited by
-        favorite_locations: Favorite locations
-        favorite_styles: Favorite styles
+        favorite_locations: Interests – Places
+        favorite_styles: Interests – Styles
         delete_heading: Delete account
-        delete_hint: This permanently removes this account and its favorites.
+        delete_hint: This permanently removes this account and its interests.
         delete: Delete account
         delete_confirm: "Permanently delete account %{username}?"
     invitations:
@@ -527,7 +548,7 @@ en:
         list: List
         calendar: Calendar
       favorites_filter:
-        label: My favorites
+        label: My interests
       notify_filter: Notify me
     day:
       empty: No events on this day.

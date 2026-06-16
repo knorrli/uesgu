@@ -1,7 +1,7 @@
 <%# A single day's events, grouped under their venue so a venue hosting several
     events that day shows its name once. Chronological by start time; untimed
     events sort last. Used by the list view, the calendar day drawer, and (read
-    only, interactive: false) notification digests. %>
+    only, interactive: false) the admin genre-editor preview. %>
 <% interactive = local_assigns.fetch(:interactive, true) %>
 <% groups = events
      .sort_by { |event| [event.start_time ? 0 : 1, event.start_time, event.title.to_s] }

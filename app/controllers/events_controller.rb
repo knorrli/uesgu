@@ -58,10 +58,12 @@ class EventsController < ApplicationController
 
   def build_filter
     Filter.new.tap do |filter|
-      filter.queries = params[:q].compact_blank if params[:q].present?
+      # Array() wraps a hand-typed scalar (?q=foo) into a list so compact_blank
+      # works; the UI always sends arrays, so this only guards the manual-URL case.
+      filter.queries = Array(params[:q]).compact_blank if params[:q].present?
       filter.location_list = params[:l] if params[:l].present?
       filter.style_list = params[:s] if params[:s].present?
-      filter.date_ranges = params[:d].compact_blank if params[:d].present?
+      filter.date_ranges = Array(params[:d]).compact_blank if params[:d].present?
     end
   end
 

@@ -11,7 +11,10 @@
 <section id="calendar" class="event-calendar flex flex-col gap-medium">
   <%= turbo_frame_tag 'calendar-frame', data: { turbo_action: 'advance' } do %>
     <%= month_calendar(start_date: @calendar_start, events: events, attribute: :start_date) do |date, day_events| %>
-      <% number = class_names('calendar-day-number', today: date == Date.current) %>
+      <%# The date's own prominence is the "something's on, tap me" affordance:
+          full weight when the day has events, muted when it has none (.empty). No
+          separate count — the cell leads with relevance (markers), not a tally. %>
+      <% number = class_names('calendar-day-number', today: date == Date.current, empty: day_events.none?) %>
       <% if day_events.any? %>
         <% selected = date == @open_day %>
         <%# Transparent overlay fills the cell's full (row) height so the whole cell
@@ -24,11 +27,12 @@
       <% if day_events.any? %>
         <% day_keys = calendar_day_favorite_keys(day_events) %>
         <% saved_count = show_saved_markers ? day_events.count { |event| event_saved?(event) } : 0 %>
-        <%# Personal markers, top-right, in one slot. A filled bookmark (you saved a
-            show that day) is the strong, sparse signal and claims the slot; a faint
-            dot (the day matches a follow) is the quieter one and gives way to it
-            (see .day-markers CSS). The dot carries the day's keys so the favorite
-            controller can flip it live without re-rendering the grid. %>
+        <%# Personal markers, top-right, in one slot — the cell's relevance signal.
+            Priority: a raspberry HEART (you saved a show that day) is the strong,
+            rare signal and claims the slot; a green STAR (the day matches a follow)
+            is the quieter one and gives way to it (see .day-markers CSS). The star
+            carries the day's keys so the favorite controller can flip it live
+            without re-rendering the grid. %>
         <div class="day-markers" aria-hidden="true">
           <% if saved_count.positive? %>
             <span class="day-saved-marker"><% if saved_count > 1 %><span class="day-saved-count"><%= saved_count %></span><% end %></span>
@@ -39,11 +43,6 @@
       <% end %>
       <div class="day-content">
         <div class="<%= number %>"><%= date.day %></div>
-        <% if day_events.any? %>
-          <%# The exact count carries the day's busyness now that the meter bar is
-              gone — one number, the same on every width, no desktop/mobile split. %>
-          <span class="day-count" aria-label="<%= t('events.calendar.events', count: day_events.size) %>"><%= day_events.size %></span>
-        <% end %>
       </div>
     <% end %>
   <% end %>

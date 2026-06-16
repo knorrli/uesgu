@@ -492,6 +492,15 @@
     text-align: left;
     font-size: var(--font-size-small);
 
+    /* No events that day: a muted date reads as "nothing here" (and the cell has
+       no click target). A full-weight date = "something's on, tap me" — so the
+       date's own prominence is the affordance, no count needed. Declared before
+       &.today so today keeps its badge even on an empty day (same specificity,
+       later rule wins). */
+    &.empty {
+      color: var(--theme-fg-muted);
+    }
+
     /* Today: a filled accent badge so it can't get lost in the grid. Stays
        display:block (shrink-wrapped) so it keeps the same line height as plain
        day numbers — an inline-block badge would push the cell's venues down. */
@@ -547,34 +556,25 @@
     font-weight: bold;
   }
 
-  /* A followed location or style plays this day: a small green dot (green = the
-     follow accent). When you follow broad things (a whole canton) many days match,
-     so a dot keeps a field of them calm while the rarer raspberry saved heart pops
-     above it — green field, rare raspberry highlights. Carries the day's keys so
-     the favorite controller can flip it live. */
+  /* A followed location or style plays this day: a green STAR — the same
+     interest=star glyph used in the list/tags, so the marker's meaning is
+     self-evident (★ = your interest) rather than an unlabelled dot. Sized to
+     match the saved heart so the two markers read as one family (green star =
+     interest, raspberry heart = saved). Carries the day's keys so the favorite
+     controller can flip it live. */
   .day-favorite-marker {
     display: block;
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
+    width: 0.9rem;
+    height: 0.9rem;
     background-color: var(--theme-accent-color);
+    -webkit-mask: var(--star-fill) center / contain no-repeat;
+    mask: var(--star-fill) center / contain no-repeat;
   }
 
   /* When a show is also saved that day, the bookmark already flags it as yours —
      the dot would just be noise, so it gives way. */
   .day-markers:has(.day-saved-marker) .day-favorite-marker {
     display: none;
-  }
-
-  /* The exact event count, sitting just under the date — left-aligned so it reads
-     as a unit with the day number, and muted/smaller so it never reads as another
-     date. Identical on every width; with the meter bar gone, this number alone
-     carries the day's busyness. */
-  .day-count {
-    display: block;
-    margin-top: var(--gap-small);
-    font-size: var(--font-size-small);
-    color: var(--theme-fg-muted);
   }
 
   /* Inline expanding row: the day-detail frame rendered full-width beneath the

@@ -90,5 +90,8 @@ class SavedEventsTest < ActionDispatch::IntegrationTest
 
     get saved_events_path(view: 'calendar')
     assert_select 'section.event-calendar .day-count'
+    # Every show here is saved by definition, so the bookmark marker is suppressed
+    # — it would otherwise flag every day and carry no signal.
+    assert_select '.day-saved-marker', count: 0
   end
 end

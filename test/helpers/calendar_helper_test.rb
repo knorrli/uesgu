@@ -50,17 +50,6 @@ class CalendarHelperTest < ActionView::TestCase
     assert_equal ['Aula'], calendar_day_venues(events).map(&:name)
   end
 
-  test 'calendar_day_load is zero for empty days and clamps at saturation' do
-    assert_equal 0.0, calendar_day_load(0)
-    assert_equal 0.0, calendar_day_load(-3)
-    # A single event still tints (floored above zero), and the fraction rises with
-    # the count until it saturates at 1.0 and stays there.
-    assert_operator calendar_day_load(1), :>, 0.0
-    assert_operator calendar_day_load(2), :>, calendar_day_load(1)
-    assert_equal 1.0, calendar_day_load(CalendarHelper::CALENDAR_LOAD_SATURATION)
-    assert_equal 1.0, calendar_day_load(CalendarHelper::CALENDAR_LOAD_SATURATION + 5)
-  end
-
   test 'calendar_day_favorite_keys namespaces locations and styles, deduped' do
     a = event(location_list: ['Loc1'], style_list: ['Style1'])
     b = event(location_list: ['Loc1'], style_list: ['Style1']) # same tags

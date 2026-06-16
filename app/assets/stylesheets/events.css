@@ -471,28 +471,6 @@
     padding: var(--gap-small);
   }
 
-  /* Busyness meter: a thin track pinned to the cell's bottom edge whose fill width
-     scales with the day's event count, so scanning a column reads like a bar chart.
-     Neutral on purpose — green and the heart stay reserved for follows. Behind the
-     content and the click target. */
-  .day-meter {
-    position: absolute;
-    z-index: 0;
-    left: var(--gap-small);
-    right: var(--gap-small);
-    bottom: var(--gap-small);
-    height: 0.25rem;
-    pointer-events: none;
-    background-color: color-mix(in srgb, var(--theme-fg-color) 12%, transparent);
-  }
-
-  .day-meter-fill {
-    display: block;
-    height: 100%;
-    min-width: 2px;
-    background-color: var(--theme-fg-muted);
-  }
-
   /* Transparent click target covering the cell's full (row) height. */
   .calendar-day-link {
     position: absolute;
@@ -518,18 +496,31 @@
     }
   }
 
-  /* A followed location or style on this day: a small solid heart tucked into
-     the top-right corner. Decorative and click-through, so the full-cell day
-     link underneath still receives the tap. */
-  .day-favorite-marker {
+  /* Personal markers tucked into the cell's top-right corner: a saved-show
+     bookmark and/or a followed-tag dot, laid out in one slot. Decorative and
+     click-through, so the full-cell day link underneath still receives the tap. */
+  .day-markers {
     position: absolute;
     z-index: 3;
     top: var(--gap-small);
     right: var(--gap-small);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    pointer-events: none;
+  }
+
+  /* You've saved a show playing this day: a solid bookmark in the accent colour —
+     the same fill = "saved" language as the per-event save button. Sparse by
+     nature, so it reads as a deliberate flag, not calendar wallpaper. The strong
+     signal, so it leads the slot. */
+  .day-saved-marker {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
     font-size: var(--font-size-small);
     line-height: 1;
-    color: var(--theme-favorite-color);
-    pointer-events: none;
+    color: var(--theme-accent-color);
 
     &::before {
       content: "";
@@ -537,15 +528,41 @@
       width: 1em;
       height: 1em;
       background-color: currentColor;
-      -webkit-mask: var(--heart-fill) center / contain no-repeat;
-      mask: var(--heart-fill) center / contain no-repeat;
+      -webkit-mask: var(--bookmark-fill) center / contain no-repeat;
+      mask: var(--bookmark-fill) center / contain no-repeat;
     }
+  }
+
+  /* Only shown when more than one show is saved that day. */
+  .day-saved-count {
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+
+  /* A followed location or style plays this day: a small, quiet dot in the
+     favorite colour — the follow heart's colour, dialled right down. When you
+     follow broad things (a whole canton) many days match, and a full heart on
+     every one shouts; a dot lets a field of them stay calm while the rarer saved
+     bookmark still pops above it. Carries the day's keys so the favorite
+     controller can flip it live. */
+  .day-favorite-marker {
+    display: block;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background-color: var(--theme-favorite-color);
+  }
+
+  /* When a show is also saved that day, the bookmark already flags it as yours —
+     the dot would just be noise, so it gives way. */
+  .day-markers:has(.day-saved-marker) .day-favorite-marker {
+    display: none;
   }
 
   /* The exact event count, sitting just under the date — left-aligned so it reads
      as a unit with the day number, and muted/smaller so it never reads as another
-     date. Identical on every width; the tint behind it carries the at-a-glance
-     busyness, this carries the precise number. */
+     date. Identical on every width; with the meter bar gone, this number alone
+     carries the day's busyness. */
   .day-count {
     display: block;
     margin-top: var(--gap-small);

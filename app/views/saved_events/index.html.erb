@@ -11,7 +11,9 @@
   <% if !@any_saved %>
     <p class="empty-state"><%= t('saved_events.empty') %></p>
   <% elsif @view == 'calendar' %>
-    <%= render 'events/calendar', events: @events %>
+    <%# These shows are all saved already, so the per-day bookmark marker would
+        flag every day — suppress it; the interest dot still applies. %>
+    <%= render 'events/calendar', events: @events, show_saved_markers: false %>
   <% elsif @events.empty? %>
     <%# Has saved shows, but none upcoming — the calendar still holds the past ones. %>
     <p class="empty-state"><%= t('saved_events.none_upcoming') %></p>

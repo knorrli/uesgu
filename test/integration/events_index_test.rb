@@ -20,6 +20,28 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'the calendar flags days holding a saved show with a bookmark marker' do
+    u = sign_in_as user
+    saved = event(start_date: Date.current + 3, title: 'SavedShow')
+    event(start_date: Date.current + 5, title: 'UnsavedShow') # different day, not saved
+    u.event_saves.create!(event: saved)
+
+    get events_path(view: 'calendar')
+
+    assert_response :success
+    # Only the day with the saved show is flagged — not every day with events.
+    assert_select 'section.event-calendar .day-saved-marker', count: 1
+  end
+
+  test 'guests never see the calendar bookmark marker' do
+    event(start_date: Date.current + 3)
+
+    get events_path(view: 'calendar')
+
+    assert_response :success
+    assert_select '.day-saved-marker', count: 0
+  end
+
   test 'a location filter narrows the listing' do
     event(title: 'AlphaShow', location_list: ['VenueAlpha'], start_date: Date.current + 2.days)
     event(title: 'BetaShow', location_list: ['VenueBeta'], start_date: Date.current + 2.days)

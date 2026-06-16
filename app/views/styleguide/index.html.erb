@@ -99,30 +99,28 @@
   <%# ============================================================ BUTTONS %>
   <section class="sg-section" id="buttons">
     <h2>Buttons &amp; actions</h2>
-    <p class="sg-section__intro">One ladder, used app-wide: primary → secondary → tertiary → danger, plus the flat icon action and the text link. A box reads as clickable; only <code>.text-link</code> is borderless.</p>
+    <p class="sg-section__intro"><b>Three weights:</b> primary → secondary → danger, plus the flat icon action and the text link. Weight is the role; size (full-width vs small pill) is just context, not a separate tier. <b>Per-page primary:</b> at most one filled button per page, so it's the thing that stands out — everything else is secondary (hollow) or danger.</p>
 
     <div class="sg-row">
-      <div class="sg-specimen"><input type="submit" value="Save"></div>
+      <div class="sg-specimen">
+        <input type="submit" value="Save">
+        <button type="button" class="button-small primary">Done</button>
+      </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Primary submit</span> · <code>input[type=submit]</code>
-        <p class="sg-purpose">Commit the main action of a form (Save, Log in, Sign up, Create rule).</p>
-        <span class="sg-flag"><b>Audit #7.</b> Only this filled-accent treatment exists for "primary"; <code>&lt;button&gt;</code>/<code>&lt;a&gt;</code> have no matching primary look.</span>
+        <span class="sg-spec__name">Primary</span> · <code>input[type=submit]</code> / <code>.primary</code>
+        <p class="sg-purpose">The ONE main commit of a page — filled accent. <code>input[type=submit]</code> is primary automatically; a non-submit primary (the rule editor's done link, the cookie CTA) opts in with <code>.primary</code> at any size.</p>
       </div>
     </div>
 
     <div class="sg-row">
-      <div class="sg-specimen"><button type="button" class="button-small">Fire now</button></div>
-      <div class="sg-spec">
-        <span class="sg-spec__name">Secondary pill</span> · <code>.button-small</code>
-        <p class="sg-purpose">A secondary commit that isn't the form's main action (Fire now, Trigger run).</p>
+      <div class="sg-specimen">
+        <button type="button" class="button">Enable</button>
+        <button type="button" class="button-small">Test now</button>
       </div>
-    </div>
-
-    <div class="sg-row">
-      <div class="sg-specimen"><button type="button" class="button-small button-ghost">Edit filter</button></div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Tertiary / ghost pill</span> · <code>.button-small.button-ghost</code>
-        <p class="sg-purpose">A low-emphasis option beside a primary/secondary one (Cancel, Enable/Disable, Edit filter).</p>
+        <span class="sg-spec__name">Secondary</span> · <code>&lt;button&gt;</code> / <code>.button</code> / <code>.button-small</code> (default)
+        <p class="sg-purpose">Every action that isn't the page's primary or destructive — hollow accent, full-size or pill. One treatment (no separate "neutral box" vs "ghost"): Sign out, Enable, Test now, Pause, Create link, …</p>
+        <span class="sg-ok"><b>Resolved.</b> Collapsed the old neutral-box + secondary-filled-pill + tertiary-ghost into one secondary look; primary is now filled-only and rare. <code>.button-ghost</code> stays as a no-op alias.</span>
       </div>
     </div>
 
@@ -175,16 +173,14 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <button type="button" class="button">Neutral</button>
         <span class="view-switcher" style="display:inline-flex; gap:var(--gap-medium);">
           <a href="#buttons" class="view-switch__item">List</a>
           <a href="#buttons" class="view-switch__item active"><b>Calendar</b></a>
         </span>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Neutral button + view switcher</span> · <code>.button</code> / <code>.view-switch__item</code>
-        <p class="sg-purpose"><code>.button</code> is a full-size muted boxed button. The List/Calendar toggle is flat text (<code>.view-switch__item</code>; active = bold accent).</p>
-        <span class="sg-ok"><b>Audit #6 — resolved.</b> <code>.button</code> is now a real boxed button (no more bare-reset cascade); the flat-text controls (view switcher, favorites + notify shortcuts) use their own domain classes.</span>
+        <span class="sg-spec__name">View switcher</span> · <code>.view-switch__item</code>
+        <p class="sg-purpose">Flat text toggle (not a button) between list and calendar; active = bold accent. The flat-text controls (view switcher, favorites + notify shortcuts) use their own domain classes rather than borrowing <code>.button</code>.</p>
       </div>
     </div>
 

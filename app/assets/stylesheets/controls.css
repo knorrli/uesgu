@@ -6,16 +6,27 @@
   outline-offset: 2px;
 }
 
+/* SECONDARY is the default for any button: hollow accent (outlined green). Every
+   action that isn't the page's one primary commit or a destructive action looks
+   like this — one secondary treatment, no separate "neutral box" vs "ghost". */
 button, a.button {
   text-align: center;
   align-content: center;
   cursor: pointer;
   text-decoration: none;
   padding: 5px;
-  border: var(--border-width) solid var(--border-color);
+  border: var(--border-width) solid var(--theme-accent-color);
   border-radius: var(--border-radius);
-  background-color: var(--theme-bg-muted);
-  color: var(--theme-fg-color);
+  background-color: transparent;
+  color: var(--theme-accent-color);
+
+  /* PRIMARY: the single main commit of a page (opt-in; input[type=submit] is
+     primary automatically). Filled accent so it's the one thing that stands out. */
+  &.primary {
+    background-color: var(--theme-accent-color);
+    border-color: var(--theme-accent-color);
+    color: var(--theme-on-accent);
+  }
 
   /* Destructive: hollow warn at rest, fills warn on commit (hover/focus) — the
      single danger language, shared with .button-small.danger (scales by size,
@@ -90,26 +101,26 @@ input[type=submit] {
 }
 
 /* ── The button ladder ───────────────────────────────────────────────────────
-   One vocabulary, used app-wide. "A box reads as clickable", so every one of
-   these is a box (except .text-link, which is a navigation link):
+   Three weights, app-wide. "A box reads as clickable", so every one is a box
+   (except .text-link, a navigation link). Weight is the role; size is just
+   context (full-width vs small pill), NOT a separate tier:
 
-     NEUTRAL      .button / <button>            full-size muted boxed button
-     PRIMARY      input[type=submit]            filled accent  (commit a form)
-     SECONDARY    .button-small                 filled accent pill (a smaller
-                                                 commit: Fire now, Trigger run)
-     TERTIARY     .button-small.button-ghost    hollow accent pill (Cancel,
-                                                 Enable/Disable, Run one)
-     DANGER       .button.delete / .button-small.danger
-                                                 hollow warn → fills on commit
-     ICON         .icon-button (+ .danger)      flat boxless inline icon action
-     LINK         .text-link                    underlined accent navigation
+     PRIMARY    input[type=submit], .primary    filled accent — the ONE main
+                                                 commit of a page (Save, Log in,
+                                                 the rule editor's done link)
+     SECONDARY  <button> / .button / .button-small (default)
+                                                 hollow accent — every other
+                                                 action (Sign out, Enable, Test
+                                                 now, Pause, Create link, …)
+     DANGER     .delete / .danger               hollow warn → fills on commit
+     ICON       .icon-button (+ .danger)        flat boxless inline icon action
+     LINK       .text-link                      underlined accent navigation
 
-   Flat-text controls that AREN'T buttons (the view switcher, the favorites/notify
-   shortcuts) have their own domain classes (.view-switch__item,
-   .favorites-filter-link, .notify-filter-link) — they no longer borrow .button.
-   .button-small is the canonical small button (was duplicated as the admin-only
-   .button--small). Layout — where a button sits — is the caller's job; this file
-   owns the look. */
+   Per-page primary: at most one filled button per page; everything else is
+   secondary (hollow) or danger, so the primary is the thing that stands out.
+   (.button-ghost is kept as a no-op alias — secondary is already hollow — so
+   existing markup needn't be swept.) Flat-text controls that aren't buttons
+   (view switcher, favorites/notify shortcuts) keep their own domain classes. */
 .button-small {
   /* inline-flex + a fixed line-height makes every pill the same height whether
      it's an <a>, a <button> (via button_to), or an <input> — otherwise the <a>
@@ -121,11 +132,17 @@ input[type=submit] {
   line-height: 1.2;
   padding: var(--gap-small) var(--gap-medium);
   border: var(--border-width) solid var(--theme-accent-color);
-  background: var(--theme-accent-color);
-  color: var(--theme-on-accent);
+  background: transparent;
+  color: var(--theme-accent-color);
   border-radius: var(--border-radius);
   cursor: pointer;
   text-decoration: none;
+}
+
+/* Filled primary, small-pill size (the rule editor's done link, the cookie CTA). */
+.button-small.primary {
+  background: var(--theme-accent-color);
+  color: var(--theme-on-accent);
 }
 
 .button-small[disabled] {
@@ -133,8 +150,10 @@ input[type=submit] {
   cursor: not-allowed;
 }
 
+/* No-op alias: secondary is already hollow accent. Kept so existing markup that
+   says .button-ghost still reads as secondary without a sweep. */
 .button-small.button-ghost {
-  background: none;
+  background: transparent;
   color: var(--theme-accent-color);
 }
 

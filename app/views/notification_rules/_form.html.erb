@@ -113,7 +113,7 @@
       links (not button_to, which would nest a <form>) that break out of the
       editor's turbo frame to navigate. %>
   <div class="flex gap-small rule-actions">
-    <%= link_to t('notification_rules.save_button'), notification_rules_path, class: 'button-small', data: { turbo_frame: '_top' } %>
+    <%= link_to t('notification_rules.save_button'), notification_rules_path, class: 'button-small primary', data: { turbo_frame: '_top' } %>
     <% if rule.persisted? %>
       <%= link_to t('notification_rules.delete'), notification_rule_path(rule),
             class: 'button-small button-ghost danger',

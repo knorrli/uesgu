@@ -13,27 +13,25 @@
 - **Data ingestion** — venue scrapers, genre→style taxonomy + normalization,
   location hierarchy (venue/city/canton), cancellation detection, scrape-run admin.
 - **Browsing** — events feed (list + calendar views), What/Where/When filter +
-  date presets, busyness calendar, light/dark theme, de/en/fr, installable PWA.
+  date presets, calendar with saved/interest day markers, light/dark theme,
+  de/en/fr, installable PWA.
 - **Accounts** — invite-only signup, username/password, optional email, settings.
 - **Favorites** — follow locations + styles (inline hearts + `/favorites`),
   "My favorites" filter shortcut.
 - **Admin** — dashboard, users, invitations, scrape runs, genre/style/location
-  catalogues, per-event manual overrides, genre "tinder" queue.
+  catalogues, per-event manual overrides, genre "tinder" queue, discard rules.
+- **Saved shows** — single-event save, "My saved shows", ICS feed, midday reminders.
+- **Notifications** — rule-based alerts (saved filter + schedule), in-app inbox,
+  web push, email (Resend), auto-naming, "Test now".
 
-**On the `notification-rules` branch (not deployed):**
-- **Notifications** — rule-based alerts (a saved filter + a schedule), in-app
-  inbox, web push, email (Resend), auto-naming, "Test now".
+## Definition of "functionally complete" — ✅ REACHED
 
-## Definition of "functionally complete"
+The bounded set where the tool serves daily use. All three pieces shipped to
+`main`; functional completeness is met. Remaining work is the UI polish pass.
 
-The bounded set where the tool serves daily use. Three pieces remain; everything
-else live today already counts.
-
-1. **Notifications close-out** — finish the in-flight feature (punch list §1).
-2. **Per-event saving** — save a single show + a "My saved shows" view. The other
-   half of "a tool, not an aggregator" (today only venues/styles are followable).
-3. **Email third-party disclaimer** — disclose the Resend hand-off at the
-   email-entry point (privacy ethos), now that email sends for real.
+1. **Notifications close-out** — ✅ done (punch list §1).
+2. **Per-event saving** — ✅ done (single-show save + "My saved shows", §2).
+3. **Email third-party disclaimer** — ✅ done (§3).
 
 ## Punch list (ordered toward functional completeness)
 
@@ -60,9 +58,8 @@ else live today already counts.
       the Settings email field — the only end-user email-entry point. de/en/fr.
       The digest email's "Manage rules" footer link is the paired opt-out.
 
-### §4 — Deploy
-- [ ] Optionally apply the review's pre-merge cleanups (below).
-- [ ] Merge `notification-rules` → `main`, deploy, verify cron + push + email in prod.
+### §4 — Deploy — ✅ DONE
+- [x] Merged `notification-rules` → `main`, pushed (auto-deploys to Render).
 
 ## After functional: UI polish pass (required for "complete")
 - Notification-rules card visual hierarchy — info chips vs. action buttons vs.
@@ -71,7 +68,8 @@ else live today already counts.
 - Constrain the notify-time input to 15-min steps (`step="900"`) — the `notify-due`
   cron ticks at :00/:15/:30/:45, so finer granularity implies precision we don't
   deliver (a rule fires at the first tick ≥ its time).
-- General mobile-first pass (e.g. `/favorites` flagged as rough).
+- General mobile-first pass (`/favorites` now reads fine on mobile — done; sweep
+  the rest of the app).
 - Review cleanup/efficiency: inbox-count N+1, duplicated `build_filter` across two
   controllers, duplicated favorites-OR query, dead `display_name` fallback,
   `rule_about` passthrough, mailer re-queries events `fire!` already loaded,

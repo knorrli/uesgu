@@ -65,9 +65,11 @@ namespace :scrapers do
   # Records the sweep into a ScrapeRun + per-scraper ScrapeResult rows (the
   # /admin/scrape_runs oversight page reads these), stamps the events each
   # scraper created with the run, prints a per-scraper summary to stdout (which
-  # Render captures as the cron job's live log), and exits non-zero ONLY if a
-  # scraper raised — so Render's failure notification fires for a site being
-  # down but NOT for a clean-but-empty run (those surface in-app instead). A
+  # Render captures as the cron job's live log), and exits non-zero if a scraper
+  # raised OR a venue that produced events last run came back empty (a silent
+  # drop-to-zero — HTTP 200 but the markup broke). Render's failure notification
+  # then fires for a site being down or a quietly-broken parser, but NOT for a
+  # venue that's simply chronically empty (that surfaces in-app instead). A
   # per-event parse error is skipped and counted inside the scraper.
   #
   #   bin/rails scrapers:run_all
@@ -76,9 +78,14 @@ namespace :scrapers do
     run = Scrapers::Sweep.run!
 
     failed = run.scrape_results.failed.pluck(:scraper)
-    if failed.any?
-      puts format('scrapers:run_all: %d/%d FAILED (%s) in %.1fs',
-                  failed.size, run.scrapers_total, failed.join(', '), run.duration)
+    dropped = run.dropped_to_zero
+
+    if failed.any? || dropped.any?
+      reasons = []
+      reasons << "#{failed.size} FAILED (#{failed.join(', ')})" if failed.any?
+      reasons << "#{dropped.size} DROPPED TO ZERO (#{dropped.join(', ')})" if dropped.any?
+      puts format('scrapers:run_all: %s of %d scrapers in %.1fs — see /admin/scrape_runs',
+                  reasons.join('; '), run.scrapers_total, run.duration)
       abort('scrapers:run_all finished with failures')
     elsif run.scrapers_empty.positive?
       puts format('scrapers:run_all: all %d ran but %d produced no events in %.1fs — see /admin/scrape_runs',

@@ -32,6 +32,23 @@ class ScrapeRun < ApplicationRecord
     scrapers_failed.positive? || scrapers_empty.positive?
   end
 
+  # The most recent finished sweep before this one — the baseline for the
+  # drop-to-zero check below.
+  def previous
+    self.class.finished.where(started_at: ...started_at).recent.first
+  end
+
+  # Scrapers that produced events in the previous sweep but came back empty in
+  # this one: a silent drop-to-zero (HTTP 200, but the markup changed under us).
+  # This is the regression worth alerting on — distinct from a venue that's
+  # simply chronically empty (empty last run too), which we leave to the admin
+  # page. Returns the offending scraper slugs.
+  def dropped_to_zero
+    prev = previous or return []
+    baseline = prev.scrape_results.ok.pluck(:scraper).to_set
+    scrape_results.empty.pluck(:scraper).select { |slug| baseline.include?(slug) }
+  end
+
   def duration
     return unless started_at && finished_at
 

@@ -4,9 +4,10 @@ Rails.application.routes.draw do
   # variants, so 301 every one of those to the umlaut domain, preserving path +
   # query. www.üsgu.ch is included here too so Rails is the single source of
   # truth for canonicalization rather than relying on Render's www handling.
-  constraints(host: /\A(?:www\.xn--sgu-goa\.ch|(?:www\.)?uesgu\.ch)\z/i) do
+  redirecting_hosts = ["www.#{AppHost::PUBLIC}", AppHost::CODE, "www.#{AppHost::CODE}"]
+  constraints(host: /\A(?:#{redirecting_hosts.map { |h| Regexp.escape(h) }.join('|')})\z/i) do
     match "(*path)", via: :all,
-      to: redirect(status: 301) { |_params, request| "https://xn--sgu-goa.ch#{request.fullpath}" }
+      to: redirect(status: 301) { |_params, request| "https://#{AppHost::PUBLIC}#{request.fullpath}" }
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

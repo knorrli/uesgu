@@ -21,9 +21,9 @@ module WebPushConfig
   end
 
   # The "subject" is a contact URL the push service can use to reach us about our
-  # traffic. uesgu.ch is the canonical code/email domain (never the umlaut host).
+  # traffic. AppHost::CODE is the canonical code/email domain (never the umlaut host).
   def subject
-    ENV["VAPID_SUBJECT"].presence || "mailto:hello@uesgu.ch"
+    ENV["VAPID_SUBJECT"].presence || "mailto:hello@#{AppHost::CODE}"
   end
 
   def configured?

@@ -100,11 +100,12 @@ en:
     empty: Nothing saved yet — tap the bookmark on any show.
     none_upcoming: Nothing coming up — your past saves are on the calendar.
     toggle: Save show
+  copy_field:
+    copy: Copy
+    copied: Copied!
   calendar_feed:
     name: üsgu — saved shows
     cancelled_prefix: "Cancelled: %{title}"
-    copy: Copy
-    copied: Copied!
     create: Create subscription link
     regenerate: New link
     regenerate_confirm: Replace the link? Your calendar app will need the new one.

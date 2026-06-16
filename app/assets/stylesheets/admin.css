@@ -176,11 +176,6 @@
   letter-spacing: 0.08em;
 }
 
-.invite__link {
-  word-break: break-all;
-  color: var(--theme-fg-muted);
-}
-
 .invite__status--redeemed {
   color: var(--theme-fg-muted);
 }

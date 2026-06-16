@@ -47,7 +47,7 @@
             </div>
 
             <% if invitation.available? %>
-              <code class="invite__link"><%= signup_url(invite: invitation.code) %></code>
+              <%= render "shared/copy_field", value: signup_url(invite: invitation.code, **share_url_options) %>
               <% if invitation.expires_at %>
                 <span class="muted"><%= t('.expires', date: l(invitation.expires_at.to_date)) %></span>
               <% end %>

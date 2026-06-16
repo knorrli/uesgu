@@ -108,19 +108,12 @@
     <h2><%= t('settings.calendar_feed_heading') %></h2>
 
     <% if @user.calendar_feed_token.present? %>
-      <div class="flex flex-col gap-small" data-controller="clipboard"
-           data-clipboard-copied-value="<%= t('calendar_feed.copied') %>">
+      <div class="flex flex-col gap-small">
         <p class="muted"><%= t('settings.calendar_feed_hint_on') %></p>
-        <label class="flex flex-col gap-small">
-          <span class="field-label"><%= t('settings.calendar_feed_url_label') %></span>
-          <input type="text" readonly data-clipboard-target="source"
-                 data-action="focus->clipboard#select"
-                 value="<%= public_calendar_feed_url(@user.calendar_feed_token, format: :ics) %>">
-        </label>
+        <%= render "shared/copy_field",
+              label: t('settings.calendar_feed_url_label'),
+              value: public_calendar_feed_url(@user.calendar_feed_token, format: :ics, **share_url_options) %>
         <div class="settings-actions flex gap-small wrap">
-          <button type="button" data-clipboard-target="button" data-action="clipboard#copy">
-            <%= t('calendar_feed.copy') %>
-          </button>
           <%= button_to t('calendar_feed.regenerate'), calendar_feed_path, method: :post,
                 class: "button-ghost",
                 data: { turbo_confirm: t('calendar_feed.regenerate_confirm') } %>

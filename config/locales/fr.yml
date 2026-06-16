@@ -100,11 +100,12 @@ fr:
     empty: Rien d'enregistré — touche le signet sur un événement.
     none_upcoming: Rien à venir — tes enregistrements passés sont dans le calendrier.
     toggle: Enregistrer l'événement
+  copy_field:
+    copy: Copier
+    copied: Copié !
   calendar_feed:
     name: üsgu — à voir
     cancelled_prefix: "Annulé : %{title}"
-    copy: Copier
-    copied: Copié !
     create: Créer le lien d'abonnement
     regenerate: Nouveau lien
     regenerate_confirm: Remplacer le lien ? Ton app calendrier aura besoin du nouveau.

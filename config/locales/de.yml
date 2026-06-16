@@ -100,11 +100,12 @@ de:
     empty: Noch nichts gespeichert — tippe das Lesezeichen bei einer Veranstaltung.
     none_upcoming: Nichts Anstehendes — vergangene Einträge findest du im Kalender.
     toggle: Veranstaltung speichern
+  copy_field:
+    copy: Kopieren
+    copied: Kopiert!
   calendar_feed:
     name: üsgu — Merkliste
     cancelled_prefix: "Abgesagt: %{title}"
-    copy: Kopieren
-    copied: Kopiert!
     create: Abo-Link erstellen
     regenerate: Neuer Link
     regenerate_confirm: Link ersetzen? Deine Kalender-App braucht dann den neuen.

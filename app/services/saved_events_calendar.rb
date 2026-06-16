@@ -43,8 +43,9 @@ class SavedEventsCalendar
 
   def build_event(event)
     Icalendar::Event.new.tap do |e|
-      # Stable per event so a re-fetch updates the same entry instead of duplicating.
-      e.uid     = "saved-event-#{event.id}@uesgu.ch"
+      # Stable per event so a re-fetch updates the same entry instead of duplicating;
+      # AppHost::CODE is just the identifier namespace here, not a routable link.
+      e.uid     = "saved-event-#{event.id}@#{AppHost::CODE}"
       e.summary = event.cancelled? ? I18n.t('calendar_feed.cancelled_prefix', title: event.title) : event.title
       e.dtstamp = utc(event.updated_at)
       apply_times(e, event)

@@ -154,6 +154,29 @@ a {
   gap: var(--gap-small);
 }
 
+/* Copyable field (shared/_copy_field): a read-only URL input with an inline
+   Copy button. The input flexes to fill, the button hugs its label. */
+.copy-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+}
+
+.copy-field__row {
+  display: flex;
+  gap: var(--gap-small);
+  align-items: stretch;
+}
+
+.copy-field__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.copy-field__button {
+  white-space: nowrap;
+}
+
 /* Flash messages: a fixed toast at the bottom so they never push content down;
    auto-dismiss after a few seconds. */
 .flashes {

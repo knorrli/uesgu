@@ -61,10 +61,10 @@ Rails.application.configure do
   # variants are allowed so the canonicalizing 301 in routes.rb can fire before
   # rejection; *.onrender.com covers Render's assigned URL and health checks.
   config.hosts = [
-    "xn--sgu-goa.ch",       # üsgu.ch
-    "www.xn--sgu-goa.ch",   # www.üsgu.ch
-    "uesgu.ch",
-    "www.uesgu.ch",
+    AppHost::PUBLIC,            # üsgu.ch (punycode)
+    "www.#{AppHost::PUBLIC}",   # www.üsgu.ch
+    AppHost::CODE,              # uesgu.ch
+    "www.#{AppHost::CODE}",
     /\A[a-z0-9-]+\.onrender\.com\z/
   ]
 

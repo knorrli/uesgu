@@ -18,6 +18,20 @@ require "action_view/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Single source of truth for our two domains. The public site is served from the
+# umlaut domain üsgu.ch, which arrives on the wire as its punycode form
+# (AppHost::PUBLIC) — the canonical host everything 301s to. uesgu.ch
+# (AppHost::CODE) is the ASCII twin used for email and shareable/copyable links;
+# it 301s back to PUBLIC preserving path + query (see config/routes.rb).
+#
+# ENV-backed so a domain move is a one-place change, with the current values as
+# defaults. Defined here rather than in an initializer because config/environments
+# and config/routes.rb read these constants during boot, before initializers run.
+module AppHost
+  PUBLIC = ENV.fetch("PUBLIC_HOST", "xn--sgu-goa.ch") # üsgu.ch, punycode-encoded
+  CODE   = ENV.fetch("CODE_HOST", "uesgu.ch")         # ASCII twin for mail + links
+end
+
 module Uesgu
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.

@@ -14,7 +14,7 @@ module MailConfig
   end
 
   def from
-    ENV["MAIL_FROM"].presence || "üsgu <noreply@uesgu.ch>"
+    ENV["MAIL_FROM"].presence || "üsgu <noreply@#{AppHost::CODE}>"
   end
 
   def configured?
@@ -23,7 +23,7 @@ module MailConfig
 
   # Public web host for absolute links in emails (the umlaut domain in punycode).
   def web_host
-    ENV["MAIL_WEB_HOST"].presence || "xn--sgu-goa.ch"
+    ENV["MAIL_WEB_HOST"].presence || AppHost::PUBLIC
   end
 
   def smtp_settings

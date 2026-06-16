@@ -10,7 +10,6 @@ en:
     settings: Settings
     logout: Log out
     login: Log in
-    signup: Sign up
     theme: Theme
     install: Install app
   cookie_notice:

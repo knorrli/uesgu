@@ -10,7 +10,6 @@ fr:
     settings: Paramètres
     logout: Déconnexion
     login: Connexion
-    signup: Inscription
     theme: Thème
     install: Installer l'app
   cookie_notice:

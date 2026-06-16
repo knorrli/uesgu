@@ -42,6 +42,7 @@
               <th class="num"><%= t('.col.updated') %></th>
               <th class="num"><%= t('.col.unchanged') %></th>
               <th class="num"><%= t('.col.skipped') %></th>
+              <th class="num"><%= t('.col.filtered') %></th>
               <th><%= t('.col.history') %></th>
               <th></th>
             </tr>
@@ -57,6 +58,7 @@
                 <td class="num"><%= result&.updated_count %></td>
                 <td class="num"><%= result&.unchanged_count %></td>
                 <td class="num"><%= result&.skipped_count %></td>
+                <td class="num"><%= result&.discarded_count %></td>
                 <td>
                   <span class="scrape-history">
                     <% @presenter.history(slug).each do |entry| %>

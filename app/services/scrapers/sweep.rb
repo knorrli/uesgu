@@ -62,14 +62,15 @@ module Scrapers
       run.scrape_results.create!(
         scraper: slug, status: status, started_at: started, duration_ms: ms_since(started),
         rows_seen: result.seen, created_count: result.created, updated_count: result.updated,
-        unchanged_count: result.unchanged, skipped_count: result.skipped
+        unchanged_count: result.unchanged, skipped_count: result.skipped,
+        discarded_count: result.discarded
       )
       if result.created_ids.any?
         Event.where(id: result.created_ids).update_all(created_in_scrape_run_id: run.id)
       end
-      @out.puts format('[%s] %s in %.1fs (%d seen, +%d new, ~%d updated, %d skipped)',
+      @out.puts format('[%s] %s in %.1fs (%d seen, +%d new, ~%d updated, %d skipped, %d filtered)',
                        slug, status.to_s.upcase, ms_since(started) / 1000.0,
-                       result.seen, result.created, result.updated, result.skipped)
+                       result.seen, result.created, result.updated, result.skipped, result.discarded)
     rescue StandardError => e
       # A total failure (site down, markup that breaks before the loop) raises out
       # of #call; record it and carry on to the next venue.

@@ -396,6 +396,7 @@ en:
           updated: Updated
           unchanged: Unchanged
           skipped: Skipped
+          filtered: Filtered
           history: History
       show:
         back: ← All runs

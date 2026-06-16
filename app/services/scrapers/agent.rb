@@ -46,7 +46,8 @@ module Scrapers
       end
 
       Result.new(seen: @seen, created: @created, updated: @updated,
-                 unchanged: @unchanged, skipped: @failures, created_ids: @created_ids)
+                 unchanged: @unchanged, skipped: @failures, discarded: @discarded,
+                 created_ids: @created_ids)
     end
 
     private
@@ -58,7 +59,7 @@ module Scrapers
       # Counters live here (not in #call) so the offline golden harness, which
       # drives #process_events directly, initializes them too. #call reads them
       # back into the returned Result.
-      @seen = @created = @updated = @unchanged = @failures = 0
+      @seen = @created = @updated = @unchanged = @failures = @discarded = 0
       @created_ids = []
 
       get(self.class.url)
@@ -168,6 +169,7 @@ module Scrapers
         r.matches?(title: event.title, subtitle: event.subtitle, location: self.class.location)
       end
       event.discarded_by_rule_id = rule&.id
+      @discarded += 1 if rule
     end
 
     # Active discard rules, loaded once per run.

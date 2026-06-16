@@ -396,6 +396,7 @@ de:
           updated: Aktualisiert
           unchanged: Unverändert
           skipped: Übersprungen
+          filtered: Gefiltert
           history: Verlauf
       show:
         back: ← Alle Läufe

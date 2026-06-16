@@ -396,6 +396,7 @@ fr:
           updated: Mis à jour
           unchanged: Inchangés
           skipped: Ignorés
+          filtered: Filtrés
           history: Historique
       show:
         back: ← Tous les passages

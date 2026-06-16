@@ -131,9 +131,10 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     url = 'https://fixture.test/discard'
     DiscardRule.create!(pattern: 'Tschütte')
     CountingScraperHarness.next_rows = [{ url: url, title: 'Tschütte live' }]
-    CountingScraperHarness.new.call
+    result = CountingScraperHarness.new.call
     event = Event.find_by(url: url)
     assert event.discarded?, 'event should be flagged by the matching rule'
+    assert_equal 1, result.discarded, 'the run should tally the filtered event'
 
     # Rule gone → next scrape re-derives the flag to nil (not sticky).
     DiscardRule.destroy_all

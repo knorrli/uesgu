@@ -32,6 +32,18 @@ class Scrapers::SweepTest < ActiveSupport::TestCase
     assert(run.created_events.all? { |e| e.created_in_scrape_run_id == run.id })
   end
 
+  test 'records how many events a run filtered via discard rules' do
+    DiscardRule.create!(pattern: 'zorp')
+    CountingScraperHarness.next_rows = [
+      { url: 'https://fixture.test/a', title: 'zorp fest' },
+      { url: 'https://fixture.test/b', title: 'real concert' }
+    ]
+
+    run = sweep('CountingScraperHarness' => CountingScraperHarness)
+
+    assert_equal 1, run.scrape_results.sole.discarded_count
+  end
+
   test 'a scraper that writes nothing is recorded empty (the silent regression)' do
     CountingScraperHarness.next_rows = []
 

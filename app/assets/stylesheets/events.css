@@ -944,17 +944,18 @@ body.filter-sheet-open { overflow: hidden; }
 .opt--query .opt__type { color: var(--theme-accent-color); }
 
 /* Desktop counterpart of .opt--newquery: the free-text "search for «X»" row at
-   the foot of the What dropdown. Reuses the gem's .hw-combobox__option base
-   (padding + hover). It reads like the plain options now — neutral text, no
-   leading icon — distinguished only by its label ("Search for «X»") and the muted
-   "free text" tag; the faint ground sets it apart as the one action row. */
+   the top of the What dropdown (tag_picker prepends it). Reuses the gem's
+   .hw-combobox__option base (padding + hover). It reads like the plain options —
+   neutral text, no leading icon — distinguished only by its label ("Search for
+   «X»") and the faint active ground when it's the highlighted row. No top border:
+   the row sits flush at the top of the listbox now, so a border there just drew a
+   stray grey line under the field's focus underline. */
 .filter-searchfor {
   display: flex;
   align-items: center;
   gap: var(--gap-small);
   width: 100%;
   border: 0;
-  border-top: var(--border-width) solid var(--border-color);
   background: none;
   color: var(--theme-fg-color);
   font: inherit;

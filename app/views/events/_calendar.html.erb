@@ -43,6 +43,12 @@
       <% end %>
       <div class="day-content">
         <div class="<%= number %>"><%= date.day %></div>
+        <%# Desktop-only relevance headline: the venue of the day's top-priority
+            personal event (saved > interest). One truncated line; hidden on mobile
+            (no room — the marker carries the signal there). Only on relevant days. %>
+        <% if day_events.any? && (headline = calendar_day_headline_venue(day_events)) %>
+          <span class="day-headline"><%= headline %></span>
+        <% end %>
       </div>
     <% end %>
   <% end %>

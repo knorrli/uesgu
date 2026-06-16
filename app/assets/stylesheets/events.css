@@ -479,6 +479,21 @@
     padding: var(--gap-small);
   }
 
+  /* Desktop-only relevance headline: the day's top-priority venue (saved >
+     interest). Hidden on mobile — the marker carries the signal there and a name
+     won't fit. One line, truncated to the cell width. Muted so it supports the
+     date + marker rather than competing; click-through (sits below the day link). */
+  .day-headline {
+    display: none;
+    margin-top: var(--gap-xsmall);
+    font-size: var(--font-size-small);
+    line-height: 1.2;
+    color: var(--theme-fg-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   /* Transparent click target covering the cell's full (row) height. */
   .calendar-day-link {
     position: absolute;
@@ -656,6 +671,8 @@
   /* Wider columns can carry the taller cell without looking squashed; restore the
      roomier desktop calendar height (mobile keeps the compact 4.25rem above). */
   .simple-calendar .day { height: 7rem; }
+  /* Room for the venue headline only at desktop width. */
+  .simple-calendar .day-headline { display: block; }
 }
 
 /* ── Trigger bar ── three underlined rows echoing the inline filter, but each

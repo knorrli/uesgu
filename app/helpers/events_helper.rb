@@ -122,6 +122,15 @@ module EventsHelper
     saved_event_ids.include?(event.id)
   end
 
+  # True when an event touches one of the user's follows — a followed location or
+  # style. In-memory over already-loaded associations + the cached followed sets,
+  # so it stays cheap across a calendar month. Used to pick a cell's interest
+  # headline (see CalendarHelper#calendar_day_headline_venue).
+  def event_matches_follow?(event)
+    event.locations.any? { |location| followed_locations.include?(location.name) } ||
+      event.styles.any? { |style| followed_styles.include?(style.name) }
+  end
+
   # The bookmark toggle on an event. Logged-in only; optimistic via the `save`
   # Stimulus controller (one self-contained controller per button, no cross-sync).
   def event_save_button(event)

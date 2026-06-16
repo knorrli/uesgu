@@ -1,11 +1,33 @@
 # "Save this show": per-event bookmarks + the "My saved shows" list.
 class SavedEventsController < ApplicationController
-  # The user's upcoming saved shows, grouped by day in the view.
+  include ListingViewMode
+
+  # The user's saved shows, as a day-grouped list (upcoming only) or a month
+  # calendar — the same list/calendar toggle as the main programme.
   def index
-    @events = current_user.saved_events
-                          .where("events.start_date >= ?", Date.current.beginning_of_day)
-                          .includes(:locations, :styles, :genres)
-                          .order(:start_date, :start_time, :title)
+    @any_saved = current_user.event_saves.exists?
+    @view = resolve_view(session_key: :saved_events_view, account_attr: :saved_events_view)
+    # The saved list shows plain tags (it's your own shelf, not a place to follow
+    # things), so both views render read-only.
+    @calendar_interactive = false
+
+    scope = current_user.saved_events.includes(:locations, :styles, :genres)
+    if @view == 'calendar'
+      @calendar_start = (Date.parse(params[:start_date]) rescue nil) || Date.current
+      # The focused month plus a week of padding so adjacent-month grid cells are
+      # covered (mirrors EventsController#index).
+      @events = scope.where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))
+                     .order(:start_date, :start_time, :title)
+      @open_day = (Date.parse(params[:day]) rescue nil) if params[:day].present?
+      # The month is already loaded, so slice the open day out of it rather than
+      # re-querying.
+      @open_day_events = @events.select { |event| event.start_date == @open_day } if @open_day
+    else
+      # Compare the date column against a plain Date — a zoned beginning_of_day
+      # timestamp slips a day across the +0200 offset (date-vs-timestamp footgun).
+      @events = scope.where('events.start_date >= ?', Date.current)
+                     .order(:start_date, :start_time, :title)
+    end
   end
 
   # Toggle a single event's saved state. Optimistic — the save Stimulus

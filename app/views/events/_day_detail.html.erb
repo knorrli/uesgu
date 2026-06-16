@@ -1,6 +1,7 @@
 <%# The expanded day, rendered inline in the calendar grid as a full-width row.
     URL-driven (params[:day]); the close link just navigates back to the
     no-day URL. Scrolls itself into view on connect for off-screen opens. %>
+<% interactive = local_assigns.fetch(:interactive, true) %>
 <section class="day-detail event-list flex flex-col gap-small" data-controller="day-detail">
   <% day_keys = calendar_day_favorite_keys(events) %>
   <% followed_keys = favorite_followed_keys.to_set %>
@@ -10,7 +11,7 @@
           'aria-label': t('events.day.close'), title: t('events.day.close') %>
   </header>
   <% if events.any? %>
-    <%= render 'venue_groups', events: events, filter: filter %>
+    <%= render 'events/venue_groups', events: events, filter: filter, interactive: interactive %>
   <% else %>
     <p class="muted"><%= t('events.day.empty') %></p>
   <% end %>

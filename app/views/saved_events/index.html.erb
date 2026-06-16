@@ -1,10 +1,20 @@
 <% content_for :title, t('saved_events.title') %>
 
 <div class="flex flex-col gap-large">
-  <h1><%= t('saved_events.title') %></h1>
+  <%# The view switcher only appears once there's something to look at — a brand
+      new shelf just shows the empty state, nothing to toggle between. %>
+  <div class="flex justify-between align-baseline wrap gap-medium">
+    <h1><%= t('saved_events.title') %></h1>
+    <% if @any_saved %><%= render 'events/view_switcher', view: @view %><% end %>
+  </div>
 
-  <% if @events.empty? %>
+  <% if !@any_saved %>
     <p class="empty-state"><%= t('saved_events.empty') %></p>
+  <% elsif @view == 'calendar' %>
+    <%= render 'events/calendar', events: @events %>
+  <% elsif @events.empty? %>
+    <%# Has saved shows, but none upcoming — the calendar still holds the past ones. %>
+    <p class="empty-state"><%= t('saved_events.none_upcoming') %></p>
   <% else %>
     <div class="event-list flex flex-col gap-xlarge">
       <% @events.group_by(&:start_date).each do |date, events| %>

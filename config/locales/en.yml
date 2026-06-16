@@ -98,6 +98,7 @@ en:
   saved_events:
     title: Watchlist
     empty: Nothing saved yet — tap the bookmark on any show.
+    none_upcoming: Nothing coming up — your past saves are on the calendar.
     toggle: Save show
   notification_rules:
     title: Notification rules

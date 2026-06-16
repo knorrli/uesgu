@@ -98,6 +98,7 @@ de:
   saved_events:
     title: Merkliste
     empty: Noch nichts gespeichert — tippe das Lesezeichen bei einer Veranstaltung.
+    none_upcoming: Nichts Anstehendes — vergangene Einträge findest du im Kalender.
     toggle: Veranstaltung speichern
   notification_rules:
     title: Benachrichtigungen

@@ -98,6 +98,7 @@ fr:
   saved_events:
     title: À voir
     empty: Rien d'enregistré — touche le signet sur un événement.
+    none_upcoming: Rien à venir — tes enregistrements passés sont dans le calendrier.
     toggle: Enregistrer l'événement
   notification_rules:
     title: Règles de notification

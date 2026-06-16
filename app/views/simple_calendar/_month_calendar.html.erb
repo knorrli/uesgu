@@ -38,7 +38,7 @@
         <% if @open_day && week.include?(@open_day) %>
           <tr class="day-detail-row">
             <td colspan="7">
-              <%= render 'events/day_detail', date: @open_day, events: @open_day_events, filter: @filter %>
+              <%= render 'events/day_detail', date: @open_day, events: @open_day_events, filter: @filter, interactive: @calendar_interactive %>
             </td>
           </tr>
         <% end %>

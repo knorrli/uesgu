@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_13_190000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_16_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -221,6 +221,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_190000) do
     t.boolean "admin", default: false, null: false
     t.string "locale"
     t.string "events_view"
+    t.string "saved_events_view"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end

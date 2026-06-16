@@ -2,16 +2,24 @@ module EventsHelper
   # The calendar's open day lives in the URL (?day=YYYY-MM-DD) so it is linkable,
   # survives reload, and is what the server renders. These keep the rest of the
   # URL state (filter, focused month) intact while toggling just the open day.
+  # Route-agnostic (via url_for) so the same calendar partials drive both the
+  # main programme and the saved-shows list.
   def calendar_day_path(date)
-    events_path(calendar_state_params.merge('day' => date.iso8601))
+    calendar_listing_path(calendar_state_params.merge('day' => date.iso8601))
   end
 
   def calendar_collapse_path
-    events_path(calendar_state_params)
+    calendar_listing_path(calendar_state_params)
   end
 
   def calendar_state_params
     request.query_parameters.except('day', 'page').merge('view' => 'calendar')
+  end
+
+  # Build a path to the *current* listing (events_path or saved_events_path) from
+  # a query hash — url_for fills the controller/action from the live request.
+  def calendar_listing_path(query)
+    url_for(query.merge(only_path: true))
   end
 
   # simple_calendar builds its month-nav links by merging the *current* query —

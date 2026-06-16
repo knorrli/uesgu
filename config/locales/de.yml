@@ -248,7 +248,6 @@ de:
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
     save: Speichern
-    push_heading: Benachrichtigungen auf diesem Gerät
     push_hint: Wir pingen dich hier an, sobald neue Veranstaltungen zu deinen Interessen passen.
     push_enable: Auf diesem Gerät aktivieren
     push_disable: Auf diesem Gerät deaktivieren

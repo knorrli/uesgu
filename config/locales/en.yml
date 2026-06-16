@@ -248,7 +248,6 @@ en:
     new_password: New password
     confirm_new_password: Confirm new password
     save: Save
-    push_heading: Notifications on this device
     push_hint: Get pinged here when new events match your interests.
     push_enable: Enable on this device
     push_disable: Disable on this device

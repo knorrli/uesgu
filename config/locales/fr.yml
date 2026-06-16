@@ -248,7 +248,6 @@ fr:
     new_password: Nouveau mot de passe
     confirm_new_password: Confirmer le nouveau mot de passe
     save: Enregistrer
-    push_heading: Notifications sur cet appareil
     push_hint: On te notifie ici dès que de nouveaux événements correspondent à tes intérêts.
     push_enable: Activer sur cet appareil
     push_disable: Désactiver sur cet appareil

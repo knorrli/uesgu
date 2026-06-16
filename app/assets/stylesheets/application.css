@@ -148,18 +148,6 @@ a {
   padding: 0;
 }
 
-/* The "on this device" cluster (install + push) under Notifications. */
-.settings-subsection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-medium);
-}
-
-.settings-subsection h3 {
-  font-weight: normal;
-  color: var(--theme-fg-muted);
-}
-
 .settings-actions {
   display: flex;
   flex-wrap: wrap;

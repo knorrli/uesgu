@@ -97,7 +97,7 @@ en:
     tab_rules: Rules
   saved_events:
     title: Watchlist
-    empty: Nothing saved yet — tap the bookmark on any show.
+    empty: Nothing saved yet — tap the heart on any show.
     none_upcoming: Nothing coming up — your past saves are on the calendar.
     toggle: Save show
   copy_field:
@@ -241,7 +241,7 @@ en:
     next: Next
   favorites:
     title: Interests
-    intro: Pick the styles and places that interest you — matching days get a heart, and you can filter the programme down to your interests.
+    intro: Pick the styles and places that interest you — matching days get a star, and you can filter the programme down to your interests.
     canton_label: "Canton %{code}"
     saved: Interests saved.
     save: Save interests

@@ -8,7 +8,7 @@ body {
   --color-background: #e8e1cd;
   --color-accent: #0e7a4a;
   --color-warn: var(--color-red);
-  --color-favorite: var(--color-raspberry);
+  --color-saved: var(--color-raspberry);
 
   --border-width: 2px;
   --tag-border-width: 1px;
@@ -29,7 +29,7 @@ body {
   --theme-fg-color: var(--color-text);
   --theme-accent-color: var(--color-accent);
   --theme-warn-color: var(--color-warn);
-  --theme-favorite-color: var(--color-favorite);
+  --theme-saved-color: var(--color-saved);
   /* Text/glyphs painted ON the accent fill (primary buttons, badges, the today
      badge, checked-box ticks, chips). The on-accent colour matches the page
      background — the "punched out" look — and stays legible in both themes
@@ -69,7 +69,7 @@ html[data-theme="dark"] body {
      instead of glowing against the dark field. */
   --color-accent: #38c08a;
   --color-warn: #f0837a;
-  --color-favorite: #ec6f98;
+  --color-saved: #ec6f98;
 
   /* On the brighter dark-theme green, the dark plum ground reads far better than
      white (which glares). */

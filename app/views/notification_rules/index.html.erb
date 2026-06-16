@@ -24,7 +24,7 @@
             <% rule_channels(rule).each do |label| %>
               <span class="chip"><%= label %></span>
             <% end %>
-            <% if rule.track_favorites? %><span class="chip chip--window"><%= t('notification_rules.favorites_live') %></span><% end %>
+            <% if rule.track_favorites? %><span class="chip"><%= t('notification_rules.favorites_live') %></span><% end %>
             <% unless rule.enabled? %><span class="chip chip--muted"><%= t('notification_rules.disabled') %></span><% end %>
           </div>
 

@@ -239,15 +239,15 @@
 /* The follow STAR trails its tag and inherits the tag's font-size, so the big
    venue header gets a big star and a small style tag a small one. It's the sole
    "you can follow this" signal, so it stays visible — mobile-first, no hover to
-   hide behind. (Class still named .fav-heart for now — glyph swapped heart→star;
+   hide behind. (Class still named .fav-star for now — glyph swapped heart→star;
    rename is non-visual cleanup.) */
-.fav-heart {
+.fav-star {
   margin-left: 0.4ch;
 }
 
 /* A masked Phosphor star: the mask is the shape, background-color paints it, so
    it inherits a theme colour and the tag's em size. */
-.fav-heart::before {
+.fav-star::before {
   content: "";
   display: inline-block;
   width: 1em;
@@ -260,13 +260,13 @@
 
 /* Not-yet-followed: a faint outline star — present enough to be discoverable and
    tappable on touch, quiet enough not to clutter the row. */
-.event-tag.fav:not(.followed) .fav-heart {
+.event-tag.fav:not(.followed) .fav-star {
   opacity: 0.4;
 }
 
 /* Followed: solid green star at full strength, so your follows are the dominant
    accent across the page. */
-.event-tag.fav.followed .fav-heart::before {
+.event-tag.fav.followed .fav-star::before {
   background-color: var(--theme-accent-color);
   -webkit-mask-image: var(--star-fill);
   mask-image: var(--star-fill);
@@ -396,7 +396,7 @@
   text-decoration: underline;
 }
 
-.favorites-filter-link .fav-heart {
+.favorites-filter-link .fav-star {
   margin-left: 0;
 }
 
@@ -405,7 +405,7 @@
   font-weight: bold;
 }
 
-.favorites-filter-link.active .fav-heart::before {
+.favorites-filter-link.active .fav-star::before {
   background-color: var(--theme-accent-color);
   -webkit-mask-image: var(--star-fill);
   mask-image: var(--star-fill);
@@ -527,7 +527,7 @@
     gap: 0.15rem;
     font-size: var(--font-size-small);
     line-height: 1;
-    color: var(--theme-favorite-color);
+    color: var(--theme-saved-color);
 
     &::before {
       content: "";
@@ -1041,14 +1041,14 @@ body.filter-sheet-open { overflow: hidden; }
    active). In the favorite colour (raspberry), never green. The follow STAR and
    this save HEART share the raspberry family but differ in shape, so the two
    personal signals never rely on colour alone. Masked SVG because Phosphor
-   Regular has no fill weight. (Class still named .save-bookmark — glyph swapped
+   Regular has no fill weight. (Class still named .save-heart — glyph swapped
    bookmark→heart; rename is non-visual cleanup.) */
-.save-bookmark {
+.save-heart {
   display: inline-block;
   line-height: 0;
 }
 
-.save-bookmark::before {
+.save-heart::before {
   content: "";
   display: inline-block;
   width: 1em;
@@ -1059,13 +1059,13 @@ body.filter-sheet-open { overflow: hidden; }
   mask: var(--heart-outline) center / contain no-repeat;
 }
 
-.event-save:hover .save-bookmark::before {
-  background-color: var(--theme-favorite-color);
+.event-save:hover .save-heart::before {
+  background-color: var(--theme-saved-color);
 }
 
 /* Saved: solid fill, favorite colour — a filled heart = "saved". */
-.event-save.saved .save-bookmark::before {
-  background-color: var(--theme-favorite-color);
+.event-save.saved .save-heart::before {
+  background-color: var(--theme-saved-color);
   -webkit-mask-image: var(--heart-fill);
   mask-image: var(--heart-fill);
 }

@@ -10,7 +10,7 @@ Six parallel research passes + firsthand verification. **TL;DR:**
 
 | Rank | Source | License/terms | Time? | Genre? | Covers our venues | Verdict |
 |---|---|---|---|---|---|---|
-| 1 | **PETZI agenda** (petzi.ch) | public, robots-allowed; no open license | ✅ doors+show | ✅ tags | **16 of ours, live** | **BUILD IT** |
+| 1 | **PETZI agenda** (petzi.ch) | public, robots-allowed; no open license | ✅ doors+show | ✅ tags | **14 of ours, live** | **BUILD IT** |
 | 2 | **OLE / hinto.ch** | **CC-BY-SA (open)** | ✅ ISO-8601 | ✅ rich | only Dachstock | Promising, narrow |
 | 3 | stadtkonzerte.ch | no grant (grey) | ❌ **no time** | patchy | broad | Enrichment only |
 | 4 | Eventfrog API | **AGB forbids** modify/redisplay | ✅ | coarse | partial | Blocked by terms |
@@ -20,8 +20,8 @@ Six parallel research passes + firsthand verification. **TL;DR:**
 | — | **Heitere Fahne** (the trigger) | — | only via private ajax | — | n/a | **Stays shelved** |
 
 **Headline:** **PETZI is the find.** A single uniform, server-rendered, robots-allowed
-source covering 16 of our venues with date + doors/show clock time + curated genre tags —
-verified firsthand with a working POC (`script/petzi_poc.rb`). It can **consolidate ~16
+source covering 14 of our venues with date + doors/show clock time + curated genre tags —
+verified firsthand with a working POC (`script/petzi_poc.rb`). It can **consolidate ~14
 bespoke scrapers** (including flaky beloved ones) and **add curated genres**, but it does
 **not** unlock the JS-blocked venues (Heitere Fahne, ONO, …), which aren't in it.
 
@@ -61,19 +61,28 @@ which is why the data is centralized and clean.
 | Docks (Lausanne) | 42 | | Helsinki (Zürich) | 10 |
 | Kofmehl (Solothurn) | 36 | | Böröm | 6 |
 | Dachstock (Bern) | 20 | | Café Kairo (Bern) | 3 |
-| Fri-Son (Fribourg) | 18 | | Treibhaus / Le Singe / Zent | 2 each |
+| Fri-Son (Fribourg) | 18 | | Treibhaus (Luzern) | 2 |
 | Neubad (Luzern) | 17 | | | |
-| ISC (Bern) | 16 | | **= 16 venues** | |
+| ISC (Bern) | 15 | | **= 14 venues** | |
 
-**NOT in PETZI** (keep their bespoke scrapers): Bad Bonn, Rote Fabrik, Südpol, Kaserne,
-Dynamo, Mahogany Hall, Turnhalle, Schüür, Bierhübeli, Volkshaus, Dampfzentrale, Sous Soul,
-Rössli, Sägegasse, Bar 59, Mühle Hunziken. **And none of the JS-blocked targets** (Heitere
-Fahne, ONO, Café Hueber, Marians, PROZESS, Café du Commerce, Mokka) are in it.
+**NOT in PETZI** (keep their bespoke scrapers): **Le Singe, Zent** (their earlier
+non-zero counts were substring false positives — "ber**singe**r", "**zent**ralwäscherei"),
+Bad Bonn, Rote Fabrik, Südpol, Kaserne, Dynamo, Mahogany Hall, Turnhalle, Schüür,
+Bierhübeli, Volkshaus, Dampfzentrale, Sous Soul, Rössli, Sägegasse, Bar 59, Mühle Hunziken.
+**And none of the JS-blocked targets** (Heitere Fahne, ONO, Café Hueber, Marians, PROZESS,
+Café du Commerce, Mokka) are in it.
 
-> ⚠️ **Important correction to the initial research:** a subagent reported "15/19 venues are
-> PETZI *members*." Membership ≠ live agenda coverage. The numbers above are the *actual*
-> sitemap contents, which is what matters. Bad Bonn & Rote Fabrik are members but currently
-> push **zero** events to the PETZI agenda.
+> ⚠️ **Two corrections from verification:** (1) a subagent reported "15/19 venues are PETZI
+> *members*" — membership ≠ live agenda coverage; the numbers above are actual sitemap
+> contents. Bad Bonn & Rote Fabrik are members but push **zero** events. (2) Anchored-slug
+> recount dropped the overlap from 16 to **14** (Le Singe, Zent were substring artifacts).
+
+**Divergence vs our existing scrapers** (`docs/petzi-divergence-report.md`, harness
+`script/petzi_divergence.rb`): coverage is **complementary, not subset** — PETZI and the
+bespoke scrapers each catch events the other misses, so PETZI-only would drop ~48+ real
+events. Times are highly reconcilable (mostly doors-vs-show offset). Genres are
+complementary (PETZI fills Kofmehl/KIFF where we had none; we fill Fri-Son/Sedel where PETZI
+had none). **Conclusion: keep both, merge with union semantics, PETZI as the stable spine.**
 
 **POC result.** `script/petzi_poc.rb` (sitemap → filter → detail-page extract) ran clean
 against 8 venues. Sample:
@@ -89,7 +98,7 @@ ISC (Bern)
   title : Anda Morts    date: 10.09.2026    doors: 20:00    genres: Club, Concert, Indie, Punk
 ```
 
-**Pros:** one robust source replaces ~16 fragile scrapers; curated genres for free; reliable
+**Pros:** one robust source supplements ~14 bespoke scrapers; curated genres for free; reliable
 ISO-derived times; sitemap = no pagination fragility; mission-aligned non-profit; also a
 discovery source for ~68 other Swiss venues.
 **Cons:** no open license (rests on "public + robots-allowed" — recommend a courtesy email to
@@ -169,9 +178,9 @@ Backlog note updated.
 ## Recommendation & next steps
 
 1. **Build a `Scrapers::Petzi`** (template-method Agent + golden fixtures): sitemap →
-   filter to our 16 venues → detail-page extract (title, date, doors/show, venue/city, genre
-   tags). Biggest single win: consolidates ~16 scrapers and adds curated genres.
-   - **Open decision (yours):** *replace* the 16 existing per-venue scrapers, or run PETZI
+   filter to our 14 venues → detail-page extract (title, date, doors/show, venue/city, genre
+   tags). Biggest single win: complements ~14 scrapers and adds curated genres.
+   - **Open decision (yours):** *replace* the 14 existing per-venue scrapers, or run PETZI
      *alongside* them and **dedup**? Replacing is cleaner but loses any venue-specific fields
      the bespoke scrapers extract; alongside needs a dedup key (venue + date + fuzzy title).
    - Genre handling: PETZI tags are curated-ish but third-party → lean **consumption

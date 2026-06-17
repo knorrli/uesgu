@@ -526,11 +526,12 @@
       width: fit-content;
       font-weight: bold;
       padding: 0 0.45em;
-      /* Muted-sand badge (not green): green is for interaction/follows, so a green
-         today pill clashed with the green interest stars. Dark text on the sand
-         lifts it just enough off the cell while staying calm and on-palette. */
+      /* Sand badge (not green): green is for interaction/follows, so a green today
+         pill clashed with the green interest stars. Uses --theme-bg-emphasis (a
+         stronger sand than the muted wash) so it stays clearly readable on the dark
+         theme and on a hovered/selected cell, while staying calm and on-palette. */
       color: var(--theme-fg-color);
-      background-color: var(--theme-bg-muted);
+      background-color: var(--theme-bg-emphasis);
     }
   }
 

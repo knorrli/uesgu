@@ -153,7 +153,7 @@ module Scrapers
       # disposition/recompute touched it.
       event.style_list    = event_styles(genres: event.genre_list)
       event.hidden        = event.hidden_by_genre?
-      event.location_list = self.class.locations
+      event.location_list = event_locations(content)
       postprocess(event)
       mark_cancellation(event, content)
       mark_discarded(event)
@@ -218,6 +218,11 @@ module Scrapers
 
     # The node field extractors read from. List-page default: the row itself.
     def event_content(row) = row
+
+    # The [venue, city, canton] tags for this event. Single-venue scrapers use the
+    # class constant; a multi-venue scraper (PETZI) overrides this to resolve the
+    # venue per event. Default preserves every existing scraper's behaviour.
+    def event_locations(_content) = self.class.locations
 
     # Run before field extraction (e.g. stateful year-rollover detection).
     def preprocess(_content) = nil

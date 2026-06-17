@@ -73,6 +73,23 @@ class Event < ApplicationRecord
     update!(dismissed_at: nil) if dismissed?
   end
 
+  # Admin manual merge: mark this event a duplicate of `canonical` and PIN the
+  # link so the next sweep's dedup leaves it alone. Used to collapse a pair the
+  # fuzzy matcher missed (titles drifted between PETZI and the venue source).
+  def merge_into!(canonical)
+    raise ArgumentError, 'cannot merge an event into itself' if canonical.id == id
+
+    update!(canonical_event_id: canonical.id)
+    lock_field!('canonical_event')
+  end
+
+  # Admin manual un-merge: declare this event standalone and PIN that decision, so
+  # dedup won't re-merge it. Used to split a pair the fuzzy matcher wrongly joined.
+  def mark_standalone!
+    update!(canonical_event_id: nil)
+    lock_field!('canonical_event')
+  end
+
   # Scalar fields an admin may edit and lock against the scraper. Tracked by
   # ActiveRecord dirty-checking, so the controller locks exactly what changed.
   # `url` is the immutable upsert key, so it's deliberately absent.
@@ -85,9 +102,14 @@ class Event < ApplicationRecord
   # — styles and the `hidden`/`cancelled` flags stay source-derived projections.
   OVERRIDABLE_TAG_FIELDS = %w[genres].freeze
 
+  # The dedup link an admin may pin: a manual merge/un-merge that Scrapers::Dedup
+  # must not re-derive on the next sweep (fuzzy matching can miss or mis-pair when
+  # titles drift between the PETZI and venue sources).
+  OVERRIDABLE_LINK_FIELDS = %w[canonical_event].freeze
+
   # Everything an admin may pin: the allowlist lock_field! guards and the set the
   # admin UI lists as revertible.
-  LOCKABLE_FIELDS = (OVERRIDABLE_FIELDS + OVERRIDABLE_TAG_FIELDS).freeze
+  LOCKABLE_FIELDS = (OVERRIDABLE_FIELDS + OVERRIDABLE_TAG_FIELDS + OVERRIDABLE_LINK_FIELDS).freeze
 
   # `overridden_fields` is the field-level sibling of `dismissed_at`: a name
   # listed here is admin-owned, so the re-scrape leaves that column untouched

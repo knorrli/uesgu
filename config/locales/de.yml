@@ -492,6 +492,15 @@ de:
         dismiss: Veranstaltung entfernen
         dismissed_intro: Diese Veranstaltung ist entfernt – aus allen öffentlichen Listen ausgeblendet und vom Scraper übersprungen. Stelle sie wieder her, um sie zurückzuholen.
         restore: Veranstaltung wiederherstellen
+        source_label: "via %{source}"
+        field_canonical_event: Duplikat-Verknüpfung
+        dedup_heading: Duplikate
+        is_duplicate_html: Diese Veranstaltung ist ein Duplikat von %{link} – zu deren Gunsten aus den Listen ausgeblendet.
+        unmerge: Als eigenständig markieren
+        has_duplicates: "In diese Veranstaltung zusammengeführt:"
+        merge_intro: Führe diese Veranstaltung in eine andere zusammen (ID der kanonischen Veranstaltung eingeben), um ein vom Matcher übersehenes Duplikat zu beseitigen.
+        merge_placeholder: ID der kanonischen Veranstaltung
+        merge: Zusammenführen
       update:
         saved: Veranstaltung aktualisiert.
       revert:
@@ -500,6 +509,10 @@ de:
         dismissed: Veranstaltung entfernt.
       undismiss:
         restored: Veranstaltung wiederhergestellt.
+      merge:
+        merged: Veranstaltungen zusammengeführt.
+      unmerge:
+        unmerged: Veranstaltung als eigenständig getrennt.
     styles:
       index:
         title: Stile

@@ -29,14 +29,18 @@ module Scrapers
       bespoke = scope.where.not('events.url LIKE ?', "%#{PETZI_HOST}%").to_a
       return if petzi.empty?
 
-      matched = Hash.new { |h, k| h[k] = [] } # canonical id => [duplicate events]
       bespoke.each do |b|
+        next if b.overridden?('canonical_event') # admin-pinned merge/un-merge: leave it
+
         canonical = best_match(b, petzi)
         b.update_column(:canonical_event_id, canonical&.id) # nil resets a stale link
-        matched[canonical.id] << b if canonical
       end
 
-      petzi.each { |p| merge_genres(p, matched[p.id]) }
+      # Re-derive each canonical's genres as its own ∪ its duplicates' (auto-matched
+      # AND admin-pinned), so a manual merge still enriches the canonical's genres.
+      petzi.each do |p|
+        merge_genres(p, bespoke.select { |b| b.canonical_event_id == p.id })
+      end
     end
 
     # Union the duplicates' genres onto the canonical (PETZI re-set its own genres

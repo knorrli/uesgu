@@ -97,6 +97,40 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes Event.visible, b
   end
 
+  test 'an admin-pinned merge is not undone by a later dedup' do
+    p = petzi_event(title: 'Pinned Canonical')
+    b = bespoke_event(title: 'Drifted Title The Matcher Misses')
+    b.merge_into!(p) # manual merge + pin
+
+    Scrapers::Dedup.run
+
+    assert_equal p.id, b.reload.canonical_event_id, 'pinned link survives'
+    refute_includes Event.visible, b
+  end
+
+  test 'an admin-pinned merge still feeds its genres to the canonical' do
+    p = petzi_event(title: 'Pinned Genres', genres: ['zorpcanon-x'])
+    b = bespoke_event(title: 'Totally Different But Manually Merged', genres: ['zorpdup-x'])
+    b.merge_into!(p)
+
+    Scrapers::Dedup.run
+
+    genres = p.reload.genre_list.map(&:downcase)
+    assert_includes genres, 'zorpcanon-x'
+    assert_includes genres, 'zorpdup-x'
+  end
+
+  test 'an admin-pinned standalone is not re-merged by dedup' do
+    p = petzi_event(title: 'Identical Title')
+    b = bespoke_event(title: 'Identical Title') # would auto-match
+    b.mark_standalone! # admin says: NOT a duplicate, pin it
+
+    Scrapers::Dedup.run
+
+    assert_nil b.reload.canonical_event_id, 'pinned standalone stays split'
+    assert_includes Event.visible, b
+  end
+
   test 'past events are left untouched' do
     past = Date.current - 5
     p = petzi_event(title: 'Past Show', date: past)

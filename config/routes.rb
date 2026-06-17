@@ -130,6 +130,8 @@ Rails.application.routes.draw do
       member do
         patch :revert
         patch :undismiss
+        patch :merge      # pin this event as a duplicate of another (canonical_id)
+        patch :unmerge    # pin this event as standalone (split a wrong auto-merge)
       end
     end
     resources :styles, only: %i[index]

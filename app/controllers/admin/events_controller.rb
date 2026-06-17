@@ -80,6 +80,26 @@ module Admin
       redirect_to admin_event_path(event), notice: t('.restored')
     end
 
+    # Manually mark this event a duplicate of another (the canonical), pinning the
+    # link so dedup won't undo it — for a pair the fuzzy matcher missed because the
+    # PETZI and venue titles drifted apart. The duplicate drops out of listings.
+    def merge
+      event = Event.find(params.expect(:id))
+      canonical = Event.find(params.expect(:canonical_id))
+      event.merge_into!(canonical)
+      redirect_to admin_event_path(canonical), notice: t('.merged')
+    rescue ArgumentError => e
+      redirect_to admin_event_path(event), alert: e.message
+    end
+
+    # Split this event back out as standalone and pin that, so dedup won't re-merge
+    # it — for a pair the fuzzy matcher wrongly joined.
+    def unmerge
+      event = Event.find(params.expect(:id))
+      event.mark_standalone!
+      redirect_to admin_event_path(event), notice: t('.unmerged')
+    end
+
     private
 
     # start_date + start_time move together: the form edits a date and a

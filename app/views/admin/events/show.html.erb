@@ -8,6 +8,7 @@
       <span><%= l(@event.start_date) %></span>
       <% if @event.venue %><span><%= @event.venue.name %></span><% end %>
       <%= link_to t('.source_link'), @event.url, target: '_blank', rel: 'noopener' %>
+      <% if @event.data_source.present? %><span><%= t('.source_label', source: @event.data_source) %></span><% end %>
       <% if @event.cancelled? %><span class="chip"><%= t('admin.events.index.cancelled_badge') %></span><% end %>
       <% if @event.hidden? %><span><%= t('admin.events.index.hidden_badge') %></span><% end %>
       <% if @event.dismissed? %><span class="chip"><%= t('.dismissed_badge') %></span><% end %>
@@ -91,6 +92,36 @@
       </ul>
     </section>
   <% end %>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.dedup_heading') %></h2>
+    <% if @event.canonical_event %>
+      <p class="muted">
+        <%= t('.is_duplicate_html',
+              link: link_to(@event.canonical_event.title, admin_event_path(@event.canonical_event))) %>
+      </p>
+      <%= button_to t('.unmerge'), unmerge_admin_event_path(@event), method: :patch, class: 'button-small button-ghost' %>
+    <% else %>
+      <% if @event.duplicate_events.any? %>
+        <p class="muted"><%= t('.has_duplicates') %></p>
+        <ul class="admin-list">
+          <% @event.duplicate_events.includes(:locations).each do |dup| %>
+            <li class="admin-row">
+              <span class="admin-row__main">
+                <%= link_to dup.title, admin_event_path(dup) %>
+                <span class="muted">(<%= dup.data_source %>)</span>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+      <p class="muted"><%= t('.merge_intro') %></p>
+      <%= form_with url: merge_admin_event_path(@event), method: :patch, class: 'flex gap-small align-baseline wrap' do %>
+        <%= number_field_tag :canonical_id, nil, placeholder: t('.merge_placeholder'), required: true, min: 1 %>
+        <%= submit_tag t('.merge'), class: 'button-small' %>
+      <% end %>
+    <% end %>
+  </section>
 
   <section class="flex flex-col gap-small">
     <h2><%= t('.dismiss_heading') %></h2>

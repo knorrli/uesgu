@@ -31,6 +31,12 @@ module Scrapers
       new.call
     end
 
+    # The provenance stamp written to every event this scraper owns (Event#data_source).
+    # Defaults to the demodulized class name ("Kofmehl", "Petzi").
+    def self.source_key
+      name.demodulize
+    end
+
     # Returns a Scrapers::Result tallying what this run saw and wrote, so the
     # orchestrator (scrapers:run_all) can persist a ScrapeResult and stamp the
     # created events — without the Agent itself knowing about those tables.
@@ -154,6 +160,7 @@ module Scrapers
       event.style_list    = event_styles(genres: event.genre_list)
       event.hidden        = event.hidden_by_genre?
       event.location_list = event_locations(content)
+      event.data_source   = self.class.source_key
       postprocess(event)
       mark_cancellation(event, content)
       mark_discarded(event)

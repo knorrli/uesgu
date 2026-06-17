@@ -492,6 +492,15 @@ en:
         dismiss: Dismiss event
         dismissed_intro: This event is dismissed — hidden from every public listing and skipped by the scraper. Restore it to bring it back.
         restore: Restore event
+        source_label: "via %{source}"
+        field_canonical_event: Duplicate link
+        dedup_heading: Duplicates
+        is_duplicate_html: This event is a duplicate of %{link} — hidden from listings in its favour.
+        unmerge: Mark standalone
+        has_duplicates: "Events merged into this one:"
+        merge_intro: Merge this event into another (enter the canonical event's ID) to collapse a duplicate the matcher missed.
+        merge_placeholder: Canonical event ID
+        merge: Merge
       update:
         saved: Event updated.
       revert:
@@ -500,6 +509,10 @@ en:
         dismissed: Event dismissed.
       undismiss:
         restored: Event restored.
+      merge:
+        merged: Events merged.
+      unmerge:
+        unmerged: Event split out as standalone.
     styles:
       index:
         title: Styles

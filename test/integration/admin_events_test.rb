@@ -171,6 +171,62 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     refute e.reload.dismissed?
   end
 
+  test 'an admin can merge an event into a canonical and split it back out' do
+    canonical = event(title: 'PETZI Version')
+    dup = event(title: 'Venue Version')
+    sign_in_as user(admin: true)
+
+    patch merge_admin_event_path(dup), params: { canonical_id: canonical.id }
+    assert_redirected_to admin_event_path(canonical)
+    dup.reload
+    assert_equal canonical.id, dup.canonical_event_id
+    assert dup.overridden?(:canonical_event), 'merge is pinned against dedup'
+    refute_includes Event.visible, dup
+
+    patch unmerge_admin_event_path(dup)
+    assert_redirected_to admin_event_path(dup)
+    assert_nil dup.reload.canonical_event_id
+    assert dup.overridden?(:canonical_event), 'standalone decision stays pinned'
+    assert_includes Event.visible, dup
+  end
+
+  test 'merging an event into itself is rejected' do
+    e = event(title: 'Solo')
+    sign_in_as user(admin: true)
+
+    patch merge_admin_event_path(e), params: { canonical_id: e.id }
+    assert_redirected_to admin_event_path(e)
+    assert_nil e.reload.canonical_event_id
+  end
+
+  test 'the show page surfaces the merge form and the duplicate relationship' do
+    canonical = event(title: 'The Canonical')
+    dup = event(title: 'The Duplicate')
+    dup.merge_into!(canonical)
+    sign_in_as user(admin: true)
+
+    # canonical lists its merged duplicates
+    get admin_event_path(canonical)
+    assert_select 'a', text: 'The Duplicate'
+    assert_select 'form[action=?]', merge_admin_event_path(canonical)
+
+    # the duplicate offers an unmerge action
+    get admin_event_path(dup)
+    assert_select 'form[action=?]', unmerge_admin_event_path(dup)
+  end
+
+  test 'guests and non-admins cannot merge events' do
+    canonical = event(title: 'C')
+    dup = event(title: 'D')
+    patch merge_admin_event_path(dup), params: { canonical_id: canonical.id }
+    assert_redirected_to new_session_path
+
+    sign_in_as user(admin: false)
+    patch merge_admin_event_path(dup), params: { canonical_id: canonical.id }
+    assert_response :forbidden
+    assert_nil dup.reload.canonical_event_id
+  end
+
   test 'guests and non-admins cannot edit events' do
     e = event(title: 'Untouched')
     patch admin_event_path(e), params: { event: { title: 'Hacked', date: e.start_date.iso8601 } }

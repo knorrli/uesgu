@@ -492,6 +492,15 @@ fr:
         dismiss: Retirer l'événement
         dismissed_intro: Cet événement est retiré — masqué de toutes les listes publiques et ignoré par le scraper. Restaure-le pour le faire revenir.
         restore: Restaurer l'événement
+        source_label: "via %{source}"
+        field_canonical_event: Lien de doublon
+        dedup_heading: Doublons
+        is_duplicate_html: Cet événement est un doublon de %{link} — masqué des listes à son profit.
+        unmerge: Marquer comme autonome
+        has_duplicates: "Événements fusionnés dans celui-ci :"
+        merge_intro: Fusionne cet événement dans un autre (saisis l'ID de l'événement canonique) pour supprimer un doublon manqué par le matcher.
+        merge_placeholder: ID de l'événement canonique
+        merge: Fusionner
       update:
         saved: Événement mis à jour.
       revert:
@@ -500,6 +509,10 @@ fr:
         dismissed: Événement retiré.
       undismiss:
         restored: Événement restauré.
+      merge:
+        merged: Événements fusionnés.
+      unmerge:
+        unmerged: Événement séparé comme autonome.
     styles:
       index:
         title: Styles

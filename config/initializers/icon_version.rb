@@ -5,4 +5,5 @@
 # and the PWA manifest view (rendered outside ApplicationController) can read it.
 #
 # History: v2 = cream light mark + stronger dark spotlight cones (2026-06-17).
-ICON_VERSION = "2".freeze
+#          v3 = PWA/light icon gains splayed light cones on cream (2026-06-17).
+ICON_VERSION = "3".freeze

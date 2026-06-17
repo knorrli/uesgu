@@ -38,6 +38,10 @@ module Scrapers
     def perform(run)
       @scrapers.each { |name, klass| record(run, name.underscore, klass) }
 
+      # Collapse cross-source duplicates (PETZI vs our bespoke scrapers) once every
+      # scraper has run, before reconcile so the canonical's merged genres count.
+      Dedup.run
+
       # Refresh genre usage counts once after the full sweep so newly seen genres
       # surface in the assignment queue (the old per-scraper job did this each time).
       Genre.reconcile!

@@ -17,12 +17,24 @@ class Event < ApplicationRecord
   belongs_to :discarded_by_rule, class_name: 'DiscardRule', optional: true,
                                  inverse_of: :discarded_events
 
+  # Event dedup (non-destructive): a duplicate points at its canonical (the
+  # preferred source, PETZI). nil = this event IS canonical / standalone.
+  # Re-derived each scrape by Scrapers::Dedup; bookmarks on a duplicate are
+  # preserved (never deleted), the duplicate is just hidden from listings.
+  belongs_to :canonical_event, class_name: 'Event', optional: true,
+                               inverse_of: :duplicate_events
+  has_many :duplicate_events, class_name: 'Event', foreign_key: :canonical_event_id,
+                              dependent: :nullify, inverse_of: :canonical_event
+
   validates :title, :start_date, :url, presence: true
 
   # Public-facing events: non-music events (carrying a hidden genre, with no
   # music style) are hidden, events matched by an admin discard rule are filtered
-  # out, and dismissed events are gone for good. Admin/curation views skip this.
-  scope :visible, -> { kept.where(hidden: false, discarded_by_rule_id: nil) }
+  # out, dismissed events are gone for good, and a duplicate (merged into a
+  # canonical) is suppressed in favour of its canonical. Admin/curation views skip this.
+  scope :visible, -> { kept.where(hidden: false, discarded_by_rule_id: nil, canonical_event_id: nil) }
+  scope :duplicates, -> { where.not(canonical_event_id: nil) }
+  scope :canonical, -> { where(canonical_event_id: nil) }
   scope :discarded, -> { kept.where.not(discarded_by_rule_id: nil) }
   scope :cancelled, -> { where.not(cancelled_at: nil) }
 

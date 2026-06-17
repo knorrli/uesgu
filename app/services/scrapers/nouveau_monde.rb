@@ -29,14 +29,16 @@ module Scrapers
       date_string = schedule.children.first.text.squish[/\d{1,2}\.\d{1,2}\.\d{4}/]
       raise "Unparseable date #{schedule.children.first.text.squish.inspect}" if date_string.blank?
 
-      # A detail page without a "Beginn/Debut" door-time line yields a date-only
-      # event rather than a NoMethodError on the missing node.
-      time_node = schedule.css('.scheduleLine').find { |node| node.text.squish.starts_with?(/Beginn|Debut/) }
+      time_node = schedule.css('.scheduleLine').find { |node| node.text.squish.match?(/\d{1,2}h\d{1,2}/) }
       time_string = time_node&.text&.squish&.slice(/\d{1,2}h\d{1,2}/)
       Time.zone.parse([date_string, time_string].compact.join(', '))
     end
 
     def event_title(content)
+      content.css('.groupHeading h2').text.squish
+    end
+
+    def event_subtitle(content)
       content.css('.groupIntro').map do |node|
         country_code = node.css('.plateMedium').text.squish
         act_name = StringIO.new

@@ -11,7 +11,12 @@ class NotificationMailer < ApplicationMailer
     @browse_url = root_url
 
     I18n.with_locale(@user.locale.presence || I18n.default_locale) do
-      @heading = @notification.title
+      # Render the heading in the recipient's locale rather than reusing the title
+      # frozen at fire time (which carries whatever locale was active when the rule
+      # was last saved) — otherwise a digest body and its heading could disagree.
+      # deliver_later runs within seconds of firing, so describe still matches the
+      # snapshot; fall back to the frozen title for any rule-less notification.
+      @heading = @rule ? @rule.describe : @notification.title
       mail(to: @user.email_address, subject: t("notification_mailer.digest.subject", count: @events.size))
     end
   end

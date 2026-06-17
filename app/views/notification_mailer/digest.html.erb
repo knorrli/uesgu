@@ -42,7 +42,11 @@
                       <div style="font-size:16px; font-weight:600; line-height:1.35;">
                         <% if event.start_time.present? %><span style="color:#0e8857;"><%= l event.start_time, format: :time %></span> <% end %>
                         <% if event.cancelled? %><span style="color:#ef4444; font-weight:700;"><%= t('events.cancelled') %></span> <% end %>
-                        <a href="<%= event.url %>" style="color:#1d1620; text-decoration:none; border-bottom:1px solid #d8c7d1;"><%= event.title %> &#8599;</a>
+                        <% if href = digest_event_href(event) %>
+                          <a href="<%= href %>" style="color:#1d1620; text-decoration:none; border-bottom:1px solid #d8c7d1;"><%= event.title %> &#8599;</a>
+                        <% else %>
+                          <span style="color:#1d1620;"><%= event.title %></span>
+                        <% end %>
                       </div>
                       <% if venue || city %>
                         <div style="margin-top:4px; font-size:14px; color:#5b515a;">

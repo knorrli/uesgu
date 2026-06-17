@@ -1,4 +1,5 @@
 require 'cgi'
+require 'nokogiri'
 
 module Scrapers
   # Bierhübeli (Bern) runs on WordPress + Toolset; its public site is a paginated
@@ -51,13 +52,22 @@ module Scrapers
       CGI.unescapeHTML(row.dig('title', 'rendered').to_s).squish
     end
 
+    # billboard-byline is free-text HTML. Its <br> tags separate the tagline from
+    # the support act (and some samples have no spaces around them), so promote
+    # those to a middot first or strip_tags would merge the words; then strip every
+    # remaining tag and decode entities (&amp; → &), matching event_title.
+    def event_subtitle(row)
+      html = event_field(row, 'billboard-byline').to_s.gsub(%r{<br\s*/?>}i, ' · ')
+      CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(html)).squish.presence
+    end
+
+
     # Free-text genre fields the venue types per event — match-only against the
     # existing vocabulary so typos/marketing terms can't mint taxonomy.
-    # beschreibungstag-1 is a type/location note ("Externer Anlass"), not a genre.
+    # `musicradar` is a rich HTML blurb (Wer:/Stil:/Aktuell:/…); only its "Stil:"
+    # line is genre data, so parse that segment out rather than the whole prose.
     def event_consumption_genres(row)
-      %w[beschreibungstag-2 beschreibungstag-3].filter_map do |key|
-        artist_field(row, key).presence
-      end
+      extract_tag_genres(row) | extract_musicradar_genres(row)
     end
 
     private
@@ -68,6 +78,32 @@ module Scrapers
 
     def artist_field(row, key)
       row.dig('toolset-meta', 'artistfields', key, 'raw').to_s.squish
+    end
+
+    # beschreibungstag-1 sometimes carries real genre info and sometimes a
+    # type/location note ("Externer Anlass", "Girlhood") that DOES match vocabulary
+    # and leaks onto events — kept in deliberately; the noise is pruned via the
+    # admin queue rather than dropped here. beschreibungstag-2/3 are clean genre tags.
+    def extract_tag_genres(row)
+      %w[beschreibungstag-1 beschreibungstag-2 beschreibungstag-3].filter_map do |key|
+        artist_field(row, key).presence
+      end
+    end
+
+    # Walk the DOM from the <strong>Stil:</strong> label to the next <strong>, so
+    # the surrounding marketing HTML (data-* attrs, decorative <strong>, <br>)
+    # can't derail it.
+    def extract_musicradar_genres(row)
+      doc   = Nokogiri::HTML.fragment(artist_field(row, 'musicradar'))
+      label = doc.css('strong').find { |s| s.text.squish =~ /\AStil:?\z/i }
+      return [] unless label
+
+      parts, node = [], label.next_sibling
+      while node && !(node.element? && node.name == 'strong')
+        parts << node.text if node.text?
+        node = node.next_sibling
+      end
+      parts.join(' ').split(%r{[,/]}).map(&:squish).reject(&:blank?)
     end
   end
 end

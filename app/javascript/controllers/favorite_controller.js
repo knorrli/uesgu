@@ -105,13 +105,23 @@ export default class extends Controller {
     )
   }
 
-  // A day marker — a calendar cell's corner heart or a list date header's heart
-  // — shows when any tag on that day is followed. Each marker carries its day's
-  // keys, so this is a cheap set check that touches only the markers.
+  // A day marker — a calendar cell's corner star — shows when any tag on that day
+  // is followed; each carries its day's keys, so this is a cheap set check. A date
+  // header's ★ count instead carries per-event key lists, so it recomputes how many
+  // of the day's shows match the followed set. Both update live, no re-render.
   #refreshMarkers(root) {
     root.querySelectorAll("[data-day-keys]").forEach((marker) => {
       const keys = JSON.parse(marker.dataset.dayKeys)
       marker.hidden = !keys.some((key) => this.followed.has(key))
+    })
+
+    root.querySelectorAll("[data-interest-events]").forEach((summary) => {
+      const events = JSON.parse(summary.dataset.interestEvents)
+      const count = events.filter((keys) => keys.some((key) => this.followed.has(key))).length
+      const badge = summary.querySelector(".day-summary__count--interest")
+      if (!badge) return
+      badge.textContent = count
+      badge.hidden = count === 0
     })
   }
 

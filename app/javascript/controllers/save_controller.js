@@ -12,10 +12,14 @@ export default class extends Controller {
     this.#persist(saved).catch(() => this.#apply(!saved))
   }
 
+  // Flip the bookmark and announce it so the day's header ♥ count can keep step
+  // (day_summary_controller listens for save:toggled). It bubbles, so this per-
+  // button controller stays self-contained — it tells the day, never reaches in.
   #apply(saved) {
     this.savedValue = saved
     this.element.classList.toggle("saved", saved)
     this.element.setAttribute("aria-pressed", saved)
+    this.dispatch("toggled", { detail: { saved }, bubbles: true })
   }
 
   async #persist(saved) {

@@ -1,0 +1,16 @@
+<%# Right-aligned per-day relevance summary for a date header: a saved (♥) count
+    and an interest (★) count, each shown only when > 0 — so the date itself stays
+    cleanly left-aligned with no sometimes-there icon. The ★ count recomputes live
+    as you follow/unfollow (favorite_controller reads data-interest-events); the ♥
+    count is adjusted by the save toggles within the day (day-summary controller). %>
+<% followed = favorite_followed_keys.to_set %>
+<% interest_events = events.map { |event| event_follow_keys(event) } %>
+<% saved_count = events.count { |event| event_saved?(event) } %>
+<% interest_count = interest_events.count { |keys| keys.any? { |key| followed.include?(key) } } %>
+<%# The day-summary controller lives on the day CONTAINER (so save toggles within
+    the day bubble to it); this is just the counts it owns. data-interest-events is
+    read by favorite_controller to recompute the ★ live on follow/unfollow. %>
+<div class="day-summary" aria-hidden="true" data-interest-events="<%= interest_events.to_json %>">
+  <span class="day-summary__count day-summary__count--saved" data-day-summary-target="saved" <%= 'hidden' unless saved_count.positive? %>><%= saved_count %></span>
+  <span class="day-summary__count day-summary__count--interest" <%= 'hidden' unless interest_count.positive? %>><%= interest_count %></span>
+</div>

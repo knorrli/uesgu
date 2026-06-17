@@ -1,10 +1,14 @@
 <section id="events" class="flex flex-col gap-xlarge event-list">
-  <% followed_keys = favorite_followed_keys.to_set %>
   <% events_by_date = @events.group_by(&:start_date) %>
   <% events_by_date.each do |date, events| %>
-    <div class="flex flex-col gap-medium date-events <%= class_names(past: date < Date.current.beginning_of_day) %>">
-      <% day_keys = calendar_day_favorite_keys(events) %>
-      <h2 id="<%= date.iso8601 %>" class="flex date"><span class="date-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>" <%= 'hidden' unless followed_keys.any? { |key| day_keys.include?(key) } %>></span><%= l date, format: :detailed %></h2>
+    <div class="flex flex-col gap-medium date-events <%= class_names(past: date < Date.current.beginning_of_day) %>"
+         data-controller="day-summary" data-action="save:toggled->day-summary#adjustSaved">
+      <%# Date stays flush-left; the relevance counts (♥ saved / ★ interest) sit just
+          after it, collapsing to nothing when a day has neither (see .day-summary). %>
+      <h2 id="<%= date.iso8601 %>" class="flex date">
+        <span class="date__label"><%= l date, format: :detailed %></span>
+        <%= render 'day_summary', events: events %>
+      </h2>
       <%= render 'venue_groups', events: events, filter: @filter %>
     </div>
   <% end %>

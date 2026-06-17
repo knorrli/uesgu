@@ -2,11 +2,16 @@
     URL-driven (params[:day]); the close link just navigates back to the
     no-day URL. Scrolls itself into view on connect for off-screen opens. %>
 <% interactive = local_assigns.fetch(:interactive, true) %>
-<section class="day-detail event-list flex flex-col gap-small" data-controller="day-detail">
-  <% day_keys = calendar_day_favorite_keys(events) %>
-  <% followed_keys = favorite_followed_keys.to_set %>
+<section class="day-detail event-list flex flex-col gap-small"
+         data-controller="day-detail day-summary"
+         data-action="save:toggled->day-summary#adjustSaved">
   <header class="day-detail-header flex">
-    <h2 class="flex date"><span class="date-favorite-marker" aria-hidden="true" data-day-keys="<%= day_keys.to_json %>" <%= 'hidden' unless day_keys.any? { |key| followed_keys.include?(key) } %>></span><%= l date, format: :detailed %></h2>
+    <h2 class="flex date">
+      <span class="date__label"><%= l date, format: :detailed %></span>
+      <%= render 'events/day_summary', events: events %>
+    </h2>
+    <%# Counts sit just after the date (left-clustered), so the ✕ stays a clean,
+        undivided target alone on the right. %>
     <%= link_to '✕', calendar_collapse_path, class: 'day-detail-close',
           'aria-label': t('events.day.close'), title: t('events.day.close') %>
   </header>

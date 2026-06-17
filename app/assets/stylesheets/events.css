@@ -39,30 +39,62 @@
    border — a quiet section divider, not a decorative slab. */
 .date {
   align-items: baseline;
+  gap: var(--gap-small);
   color: var(--theme-fg-color);
   font-weight: bold;
   padding-bottom: var(--gap-small);
   border-bottom: var(--border-width) solid var(--rule-color);
 }
 
-/* A star before a list date that holds a followed venue/style — the list-view
-   echo of the calendar's day marker, and the "interested" signal (star = follow).
-   GREEN: following is frequent, so it carries the dominant accent and keeps green
-   present across the page; the rare saved heart is the raspberry highlight.
-   Normal weight so it doesn't shout over the date. */
-.date-favorite-marker {
-  margin-right: 0.5ch;
-  color: var(--theme-accent-color);
+/* Per-day relevance counts sitting just after a date header's date: a saved (♥)
+   tally and an interest (★) tally, each hidden when zero. Same glyph language as the
+   calendar markers — raspberry heart = saved, green star = interest — just carried
+   as counts. Normal weight + small so they support the date rather than compete.
+   Collapses entirely (no trailing gap) on a day with neither, so the date keeps its
+   flush-left place; :has lets a live follow/save bring it back without the
+   controller touching the wrapper. */
+.day-summary {
+  display: none;
+  align-items: center;
+  gap: 0.8ch;
+  flex: none;
+  font-size: var(--font-size-small);
   font-weight: normal;
 }
 
-.date-favorite-marker::before {
+.day-summary:has(.day-summary__count:not([hidden])) {
+  display: flex;
+}
+
+.day-summary__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3ch;
+  line-height: 1;
+}
+
+.day-summary__count::before {
   content: "";
   display: inline-block;
   width: 1em;
   height: 1em;
-  vertical-align: -0.15em;
   background-color: currentColor;
+}
+
+.day-summary__count--saved {
+  color: var(--theme-saved-color);
+}
+
+.day-summary__count--saved::before {
+  -webkit-mask: var(--heart-fill) center / contain no-repeat;
+  mask: var(--heart-fill) center / contain no-repeat;
+}
+
+.day-summary__count--interest {
+  color: var(--theme-accent-color);
+}
+
+.day-summary__count--interest::before {
   -webkit-mask: var(--star-fill) center / contain no-repeat;
   mask: var(--star-fill) center / contain no-repeat;
 }

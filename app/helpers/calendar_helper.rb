@@ -39,9 +39,15 @@ module CalendarHelper
   # favorite Stimulus controller can flip it the instant a matching tag is
   # toggled, without re-rendering the grid (and disturbing the open day drawer).
   def calendar_day_favorite_keys(events)
-    events.flat_map do |event|
-      event.locations.map { |location| "l:#{location.name}" } +
-        event.styles.map { |style| "s:#{style.name}" }
-    end.uniq
+    events.flat_map { |event| event_follow_keys(event) }.uniq
+  end
+
+  # One event's follow keys ("l:<location>" / "s:<style>"). The per-event form of
+  # calendar_day_favorite_keys: a date header carries the per-event lists so the
+  # favorite controller can recount how many of the day's shows match the followed
+  # set (the live ★ interest count) without a re-render.
+  def event_follow_keys(event)
+    event.locations.map { |location| "l:#{location.name}" } +
+      event.styles.map { |style| "s:#{style.name}" }
   end
 end

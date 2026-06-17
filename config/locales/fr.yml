@@ -626,7 +626,6 @@ fr:
     edit_event: Modifier l'événement
     edit_tag: Modifier le tag
     index:
-      title: üsgu
       empty: Aucun événement ne correspond aux filtres actuels.
       view:
         label: Vue

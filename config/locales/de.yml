@@ -626,7 +626,6 @@ de:
     edit_event: Veranstaltung bearbeiten
     edit_tag: Tag bearbeiten
     index:
-      title: üsgu
       empty: Keine Veranstaltungen für die aktuellen Filter.
       view:
         label: Ansicht

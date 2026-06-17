@@ -1,4 +1,5 @@
-<% content_for :title, t('events.index.title') %>
+<%# The home/listing page's tab is just the brand — it sets no content_for(:title),
+    so the layout's bare "üsgu" fallback applies (a "üsgu — üsgu" would be silly). %>
 <%# This page renders list OR calendar for the SAME url depending on the saved
     view preference (session/account) — which Turbo's url-keyed snapshot cache
     can't represent, so a cached snapshot of the other view flashes on navigation

@@ -2,7 +2,10 @@
 <% theme = cookies[:theme].presence_in(%w[light dark]) %>
 <html<%= " data-theme=\"#{theme}\"".html_safe if theme %>>
   <head>
-    <title><%= content_for(:title) || "üsgu" %></title>
+    <%# One place owns the brand suffix: a page sets just its own name via
+        content_for(:title) and the layout appends " — üsgu" (bare "üsgu" when a
+        page sets none), so every tab title reads the same way. %>
+    <title><%= [content_for(:title).presence, "üsgu"].compact.join(" — ") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">

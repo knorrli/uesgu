@@ -1,3 +1,4 @@
+<% content_for :title, t('.title') %>
 <div class="flex flex-col gap-large">
   <%# While a sweep is running, poll so its per-scraper rows fill in live. %>
   <% if @presenter.in_progress? %>

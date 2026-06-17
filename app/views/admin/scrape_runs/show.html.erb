@@ -1,3 +1,4 @@
+<% content_for :title, l(@run.started_at) %>
 <div class="flex flex-col gap-large">
   <%# While this run is going, poll so its per-scraper rows fill in live. %>
   <% if @run.running? %>

@@ -626,7 +626,6 @@ en:
     edit_event: Edit event
     edit_tag: Edit tag
     index:
-      title: üsgu
       empty: No events match your current filters.
       view:
         label: View

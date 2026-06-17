@@ -6,10 +6,13 @@
     nested <form>) and carries the filter in the query string. %>
 <% if current_user.present? &&
       (@filter.queries.any? || @filter.style_list.any? || @filter.location_list.any? || @filter.date_ranges.any?) %>
+  <%# aria-label carries the name so the control stays labelled on mobile, where
+      the text collapses to the bell icon only (see .toolbar-action__label). %>
   <%= link_to notification_rules_path(q: @filter.queries, l: @filter.location_list,
                                       s: @filter.style_list, d: @filter.date_ranges),
-        class: 'notify-filter-link', data: { turbo_method: :post } do %>
+        class: 'notify-filter-link', 'aria-label': t('events.index.notify_filter'),
+        data: { turbo_method: :post } do %>
     <span class="ph ph-bell" aria-hidden="true"></span>
-    <span><%= t('events.index.notify_filter') %></span>
+    <span class="toolbar-action__label"><%= t('events.index.notify_filter') %></span>
   <% end %>
 <% end %>

@@ -340,6 +340,21 @@
   flex-wrap: wrap;
 }
 
+/* The two toolbar actions (interests, notify) collapse to icon-only below the
+   tablet breakpoint, so the interests/notify/view-switcher row stays on one line
+   on mobile instead of wrapping when both actions are present. Mobile-first: the
+   label is hidden by default and returns on desktop. Each link keeps an
+   aria-label, so the accessible name is stable when the text is hidden. */
+.toolbar-action__label {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .toolbar-action__label {
+    display: inline;
+  }
+}
+
 /* Empty-result message: its own line under the toolbar so a long sentence can't
    wrap the favorites/notify cluster or push the view switcher around. */
 .events-empty {

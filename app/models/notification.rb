@@ -11,7 +11,10 @@ class Notification < ApplicationRecord
   belongs_to :notification_rule, optional: true
 
   scope :unread, -> { where(read_at: nil) }
-  scope :ordered, -> { order(period_end: :desc) }
+  scope :read, -> { where.not(read_at: nil) }
+  # Newest received first. created_at — not period_end, which for "happening
+  # soon" rules is the (future) end of the event window, not the arrival time.
+  scope :ordered, -> { order(created_at: :desc) }
 
   def rule_based?
     notification_rule_id.present? || event_ids.present?

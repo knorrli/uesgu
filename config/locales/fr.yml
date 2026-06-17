@@ -291,8 +291,13 @@ fr:
     index:
       title: Notifications
       empty: Rien pour l'instant — les nouveaux événements arriveront ici.
+      all_read: Tout est lu — les nouvelles notifications arriveront ici.
       unread_badge: Nouveau
       fallback_name: Notification
+      show_read:
+        one: Afficher 1 lue
+        other: "Afficher %{count} lues"
+      hide_read: Masquer les lues
       event_count:
         one: 1 événement
         other: "%{count} événements"

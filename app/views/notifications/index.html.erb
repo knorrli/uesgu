@@ -6,9 +6,7 @@
     <%= render 'shared/inbox_tabs' %>
   </header>
 
-  <% if @notifications.empty? %>
-    <p class="empty-state"><%= t('notifications.index.empty') %></p>
-  <% else %>
+  <% if @notifications.any? %>
     <ul class="notifications">
     <% @notifications.each do |notification| %>
       <li class="<%= class_names('notification', unread: !notification.read?) %>">
@@ -28,6 +26,18 @@
         <% end %>
       </li>
     <% end %>
-  </ul>
+    </ul>
+  <% elsif @read_count.zero? %>
+    <p class="empty-state"><%= t('notifications.index.empty') %></p>
+  <% else %>
+    <p class="empty-state"><%= t('notifications.index.all_read') %></p>
+  <% end %>
+
+  <% if @read_count.positive? %>
+    <% if @show_read %>
+      <%= link_to t('notifications.index.hide_read'), notifications_path, class: 'notifications__read-toggle' %>
+    <% else %>
+      <%= link_to t('notifications.index.show_read', count: @read_count), notifications_path(read: 1), class: 'notifications__read-toggle' %>
+    <% end %>
   <% end %>
 </div>

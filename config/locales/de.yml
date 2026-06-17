@@ -291,8 +291,13 @@ de:
     index:
       title: Benachrichtigungen
       empty: Noch nichts da — neue Veranstaltungen landen hier.
+      all_read: Alles gelesen — neue Benachrichtigungen landen hier.
       unread_badge: Neu
       fallback_name: Benachrichtigung
+      show_read:
+        one: 1 gelesene anzeigen
+        other: "%{count} gelesene anzeigen"
+      hide_read: Gelesene ausblenden
       event_count:
         one: 1 Veranstaltung
         other: "%{count} Veranstaltungen"

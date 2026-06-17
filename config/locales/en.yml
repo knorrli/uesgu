@@ -291,8 +291,13 @@ en:
     index:
       title: Notifications
       empty: Nothing yet — new events will land here.
+      all_read: All caught up — new notifications will land here.
       unread_badge: New
       fallback_name: Notification
+      show_read:
+        one: Show 1 read
+        other: "Show %{count} read"
+      hide_read: Hide read
       event_count:
         one: 1 event
         other: "%{count} events"

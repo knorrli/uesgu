@@ -51,6 +51,20 @@ module Scrapers
       current_row.at_css('h2')&.text&.squish
     end
 
+    # The detail page carries a venue-typed genre bar (beside a language badge and
+    # Spotify link) with no usable wrapper class — just bare text nodes joined by
+    # `<span class="last-of-type:hidden">, </span>` comma separators, which are the
+    # page's only such inline comma-list. So anchor on those separators, read their
+    # parent, and split on the commas they carry. Match-only (consumption): the
+    # field is third-party free-text that sometimes holds a non-genre category
+    # ("Podcast"), so it must never mint taxonomy.
+    def event_consumption_genres(content)
+      list = content.css('span').find { |s| s['class'].to_s.include?('last-of-type:hidden') }&.parent
+      return [] unless list
+
+      list.text.split(',').map(&:squish).reject(&:blank?)
+    end
+
     private
 
     def row_href(row)

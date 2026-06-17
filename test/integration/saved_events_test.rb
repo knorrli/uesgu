@@ -89,7 +89,10 @@ class SavedEventsTest < ActionDispatch::IntegrationTest
     assert_select 'p.empty-state' # has saves, none upcoming
 
     get saved_events_path(view: 'calendar')
-    assert_select 'section.event-calendar .day-count'
+    # The cell carries no separate count anymore (relevance-led redesign); a
+    # non-empty day renders the clickable day-link, which is what proves the
+    # calendar still holds the past save.
+    assert_select 'section.event-calendar .calendar-day-link'
     # Every show here is saved by definition, so the bookmark marker is suppressed
     # — it would otherwise flag every day and carry no signal.
     assert_select '.day-saved-marker', count: 0

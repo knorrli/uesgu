@@ -1,7 +1,9 @@
 /* Filter fields as underlined inputs rather than full boxes — lighter, reads as
    a form line, consistent with the de-boxed list below. */
 .input-wrapper {
-  padding: var(--gap-small) 0;
+  /* A little horizontal breathing room so the caret/placeholder doesn't sit flush
+     on the field edge; the underline still spans the full width. */
+  padding: var(--gap-small) var(--gap-small);
   border-bottom: var(--border-width) solid var(--field-border-color);
   line-height: var(--filter-input-line-height);
   position: relative;

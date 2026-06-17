@@ -42,7 +42,12 @@ headless-browser fetch path we don't have yet. Recorded so we don't re-investiga
 - [ ] **Heitere Fahne** — Wabern (BE) — https://www.dieheiterefahne.ch/events —
       *Vue app.* Events live in an `<event-list :initial-data="…">` JSON blob, but
       it carries **no start time** (all `00:00:00`), no per-event URL, and no
-      category. Needs the venue's detail API (not exposed in the page).
+      category. Detail URLs ARE deterministic (`/events/{id}/{DD-MM-YYYY}/{slug}`)
+      but the detail page is client-side only — **time + category come from a
+      `/ajax/` XHR (undocumented backend)**, which we won't call. No JSON-LD, no
+      ICS/RSS/sitemap feed. Not in PETZI or OLE. **No clean path to time+genre —
+      stays shelved.** Full 2026-06-17 feed/aggregator investigation:
+      `docs/open-event-data-research.md`.
 - [ ] **Café du Commerce** — Biel/Bienne (BE) — http://www.ducommerce-biel.ch —
       *Squarespace, JS.* No structured events collection (nav is only /menu,
       /search; sitemap has no event pages). The Thursday concert series isn't

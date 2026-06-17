@@ -100,6 +100,17 @@ class NotificationRuleTest < ActiveSupport::TestCase
     refute r.due?(at(18, 30))
   end
 
+  test 'the scheduled time tracks wall-clock across a DST spring-forward (no hour drift)' do
+    # CET→CEST on Sun 2026-03-29: clocks jump 02:00→03:00. Adding 18h to local
+    # midnight lands at 19:00 (the skipped hour double-counts); a daily 18:00 rule
+    # must still resolve to 18:00 wall-clock.
+    r = rule(user, filter: { s: ['x'] }, cadence: 'daily', time_of_day: 18 * 60)
+    scheduled = r.previous_scheduled_at(Time.zone.local(2026, 3, 29, 20, 0))
+
+    assert_equal [18, 0], [scheduled.hour, scheduled.min],
+                 'daily 18:00 must fire at 18:00 CEST, not 19:00'
+  end
+
   test 'weekly rule fires on its weekday after its time' do
     r = rule(user, filter: { s: ['x'] }, cadence: 'weekly', weekday: TODAY.wday, time_of_day: 11 * 60)
     r.last_fired_at = at(0)

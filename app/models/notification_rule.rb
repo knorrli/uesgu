@@ -234,7 +234,10 @@ class NotificationRule < ApplicationRecord
   end
 
   def at_time(date)
-    Time.zone.local(date.year, date.month, date.day) + time_of_day.minutes
+    # Construct the wall-clock time directly rather than adding minutes to local
+    # midnight: on a DST-transition day the latter double-counts the skipped/
+    # repeated hour (a daily 18:00 rule drifted to 19:00 on the spring-forward day).
+    Time.zone.local(date.year, date.month, date.day, time_of_day / 60, time_of_day % 60)
   end
 
   def coverage_floor = last_fired_at || created_at || Time.current

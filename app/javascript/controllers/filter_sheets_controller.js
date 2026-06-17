@@ -104,6 +104,26 @@ export default class extends Controller {
     if (search) { search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true })) }
   }
 
+  // Enter / the keyboard's search key on the What field commits the typed query
+  // straight away — no need to tap the "search for X" row first. Mirrors addQuery,
+  // then submits. Wired only on the What field (it owns the free-text concept);
+  // preventDefault stops the input's implicit form submit, which would otherwise
+  // reload without the typed text (the field carries no name of its own).
+  commitTyped(event) {
+    if (event.key !== "Enter") return
+    event.preventDefault()
+
+    const input = event.target
+    const { value, blank } = searchForSuggestion(input.value, this.searchForTemplateValue, this.searchAnythingValue)
+    if (!blank) {
+      const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
+        .some((row) => row.value === value)
+      if (!exists) this.queriesTarget.prepend(this.#queryRow(value))
+      input.value = ""
+    }
+    this.#submit()
+  }
+
   // Two native date inputs → the hidden "start - end" d[] input.
   customRange() {
     const start = this.customStartTarget.value

@@ -83,7 +83,7 @@
         <span class="sheet__search-icon ph ph-magnifying-glass"></span>
         <input type="search" class="sheet__search-input" enterkeyhint="search" autocomplete="off"
                placeholder="<%= t('events.filter.what') %>"
-               data-action="input->filter-sheets#filter">
+               data-action="input->filter-sheets#filter keydown->filter-sheets#commitTyped">
       </div>
       <div class="sheet__body">
         <%# The thing a fixed list can't do: turn whatever you typed into a search. %>

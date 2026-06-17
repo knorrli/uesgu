@@ -276,15 +276,12 @@ class NotificationRule < ApplicationRecord
   # saved custom filter matches identically (AND across what/where, date presets
   # re-resolved, future floor when no date).
   def to_filter
-    Filter.new.tap do |f|
-      f.queries = queries
-      f.style_list = style_list
-      f.location_list = location_list
-      # Presets only — never a stored absolute range (see filter_attributes=).
-      # active_windows also covers any legacy rule that still has one stored, so
-      # it falls back to the new-events floor rather than a dead past range.
-      f.date_ranges = active_windows
-    end
+    # date_ranges = active_windows (presets only) — never a stored absolute range
+    # (see filter_attributes=). active_windows also covers any legacy rule that
+    # still has one stored, so it falls back to the new-events floor rather than a
+    # dead past range.
+    Filter.build(queries: queries, style_list: style_list,
+                 location_list: location_list, date_ranges: active_windows)
   end
 
   # Date constraint for the favorites path (which can't reuse Filter — it needs

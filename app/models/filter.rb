@@ -11,6 +11,19 @@ class Filter
     @date_ranges = []
   end
 
+  # Construct from the four list inputs, skipping any passed as nil (so each
+  # caller sets only what it has). The one place the q/l/s/d shape is assembled —
+  # the events listing, a saved rule's edit filter, and the rule's own matcher all
+  # funnel through here instead of each repeating `new.tap { ... }`.
+  def self.build(queries: nil, style_list: nil, location_list: nil, date_ranges: nil)
+    new.tap do |filter|
+      filter.queries = queries unless queries.nil?
+      filter.style_list = style_list unless style_list.nil?
+      filter.location_list = location_list unless location_list.nil?
+      filter.date_ranges = date_ranges unless date_ranges.nil?
+    end
+  end
+
   def queries=(new_queries)
     @queries = parse(new_queries)
   end

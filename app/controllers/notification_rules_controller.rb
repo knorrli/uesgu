@@ -15,7 +15,7 @@ class NotificationRulesController < ApplicationController
     @rule = current_user.notification_rules.new(default_schedule)
     @rule.filter_attributes = filter_params
     @filter = filter_for(@rule)
-    @matches_favorites = favorites_match?(@filter)
+    @matches_favorites = current_user.favorites_filter?(@filter)
   end
 
   # "Benachrichtigen" creates the rule immediately (it's only offered with an
@@ -42,7 +42,7 @@ class NotificationRulesController < ApplicationController
   # frame, so there's no Save button. See #update.
   def edit
     @filter = filter_for(@rule)
-    @matches_favorites = favorites_match?(@filter)
+    @matches_favorites = current_user.favorites_filter?(@filter)
   end
 
   # Autosave target: re-render the editor frame with the canonical server state
@@ -54,7 +54,7 @@ class NotificationRulesController < ApplicationController
     @rule.save
 
     @filter = filter_for(@rule)
-    @matches_favorites = favorites_match?(@filter)
+    @matches_favorites = current_user.favorites_filter?(@filter)
     render :edit, status: (@rule.errors.any? ? :unprocessable_entity : :ok)
   end
 
@@ -106,21 +106,7 @@ class NotificationRulesController < ApplicationController
 
   # The filter shown on the edit form, built from the rule's saved filter.
   def filter_for(rule)
-    Filter.new.tap do |filter|
-      filter.queries = rule.queries
-      filter.location_list = rule.location_list
-      filter.style_list = rule.style_list
-      filter.date_ranges = rule.date_ranges
-    end
-  end
-
-  # True when the filter's tags are exactly the user's favorites (and there's no
-  # extra free-text query) — the only case where "keep in sync" is meaningful.
-  def favorites_match?(filter)
-    return false if filter.queries.any?
-    return false unless current_user.location_list.any? || current_user.style_list.any?
-
-    Set.new(filter.location_list) == Set.new(current_user.location_list) &&
-      Set.new(filter.style_list) == Set.new(current_user.style_list)
+    Filter.build(queries: rule.queries, location_list: rule.location_list,
+                 style_list: rule.style_list, date_ranges: rule.date_ranges)
   end
 end

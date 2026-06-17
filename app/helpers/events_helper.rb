@@ -104,12 +104,10 @@ module EventsHelper
   end
 
   # True when the active filter is exactly the user's favorites (locations and
-  # styles compared as sets, order-independent). When on, the control reads as
-  # active and a click clears it back to the full programme.
+  # styles, order-independent, and no extra free-text query). When on, the control
+  # reads as active and a click clears it back to the full programme.
   def favorites_filter_active?
-    favorites_filter_available? &&
-      Set.new(@filter.location_list) == followed_locations &&
-      Set.new(@filter.style_list) == followed_styles
+    favorites_filter_available? && current_user.favorites_filter?(@filter)
   end
 
   # The current user's saved event ids, loaded once so the per-event save button

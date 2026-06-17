@@ -71,4 +71,14 @@ class EventsHelperTest < ActionView::TestCase
 
     refute favorites_filter_active?
   end
+
+  test 'favorites_filter_active? is false when an extra free-text query is layered on' do
+    self.current_user = user(location_list: %w[A B], style_list: ['s'])
+    @filter = Filter.new
+    @filter.location_list = 'A, B'
+    @filter.style_list = 's'
+    @filter.queries = 'extra' # exact follows PLUS a query is no longer "just my favorites"
+
+    refute favorites_filter_active?
+  end
 end

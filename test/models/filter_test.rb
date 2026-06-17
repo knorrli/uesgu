@@ -13,6 +13,22 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal %w[wubstep glimmercore], f.style_list
   end
 
+  test 'build sets the lists it is given and leaves nil ones at their default' do
+    f = Filter.build(queries: 'rock', style_list: %w[techno], location_list: nil)
+
+    assert_equal %w[rock], f.queries
+    assert_equal %w[techno], f.style_list
+    assert_empty f.location_list, 'a nil list is left at its empty default'
+    assert_empty f.date_ranges, 'an omitted list is left at its empty default'
+  end
+
+  test 'build runs each value through the same parsing as the setters' do
+    f = Filter.build(queries: 'rock, jazz', date_ranges: %w[next_week today])
+
+    assert_equal %w[rock jazz], f.queries, 'comma string parses to a tag array'
+    assert_equal %w[today next_week], f.date_ranges, 'presets sort into preset order'
+  end
+
   test 'date_ranges are ordered by the datepicker preset sequence' do
     f = Filter.new
     f.date_ranges = %w[next_week today] # given out of order

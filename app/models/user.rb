@@ -36,6 +36,18 @@ class User < ApplicationRecord
     admin
   end
 
+  # True when `filter` is exactly this user's follows — the same followed locations
+  # and styles (order-independent) with no extra free-text query. The one
+  # definition behind the events "favorites" pill's active state (EventsHelper) and
+  # a rule's "keep in sync with my favorites" detection (NotificationRulesController).
+  def favorites_filter?(filter)
+    return false if filter.queries.any?
+    return false unless location_list.any? || style_list.any?
+
+    Set.new(filter.location_list) == Set.new(location_list) &&
+      Set.new(filter.style_list) == Set.new(style_list)
+  end
+
   # Mint (or rotate) the bearer token behind the subscribable ICS feed. Rotating
   # silently invalidates any old subscription URL — the way to revoke one.
   def regenerate_calendar_feed_token!

@@ -107,25 +107,65 @@
   display: none;
 }
 
-/* "Notify me about this" — flat accent link in the toggle row, sibling of the
-   favorites-filter shortcut. Its own class (was .button notify-filter-link); the
-   text-decoration reset is now explicit since it no longer borrows a.button. */
+/* "Notify me about this filter" — an icon-only, opt-in action pinned to the right
+   of the applied-filter chips (both the inline filter and the mobile sheets). The
+   accent bell signals it's interactive; its context (sitting at the end of the
+   filter you just built) carries the meaning, so it needs no label. Padding gives
+   a finger-sized (~40px) hit area; the matching negative top/bottom margin cancels
+   the vertical growth so the bell rides the chip row's reserved one-line height
+   rather than making the row (and so the whole page) taller. */
 .notify-filter-link {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
-  gap: var(--gap-xsmall);
-  color: var(--theme-fg-muted);
+  justify-content: center;
+  padding: 9px;
+  margin: -9px 0;
+  color: var(--theme-accent-color);
   text-decoration: none;
 }
 
-.notify-filter-link:hover {
-  text-decoration: underline;
-}
-
 .notify-filter-link .ph {
-  font-size: 1.15em;
+  font-size: 1.35rem;
+  line-height: 1;
 }
 
+/* Hover/focus reveals the tap target as a soft pill — the state cue an icon-only
+   control otherwise lacks (Phosphor is an icon font, so a bolder glyph isn't an
+   option). */
+.notify-filter-link:hover,
+.notify-filter-link:focus-visible {
+  background: var(--theme-bg-emphasis);
+  border-radius: 999px;
+  outline: none;
+}
+
+/* Lit: a rule already exists for this exact filter. Instead of the unlit outline
+   bell, a filled bell-ringing glyph (masked SVG, accent-painted) — the "this is
+   on" cue, in the followed-star's fill language but without a heavy background.
+   Tapping it opens that rule rather than making a duplicate. Sized to match the
+   1.35rem font bell; the flex link centres it vertically. */
+.notify-filter-link.active .notify-bell-fill {
+  display: inline-block;
+  width: 1.35rem;
+  height: 1.35rem;
+  background-color: var(--theme-accent-color);
+  -webkit-mask: var(--bell-ringing-fill) center / contain no-repeat;
+  mask: var(--bell-ringing-fill) center / contain no-repeat;
+}
+
+
+/* A non-blocking heads-up inside the editor (another rule already covers this
+   exact filter). Accent-bordered like a flash, not warn-red like .form-errors —
+   nothing's wrong, the duplicate is allowed; it's just worth knowing. */
+.rule-notice {
+  border: var(--border-width) solid var(--theme-accent-color);
+  padding: var(--gap-small) var(--gap-medium);
+  /* Breathing room above/below so it isn't crammed between the intro and the
+     "Worüber" legend (the turbo frame stacks these with no gap). */
+  margin: var(--gap-medium) 0;
+  line-height: 1.5;
+}
 
 /* Rule card name carries an inline type badge. */
 .rule-card__name {

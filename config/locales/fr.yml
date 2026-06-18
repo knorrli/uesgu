@@ -128,6 +128,8 @@ fr:
     save_button: Enregistrer
     window_none: Sans période (nouveautés)
     deleted: Règle supprimée.
+    already_exists: Tu as déjà cette alerte — tu peux l'ajuster ici.
+    duplicate_edit: "Tu as aussi une autre règle pour exactement ce filtre :"
     fired:
       one: Règle exécutée — 1 événement dans le digest.
       other: "Règle exécutée — %{count} événements dans le digest."
@@ -150,6 +152,7 @@ fr:
       happening: À l'affiche
     errors:
       empty_filter: Choisis d'abord un filtre (style, lieu, date …) ou synchronise avec tes intérêts.
+      duplicate: Tu as déjà une alerte pour ce filtre.
     new:
       title: Configurer une notification
       intro: À quelle fréquence et comment tu es prévenu.
@@ -655,6 +658,7 @@ fr:
       favorites_filter:
         label: Mes intérêts
       notify_filter: M'avertir
+      notify_filter_existing: Tu es averti·e — gérer
     day:
       empty: Aucun événement ce jour-là.
       close: Fermer

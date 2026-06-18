@@ -128,6 +128,8 @@ en:
     save_button: Save
     window_none: No window (new events)
     deleted: Rule deleted.
+    already_exists: You already have this alert — here you can tweak it.
+    duplicate_edit: "You also have another rule for this exact filter:"
     fired:
       one: Rule run — 1 event in the digest.
       other: "Rule run — %{count} events in the digest."
@@ -150,6 +152,7 @@ en:
       happening: What's on
     errors:
       empty_filter: Pick a filter first (style, location, date …) or sync with your interests.
+      duplicate: You already have an alert for this filter.
     new:
       title: Set up a notification
       intro: How often and how you hear about this.
@@ -655,6 +658,7 @@ en:
       favorites_filter:
         label: My interests
       notify_filter: Notify me
+      notify_filter_existing: You're notified about this — manage
     day:
       empty: No events on this day.
       close: Close

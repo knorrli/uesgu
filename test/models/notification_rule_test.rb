@@ -135,12 +135,14 @@ class NotificationRuleTest < ActiveSupport::TestCase
 
   test 'run_due! fires due rules and ignores disabled ones' do
     u = user
-    event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['probe-rock'])
+    # One event matching both styles, so the disabled rule *would* fire if enabled
+    # — distinct filters keep the two rules legal under the one-per-filter rule.
+    event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['probe-rock', 'probe-techno'])
 
     due = rule(u, filter: { s: ['probe-rock'] }, time_of_day: 0)
     due.save!
     due.update_column(:last_fired_at, 1.day.ago)
-    off = rule(u, filter: { s: ['probe-rock'] }, time_of_day: 0, enabled: false)
+    off = rule(u, filter: { s: ['probe-techno'] }, time_of_day: 0, enabled: false)
     off.save!
     off.update_column(:last_fired_at, 1.day.ago)
 
@@ -155,6 +157,42 @@ class NotificationRuleTest < ActiveSupport::TestCase
     refute rule(user, filter: {}).valid?, 'empty filter, no favorites => invalid'
     assert rule(user, filter: {}, track_favorites: true).valid?, 'favorites alert is valid'
     assert rule(user, filter: { s: ['x'] }).valid?, 'any filter is valid'
+  end
+
+  # --- dedupe (one rule per filter set) --------------------------------------
+
+  test 'fingerprint is order-independent and ignores absolute date ranges' do
+    a = rule(user, filter: { s: ['Rock', 'Jazz'], l: ['Bern'] })
+    b = rule(user, filter: { l: ['Bern'], s: ['Jazz', 'Rock'] })
+    assert_equal a.fingerprint, b.fingerprint
+
+    # An absolute range isn't kept by a rule, so it doesn't affect identity.
+    windowed = rule(user, filter: { s: ['Rock'], d: ['2030-01-01 - 2030-01-02'] })
+    plain    = rule(user, filter: { s: ['Rock'] })
+    assert_equal plain.fingerprint, windowed.fingerprint
+
+    # A preset window *does* change identity.
+    refute_equal plain.fingerprint, rule(user, filter: { s: ['Rock'], d: ['this_weekend'] }).fingerprint
+  end
+
+  test 'a second rule for the same filter set is invalid' do
+    u = user
+    rule(u, filter: { s: ['Rock'], l: ['Bern'] }).save!
+
+    dup = rule(u, filter: { l: ['Bern'], s: ['Rock'] }) # order flipped, same set
+    refute dup.valid?
+    assert_includes dup.errors[:base], I18n.t('notification_rules.errors.duplicate')
+
+    assert rule(u, filter: { s: ['Rock'] }).valid?, 'a different filter is fine'
+  end
+
+  test 'matching finds the rule for a filter, or nil' do
+    u = user
+    r = rule(u, filter: { s: ['Rock'] }).tap(&:save!)
+
+    fp = NotificationRule.fingerprint_for(Filter.build(style_list: ['Rock']))
+    assert_equal r, u.notification_rules.matching(fp)
+    assert_nil u.notification_rules.matching(NotificationRule.fingerprint_for(Filter.build(style_list: ['Jazz'])))
   end
 
   # --- auto-naming -----------------------------------------------------------

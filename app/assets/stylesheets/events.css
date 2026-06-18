@@ -374,19 +374,12 @@
   flex-wrap: wrap;
 }
 
-/* The two toolbar actions (interests, notify) collapse to icon-only below the
-   tablet breakpoint, so the interests/notify/view-switcher row stays on one line
-   on mobile instead of wrapping when both actions are present. Mobile-first: the
-   label is hidden by default and returns on desktop. Each link keeps an
-   aria-label, so the accessible name is stable when the text is hidden. */
+/* The interests shortcut keeps its label at every width: the notify bell moved
+   down to the chip row, so this left cluster is just the one control and has room
+   for "Meine Interessen" alongside the view switcher even on a phone. (The label
+   still carries an aria-label too, harmless when the text is visible.) */
 .toolbar-action__label {
-  display: none;
-}
-
-@media (min-width: 600px) {
-  .toolbar-action__label {
-    display: inline;
-  }
+  display: inline;
 }
 
 /* Empty-result message: its own line under the toolbar so a long sentence can't
@@ -737,9 +730,17 @@
    filter doesn't shove the toolbar + programme down (the row otherwise goes
    0 → 1 line). Chip box = 0.75rem text + 5px×2 padding + 1px×2 border (see
    .filter .tag / .tag). Wrapping to a second line still grows the row — an
-   accepted, rarer jump. */
-.filter .chips {
+   accepted, rarer jump. The reservation lives on the row (chips + notify bell);
+   the bell rides this same line, so it adds no further jump. */
+.filter .chips-row {
+  align-items: center;
   min-height: calc(0.75rem + 12px);
+}
+
+/* Chips take the row and wrap within it; the notify bell stays pinned right. */
+.filter .chips {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 @media (min-width: 600px) {
@@ -813,15 +814,23 @@
   color: var(--theme-fg-muted);
 }
 
-/* ── Applied-filter chips ── mirror the inline filter's .tag.active. */
+/* ── Applied-filter chips ── mirror the inline filter's .tag.active. The chips
+   wrap inside their own container; the notify bell is pinned to the right of the
+   same row (flex-start so it holds the top when chips wrap). */
 .filter-sheets__summary {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: var(--gap-small);
   margin-top: var(--gap-medium);
 }
 
-.filter-sheets__summary:empty { display: none; }
+.filter-sheets__summary-chips {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small);
+}
 
 .filter-chip {
   display: inline-flex;

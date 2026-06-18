@@ -40,6 +40,11 @@ class NotificationRule < ApplicationRecord
   # the live-favorites flag. (The "Notify me" button is also hidden on an empty
   # filter; this is the backstop.)
   validate :targets_something
+  # One rule per filter set: the "Notify me" flow redirects to the existing rule
+  # instead of creating a clone (see NotificationRulesController#create), and this
+  # backstops races and direct posts. Create-only — editing an existing rule's
+  # schedule must never be blocked, and the autosave editor re-saves constantly.
+  validate :no_duplicate_filter, on: :create
   validates :name, presence: true
 
   # The name always mirrors the filter — there are no custom names. Re-derived on
@@ -58,6 +63,13 @@ class NotificationRule < ApplicationRecord
     return if queries.any? || style_list.any? || location_list.any? || date_ranges.any?
 
     errors.add(:base, I18n.t("notification_rules.errors.empty_filter"))
+  end
+
+  def no_duplicate_filter
+    return unless user
+    return unless user.notification_rules.where.not(id: id).any? { |rule| rule.fingerprint == fingerprint }
+
+    errors.add(:base, I18n.t("notification_rules.errors.duplicate"))
   end
 
   before_create { self.last_fired_at ||= Time.current }
@@ -98,6 +110,42 @@ class NotificationRule < ApplicationRecord
 
   def happening? = active_windows.any?
   def added? = !happening?
+
+  # ── Identity (dedupe) ──────────────────────────────────────────────────────
+
+  # An order-independent fingerprint of a filter set: the four lists as sets
+  # (so "Rock · Bern" == "Bern · Rock"), date ranges narrowed to the presets a
+  # rule keeps, plus the live-favorites flag. Two rules with the same fingerprint
+  # are the same alert — the basis for "you already have this" both at creation
+  # (no duplicate is made) and on the events page (the bell lights up).
+  def self.fingerprint(queries:, style_list:, location_list:, date_ranges:, track_favorites: false)
+    {
+      queries: Set.new(Array(queries).map { |q| q.to_s.strip }.reject(&:blank?)),
+      style_list: Set.new(Array(style_list)),
+      location_list: Set.new(Array(location_list)),
+      date_ranges: Set.new(Array(date_ranges).select { |range| Datepicker.preset.key?(range) }),
+      track_favorites: track_favorites
+    }
+  end
+
+  # Fingerprint for a landing-page Filter (no favorites flag — that's a rule-only
+  # concept), so the events controller can ask "is there a rule for this filter?".
+  def self.fingerprint_for(filter)
+    fingerprint(queries: filter.queries, style_list: filter.style_list,
+                location_list: filter.location_list, date_ranges: filter.date_ranges)
+  end
+
+  def fingerprint
+    self.class.fingerprint(queries: queries, style_list: style_list, location_list: location_list,
+                           date_ranges: date_ranges, track_favorites: track_favorites?)
+  end
+
+  # The rule in this scope whose filter matches `fingerprint`, or nil. Set-based,
+  # so it runs in Ruby — fine over a single user's handful of rules. Used as
+  # current_user.notification_rules.matching(fp).
+  def self.matching(fingerprint)
+    all.detect { |rule| rule.fingerprint == fingerprint }
+  end
 
   # The cadence implied by the (first) window — nil for an "added" rule. The form
   # uses this to show the right firing-point control (weekday / day-of-month / —).

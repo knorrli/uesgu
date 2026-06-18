@@ -10,8 +10,8 @@
     Stimulus controller flips `hidden` and rewrites the href from the live
     follow set (see favorite_controller.js). Never shown to guests. %>
 <% if current_user.present? %>
-  <%# aria-label carries the name so the control stays labelled on mobile, where
-      the text collapses to the star icon only (see .toolbar-action__label). %>
+  <%# The label shows at every width now (see .toolbar-action__label); the
+      aria-label is kept as a harmless belt-and-braces accessible name. %>
   <%= link_to(favorites_filter_active? ? events_path : events_path(l: current_user.location_list.to_a, s: current_user.style_list.to_a),
         class: class_names('favorites-filter-link', active: favorites_filter_active?),
         'aria-pressed': favorites_filter_active?.to_s,

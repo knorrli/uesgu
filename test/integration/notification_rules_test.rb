@@ -108,6 +108,38 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_redirected_to events_path # bounced back, nothing created
   end
 
+  # --- one rule per filter set -----------------------------------------------
+
+  test 'create on a filter that already has a rule lands on the existing one, no duplicate' do
+    u = sign_in_as user
+    existing = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540)
+    existing.filter_attributes = { s: ['Rock'], l: ['Bern'] }
+    existing.save!
+
+    # Same filter set, order flipped → still the same rule.
+    assert_no_difference -> { u.notification_rules.count } do
+      post notification_rules_path, params: { l: ['Bern'], s: ['Rock'] }
+    end
+    assert_redirected_to edit_notification_rule_path(existing)
+  end
+
+  test 'the bell lights up and links to the existing rule for that filter' do
+    u = sign_in_as user
+    r = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
+
+    get events_path(s: ['Rock'])
+    # Lit: it links (GET) to the rule's editor rather than POSTing a new one.
+    assert_select "a.notify-filter-link.active[href=?]", edit_notification_rule_path(r)
+    assert_select "a.notify-filter-link[data-turbo-method='post']", false
+
+    # A different filter is not lit — it offers to create.
+    get events_path(s: ['Jazz'])
+    assert_select 'a.notify-filter-link.active', false
+    assert_select "a.notify-filter-link[data-turbo-method='post']"
+  end
+
   # --- edit / update ---------------------------------------------------------
 
   test 'edit shows the rule schedule + its saved filter inline' do
@@ -144,6 +176,60 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     r.reload
     assert_equal %w[Rock Jazz], r.style_list
     assert_equal ['Radiohead'], r.queries
+  end
+
+  test 'editing a filter to match another rule is allowed, with a heads-up linking to it' do
+    u = sign_in_as user
+    a = u.notification_rules.new(name: 'a', cadence: 'daily', time_of_day: 540)
+    a.filter_attributes = { s: ['Rock'] }
+    a.save!
+    b = u.notification_rules.new(name: 'b', cadence: 'daily', time_of_day: 540)
+    b.filter_attributes = { s: ['Jazz'] }
+    b.save!
+
+    # Editing B to match A IS applied (only the bell dedupes); a non-blocking
+    # notice links to A.
+    patch notification_rule_path(b), params: { s: ['Rock'], l: [''], d: [''] }
+
+    assert_response :success
+    assert_equal ['Rock'], b.reload.style_list
+    assert_select '.rule-notice a[href=?]', edit_notification_rule_path(a)
+  end
+
+  test 'trimming a filter through a colliding intermediate state is never blocked' do
+    u = sign_in_as user
+    a = u.notification_rules.new(name: 'a', cadence: 'daily', time_of_day: 540)
+    a.filter_attributes = { s: ['Rock', 'Metal'] }
+    a.save!
+    b = u.notification_rules.new(name: 'b', cadence: 'daily', time_of_day: 540)
+    b.filter_attributes = { s: ['Rock', 'Metal', 'Jazz'] }
+    b.save!
+
+    # Autosave fires one PATCH per chip removed. Removing Jazz lands on
+    # {Rock, Metal} — momentarily == A — which must still save…
+    patch notification_rule_path(b), params: { s: %w[Rock Metal], l: [''], d: [''] }
+    assert_response :success
+    assert_equal %w[Metal Rock], b.reload.style_list.sort
+
+    # …then removing Metal lands on {Rock}, the intended destination.
+    patch notification_rule_path(b), params: { s: ['Rock'], l: [''], d: [''] }
+    assert_response :success
+    assert_equal ['Rock'], b.reload.style_list
+  end
+
+  test 'editing only the schedule saves and shows no duplicate notice' do
+    u = sign_in_as user
+    r = u.notification_rules.new(name: 'r', cadence: 'daily', time_of_day: 540)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
+
+    patch notification_rule_path(r), params: {
+      notification_rule: { cadence: 'daily', time_string: '20:00' }, s: ['Rock'], l: [''], d: ['']
+    }
+
+    assert_response :success
+    assert_equal 1200, r.reload.time_of_day
+    assert_select '.rule-notice', false # only itself matches its filter
   end
 
   test 'update changes the schedule + channels without touching the filter' do

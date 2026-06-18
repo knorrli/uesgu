@@ -54,21 +54,29 @@
       <% end %>
     </div>
 
-    <%# ── Applied filters (removable). Server-rendered = always matches results ── %>
-    <div class="filter-sheets__summary">
-      <% @filter.queries.each do |query| %>
-        <%= render 'filter_chip', name: 'q', value: query, label: query, icon: 'query' %>
-      <% end %>
-      <% @filter.style_list.each do |style| %>
-        <%= render 'filter_chip', name: 's', value: style, label: style, icon: 'styles' %>
-      <% end %>
-      <% @filter.location_list.each do |location| %>
-        <%= render 'filter_chip', name: 'l', value: location, label: location_display(location), icon: Location.type_for(location) %>
-      <% end %>
-      <% @filter.date_ranges.each do |range| %>
-        <%= render 'filter_chip', name: 'd', value: range, label: date_range_label(range), icon: 'date' %>
-      <% end %>
-    </div>
+    <%# ── Applied filters (removable). Server-rendered = always matches results.
+        Chips wrap inside their own growing container; the notify bell is pinned to
+        the right of the same row, so applying a filter doesn't add a separate row.
+        The whole summary only renders when a filter is active. ── %>
+    <% if @filter.active? %>
+      <div class="filter-sheets__summary">
+        <div class="filter-sheets__summary-chips">
+          <% @filter.queries.each do |query| %>
+            <%= render 'filter_chip', name: 'q', value: query, label: query, icon: 'query' %>
+          <% end %>
+          <% @filter.style_list.each do |style| %>
+            <%= render 'filter_chip', name: 's', value: style, label: style, icon: 'styles' %>
+          <% end %>
+          <% @filter.location_list.each do |location| %>
+            <%= render 'filter_chip', name: 'l', value: location, label: location_display(location), icon: Location.type_for(location) %>
+          <% end %>
+          <% @filter.date_ranges.each do |range| %>
+            <%= render 'filter_chip', name: 'd', value: range, label: date_range_label(range), icon: 'date' %>
+          <% end %>
+        </div>
+        <%= render 'notify_button' %>
+      </div>
+    <% end %>
 
     <%# ── WHAT sheet — styles + free-text query ── %>
     <section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"

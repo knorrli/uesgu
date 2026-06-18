@@ -18,13 +18,14 @@
   <%= render 'filter_sheets' %>
 
   <%# Toggle row, above the content in both views (so the first bold header lines
-      up across views). The left cluster holds the "my interests" filter shortcut
-      and — when the filter comes up empty — the empty message, both riding on the
-      left of this same always-present row so nothing below it jumps. %>
-  <div class="events-toolbar flex justify-between align-baseline gap-medium">
+      up across views). The left holds the "my interests" filter shortcut; the
+      "notify me about this filter" action lives down by the filter chips (where
+      its meaning is clear), so this row stays identical whether or not a filter
+      is active. align-center, since on mobile the left can be a lone star icon
+      with no text baseline to ride on. %>
+  <div class="events-toolbar flex justify-between align-center gap-medium">
     <div class="events-toolbar__left flex align-center gap-medium">
       <%= render 'favorites_filter' %>
-      <%= render 'notify_button' %>
     </div>
     <%= render 'view_switcher', view: @view %>
   </div>

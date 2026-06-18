@@ -29,7 +29,12 @@ class NotificationRulesController < ApplicationController
     @rule.assign_attributes(rule_params) if params[:notification_rule].present?
     @rule.filter_attributes = filter_params
 
-    if @rule.save
+    # One alert per filter set: if the user already has a rule for exactly this
+    # filter, land them on it (to tweak the schedule/channels) rather than making
+    # a duplicate. The events-page bell is already lit in this case.
+    if (existing = current_user.notification_rules.matching(@rule.fingerprint))
+      redirect_to edit_notification_rule_path(existing), notice: t("notification_rules.already_exists")
+    elsif @rule.save
       redirect_to edit_notification_rule_path(@rule)
     else
       redirect_to events_path, alert: @rule.errors.full_messages.to_sentence
@@ -43,6 +48,7 @@ class NotificationRulesController < ApplicationController
   def edit
     @filter = filter_for(@rule)
     @matches_favorites = current_user.favorites_filter?(@filter)
+    @duplicate_of = duplicate_of(@rule)
   end
 
   # Autosave target: re-render the editor frame with the canonical server state
@@ -55,6 +61,11 @@ class NotificationRulesController < ApplicationController
 
     @filter = filter_for(@rule)
     @matches_favorites = current_user.favorites_filter?(@filter)
+    # Editing CAN knowingly produce two rules for the same filter (the bell can't);
+    # surface it as a non-blocking heads-up, never a block. Blocking would trap the
+    # autosave editor: trimming "Rock·Metal·Jazz" down to "Rock" passes through
+    # "Rock·Metal", which might momentarily collide with another rule.
+    @duplicate_of = duplicate_of(@rule) if @rule.persisted?
     render :edit, status: (@rule.errors.any? ? :unprocessable_entity : :ok)
   end
 
@@ -108,5 +119,11 @@ class NotificationRulesController < ApplicationController
   def filter_for(rule)
     Filter.build(queries: rule.queries, location_list: rule.location_list,
                  style_list: rule.style_list, date_ranges: rule.date_ranges)
+  end
+
+  # Another of the user's rules with the same filter as `rule`, if any — the
+  # editor's non-blocking "you also have a rule for this" heads-up.
+  def duplicate_of(rule)
+    current_user.notification_rules.where.not(id: rule.id).matching(rule.fingerprint)
   end
 end

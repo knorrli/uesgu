@@ -128,6 +128,8 @@ de:
     save_button: Speichern
     window_none: Kein Zeitraum (neue Events)
     deleted: Regel gelöscht.
+    already_exists: Diese Benachrichtigung gibt es schon — hier kannst du sie anpassen.
+    duplicate_edit: "Du hast noch eine Regel für genau diesen Filter:"
     fired:
       one: Regel ausgeführt — 1 Veranstaltung im Digest.
       other: "Regel ausgeführt — %{count} Veranstaltungen im Digest."
@@ -150,6 +152,7 @@ de:
       happening: Was läuft
     errors:
       empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Interessen.
+      duplicate: Für diesen Filter hast du schon eine Benachrichtigung.
     new:
       title: Benachrichtigung einrichten
       intro: Wie oft und wie du davon erfährst.
@@ -655,6 +658,7 @@ de:
       favorites_filter:
         label: Meine Interessen
       notify_filter: Benachrichtige mich
+      notify_filter_existing: Du wirst benachrichtigt — verwalten
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen

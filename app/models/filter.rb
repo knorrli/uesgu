@@ -45,6 +45,13 @@ class Filter
     @date_ranges = ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] }
   end
 
+  # True when the listing is scoped by at least one of the four UI inputs
+  # (what / where / when). Drives the "notify me about this filter" affordance and
+  # the applied-chips row — both meaningless on an unfiltered, all-events listing.
+  def active?
+    [queries, style_list, location_list, date_ranges].any?(&:present?)
+  end
+
   def ransack_query
     {
       g: [

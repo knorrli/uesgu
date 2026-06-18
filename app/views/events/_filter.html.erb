@@ -33,9 +33,15 @@
 
     <%# One combined chips row for every applied filter (what · where · when),
         below all three fields. Shared What/Where chips, then the date chips. %>
-    <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
-      <%= render 'tags/filter_chips', filter: @filter %>
-      <% @filter.date_ranges.each { |date_range| %><%= render 'tags/filter_chip', param: 'd[]', value: date_range.to_s, label: date_range_label(date_range) %><% } %>
+    <%# Chips wrap inside their own growing container; the notify bell is a
+        sibling pinned to the right of the row (the row reserves one chip-line of
+        height, so the bell appears in already-reserved space — no page jump). %>
+    <div class="chips-row flex flex-row gap-small">
+      <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
+        <%= render 'tags/filter_chips', filter: @filter %>
+        <% @filter.date_ranges.each { |date_range| %><%= render 'tags/filter_chip', param: 'd[]', value: date_range.to_s, label: date_range_label(date_range) %><% } %>
+      </div>
+      <%= render 'notify_button' %>
     </div>
   <% end %>
 </section>

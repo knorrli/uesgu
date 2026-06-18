@@ -8,6 +8,12 @@ class EventsController < ApplicationController
   # GET /events
   def index
     @filter = build_filter
+    # A logged-in user gets a "notify me about this filter" bell; if they already
+    # have a rule for exactly this filter set, it's lit and links to that rule
+    # instead of creating a clone (see _notify_button + NotificationRule.matching).
+    if current_user && @filter.active?
+      @notify_rule = current_user.notification_rules.matching(NotificationRule.fingerprint_for(@filter))
+    end
     @q = Event.visible.ransack(@filter.ransack_query)
 
     @view = resolve_view(session_key: :events_view, account_attr: :events_view)

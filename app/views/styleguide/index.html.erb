@@ -148,10 +148,13 @@
     </div>
 
     <div class="sg-row">
-      <div class="sg-specimen"><a href="#buttons" class="notify-filter-link"><span class="ph ph-bell"></span> Notify me about this</a></div>
+      <div class="sg-specimen flex gap-medium">
+        <a href="#buttons" class="notify-filter-link" aria-label="Notify me about this"><span class="ph ph-bell"></span></a>
+        <a href="#buttons" class="notify-filter-link active" aria-label="A rule watches this"><span class="notify-bell-fill"></span></a>
+      </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Notify link</span> · <code>.notify-filter-link</code>
-        <p class="sg-purpose">A flat accent text link with a leading glyph — promotes turning the current filter into a notification rule.</p>
+        <span class="sg-spec__name">Notify bell</span> · <code>.notify-filter-link</code>
+        <p class="sg-purpose">An icon-only accent action pinned to the right of the applied-filter chips — turns the current filter into a notification rule. Finger-sized hit area; hover/focus reveals a soft pill. <code>.active</code> (right) = a rule already watches this filter: a filled bell-ringing glyph, not the outline bell.</p>
       </div>
     </div>
 

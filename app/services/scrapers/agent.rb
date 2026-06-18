@@ -37,6 +37,15 @@ module Scrapers
       name.demodulize
     end
 
+    # Most scrapers represent exactly one venue and declare a real
+    # `[venue, city, canton]` place (see Location). A multi-venue aggregator
+    # (e.g. Petzi) resolves the venue per event instead, so its class-level
+    # `location`/`locations` are placeholders that must NOT seed the location
+    # taxonomy — Location skips aggregators when building its hierarchy.
+    def self.aggregator?
+      false
+    end
+
     # Returns a Scrapers::Result tallying what this run saw and wrote, so the
     # orchestrator (scrapers:run_all) can persist a ScrapeResult and stamp the
     # created events — without the Agent itself knowing about those tables.

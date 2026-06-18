@@ -239,6 +239,9 @@ fr:
     previous: Précédent
     today: Aujourd'hui
     next: Suivant
+    more_venues:
+      one: "+ 1 autre"
+      other: "+ %{count} autres"
   favorites:
     title: Intérêts
     intro: Choisis les styles et les lieux qui t'intéressent — les jours correspondants reçoivent une étoile, et tu peux filtrer le programme sur tes intérêts.

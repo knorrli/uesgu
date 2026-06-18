@@ -9,14 +9,23 @@
 class Location
   include ActiveModel::Model
 
+  # The single-venue scrapers — the ones that declare a real [venue, city, canton]
+  # place. Multi-venue aggregators (e.g. Petzi) resolve the venue per event and
+  # carry only a placeholder class-level location, so they'd pollute the taxonomy
+  # (and crash the favorites hierarchy with a nil city). Their venues already
+  # appear via the dedicated scrapers, so dropping them here loses nothing.
+  def self.place_scrapers
+    Scrapers::All.scrapers.values.reject(&:aggregator?)
+  end
+
   # The venues our scrapers cover (== each scraper's `self.location`).
   def self.venue_names
-    Scrapers::All.scrapers.values.map(&:location).to_set
+    place_scrapers.map(&:location).to_set
   end
 
   # The canton codes our scrapers cover (== each scraper's last location element).
   def self.canton_codes
-    Scrapers::All.scrapers.values.map { |scraper| scraper.locations.last }.to_set
+    place_scrapers.map { |scraper| scraper.locations.last }.to_set
   end
 
   # :venue for a concrete venue, :canton for a canton code, :city otherwise. The
@@ -50,7 +59,7 @@ class Location
   # Grouped tree for the favorites UI, derived from each scraper's locations array:
   #   { "BE" => { "Bern" => ["Dachstock", "Gaskessel", ...] }, ... }
   def self.hierarchy
-    Scrapers::All.scrapers.values.each_with_object({}) do |scraper, tree|
+    place_scrapers.each_with_object({}) do |scraper, tree|
       locations = scraper.locations
       canton = locations.last
       city = locations[-2]

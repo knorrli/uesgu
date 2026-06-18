@@ -4,8 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
   </head>
-  <body style="margin:0; padding:0; background:#f4eef1; -webkit-font-smoothing:antialiased; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; color:#1d1620;">
+  <%# Mirrors the app's light theme: Space Mono (monospace identity, with a robust
+      system-mono fallback since email clients can't be trusted to load a web font),
+      cream ground, near-black text. Sharp corners + neutral hairlines + green-only-
+      for-interaction are carried by the inline styles in the digest body. %>
+  <body style="margin:0; padding:0; background:#d8cfb2; -webkit-font-smoothing:antialiased; font-family:'Space Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace; color:#1d1620;">
     <%= yield %>
   </body>
 </html>

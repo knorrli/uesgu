@@ -10,6 +10,14 @@ class NotificationMailer < ApplicationMailer
     @notification_url = notification_url(@notification)
     @browse_url = root_url
 
+    # The brand mark, CID-embedded (multipart/related inline attachment) rather
+    # than hot-linked: it then renders even where remote images are blocked
+    # (Outlook desktop, images-off) and with no external fetch / tracking pixel.
+    # SVG is deliberately not used — Gmail and Outlook strip it. binread keeps the
+    # PNG bytes intact (a text read would re-encode and corrupt them). The header
+    # references this via attachments[...].url, which resolves to its cid: URL.
+    attachments.inline["uesgu-icon.png"] = File.binread(Rails.root.join("public/icon-192.png"))
+
     I18n.with_locale(@user.locale.presence || I18n.default_locale) do
       # Render the heading in the recipient's locale rather than reusing the title
       # frozen at fire time (which carries whatever locale was active when the rule

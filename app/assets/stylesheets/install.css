@@ -61,7 +61,22 @@
 }
 
 /* Header shortcut: a touch bolder than the surrounding nav links so the most
-   important action stands out without shouting. */
+   important action stands out without shouting. Icon + label; on phones the label
+   is hidden and only the download glyph shows, so the bar can't wrap when the
+   German "App installieren" sits next to "Anmelden" on a ~390px screen. */
 .nav-install {
   font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-small);
+}
+
+.nav-install__label {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .nav-install__label {
+    display: inline;
+  }
 }

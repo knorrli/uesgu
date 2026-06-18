@@ -77,8 +77,14 @@
           <%# Install shortcut, visible signed in or out (installing needs no
               account). Ships hidden; the install-link controller reveals it only
               where the PWA can actually be installed (not when already installed,
-              and not on Firefox desktop). %>
-          <%= link_to t('nav.install'), install_path, class: 'nav-install', hidden: true, data: { controller: 'install-link' } %>
+              and not on Firefox desktop). Icon + label; the label collapses to
+              icon-only on phones (German "App installieren" + "Anmelden" together
+              would otherwise wrap the bar on a ~390px screen). aria-label keeps the
+              accessible name when the text is hidden. %>
+          <%= link_to install_path, class: 'nav-install', hidden: true, 'aria-label': t('nav.install'), data: { controller: 'install-link' } do %>
+            <span class="ph ph-download-simple" aria-hidden="true"></span>
+            <span class="nav-install__label"><%= t('nav.install') %></span>
+          <% end %>
           <% if authenticated? %>
             <% unread = current_user.notifications.unread.count %>
             <%# Personal/account links collapse into one menu to keep the bar light.

@@ -11,6 +11,27 @@ HwComboboxController.prototype._forceSelectionAndFilter = function (option) {
   this._forceSelectionWithoutFiltering(option)
 }
 
+// The "What" field runs its OWN single highlight across the free-text row and the
+// options (see #applyNav). The gem soft-selects the first matching option on every
+// keystroke and tints it with the same class our free-text row uses — so left
+// alone, typing "c" lights BOTH the "Search for «c»" row and "Classical".
+//
+// We used to strip that class after the fact in #applyNav, but that only won the
+// race when the gem's input handler ran before ours. After a Turbo navigation the
+// two input listeners reconnect in the opposite order, our strip ran first, and
+// both rows stayed lit (and it stuck for the rest of the page's life). Drop the
+// visual class at the SOURCE for What options instead — race-free, regardless of
+// listener order. Keep the gem's a11y attributes; a What listbox is the one that
+// carries our free-text row (.filter-searchfor). The Where field has none, so its
+// normal soft-select highlight is untouched.
+const _markSelected = HwComboboxController.prototype._markSelected
+HwComboboxController.prototype._markSelected = function (option) {
+  _markSelected.call(this, option)
+  if (this.hasSelectedClass && option.closest('[role="listbox"]')?.querySelector(".filter-searchfor")) {
+    option.classList.remove(this.selectedClass)
+  }
+}
+
 // Param → Phosphor glyph for a chip's leading icon. Mirrors TagsHelper#
 // filter_chip_icon so a chip built here matches one rendered server-side.
 const CHIP_GLYPH = {
@@ -187,8 +208,9 @@ export default class extends Controller {
     // ONE highlight across [free-text row, …visible options]; Enter commits the
     // highlighted one — a style chip for an option (or an exact-name match), a
     // free-text query otherwise. This makes the free-text row reachable by keyboard
-    // and keeps exactly one row lit (the gem's own auto-highlight is suppressed in
-    // CSS for this field, see events.css). We commit ourselves because our
+    // and keeps exactly one row lit (the gem's own soft-select highlight is dropped
+    // at the source for this field, see the _markSelected patch up top). We commit
+    // ourselves because our
     // _lockInSelection patch stops the gem finalizing on close.
     this.onWhatKeydown = (event) => this.#onKeydown(event)
     this.styleInput.addEventListener("keydown", this.onWhatKeydown, true)
@@ -216,12 +238,8 @@ export default class extends Controller {
     const items = this.#navItems()
     if (!items.length) return
     this.navIndex = ((this.navIndex % items.length) + items.length) % items.length // wrap
-    // Clear the gem's soft-select highlight (it lights the first match on type) so
-    // ours is the only one — removing the class, not suppressing it in CSS, keeps
-    // that option hoverable/navigable.
-    this.styleListbox
-      .querySelectorAll(".hw-combobox__option--selected, .hw-combobox__option--navigated")
-      .forEach((o) => o.classList.remove("hw-combobox__option--selected", "hw-combobox__option--navigated"))
+    // The gem's soft-select highlight on the first match is dropped at the source
+    // (see the _markSelected patch up top), so ours is the only one to apply here.
     items.forEach((el, i) => {
       const active = i === this.navIndex
       const cls = el === this.searchForTarget ? "filter-searchfor--active" : "hw-combobox__option--nav-active"

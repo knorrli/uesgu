@@ -134,4 +134,34 @@ class EventFilterTest < ApplicationSystemTestCase
     what.send_keys(:enter)
     assert_selector ".filter-desktop .chips input[name='s[]'][value='Classical']", visible: :all
   end
+
+  # Regression: the gem soft-highlights the first match on every keystroke, and we
+  # used to strip that class AFTER the gem set it — which only won when the gem's
+  # input listener fired before ours. After the first auto-submit (a Turbo visit)
+  # the two listeners reconnected in the opposite order, our strip ran first, and
+  # the match lit up alongside the free-text row again (and stuck). The highlight
+  # is now dropped at the source, so a single highlight must survive a navigation.
+  test "single highlight survives a filter submit (no double-lit after navigation)" do
+    event(start_date: Date.current + 3, style_list: %w[Rock Classical Country Electronic])
+
+    visit events_path
+    assert_selector ".filter-desktop .filter-searchfor", visible: :all # controller connected
+
+    # Pick a style — this auto-submits and Turbo-navigates, reconnecting the field.
+    within ".filter-desktop" do
+      find('input[role="combobox"]', match: :first).send_keys("Rock")
+    end
+    find("[role=option]", text: "Rock", match: :first).click
+    assert_selector ".filter-desktop .chips .tag", text: "Rock"
+
+    # Type again on the reconnected field: "c" matches "Classical".
+    what = find(".filter-desktop input[role='combobox']", match: :first)
+    what.click
+    what.send_keys("c")
+
+    # Free-text row is the single lit row; the matched option must NOT carry the
+    # gem's soft-select highlight (the double-lit bug).
+    assert_selector ".filter-desktop .filter-searchfor--active"
+    assert_no_selector ".filter-desktop [role=option].hw-combobox__option--selected"
+  end
 end

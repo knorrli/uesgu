@@ -45,6 +45,13 @@ module Scrapers
       [location] # fallback only; real value comes per-event from #event_locations
     end
 
+    # Multi-venue: the venue is resolved per event (#event_locations), so the
+    # class-level place above is a placeholder. Keeps "PETZI" out of the location
+    # taxonomy / favorites hierarchy — the real venues come from their own scrapers.
+    def self.aggregator?
+      true
+    end
+
     # The sitemap lists every member event; keep only the URLs for venues we track.
     def event_rows
       xml = Nokogiri::XML(page.body)

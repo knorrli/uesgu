@@ -7,7 +7,9 @@ require 'db_test_helper'
 # the fleet changes.
 class LocationTest < ActiveSupport::TestCase
   setup do
-    @scraper = Scrapers::All.scrapers.values.first
+    # A single-venue scraper (skip aggregators like Petzi, whose class-level place
+    # is a placeholder — see Location.place_scrapers).
+    @scraper = Scrapers::All.scrapers.values.reject(&:aggregator?).first
     skip 'no scrapers registered' if @scraper.nil?
   end
 
@@ -46,5 +48,21 @@ class LocationTest < ActiveSupport::TestCase
     assert_includes tree.keys, canton
     assert_includes tree[canton].keys, city
     assert_includes tree[canton][city], @scraper.location
+  end
+
+  # Regression: a multi-venue aggregator (Petzi) declares only a placeholder
+  # [location] (size 1), so it has no city. It must be excluded from the tree —
+  # otherwise the favorites location picker calls parameterize on a nil city and
+  # the whole /favorites page 500s.
+  test 'hierarchy excludes aggregator scrapers and never yields a nil city' do
+    tree = Location.hierarchy
+
+    aggregators = Scrapers::All.scrapers.values.select(&:aggregator?)
+    aggregators.each do |agg|
+      refute_includes tree.keys, agg.location, "#{agg} should not appear as a canton"
+    end
+
+    cities = tree.values.flat_map(&:keys)
+    assert_empty cities.select(&:nil?), 'no city key may be nil'
   end
 end

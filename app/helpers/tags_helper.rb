@@ -85,17 +85,21 @@ module TagsHelper
       city_nodes = cities.sort.filter_map do |city, venues|
         venue_nodes = venues.uniq.sort.filter_map do |venue|
           count = counts[venue].to_i
-          { name: venue, value: venue, type: :venue, count: count } if count.positive?
+          { name: venue, value: venue, type: :venue, count: count, search: venue } if count.positive?
         end
         next if venue_nodes.empty? && counts[city].to_i.zero?
 
         { name: city, value: city, type: :city,
-          count: counts[city] || venue_nodes.sum { |v| v[:count] }, children: venue_nodes }
+          count: counts[city] || venue_nodes.sum { |v| v[:count] },
+          search: ([city] + venue_nodes.map { |v| v[:name] }).join(' '), children: venue_nodes }
       end
       next if city_nodes.empty? && counts[canton].to_i.zero?
 
-      { name: canton_name(canton), value: canton, type: :canton,
-        count: counts[canton] || city_nodes.sum { |c| c[:count] }, children: city_nodes }
+      name = canton_name(canton)
+      { name: name, value: canton, type: :canton,
+        count: counts[canton] || city_nodes.sum { |c| c[:count] },
+        search: ([name, canton] + city_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(' '),
+        children: city_nodes }
     end
   end
 end

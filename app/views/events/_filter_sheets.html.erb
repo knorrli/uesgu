@@ -135,7 +135,7 @@
         <% location_filter_tree.each do |canton| %>
           <div class="loc-group collapsed" data-filter-sheets-target="group">
             <div class="loc-group__head">
-              <label class="opt opt--canton" data-search="<%= canton[:name] %> <%= canton[:value] %>">
+              <label class="opt opt--canton" data-search="<%= canton[:search] %>">
                 <input type="checkbox" name="l[]" value="<%= canton[:value] %>" <%= 'checked' if @filter.location_list.include?(canton[:value]) %>>
                 <span class="opt__box"></span>
                 <span class="opt__label"><%= canton[:name] %></span>
@@ -149,7 +149,7 @@
             </div>
             <div class="loc-group__body">
               <% canton[:children].each do |city| %>
-                <label class="opt opt--city" data-search="<%= city[:name] %>">
+                <label class="opt opt--city" data-search="<%= city[:search] %>">
                   <input type="checkbox" name="l[]" value="<%= city[:value] %>" <%= 'checked' if @filter.location_list.include?(city[:value]) %>>
                   <span class="opt__box"></span>
                   <span class="opt__label"><%= city[:name] %></span>
@@ -157,7 +157,7 @@
                   <span class="opt__count"><%= city[:count] %></span>
                 </label>
                 <% city[:children].each do |venue| %>
-                  <label class="opt opt--venue" data-search="<%= venue[:name] %>">
+                  <label class="opt opt--venue" data-search="<%= venue[:search] %>">
                     <input type="checkbox" name="l[]" value="<%= venue[:value] %>" <%= 'checked' if @filter.location_list.include?(venue[:value]) %>>
                     <span class="opt__box"></span>
                     <span class="opt__label"><%= venue[:name] %></span>

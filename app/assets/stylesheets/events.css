@@ -543,6 +543,21 @@
     text-overflow: ellipsis;
   }
 
+  /* A second stacked venue sits directly under the first — no extra gap. */
+  .day-headline + .day-headline {
+    margin-top: 0;
+  }
+
+  /* Overflow line ("+N more") for days with three or more relevant venues.
+     Fainter than the named venues so it reads as a count, not a name. */
+  .day-headline-more {
+    display: none;
+    margin-top: var(--gap-xsmall);
+    font-size: var(--font-size-small);
+    line-height: 1.2;
+    color: color-mix(in srgb, var(--theme-fg-muted) 70%, transparent);
+  }
+
   /* Transparent click target covering the cell's full (row) height. */
   .calendar-day-link {
     position: absolute;
@@ -734,7 +749,8 @@
      roomier desktop calendar height (mobile keeps the compact 4.25rem above). */
   .simple-calendar .day { height: 7rem; }
   /* Room for the venue headline only at desktop width. */
-  .simple-calendar .day-headline { display: block; }
+  .simple-calendar .day-headline,
+  .simple-calendar .day-headline-more { display: block; }
   /* Wider cell: the marker rides up beside the date (no today-badge crowding here). */
   .simple-calendar .day-markers { top: var(--gap-small); bottom: auto; }
 }

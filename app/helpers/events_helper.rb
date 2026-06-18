@@ -123,7 +123,7 @@ module EventsHelper
   # True when an event touches one of the user's follows — a followed location or
   # style. In-memory over already-loaded associations + the cached followed sets,
   # so it stays cheap across a calendar month. Used to pick a cell's interest
-  # headline (see CalendarHelper#calendar_day_headline_venue).
+  # headline (see CalendarHelper#calendar_day_headline).
   def event_matches_follow?(event)
     event.locations.any? { |location| followed_locations.include?(location.name) } ||
       event.styles.any? { |style| followed_styles.include?(style.name) }

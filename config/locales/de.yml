@@ -239,6 +239,9 @@ de:
     previous: Zurück
     today: Heute
     next: Weiter
+    more_venues:
+      one: "+ 1 weitere"
+      other: "+ %{count} weitere"
   favorites:
     title: Interessen
     intro: Wähle Stile und Orte, die dich interessieren — passende Tage bekommen einen Stern, und du filterst das Programm auf deine Interessen.

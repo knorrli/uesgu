@@ -1,5 +1,6 @@
 module CalendarHelper
   CalendarVenue = Struct.new(:name, :count, :favorite, keyword_init: true)
+  CalendarHeadline = Struct.new(:venues, :extra, keyword_init: true)
 
   # Glanceable summary for a calendar cell: distinct venue labels for the day's
   # events (deduped with a count), favorited venues first, then busiest. Titles
@@ -13,25 +14,21 @@ module CalendarHelper
       .sort_by { |venue| [venue.favorite ? 0 : 1, -venue.count, venue.name] }
   end
 
-  # The single most-relevant venue to headline on a calendar cell (desktop, phase
-  # 2): the venue of a SAVED event that day (the strongest signal) if any, else the
-  # venue of an event matching a FOLLOW (followed location/style), else nil — so a
-  # generic events-only day shows no headline. One name, never a list (the clutter
-  # trap); the full agenda is one tap away. All in-memory over the day's already-
+  # The most-relevant venues to headline on a calendar cell (desktop, phase 2):
+  # the venues of the day's SAVED events (the strongest signal) if any, else the
+  # venues of events matching a FOLLOW (followed location/style), else nil — so a
+  # generic events-only day shows no headline. Returns a CalendarHeadline with up
+  # to two distinct venue names plus an `extra` overflow count: two names fit a
+  # narrow column and 2+ saved shows a day is plausible, so we surface both and
+  # spill the rest into a "+N more" line. All in-memory over the day's already-
   # loaded events. Venue (not title) — titles vary wildly and truncate uselessly.
-  def calendar_day_headline_venue(events)
-    # Saved wins. With saved shows at several distinct venues, name the first and
-    # append "+N" so the day is honest about the others without listing them all
-    # (the noise trap) — e.g. "Kofmehl +1". Same venue twice → no suffix.
+  def calendar_day_headline(events)
     saved = events.select { |event| event_saved?(event) }
-    if saved.any?
-      venues = saved.filter_map { |event| event.venue&.name || event.locations.first&.name }.uniq
-      extra = venues.size - 1
-      return extra.positive? ? "#{venues.first} +#{extra}" : venues.first
-    end
+    source = saved.any? ? saved : events.select { |event| event_matches_follow?(event) }
+    venues = source.filter_map { |event| event.venue&.name || event.locations.first&.name }.uniq
+    return nil if venues.empty?
 
-    relevant = events.find { |event| event_matches_follow?(event) }
-    relevant&.venue&.name || relevant&.locations&.first&.name
+    CalendarHeadline.new(venues: venues.first(2), extra: [venues.size - 2, 0].max)
   end
 
   # The favoritable things happening on a day, as namespaced keys

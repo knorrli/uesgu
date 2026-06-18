@@ -467,6 +467,7 @@ fr:
         status_hidden: Masqués
         status_cancelled: Annulés
         status_discarded: Filtrés
+        status_duplicates: Doublons
         status_dismissed: Retirés
         search: Rechercher des événements…
         sort_by: Trier par
@@ -477,6 +478,10 @@ fr:
         discarded_badge: "filtré : %{pattern}"
         empty: Aucun événement correspondant.
         overridden_badge: modifié
+        duplicate_of: "doublon de %{title}"
+        merged_badge:
+          one: 1 source fusionnée
+          other: "%{count} sources fusionnées"
         restore: Restaurer
       show:
         back: Retour aux événements

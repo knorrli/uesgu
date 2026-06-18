@@ -4,7 +4,7 @@
   <h1><%= t('.title') %> <span class="muted"><%= @events.total_count %></span></h1>
 
   <div class="flex gap-small wrap align-baseline catalogue-filters">
-    <% %w[all visible hidden cancelled discarded dismissed].each do |status| %>
+    <% %w[all visible hidden cancelled discarded duplicates dismissed].each do |status| %>
       <%= link_to t(".status_#{status}"),
             admin_events_path(status: (status == 'all' ? nil : status), q: params[:q].presence, sort: params[:sort].presence),
             class: class_names(:tag, active: @status == status) %>
@@ -47,6 +47,10 @@
               <% if event.hidden? %><span><%= t('.hidden_badge') %></span><% end %>
               <% if event.discarded? %><span><%= t('.discarded_badge', pattern: event.discarded_by_rule&.pattern) %></span><% end %>
               <% if event.overridden_fields.any? %><span><%= t('.overridden_badge') %></span><% end %>
+              <%# Duplicate of a canonical (only ever shown under the duplicates filter) — link through to the event it merged into. %>
+              <% if event.canonical_event %><span><%= link_to t('.duplicate_of', title: event.canonical_event.title), admin_event_path(event.canonical_event) %></span><% end %>
+              <%# Canonical that aggregates N merged sources — manage the merge on its show page. %>
+              <% if (merged = @duplicate_counts[event.id].to_i).positive? %><span><%= t('.merged_badge', count: merged) %></span><% end %>
             </div>
           </div>
           <% if event.dismissed? %>

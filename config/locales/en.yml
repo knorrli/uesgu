@@ -467,6 +467,7 @@ en:
         status_hidden: Hidden
         status_cancelled: Cancelled
         status_discarded: Discarded
+        status_duplicates: Duplicates
         status_dismissed: Dismissed
         search: Search events…
         sort_by: Sort by
@@ -477,6 +478,10 @@ en:
         discarded_badge: "discarded: %{pattern}"
         empty: No events match.
         overridden_badge: edited
+        duplicate_of: "duplicate of %{title}"
+        merged_badge:
+          one: 1 merged source
+          other: "%{count} merged sources"
         restore: Restore
       show:
         back: Back to events

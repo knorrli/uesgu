@@ -467,6 +467,7 @@ de:
         status_hidden: Ausgeblendet
         status_cancelled: Abgesagt
         status_discarded: Gefiltert
+        status_duplicates: Duplikate
         status_dismissed: Entfernt
         search: Veranstaltungen suchen…
         sort_by: Sortieren nach
@@ -477,6 +478,10 @@ de:
         discarded_badge: "gefiltert: %{pattern}"
         empty: Keine passenden Veranstaltungen.
         overridden_badge: bearbeitet
+        duplicate_of: "Duplikat von %{title}"
+        merged_badge:
+          one: 1 zusammengeführte Quelle
+          other: "%{count} zusammengeführte Quellen"
         restore: Wiederherstellen
       show:
         back: Zurück zu Veranstaltungen

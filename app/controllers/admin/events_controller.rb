@@ -7,11 +7,14 @@ module Admin
     # = called-off shows that stay listed publicly with a marker; "dismissed" =
     # admin-soft-deleted (gone from public, never re-scraped back). The first
     # three exclude dismissed so it only surfaces under its own filter.
+    # "duplicates" = events merged into a canonical (their own dedicated bucket,
+    # hidden from the default list which is canonical-only — see #index).
     STATUS_SCOPES = {
       'visible' => -> { Event.visible },
       'hidden' => -> { Event.kept.where(hidden: true) },
       'cancelled' => -> { Event.kept.cancelled },
       'discarded' => -> { Event.discarded },
+      'duplicates' => -> { Event.duplicates },
       'dismissed' => -> { Event.dismissed }
     }.freeze
 
@@ -26,10 +29,16 @@ module Admin
     def index
       @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : 'all'
       @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : 'date'
-      # "all" means all kept events — dismissed ones are reached via their filter.
-      scope = @status == 'all' ? Event.kept : STATUS_SCOPES[@status].call
+      # "all" means all kept *canonical* events — duplicates merged into a
+      # canonical are reached via their own filter, dismissed ones via theirs.
+      scope = @status == 'all' ? Event.kept.canonical : STATUS_SCOPES[@status].call
       scope = scope.where('title ILIKE ?', "%#{params[:q]}%") if params[:q].present?
-      @events = SORT_SCOPES[@sort].call(scope).includes(:locations, :styles, :discarded_by_rule).page(params[:page]).per(50)
+      @events = SORT_SCOPES[@sort].call(scope)
+                                  .includes(:locations, :styles, :discarded_by_rule, :canonical_event)
+                                  .page(params[:page]).per(50)
+      # How many duplicates fold into each canonical on this page — one grouped
+      # query (no N+1) so rows can flag aggregated events at a glance.
+      @duplicate_counts = Event.where(canonical_event_id: @events.map(&:id)).group(:canonical_event_id).count
     end
 
     def show

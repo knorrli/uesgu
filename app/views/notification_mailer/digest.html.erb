@@ -4,10 +4,10 @@
     marker, the primary CTA, footer links — never on structure or metadata, which
     stay neutral. Time is muted (not green), styles bold-fg, genres muted, exactly
     as in the list view. Inline styles only — clients strip <style>/external CSS. %>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="u-ground" style="background:#d8cfb2; padding:24px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="u-ground" style="background:#d8cfb2 url('<%= NotificationMailerHelper::GROUND_TILE %>') repeat; padding:24px 12px;">
   <tr>
     <td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" class="u-card" style="max-width:600px; width:100%; background:#e8e1cd; border:1px solid #b8b29f;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" class="u-card" style="max-width:600px; width:100%; background:#e8e1cd url('<%= NotificationMailerHelper::CARD_TILE %>') repeat; border:1px solid #b8b29f;">
 
         <%# ── Header: the app's brand bar — real logo mark (CID-embedded PNG, see
               the mailer) + fg wordmark, hairline rule. The mark's own ground is the

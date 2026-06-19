@@ -41,16 +41,21 @@
         .u-logo-dark { display:inline-block !important; width:36px !important; height:36px !important; max-height:none !important; overflow:visible !important; }
       }
 
-      <%# Outlook.com / Outlook-on-the-web / Windows Mail dark mode: these do NOT
-          honor prefers-color-scheme — they rewrite colors in place and tag each
-          element they touched with data-ogsc (overrode text color) / data-ogsb
+      <%# Outlook.com / Outlook-on-the-web / Windows "new Outlook" dark mode: these
+          do NOT honor prefers-color-scheme — they rewrite colors in place and tag
+          each touched element with data-ogsc (overrode text color) / data-ogsb
           (overrode background). Re-asserting our palette on those attributed
-          elements stops the blunt rewrite from muddying the design. (Classic
-          Word-engine Outlook for Windows leaves the body untouched and just gets
-          the light inline styles — nothing to fix there.) %>
-      [data-ogsc] body, [data-ogsb] body, [data-ogsb] .u-ground { background:#100d13 !important; }
-      [data-ogsc] body { color:#d4ced3 !important; }
-      [data-ogsb] .u-card { background:#17131a !important; }
+          elements stops the blunt rewrite from muddying the design. Outlook only
+          supports the solo ([attr]) and element (E[attr]) attribute-selector
+          forms — NOT compound (.class[attr]) — so we either match the element
+          itself (body[data-ogsb]) or descend from an attributed ANCESTOR
+          ([data-ogsb] .u-card). body has no attributed ancestor, so it must be the
+          element form. (Classic Word-engine Outlook for Windows and Outlook for
+          Mac don't use these attributes at all — the data-URI background tiles
+          above are what protect the grounds there.) %>
+      body[data-ogsb], .u-ground[data-ogsb], [data-ogsb] .u-ground { background:#100d13 !important; }
+      body[data-ogsc] { color:#d4ced3 !important; }
+      [data-ogsb] .u-card, .u-card[data-ogsb] { background:#17131a !important; }
       [data-ogsc] .u-card { border-color:#34303a !important; }
       [data-ogsc] .u-text { color:#d4ced3 !important; }
       [data-ogsc] .u-muted { color:#968d97 !important; }
@@ -68,7 +73,7 @@
       cream ground, near-black text. Sharp corners + neutral hairlines + green-only-
       for-interaction are carried by the inline styles in the digest body; the dark
       counterparts live in the <style> block above. %>
-  <body style="margin:0; padding:0; background:#d8cfb2; -webkit-font-smoothing:antialiased; font-family:'Space Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace; color:#1d1620;">
+  <body style="margin:0; padding:0; background:#d8cfb2 url('<%= NotificationMailerHelper::GROUND_TILE %>') repeat; -webkit-font-smoothing:antialiased; font-family:'Space Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace; color:#1d1620;">
     <%= yield %>
   </body>
 </html>

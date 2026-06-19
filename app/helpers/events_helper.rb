@@ -41,14 +41,16 @@ module EventsHelper
   # usual "this is interactive" again. favorite_type: is kept for call-site
   # compatibility.
   #
-  # The tap TOGGLES the term in the active filter rather than replacing the whole
-  # filter. Tapping an inactive term ADDS it (each category unions — see Filter, so
-  # you build "psych + jazz" by tapping both); tapping a term that's already applied
-  # REMOVES it. So the rule is simply: a lit tag ⇔ tapping it drops that term. Page
-  # is reset so you land on page 1 of the changed set. The `active` class lights the
-  # tag green — the one place green is earned on a row, marking *your* applied
-  # filter (resting tags are structural ink/muted; affordance is weight + hover-
-  # underline, not colour). In a read-only context (no filter form, e.g. a
+  # The tap TOGGLES the filter by this term, and the highlight follows MATCHING,
+  # not exact equality. A tag lights green when an applied filter matches it — for
+  # the freetext path (q[], how genres are tapped) that means CONTAINS: filter
+  # "metal" lights "Metal", "Dark Metal", "Death Metal", not just an exact "metal".
+  # The rule the user reads is "green = you're filtering by this":
+  #   • tap a GREY tag → add it (its own term);
+  #   • tap a GREEN tag → remove the applied term(s) that matched it (e.g. tapping
+  #     the lit "Dark Metal" while filtering "metal" drops "metal" and broadens).
+  # Locations (l[]) match exactly — a substring venue would be nonsense. Page is
+  # reset so you land on page 1. In a read-only context (no filter form, e.g. a
   # notification digest passing interactive: false) it stays a plain single-value
   # link into the listing — a way back into the site.
   def event_filter_tag(label, field:, value:, interactive: true, modifier: nil, favorite_type: nil)
@@ -61,13 +63,27 @@ module EventsHelper
 
     applied = request.query_parameters.except('page')
     current = Array(applied[param])
-    active = current.include?(value.to_s)
-    values = active ? current - [value.to_s] : current + [value.to_s]
+    matched = filter_terms_matching(current, value, param: param)
+    active = matched.any?
+    values = active ? current - matched : current + [value.to_s]
     query = values.any? ? applied.merge(param => values) : applied.except(param)
 
     link_to label, events_path(query),
             class: class_names('filter-link', modifier, active: active),
             data: { turbo_frame: '_top' }
+  end
+
+  # The applied terms that "match" a tag — the ones that light it green and that
+  # tapping it removes. Freetext (q[]) matches by CONTAINS (the tag contains the
+  # applied term), so sibling descriptors light up instead of only exact hits;
+  # everything else matches exactly. Case-insensitive.
+  def filter_terms_matching(applied_terms, value, param:)
+    if param == 'q'
+      haystack = value.to_s.downcase
+      applied_terms.select { |term| haystack.include?(term.to_s.downcase) }
+    else
+      applied_terms.select { |term| term.to_s == value.to_s }
+    end
   end
 
   # The whole tag is the follow toggle: clicking the venue/style name (a big,

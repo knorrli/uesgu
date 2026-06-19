@@ -22,9 +22,9 @@ b.at_css("input[type='submit'], button[type='submit']").click
 b.network.wait_for_idle(timeout: 10) rescue nil
 
 SHOTS = {
-  "list-rest"          => "/?view=list",
-  "list-active-style"  => "/?view=list&s[]=Metal",
-  "list-active-genre"  => "/?view=list&q[]=Metal"
+  "list-rest"        => "/?view=list",
+  "list-match-metal" => "/?view=list&q[]=Metal", # lights Metal / Dark Metal / Death Metal
+  "list-match-rock"  => "/?view=list&q[]=Rock"   # lights Rock / Punk Rock / Alternative Rock
 }
 
 SHOTS.each do |slug, path|

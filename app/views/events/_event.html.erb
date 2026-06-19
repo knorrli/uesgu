@@ -10,15 +10,12 @@
       <div class="event-subtitle"><%= simple_format(event.subtitle) %></div>
     <% end %>
 
-    <% if event.styles.any? %>
-      <div class="event-styles">
-        <% event.styles.each_with_index do |style, i| %>
-          <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <%= event_filter_tag style.name, field: 's[]', value: style.name, interactive: interactive, favorite_type: :style %>
-        <% end %>
-      </div>
-    <% end %>
-
+    <%# Styles are NOT shown on the row: an event's styles are derived FROM its
+        genres (recompute_styles!), so showing both was a summary beside its own
+        inputs — the source of the style/genre "same word, two pills" wrinkle.
+        Styles live on under the hood (reliable follows, music-focus hiding) and as
+        the curated broad pick in the What filter; the row shows the granular
+        genres only, all tapped through the same freetext path. %>
     <% if event.genres.any? %>
       <div class="event-genres">
         <% event.genres.each_with_index do |genre, i| %>

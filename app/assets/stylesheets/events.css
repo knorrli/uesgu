@@ -1227,3 +1227,65 @@ body.filter-sheet-open { overflow: hidden; }
   .pagination .first,
   .pagination .last { display: none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROTOTYPE (uncommitted, easy to revert): two click-affordance systems.
+   - Big text links use the UNDERLINE family: event title = solid (primary),
+     venue = dotted (the same language, a weaker member) — so a venue reads as
+     tappable without a pill, which would be clunky at headline size.
+   - Small filter tokens (styles, genres, city/canton) use the PILL family: an
+     outline pill at rest = "tap me", and when applied it fills green — which is
+     exactly the filter CHIP in the chips row, so the tag and the chip are one
+     object in two states. Mobile-first: the pill outline carries the affordance
+     with no hover needed, and it doesn't saturate the page the way coloured text
+     did (the colour is spent only on the rare applied state).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Descriptor rows become wrapping flex so pills space by gap, not · separators. */
+.event-styles,
+.event-genres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.4ch;
+}
+
+.event-styles .sep,
+.event-genres .sep { display: none; }
+
+/* Resting pill: a sharp (on-brand) outline token, inheriting its tier's colour
+   (styles bold-ink, genres muted). Pills are reserved for the DESCRIPTORS
+   (styles + genres); locations use the underline family below. */
+.event-styles .filter-link,
+.event-genres .filter-link {
+  padding: 1px 6px;
+  border: var(--tag-border-width) solid var(--border-color);
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.event-styles .filter-link:hover,
+.event-genres .filter-link:hover {
+  text-decoration: none;
+  background: var(--theme-bg-muted);
+}
+
+/* Applied pill = the filled green chip. Outranks the base .filter-link.active
+   (which only recolours text) so the small tokens fill instead. */
+.event-styles .filter-link.active,
+.event-genres .filter-link.active {
+  background: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
+  color: var(--theme-on-accent);
+}
+
+/* Locations (venue + city/canton) use the UNDERLINE family: dotted = tappable,
+   deliberately distinct from the event title's solid underline so the two link
+   tiers never blur. City/canton stay muted text (not pills) — same affordance as
+   the venue, just quieter, which also keeps the metadata line from boxing up. */
+.event-where .filter-link,
+.event-where-meta .filter-link {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}

@@ -37,6 +37,26 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     refute g.reload.ignored?
   end
 
+  test 'set_parent files the genre under the chosen parent' do
+    g = genre(events_count: 2)
+    parent = genre
+
+    post set_parent_genre_path(g), params: { genre: { parent_genre_id: parent.id }, return_to: genres_path }
+
+    assert_redirected_to genres_path
+    assert_equal parent.id, g.reload.parent_id
+  end
+
+  test 'set_parent rejects a cycle and keeps the tree unchanged' do
+    parent = genre
+    g = genre; g.set_parent!(parent)
+
+    post set_parent_genre_path(parent), params: { genre: { parent_genre_id: g.id } }
+
+    assert_equal parent.id, g.reload.parent_id, 'g still sits under parent'
+    assert_nil parent.reload.parent_id, 'the rejected re-parent left parent a root'
+  end
+
   test 'queue serves the highest-impact unmapped genre' do
     genre(name: 'light', events_count: 2)
     heavy = genre(name: 'heavy', events_count: 99)

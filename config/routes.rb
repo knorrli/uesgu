@@ -88,12 +88,15 @@ Rails.application.routes.draw do
   scope :admin do
     get '', to: 'admin#index', as: :admin
 
-    # Genre → style mapping. index/edit are standard CRUD over all genres in
-    # use; queue is the "tinder" flow serving the next unmapped genre; update
-    # assigns styles; ignore/hide/block set a disposition, restore clears it;
-    # merge folds the genre into a canonical one (a semantic alias).
+    # Genre curation. index/edit are standard CRUD over all genres in use; queue
+    # is the "tinder" flow serving the next genre not yet filed into the tree;
+    # update assigns styles (legacy, removed with Style in Phase 2); set_parent
+    # files a genre under a parent (the tree's curation action); ignore/hide/block
+    # set a disposition, restore clears it; merge folds the genre into a canonical
+    # one (a semantic alias).
     resources :genres, only: %i[index edit update] do
       member do
+        post :set_parent
         post :ignore
         post :hide
         post :block

@@ -334,6 +334,7 @@ fr:
       status_hidden: masqué
       status_blocked: bloqué
       status_merged: "fusionné avec %{canonical}"
+      status_placed: "sous %{parent}"
       sort_by: "Trier:"
       sort_name: A–Z
       sort_count: plus fréquents
@@ -346,6 +347,8 @@ fr:
       usage: "sur %{count} événements"
       status: "Statut :"
       suggested: Suggestions
+      set_parent: Définir le parent
+      set_parent_into: "Classer sous un autre genre…"
       assign: Assigner
       ignore: "Ignorer (garder, sans style)"
       hide: "Masquer l'événement (non musical)"

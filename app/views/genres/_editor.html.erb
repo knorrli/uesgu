@@ -23,6 +23,31 @@
       <span class="muted"><%= t('genres.editor.status') %> <strong><%= t("genres.index.#{status_key}") %></strong></span>
       <%= button_to t('genres.queue.restore'), restore_genre_path(genre), params: { return_to: return_to } %>
     </div>
+  <% elsif genre.placed? %>
+    <div class="flex gap-medium align-baseline wrap genre-current-status">
+      <span class="muted"><%= t('genres.editor.status') %> <strong><%= t('genres.index.status_placed', parent: genre.parent.name) %></strong></span>
+      <%= button_to t('genres.queue.restore'), restore_genre_path(genre), params: { return_to: return_to } %>
+    </div>
+  <% end %>
+
+  <%# Primary curation action: file this genre into the tree under a parent (e.g.
+      Crustpunk → Punk). Blank = a top-level (root) genre. Parents exclude this
+      genre and its own descendants (which would form a cycle) and any
+      hidden/blocked/aliased genre. The parent-based successor to "Assign". %>
+  <% parent_options = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
+                           .where.not(id: [genre.id, *genre.descendant_ids]).by_name %>
+  <%= form_with url: set_parent_genre_path(genre), method: :post, scope: :genre,
+        class: 'flex justify-between gap-medium wrap align-end genre-set-parent' do |f| %>
+    <%= hidden_field_tag :return_to, return_to %>
+    <div class="input-wrapper flex flex-grow">
+      <%= f.combobox :parent_genre_id, parent_options,
+            value: genre.parent_id,
+            placeholder: t('genres.editor.set_parent_into') do |combobox| %>
+        <% combobox.customize_fieldset class: 'flex-grow' %>
+        <% combobox.customize_input class: 'flex-grow' %>
+      <% end %>
+    </div>
+    <%= f.submit t('genres.editor.set_parent') %>
   <% end %>
 
   <% if suggestions.any? %>

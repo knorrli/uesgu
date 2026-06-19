@@ -334,6 +334,7 @@ en:
       status_hidden: hidden
       status_blocked: blocked
       status_merged: "merged into %{canonical}"
+      status_placed: "under %{parent}"
       sort_by: "Sort:"
       sort_name: A–Z
       sort_count: most used
@@ -346,6 +347,8 @@ en:
       usage: "on %{count} events"
       status: "Status:"
       suggested: Suggested
+      set_parent: Set parent
+      set_parent_into: "File under another genre…"
       assign: Assign
       ignore: "Ignore (keep, no style)"
       hide: "Hide event (non-music)"

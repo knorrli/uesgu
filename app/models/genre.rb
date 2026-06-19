@@ -12,6 +12,16 @@ class Genre < ApplicationRecord
   has_many :aliases, class_name: 'Genre', foreign_key: :canonical_id,
                      inverse_of: :canonical, dependent: :nullify
 
+  # The genre tree: a genre sits under one parent (e.g. Crustpunk → Punk → Rock),
+  # forming the curated taxonomy that supersedes the flat Style layer. A tree, not
+  # a DAG — one primary parent only. Filtering by a genre matches it OR any
+  # descendant (see subtree_ids). A root genre (no parent) is a top-level browse
+  # bucket. Orphan, don't cascade, on delete — losing a parent shouldn't delete
+  # the subtree. See docs/taxonomy-and-saved-filters-redesign.md.
+  belongs_to :parent, class_name: 'Genre', optional: true
+  has_many :children, class_name: 'Genre', foreign_key: :parent_id,
+                      inverse_of: :parent, dependent: :nullify
+
   # Unassigned = the assignment queue: in active use, mapped to no style, and
   # carrying no disposition (including not an alias). Ordered most-used first so
   # the highest-impact genres surface.
@@ -22,6 +32,15 @@ class Genre < ApplicationRecord
           .distinct
   }
   scope :assigned, -> { joins(:styles).distinct }
+  # Tree curation queue: in active use, sitting under no parent and carrying no
+  # disposition or alias — the genres still waiting to be filed into the tree.
+  # The parent-based successor to `unassigned` (which keys off Style); both
+  # coexist until Style is removed (Phase 2). Ordered most-used first by by_usage.
+  scope :unplaced, lambda {
+    in_use.where(parent_id: nil, ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+  }
+  scope :placed, -> { where.not(parent_id: nil) }
+  scope :roots, -> { where(parent_id: nil) }
   scope :ignored, -> { where.not(ignored_at: nil) }
   scope :hidden, -> { where.not(hidden_at: nil) }
   scope :blocked, -> { where.not(blocked_at: nil) }
@@ -87,6 +106,36 @@ class Genre < ApplicationRecord
     canonical_id.present?
   end
 
+  def placed?
+    parent_id.present?
+  end
+
+  # The id of this genre and every genre transitively beneath it in the tree —
+  # the set a "filter by this genre" expands to (match the genre OR any
+  # descendant). A single recursive query, freshly evaluated so it never goes
+  # stale after a re-parent (the doc's "cached descendant_ids OR recursive CTE"
+  # — CTE chosen for correctness; wrap in a cache later if the read volume grows).
+  # UNION (not UNION ALL) so a stray parent cycle terminates instead of looping.
+  def self.subtree_ids(root_ids)
+    root_ids = Array(root_ids).map(&:to_i).uniq
+    return [] if root_ids.empty?
+
+    sql = sanitize_sql_array([<<~SQL.squish, root_ids])
+      WITH RECURSIVE subtree(id) AS (
+        SELECT id FROM genres WHERE id IN (?)
+        UNION
+        SELECT g.id FROM genres g JOIN subtree s ON g.parent_id = s.id
+      )
+      SELECT id FROM subtree
+    SQL
+    connection.select_values(sql).map(&:to_i)
+  end
+
+  # This genre's descendants (excluding itself). Memoised per instance.
+  def descendant_ids
+    @descendant_ids ||= self.class.subtree_ids([id]) - [id]
+  end
+
   # The normalized matching key. MUST reproduce the SQL `fingerprint` generated
   # column exactly (AddFingerprintToGenres) — verified by test. Used at ingest on
   # raw scraped strings that have no row to read the stored column off.
@@ -149,12 +198,29 @@ class Genre < ApplicationRecord
     recompute_events!
   end
 
+  # File this genre into the tree under `parent` (a Genre or its id; nil detaches
+  # it back to a root). The parent-based successor to assign_styles! — a placed
+  # genre carries no disposition or alias, so clear those. Rejects parenting a
+  # genre under itself or its own descendant (which would form a cycle). Re-derives
+  # events so a previously-hidden genre re-surfaces once it's placed.
+  def set_parent!(parent)
+    new_parent_id = parent.is_a?(Genre) ? parent.id : parent.presence&.to_i
+    if new_parent_id && self.class.subtree_ids([id]).include?(new_parent_id)
+      raise ArgumentError, 'a genre cannot be parented under itself or its own descendant'
+    end
+
+    transaction do
+      update!(parent_id: new_parent_id, ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+    end
+    recompute_events!
+  end
+
   # "Ignore" it for mapping: a real, publicly-shown genre we deliberately leave
   # unmapped. Clear styles, set ignored_at, re-derive events.
   def ignore!
     transaction do
       styles.clear
-      update!(ignored_at: Time.current, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+      update!(ignored_at: Time.current, hidden_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
     end
     recompute_events!
   end
@@ -164,7 +230,7 @@ class Genre < ApplicationRecord
   def hide!
     transaction do
       styles.clear
-      update!(hidden_at: Time.current, ignored_at: nil, blocked_at: nil, canonical_id: nil)
+      update!(hidden_at: Time.current, ignored_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
     end
     recompute_events!
   end
@@ -176,7 +242,7 @@ class Genre < ApplicationRecord
   def block!
     transaction do
       styles.clear
-      update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil, canonical_id: nil)
+      update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil, canonical_id: nil, parent_id: nil)
     end
     # Snapshot ids first: recompute_styles! drops this genre's tagging from each
     # event, shrinking the tagged_with set find_each would page over — which would
@@ -214,7 +280,7 @@ class Genre < ApplicationRecord
         taggings.update_all(tag_id: canonical_tag.id)
       end
       styles.clear
-      update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil)
+      update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil, parent_id: nil)
     end
     Event.where(id: affected).find_each(&:recompute_styles!)
     Genre.reconcile!
@@ -224,7 +290,7 @@ class Genre < ApplicationRecord
   # events. Like restoring a blocked genre, repointed/stripped taggings don't
   # come back — restore only lifts the mark for future scrapes.
   def restore!
-    update!(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+    update!(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
     recompute_events!
   end
 

@@ -32,12 +32,16 @@ class Genre < ApplicationRecord
           .distinct
   }
   scope :assigned, -> { joins(:styles).distinct }
-  # Tree curation queue: in active use, sitting under no parent and carrying no
-  # disposition or alias — the genres still waiting to be filed into the tree.
-  # The parent-based successor to `unassigned` (which keys off Style); both
-  # coexist until Style is removed (Phase 2). Ordered most-used first by by_usage.
+  # Tree curation queue: in active use, sitting under no parent, carrying no
+  # disposition or alias, AND not itself a parent of other genres — the genres
+  # still waiting to be filed into the tree. Excluding parents is what separates
+  # an unfiled leaf from a deliberate top-level root (a root has children but no
+  # parent, so it would otherwise look unplaced). The parent-based successor to
+  # `unassigned` (which keys off Style); both coexist until Style is removed
+  # (Phase 2). Ordered most-used first by by_usage.
   scope :unplaced, lambda {
     in_use.where(parent_id: nil, ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+          .where.not(id: Genre.where.not(parent_id: nil).select(:parent_id))
   }
   scope :placed, -> { where.not(parent_id: nil) }
   scope :roots, -> { where(parent_id: nil) }

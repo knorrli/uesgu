@@ -327,6 +327,7 @@ en:
       title: Genres
       search: Search genres
       queue_link: Assignment queue
+      tree_link: Tree
       status_all: all
       status_unassigned: unassigned
       status_assigned: assigned
@@ -338,6 +339,11 @@ en:
       sort_by: "Sort:"
       sort_name: A–Z
       sort_count: most used
+    tree:
+      title: Genre tree
+      summary: "%{roots} roots · %{placed} genres placed"
+      unplaced: "%{count} unplaced (in queue)"
+      empty: No genres placed yet.
     queue:
       title: Genre assignment
       remaining: "%{count} unassigned"

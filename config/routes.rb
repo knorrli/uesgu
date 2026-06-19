@@ -105,6 +105,8 @@ Rails.application.routes.draw do
       end
       collection do
         get :queue
+        # Read-only hierarchy view of the curated genre tree.
+        get :tree
         # Selection chips for the per-event genre-override combobox (admin only).
         post :chips
       end

@@ -2,7 +2,10 @@
   <%= render 'admin/back' %>
   <div class="flex justify-between align-baseline gap-medium wrap">
     <h1><%= t('.title') %></h1>
-    <%= link_to t('.queue_link'), queue_genres_path %>
+    <div class="flex gap-medium align-baseline wrap">
+      <%= link_to t('.tree_link'), tree_genres_path %>
+      <%= link_to t('.queue_link'), queue_genres_path %>
+    </div>
   </div>
 
   <%# Two groups: assignment status (all / assigned / unassigned), then the

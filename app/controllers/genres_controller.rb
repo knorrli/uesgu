@@ -26,6 +26,24 @@ class GenresController < ApplicationController
     @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:styles).page(params[:page]).per(50)
   end
 
+  # Read-only hierarchy view: the curated genre tree, roots → descendants, for
+  # eyeballing the cultivation at a glance. Loads the whole placed taxonomy once
+  # (dispositions/aliases excluded — they sit outside the tree) and builds the
+  # parent→children map in memory, so the recursive render does no per-node query.
+  def tree
+    genres = Genre.where(hidden_at: nil, blocked_at: nil, ignored_at: nil, canonical_id: nil)
+                  .by_name.to_a
+    @children = genres.group_by(&:parent_id)
+    # A top-level genre is a tree *root* only if something points to it as a
+    # parent. This keeps the unplaced genres (parent_id nil, no children — the
+    # curation queue's backlog) out of the hierarchy view; they're summarised
+    # below and curated from the queue, not here.
+    parents = @children.keys.compact.to_set
+    @roots = (@children[nil] || []).select { |g| parents.include?(g.id) }
+    @placed = Genre.placed.count
+    @unplaced = Genre.unplaced.count
+  end
+
   # The curation queue: serve the single highest-impact genre not yet filed into
   # the tree (unplaced = in use, no parent, no disposition), plus style/alias
   # suggestions and the events it appears on. Placing/ignoring it returns here,

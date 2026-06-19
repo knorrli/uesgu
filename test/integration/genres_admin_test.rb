@@ -67,6 +67,19 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     assert_includes response.body, heavy.name, 'the most-used unmapped genre surfaces first'
   end
 
+  test 'tree renders the placed hierarchy for an admin' do
+    rock = genre(name: 'treerock', events_count: 3)
+    punk = genre(name: 'treepunk', events_count: 2); punk.set_parent!(rock)
+    genre(name: 'treehidden', events_count: 1).hide!
+
+    get tree_genres_path
+
+    assert_response :success
+    assert_includes response.body, rock.name
+    assert_includes response.body, punk.name
+    refute_includes response.body, 'treehidden', 'disposed genres sit outside the tree'
+  end
+
   test 'index and edit render for an admin' do
     g = genre(events_count: 1)
     get genres_path

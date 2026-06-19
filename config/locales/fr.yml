@@ -327,6 +327,7 @@ fr:
       title: Genres
       search: Rechercher des genres
       queue_link: File d'assignation
+      tree_link: Arborescence
       status_all: tous
       status_unassigned: non assigné
       status_assigned: assigné
@@ -338,6 +339,11 @@ fr:
       sort_by: "Trier:"
       sort_name: A–Z
       sort_count: plus fréquents
+    tree:
+      title: Arborescence des genres
+      summary: "%{roots} racines · %{placed} genres classés"
+      unplaced: "%{count} non classés (dans la file)"
+      empty: Aucun genre encore classé.
     queue:
       title: Assignation des genres
       remaining: "%{count} non assignés"

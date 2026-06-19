@@ -327,6 +327,7 @@ de:
       title: Genres
       search: Genres suchen
       queue_link: Zuweisungs-Queue
+      tree_link: Baum
       status_all: alle
       status_unassigned: nicht zugewiesen
       status_assigned: zugewiesen
@@ -338,6 +339,11 @@ de:
       sort_by: "Sortieren:"
       sort_name: A–Z
       sort_count: am häufigsten
+    tree:
+      title: Genre-Baum
+      summary: "%{roots} Wurzeln · %{placed} Genres eingeordnet"
+      unplaced: "%{count} nicht eingeordnet (in Queue)"
+      empty: Noch keine Genres eingeordnet.
     queue:
       title: Genre-Zuweisung
       remaining: "%{count} nicht zugewiesen"

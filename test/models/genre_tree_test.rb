@@ -64,8 +64,9 @@ class GenreTreeTest < ActiveSupport::TestCase
     assert_nil rock.reload.parent_id, 'a rejected re-parent leaves the tree unchanged'
   end
 
-  test 'unplaced is in-use genres with no parent and no disposition' do
-    placed = genre(name: 'flux-placed', events_count: 5); placed.set_parent!(genre(name: 'flux-root'))
+  test 'unplaced is in-use leaf genres with no parent and no disposition' do
+    root = genre(name: 'flux-root', events_count: 5)
+    placed = genre(name: 'flux-placed', events_count: 5); placed.set_parent!(root)
     waiting = genre(name: 'flux-waiting', events_count: 5)
     unused = genre(name: 'flux-unused', events_count: 0)
     hidden = genre(name: 'flux-hidden', events_count: 5); hidden.hide!
@@ -73,6 +74,7 @@ class GenreTreeTest < ActiveSupport::TestCase
     ids = Genre.unplaced.pluck(:id)
     assert_includes ids, waiting.id
     refute_includes ids, placed.id, 'a placed genre has left the queue'
+    refute_includes ids, root.id, 'a root (has children, no parent) is not unplaced'
     refute_includes ids, unused.id, 'a genre on no events is not queued'
     refute_includes ids, hidden.id, 'a disposed genre is not queued'
   end

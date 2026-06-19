@@ -17,6 +17,8 @@ Six parallel research passes + firsthand verification. **TL;DR:**
 | — | Songkick / Bandsintown | terms exclude us; ClaudeBot-banned | mixed | ❌ | sparse | Dead end |
 | — | bka.ch / Berner Kulturagenda | **explicit AI/bot opt-out + 403** | likely | likely | broadest | Dead end (ethics) |
 | — | opendata.swiss / Bern OGD | open | — | — | **no events dataset** | Dead end |
+| — | **guidle** (guidle.ch) | **contract-gated** (Guidle AG agreement) | ✅ | ~ | tourism-skewed, weak on ours | Dead end (gated + wrong scope) |
+| — | TICKETINO REST API | free/open | ✅ | coarse | own-ticketed only (silo) | Dead end |
 | — | **Heitere Fahne** (the trigger) | — | only via private ajax | — | n/a | **Stays shelved** |
 
 **Headline:** **PETZI is the find.** A single uniform, server-rendered, robots-allowed
@@ -195,3 +197,38 @@ Backlog note updated.
 
 *POC lives at `script/petzi_poc.rb` (standalone, persists nothing). See
 [[project-open-event-data-avenues]] memory for the condensed version.*
+
+---
+
+## Addendum (2026-06-19): two more sources checked + long-term direction
+
+A follow-up sweep surfaced two avenues the original pass missed. Both confirm the same
+pattern: **the problem _is_ solved commercially, never as open data.**
+
+- **guidle** (guidle.ch) — the *de facto* national hub. Schweiz Tourismus / MySwitzerland
+  commissioned guidle to run the national event calendar; the tourism capture tools
+  (Feratel, Deskline, TOMAS) all feed it, and it exposes an **XML *and* JSON interface** —
+  technically exactly what we'd want. **Two killers:** (1) access is **contract-gated**
+  ("interface activation only after signing an agreement with Guidle AG") — not a
+  `curl`-able feed; (2) content skews **tourism/destination**, not indie music clubs, so
+  coverage of our actual venues is weak. **Dead end** (confirmed by SK — gated + wrong scope).
+- **TICKETINO REST API** — a genuinely **free/open** REST API from a Swiss ticketing
+  platform. But it's an *organizer ticketing-integration* API: it exposes only events
+  ticketed **through TICKETINO** — a per-platform silo, not a consumption feed, and coverage
+  of our venues is likely thin. **Dead end.**
+
+**Conclusion (reaffirmed):** no open, license-clean, comprehensive feed of the Swiss
+indie-music scene exists. Every broad source is either contract-gated B2B (guidle, Eventfrog)
+or a per-platform ticketing silo (TICKETINO, Petzi ticketing, Starticket/See Tickets). The
+clubs are too small and too fragmented for anyone to have aggregated them openly — **which is
+exactly the gap our per-venue scrapers fill.** Scrapers are the right call; Petzi stays a
+useful-but-grey supplement we should not over-invest in.
+
+**Long-term direction (far off — only once the product has proven useful):**
+1. **Ask the venues directly.** Once üsgu is demonstrably useful, reach out to venues to (a)
+   confirm they're OK with us scraping (it's free advertising for their shows — no obvious
+   downside for them) and (b) ask whether they'd expose their data in a machine-readable
+   format (even a simple ICS/JSON/RSS would beat HTML scraping).
+2. **Eventually, expose our own API.** If üsgu becomes genuinely successful, *we* could become
+   the open, license-clean Swiss indie-events feed that doesn't exist today — closing the gap
+   for the next person. Very distant idea, recorded so it isn't lost.

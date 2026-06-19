@@ -39,4 +39,22 @@ class TagsHelperTest < ActionView::TestCase
 
     refute_includes available_tags(context: :locations, applied: [venue]).map(&:name), venue
   end
+
+  test 'genre_filter_tree nests roots, sums subtree counts, prunes empties and unplaced' do
+    rock = genre(name: 'treerock', events_count: 1)
+    indie = genre(name: 'treeindie', events_count: 2); indie.set_parent!(rock)
+    shoegaze = genre(name: 'treeshoe', events_count: 3); shoegaze.set_parent!(indie)
+    empty = genre(name: 'treeempty', events_count: 0); empty.set_parent!(rock)
+    loose = genre(name: 'treeloose', events_count: 5) # top-level but childless = unplaced
+
+    tree = genre_filter_tree
+    root = tree.find { |node| node[:name] == rock.name }
+
+    assert root, 'a root genre (top-level with children) is present'
+    assert_equal 6, root[:count], 'subtree count sums self + every descendant (1+2+3)'
+    indie_node = root[:children].find { |node| node[:name] == indie.name }
+    assert_equal [shoegaze.name], indie_node[:children].map { |node| node[:name] }
+    refute root[:children].any? { |node| node[:name] == empty.name }, 'a zero-count subtree is pruned'
+    refute tree.any? { |node| node[:value] == loose.name }, 'an unplaced childless top-level genre is excluded'
+  end
 end

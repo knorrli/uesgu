@@ -14,7 +14,7 @@
     focused when the user taps it, never on open.
    ───────────────────────────────────────────────────────────────────────── %>
 
-<% what_terms  = @filter.queries + @filter.style_list %>
+<% what_terms  = @filter.queries + @filter.genres %>
 <% where_terms = @filter.location_list.map { |loc| location_display(loc) } %>
 <% when_terms  = @filter.date_ranges.map { |range| date_range_label(range) } %>
 <% custom_range = @filter.date_ranges.find { |r| r.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) } %>
@@ -63,8 +63,8 @@
           <% @filter.queries.each do |query| %>
             <%= render 'filter_chip', name: 'q', value: query, label: query, icon: 'query' %>
           <% end %>
-          <% @filter.style_list.each do |style| %>
-            <%= render 'filter_chip', name: 's', value: style, label: style, icon: 'query' %>
+          <% @filter.genres.each do |genre| %>
+            <%= render 'filter_chip', name: 'g', value: genre, label: genre, icon: 'query' %>
           <% end %>
           <% @filter.location_list.each do |location| %>
             <%= render 'filter_chip', name: 'l', value: location, label: location_display(location), icon: Location.type_for(location) %>
@@ -112,30 +112,44 @@
           <% end %>
         </div>
 
-        <%# Curated STYLES — the always-visible browse vocabulary (~15 buckets). A
-            pick commits its exact s[] bucket. %>
-        <% styles = available_tags(context: :styles).to_a %>
-        <% style_names = styles.map { |style| style.name.downcase } %>
-        <% styles.each do |style| %>
-          <label class="opt">
-            <input type="checkbox" name="s[]" value="<%= style.name %>" <%= 'checked' if @filter.style_list.include?(style.name) %>>
-            <span class="opt__box"></span>
-            <span class="opt__label"><%= style.name %></span>
-          </label>
-        <% end %>
-
-        <%# In-use GENRES — listed after the styles, same as the desktop What
-            dropdown (which carries the full styles + genres list and just filters it
-            live). A genre pick commits q[] (substring); styles commit their exact
-            s[] bucket. Deduped against the style names; applied queries already show
-            above (excluded). Long, but the search box filters it like desktop. %>
-        <% available_tags(context: :genres, applied: @filter.queries).each do |genre| %>
-          <% next if style_names.include?(genre.name.downcase) %>
-          <label class="opt">
-            <input type="checkbox" name="q[]" value="<%= genre.name %>">
-            <span class="opt__box"></span>
-            <span class="opt__label"><%= genre.name %></span>
-          </label>
+        <%# Curated GENRE TREE — roots → children → grandchildren, rendered through
+            the same collapsible markup as the Where sheet's canton > city > venue so
+            What and Where read identically. A pick commits its g[] genre, which
+            matches that genre + every descendant (Filter#expanded_genre_names). The
+            search box filters the whole tree live (data-search). %>
+        <% genre_filter_tree.each do |root| %>
+          <div class="loc-group collapsed" data-filter-sheets-target="group">
+            <div class="loc-group__head">
+              <label class="opt opt--canton" data-search="<%= root[:search] %>">
+                <input type="checkbox" name="g[]" value="<%= root[:value] %>" <%= 'checked' if @filter.genres.include?(root[:value]) %>>
+                <span class="opt__box"></span>
+                <span class="opt__label"><%= root[:name] %></span>
+              </label>
+              <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
+                      aria-label="<%= root[:name] %>">
+                <span class="loc-group__count"><%= root[:count] %></span>
+                <span class="loc-group__chevron ph ph-caret-down"></span>
+              </button>
+            </div>
+            <div class="loc-group__body">
+              <% root[:children].each do |child| %>
+                <label class="opt opt--city" data-search="<%= child[:search] %>">
+                  <input type="checkbox" name="g[]" value="<%= child[:value] %>" <%= 'checked' if @filter.genres.include?(child[:value]) %>>
+                  <span class="opt__box"></span>
+                  <span class="opt__label"><%= child[:name] %></span>
+                  <span class="opt__count"><%= child[:count] %></span>
+                </label>
+                <% child[:children].each do |grandchild| %>
+                  <label class="opt opt--venue" data-search="<%= grandchild[:search] %>">
+                    <input type="checkbox" name="g[]" value="<%= grandchild[:value] %>" <%= 'checked' if @filter.genres.include?(grandchild[:value]) %>>
+                    <span class="opt__box"></span>
+                    <span class="opt__label"><%= grandchild[:name] %></span>
+                    <span class="opt__count"><%= grandchild[:count] %></span>
+                  </label>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
         <% end %>
       </div>
       <footer class="sheet__footer">

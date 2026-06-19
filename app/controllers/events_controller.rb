@@ -27,9 +27,6 @@ class EventsController < ApplicationController
       # simple_calendar navigates via params[:start_date]; load the focused
       # month plus a week of padding so adjacent-month grid cells are covered.
       @events = events.includes(:locations, :styles).where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))
-      # Followed locations surface venues first in each cell; the per-day heart
-      # marker (locations or styles) is computed in the calendar partial.
-      @favorites = current_user&.location_list.to_a
       # A day's expansion is URL state (params[:day]), so the server renders the
       # open day's detail inline in the grid — linkable, reload-safe, and the
       # source of truth (no client-side drawer to preserve). See #day_events.

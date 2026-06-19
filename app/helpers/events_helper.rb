@@ -36,10 +36,9 @@ module EventsHelper
   # FILTERS the programme by that term ("tap rock → rock events"), the behaviour
   # cold users expect. One action per tag: the whole tag is the filter link, so a
   # tag means exactly one thing (no tiny secondary follow target crammed onto a
-  # finger-sized chip). Following moved off the tag onto the dedicated "follow this
-  # filter" control (see _notify_button), which frees colour to mean the app's
-  # usual "this is interactive" again. favorite_type: is kept for call-site
-  # compatibility.
+  # finger-sized chip). Following was removed entirely (the ★ saves a whole filter
+  # instead — see _save_notify), which frees colour to mean the app's usual "this
+  # is interactive" again.
   #
   # The tap TOGGLES the filter by this term, and the highlight follows MATCHING,
   # not exact equality. A tag lights green when an applied filter matches it — for
@@ -53,7 +52,7 @@ module EventsHelper
   # reset so you land on page 1. In a read-only context (no filter form, e.g. a
   # notification digest passing interactive: false) it stays a plain single-value
   # link into the listing — a way back into the site.
-  def event_filter_tag(label, field:, value:, interactive: true, modifier: nil, favorite_type: nil)
+  def event_filter_tag(label, field:, value:, interactive: true, modifier: nil)
     param = field.delete_suffix('[]')
 
     unless interactive
@@ -120,67 +119,6 @@ module EventsHelper
     end
   end
 
-  # The whole tag is the follow toggle: clicking the venue/style name (a big,
-  # obvious target, not a tiny icon) follows/unfollows it, shown by a trailing
-  # heart that inherits the tag's size. Optimistic — the favorite Stimulus
-  # controller flips every matching tag on the page and POSTs in the background,
-  # so nothing reloads. At rest a followable tag looks like plain info (a faint
-  # outline heart is the only "you can follow this" cue, so the list reads the same
-  # logged in or out); following it fills the heart and lights the tag in the
-  # accent colour — the one place colour now means "this is yours".
-  def favorite_tag(label, type, value, modifier = nil)
-    followed = followed_tag?(type, value)
-    button_tag type: :button,
-               class: class_names('event-tag', 'fav', modifier, followed: followed),
-               'aria-pressed': followed.to_s,
-               'aria-label': t('favorites.toggle', name: value),
-               data: { action: 'favorite#toggle', favorite_type_param: type, favorite_value_param: value } do
-      safe_join([
-        content_tag(:span, label, class: 'fav-label'),
-        content_tag(:span, '', class: 'fav-star', 'aria-hidden': true)
-      ])
-    end
-  end
-
-  def followed_tag?(type, value)
-    case type.to_sym
-    when :location then followed_locations.include?(value)
-    when :style then followed_styles.include?(value)
-    else false
-    end
-  end
-
-  # The current user's follows, loaded once per request and reused across every
-  # tag in the list (a style repeats on many events; a venue on many days).
-  def followed_locations
-    @followed_locations ||= Set.new(current_user&.location_list)
-  end
-
-  def followed_styles
-    @followed_styles ||= Set.new(current_user&.style_list)
-  end
-
-  # The user's follows as namespaced keys ("l:<location>" / "s:<style>"). Used to
-  # render each day's heart marker server-side (the authoritative source on every
-  # render) and handed to the favorite Stimulus controller so it can flip those
-  # markers the instant a tag is toggled. See CalendarHelper#calendar_day_favorite_keys.
-  def favorite_followed_keys
-    followed_locations.map { |name| "l:#{name}" } + followed_styles.map { |name| "s:#{name}" }
-  end
-
-  # Offer the "filter to my favorites" shortcut only to a logged-in user who has
-  # at least one followed location or style — otherwise there is nothing to apply.
-  def favorites_filter_available?
-    current_user.present? && (followed_locations.any? || followed_styles.any?)
-  end
-
-  # True when the active filter is exactly the user's favorites (locations and
-  # styles, order-independent, and no extra free-text query). When on, the control
-  # reads as active and a click clears it back to the full programme.
-  def favorites_filter_active?
-    favorites_filter_available? && current_user.favorites_filter?(@filter)
-  end
-
   # The current user's saved event ids, loaded once so the per-event save button
   # doesn't N+1 across a list.
   def saved_event_ids
@@ -189,15 +127,6 @@ module EventsHelper
 
   def event_saved?(event)
     saved_event_ids.include?(event.id)
-  end
-
-  # True when an event touches one of the user's follows — a followed location or
-  # style. In-memory over already-loaded associations + the cached followed sets,
-  # so it stays cheap across a calendar month. Used to pick a cell's interest
-  # headline (see CalendarHelper#calendar_day_headline).
-  def event_matches_follow?(event)
-    event.locations.any? { |location| followed_locations.include?(location.name) } ||
-      event.styles.any? { |style| followed_styles.include?(style.name) }
   end
 
   # The bookmark toggle on an event. Logged-in only; optimistic via the `save`

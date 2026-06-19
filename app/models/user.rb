@@ -17,9 +17,6 @@ class User < ApplicationRecord
   # record when the account is deleted (redeemed_at stays set), just unlinked.
   has_one :accepted_invitation, class_name: 'Invitation', foreign_key: :redeemed_by_id, dependent: :nullify, inverse_of: :redeemed_by
 
-  # Favorites: users follow locations and styles (genres stay internal).
-  acts_as_taggable_on :locations, :styles
-
   normalizes :username, with: ->(u) { u.strip.downcase }
   normalizes :email_address, with: ->(e) { e.strip.downcase.presence }
 
@@ -34,18 +31,6 @@ class User < ApplicationRecord
 
   def admin?
     admin
-  end
-
-  # True when `filter` is exactly this user's follows — the same followed locations
-  # and styles (order-independent) with no extra free-text query. The one
-  # definition behind the events "favorites" pill's active state (EventsHelper) and
-  # a rule's "keep in sync with my favorites" detection (NotificationRulesController).
-  def favorites_filter?(filter)
-    return false if filter.queries.any?
-    return false unless location_list.any? || style_list.any?
-
-    Set.new(filter.location_list) == Set.new(location_list) &&
-      Set.new(filter.style_list) == Set.new(style_list)
   end
 
   # Mint (or rotate) the bearer token behind the subscribable ICS feed. Rotating

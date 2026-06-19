@@ -3,29 +3,20 @@
 <%# This page renders list OR calendar for the SAME url depending on the saved
     view preference (session/account) — which Turbo's url-keyed snapshot cache
     can't represent, so a cached snapshot of the other view flashes on navigation
-    (the list↔calendar flicker, e.g. after switching view then tapping "My
-    interests"). Opt out of the snapshot cache so every visit renders fresh. %>
+    (the list↔calendar flicker). Opt out of the snapshot cache so every visit
+    renders fresh. %>
 <% content_for :head do %><meta name="turbo-cache-control" content="no-cache"><% end %>
 
-<div class="flex flex-col gap-large align-stretch" data-controller="favorite"
-     data-action="turbo:before-frame-render->favorite#beforeFrameRender turbo:frame-load->favorite#reapply"
-     data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
+<div class="flex flex-col gap-large align-stretch">
   <%# One filter UI for all widths (the genre/location tree pickers + when): a
       trigger bar that opens full-screen sheets on mobile and inline dropdown
       panels on desktop (CSS-only difference). The same genre/location tree sheets
       (tags/_genre_sheet, _location_sheet) are reused by the rule editor. %>
   <%= render 'filter_sheets' %>
 
-  <%# Toggle row, above the content in both views (so the first bold header lines
-      up across views). The left holds the "my interests" filter shortcut; the
-      "notify me about this filter" action lives down by the filter chips (where
-      its meaning is clear), so this row stays identical whether or not a filter
-      is active. align-center, since on mobile the left can be a lone star icon
-      with no text baseline to ride on. %>
-  <div class="events-toolbar flex justify-between align-center gap-medium">
-    <div class="events-toolbar__left flex align-center gap-medium">
-      <%= render 'favorites_filter' %>
-    </div>
+  <%# The list/calendar view switcher, above the content in both views (so the
+      first bold header lines up across views). %>
+  <div class="events-toolbar flex justify-end align-center gap-medium">
     <%= render 'view_switcher', view: @view %>
   </div>
 

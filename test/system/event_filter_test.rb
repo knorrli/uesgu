@@ -34,6 +34,10 @@ class EventFilterTest < ApplicationSystemTestCase
     event(start_date: Date.current + 3, genre_list: [child.name])
 
     visit events_path("g[]": rock.name)
+    # filter-sheets#connect un-collapses the group holding the checked genre — wait
+    # for it so the chip's remove action is bound before we click (else, under
+    # full-suite load, the click can land before Stimulus connects and do nothing).
+    assert_selector ".sheet[data-field=what] .loc-group:not(.collapsed)", visible: :all
     find(".filter-sheets__summary .filter-chip", text: rock.name).click # filter-sheets#remove
 
     assert_no_current_path(/g%5B%5D=/)

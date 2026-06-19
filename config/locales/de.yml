@@ -4,7 +4,6 @@ de:
     admin: Admin
     notifications: Benachrichtigungen
     unread_notifications: Ungelesene Benachrichtigungen
-    favorites: Interessen
     notification_rules: Benachrichtigungen
     saved: Merkliste
     settings: Einstellungen
@@ -28,7 +27,7 @@ de:
     steps_safari_desktop: 'In Safari: „Ablage“ → „Zum Dock hinzufügen“ (ab Safari 17). Sonst läuft üsgu einfach im Browser.'
     steps_generic: 'Öffne das Browser-Menü und wähle „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
     benefit_quick: Mit einem Tipp geöffnet, ohne den Browser
-    benefit_notify: Benachrichtigungen zu neuen Veranstaltungen aus deinen Interessen
+    benefit_notify: Benachrichtigungen zu neuen Veranstaltungen aus deinen gespeicherten Filtern
     benefit_home: Eigenes Symbol auf deinem Startbildschirm
   languages:
     de: Deutsch
@@ -86,8 +85,8 @@ de:
     digest:
       title: Neue Veranstaltungen auf üsgu
       body:
-        one: 1 neue Veranstaltung passt zu deinen Interessen.
-        other: "%{count} neue Veranstaltungen passen zu deinen Interessen."
+        one: 1 neue Veranstaltung passt zu einem gespeicherten Filter.
+        other: "%{count} neue Veranstaltungen passen zu deinen gespeicherten Filtern."
     test:
       title: üsgu
       body: Dies ist eine Test-Benachrichtigung — Push funktioniert. 🎉
@@ -153,7 +152,7 @@ de:
       added: Neue Events
       happening: Was läuft
     errors:
-      empty_filter: Wähle zuerst einen Filter (Stil, Ort, Datum …) oder synchronisiere mit deinen Interessen.
+      empty_filter: Wähle zuerst einen Filter (Genre, Ort, Datum …).
       duplicate: Für diesen Filter hast du schon eine Benachrichtigung.
     new:
       title: Benachrichtigung einrichten
@@ -247,13 +246,6 @@ de:
     more_venues:
       one: "+ 1 weitere"
       other: "+ %{count} weitere"
-  favorites:
-    title: Interessen
-    intro: Wähle Stile und Orte, die dich interessieren — passende Tage bekommen einen Stern, und du filterst das Programm auf deine Interessen.
-    canton_label: "Kanton %{code}"
-    saved: Interessen gespeichert.
-    save: Interessen speichern
-    toggle: '%{name} zu deinen Interessen hinzufügen oder entfernen'
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.
@@ -440,10 +432,9 @@ de:
         joined: Beigetreten
         sessions: Aktive Sitzungen
         invited_by: Eingeladen von
-        favorite_locations: Interessen – Orte
-        favorite_styles: Interessen – Stile
+        saved_filters: Gespeicherte Filter
         delete_heading: Konto löschen
-        delete_hint: Entfernt dieses Konto und seine Interessen endgültig.
+        delete_hint: Entfernt dieses Konto und seine Daten endgültig.
         delete: Konto löschen
         delete_confirm: "Konto %{username} endgültig löschen?"
     invitations:
@@ -671,8 +662,6 @@ de:
         label: Ansicht
         list: Liste
         calendar: Kalender
-      favorites_filter:
-        label: Meine Interessen
       save_filter: Filter speichern
       save_filter_remove: Gespeichert — entfernen
       notify_filter: Benachrichtigen

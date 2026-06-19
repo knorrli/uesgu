@@ -73,8 +73,6 @@ class SavedEventsTest < ActionDispatch::IntegrationTest
     get saved_events_path(view: 'calendar', day: Date.current.iso8601)
     assert_response :success
     assert_select 'section.day-detail .event-title', text: /Tonight Save/
-    # Read-only: tags are plain, not follow toggles.
-    assert_select 'section.day-detail button.event-tag.fav', count: 0
   end
 
   test 'list view hides past saves but the calendar still holds them' do

@@ -92,15 +92,6 @@
   mask: var(--heart-fill) center / contain no-repeat;
 }
 
-.day-summary__count--interest {
-  color: var(--theme-accent-color);
-}
-
-.day-summary__count--interest::before {
-  -webkit-mask: var(--star-fill) center / contain no-repeat;
-  mask: var(--star-fill) center / contain no-repeat;
-}
-
 /* Venue-led row, zero boxes. Hierarchy comes from structure + weight — the venue
    anchor (bold ink) on its own line, the underlined event title as the primary
    link, a quiet metadata line (city/canton) beneath. Colour is rationed: green
@@ -127,33 +118,6 @@
 
 .event-tag.venue {
   color: var(--theme-fg-color);
-}
-
-/* Followable tags (logged-in): the whole tag IS the follow toggle. Colour no
-   longer marks "followable" — at rest a followable tag inherits its neighbours'
-   colour (venue = fg, city/canton = muted, styles = muted bold), identical to the
-   logged-out plain tags, so the page reads the same either way. The follow
-   affordance is the trailing heart; following lights the tag accent (see
-   .event-tag.fav.followed). font:inherit keeps the button matching the row. */
-.event-tag.fav {
-  border: 0;
-  padding: 0;
-  background: none;
-  font: inherit;
-  cursor: pointer;
-}
-
-/* A tag you follow — "this is yours" — lights GREEN, the dominant accent. Follows
-   are frequent, so green stays present across the page (the rare saved heart is
-   the raspberry highlight). The green STAR glyph distinguishes a follow from a
-   plain green link/arrow. Three classes outrank .event-tag.venue and the base
-   .event-tag, so a followed venue/city/style lights up regardless of its rest. */
-.event-tag.fav.followed {
-  color: var(--theme-accent-color);
-}
-
-.event-tag.fav:hover .fav-label {
-  text-decoration: underline;
 }
 
 /* Every taxonomy term (venue, city/canton, style, genre) is a filter link:
@@ -253,7 +217,7 @@
    so they assert a clear tier above the muted, regular-weight subtitle and genres
    they sit between, without adding another font size to the row. The fg colour
    lives on the tags themselves (not the container) so it beats the base .event-tag
-   muted; a followed style still wins to the favorite colour via .event-tag.fav.followed. */
+   muted. */
 .event-styles {
   font-weight: bold;
 }
@@ -276,42 +240,6 @@
 .meta-edit {
   margin-left: 0.4ch;
   vertical-align: middle;
-}
-
-/* The follow STAR trails its tag and inherits the tag's font-size, so the big
-   venue header gets a big star and a small style tag a small one. It's the sole
-   "you can follow this" signal, so it stays visible — mobile-first, no hover to
-   hide behind. (Class still named .fav-star for now — glyph swapped heart→star;
-   rename is non-visual cleanup.) */
-.fav-star {
-  margin-left: 0.4ch;
-}
-
-/* A masked Phosphor star: the mask is the shape, background-color paints it, so
-   it inherits a theme colour and the tag's em size. */
-.fav-star::before {
-  content: "";
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.15em;
-  background-color: var(--theme-fg-muted);
-  -webkit-mask: var(--star-outline) center / contain no-repeat;
-  mask: var(--star-outline) center / contain no-repeat;
-}
-
-/* Not-yet-followed: a faint outline star — present enough to be discoverable and
-   tappable on touch, quiet enough not to clutter the row. */
-.event-tag.fav:not(.followed) .fav-star {
-  opacity: 0.4;
-}
-
-/* Followed: solid green star at full strength, so your follows are the dominant
-   accent across the page. */
-.event-tag.fav.followed .fav-star::before {
-  background-color: var(--theme-accent-color);
-  -webkit-mask-image: var(--star-fill);
-  mask-image: var(--star-fill);
 }
 
 /* Real, inert separator between terms — a sibling element, not a pseudo on the
@@ -381,16 +309,8 @@
   flex-wrap: wrap;
 }
 
-/* The interests shortcut keeps its label at every width: the notify bell moved
-   down to the chip row, so this left cluster is just the one control and has room
-   for "Meine Interessen" alongside the view switcher even on a phone. (The label
-   still carries an aria-label too, harmless when the text is visible.) */
-.toolbar-action__label {
-  display: inline;
-}
-
 /* Empty-result message: its own line under the toolbar so a long sentence can't
-   wrap the favorites/notify cluster or push the view switcher around. */
+   push the view switcher around. */
 .events-empty {
   margin: 0;
 }
@@ -420,46 +340,6 @@
   }
 }
 
-/* "My favorites" filter shortcut, sitting in the view-switcher row. A flat, muted
-   text link with a leading heart (its own class — was .button.favorites-filter-link,
-   borrowing the bare .button). The heart is outline + muted when off; when the
-   favorites filter is applied the label bolds and the heart fills in the favorite
-   accent — echoing the follow-heart language used elsewhere. */
-.favorites-filter-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4ch;
-  border: 0;
-  padding: 0;
-  background: none;
-  color: var(--theme-fg-muted);
-  text-decoration: none;
-}
-
-/* The display above overrides the UA [hidden] rule, so re-assert it (at matching
-   specificity) — the shortcut renders hidden until the user follows something. */
-.favorites-filter-link[hidden] {
-  display: none;
-}
-
-.favorites-filter-link:hover {
-  text-decoration: underline;
-}
-
-.favorites-filter-link .fav-star {
-  margin-left: 0;
-}
-
-.favorites-filter-link.active {
-  color: var(--theme-accent-color);
-  font-weight: bold;
-}
-
-.favorites-filter-link.active .fav-star::before {
-  background-color: var(--theme-accent-color);
-  -webkit-mask-image: var(--star-fill);
-  mask-image: var(--star-fill);
-}
 
 .simple-calendar {
   .table {
@@ -644,29 +524,6 @@
   .day-saved-count {
     font-size: 0.7rem;
     font-weight: bold;
-  }
-
-  /* A followed location or style plays this day: a green STAR — the same
-     interest=star glyph used in the list/tags, so the marker's meaning is
-     self-evident (★ = your interest) rather than an unlabelled dot. Sized to
-     match the saved heart so the two markers read as one family (green star =
-     interest, raspberry heart = saved). Carries the day's keys so the favorite
-     controller can flip it live. */
-  .day-favorite-marker {
-    display: block;
-    /* Smaller than the saved heart: interest is the frequent signal, so a field of
-       these should stay quiet; the rarer heart is left a touch larger to pop. */
-    width: 0.6rem;
-    height: 0.6rem;
-    background-color: var(--theme-accent-color);
-    -webkit-mask: var(--star-fill) center / contain no-repeat;
-    mask: var(--star-fill) center / contain no-repeat;
-  }
-
-  /* When a show is also saved that day, the bookmark already flags it as yours —
-     the dot would just be noise, so it gives way. */
-  .day-markers:has(.day-saved-marker) .day-favorite-marker {
-    display: none;
   }
 
   /* Inline expanding row: the day-detail frame rendered full-width beneath the

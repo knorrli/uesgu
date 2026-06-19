@@ -11,11 +11,7 @@
 <% if @events.none? %>
   <p class="empty-state"><%= t('notifications.show.empty_all') %></p>
 <% else %>
-  <%# data-controller="favorite": venue/style tags are follow-toggles here too,
-      same as the programme and saved shows — so every user-facing listing behaves
-      identically. The wrapper hosts the favorite controller + the followed set. %>
-  <div class="event-list flex flex-col gap-xlarge" data-controller="favorite"
-       data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
+  <div class="event-list flex flex-col gap-xlarge">
     <% @events.group_by(&:start_date).each do |date, events| %>
       <div class="date-events flex flex-col gap-medium <%= class_names(past: date < Date.current.beginning_of_day) %>">
         <h2 class="date"><%= l date, format: :detailed %></h2>

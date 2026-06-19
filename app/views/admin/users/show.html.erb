@@ -38,21 +38,10 @@
   </dl>
 
   <section class="flex flex-col gap-small">
-    <h2><%= t('.favorite_locations') %></h2>
-    <% if @user.location_list.any? %>
+    <h2><%= t('.saved_filters') %></h2>
+    <% if @user.notification_rules.any? %>
       <div class="flex gap-small wrap">
-        <% @user.location_list.each do |location| %><span class="chip"><%= location %></span><% end %>
-      </div>
-    <% else %>
-      <p class="muted">—</p>
-    <% end %>
-  </section>
-
-  <section class="flex flex-col gap-small">
-    <h2><%= t('.favorite_styles') %></h2>
-    <% if @user.style_list.any? %>
-      <div class="flex gap-small wrap">
-        <% @user.style_list.each do |style| %><span class="chip"><%= style %></span><% end %>
+        <% @user.notification_rules.each do |rule| %><span class="chip"><%= rule.display_name %></span><% end %>
       </div>
     <% else %>
       <p class="muted">—</p>

@@ -4,7 +4,6 @@ en:
     admin: Admin
     notifications: Notifications
     unread_notifications: Unread notifications
-    favorites: Interests
     notification_rules: Notification rules
     saved: Watchlist
     settings: Settings
@@ -28,7 +27,7 @@ en:
     steps_safari_desktop: 'In Safari: File → Add to Dock (Safari 17+). Otherwise it just runs in the browser.'
     steps_generic: 'Open your browser menu and choose “Install app” / “Add to Home screen”.'
     benefit_quick: Opens with one tap, no browser
-    benefit_notify: Notifications for new events from your interests
+    benefit_notify: Notifications for new events from your saved filters
     benefit_home: Its own icon on your home screen
   languages:
     de: German
@@ -86,8 +85,8 @@ en:
     digest:
       title: New events on üsgu
       body:
-        one: 1 new event matches your interests.
-        other: "%{count} new events match your interests."
+        one: 1 new event matches a saved filter.
+        other: "%{count} new events match your saved filters."
     test:
       title: üsgu
       body: This is a test notification — push is working. 🎉
@@ -153,7 +152,7 @@ en:
       added: New events
       happening: What's on
     errors:
-      empty_filter: Pick a filter first (style, location, date …) or sync with your interests.
+      empty_filter: Pick a filter first (genre, location, date …).
       duplicate: You already have an alert for this filter.
     new:
       title: Set up a notification
@@ -247,13 +246,6 @@ en:
     more_venues:
       one: "+ 1 more"
       other: "+ %{count} more"
-  favorites:
-    title: Interests
-    intro: Pick the styles and places that interest you — matching days get a star, and you can filter the programme down to your interests.
-    canton_label: "Canton %{code}"
-    saved: Interests saved.
-    save: Save interests
-    toggle: 'Add or remove %{name} from your interests'
   settings:
     title: Settings
     saved: Settings saved.
@@ -440,10 +432,9 @@ en:
         joined: Joined
         sessions: Active sessions
         invited_by: Invited by
-        favorite_locations: Interests – Places
-        favorite_styles: Interests – Styles
+        saved_filters: Saved filters
         delete_heading: Delete account
-        delete_hint: This permanently removes this account and its interests.
+        delete_hint: This permanently removes this account and its data.
         delete: Delete account
         delete_confirm: "Permanently delete account %{username}?"
     invitations:
@@ -671,8 +662,6 @@ en:
         label: View
         list: List
         calendar: Calendar
-      favorites_filter:
-        label: My interests
       save_filter: Save this filter
       save_filter_remove: Saved — remove
       notify_filter: Get notified

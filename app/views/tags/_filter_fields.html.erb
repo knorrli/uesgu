@@ -32,6 +32,13 @@
       <%# Lead with the magnifying glass (not the styles glyph): the field's
           superpower is free-text search over acts/styles/genres. %>
       <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'query')}" %>
+      <%# Disable the gem's own hidden field so it never submits: the picks we keep
+          come through hw-combobox:selection into our s[]/q[] chips, but the gem's
+          hidden field (name "#{id_prefix}_what") would otherwise serialize the
+          soft-selected option into our GET URL (e.g. ?filter_what=Berner+Mundartrock).
+          The gem still reads/writes its value+name in JS (disabled blocks only
+          submission), so selection routing is unaffected. %>
+      <% combobox.customize_hidden_field disabled: true %>
     <% end %>
   </div>
 
@@ -58,6 +65,9 @@
           placeholder: t('events.filter.where') do |combobox| %>
       <% combobox.customize_fieldset class: 'flex-grow' %>
       <% combobox.customize_handle class: "filter-icon #{tag_icon_class(context: 'locations')}" %>
+      <%# See the What field above: disable the gem's hidden field so it doesn't
+          leak "#{id_prefix}_where" into the GET URL; we submit l[] chips instead. %>
+      <% combobox.customize_hidden_field disabled: true %>
     <% end %>
   </div>
 </div>

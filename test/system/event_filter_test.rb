@@ -24,6 +24,24 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_no_current_path(/s%5B%5D=Rock/)
   end
 
+  # The gem renders its own hidden field named after the combobox (e.g.
+  # "filter_what") which would otherwise serialize the soft-selected option into
+  # our GET URL — junk like ?filter_what=Rock alongside the real s[]/q[] chip. We
+  # disable that field (customize_hidden_field), so only our chips submit.
+  test "the combobox's own hidden field never leaks into the filter URL" do
+    event(start_date: Date.current + 3, style_list: ["Rock"])
+
+    visit events_path
+    within ".filter-desktop" do
+      find('input[role="combobox"]', match: :first).send_keys("Rock")
+    end
+    find("[role=option]", text: "Rock", match: :first).click
+
+    assert_current_path(/s%5B%5D=Rock/)   # the real param landed
+    assert_no_current_path(/filter_what/) # ...and the gem's field did not
+    assert_no_current_path(/filter_where/)
+  end
+
   # The What dropdown now suggests in-use GENRES alongside the curated styles. A
   # style commits its exact s[] bucket; a genre suggestion commits q[] (substring),
   # the same routing the row uses — so the dropdown and the row agree.

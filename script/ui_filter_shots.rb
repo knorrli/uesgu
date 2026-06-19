@@ -38,5 +38,17 @@ SHOTS.each do |slug, path|
   puts slug
 end
 
+# The What dropdown open, showing genre suggestions alongside the curated styles.
+b.goto("#{BASE}/?view=list")
+b.network.wait_for_idle(timeout: 10) rescue nil
+input = b.at_css(".filter-desktop input[role='combobox']")
+if input
+  input.focus
+  input.type("rock")
+  sleep 0.7
+  b.screenshot(path: File.join(OUT, "what-dropdown.png"))
+  puts "what-dropdown"
+end
+
 b.quit
 puts "DONE -> #{OUT}"

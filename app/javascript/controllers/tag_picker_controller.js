@@ -35,7 +35,7 @@ HwComboboxController.prototype._markSelected = function (option) {
 // Param → Phosphor glyph for a chip's leading icon. Mirrors TagsHelper#
 // filter_chip_icon so a chip built here matches one rendered server-side.
 const CHIP_GLYPH = {
-  "s[]": "ph-music-notes",
+  "s[]": "ph-magnifying-glass",
   "q[]": "ph-magnifying-glass",
   "l[]": "ph-map-pin",
   "d[]": "ph-calendar-dots",
@@ -59,7 +59,19 @@ export default class extends Controller {
   static values = { autoSubmit: Boolean }
 
   connect() {
+    this.#buildStyleIndex()
     this.#setupSearchFor()
+  }
+
+  // The names that are curated STYLES (vs genre suggestions), handed over as JSON
+  // on the What field. A picked style commits its exact s[] bucket; a genre or free
+  // text commits q[] (substring) — the same split the row uses. Built from the
+  // dataset, NOT the listbox, because the listbox now mixes styles + genres.
+  #buildStyleIndex() {
+    const names = this.hasWhatFieldTarget
+      ? JSON.parse(this.whatFieldTarget.dataset.styleNames || "[]")
+      : []
+    this.styleByName = new Map(names.map((name) => [name.toLowerCase(), name]))
   }
 
   disconnect() {
@@ -80,9 +92,13 @@ export default class extends Controller {
 
     const { field, queryField } = event.params
     const isNew = fieldName && fieldName === event.target.dataset.hwComboboxNameWhenNewValue
-    const param = isNew && queryField ? queryField : field
+    // A picked curated STYLE commits its exact s[] bucket (canonical casing); a
+    // genre suggestion or free text commits q[] (substring). Where has no
+    // queryField, so its location picks always take `field` (l[]).
+    const styleName = !isNew && this.styleByName?.get(value.toLowerCase())
+    const param = styleName ? field : (queryField || field)
 
-    this.#addChip(param, value)
+    this.#addChip(param, styleName || value)
     this.#clearField(event.currentTarget)
   }
 
@@ -191,16 +207,6 @@ export default class extends Controller {
     // open/close and scroll and sits above the options, like the mobile sheet.
     this.styleListbox.prepend(this.searchForTarget)
 
-    // Snapshot every style name (lowercase → canonical) up front, so Enter can
-    // tell "exact style name" from "free text" without querying the live listbox
-    // — its filtered options race the keypress and made the match flaky.
-    this.styleByName = new Map(
-      [...this.styleListbox.querySelectorAll('[role="option"]')]
-        .map((o) => (o.dataset.value ?? "").trim())
-        .filter(Boolean)
-        .map((name) => [name.toLowerCase(), name])
-    )
-
     this.onStyleInput = () => this.#onInput()
     this.styleInput.addEventListener("input", this.onStyleInput)
 
@@ -272,7 +278,10 @@ export default class extends Controller {
     } else {
       event.preventDefault()
       event.stopImmediatePropagation()
-      this.#addChip("s[]", current.dataset.value ?? current.textContent.trim())
+      // A highlighted option is a style (→ s[]) or a genre suggestion (→ q[]).
+      const optionValue = current.dataset.value ?? current.textContent.trim()
+      const styleName = this.styleByName.get(optionValue.toLowerCase())
+      this.#addChip(styleName ? "s[]" : "q[]", styleName || optionValue)
     }
 
     this.navIndex = 0

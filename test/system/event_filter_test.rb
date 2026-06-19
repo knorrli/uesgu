@@ -24,6 +24,25 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_no_current_path(/s%5B%5D=Rock/)
   end
 
+  # The What dropdown now suggests in-use GENRES alongside the curated styles. A
+  # style commits its exact s[] bucket; a genre suggestion commits q[] (substring),
+  # the same routing the row uses — so the dropdown and the row agree.
+  test "a genre suggestion commits as a free-text query (q[]), not a style" do
+    e = event_with_genres("Doomgaze")
+    name = e.genres.first.name # canonical casing as stored/shown
+
+    visit events_path
+    assert_selector ".filter-desktop .filter-searchfor", visible: :all # controller connected
+
+    within ".filter-desktop" do
+      find('input[role="combobox"]', match: :first).send_keys(name)
+    end
+    find(".filter-desktop [role=option]", text: name, match: :first).click
+
+    assert_selector ".filter-desktop .chips input[name='q[]'][value='#{name}']", visible: :all
+    assert_no_selector ".filter-desktop .chips input[name='s[]']", visible: :all
+  end
+
   test "desktop What field reveals a free-text row and commits it as a query" do
     event(start_date: Date.current + 3, style_list: ["Rock"])
 

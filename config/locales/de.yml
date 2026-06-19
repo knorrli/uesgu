@@ -149,9 +149,6 @@ de:
     edit_button: Bearbeiten
     empty_link: Filtere die Veranstaltungen
     empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite, dann tippe auf den Stern.
-    favorites_live: Meine Interessen (automatisch aktuell)
-    track_favorites: Mit meinen Interessen synchron halten
-    track_favorites_hint: berücksichtigt auch Orte/Stile, die dich später interessieren
     type:
       added: Neue Events
       happening: Was läuft

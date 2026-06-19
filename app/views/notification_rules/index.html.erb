@@ -30,7 +30,6 @@
               <% rule_channels(rule).each do |label| %>
                 <span class="chip"><%= label %></span>
               <% end %>
-              <% if rule.track_favorites? %><span class="chip"><%= t('notification_rules.favorites_live') %></span><% end %>
             </div>
           <% end %>
 

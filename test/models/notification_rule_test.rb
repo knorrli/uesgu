@@ -71,24 +71,6 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert_includes r.matched_events(Time.current).to_a, today_show
   end
 
-  # --- live favorites --------------------------------------------------------
-
-  test 'track_favorites resolves the user current favorites (OR) at match time' do
-    u = user
-    u.style_list = ['rule-fav-style']
-    u.save!
-    hit  = event(created_at: at(13), start_date: TODAY + 3, style_list: ['rule-fav-style'])
-    miss = event(created_at: at(13), start_date: TODAY + 3, style_list: ['other-style'])
-
-    r = u.notification_rules.new(cadence: 'daily', time_of_day: 1, track_favorites: true, notify_push: false)
-    r.save!
-    r.update_column(:last_fired_at, at(12))
-
-    matched = r.matched_events(at(18)).to_a
-    assert_includes matched, hit
-    refute_includes matched, miss
-  end
-
   # --- due? ------------------------------------------------------------------
 
   test 'daily rule is due after its time and not before' do
@@ -153,9 +135,8 @@ class NotificationRuleTest < ActiveSupport::TestCase
 
   # --- validations -----------------------------------------------------------
 
-  test 'an empty filter is rejected unless it tracks favorites' do
-    refute rule(user, filter: {}).valid?, 'empty filter, no favorites => invalid'
-    assert rule(user, filter: {}, track_favorites: true).valid?, 'favorites alert is valid'
+  test 'an empty filter is rejected' do
+    refute rule(user, filter: {}).valid?, 'empty filter => invalid'
     assert rule(user, filter: { s: ['x'] }).valid?, 'any filter is valid'
   end
 
@@ -239,13 +220,6 @@ class NotificationRuleTest < ActiveSupport::TestCase
     refute_equal before, r.name
   end
 
-  test 'describe for a live-favorites alert' do
-    r = user.notification_rules.new(track_favorites: true, cadence: 'daily', time_of_day: 1)
-    r.filter_attributes = {}
-    # Favorites alert + the temporal suffix (no window → new events).
-    assert_equal "#{I18n.t('notification_rules.favorites_live')} · #{I18n.t('notification_rules.type.added')}", r.describe
-  end
-
   test 'a fired notification snapshots the auto-name as its title' do
     u = user
     event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['Rock'])
@@ -277,19 +251,6 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert_equal 'weekly', rule(user, filter: { d: ['this_weekend'] }).window_rhythm
     assert_equal 'monthly', rule(user, filter: { d: ['next_month'] }).window_rhythm
     assert_nil rule(user, filter: { s: ['Rock'] }).window_rhythm
-  end
-
-  # --- firehose guard --------------------------------------------------------
-
-  test 'track_favorites with no favorites matches nothing (no firehose)' do
-    u = user # follows nothing
-    event(created_at: 1.hour.ago, start_date: Date.current + 3)
-    r = u.notification_rules.new(track_favorites: true, cadence: 'daily', time_of_day: 1, notify_push: false)
-    r.filter_attributes = {}
-    r.save!
-    r.update_column(:last_fired_at, 2.hours.ago)
-
-    assert_empty r.matched_events(Time.current).to_a
   end
 
   test 'time_string parses to minutes-since-midnight' do

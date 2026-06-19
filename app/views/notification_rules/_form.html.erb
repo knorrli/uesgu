@@ -16,6 +16,7 @@
      data-filter-sheets-submit-on-apply-value="false"
      data-filter-sheets-search-for-template-value="<%= t('events.filter.search_for', query: '%{query}') %>"
      data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>">
+  <%# `filter` is the rule's saved filter (NotificationRulesController#filter_for). %>
   <%= form_with model: rule, class: 'rule-form account-form flex flex-col gap-medium',
         data: { controller: 'rule-form', 'rule-form-rhythms-value': NotificationRule::WINDOW_RHYTHM.to_json,
                 'filter-sheets-target': 'form' } do |form| %>
@@ -48,16 +49,6 @@
             include_blank: t('notification_rules.window_none'),
             data: { 'rule-form-target': 'window', action: 'rule-form#update' } %>
     </fieldset>
-
-    <% if matches_favorites %>
-      <label class="rule-check rule-sync flex gap-small">
-        <%= form.check_box :track_favorites %>
-        <span>
-          <%= t('notification_rules.track_favorites') %>
-          <span class="muted">— <%= t('notification_rules.track_favorites_hint') %></span>
-        </span>
-      </label>
-    <% end %>
 
     <%# One schedule block, reactive to the window select (above): with a window the
         cadence is derived (picker hidden, model forces it), without one the user

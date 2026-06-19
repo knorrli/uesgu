@@ -149,9 +149,6 @@ fr:
     edit_button: Modifier
     empty_link: Filtre les événements
     empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis touche l'étoile pour l'enregistrer.
-    favorites_live: Mes intérêts (toujours à jour)
-    track_favorites: Garder synchronisé avec mes intérêts
-    track_favorites_hint: inclut aussi les lieux/styles qui t'intéresseront plus tard
     type:
       added: Nouveautés
       happening: À l'affiche

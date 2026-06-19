@@ -51,18 +51,6 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_select 'select[name="notification_rule[weekday]"]'
   end
 
-  test 'the sync checkbox appears only when the filter equals my favorites' do
-    u = sign_in_as user
-    u.style_list = ['Techno']
-    u.save!
-
-    get new_notification_rule_path(s: ['Techno'])
-    assert_select 'input[name="notification_rule[track_favorites]"]'
-
-    get new_notification_rule_path(s: ['Jazz'])
-    assert_select 'input[name="notification_rule[track_favorites]"]', false
-  end
-
   # --- create ----------------------------------------------------------------
 
   test 'create saves the filter and lands on the live editor' do

@@ -15,7 +15,6 @@ class NotificationRulesController < ApplicationController
     @rule = current_user.notification_rules.new(default_schedule)
     @rule.filter_attributes = filter_params
     @filter = filter_for(@rule)
-    @matches_favorites = current_user.favorites_filter?(@filter)
   end
 
   # "Benachrichtigen" creates the rule immediately (it's only offered with an
@@ -45,7 +44,6 @@ class NotificationRulesController < ApplicationController
   # schedule/channels — is edited on one plain form (no autosave). See #update.
   def edit
     @filter = filter_for(@rule)
-    @matches_favorites = current_user.favorites_filter?(@filter)
     @duplicate_of = duplicate_of(@rule)
   end
 
@@ -59,7 +57,6 @@ class NotificationRulesController < ApplicationController
       redirect_to notification_rules_path, notice: t("notification_rules.saved")
     else
       @filter = filter_for(@rule)
-      @matches_favorites = current_user.favorites_filter?(@filter)
       render :edit, status: :unprocessable_entity
     end
   end
@@ -129,7 +126,7 @@ class NotificationRulesController < ApplicationController
 
   def rule_params
     params.require(:notification_rule).permit(
-      :name, :cadence, :weekday, :monthday, :time_string, :notify_push, :notify_email, :track_favorites
+      :name, :cadence, :weekday, :monthday, :time_string, :notify_push, :notify_email
     )
   end
 

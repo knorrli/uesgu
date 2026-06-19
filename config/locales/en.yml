@@ -149,9 +149,6 @@ en:
     edit_button: Edit
     empty_link: Filter the events
     empty_html: No saved filters yet. %{link} on the home page, then tap the star to save it.
-    favorites_live: My interests (kept current)
-    track_favorites: Keep in sync with my interests
-    track_favorites_hint: also includes venues/styles that interest you later
     type:
       added: New events
       happening: What's on

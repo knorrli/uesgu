@@ -9,10 +9,8 @@
 #   - filter has no date window → ADDED: events newly added (by created_at) since
 #     the rule last fired, future-dated only.
 #
-# The filter (queries/style_list/location_list/date_ranges) is frozen at save
-# time and matched exactly like the landing page (Filter#ransack_query). The one
-# exception is track_favorites: a favorites alert stays live, re-resolving the
-# user's followed locations/styles (OR-matched) at send time.
+# The filter (queries/genres/location_list/date_ranges) is frozen at save time and
+# matched exactly like the landing page (Filter#ransack_query).
 class NotificationRule < ApplicationRecord
   CADENCES = %w[daily weekly biweekly monthly].freeze
 
@@ -59,7 +57,6 @@ class NotificationRule < ApplicationRecord
   before_validation :snap_time_to_quarter
 
   def targets_something
-    return if track_favorites?
     return if queries.any? || genres.any? || style_list.any? || location_list.any? || date_ranges.any?
 
     errors.add(:base, I18n.t("notification_rules.errors.empty_filter"))
@@ -119,24 +116,23 @@ class NotificationRule < ApplicationRecord
 
   # ── Identity (dedupe) ──────────────────────────────────────────────────────
 
-  # An order-independent fingerprint of a filter set: the four lists as sets
-  # (so "Rock · Bern" == "Bern · Rock"), date ranges narrowed to the presets a
-  # rule keeps, plus the live-favorites flag. Two rules with the same fingerprint
-  # are the same alert — the basis for "you already have this" both at creation
-  # (no duplicate is made) and on the events page (the bell lights up).
-  def self.fingerprint(queries:, location_list:, date_ranges:, genres: [], style_list: [], track_favorites: false)
+  # An order-independent fingerprint of a filter set: the lists as sets (so
+  # "Rock · Bern" == "Bern · Rock"), date ranges narrowed to the presets a rule
+  # keeps. Two rules with the same fingerprint are the same saved filter — the
+  # basis for "you already have this" both at save (no duplicate is made) and on
+  # the events page (the ★ lights up).
+  def self.fingerprint(queries:, location_list:, date_ranges:, genres: [], style_list: [])
     {
       queries: Set.new(Array(queries).map { |q| q.to_s.strip }.reject(&:blank?)),
       genres: Set.new(Array(genres)),
       style_list: Set.new(Array(style_list)),
       location_list: Set.new(Array(location_list)),
-      date_ranges: Set.new(Array(date_ranges).select { |range| Datepicker.preset.key?(range) }),
-      track_favorites: track_favorites
+      date_ranges: Set.new(Array(date_ranges).select { |range| Datepicker.preset.key?(range) })
     }
   end
 
-  # Fingerprint for a landing-page Filter (no favorites flag — that's a rule-only
-  # concept), so the events controller can ask "is there a rule for this filter?".
+  # Fingerprint for a landing-page Filter, so the events controller can ask "is
+  # there a saved filter for this exact filter?".
   def self.fingerprint_for(filter)
     fingerprint(queries: filter.queries, genres: filter.genres, style_list: filter.style_list,
                 location_list: filter.location_list, date_ranges: filter.date_ranges)
@@ -144,8 +140,7 @@ class NotificationRule < ApplicationRecord
 
   def fingerprint
     self.class.fingerprint(queries: queries, genres: genres, style_list: style_list,
-                           location_list: location_list, date_ranges: date_ranges,
-                           track_favorites: track_favorites?)
+                           location_list: location_list, date_ranges: date_ranges)
   end
 
   # The rule in this scope whose filter matches `fingerprint`, or nil. Set-based,
@@ -192,18 +187,13 @@ class NotificationRule < ApplicationRecord
 
   # ── Matching ───────────────────────────────────────────────────────────────
 
-  # Events this rule covers as of `now`. Non-favorites reuse the exact landing-
-  # page query (Filter#ransack_query, which also supplies the future floor when
-  # there's no date window); favorites get the live OR-match. "added" additionally
-  # bounds by created_at since the last fire.
+  # Events this saved filter covers as of `now`: the exact landing-page query
+  # (Filter#ransack_query, which also supplies the future floor when there's no
+  # date window). "added" additionally bounds by created_at since the last fire.
   def matched_events(now = Time.current)
-    # A live-favorites rule whose user has unfollowed everything must match
-    # nothing, not every event (no favorites → no OR group → would be a firehose).
-    return Event.none if track_favorites? && user.location_list.empty? && user.style_list.empty?
-
     rel = Event.visible
     rel = rel.where(created_at: coverage_floor...now) if added?
-    rel.ransack(ransack_query(now)).result(distinct: true).order(:start_date, :start_time, :title)
+    rel.ransack(to_filter.ransack_query).result(distinct: true).order(:start_date, :start_time, :title)
   end
 
   # ── Firing ─────────────────────────────────────────────────────────────────
@@ -230,17 +220,13 @@ class NotificationRule < ApplicationRecord
     name.presence || describe
   end
 
-  # Human "what this alert is about" — the auto-name when the user didn't set
-  # one, the title snapshotted onto each fired notification, and the summary in
-  # the alerts list.
+  # Human "what this saved filter is about" — the auto-name (there are no custom
+  # names), the title snapshotted onto each fired notification, and the summary in
+  # the Saved filters list.
   # Fixed template: <what> · [<where> ·] <window | "new events">. "what" is the
-  # styles + free-text queries, or "Alle Events" when none; the last part is the
-  # time window for a happening rule, else the new-events label. The editor
-  # autosaves, so the title re-renders from this on every change (server-side, no
-  # client mirror).
+  # genres + free-text queries, or "Alle Events" when none; the last part is the
+  # time window for a happening filter, else the new-events label.
   def describe
-    return describe_favorites if track_favorites?
-
     what = (genres + style_list + queries).join(", ")
     parts = [what.presence || I18n.t("notification_rules.summary.scope_all")]
     parts << location_list.join(", ") if location_list.any?
@@ -267,10 +253,6 @@ class NotificationRule < ApplicationRecord
     snapped = (time_of_day / 15.0).round * 15
     snapped -= 15 if snapped >= 1440 # keep a late time on the same day (→ 23:45)
     self.time_of_day = snapped
-  end
-
-  def describe_favorites
-    "#{I18n.t('notification_rules.favorites_live')} · #{temporal_label}"
   end
 
   # The trailing part of the name: the window label (happening) or the new-events
@@ -313,21 +295,6 @@ class NotificationRule < ApplicationRecord
     [starts.min, ends.max]
   end
 
-  def ransack_query(now)
-    if track_favorites?
-      groups = []
-      locations = user.location_list
-      styles = user.style_list
-      if locations.any? || styles.any?
-        groups << { locations_name_in: locations.presence, styles_name_in: styles.presence, m: "or" }
-      end
-      groups << favorites_date_group(now)
-      { g: groups }
-    else
-      to_filter.ransack_query
-    end
-  end
-
   # Builds the same Filter the landing page uses, from the frozen params — so a
   # saved custom filter matches identically (AND across what/where, date presets
   # re-resolved, future floor when no date).
@@ -338,17 +305,6 @@ class NotificationRule < ApplicationRecord
     # dead past range.
     Filter.build(queries: queries, genres: genres, style_list: style_list,
                  location_list: location_list, date_ranges: active_windows)
-  end
-
-  # Date constraint for the favorites path (which can't reuse Filter — it needs
-  # OR across location/style). Mirrors Filter's date handling.
-  def favorites_date_group(now)
-    if active_windows.any?
-      ranges = active_windows.map { |w| s, e = Datepicker.preset[w][:values]; "#{s} - #{e}" }
-      { start_date_between_any: ranges }
-    else
-      { start_date_gteq: now.beginning_of_day }
-    end
   end
 
   def deliver(notification, events)

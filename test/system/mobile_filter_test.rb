@@ -27,6 +27,36 @@ class MobileFilterTest < ApplicationSystemTestCase
     assert_selector ".filter-sheets__summary .filter-chip", text: "zzqx"
   end
 
+  # ~300 in-use genres is too many to browse, so the What sheet hides them until
+  # the search box matches one — then picking it commits a q[] substring filter
+  # (mirroring the desktop What dropdown). Curated styles stay browsable at rest.
+  test "What sheet search-gates genre suggestions and applies a pick as q[]" do
+    e = event(start_date: Date.current + 3, style_list: ["Zynthwave"], genre_list: ["Zylodrone"])
+    style = e.style_list.first   # read back: genre_list= canonicalizes casing
+    genre = e.genre_list.first
+
+    page.current_window.resize_to(390, 800) # below the 600px sheet breakpoint
+    visit events_path
+
+    open_what_sheet
+    # At rest: the curated style is a visible browse row; the in-use genre is in the
+    # DOM but hidden (.opt--suggest, display:none) until the search reveals it.
+    assert_selector ".sheet[data-field=what] .opt", text: style, visible: true
+    assert_no_selector ".sheet[data-field=what] .opt--suggest", text: genre, visible: true
+
+    field = find(".sheet[data-field=what] .sheet__search-input")
+    field.click # settle focus before typing (open() parks it on the close button)
+    field.send_keys(genre[0, 4].downcase) # case-insensitive substring match
+    assert_selector ".sheet[data-field=what] .opt--suggest", text: genre, visible: true
+
+    find(".sheet[data-field=what] .opt--suggest", text: genre).click
+    find(".sheet[data-field=what] .sheet__apply").click
+
+    # Server-rendered chip proves the genre round-tripped as a q[] filter.
+    assert_selector ".filter-sheets__summary .filter-chip", text: genre
+    assert_current_path(/q%5B%5D=/)
+  end
+
   private
 
   # The filter-sheets controller eager-loads asynchronously, so the very first

@@ -14,7 +14,7 @@ import { searchForSuggestion } from "lib/search_for"
 // untouched sheet closes instantly with no reload.
 export default class extends Controller {
   static targets = ["form", "sheet", "queries", "group", "customStart", "customEnd", "customValue"]
-  static values = { searchForTemplate: String, freeText: String, searchAnything: String }
+  static values = { searchForTemplate: String, searchAnything: String }
 
   connect() {
     this.onKeydown = (event) => { if (event.key === "Escape") this.#closeOpenSheet() }
@@ -71,6 +71,10 @@ export default class extends Controller {
     const sheet = event.target.closest(".sheet")
     const raw = event.target.value.trim()
     const query = raw.toLowerCase()
+
+    // Reveal the search-gated genre suggestions only while searching (they're
+    // display:none at rest — see .opt--suggest / .sheet--searching in events.css).
+    sheet.classList.toggle("sheet--searching", query !== "")
 
     sheet.querySelectorAll(".opt:not(.opt--newquery)").forEach((opt) => {
       const haystack = (opt.dataset.search || opt.textContent).toLowerCase()
@@ -169,11 +173,9 @@ export default class extends Controller {
     label.innerHTML =
       '<input type="checkbox" name="q[]" checked>' +
       '<span class="opt__box"></span>' +
-      '<span class="opt__label"></span>' +
-      '<span class="opt__type"></span>'
+      '<span class="opt__label"></span>'
     label.querySelector("input").value = value
     label.querySelector(".opt__label").textContent = value
-    label.querySelector(".opt__type").textContent = this.freeTextValue
     return label
   }
 

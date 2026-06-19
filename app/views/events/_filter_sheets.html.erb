@@ -23,8 +23,7 @@
 <div class="filter-sheets"
      data-controller="filter-sheets"
      data-filter-sheets-search-for-template-value="<%= t('events.filter.search_for', query: '%{query}') %>"
-     data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>"
-     data-filter-sheets-free-text-value="<%= t('events.filter.free_text') %>">
+     data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>">
   <%= form_with url: events_path, method: :get, class: 'filter-sheets__form',
         html: { autocomplete: 'off' },
         data: { filter_sheets_target: 'form', turbo_frame: '_top' } do %>
@@ -100,22 +99,42 @@
           <span class="opt__label" data-newquery-label></span>
         </button>
 
+        <%# Applied free-text queries (how a tapped genre arrives). No type label:
+            styles, genres and free text are ONE descriptor vocabulary now, so the
+            s[]/q[] split stays invisible here — mirrors the unified desktop chip. %>
         <div class="sheet__queries" data-filter-sheets-target="queries">
           <% @filter.queries.each do |query| %>
             <label class="opt opt--query">
               <input type="checkbox" name="q[]" value="<%= query %>" checked>
               <span class="opt__box"></span>
               <span class="opt__label"><%= query %></span>
-              <span class="opt__type"><%= t('events.filter.free_text') %></span>
             </label>
           <% end %>
         </div>
 
-        <% available_tags(context: :styles).each do |style| %>
+        <%# Curated STYLES — the always-visible browse vocabulary (~15 buckets). A
+            pick commits its exact s[] bucket. %>
+        <% styles = available_tags(context: :styles).to_a %>
+        <% style_names = styles.map { |style| style.name.downcase } %>
+        <% styles.each do |style| %>
           <label class="opt">
             <input type="checkbox" name="s[]" value="<%= style.name %>" <%= 'checked' if @filter.style_list.include?(style.name) %>>
             <span class="opt__box"></span>
             <span class="opt__label"><%= style.name %></span>
+          </label>
+        <% end %>
+
+        <%# In-use GENRES — far too many (~300) to browse, so they're SEARCH-GATED:
+            .opt--suggest stays hidden until the search box matches it (see
+            filter-sheets#filter + .sheet--searching in events.css). A genre pick
+            commits q[] (substring), mirroring the desktop What dropdown. Deduped
+            against the style names; applied queries already show above (excluded). %>
+        <% available_tags(context: :genres, applied: @filter.queries).each do |genre| %>
+          <% next if style_names.include?(genre.name.downcase) %>
+          <label class="opt opt--suggest">
+            <input type="checkbox" name="q[]" value="<%= genre.name %>">
+            <span class="opt__box"></span>
+            <span class="opt__label"><%= genre.name %></span>
           </label>
         <% end %>
       </div>

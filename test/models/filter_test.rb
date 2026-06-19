@@ -70,4 +70,35 @@ class FilterTest < ActiveSupport::TestCase
   test 'earliest_date is nil when no date filter is active' do
     assert_nil Filter.new.earliest_date
   end
+
+  test 'genres makes the filter active' do
+    assert Filter.build(genres: %w[anything]).active?
+  end
+
+  test 'expanded_genre_names returns the picked genre plus every descendant' do
+    rock = genre(name: 'filterrock')
+    indie = genre(name: 'filterindie'); indie.set_parent!(rock)
+    shoegaze = genre(name: 'filtershoegaze'); shoegaze.set_parent!(indie)
+    genre(name: 'filterpolka') # unrelated sibling tree
+
+    names = Filter.build(genres: [rock.name]).expanded_genre_names.sort
+
+    assert_equal [rock.name, indie.name, shoegaze.name].sort, names
+  end
+
+  test 'expanded_genre_names is empty with no genres picked' do
+    assert_empty Filter.new.expanded_genre_names
+  end
+
+  test 'filtering by a genre matches events tagged with any descendant' do
+    rock = genre(name: 'matchrock')
+    shoegaze = genre(name: 'matchshoegaze'); shoegaze.set_parent!(rock)
+    hit = event_with_genres(shoegaze.name)        # tagged only with the descendant
+    miss = event_with_genres(genre(name: 'matchpolka').name)
+
+    ids = Event.ransack(Filter.build(genres: [rock.name]).ransack_query).result.ids
+
+    assert_includes ids, hit.id, 'an ancestor pick catches a descendant-tagged event'
+    refute_includes ids, miss.id
+  end
 end

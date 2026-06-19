@@ -192,12 +192,17 @@ class Event < ApplicationRecord
     save!
   end
 
-  # Non-music: carries a hidden-dispositioned genre and has no music style (a real
-  # style always wins — a "concert + reading" stays visible). Reads the current
-  # genre_list + style_list, so both recompute_styles! and the scrape path
-  # (Scrapers::Agent#build_event) derive `hidden` identically.
+  # Non-music: every genre the event carries is hidden-dispositioned, so it has no
+  # genre worth showing. Any single non-hidden genre (a real music genre) keeps it
+  # visible — a "reading + concert" stays up — and an event with no genres at all
+  # stays visible too. Reads genre_list directly off genre dispositions (no
+  # dependence on the soon-removed style layer), so recompute_styles! and the
+  # scrape path (Scrapers::Agent#build_event) derive `hidden` identically.
   def hidden_by_genre?
-    fingerprints = genre_list.map { |name| Genre.fingerprint_for(name) }.presence || ['']
-    style_list.empty? && Genre.hidden.where(fingerprint: fingerprints).exists?
+    fingerprints = genre_list.map { |name| Genre.fingerprint_for(name) }
+    return false if fingerprints.empty?
+
+    hidden = Genre.hidden.where(fingerprint: fingerprints).pluck(:fingerprint).to_set
+    fingerprints.all? { |fingerprint| hidden.include?(fingerprint) }
   end
 end

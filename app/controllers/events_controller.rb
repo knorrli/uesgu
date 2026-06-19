@@ -68,6 +68,7 @@ class EventsController < ApplicationController
     # Anything absent stays nil, so Filter.build leaves that list at its default.
     Filter.build(
       queries: params[:q].present? ? Array(params[:q]).compact_blank : nil,
+      genres: params[:g].presence,
       location_list: params[:l].presence,
       style_list: params[:s].presence,
       date_ranges: params[:d].present? ? Array(params[:d]).compact_blank : nil

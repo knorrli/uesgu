@@ -216,12 +216,14 @@
 }
 
 .event-link-marker {
-  /* The only link signal on the (black) title, so give it a touch more presence
-     than the title text — but stay typographic, not icon-sized. line-height:1
-     keeps the larger glyph from inflating the title's line. */
+  /* Marks the title as an OFF-SITE link. The underline already carries the
+     "this is a link" affordance, so the arrow stays ink (inherits the title) —
+     green is now reserved for an applied filter, and a green arrow on every
+     title would dilute that. Typographic, not icon-sized; line-height:1 keeps the
+     larger glyph from inflating the title's line. */
   font-size: 1.2em;
   line-height: 1;
-  color: var(--theme-accent-color);
+  color: inherit;
   font-weight: normal;
 }
 
@@ -1253,13 +1255,15 @@ body.filter-sheet-open { overflow: hidden; }
 .event-styles .sep,
 .event-genres .sep { display: none; }
 
-/* Resting pill: a sharp (on-brand) outline token, inheriting its tier's colour
-   (styles bold-ink, genres muted). Pills are reserved for the DESCRIPTORS
-   (styles + genres); locations use the underline family below. */
+/* Resting pill: a sharp (on-brand) outline token. Ink text (not muted) — the
+   descriptors are the row's only content now (genres-only union), so they earn
+   full foreground; the outline + small size keep them clearly secondary to the
+   bold venue/title without going quiet enough to read as disabled. */
 .event-styles .filter-link,
 .event-genres .filter-link {
   padding: 1px 6px;
   border: var(--tag-border-width) solid var(--border-color);
+  color: var(--theme-fg-color);
   text-decoration: none;
   line-height: 1.4;
 }

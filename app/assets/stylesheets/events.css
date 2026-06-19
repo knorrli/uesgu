@@ -756,11 +756,10 @@ turbo-frame#filter-save {
 
   .filter-sheets .sheet--open { display: flex; }
 
-  /* The full-screen close affordance is redundant inline; Apply (or reopening
-     the trigger) closes it. Keep the title + clear for orientation. */
-  .filter-sheets .sheet__close { display: none; }
+  /* Keep the × close on desktop too (alongside Apply, click-outside and Esc) — an
+     explicit, familiar way to dismiss the panel. The header keeps its base
+     close/title/clear grid; only the title aligns left inline. */
   .filter-sheets .sheet__title { text-align: left; }
-  .filter-sheets .sheet__header { grid-template-columns: 1fr auto; }
 }
 
 .sheet {

@@ -24,6 +24,16 @@ export default class extends Controller {
     this.onKeydown = (event) => { if (event.key === "Escape") this.#closeOpenSheet() }
     document.addEventListener("keydown", this.onKeydown)
 
+    // Click-outside-to-close: on desktop the open panel is dismissed by clicking
+    // anywhere off it (and off its trigger, which toggles itself — see open()). On
+    // mobile the sheet is full-screen, so there is no "outside" and this never fires.
+    this.onClickOutside = (event) => {
+      const open = this.sheetTargets.find((sheet) => sheet.classList.contains("sheet--open"))
+      if (!open || open.contains(event.target) || event.target.closest(".filter-trigger")) return
+      this.#commit(open)
+    }
+    document.addEventListener("click", this.onClickOutside)
+
     // Reveal any canton that already holds a checked city/venue, so a pre-applied
     // location isn't hidden inside a collapsed group.
     this.groupTargets.forEach((group) => {
@@ -33,12 +43,15 @@ export default class extends Controller {
 
   disconnect() {
     document.removeEventListener("keydown", this.onKeydown)
+    document.removeEventListener("click", this.onClickOutside)
     document.body.classList.remove("filter-sheet-open")
   }
 
   open(event) {
     const sheet = this.#sheetFor(event.params.field)
     if (!sheet) return
+    // Toggle: clicking the trigger of an already-open panel closes it.
+    if (sheet.classList.contains("sheet--open")) { this.#commit(sheet); return }
     // Desktop shows panels inline, so a second trigger could open a second panel.
     // Hide any already-open one WITHOUT committing — its checkbox state persists in
     // the form and applies on the next submit, so nothing is lost. (On mobile only
@@ -48,10 +61,13 @@ export default class extends Controller {
     sheet.classList.add("sheet--open")
     sheet.setAttribute("aria-hidden", "false")
     document.body.classList.add("filter-sheet-open")
-    // Move focus into the dialog for screen-reader/keyboard users, but onto the
-    // close button — never the search field, so opening a sheet never summons the
-    // on-screen keyboard. preventScroll keeps the page from jumping.
-    sheet.querySelector(".sheet__close")?.focus({ preventScroll: true })
+    // Move focus into the dialog for screen-reader/keyboard users. On DESKTOP
+    // (inline dropdown panel) focus the search field so you can type straight away;
+    // on MOBILE focus the close button instead — never the search field, so opening
+    // a sheet never summons the on-screen keyboard. preventScroll keeps the page put.
+    const search = sheet.querySelector(".sheet__search-input")
+    const target = (this.#isDesktop() && search) ? search : sheet.querySelector(".sheet__close")
+    target?.focus({ preventScroll: true })
     // Show the free-text affordance straight away (blank "type to search" hint
     // on the What sheet; a no-op on sheets without the row).
     this.#updateNewQuery(sheet, sheet.querySelector(".sheet__search-input")?.value.trim() || "")
@@ -261,5 +277,12 @@ export default class extends Controller {
 
   #sheetFor(field) {
     return this.sheetTargets.find((sheet) => sheet.dataset.field === field)
+  }
+
+  // Desktop = the inline dropdown-panel layout (≥600px, matching the CSS breakpoint
+  // where the full-screen sheet becomes a panel). Drives autofocus: search on
+  // desktop, close button on mobile (no surprise keyboard).
+  #isDesktop() {
+    return window.matchMedia("(min-width: 600px)").matches
   }
 }

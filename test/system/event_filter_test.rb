@@ -71,13 +71,36 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_selector ".filter-sheets__summary .filter-chip", text: "zzqx"
   end
 
+  test "a filter panel closes via its × and via click-outside (desktop)" do
+    rock = genre(name: "Closerock", events_count: 1)
+    genre(name: "Closekid", events_count: 1).set_parent!(rock)
+    event(start_date: Date.current + 3, genre_list: ["Closekid"])
+    visit events_path
+
+    # The × close button is shown on desktop too (not just mobile).
+    open_sheet("what")
+    find(".sheet[data-field=what] .sheet__close").click
+    assert_no_selector ".sheet[data-field=what].sheet--open"
+
+    # Clicking outside the open panel dismisses it.
+    open_sheet("what")
+    find(".events-toolbar").click
+    assert_no_selector ".sheet[data-field=what].sheet--open"
+  end
+
   private
 
   # The filter-sheets controller eager-loads asynchronously, so the first trigger
-  # tap can land before it connects. Retry until the panel responds — Capybara's
-  # has_selector wait polls, no fixed sleeps. open() only opens, so a repeat is safe.
+  # tap can land before it connects (a no-op). Retry until the panel opens — but the
+  # trigger now TOGGLES, so check open-state before each click so we never toggle an
+  # already-open panel shut. Capybara's has_selector wait polls; no fixed sleeps.
   def open_sheet(field)
+    selector = ".sheet[data-field=#{field}].sheet--open"
     trigger = find(".filter-sheets .filter-trigger[data-filter-sheets-field-param=#{field}]")
-    trigger.click until has_selector?(".sheet[data-field=#{field}].sheet--open", wait: 1)
+    10.times do
+      break if has_selector?(selector, wait: 0.3)
+      trigger.click
+    end
+    assert_selector selector
   end
 end

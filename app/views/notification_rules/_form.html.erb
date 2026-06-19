@@ -87,7 +87,7 @@
         <span>
           <%= t('notification_rules.fields.notify_email') %>
           <% unless email_ready %>
-            <span class="muted">— <%= t('notification_rules.email_unavailable') %></span>
+            <span class="muted">— <%= link_to t('notification_rules.email_unavailable'), settings_path %></span>
           <% end %>
         </span>
       </label>

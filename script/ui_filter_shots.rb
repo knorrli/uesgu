@@ -21,10 +21,13 @@ b.at_css("input[name='password']").focus.type("shotpass123")
 b.at_css("input[type='submit'], button[type='submit']").click
 b.network.wait_for_idle(timeout: 10) rescue nil
 
+# Light/cream theme — the real ship surface (binary `theme` cookie, see layout).
+b.cookies.set(name: "theme", value: "light", domain: "localhost", path: "/")
+
 SHOTS = {
   "list-rest"        => "/?view=list",
-  "list-match-metal" => "/?view=list&q[]=Metal", # lights Metal / Dark Metal / Death Metal
-  "list-match-rock"  => "/?view=list&q[]=Rock"   # lights Rock / Punk Rock / Alternative Rock
+  "list-style-rock"  => "/?view=list&s[]=Rock", # STYLE filter (the ♫ chip): Rock-family descriptors light
+  "list-match-rock"  => "/?view=list&q[]=Rock"   # freetext: Rock / Punk Rock / Alternative Rock light
 }
 
 SHOTS.each do |slug, path|

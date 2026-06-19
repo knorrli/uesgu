@@ -62,11 +62,27 @@ module EventsHelper
     end
 
     applied = request.query_parameters.except('page')
-    current = Array(applied[param])
-    matched = filter_terms_matching(current, value, param: param)
-    active = matched.any?
-    values = active ? current - matched : current + [value.to_s]
-    query = values.any? ? applied.merge(param => values) : applied.except(param)
+
+    # A descriptor (q[]) is part of the "What" axis, so it's matched by EVERY What
+    # term — freetext q[] AND a picked style s[] — by the same CONTAINS rule. That's
+    # why applying the style "Rock" lights the "Rock" / "Punk Rock" descriptors, not
+    # only a typed freetext. Locations match their own param, exactly.
+    match_params = param == 'q' ? %w[q s] : [param]
+    matched = match_params.to_h { |p| [p, filter_terms_matching(Array(applied[p]), value, param: param)] }
+    active = matched.values.any?(&:present?)
+
+    query = applied.dup
+    if active
+      # Tap GREEN → drop every applied term that lit this tag, across q[] and s[].
+      matched.each do |p, terms|
+        next if terms.empty?
+        rest = Array(applied[p]) - terms
+        rest.any? ? query[p] = rest : query.delete(p)
+      end
+    else
+      # Tap GREY → add it (its own term, on its own param).
+      query[param] = Array(applied[param]) + [value.to_s]
+    end
 
     link_to label, events_path(query),
             class: class_names('filter-link', modifier, active: active),
@@ -74,9 +90,10 @@ module EventsHelper
   end
 
   # The applied terms that "match" a tag — the ones that light it green and that
-  # tapping it removes. Freetext (q[]) matches by CONTAINS (the tag contains the
-  # applied term), so sibling descriptors light up instead of only exact hits;
-  # everything else matches exactly. Case-insensitive.
+  # tapping it removes. The What axis (q[] freetext + s[] styles, passed as param
+  # 'q') matches by CONTAINS (the tag contains the applied term), so sibling
+  # descriptors light up instead of only exact hits; locations match exactly.
+  # Case-insensitive.
   def filter_terms_matching(applied_terms, value, param:)
     if param == 'q'
       haystack = value.to_s.downcase

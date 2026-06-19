@@ -95,11 +95,28 @@ module EventsHelper
   # descriptors light up instead of only exact hits; locations match exactly.
   # Case-insensitive.
   def filter_terms_matching(applied_terms, value, param:)
-    if param == 'q'
+    case param
+    when 'q'
       haystack = value.to_s.downcase
       applied_terms.select { |term| haystack.include?(term.to_s.downcase) }
+    when 'g'
+      # A genre tag lights when an applied genre filter's SUBTREE contains it —
+      # descendant-set membership, reusing the same tree expansion Filter matches
+      # with (so filtering "Rock" lights a row's "Shoegaze"). Tapping it removes
+      # that ancestor term, broadening the filter (the toggle semantics below).
+      applied_terms.select { |term| genre_subtree_names(term).include?(value.to_s) }
     else
       applied_terms.select { |term| term.to_s == value.to_s }
+    end
+  end
+
+  # The set of genre names in the subtree rooted at `term` (the genre itself plus
+  # every descendant), matched by fingerprint. Memoised per request so a genre
+  # repeated across many rows costs one lookup, not one per tag.
+  def genre_subtree_names(term)
+    (@genre_subtree_names ||= {})[term.to_s] ||= begin
+      root_ids = Genre.where(fingerprint: Genre.fingerprint_for(term)).ids
+      Set.new(Genre.where(id: Genre.subtree_ids(root_ids)).pluck(:name))
     end
   end
 

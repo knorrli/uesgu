@@ -39,6 +39,19 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_no_current_path(/g%5B%5D=/)
   end
 
+  test "tapping a genre on an event row filters by it (g[]) and lights it" do
+    rock = genre(name: "Taprock", events_count: 1)
+    shoegaze = genre(name: "Tapshoe", events_count: 1)
+    shoegaze.set_parent!(rock)
+    event(start_date: Date.current + 3, genre_list: [shoegaze.name]) # row shows Tapshoe
+
+    visit events_path
+    find(".event-genres .filter-link", text: shoegaze.name).click
+
+    assert_current_path(/g%5B%5D=#{Regexp.escape(shoegaze.name)}/)
+    assert_selector ".event-genres .filter-link.active", text: shoegaze.name
+  end
+
   test "the What free-text row commits the typed text as a q[] query" do
     event(start_date: Date.current + 3, genre_list: ["Zylogenre"])
 

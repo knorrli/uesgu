@@ -81,4 +81,31 @@ class EventsHelperTest < ActionView::TestCase
 
     refute favorites_filter_active?
   end
+
+  test 'genre_subtree_names returns the genre plus every descendant' do
+    rock = genre(name: 'helprock')
+    indie = genre(name: 'helpindie'); indie.set_parent!(rock)
+    shoegaze = genre(name: 'helpshoe'); shoegaze.set_parent!(indie)
+    genre(name: 'helppolka') # unrelated
+
+    names = genre_subtree_names(rock.name)
+
+    assert_includes names, rock.name
+    assert_includes names, indie.name
+    assert_includes names, shoegaze.name
+    refute(names.any? { |n| n.start_with?('helppolka') })
+  end
+
+  test 'filter_terms_matching(g) lights a genre sitting under an applied ancestor' do
+    rock = genre(name: 'litrock')
+    shoegaze = genre(name: 'litshoe'); shoegaze.set_parent!(rock)
+    jazz = genre(name: 'litjazz')
+
+    # Filtering by the ancestor "litrock" lights the descendant tag "litshoe"...
+    assert_equal [rock.name], filter_terms_matching([rock.name], shoegaze.name, param: 'g')
+    # ...and tapping the genre itself lights it (self is in its own subtree).
+    assert_equal [rock.name], filter_terms_matching([rock.name], rock.name, param: 'g')
+    # An unrelated applied genre does not light it.
+    assert_empty filter_terms_matching([jazz.name], shoegaze.name, param: 'g')
+  end
 end

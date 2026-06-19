@@ -67,9 +67,6 @@
           <% @filter.style_list.each do |style| %>
             <%= render 'filter_chip', name: 's', value: style, label: style, icon: 'styles' %>
           <% end %>
-          <% @filter.genre_list.each do |genre| %>
-            <%= render 'filter_chip', name: 'g', value: genre, label: genre, icon: 'genres' %>
-          <% end %>
           <% @filter.location_list.each do |location| %>
             <%= render 'filter_chip', name: 'l', value: location, label: location_display(location), icon: Location.type_for(location) %>
           <% end %>
@@ -79,15 +76,6 @@
         </div>
         <%= render 'notify_button' %>
       </div>
-    <% end %>
-
-    <%# ── Genres have no sheet of their own — they're applied by TAPPING a genre
-        on an event, never picked from a list (the taxonomy is too large and noisy
-        to browse). Carry each active genre as a hidden, checked input so it
-        survives a re-submit from any other sheet; its summary chip removes it by
-        unchecking this input (filter-sheets#remove matches by name + value). ── %>
-    <% @filter.genre_list.each do |genre| %>
-      <input type="checkbox" name="g[]" value="<%= genre %>" checked hidden>
     <% end %>
 
     <%# ── WHAT sheet — styles + free-text query ── %>

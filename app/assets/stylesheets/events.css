@@ -101,11 +101,11 @@
   mask: var(--star-fill) center / contain no-repeat;
 }
 
-/* Venue-led row, zero boxes. Hierarchy comes from structure — the venue anchor on
-   its own line, a quiet metadata line (city/canton) beneath it — so the list reads
-   the same logged in or out. Colour is an enhancement, not the separator: green
-   now marks a tag you *follow* (your stuff), plus true links and the external-link
-   arrow; muted grey = passive info; black = the event itself. */
+/* Venue-led row, zero boxes. Hierarchy comes from structure + weight — the venue
+   anchor (bold ink) on its own line, the underlined event title as the primary
+   link, a quiet metadata line (city/canton) beneath. Colour is rationed: green
+   marks an *applied* filter term (.filter-link.active) and nothing else on the row;
+   muted grey = passive info; ink = structure and the event itself. */
 .event {
   display: flex;
   justify-content: space-between;
@@ -157,23 +157,32 @@
 }
 
 /* Every taxonomy term (venue, city/canton, style, genre) is a filter link:
-   tapping it filters the programme by that term. The accent colour is the app's
-   established "this is interactive" signal, now applied uniformly so the whole
-   row reads as tappable at rest — mobile-first, no hover to lean on. Hierarchy
-   still comes from size/weight (venue large+bold via .event-where .venue, styles
-   bold via .event-styles), not colour. */
+   tapping it toggles the programme's filter by that term. At REST it carries no
+   colour of its own — it inherits its context (venue = fg, city/canton = muted,
+   styles = fg bold, genres = muted), so the row reads as calm structure, not a
+   field of green. Affordance comes from weight/hierarchy + a hover underline on
+   desktop and tap convention on touch. Colour is spent only on .active below. */
 .filter-link {
   border: 0;
   padding: 0;
   background: none;
   font: inherit;
-  color: var(--theme-accent-color);
+  color: inherit;
   cursor: pointer;
   text-decoration: none;
 }
 
 .filter-link:hover {
   text-decoration: underline;
+}
+
+/* An APPLIED term — this tag is in your active filter — lights GREEN. It's the one
+   place green is earned on a row, so green now means "your filter" (resting tags
+   stay neutral). Lit ⇔ tapping removes it (see EventsHelper#event_filter_tag). Two
+   classes outrank the contextual muted/fg, so an active city/canton or genre lights
+   up regardless of its rest colour. */
+.filter-link.active {
+  color: var(--theme-accent-color);
 }
 
 /* Venue is the headline: the largest, boldest thing in the row, alone on its line
@@ -195,15 +204,14 @@
   overflow-wrap: anywhere;
 }
 
+/* The title is the row's PRIMARY action — the link to the event itself — so it
+   gets the strongest, most honest affordance: bold ink (headline weight) +
+   a persistent underline (the web's universal link signal), with the green ↗
+   marking that it leaves the site. Underline-at-rest, not on-hover, because this
+   is the one target that must read as tappable without a pointer (mobile) and
+   without leaning on colour (accessible). */
 .event-title a {
   color: var(--theme-fg-color);
-  text-decoration: none;
-}
-
-/* The title is an external link (off-site, marked by the green ↗ which carries
-   the clickable signal at rest). It stays black for headline hierarchy; hover
-   just underlines, so the headline never changes colour. */
-.event-title a:hover {
   text-decoration: underline;
 }
 
@@ -252,19 +260,11 @@
   color: var(--theme-fg-color);
 }
 
-/* Genres are display-only (not filters): muted, so the colour alone says
-   "not clickable". */
+/* Genres: the quietest descriptor tier — muted at rest, a step below the bold
+   styles above them. They're filter links (.filter-link) like everything else, so
+   an applied genre lights green via .filter-link.active. */
 .event-genres {
   color: var(--theme-fg-muted);
-}
-
-/* A genre matched by the active free-text query. Emphasise it so it stands out
-   from its muted siblings — but stay in the text vocabulary (un-muted + bold),
-   never the accent colour, which in this UI means "interactive/clickable". The
-   match is information, not a link. */
-.event-genres .genre.active {
-  color: var(--theme-fg-color);
-  font-weight: bold;
 }
 
 /* The genre tag's inline edit gear (an .icon-button); only the inline layout is

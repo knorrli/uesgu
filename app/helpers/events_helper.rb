@@ -38,13 +38,35 @@ module EventsHelper
   # tag means exactly one thing (no tiny secondary follow target crammed onto a
   # finger-sized chip). Following moved off the tag onto the dedicated "follow this
   # filter" control (see _notify_button), which frees colour to mean the app's
-  # usual "this is interactive" again. interactive:/favorite_type: are kept for
-  # call-site compatibility; every caller now gets the same filter link (the
-  # notification digest included — there it's just a way back into the site).
+  # usual "this is interactive" again. favorite_type: is kept for call-site
+  # compatibility.
+  #
+  # The tap TOGGLES the term in the active filter rather than replacing the whole
+  # filter. Tapping an inactive term ADDS it (each category unions — see Filter, so
+  # you build "psych + jazz" by tapping both); tapping a term that's already applied
+  # REMOVES it. So the rule is simply: a lit tag ⇔ tapping it drops that term. Page
+  # is reset so you land on page 1 of the changed set. The `active` class lights the
+  # tag green — the one place green is earned on a row, marking *your* applied
+  # filter (resting tags are structural ink/muted; affordance is weight + hover-
+  # underline, not colour). In a read-only context (no filter form, e.g. a
+  # notification digest passing interactive: false) it stays a plain single-value
+  # link into the listing — a way back into the site.
   def event_filter_tag(label, field:, value:, interactive: true, modifier: nil, favorite_type: nil)
-    param = field.delete_suffix('[]').to_sym
-    link_to label, events_path(param => Array(value)),
-            class: class_names('filter-link', modifier),
+    param = field.delete_suffix('[]')
+
+    unless interactive
+      return link_to label, events_path(param.to_sym => Array(value)),
+                     class: class_names('filter-link', modifier)
+    end
+
+    applied = request.query_parameters.except('page')
+    current = Array(applied[param])
+    active = current.include?(value.to_s)
+    values = active ? current - [value.to_s] : current + [value.to_s]
+    query = values.any? ? applied.merge(param => values) : applied.except(param)
+
+    link_to label, events_path(query),
+            class: class_names('filter-link', modifier, active: active),
             data: { turbo_frame: '_top' }
   end
 

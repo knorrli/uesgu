@@ -1,13 +1,12 @@
 # Plain query object built from request params (see EventsController#index).
 # Filters are no longer persisted, so this is not an ActiveRecord model.
 class Filter
-  attr_reader :queries, :style_list, :location_list, :genre_list, :date_ranges
+  attr_reader :queries, :style_list, :location_list, :date_ranges
 
   def initialize
     @queries = []
     @style_list = []
     @location_list = []
-    @genre_list = []
     @date_ranges = []
   end
 
@@ -15,12 +14,11 @@ class Filter
   # caller sets only what it has). The one place the q/l/s/d shape is assembled —
   # the events listing, a saved rule's edit filter, and the rule's own matcher all
   # funnel through here instead of each repeating `new.tap { ... }`.
-  def self.build(queries: nil, style_list: nil, location_list: nil, genre_list: nil, date_ranges: nil)
+  def self.build(queries: nil, style_list: nil, location_list: nil, date_ranges: nil)
     new.tap do |filter|
       filter.queries = queries unless queries.nil?
       filter.style_list = style_list unless style_list.nil?
       filter.location_list = location_list unless location_list.nil?
-      filter.genre_list = genre_list unless genre_list.nil?
       filter.date_ranges = date_ranges unless date_ranges.nil?
     end
   end
@@ -37,30 +35,20 @@ class Filter
     @location_list = parse(new_locations)
   end
 
-  def genre_list=(new_genres)
-    @genre_list = parse(new_genres)
-  end
-
   def date_ranges=(new_date_ranges)
     ranges = parse(new_date_ranges)
     @date_ranges = ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] }
   end
 
-  # Subscribable inputs — what / where / when. A notification rule (a saved
-  # "follow this filter") is built from these only; genres are deliberately NOT
-  # subscribable, because venues tag them inconsistently ("psych" vs "psych rock"
-  # vs "psychedelic rock"), so following a raw genre would silently miss the very
-  # events you wanted. Drives the "follow this filter" bell.
-  def subscribable?
-    [queries, style_list, location_list, date_ranges].any?(&:present?)
-  end
-
-  # True when the listing is scoped by ANY UI input, genres included. Drives the
-  # applied-chips row — a genre is a fine transient filter (you're present and can
-  # widen again) even though it can't be followed. Meaningless on an unfiltered,
-  # all-events listing.
+  # True when the listing is scoped by ANY UI input. Drives both the applied-chips
+  # row and the "follow this filter" bell — there's no longer a filter you can
+  # apply but not follow. Tapping a genre on an event applies it as a free-text
+  # query (q[]), so a genre rides in `queries`: searchable, followable, and
+  # SUBSTRING-matched, which catches sibling tags ("psych" → psych / psych rock /
+  # psychedelic rock) instead of silently missing them the way an exact match would.
+  # Meaningless on an unfiltered, all-events listing.
   def active?
-    subscribable? || genre_list.present?
+    [queries, style_list, location_list, date_ranges].any?(&:present?)
   end
 
   def ransack_query
@@ -69,7 +57,6 @@ class Filter
         {
           title_or_subtitle_or_styles_name_or_genres_name_cont_any: queries,
           styles_name_in: style_list.presence,
-          genres_name_in: genre_list.presence,
           m: Ransack::Constants::OR
         },
         {

@@ -33,11 +33,13 @@ module TagsHelper
 
   # The leading icon on an applied-filter chip, derived from its param so the
   # events filter and the rule form render the same glyph for the same kind of
-  # token. Locations (l[]) resolve PER-TYPE from the value (canton/city/venue),
-  # matching the mobile filter sheet and the dropdown — so a location chip's icon
-  # tells you which kind of place it is, not a flat "where" pin.
+  # token. The whole WHAT axis — a picked style (s[]) and a freetext/genre (q[]) —
+  # shares ONE icon (the search glyph), because styles and genres are unified on the
+  # row; surfacing the internal s[]/q[] split only on the chip would re-leak the very
+  # distinction the row hides. Locations (l[]) resolve PER-TYPE from the value
+  # (canton/city/venue), so a location chip's icon tells you which kind of place.
   FILTER_CHIP_GLYPH = {
-    's[]' => 'ph-music-notes',
+    's[]' => 'ph-magnifying-glass',
     'q[]' => 'ph-magnifying-glass',
     'd[]' => 'ph-calendar-dots'
   }.freeze

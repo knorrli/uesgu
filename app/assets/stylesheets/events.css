@@ -731,7 +731,6 @@
    the default; the inline combobox filter (wrapped in .filter-desktop) takes over
    at the tablet breakpoint — 600px, matching the calendar breakpoint above.
    ───────────────────────────────────────────────────────────────────────── */
-.filter-desktop { display: none; }
 
 /* Reserve one chip-row of height in the events filter so applying the FIRST
    filter doesn't shove the toolbar + programme down (the row otherwise goes
@@ -751,8 +750,6 @@
 }
 
 @media (min-width: 600px) {
-  .filter-desktop { display: block; }
-  .filter-sheets { display: none; }
   /* Wider columns can carry the taller cell without looking squashed; restore the
      roomier desktop calendar height (mobile keeps the compact 4.25rem above). */
   .simple-calendar .day { height: 7rem; }
@@ -863,7 +860,43 @@
 .filter-chip__remove { font-size: 1.1em; }
 
 /* ── The sheet ── full-screen, slides up from the bottom. */
-body.filter-sheet-open { overflow: hidden; }
+/* Mobile only: the full-screen sheet locks the page behind it. On desktop the
+   sheet is an inline dropdown panel, so the page must stay scrollable. */
+@media (max-width: 599px) {
+  body.filter-sheet-open { overflow: hidden; }
+}
+
+/* ── Desktop (≥600px): the same sheet markup, presented as a horizontal trigger
+   bar whose panels drop down inline below the bar instead of a full-screen sheet.
+   One filter UI for both platforms; only the presentation differs. ── */
+@media (min-width: 600px) {
+  /* Triggers sit in a row, each a field-like cell. */
+  .filter-sheets__bar { flex-direction: row; gap: var(--gap-medium); }
+  .filter-trigger { flex: 1 1 0; min-width: 0; }
+
+  /* A sheet becomes an inline panel in normal flow: since the closed sheets are
+     display:none, the open one drops in right under the bar (and the summary
+     chips). Full filter width, bordered, its body scrolls. No slide transform. */
+  .filter-sheets .sheet {
+    position: static;
+    inset: auto;
+    max-height: 26rem;
+    margin-top: var(--gap-small);
+    transform: none;
+    visibility: visible;
+    display: none;
+    border: var(--border-width) solid var(--rule-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .filter-sheets .sheet--open { display: flex; }
+
+  /* The full-screen close affordance is redundant inline; Apply (or reopening
+     the trigger) closes it. Keep the title + clear for orientation. */
+  .filter-sheets .sheet__close { display: none; }
+  .filter-sheets .sheet__title { text-align: left; }
+  .filter-sheets .sheet__header { grid-template-columns: 1fr auto; }
+}
 
 .sheet {
   position: fixed;

@@ -35,6 +35,11 @@ export default class extends Controller {
   open(event) {
     const sheet = this.#sheetFor(event.params.field)
     if (!sheet) return
+    // Desktop shows panels inline, so a second trigger could open a second panel.
+    // Hide any already-open one WITHOUT committing — its checkbox state persists in
+    // the form and applies on the next submit, so nothing is lost. (On mobile only
+    // one sheet is ever reachable, so this loop is a no-op there.)
+    this.sheetTargets.forEach((other) => { if (other !== sheet) this.#closeSheet(other) })
     this.snapshot = this.#serialize(sheet)
     sheet.classList.add("sheet--open")
     sheet.setAttribute("aria-hidden", "false")

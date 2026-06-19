@@ -10,11 +10,10 @@
 <div class="flex flex-col gap-large align-stretch" data-controller="favorite"
      data-action="turbo:before-frame-render->favorite#beforeFrameRender turbo:frame-load->favorite#reapply"
      data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
-  <%# Two presentations of the same filter, CSS-toggled at 600px: the inline
-      combobox filter on wider screens, full-screen sheets on mobile. Each is an
-      independent GET form producing identical params; only the visible one is
-      interactive, so they never collide. %>
-  <div class="filter-desktop"><%= render 'filter', filter: @filter %></div>
+  <%# One filter UI for all widths (the genre/location tree pickers + when): a
+      trigger bar that opens full-screen sheets on mobile and inline dropdown
+      panels on desktop (CSS-only difference). The old desktop combobox filter is
+      retired here; tags/_filter_fields lives on only in the rule editor. %>
   <%= render 'filter_sheets' %>
 
   <%# Toggle row, above the content in both views (so the first bold header lines

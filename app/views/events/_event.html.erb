@@ -3,7 +3,7 @@
   <div class="event-body">
 
     <h3 class="event-title">
-      <% if event.start_time.present? %><span class="event-time"><%= l event.start_time, format: :time %></span> <% end %><% if event.cancelled? %><span class="event-cancelled"><%= t('events.cancelled') %></span> <% end %><%= link_to event.url, target: :blank do %><%= event.title %> <span class="event-link-marker" aria-hidden="true">&#8599;</span><% end %>
+      <% if event.start_time.present? %><span class="event-time"><%= l event.start_time, format: :time %></span> <% end %><% if event.cancelled? %><span class="event-cancelled"><%= t('events.cancelled') %></span> <% end %><%= link_to event.url, target: '_blank', rel: 'noopener' do %><%= event.title %> <span class="event-link-marker" aria-hidden="true">&#8599;</span><% end %>
     </h3>
 
     <% if event.subtitle.present? %>

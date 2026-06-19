@@ -53,6 +53,22 @@ class NotificationMailerTest < ActionMailer::TestCase
     assert_no_match(/href="javascript:/, html, 'but not as a link')
   end
 
+  test 'ships a dark-mode variant: both logo grounds embed and the media query is present' do
+    u = user(email_address: 'fan5@example.test', locale: 'de')
+    ev = event(start_date: Date.current + 2)
+    note = u.notifications.create!(title: 'D', event_ids: [ev.id],
+                                   period_start: 1.week.ago, period_end: Time.current)
+
+    mail = NotificationMailer.digest(note)
+    names = mail.all_parts.map(&:filename).compact
+    assert_includes names, 'uesgu-icon.png', 'light (cream-ground) mark embedded'
+    assert_includes names, 'uesgu-icon-dark.png', 'dark (plum-ground) mark embedded'
+
+    html = mail.html_part.body.to_s
+    assert_match 'prefers-color-scheme: dark', html, 'dark media query ships'
+    assert_match 'content="light dark"', html, 'both schemes declared so clients honor the query'
+  end
+
   test 'subject pluralizes with the event count' do
     u = user(email_address: 'fan2@example.test', locale: 'en')
     e1 = event(start_date: Date.current + 1)

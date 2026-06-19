@@ -15,8 +15,14 @@ class NotificationMailer < ApplicationMailer
     # (Outlook desktop, images-off) and with no external fetch / tracking pixel.
     # SVG is deliberately not used — Gmail and Outlook strip it. binread keeps the
     # PNG bytes intact (a text read would re-encode and corrupt them). The header
-    # references this via attachments[...].url, which resolves to its cid: URL.
+    # references these via attachments[...].url, which resolves to their cid: URL.
+    #
+    # Two grounds: the light mark sits on the cream card, the dark mark on the
+    # plum card. The header swaps between them via a prefers-color-scheme media
+    # query (see the layout) so the mark's own ground always matches the card it
+    # sits on — no bright cream plate glaring on the dark card, and vice versa.
     attachments.inline["uesgu-icon.png"] = File.binread(Rails.root.join("public/icon-192.png"))
+    attachments.inline["uesgu-icon-dark.png"] = File.binread(Rails.root.join("public/icon-192-dark.png"))
 
     I18n.with_locale(@user.locale.presence || I18n.default_locale) do
       # Render the heading in the recipient's locale rather than reusing the title

@@ -8,9 +8,9 @@ class EventsController < ApplicationController
   # GET /events
   def index
     @filter = build_filter
-    # A logged-in user gets a "notify me about this filter" bell; if they already
-    # have a rule for exactly this filter set, it's lit and links to that rule
-    # instead of creating a clone (see _notify_button + NotificationRule.matching).
+    # A logged-in user gets the ★ save / 🔔 notify cluster for the active filter;
+    # @notify_rule is the saved filter matching this exact filter set, if any (lit
+    # ★, and 🔔 shown — see _save_notify + NotificationRule.matching).
     if current_user && @filter.active?
       @notify_rule = current_user.notification_rules.matching(NotificationRule.fingerprint_for(@filter))
     end

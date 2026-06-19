@@ -54,9 +54,18 @@ Rails.application.routes.draw do
   # enabled; fire runs the rule on demand ("Fire now" — test without waiting for
   # the schedule).
   resources :notification_rules, only: %i[index new create edit update destroy] do
+    collection do
+      # The events-page ★: toggle a SILENT saved filter (notify off) for the
+      # current filter, in place — create if none matches the fingerprint, destroy
+      # if one does. Re-renders just the save/notify button frame.
+      post :toggle_save
+    end
     member do
       patch :toggle
       post :fire
+      # The events-page 🔔: turn notifications on for an already-saved filter and
+      # land on the editor to set the schedule/channels.
+      post :notify
     end
   end
 

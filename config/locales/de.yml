@@ -94,7 +94,7 @@ de:
   inbox:
     title: Benachrichtigungen
     tab_messages: Eingang
-    tab_rules: Regeln
+    tab_rules: Filter
   saved_events:
     title: Merkliste
     empty: Noch nichts gespeichert — tippe das Herz bei einer Veranstaltung.
@@ -120,14 +120,19 @@ de:
       one: 1 gespeicherte Veranstaltung steht an
       other: "%{count} gespeicherte Veranstaltungen stehen an"
   notification_rules:
-    title: Benachrichtigungen
-    intro: Bau dir eigene Benachrichtigungen — was, wann und wie du es erfährst. Lass so viele laufen, wie du willst.
+    title: Gespeicherte Filter
+    intro: Deine gespeicherten Filter. Wende einen an, um ihn durchzustöbern, schalte die Glocke ein für Benachrichtigungen, oder bearbeite den Zeitplan.
     your_rules: Deine Regeln
     empty: Noch keine Regeln — erstell unten deine erste.
     add_rule: Regel hinzufügen
     save_button: Speichern
     window_none: Kein Zeitraum (neue Events)
-    deleted: Regel gelöscht.
+    apply: Anwenden
+    notify_on: Benachrichtigen
+    notify_off: Nicht mehr benachrichtigen
+    silent: Keine Benachrichtigung
+    saved: Gespeichert.
+    deleted: Gespeicherter Filter gelöscht.
     already_exists: Diese Benachrichtigung gibt es schon — hier kannst du sie anpassen.
     duplicate_edit: "Du hast noch eine Regel für genau diesen Filter:"
     fired:
@@ -143,7 +148,7 @@ de:
     default_name: Benachrichtigung
     edit_button: Bearbeiten
     empty_link: Filtere die Veranstaltungen
-    empty_html: Noch keine Benachrichtigungen. %{link} auf der Startseite, dann tippe „Benachrichtige mich“.
+    empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite, dann tippe auf den Stern.
     favorites_live: Meine Interessen (automatisch aktuell)
     track_favorites: Mit meinen Interessen synchron halten
     track_favorites_hint: berücksichtigt auch Orte/Stile, die dich später interessieren
@@ -671,7 +676,9 @@ de:
         calendar: Kalender
       favorites_filter:
         label: Meine Interessen
-      notify_filter: Benachrichtige mich
+      save_filter: Filter speichern
+      save_filter_remove: Gespeichert — entfernen
+      notify_filter: Benachrichtigen
       notify_filter_existing: Du wirst benachrichtigt — verwalten
     day:
       empty: Keine Events an diesem Tag.

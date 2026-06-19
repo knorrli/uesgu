@@ -1,123 +1,116 @@
 <%# Shared by new + edit. form_with infers POST (create) vs PATCH (update) from
-    the record. The filter (q/l/s/d) posts as top-level fields (read by the
-    controller's filter_params, not nested under notification_rule) via inline
-    multiselect comboboxes + a window select.
+    the record. The saved filter (q/g/l/d) posts as top-level fields (read by the
+    controller's filter_params, not nested under notification_rule).
 
-    The editor AUTOSAVES — there's no Save button. The autosave controller submits
-    on every change; on the edit page the form lives in a turbo frame, so it
-    re-renders in place with the canonical server state (sorted/deduped chips,
-    dropdowns excluding picks, window-as-tag, refreshed name). This is the same
-    submit-on-select model as the events filter — true parity, not a client-side
-    reimplementation. rule-form keys the schedule off the window (windowed →
-    derived cadence) for instant feedback before the round-trip confirms it. %>
-<%= form_with model: rule, class: 'rule-form account-form flex flex-col gap-medium',
-      data: { controller: 'rule-form autosave', 'rule-form-rhythms-value': NotificationRule::WINDOW_RHYTHM.to_json } do |form| %>
-  <% if rule.errors.any? %>
-    <ul class="form-errors">
-      <% rule.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
-    </ul>
-  <% end %>
-
-  <%# What this alert watches — laid out exactly like the events filter
-      (app/views/events/_filter.html.erb): the what / where / window fields
-      stacked, then one combined chips row below. The window is a preset select
-      (a recurring alert has no custom date range) but it still shows as a green
-      tag in the row, so the row reads identically. %>
-  <fieldset class="rule-fieldset flex flex-col gap-medium">
-    <legend><%= t('notification_rules.section_what') %></legend>
-
-    <div class="tag-picker-group flex flex-col gap-medium" data-controller="tag-picker">
-      <div class="filter-fields flex flex-col">
-        <%# What + Where shared with the events filter (tags/_filter_fields). %>
-        <%= render 'tags/filter_fields', filter: filter, id_prefix: "rule_#{rule.id || 'new'}" %>
-
-        <%# "When" — a preset window select (no custom ranges for a recurring
-            alert). It carries d[]; on change the schedule reacts (rule-form) and
-            autosave persists. Stretches full width as a flex-col child. %>
-        <%= select_tag 'd[]', options_for_select(rule_window_options, filter.date_ranges.first),
-              include_blank: t('notification_rules.window_none'),
-              data: { 'rule-form-target': 'window', action: 'rule-form#update' } %>
-      </div>
-
-      <%# Combined chips row, below all fields (mirrors the events filter): shared
-          What/Where chips, then the window as a display-only green tag (the select
-          above carries d[]), its × clears the select via rule-form#clearWindow. %>
-      <div class="chips flex flex-row wrap gap-small" data-tag-picker-target="chips">
-        <%= render 'tags/filter_chips', filter: filter %>
-        <% if (window = filter.date_ranges.first) %>
-          <%= render 'tags/filter_chip', param: 'd[]', value: window, label: date_range_label(window),
-                input: false, remove_action: 'rule-form#clearWindow' %>
-        <% end %>
-      </div>
-    </div>
-  </fieldset>
-
-  <% if matches_favorites %>
-    <label class="rule-check rule-sync flex gap-small">
-      <%= form.check_box :track_favorites %>
-      <span>
-        <%= t('notification_rules.track_favorites') %>
-        <span class="muted">— <%= t('notification_rules.track_favorites_hint') %></span>
-      </span>
-    </label>
-  <% end %>
-
-  <%# One schedule block, reactive to the window select (above): with a window the
-      cadence is derived (picker hidden, model forces it), without one the user
-      picks freely. weekday shows for weekly/biweekly, monthday for monthly. %>
-  <fieldset class="rule-fieldset flex flex-col gap-small">
-    <legend><%= t('notification_rules.section_when') %></legend>
-    <%# No per-field labels — the values speak for themselves (matching the
-        filter's placeholder-only style); aria-label keeps each control named for
-        assistive tech. The time snaps to the quarter hour on blur (rule-form#
-        snapTime), since the scheduler runs quarter-hourly — done with JS rather
-        than step= so an off-quarter entry quietly rounds instead of blocking
-        submit with a validation error. %>
-    <div class="rule-row flex gap-small">
-      <label class="flex flex-col gap-xsmall" data-rule-form-target="cadenceField">
-        <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' }, 'aria-label': t('notification_rules.fields.cadence') %>
-      </label>
-      <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
-        <%= form.select :weekday, rule_weekday_options, {}, 'aria-label': t('notification_rules.fields.weekday') %>
-      </label>
-      <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
-        <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('notification_rules.fields.monthday') %>
-      </label>
-      <label class="flex flex-col gap-xsmall">
-        <%= form.time_field :time_string, value: rule.time_string, 'aria-label': t('notification_rules.fields.time'), data: { action: 'change->rule-form#snapTime' } %>
-      </label>
-    </div>
-  </fieldset>
-
-  <fieldset class="rule-fieldset flex flex-col gap-small">
-    <legend><%= t('notification_rules.section_channels') %></legend>
-    <p class="muted rule-hint"><%= t('notification_rules.channels_hint') %></p>
-    <label class="rule-check flex gap-small">
-      <%= form.check_box :notify_push %>
-      <span><%= t('notification_rules.fields.notify_push') %></span>
-    </label>
-    <% email_ready = MailConfig.configured? && current_user.email_address.present? %>
-    <label class="<%= class_names('rule-check', 'flex', 'gap-small', 'rule-check--disabled': !email_ready) %>">
-      <%= form.check_box :notify_email, disabled: !email_ready %>
-      <span>
-        <%= t('notification_rules.fields.notify_email') %>
-        <% unless email_ready %>
-          <span class="muted">— <%= t('notification_rules.email_unavailable') %></span>
-        <% end %>
-      </span>
-    </label>
-  </fieldset>
-
-  <%# The editor autosaves, so "Save" really just confirms and returns to the list
-      (the changes are already persisted); "Löschen" removes the rule. Both are
-      links (not button_to, which would nest a <form>) that break out of the
-      editor's turbo frame to navigate. %>
-  <div class="flex gap-small rule-actions">
-    <%= link_to t('notification_rules.save_button'), notification_rules_path, class: 'button-small primary', data: { turbo_frame: '_top' } %>
-    <% if rule.persisted? %>
-      <%= link_to t('notification_rules.delete'), notification_rule_path(rule),
-            class: 'button-small button-ghost danger',
-            data: { turbo_method: :delete, turbo_confirm: t('notification_rules.delete_confirm'), turbo_frame: '_top' } %>
+    A plain form with an explicit Save — no autosave. The What/Where pickers are the
+    SAME genre/location tree the events filter uses (tags/_genre_sheet, _location_sheet
+    via the filter-sheets controller), with submit-on-apply OFF: picking a genre
+    stages it into this form as a checked g[]/l[] input and commits only on Save.
+    (Autosave existed to tame the old combobox's client-side chip drift; the tree is
+    plain server-rendered checkboxes, so there's nothing to drift — see the redesign
+    doc.) rule-form keys the schedule off the window select. %>
+<%# .filter-sheets pulls in the same desktop dropdown-panel + mobile full-screen
+    sheet CSS the events filter uses (keyed off that class). %>
+<div class="rule-filter-picker filter-sheets"
+     data-controller="filter-sheets"
+     data-filter-sheets-submit-on-apply-value="false"
+     data-filter-sheets-search-for-template-value="<%= t('events.filter.search_for', query: '%{query}') %>"
+     data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>">
+  <%= form_with model: rule, class: 'rule-form account-form flex flex-col gap-medium',
+        data: { controller: 'rule-form', 'rule-form-rhythms-value': NotificationRule::WINDOW_RHYTHM.to_json,
+                'filter-sheets-target': 'form' } do |form| %>
+    <% if rule.errors.any? %>
+      <ul class="form-errors">
+        <% rule.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
+      </ul>
     <% end %>
-  </div>
-<% end %>
+
+    <%# What this watches — the same trigger bar + tree sheets as the events filter,
+        so the two read identically. The window (the filter's date) is a preset
+        select (a recurring alert takes no custom range), and it also drives the
+        schedule cadence below (rule-form#update). %>
+    <fieldset class="rule-fieldset flex flex-col gap-medium">
+      <legend><%= t('notification_rules.section_what') %></legend>
+
+      <% what_terms  = filter.queries + filter.genres %>
+      <% where_terms = filter.location_list.map { |loc| location_display(loc) } %>
+      <div class="filter-sheets__bar">
+        <%= render 'tags/filter_trigger', field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') %>
+        <%= render 'tags/filter_trigger', field: 'where', icon: 'locations', terms: where_terms, empty: t('events.filter.where') %>
+      </div>
+
+      <%# The sheets sit right under the bar so the desktop dropdown panel lands
+          beneath its trigger. (Mobile sheets are fixed full-screen — order is moot.) %>
+      <%= render 'tags/genre_sheet', filter: filter %>
+      <%= render 'tags/location_sheet', filter: filter %>
+
+      <%= select_tag 'd[]', options_for_select(rule_window_options, filter.date_ranges.first),
+            include_blank: t('notification_rules.window_none'),
+            data: { 'rule-form-target': 'window', action: 'rule-form#update' } %>
+    </fieldset>
+
+    <% if matches_favorites %>
+      <label class="rule-check rule-sync flex gap-small">
+        <%= form.check_box :track_favorites %>
+        <span>
+          <%= t('notification_rules.track_favorites') %>
+          <span class="muted">— <%= t('notification_rules.track_favorites_hint') %></span>
+        </span>
+      </label>
+    <% end %>
+
+    <%# One schedule block, reactive to the window select (above): with a window the
+        cadence is derived (picker hidden, model forces it), without one the user
+        picks freely. weekday shows for weekly/biweekly, monthday for monthly. %>
+    <fieldset class="rule-fieldset flex flex-col gap-small">
+      <legend><%= t('notification_rules.section_when') %></legend>
+      <%# No per-field labels — the values speak for themselves; aria-label keeps
+          each control named for assistive tech. The time snaps to the quarter hour
+          on blur (rule-form#snapTime), since the scheduler runs quarter-hourly. %>
+      <div class="rule-row flex gap-small">
+        <label class="flex flex-col gap-xsmall" data-rule-form-target="cadenceField">
+          <%= form.select :cadence, rule_cadence_options, {}, data: { 'rule-form-target': 'cadence', action: 'rule-form#update' }, 'aria-label': t('notification_rules.fields.cadence') %>
+        </label>
+        <label class="flex flex-col gap-xsmall" data-rule-form-target="weekday">
+          <%= form.select :weekday, rule_weekday_options, {}, 'aria-label': t('notification_rules.fields.weekday') %>
+        </label>
+        <label class="flex flex-col gap-xsmall" data-rule-form-target="monthday">
+          <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('notification_rules.fields.monthday') %>
+        </label>
+        <label class="flex flex-col gap-xsmall">
+          <%= form.time_field :time_string, value: rule.time_string, 'aria-label': t('notification_rules.fields.time'), data: { action: 'change->rule-form#snapTime' } %>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset class="rule-fieldset flex flex-col gap-small">
+      <legend><%= t('notification_rules.section_channels') %></legend>
+      <p class="muted rule-hint"><%= t('notification_rules.channels_hint') %></p>
+      <label class="rule-check flex gap-small">
+        <%= form.check_box :notify_push %>
+        <span><%= t('notification_rules.fields.notify_push') %></span>
+      </label>
+      <% email_ready = MailConfig.configured? && current_user.email_address.present? %>
+      <label class="<%= class_names('rule-check', 'flex', 'gap-small', 'rule-check--disabled': !email_ready) %>">
+        <%= form.check_box :notify_email, disabled: !email_ready %>
+        <span>
+          <%= t('notification_rules.fields.notify_email') %>
+          <% unless email_ready %>
+            <span class="muted">— <%= t('notification_rules.email_unavailable') %></span>
+          <% end %>
+        </span>
+      </label>
+    </fieldset>
+
+    <%# Explicit Save (the form commits everything at once); "Löschen" removes the
+        rule. Delete is a turbo_method link (not button_to, which would nest a form). %>
+    <div class="flex gap-small rule-actions">
+      <%= form.submit t('notification_rules.save_button'), class: 'button-small primary' %>
+      <% if rule.persisted? %>
+        <%= link_to t('notification_rules.delete'), notification_rule_path(rule),
+              class: 'button-small button-ghost danger',
+              data: { turbo_method: :delete, turbo_confirm: t('notification_rules.delete_confirm') } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

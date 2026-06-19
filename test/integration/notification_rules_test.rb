@@ -7,14 +7,14 @@ require 'db_test_helper'
 class NotificationRulesTest < ActionDispatch::IntegrationTest
   # --- landing-page button ---------------------------------------------------
 
-  test 'the Notify-me button shows only with an active filter' do
+  test 'the save action shows only with an active filter' do
     sign_in_as user
 
     get events_path
-    assert_select 'a.notify-filter-link', false, 'no button on an empty filter'
+    assert_select 'a.save-filter-link', false, 'no save on an empty filter'
 
-    get events_path(s: ['Rock'])
-    assert_select 'a.notify-filter-link'
+    get events_path(g: ['Rock'])
+    assert_select 'a.save-filter-link'
   end
 
   # --- new -------------------------------------------------------------------
@@ -26,18 +26,18 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
 
   test 'new (added filter) carries the filter through and wires the schedule form' do
     sign_in_as user
-    get new_notification_rule_path(s: ['Rock'], l: ['Dachstock']) # no date → added rule
+    leaf = genre_in_tree('Zylonew')
+    get new_notification_rule_path(g: [leaf.name]) # no date → added rule
 
     assert_response :success
-    # Filter pre-filled inline (combobox hidden fields), window as a select.
-    assert_select 'input[name="s[]"][value=?]', 'Rock'
-    assert_select 'input[name="l[]"][value=?]', 'Dachstock'
+    # The picked genre is pre-checked in the What tree; window is a select.
+    assert_select "input[name='g[]'][value='#{leaf.name}'][checked]"
     assert_select 'form[data-controller~="rule-form"]'
     assert_select 'select[name="notification_rule[cadence]"][data-rule-form-target="cadence"]'
     assert_select '[data-rule-form-target="weekday"]'
     # No name field — the name is the derived filter description, in the title.
     assert_select 'input[name="notification_rule[name]"]', false
-    assert_select 'h1', text: /Dachstock/
+    assert_select 'h1', text: /Zylonew/
   end
 
   test 'new (windowed filter) preselects the window and shows the firing-day picker' do
@@ -123,148 +123,163 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_notification_rule_path(existing)
   end
 
-  test 'the bell lights up and links to the existing rule for that filter' do
+  test 'the star lights when saved; the bell follows the notify state' do
     u = sign_in_as user
-    r = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540)
-    r.filter_attributes = { s: ['Rock'] }
+
+    # Unsaved: outline star (offers to save), no bell link yet.
+    get events_path(g: ['Rock'])
+    assert_select "a.save-filter-link[data-turbo-method='post']"
+    assert_select 'a.save-filter-link.active', false
+    assert_select 'a.notify-bell-link', false
+
+    # A silent saved filter (notifications off): star lit, bell present but unlit.
+    r = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540, enabled: false)
+    r.filter_attributes = { g: ['Rock'] }
+    r.save!
+    get events_path(g: ['Rock'])
+    assert_select 'a.save-filter-link.active'
+    assert_select "a.notify-bell-link[href=?]", notify_notification_rule_path(r)
+    assert_select 'a.notify-bell-link.active', false
+
+    # Notifying (enabled): both lit.
+    r.update!(enabled: true)
+    get events_path(g: ['Rock'])
+    assert_select 'a.save-filter-link.active'
+    assert_select 'a.notify-bell-link.active'
+  end
+
+  # --- save (★) / notify (🔔) lifecycle --------------------------------------
+
+  test 'the star toggles a silent saved filter in place' do
+    u = sign_in_as user
+
+    assert_difference -> { u.notification_rules.count }, 1 do
+      post toggle_save_notification_rules_path(g: ['Rock'])
+    end
+    r = u.notification_rules.last
+    refute r.enabled?, 'a ★-saved filter is silent (notifications off)'
+    assert_equal ['Rock'], r.genres
+
+    # Toggling the same filter again removes it.
+    assert_difference -> { u.notification_rules.count }, -1 do
+      post toggle_save_notification_rules_path(g: ['Rock'])
+    end
+  end
+
+  test 'the bell turns notifications on and opens the editor' do
+    u = sign_in_as user
+    r = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540, enabled: false)
+    r.filter_attributes = { g: ['Rock'] }
     r.save!
 
-    get events_path(s: ['Rock'])
-    # Lit: it links (GET) to the rule's editor rather than POSTing a new one.
-    assert_select "a.notify-filter-link.active[href=?]", edit_notification_rule_path(r)
-    assert_select "a.notify-filter-link[data-turbo-method='post']", false
-
-    # A different filter is not lit — it offers to create.
-    get events_path(s: ['Jazz'])
-    assert_select 'a.notify-filter-link.active', false
-    assert_select "a.notify-filter-link[data-turbo-method='post']"
+    post notify_notification_rule_path(r)
+    assert r.reload.enabled?
+    assert_redirected_to edit_notification_rule_path(r)
   end
 
   # --- edit / update ---------------------------------------------------------
 
-  test 'edit shows the rule schedule + its saved filter inline' do
+  test 'edit shows the schedule + the saved filter pre-checked in the tree' do
     u = sign_in_as user
+    leaf = genre_in_tree('Zyloedit')
     r = u.notification_rules.new(name: 'My alert', cadence: 'weekly', weekday: 5, time_of_day: 1050)
-    r.filter_attributes = { l: ['Dachstock'], s: ['Rock'] }
+    r.filter_attributes = { g: [leaf.name] }
     r.save!
 
     get edit_notification_rule_path(r)
     assert_response :success
-    # Filter pre-filled inline: the multiselect combobox hidden field carries the
-    # current values, the window is a <select>.
-    assert_select 'input[name="s[]"][value=?]', 'Rock'
-    assert_select 'input[name="l[]"][value=?]', 'Dachstock'
+    # The saved genre is pre-checked in the What tree; the window is a <select>.
+    assert_select "input[name='g[]'][value='#{leaf.name}'][checked]"
     assert_select 'select[name="d[]"]'
     # No name field; the derived name is the (server-rendered) page title.
     assert_select 'input[name="notification_rule[name]"]', false
-    assert_select 'h1', text: /Rock/
+    assert_select 'h1', text: /Zyloedit/
   end
 
-  test 'update saves picked styles and free-text queries from the what field separately' do
+  test 'update saves genre picks and free-text queries from the what field' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'daily', time_of_day: 60)
-    r.filter_attributes = { s: ['Rock'] }
+    r.filter_attributes = { g: ['Rock'] }
     r.save!
 
-    # The "what" tag-picker submits styles as s[] and free text as q[].
+    # The What tree submits genre picks as g[] and free text as q[].
     patch notification_rule_path(r), params: {
       notification_rule: { cadence: 'daily', time_string: '09:00' },
-      s: %w[Rock Jazz], q: ['Radiohead'], l: [''], d: ['']
+      g: %w[Rock Jazz], q: ['Radiohead'], l: [''], d: ['']
     }
 
-    assert_response :success # autosave re-renders the editor in place
+    assert_redirected_to notification_rules_path # explicit save returns to the list
     r.reload
-    assert_equal %w[Rock Jazz], r.style_list
+    assert_equal %w[Rock Jazz], r.genres
     assert_equal ['Radiohead'], r.queries
   end
 
-  test 'editing a filter to match another rule is allowed, with a heads-up linking to it' do
+  test 'editing a filter to match another rule is allowed; the editor flags it' do
     u = sign_in_as user
     a = u.notification_rules.new(name: 'a', cadence: 'daily', time_of_day: 540)
-    a.filter_attributes = { s: ['Rock'] }
+    a.filter_attributes = { g: ['Rock'] }
     a.save!
     b = u.notification_rules.new(name: 'b', cadence: 'daily', time_of_day: 540)
-    b.filter_attributes = { s: ['Jazz'] }
+    b.filter_attributes = { g: ['Jazz'] }
     b.save!
 
-    # Editing B to match A IS applied (only the bell dedupes); a non-blocking
-    # notice links to A.
-    patch notification_rule_path(b), params: { s: ['Rock'], l: [''], d: [''] }
+    # Editing B to match A IS applied (only the ★ dedupes); not blocked.
+    patch notification_rule_path(b), params: { g: ['Rock'], l: [''], d: [''] }
+    assert_redirected_to notification_rules_path
+    assert_equal ['Rock'], b.reload.genres
 
-    assert_response :success
-    assert_equal ['Rock'], b.reload.style_list
+    # The editor then surfaces a non-blocking notice linking to A.
+    get edit_notification_rule_path(b)
     assert_select '.rule-notice a[href=?]', edit_notification_rule_path(a)
   end
 
-  test 'trimming a filter through a colliding intermediate state is never blocked' do
-    u = sign_in_as user
-    a = u.notification_rules.new(name: 'a', cadence: 'daily', time_of_day: 540)
-    a.filter_attributes = { s: ['Rock', 'Metal'] }
-    a.save!
-    b = u.notification_rules.new(name: 'b', cadence: 'daily', time_of_day: 540)
-    b.filter_attributes = { s: ['Rock', 'Metal', 'Jazz'] }
-    b.save!
-
-    # Autosave fires one PATCH per chip removed. Removing Jazz lands on
-    # {Rock, Metal} — momentarily == A — which must still save…
-    patch notification_rule_path(b), params: { s: %w[Rock Metal], l: [''], d: [''] }
-    assert_response :success
-    assert_equal %w[Metal Rock], b.reload.style_list.sort
-
-    # …then removing Metal lands on {Rock}, the intended destination.
-    patch notification_rule_path(b), params: { s: ['Rock'], l: [''], d: [''] }
-    assert_response :success
-    assert_equal ['Rock'], b.reload.style_list
-  end
-
-  test 'editing only the schedule saves and shows no duplicate notice' do
+  test 'editing only the schedule saves and returns to the list' do
     u = sign_in_as user
     r = u.notification_rules.new(name: 'r', cadence: 'daily', time_of_day: 540)
-    r.filter_attributes = { s: ['Rock'] }
+    r.filter_attributes = { g: ['Rock'] }
     r.save!
 
     patch notification_rule_path(r), params: {
-      notification_rule: { cadence: 'daily', time_string: '20:00' }, s: ['Rock'], l: [''], d: ['']
+      notification_rule: { cadence: 'daily', time_string: '20:00' }, g: ['Rock'], l: [''], d: ['']
     }
 
-    assert_response :success
+    assert_redirected_to notification_rules_path
     assert_equal 1200, r.reload.time_of_day
-    assert_select '.rule-notice', false # only itself matches its filter
   end
 
   test 'update changes the schedule + channels without touching the filter' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'weekly', weekday: 5, time_of_day: 1050, notify_email: false)
-    r.filter_attributes = { s: ['Rock'] }
+    r.filter_attributes = { g: ['Rock'] }
     r.save!
 
     patch notification_rule_path(r), params: {
       notification_rule: { cadence: 'weekly', weekday: '2', time_string: '08:15', notify_push: '1', notify_email: '1' },
-      s: ['Rock']
+      g: ['Rock']
     }
 
-    assert_response :success # autosave re-renders the editor in place
+    assert_redirected_to notification_rules_path
     r.reload
     assert_equal 2, r.weekday
     assert_equal 495, r.time_of_day
     assert r.notify_email?
-    assert_equal ['Rock'], r.style_list # filter untouched
+    assert_equal ['Rock'], r.genres # filter untouched
   end
 
   test 'update with a windowed filter flips an added rule to happening' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'weekly', weekday: 5, time_of_day: 1050)
-    r.filter_attributes = { s: ['Rock'] } # no date → added
+    r.filter_attributes = { g: ['Rock'] } # no date → added
     r.save!
     assert r.added?
 
-    # Selecting a window in the inline form flips the rule to happening.
+    # Selecting a window in the form flips the rule to happening.
     patch notification_rule_path(r), params: {
       notification_rule: { cadence: 'weekly', weekday: '5', time_string: '17:30' },
-      s: ['Rock'], d: ['this_weekend']
+      g: ['Rock'], d: ['this_weekend']
     }
 
-    assert_response :success # autosave re-renders the editor in place
+    assert_redirected_to notification_rules_path
     r.reload
     assert_equal ['this_weekend'], r.date_ranges
     assert r.happening?
@@ -273,7 +288,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
   test "edit only reaches the current user's own rules" do
     other = User.create!(username: 'someone', password: 'password12345')
     foreign = other.notification_rules.new(cadence: 'daily', time_of_day: 60)
-    foreign.filter_attributes = { s: ['Rock'] }
+    foreign.filter_attributes = { g: ['Rock'] }
     foreign.save!
 
     sign_in_as user
@@ -335,5 +350,17 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_difference -> { u.notification_rules.count }, -1 do
       delete notification_rule_path(r)
     end
+  end
+
+  private
+
+  # A genre that actually renders in the editor's What tree: a root (no events) with
+  # one in-use child, so genre_filter_tree includes it and the child is checkable.
+  # Returns the child (the leaf you filter by).
+  def genre_in_tree(name)
+    root = genre(name: "#{name}root", events_count: 0)
+    leaf = genre(name: name, events_count: 1)
+    leaf.set_parent!(root)
+    leaf
   end
 end

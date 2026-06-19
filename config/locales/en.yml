@@ -94,7 +94,7 @@ en:
   inbox:
     title: Notifications
     tab_messages: Inbox
-    tab_rules: Rules
+    tab_rules: Saved filters
   saved_events:
     title: Watchlist
     empty: Nothing saved yet — tap the heart on any show.
@@ -120,14 +120,19 @@ en:
       one: 1 saved show coming up
       other: "%{count} saved shows coming up"
   notification_rules:
-    title: Notification rules
-    intro: Build your own alerts — pick what, when, and how you hear about it. Run as many as you like.
+    title: Saved filters
+    intro: Filters you've saved. Apply one to browse it, switch on the bell to get notified, or edit its schedule.
     your_rules: Your rules
     empty: No rules yet — make your first one below.
     add_rule: Add a rule
     save_button: Save
     window_none: No window (new events)
-    deleted: Rule deleted.
+    apply: Apply
+    notify_on: Get notified
+    notify_off: Stop notifying
+    silent: Not notifying
+    saved: Saved.
+    deleted: Saved filter deleted.
     already_exists: You already have this alert — here you can tweak it.
     duplicate_edit: "You also have another rule for this exact filter:"
     fired:
@@ -143,7 +148,7 @@ en:
     default_name: Notification
     edit_button: Edit
     empty_link: Filter the events
-    empty_html: No alerts yet. %{link} on the home page, then tap “Notify me”.
+    empty_html: No saved filters yet. %{link} on the home page, then tap the star to save it.
     favorites_live: My interests (kept current)
     track_favorites: Keep in sync with my interests
     track_favorites_hint: also includes venues/styles that interest you later
@@ -671,8 +676,10 @@ en:
         calendar: Calendar
       favorites_filter:
         label: My interests
-      notify_filter: Notify me
-      notify_filter_existing: You're notified about this — manage
+      save_filter: Save this filter
+      save_filter_remove: Saved — remove
+      notify_filter: Get notified
+      notify_filter_existing: You're notified — manage
     day:
       empty: No events on this day.
       close: Close

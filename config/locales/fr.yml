@@ -94,7 +94,7 @@ fr:
   inbox:
     title: Notifications
     tab_messages: Reçues
-    tab_rules: Règles
+    tab_rules: Filtres
   saved_events:
     title: À voir
     empty: Rien d'enregistré — touche le cœur sur un événement.
@@ -120,14 +120,19 @@ fr:
       one: 1 événement enregistré arrive
       other: "%{count} événements enregistrés arrivent"
   notification_rules:
-    title: Règles de notification
-    intro: Crée tes propres alertes — quoi, quand et comment tu es prévenu. Lances-en autant que tu veux.
+    title: Filtres enregistrés
+    intro: Tes filtres enregistrés. Applique-en un pour le parcourir, active la cloche pour être averti·e, ou modifie sa planification.
     your_rules: Tes règles
     empty: Aucune règle — crée ta première ci-dessous.
     add_rule: Ajouter une règle
     save_button: Enregistrer
     window_none: Sans période (nouveautés)
-    deleted: Règle supprimée.
+    apply: Appliquer
+    notify_on: M'avertir
+    notify_off: Ne plus m'avertir
+    silent: Sans notification
+    saved: Enregistré.
+    deleted: Filtre enregistré supprimé.
     already_exists: Tu as déjà cette alerte — tu peux l'ajuster ici.
     duplicate_edit: "Tu as aussi une autre règle pour exactement ce filtre :"
     fired:
@@ -143,7 +148,7 @@ fr:
     default_name: Notification
     edit_button: Modifier
     empty_link: Filtre les événements
-    empty_html: Aucune alerte. %{link} sur la page d'accueil, puis touche « M'avertir ».
+    empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis touche l'étoile pour l'enregistrer.
     favorites_live: Mes intérêts (toujours à jour)
     track_favorites: Garder synchronisé avec mes intérêts
     track_favorites_hint: inclut aussi les lieux/styles qui t'intéresseront plus tard
@@ -671,6 +676,8 @@ fr:
         calendar: Calendrier
       favorites_filter:
         label: Mes intérêts
+      save_filter: Enregistrer le filtre
+      save_filter_remove: Enregistré — retirer
       notify_filter: M'avertir
       notify_filter_existing: Tu es averti·e — gérer
     day:

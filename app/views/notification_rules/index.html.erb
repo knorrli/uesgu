@@ -12,29 +12,42 @@
   <% else %>
     <ul class="rule-list flex flex-col gap-medium">
       <% @rules.each do |rule| %>
-        <li class="<%= class_names('rule-card', 'flex', 'flex-col', 'gap-small', 'rule-card--off': !rule.enabled?) %>">
+        <%# A saved filter is "silent" (a pure interest/scope) when notifications are
+            off (enabled: false). Both kinds live in one list; the bell toggle is what
+            moves a filter between silent and notifying. %>
+        <li class="<%= class_names('rule-card', 'flex', 'flex-col', 'gap-small', 'rule-card--silent': !rule.enabled?) %>">
           <div class="flex flex-col gap-xsmall">
             <%# The name already encodes the type (… · Neue Events / … · Diese Woche),
                 so no separate type badge or repeated summary line is needed. %>
             <span class="rule-card__name"><%= rule.display_name %></span>
-            <span class="muted rule-card__summary"><%= rule_schedule_summary(rule) %></span>
+            <span class="muted rule-card__summary">
+              <%= rule.enabled? ? rule_schedule_summary(rule) : t('notification_rules.silent') %>
+            </span>
           </div>
 
-          <div class="rule-card__chips flex gap-xsmall">
-            <% rule_channels(rule).each do |label| %>
-              <span class="chip"><%= label %></span>
-            <% end %>
-            <% if rule.track_favorites? %><span class="chip"><%= t('notification_rules.favorites_live') %></span><% end %>
-            <% unless rule.enabled? %><span class="chip chip--muted"><%= t('notification_rules.disabled') %></span><% end %>
-          </div>
+          <% if rule.enabled? %>
+            <div class="rule-card__chips flex gap-xsmall">
+              <% rule_channels(rule).each do |label| %>
+                <span class="chip"><%= label %></span>
+              <% end %>
+              <% if rule.track_favorites? %><span class="chip"><%= t('notification_rules.favorites_live') %></span><% end %>
+            </div>
+          <% end %>
 
           <div class="rule-card__actions flex gap-small">
-            <%# In-place actions are buttons (the ladder: secondary pill / ghost /
-                ghost-warn); Bearbeiten navigates to the edit page, so it's a
-                text link, not a button. %>
-            <%= button_to t('notification_rules.fire_now'), fire_notification_rule_path(rule), class: 'button-small' %>
-            <%= button_to rule.enabled? ? t('notification_rules.disable') : t('notification_rules.enable'),
-                  toggle_notification_rule_path(rule), method: :patch, class: 'button-small button-ghost' %>
+            <%# Apply copies the saved filter into the events URL (the link is then
+                severed — the main page stays ephemeral). It's navigation, so a link. %>
+            <%= link_to t('notification_rules.apply'),
+                  events_path(q: rule.queries, g: rule.genres, l: rule.location_list, s: rule.style_list, d: rule.date_ranges),
+                  class: 'button-small' %>
+            <%# The bell toggles notifications on/off (enabled is the notify state) —
+                the single control that moves a filter between silent and notifying. %>
+            <%= button_to rule.enabled? ? t('notification_rules.notify_off') : t('notification_rules.notify_on'),
+                  toggle_notification_rule_path(rule), method: :patch,
+                  class: class_names('button-small', 'button-ghost', 'rule-notify-toggle', active: rule.enabled?) %>
+            <% if rule.enabled? %>
+              <%= button_to t('notification_rules.fire_now'), fire_notification_rule_path(rule), class: 'button-small button-ghost' %>
+            <% end %>
             <%= button_to t('notification_rules.delete'), notification_rule_path(rule), method: :delete,
                   class: 'button-small button-ghost danger', data: { turbo_confirm: t('notification_rules.delete_confirm') } %>
             <%= link_to t('notification_rules.edit_button'), edit_notification_rule_path(rule), class: 'text-link' %>

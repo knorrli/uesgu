@@ -14,7 +14,11 @@ import { searchForSuggestion } from "lib/search_for"
 // untouched sheet closes instantly with no reload.
 export default class extends Controller {
   static targets = ["form", "sheet", "queries", "group", "customStart", "customEnd", "customValue"]
-  static values = { searchForTemplate: String, searchAnything: String }
+  // submitOnApply: the events filter navigates on every apply (live listing). The
+  // rule editor sets it false — picks stage into the form as checked inputs and
+  // commit only on the explicit Save, so we refresh the trigger counts client-side
+  // instead of round-tripping.
+  static values = { searchForTemplate: String, searchAnything: String, submitOnApply: { type: Boolean, default: true } }
 
   connect() {
     this.onKeydown = (event) => { if (event.key === "Escape") this.#closeOpenSheet() }
@@ -130,6 +134,7 @@ export default class extends Controller {
       input.value = ""
     }
     this.#submit()
+    if (!this.submitOnApplyValue) this.#refreshTrigger(input.closest(".sheet"))
   }
 
   // Two native date inputs → the hidden "start - end" d[] input.
@@ -187,7 +192,45 @@ export default class extends Controller {
     if (!sheet) return
     const changed = this.snapshot !== undefined && this.#serialize(sheet) !== this.snapshot
     this.#closeSheet(sheet)
-    if (changed) this.#submit()
+    if (!changed) return
+    this.#submit()
+    if (!this.submitOnApplyValue) this.#refreshTrigger(sheet)
+  }
+
+  // Update a trigger's label + count from its sheet's checked rows — the live
+  // feedback the events filter gets from a server re-render, done client-side for
+  // the no-submit (rule editor) path.
+  #refreshTrigger(sheet) {
+    const trigger = this.element.querySelector(`.filter-trigger[data-filter-sheets-field-param="${sheet.dataset.field}"]`)
+    if (!trigger) return
+
+    const labels = [...sheet.querySelectorAll("input[type=checkbox]:checked")]
+      .map((input) => input.closest(".opt")?.querySelector(".opt__label")?.textContent.trim())
+      .filter(Boolean)
+    const labelEl = trigger.querySelector(".filter-trigger__label")
+    let badge = trigger.querySelector(".badge")
+
+    if (labels.length === 0) {
+      labelEl.classList.add("is-empty")
+      labelEl.textContent = trigger.dataset.emptyLabel || ""
+      badge?.remove()
+      return
+    }
+
+    labelEl.classList.remove("is-empty")
+    labelEl.textContent = labels[0]
+    if (labels.length > 1) {
+      const more = document.createElement("span")
+      more.className = "filter-trigger__more"
+      more.textContent = ` +${labels.length - 1}`
+      labelEl.appendChild(more)
+    }
+    if (!badge) {
+      badge = document.createElement("span")
+      badge.className = "badge"
+      labelEl.after(badge)
+    }
+    badge.textContent = labels.length
   }
 
   #closeOpenSheet() {
@@ -212,6 +255,7 @@ export default class extends Controller {
   }
 
   #submit() {
+    if (!this.submitOnApplyValue) return
     this.formTarget.requestSubmit()
   }
 

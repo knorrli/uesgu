@@ -60,7 +60,7 @@ class NotificationRule < ApplicationRecord
 
   def targets_something
     return if track_favorites?
-    return if queries.any? || style_list.any? || location_list.any? || date_ranges.any?
+    return if queries.any? || genres.any? || style_list.any? || location_list.any? || date_ranges.any?
 
     errors.add(:base, I18n.t("notification_rules.errors.empty_filter"))
   end
@@ -88,6 +88,11 @@ class NotificationRule < ApplicationRecord
   def filter_attributes=(params)
     self.filter = {
       "queries" => clean(params[:q]),
+      # genres (g[]) is the tree-aware slot the events page + editor now feed: each
+      # picked genre matches itself + every descendant (see Filter#expanded_genre_names).
+      # style_list (s[]) is the legacy flat-style slot — kept so any pre-migration
+      # rule still round-trips, but the UI no longer sets it, so it stays empty.
+      "genres" => clean(params[:g]),
       "style_list" => clean(params[:s]),
       "location_list" => clean(params[:l]),
       # Rules only do relative windows (re-resolved each fire); a fixed absolute
@@ -98,6 +103,7 @@ class NotificationRule < ApplicationRecord
   end
 
   def queries       = Array(filter["queries"])
+  def genres        = Array(filter["genres"])
   def style_list    = Array(filter["style_list"])
   def location_list = Array(filter["location_list"])
   def date_ranges   = Array(filter["date_ranges"])
@@ -118,9 +124,10 @@ class NotificationRule < ApplicationRecord
   # rule keeps, plus the live-favorites flag. Two rules with the same fingerprint
   # are the same alert — the basis for "you already have this" both at creation
   # (no duplicate is made) and on the events page (the bell lights up).
-  def self.fingerprint(queries:, style_list:, location_list:, date_ranges:, track_favorites: false)
+  def self.fingerprint(queries:, location_list:, date_ranges:, genres: [], style_list: [], track_favorites: false)
     {
       queries: Set.new(Array(queries).map { |q| q.to_s.strip }.reject(&:blank?)),
+      genres: Set.new(Array(genres)),
       style_list: Set.new(Array(style_list)),
       location_list: Set.new(Array(location_list)),
       date_ranges: Set.new(Array(date_ranges).select { |range| Datepicker.preset.key?(range) }),
@@ -131,13 +138,14 @@ class NotificationRule < ApplicationRecord
   # Fingerprint for a landing-page Filter (no favorites flag — that's a rule-only
   # concept), so the events controller can ask "is there a rule for this filter?".
   def self.fingerprint_for(filter)
-    fingerprint(queries: filter.queries, style_list: filter.style_list,
+    fingerprint(queries: filter.queries, genres: filter.genres, style_list: filter.style_list,
                 location_list: filter.location_list, date_ranges: filter.date_ranges)
   end
 
   def fingerprint
-    self.class.fingerprint(queries: queries, style_list: style_list, location_list: location_list,
-                           date_ranges: date_ranges, track_favorites: track_favorites?)
+    self.class.fingerprint(queries: queries, genres: genres, style_list: style_list,
+                           location_list: location_list, date_ranges: date_ranges,
+                           track_favorites: track_favorites?)
   end
 
   # The rule in this scope whose filter matches `fingerprint`, or nil. Set-based,
@@ -233,7 +241,7 @@ class NotificationRule < ApplicationRecord
   def describe
     return describe_favorites if track_favorites?
 
-    what = (style_list + queries).join(", ")
+    what = (genres + style_list + queries).join(", ")
     parts = [what.presence || I18n.t("notification_rules.summary.scope_all")]
     parts << location_list.join(", ") if location_list.any?
     parts << temporal_label
@@ -328,7 +336,7 @@ class NotificationRule < ApplicationRecord
     # (see filter_attributes=). active_windows also covers any legacy rule that
     # still has one stored, so it falls back to the new-events floor rather than a
     # dead past range.
-    Filter.build(queries: queries, style_list: style_list,
+    Filter.build(queries: queries, genres: genres, style_list: style_list,
                  location_list: location_list, date_ranges: active_windows)
   end
 

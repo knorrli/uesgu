@@ -5,7 +5,7 @@
 # that filter pre-loaded; `create` saves it. `index` is the read-only "My alerts"
 # list; fire/toggle/destroy manage individual alerts.
 class NotificationRulesController < ApplicationController
-  before_action :set_rule, only: %i[edit update destroy toggle fire]
+  before_action :set_rule, only: %i[edit update destroy toggle fire notify]
 
   def index
     @rules = current_user.notification_rules.order(:created_at)
@@ -41,32 +41,27 @@ class NotificationRulesController < ApplicationController
     end
   end
 
-  # The whole rule (schedule, channels, name, and the filter via inline
-  # multiselect comboboxes + a window select) is edited on this one form. It
-  # autosaves: every change submits and the form re-renders inside its turbo
-  # frame, so there's no Save button. See #update.
+  # The whole saved filter — its scope (the genre/location tree + window) and its
+  # schedule/channels — is edited on one plain form (no autosave). See #update.
   def edit
     @filter = filter_for(@rule)
     @matches_favorites = current_user.favorites_filter?(@filter)
     @duplicate_of = duplicate_of(@rule)
   end
 
-  # Autosave target: re-render the editor frame with the canonical server state
-  # (chips sorted + deduped, dropdowns excluding picks, window as a tag, derived
-  # name refreshed) instead of redirecting. Stays put — the user is still editing.
+  # Save the edited filter + schedule and return to the Saved filters list. On a
+  # validation error, re-render the editor with the messages.
   def update
     @rule.assign_attributes(rule_params) if params[:notification_rule].present?
     @rule.filter_attributes = filter_params
-    @rule.save
 
-    @filter = filter_for(@rule)
-    @matches_favorites = current_user.favorites_filter?(@filter)
-    # Editing CAN knowingly produce two rules for the same filter (the bell can't);
-    # surface it as a non-blocking heads-up, never a block. Blocking would trap the
-    # autosave editor: trimming "Rock·Metal·Jazz" down to "Rock" passes through
-    # "Rock·Metal", which might momentarily collide with another rule.
-    @duplicate_of = duplicate_of(@rule) if @rule.persisted?
-    render :edit, status: (@rule.errors.any? ? :unprocessable_entity : :ok)
+    if @rule.save
+      redirect_to notification_rules_path, notice: t("notification_rules.saved")
+    else
+      @filter = filter_for(@rule)
+      @matches_favorites = current_user.favorites_filter?(@filter)
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def destroy
@@ -77,6 +72,34 @@ class NotificationRulesController < ApplicationController
   def toggle
     @rule.update(enabled: !@rule.enabled)
     redirect_to notification_rules_path
+  end
+
+  # The events-page ★. Toggle a SILENT saved filter (a notify-off interest) for the
+  # current landing-page filter, in place: destroy the matching rule if it already
+  # exists, else create one with notifications off (enabled: false → never fires).
+  # Re-renders only the save/notify button frame, so the listing stays put and the
+  # main-page filter stays ephemeral (the "saved?" state is derived from the
+  # fingerprint, never a stored active-filter pointer).
+  def toggle_save
+    @filter = filter_for_params
+    if (existing = current_user.notification_rules.matching(NotificationRule.fingerprint_for(@filter)))
+      existing.destroy
+      @notify_rule = nil
+    else
+      rule = current_user.notification_rules.new(default_schedule.merge(enabled: false))
+      rule.filter_attributes = filter_params
+      @notify_rule = rule if rule.save
+    end
+    render :toggle_save
+  end
+
+  # The events-page 🔔 (shown only once a filter is saved). Turn notifications on
+  # for the saved filter and land on the editor so the user sets the schedule and
+  # channels (push/email still default off — see default_schedule). Idempotent: a
+  # tap on an already-notifying filter just reopens the editor.
+  def notify
+    @rule.update(enabled: true)
+    redirect_to edit_notification_rule_path(@rule)
   end
 
   # "Fire now": run the rule immediately on its real channels so you can see the
@@ -112,12 +135,18 @@ class NotificationRulesController < ApplicationController
 
   # The landing-page filter, carried straight through (same keys as events#index).
   def filter_params
-    params.permit(q: [], l: [], s: [], d: []).to_h.symbolize_keys
+    params.permit(q: [], g: [], l: [], s: [], d: []).to_h.symbolize_keys
+  end
+
+  # A Filter from the raw request params (the ★ toggle's fingerprint source).
+  def filter_for_params
+    Filter.build(queries: params[:q], genres: params[:g], location_list: params[:l],
+                 style_list: params[:s], date_ranges: params[:d])
   end
 
   # The filter shown on the edit form, built from the rule's saved filter.
   def filter_for(rule)
-    Filter.build(queries: rule.queries, location_list: rule.location_list,
+    Filter.build(queries: rule.queries, genres: rule.genres, location_list: rule.location_list,
                  style_list: rule.style_list, date_ranges: rule.date_ranges)
   end
 

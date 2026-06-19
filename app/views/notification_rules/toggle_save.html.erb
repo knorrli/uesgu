@@ -1,0 +1,5 @@
+<%# The ★ toggle's response: re-render just the save/notify button frame in place
+    (the listing and the ephemeral filter are untouched). See #toggle_save. %>
+<%= turbo_frame_tag 'filter-save' do %>
+  <%= render 'events/save_notify' %>
+<% end %>

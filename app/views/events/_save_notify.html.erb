@@ -1,0 +1,52 @@
+<%# The ★ save + 🔔 notify cluster for the active filter, pinned to the right of
+    the applied-filter chips. Logged-in users with an active filter only (an empty
+    filter would be an "all events" firehose we don't offer).
+
+    Deliberately ONE small isolated partial. The two-button model is on probation
+    (★ = a silent saved interest, 🔔 = notifications layered on top): if it reads
+    as two controls for the same thing, collapse it to a single button HERE —
+    nothing in the model or the toggle_save/#notify lifecycle depends on there
+    being two buttons.
+
+    States (set from @notify_rule; see NotificationRulesController):
+      • no rule           → ★ outline only. Tapping ★ saves a silent filter in
+        place (toggle_save, enabled: false), re-rendering just this frame.
+      • saved, notify off → ★ filled + 🔔 outline. Tapping 🔔 turns notifications
+        on and opens the editor (#notify) to set the schedule/channels.
+      • notifying          → ★ filled + 🔔 filled. ★ tap removes the saved filter
+        entirely; 🔔 tap reopens the editor.
+
+    Icon-only: the buttons ride the chip row's reserved height (padding gives the
+    hit area, negative margin cancels the growth — see .notify-filter-link). The
+    accessible name lives on aria-label. %>
+<% if current_user.present? && @filter.active? %>
+  <div class="filter-actions flex flex-row align-center">
+    <%# ★ — toggle a silent saved filter in place; re-renders this frame only. %>
+    <%= link_to toggle_save_notification_rules_path(q: @filter.queries, g: @filter.genres,
+                  l: @filter.location_list, s: @filter.style_list, d: @filter.date_ranges),
+          class: class_names('notify-filter-link', 'save-filter-link', active: @notify_rule.present?),
+          'aria-label': t(@notify_rule ? 'events.index.save_filter_remove' : 'events.index.save_filter'),
+          data: { turbo_method: :post, turbo_frame: 'filter-save' } do %>
+      <% if @notify_rule %>
+        <span class="star-fill" aria-hidden="true"></span>
+      <% else %>
+        <span class="ph ph-star" aria-hidden="true"></span>
+      <% end %>
+    <% end %>
+
+    <%# 🔔 — only once saved. Turns notifications on and opens the editor; lit when
+        the saved filter is actively notifying (enabled). %>
+    <% if @notify_rule %>
+      <%= link_to notify_notification_rule_path(@notify_rule),
+            class: class_names('notify-filter-link', 'notify-bell-link', active: @notify_rule.enabled?),
+            'aria-label': t(@notify_rule.enabled? ? 'events.index.notify_filter_existing' : 'events.index.notify_filter'),
+            data: { turbo_method: :post, turbo_frame: '_top' } do %>
+        <% if @notify_rule.enabled? %>
+          <span class="notify-bell-fill" aria-hidden="true"></span>
+        <% else %>
+          <span class="ph ph-bell" aria-hidden="true"></span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

@@ -1,0 +1,59 @@
+<%# The "Where" sheet/panel: the canton > city > venue tree. Shared by the events
+    filter (filter: @filter) and the rule editor. Option rows submit l[]. Local:
+    filter. %>
+<section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
+         aria-label="<%= t('events.filter.sheet.where') %>"
+         data-filter-sheets-target="sheet" data-field="where">
+  <header class="sheet__header">
+    <button type="button" class="sheet__close ph ph-x" data-action="filter-sheets#close" aria-label="<%= t('events.filter.close') %>"></button>
+    <h2 class="sheet__title"><%= t('events.filter.sheet.where') %></h2>
+    <button type="button" class="sheet__clear" data-action="filter-sheets#clear" data-filter-sheets-field-param="where"><%= t('events.filter.clear') %></button>
+  </header>
+  <div class="sheet__search">
+    <span class="sheet__search-icon ph ph-magnifying-glass"></span>
+    <input type="search" class="sheet__search-input" enterkeyhint="search" autocomplete="off"
+           placeholder="<%= t('events.filter.search_where') %>"
+           data-action="input->filter-sheets#filter">
+  </div>
+  <div class="sheet__body">
+    <% location_filter_tree.each do |canton| %>
+      <div class="loc-group collapsed" data-filter-sheets-target="group">
+        <div class="loc-group__head">
+          <label class="opt opt--canton" data-search="<%= canton[:search] %>">
+            <input type="checkbox" name="l[]" value="<%= canton[:value] %>" <%= 'checked' if filter.location_list.include?(canton[:value]) %>>
+            <span class="opt__box"></span>
+            <span class="opt__label"><%= canton[:name] %></span>
+            <span class="opt__type"><%= t('events.filter.location_types.canton') %></span>
+          </label>
+          <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
+                  aria-label="<%= canton[:name] %>">
+            <span class="loc-group__count"><%= canton[:count] %></span>
+            <span class="loc-group__chevron ph ph-caret-down"></span>
+          </button>
+        </div>
+        <div class="loc-group__body">
+          <% canton[:children].each do |city| %>
+            <label class="opt opt--city" data-search="<%= city[:search] %>">
+              <input type="checkbox" name="l[]" value="<%= city[:value] %>" <%= 'checked' if filter.location_list.include?(city[:value]) %>>
+              <span class="opt__box"></span>
+              <span class="opt__label"><%= city[:name] %></span>
+              <span class="opt__type"><%= t('events.filter.location_types.city') %></span>
+              <span class="opt__count"><%= city[:count] %></span>
+            </label>
+            <% city[:children].each do |venue| %>
+              <label class="opt opt--venue" data-search="<%= venue[:search] %>">
+                <input type="checkbox" name="l[]" value="<%= venue[:value] %>" <%= 'checked' if filter.location_list.include?(venue[:value]) %>>
+                <span class="opt__box"></span>
+                <span class="opt__label"><%= venue[:name] %></span>
+                <span class="opt__count"><%= venue[:count] %></span>
+              </label>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <footer class="sheet__footer">
+    <button type="button" class="sheet__apply" data-action="filter-sheets#apply"><%= t('events.filter.apply') %></button>
+  </footer>
+</section>

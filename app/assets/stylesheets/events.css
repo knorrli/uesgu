@@ -836,6 +836,14 @@
   gap: var(--gap-small);
 }
 
+/* The ★/🔔 cluster lives in its own turbo frame (so ★ can toggle in place); keep
+   the frame out of the flex grow so it stays pinned to the right of the chips. */
+turbo-frame#filter-save {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
 .filter-chip {
   display: inline-flex;
   align-items: center;

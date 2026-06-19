@@ -12,8 +12,8 @@
      data-favorite-followed-value="<%= favorite_followed_keys.to_json %>">
   <%# One filter UI for all widths (the genre/location tree pickers + when): a
       trigger bar that opens full-screen sheets on mobile and inline dropdown
-      panels on desktop (CSS-only difference). The old desktop combobox filter is
-      retired here; tags/_filter_fields lives on only in the rule editor. %>
+      panels on desktop (CSS-only difference). The same genre/location tree sheets
+      (tags/_genre_sheet, _location_sheet) are reused by the rule editor. %>
   <%= render 'filter_sheets' %>
 
   <%# Toggle row, above the content in both views (so the first bold header lines

@@ -13,8 +13,21 @@
   border: var(--border-width) solid var(--theme-bg-muted);
 }
 
-.rule-card--off {
-  opacity: 0.55;
+/* A silent saved filter (notifications off) is a normal, valid interest — not a
+   disabled alert — so it isn't dimmed. A subtle left accent marks the notifying
+   ones instead, and the bell toggle carries the on/off state. */
+.rule-card--silent {
+  border-left-color: var(--theme-bg-muted);
+}
+
+.rule-card:not(.rule-card--silent) {
+  border-left: 3px solid var(--theme-accent-color);
+}
+
+/* The notify toggle reads lit (accent) when notifications are on. */
+.rule-notify-toggle.active {
+  color: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
 }
 
 .rule-card__name {
@@ -152,6 +165,24 @@
   background-color: var(--theme-accent-color);
   -webkit-mask: var(--bell-ringing-fill) center / contain no-repeat;
   mask: var(--bell-ringing-fill) center / contain no-repeat;
+}
+
+/* The ★ save toggle sits just left of the 🔔, sharing the .notify-filter-link
+   chrome (pill hover, accent, hit area). Unsaved = outline star; saved = a filled
+   star (masked SVG, accent-painted), in the same fill language as the followed
+   star elsewhere. The two buttons together form the filter-actions cluster. */
+.filter-actions {
+  flex: 0 0 auto;
+  gap: 2px;
+}
+
+.save-filter-link.active .star-fill {
+  display: inline-block;
+  width: 1.35rem;
+  height: 1.35rem;
+  background-color: var(--theme-accent-color);
+  -webkit-mask: var(--star-fill) center / contain no-repeat;
+  mask: var(--star-fill) center / contain no-repeat;
 }
 
 

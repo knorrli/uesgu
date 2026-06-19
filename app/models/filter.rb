@@ -15,11 +15,12 @@ class Filter
   # caller sets only what it has). The one place the q/l/s/d shape is assembled —
   # the events listing, a saved rule's edit filter, and the rule's own matcher all
   # funnel through here instead of each repeating `new.tap { ... }`.
-  def self.build(queries: nil, style_list: nil, location_list: nil, date_ranges: nil)
+  def self.build(queries: nil, style_list: nil, location_list: nil, genre_list: nil, date_ranges: nil)
     new.tap do |filter|
       filter.queries = queries unless queries.nil?
       filter.style_list = style_list unless style_list.nil?
       filter.location_list = location_list unless location_list.nil?
+      filter.genre_list = genre_list unless genre_list.nil?
       filter.date_ranges = date_ranges unless date_ranges.nil?
     end
   end
@@ -45,11 +46,21 @@ class Filter
     @date_ranges = ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] }
   end
 
-  # True when the listing is scoped by at least one of the four UI inputs
-  # (what / where / when). Drives the "notify me about this filter" affordance and
-  # the applied-chips row — both meaningless on an unfiltered, all-events listing.
-  def active?
+  # Subscribable inputs — what / where / when. A notification rule (a saved
+  # "follow this filter") is built from these only; genres are deliberately NOT
+  # subscribable, because venues tag them inconsistently ("psych" vs "psych rock"
+  # vs "psychedelic rock"), so following a raw genre would silently miss the very
+  # events you wanted. Drives the "follow this filter" bell.
+  def subscribable?
     [queries, style_list, location_list, date_ranges].any?(&:present?)
+  end
+
+  # True when the listing is scoped by ANY UI input, genres included. Drives the
+  # applied-chips row — a genre is a fine transient filter (you're present and can
+  # widen again) even though it can't be followed. Meaningless on an unfiltered,
+  # all-events listing.
+  def active?
+    subscribable? || genre_list.present?
   end
 
   def ransack_query

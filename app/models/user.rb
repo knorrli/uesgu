@@ -41,7 +41,7 @@ class User < ApplicationRecord
   # definition behind the events "favorites" pill's active state (EventsHelper) and
   # a rule's "keep in sync with my favorites" detection (NotificationRulesController).
   def favorites_filter?(filter)
-    return false if filter.queries.any?
+    return false if filter.queries.any? || filter.genre_list.any?
     return false unless location_list.any? || style_list.any?
 
     Set.new(filter.location_list) == Set.new(location_list) &&

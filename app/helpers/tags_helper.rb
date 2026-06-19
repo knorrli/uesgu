@@ -38,6 +38,7 @@ module TagsHelper
   # tells you which kind of place it is, not a flat "where" pin.
   FILTER_CHIP_GLYPH = {
     's[]' => 'ph-music-notes',
+    'g[]' => 'ph-tag',
     'q[]' => 'ph-magnifying-glass',
     'd[]' => 'ph-calendar-dots'
   }.freeze

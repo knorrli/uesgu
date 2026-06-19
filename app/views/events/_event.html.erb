@@ -23,7 +23,7 @@
       <div class="event-genres">
         <% event.genres.each_with_index do |genre, i| %>
           <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <span class="<%= class_names('genre', active: (interactive && filter&.queries&.any? { |query| genre.name.downcase.include?(query.to_s.downcase) })) %>"><%= genre.name %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
+          <%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %>
         <% end %>
       </div>
     <% end %>

@@ -156,8 +156,12 @@
   text-decoration: underline;
 }
 
-/* Read-only link back into the filtered list (notification digests only, where
-   there's no filter form). */
+/* Every taxonomy term (venue, city/canton, style, genre) is a filter link:
+   tapping it filters the programme by that term. The accent colour is the app's
+   established "this is interactive" signal, now applied uniformly so the whole
+   row reads as tappable at rest — mobile-first, no hover to lean on. Hierarchy
+   still comes from size/weight (venue large+bold via .event-where .venue, styles
+   bold via .event-styles), not colour. */
 .filter-link {
   border: 0;
   padding: 0;
@@ -165,6 +169,7 @@
   font: inherit;
   color: var(--theme-accent-color);
   cursor: pointer;
+  text-decoration: none;
 }
 
 .filter-link:hover {

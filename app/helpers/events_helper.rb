@@ -32,21 +32,20 @@ module EventsHelper
     uri.to_s
   end
 
-  # A tag on an event (venue, location, style). Filtering the programme is done in
-  # the filter inputs, not by clicking tags — so for a logged-in visitor the whole
-  # tag is instead the *follow* toggle (see #favorite_tag). Logged-out visitors
-  # can't follow, so they get a plain label. In read-only contexts (e.g. a
-  # notification digest) there's no filter form, so it stays a link into the
-  # filtered list as a way back into the site.
+  # A taxonomy term on an event — venue, city/canton, style, or genre. Tapping it
+  # FILTERS the programme by that term ("tap rock → rock events"), the behaviour
+  # cold users expect. One action per tag: the whole tag is the filter link, so a
+  # tag means exactly one thing (no tiny secondary follow target crammed onto a
+  # finger-sized chip). Following moved off the tag onto the dedicated "follow this
+  # filter" control (see _notify_button), which frees colour to mean the app's
+  # usual "this is interactive" again. interactive:/favorite_type: are kept for
+  # call-site compatibility; every caller now gets the same filter link (the
+  # notification digest included — there it's just a way back into the site).
   def event_filter_tag(label, field:, value:, interactive: true, modifier: nil, favorite_type: nil)
-    unless interactive
-      return link_to label, events_path(field.delete_suffix('[]').to_sym => [value]),
-                     class: class_names('filter-link', modifier)
-    end
-
-    return content_tag(:span, label, class: class_names('event-tag', modifier)) unless favorite_type && authenticated?
-
-    favorite_tag(label, favorite_type, value, modifier)
+    param = field.delete_suffix('[]').to_sym
+    link_to label, events_path(param => Array(value)),
+            class: class_names('filter-link', modifier),
+            data: { turbo_frame: '_top' }
   end
 
   # The whole tag is the follow toggle: clicking the venue/style name (a big,

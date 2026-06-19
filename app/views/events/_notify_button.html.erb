@@ -11,7 +11,7 @@
     Icon-only: it rides the chip row's reserved height instead of adding a row, and
     its finger-sized hit area comes from padding (see .notify-filter-link). The
     accessible name lives on the aria-label since there's no visible text. %>
-<% if current_user.present? && @filter.active? %>
+<% if current_user.present? && @filter.subscribable? %>
   <% if @notify_rule %>
     <%= link_to edit_notification_rule_path(@notify_rule),
           class: 'notify-filter-link active', 'aria-label': t('events.index.notify_filter_existing') do %>

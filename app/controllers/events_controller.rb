@@ -11,7 +11,7 @@ class EventsController < ApplicationController
     # A logged-in user gets a "notify me about this filter" bell; if they already
     # have a rule for exactly this filter set, it's lit and links to that rule
     # instead of creating a clone (see _notify_button + NotificationRule.matching).
-    if current_user && @filter.active?
+    if current_user && @filter.subscribable?
       @notify_rule = current_user.notification_rules.matching(NotificationRule.fingerprint_for(@filter))
     end
     @q = Event.visible.ransack(@filter.ransack_query)
@@ -70,6 +70,7 @@ class EventsController < ApplicationController
       queries: params[:q].present? ? Array(params[:q]).compact_blank : nil,
       location_list: params[:l].presence,
       style_list: params[:s].presence,
+      genre_list: params[:g].presence,
       date_ranges: params[:d].present? ? Array(params[:d]).compact_blank : nil
     )
   end

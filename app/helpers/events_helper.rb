@@ -32,21 +32,75 @@ module EventsHelper
     uri.to_s
   end
 
-  # A tag on an event (venue, location, style). Filtering the programme is done in
-  # the filter inputs, not by clicking tags — so for a logged-in visitor the whole
-  # tag is instead the *follow* toggle (see #favorite_tag). Logged-out visitors
-  # can't follow, so they get a plain label. In read-only contexts (e.g. a
-  # notification digest) there's no filter form, so it stays a link into the
-  # filtered list as a way back into the site.
+  # A taxonomy term on an event — venue, city/canton, style, or genre. Tapping it
+  # FILTERS the programme by that term ("tap rock → rock events"), the behaviour
+  # cold users expect. One action per tag: the whole tag is the filter link, so a
+  # tag means exactly one thing (no tiny secondary follow target crammed onto a
+  # finger-sized chip). Following moved off the tag onto the dedicated "follow this
+  # filter" control (see _notify_button), which frees colour to mean the app's
+  # usual "this is interactive" again. favorite_type: is kept for call-site
+  # compatibility.
+  #
+  # The tap TOGGLES the filter by this term, and the highlight follows MATCHING,
+  # not exact equality. A tag lights green when an applied filter matches it — for
+  # the freetext path (q[], how genres are tapped) that means CONTAINS: filter
+  # "metal" lights "Metal", "Dark Metal", "Death Metal", not just an exact "metal".
+  # The rule the user reads is "green = you're filtering by this":
+  #   • tap a GREY tag → add it (its own term);
+  #   • tap a GREEN tag → remove the applied term(s) that matched it (e.g. tapping
+  #     the lit "Dark Metal" while filtering "metal" drops "metal" and broadens).
+  # Locations (l[]) match exactly — a substring venue would be nonsense. Page is
+  # reset so you land on page 1. In a read-only context (no filter form, e.g. a
+  # notification digest passing interactive: false) it stays a plain single-value
+  # link into the listing — a way back into the site.
   def event_filter_tag(label, field:, value:, interactive: true, modifier: nil, favorite_type: nil)
+    param = field.delete_suffix('[]')
+
     unless interactive
-      return link_to label, events_path(field.delete_suffix('[]').to_sym => [value]),
+      return link_to label, events_path(param.to_sym => Array(value)),
                      class: class_names('filter-link', modifier)
     end
 
-    return content_tag(:span, label, class: class_names('event-tag', modifier)) unless favorite_type && authenticated?
+    applied = request.query_parameters.except('page')
 
-    favorite_tag(label, favorite_type, value, modifier)
+    # A descriptor (q[]) is part of the "What" axis, so it's matched by EVERY What
+    # term — freetext q[] AND a picked style s[] — by the same CONTAINS rule. That's
+    # why applying the style "Rock" lights the "Rock" / "Punk Rock" descriptors, not
+    # only a typed freetext. Locations match their own param, exactly.
+    match_params = param == 'q' ? %w[q s] : [param]
+    matched = match_params.to_h { |p| [p, filter_terms_matching(Array(applied[p]), value, param: param)] }
+    active = matched.values.any?(&:present?)
+
+    query = applied.dup
+    if active
+      # Tap GREEN → drop every applied term that lit this tag, across q[] and s[].
+      matched.each do |p, terms|
+        next if terms.empty?
+        rest = Array(applied[p]) - terms
+        rest.any? ? query[p] = rest : query.delete(p)
+      end
+    else
+      # Tap GREY → add it (its own term, on its own param).
+      query[param] = Array(applied[param]) + [value.to_s]
+    end
+
+    link_to label, events_path(query),
+            class: class_names('filter-link', modifier, active: active),
+            data: { turbo_frame: '_top' }
+  end
+
+  # The applied terms that "match" a tag — the ones that light it green and that
+  # tapping it removes. The What axis (q[] freetext + s[] styles, passed as param
+  # 'q') matches by CONTAINS (the tag contains the applied term), so sibling
+  # descriptors light up instead of only exact hits; locations match exactly.
+  # Case-insensitive.
+  def filter_terms_matching(applied_terms, value, param:)
+    if param == 'q'
+      haystack = value.to_s.downcase
+      applied_terms.select { |term| haystack.include?(term.to_s.downcase) }
+    else
+      applied_terms.select { |term| term.to_s == value.to_s }
+    end
   end
 
   # The whole tag is the follow toggle: clicking the venue/style name (a big,

@@ -10,20 +10,31 @@
       <div class="event-subtitle"><%= simple_format(event.subtitle) %></div>
     <% end %>
 
-    <% if event.styles.any? %>
-      <div class="event-styles">
-        <% event.styles.each_with_index do |style, i| %>
-          <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <%= event_filter_tag style.name, field: 's[]', value: style.name, interactive: interactive, favorite_type: :style %>
-        <% end %>
-      </div>
-    <% end %>
-
-    <% if event.genres.any? %>
+    <%# One descriptor row: genres + the styles a genre doesn't already reveal, all
+        equal, all tapped through the same freetext path. Styles are derived from
+        the genres, so we show the genres (granular, with the admin edit gear) and
+        append a style ONLY when no shown genre is substring-related to it — so the
+        broad bucket "Rock" surfaces on an event whose genres are "Experimental /
+        Pest Modern" (the otherwise-invisible reason it matches a "rock" search),
+        but the redundant "Metal" is suppressed when "Modern Metal" is already
+        there, and "Electronic" when "Electro" is. That keeps search recall AND
+        answers "why is this here?" without the roll-up duplication. Equal-weight
+        pills, so there's no style/genre tier to ask about. %>
+    <% genre_names = event.genres.map { |genre| genre.name.downcase } %>
+    <% extra_styles = event.styles.reject { |style|
+         name = style.name.downcase
+         genre_names.any? { |genre| genre.include?(name) || name.include?(genre) }
+       } %>
+    <% if event.genres.any? || extra_styles.any? %>
       <div class="event-genres">
-        <% event.genres.each_with_index do |genre, i| %>
-          <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <span class="<%= class_names('genre', active: (interactive && filter&.queries&.any? { |query| genre.name.downcase.include?(query.to_s.downcase) })) %>"><%= genre.name %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
+        <% first = true %>
+        <% event.genres.each do |genre| %>
+          <% unless first %><span class="sep" aria-hidden="true">&middot;</span><% end %><% first = false %>
+          <%= event_filter_tag genre.name, field: 'q[]', value: genre.name, interactive: interactive %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %>
+        <% end %>
+        <% extra_styles.each do |style| %>
+          <% unless first %><span class="sep" aria-hidden="true">&middot;</span><% end %><% first = false %>
+          <%= event_filter_tag style.name, field: 'q[]', value: style.name, interactive: interactive %>
         <% end %>
       </div>
     <% end %>

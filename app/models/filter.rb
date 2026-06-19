@@ -1,13 +1,12 @@
 # Plain query object built from request params (see EventsController#index).
 # Filters are no longer persisted, so this is not an ActiveRecord model.
 class Filter
-  attr_reader :queries, :style_list, :location_list, :genre_list, :date_ranges
+  attr_reader :queries, :style_list, :location_list, :date_ranges
 
   def initialize
     @queries = []
     @style_list = []
     @location_list = []
-    @genre_list = []
     @date_ranges = []
   end
 
@@ -36,18 +35,18 @@ class Filter
     @location_list = parse(new_locations)
   end
 
-  def genre_list=(new_genres)
-    @genre_list = parse(new_genres)
-  end
-
   def date_ranges=(new_date_ranges)
     ranges = parse(new_date_ranges)
     @date_ranges = ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] }
   end
 
-  # True when the listing is scoped by at least one of the four UI inputs
-  # (what / where / when). Drives the "notify me about this filter" affordance and
-  # the applied-chips row — both meaningless on an unfiltered, all-events listing.
+  # True when the listing is scoped by ANY UI input. Drives both the applied-chips
+  # row and the "follow this filter" bell — there's no longer a filter you can
+  # apply but not follow. Tapping a genre on an event applies it as a free-text
+  # query (q[]), so a genre rides in `queries`: searchable, followable, and
+  # SUBSTRING-matched, which catches sibling tags ("psych" → psych / psych rock /
+  # psychedelic rock) instead of silently missing them the way an exact match would.
+  # Meaningless on an unfiltered, all-events listing.
   def active?
     [queries, style_list, location_list, date_ranges].any?(&:present?)
   end
@@ -58,7 +57,6 @@ class Filter
         {
           title_or_subtitle_or_styles_name_or_genres_name_cont_any: queries,
           styles_name_in: style_list.presence,
-          genres_name_in: genre_list.presence,
           m: Ransack::Constants::OR
         },
         {

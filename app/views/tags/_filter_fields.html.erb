@@ -9,8 +9,16 @@
     Locals: filter (for the applied lists, so picks drop out of the dropdowns),
     id_prefix (unique combobox ids per page). The combobox names are throwaways —
     only the chips' s[]/q[]/l[] hidden fields submit. %>
-<div class="filter-field" data-tag-picker-target="whatField">
-  <%# "What" — a style pick matches s[]; free text (name_when_new) becomes q[]. %>
+<%# The What dropdown suggests the curated STYLES plus the in-use GENRES (deduped
+    against the style names, minus anything already applied) — so the dropdown is a
+    discovery surface for the same descriptors you tap on a row. A style pick commits
+    its exact s[] bucket; a genre pick or free text commits q[] (substring). The style
+    names go to the controller via data-style-names so it can route each pick. %>
+<% what_styles = available_tags(context: :styles, applied: filter.style_list).to_a %>
+<% style_names = what_styles.map { |tag| tag.name.downcase } %>
+<% what_genres = available_tags(context: :genres, applied: filter.queries).to_a.reject { |tag| style_names.include?(tag.name.downcase) } %>
+<div class="filter-field" data-tag-picker-target="whatField" data-style-names="<%= what_styles.map(&:name).to_json %>">
+  <%# "What" — a style pick matches s[]; a genre pick or free text becomes q[]. %>
   <div class="input-wrapper flex flex-row gap-small"
        data-action="hw-combobox:selection->tag-picker#add"
        data-tag-picker-field-param="s[]" data-tag-picker-query-field-param="q[]">
@@ -18,7 +26,7 @@
         the input holds exactly what was typed — letting tag-picker's Enter handler
         treat a query that's a prefix of a style ("Bl") as free text rather than
         the gem hijacking it to the style ("Blues"). %>
-    <%= combobox_tag "#{id_prefix}_what", combobox_options(available_tags(context: :styles, applied: filter.style_list), render_in: { partial: 'tags/chip' }, value: :name),
+    <%= combobox_tag "#{id_prefix}_what", combobox_options(what_styles + what_genres, render_in: { partial: 'tags/chip' }, value: :name),
           name_when_new: 'query', autocomplete: :list, placeholder: t('events.filter.what') do |combobox| %>
       <% combobox.customize_fieldset class: 'flex-grow' %>
       <%# Lead with the magnifying glass (not the styles glyph): the field's

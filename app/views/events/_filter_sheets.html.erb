@@ -65,7 +65,7 @@
             <%= render 'filter_chip', name: 'q', value: query, label: query, icon: 'query' %>
           <% end %>
           <% @filter.style_list.each do |style| %>
-            <%= render 'filter_chip', name: 's', value: style, label: style, icon: 'styles' %>
+            <%= render 'filter_chip', name: 's', value: style, label: style, icon: 'query' %>
           <% end %>
           <% @filter.location_list.each do |location| %>
             <%= render 'filter_chip', name: 'l', value: location, label: location_display(location), icon: Location.type_for(location) %>

@@ -37,9 +37,30 @@
         .u-accent { color:#38c08a !important; }
         .u-warn { color:#f0837a !important; }
         .u-btn { background:#38c08a !important; color:#17131a !important; border-color:#38c08a !important; }
-        .u-logo-light { display:none !important; width:0 !important; height:0 !important; max-height:0 !important; overflow:hidden !important; mso-hide:all; }
+        .u-logo-light { display:none !important; width:0 !important; height:0 !important; max-height:0 !important; overflow:hidden !important; }
         .u-logo-dark { display:inline-block !important; width:36px !important; height:36px !important; max-height:none !important; overflow:visible !important; }
       }
+
+      <%# Outlook.com / Outlook-on-the-web / Windows Mail dark mode: these do NOT
+          honor prefers-color-scheme — they rewrite colors in place and tag each
+          element they touched with data-ogsc (overrode text color) / data-ogsb
+          (overrode background). Re-asserting our palette on those attributed
+          elements stops the blunt rewrite from muddying the design. (Classic
+          Word-engine Outlook for Windows leaves the body untouched and just gets
+          the light inline styles — nothing to fix there.) %>
+      [data-ogsc] body, [data-ogsb] body, [data-ogsb] .u-ground { background:#100d13 !important; }
+      [data-ogsc] body { color:#d4ced3 !important; }
+      [data-ogsb] .u-card { background:#17131a !important; }
+      [data-ogsc] .u-card { border-color:#34303a !important; }
+      [data-ogsc] .u-text { color:#d4ced3 !important; }
+      [data-ogsc] .u-muted { color:#968d97 !important; }
+      [data-ogsc] .u-rule { border-color:#34303a !important; }
+      [data-ogsc] .u-rule-soft { border-color:#2a262f !important; }
+      [data-ogsc] .u-rule-strong { border-color:#565060 !important; }
+      [data-ogsc] .u-accent { color:#38c08a !important; }
+      [data-ogsc] .u-warn { color:#f0837a !important; }
+      [data-ogsb] .u-btn { background:#38c08a !important; }
+      [data-ogsc] .u-btn { color:#17131a !important; border-color:#38c08a !important; }
     </style>
   </head>
   <%# Mirrors the app's light theme: Space Mono (monospace identity, with a robust

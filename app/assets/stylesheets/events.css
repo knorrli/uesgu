@@ -978,15 +978,6 @@ body.filter-sheet-open { overflow: hidden; }
 
 .opt--hidden { display: none; }
 
-/* Search-gated genre suggestions: ~300 in-use genres is far too many to browse,
-   so a genre row stays hidden at rest and only surfaces when the search box
-   matches it (filter-sheets#filter flags the sheet .sheet--searching and clears
-   .opt--hidden on hits). Curated styles stay always visible above; a genre pick
-   commits q[] like the desktop What dropdown. The compound selector outranks the
-   bare .opt--suggest, and :not(.opt--hidden) keeps non-matches hidden mid-search. */
-.opt--suggest { display: none; }
-.sheet--searching .opt--suggest:not(.opt--hidden) { display: flex; }
-
 /* `.opt { display: flex }` is an author rule, so it would beat the UA's
    `[hidden] { display: none }` (equal specificity) and leave a `hidden` row
    visible. Re-assert hiding at higher specificity so both the initial state and

@@ -72,10 +72,6 @@ export default class extends Controller {
     const raw = event.target.value.trim()
     const query = raw.toLowerCase()
 
-    // Reveal the search-gated genre suggestions only while searching (they're
-    // display:none at rest — see .opt--suggest / .sheet--searching in events.css).
-    sheet.classList.toggle("sheet--searching", query !== "")
-
     sheet.querySelectorAll(".opt:not(.opt--newquery)").forEach((opt) => {
       const haystack = (opt.dataset.search || opt.textContent).toLowerCase()
       opt.classList.toggle("opt--hidden", query !== "" && !haystack.includes(query))
@@ -94,17 +90,20 @@ export default class extends Controller {
     this.#updateNewQuery(sheet, raw)
   }
 
-  // Free-text "Search for X" row → a checked q[] row.
+  // Free-text "Search for X" row → a checked q[] row. When it's still the blank
+  // "type to search" hint (no value yet), people tap it expecting it to focus the
+  // search field and start typing — so do exactly that (the tap is a user gesture,
+  // so the mobile keyboard opens) rather than no-op.
   addQuery(event) {
     const row = event.currentTarget
+    const search = row.closest(".sheet").querySelector(".sheet__search-input")
     const value = row.dataset.value
-    if (!value) return
+    if (!value) { search?.focus(); return }
 
     const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
       .some((input) => input.value === value)
     if (!exists) this.queriesTarget.prepend(this.#queryRow(value))
 
-    const search = row.closest(".sheet").querySelector(".sheet__search-input")
     if (search) { search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true })) }
   }
 

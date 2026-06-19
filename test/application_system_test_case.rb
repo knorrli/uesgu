@@ -18,6 +18,20 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       browser_path: ENV["CHROME_PATH"].presence
     }.compact
 
+  # Kill CSS transitions/animations after every visit so tests never race a
+  # slide/fade — e.g. the mobile filter sheet's 0.22s slide-up: a click dispatched
+  # while the target is still translating can land on empty space and be lost.
+  # Instant state = deterministic clicks; no test depends on animation timing.
+  NO_MOTION_CSS = "*,*::before,*::after{transition:none!important;animation:none!important}"
+
+  def visit(*)
+    super
+    execute_script(
+      "var s=document.createElement('style');s.textContent=#{NO_MOTION_CSS.inspect};" \
+      "document.head.appendChild(s)"
+    )
+  end
+
   # Sign in through the real login form. (The integration `sign_in_as` posts to
   # the session controller and only sets the test's cookie jar — that doesn't
   # carry into the browser, so the browser must log in for real.)

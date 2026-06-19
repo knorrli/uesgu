@@ -124,14 +124,14 @@
           </label>
         <% end %>
 
-        <%# In-use GENRES — far too many (~300) to browse, so they're SEARCH-GATED:
-            .opt--suggest stays hidden until the search box matches it (see
-            filter-sheets#filter + .sheet--searching in events.css). A genre pick
-            commits q[] (substring), mirroring the desktop What dropdown. Deduped
-            against the style names; applied queries already show above (excluded). %>
+        <%# In-use GENRES — listed after the styles, same as the desktop What
+            dropdown (which carries the full styles + genres list and just filters it
+            live). A genre pick commits q[] (substring); styles commit their exact
+            s[] bucket. Deduped against the style names; applied queries already show
+            above (excluded). Long, but the search box filters it like desktop. %>
         <% available_tags(context: :genres, applied: @filter.queries).each do |genre| %>
           <% next if style_names.include?(genre.name.downcase) %>
-          <label class="opt opt--suggest">
+          <label class="opt">
             <input type="checkbox" name="q[]" value="<%= genre.name %>">
             <span class="opt__box"></span>
             <span class="opt__label"><%= genre.name %></span>

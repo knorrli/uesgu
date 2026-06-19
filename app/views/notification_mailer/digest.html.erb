@@ -4,26 +4,28 @@
     marker, the primary CTA, footer links — never on structure or metadata, which
     stay neutral. Time is muted (not green), styles bold-fg, genres muted, exactly
     as in the list view. Inline styles only — clients strip <style>/external CSS. %>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#d8cfb2; padding:24px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="u-ground" style="background:#d8cfb2; padding:24px 12px;">
   <tr>
     <td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; background:#e8e1cd; border:1px solid #b8b29f;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" class="u-card" style="max-width:600px; width:100%; background:#e8e1cd; border:1px solid #b8b29f;">
 
         <%# ── Header: the app's brand bar — real logo mark (CID-embedded PNG, see
               the mailer) + fg wordmark, hairline rule. The mark's own ground is the
-              same cream as this bar, so it sits flush with no visible plate. ─────── %>
+              same as the card it sits on (cream in light, plum in dark), so it sits
+              flush with no visible plate — hence the two imgs, swapped by theme. ── %>
         <tr>
-          <td style="padding:18px 28px; border-bottom:1px solid #b8b29f;">
-            <img src="<%= attachments['uesgu-icon.png'].url %>" width="36" height="36" alt="" style="display:inline-block; width:36px; height:36px; vertical-align:middle; border:0;">
-            <span style="font-size:22px; font-weight:700; letter-spacing:0.5px; color:#1d1620; vertical-align:middle; margin-left:8px;">üsgu</span>
+          <td class="u-rule" style="padding:18px 28px; border-bottom:1px solid #b8b29f;">
+            <img src="<%= attachments['uesgu-icon.png'].url %>" width="36" height="36" alt="" class="u-logo-light" style="display:inline-block; width:36px; height:36px; vertical-align:middle; border:0;">
+            <img src="<%= attachments['uesgu-icon-dark.png'].url %>" width="36" height="36" alt="" class="u-logo-dark" style="display:none; width:0; height:0; max-height:0; overflow:hidden; vertical-align:middle; border:0;">
+            <span class="u-text" style="font-size:22px; font-weight:700; letter-spacing:0.5px; color:#1d1620; vertical-align:middle; margin-left:8px;">üsgu</span>
           </td>
         </tr>
 
         <%# ── Intro ───────────────────────────────────────────────── %>
         <tr>
           <td style="padding:26px 28px 4px;">
-            <p style="margin:0 0 8px; font-size:12px; color:#5b515a; font-weight:700; text-transform:uppercase; letter-spacing:0.6px;"><%= @heading %></p>
-            <h1 style="margin:0; font-size:20px; line-height:1.3; color:#1d1620; font-weight:700;">
+            <p class="u-muted" style="margin:0 0 8px; font-size:12px; color:#5b515a; font-weight:700; text-transform:uppercase; letter-spacing:0.6px;"><%= @heading %></p>
+            <h1 class="u-text" style="margin:0; font-size:20px; line-height:1.3; color:#1d1620; font-weight:700;">
               <%= t("notification_mailer.digest.intro", count: @events.size) %>
             </h1>
           </td>
@@ -34,37 +36,37 @@
         <tr>
           <td style="padding:8px 28px 4px;">
             <% @events.group_by(&:start_date).sort.each do |day, day_events| %>
-              <p style="margin:24px 0 0; padding-bottom:6px; border-bottom:2px solid #807b70; font-size:14px; font-weight:700; color:#1d1620;">
+              <p class="u-text u-rule-strong" style="margin:24px 0 0; padding-bottom:6px; border-bottom:2px solid #807b70; font-size:14px; font-weight:700; color:#1d1620;">
                 <%= l day, format: :detailed %>
               </p>
 
               <% day_events.sort_by { |e| [e.start_time ? 0 : 1, e.start_time, e.title.to_s] }.each_with_index do |event, i| %>
                 <% venue = event.venue %>
                 <% city = event.locations.to_a.reject { |loc| loc == venue }.map(&:name).first %>
-                <div style="padding:13px 0;<%= ' border-top:1px solid #cfc8b3;' if i > 0 %>">
-                  <div style="font-size:16px; font-weight:700; line-height:1.4; color:#1d1620;">
-                    <% if event.start_time.present? %><span style="color:#5b515a; font-weight:400; margin-right:6px;"><%= l event.start_time, format: :time %></span><% end %>
-                    <% if event.cancelled? %><span style="color:#ef4444; font-weight:700;"><%= t('events.cancelled') %></span> <% end %>
+                <div class="<%= 'u-rule-soft' if i > 0 %>" style="padding:13px 0;<%= ' border-top:1px solid #cfc8b3;' if i > 0 %>">
+                  <div class="u-text" style="font-size:16px; font-weight:700; line-height:1.4; color:#1d1620;">
+                    <% if event.start_time.present? %><span class="u-muted" style="color:#5b515a; font-weight:400; margin-right:6px;"><%= l event.start_time, format: :time %></span><% end %>
+                    <% if event.cancelled? %><span class="u-warn" style="color:#ef4444; font-weight:700;"><%= t('events.cancelled') %></span> <% end %>
                     <% if href = digest_event_href(event) %>
-                      <a href="<%= href %>" style="color:#1d1620; text-decoration:none;"><%= event.title %> <span style="color:#0e7a4a; font-size:1.1em;">&#8599;</span></a>
+                      <a href="<%= href %>" class="u-text" style="color:#1d1620; text-decoration:none;"><%= event.title %> <span class="u-accent" style="color:#0e7a4a; font-size:1.1em;">&#8599;</span></a>
                     <% else %>
-                      <span style="color:#1d1620;"><%= event.title %></span>
+                      <span class="u-text" style="color:#1d1620;"><%= event.title %></span>
                     <% end %>
                   </div>
                   <% if venue || city %>
-                    <div style="margin-top:4px; font-size:14px; color:#5b515a;">
-                      <% if venue %><strong style="font-weight:700; color:#1d1620;"><%= venue.name %></strong><% end %>
+                    <div class="u-muted" style="margin-top:4px; font-size:14px; color:#5b515a;">
+                      <% if venue %><strong class="u-text" style="font-weight:700; color:#1d1620;"><%= venue.name %></strong><% end %>
                       <% if venue && city %> · <% end %>
                       <% if city %><%= city %><% end %>
                     </div>
                   <% end %>
                   <% if event.styles.any? %>
-                    <div style="margin-top:6px; font-size:12px; font-weight:700; color:#1d1620;">
+                    <div class="u-text" style="margin-top:6px; font-size:12px; font-weight:700; color:#1d1620;">
                       <%= event.styles.map(&:name).join("  ·  ") %>
                     </div>
                   <% end %>
                   <% if event.genres.any? %>
-                    <div style="margin-top:4px; font-size:12px; color:#5b515a;">
+                    <div class="u-muted" style="margin-top:4px; font-size:12px; color:#5b515a;">
                       <%= event.genres.map(&:name).join("  ·  ") %>
                     </div>
                   <% end %>
@@ -77,7 +79,7 @@
         <%# ── CTA: the app's primary button — filled green, cream text, SHARP ──── %>
         <tr>
           <td align="center" style="padding:20px 28px 30px;">
-            <a href="<%= @notification_url %>" style="display:inline-block; background:#0e7a4a; color:#e8e1cd; text-decoration:none; font-size:15px; font-weight:700; padding:11px 26px; border:2px solid #0e7a4a;">
+            <a href="<%= @notification_url %>" class="u-btn" style="display:inline-block; background:#0e7a4a; color:#e8e1cd; text-decoration:none; font-size:15px; font-weight:700; padding:11px 26px; border:2px solid #0e7a4a;">
               <%= t("notification_mailer.digest.cta") %>
             </a>
           </td>
@@ -85,12 +87,12 @@
 
         <%# ── Footer ──────────────────────────────────────────────── %>
         <tr>
-          <td style="padding:18px 28px 26px; border-top:1px solid #b8b29f;">
-            <p style="margin:0; font-size:12px; line-height:1.6; color:#5b515a;">
+          <td class="u-rule" style="padding:18px 28px 26px; border-top:1px solid #b8b29f;">
+            <p class="u-muted" style="margin:0; font-size:12px; line-height:1.6; color:#5b515a;">
               <%= t("notification_mailer.digest.footer_reason") %><br>
-              <a href="<%= @browse_url %>" style="color:#0e7a4a; text-decoration:none;">üsgu.ch</a>
+              <a href="<%= @browse_url %>" class="u-accent" style="color:#0e7a4a; text-decoration:none;">üsgu.ch</a>
               &nbsp;·&nbsp;
-              <a href="<%= settings_url %>" style="color:#0e7a4a; text-decoration:underline;"><%= t("notification_mailer.digest.footer_manage") %></a>
+              <a href="<%= settings_url %>" class="u-accent" style="color:#0e7a4a; text-decoration:underline;"><%= t("notification_mailer.digest.footer_manage") %></a>
             </p>
           </td>
         </tr>

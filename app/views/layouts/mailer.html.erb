@@ -3,13 +3,50 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light">
-    <meta name="supported-color-schemes" content="light">
+    <%# We now ship a designed dark variant rather than forcing light: declaring
+        BOTH schemes tells WebKit-based clients (Apple Mail, new Outlook for Mac,
+        iOS Mail) to apply the @media (prefers-color-scheme: dark) rules below
+        instead of running their own blunt auto-darkening, which muddied the cream
+        ground into olive. Clients that ignore the query just render the light
+        inline styles — the existing cream look, unchanged. %>
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <%# Dark theme, mirroring the app's own dark palette (#17131a plum ground,
+        #d4ced3 warm off-white text, #38c08a green). The body is styled inline for
+        the light/default render and for clients that strip <style>; these rules
+        carry !important because a stylesheet !important is the ONE thing that
+        beats an inline style in the cascade — that's what lets a single <style>
+        block re-skin a fully inline-styled email. Each class maps one role:
+          u-ground   outer ground + body          u-rule        hairline (header/footer/card)
+          u-card     the floating card            u-rule-soft   between-row hairline
+          u-text     primary foreground           u-rule-strong date underline
+          u-muted    secondary text               u-accent      green (links, ↗, footer)
+          u-btn      primary CTA                  u-warn        cancelled flag
+        The logo is swapped (not recoloured): u-logo-light hides / u-logo-dark
+        shows, so the mark's own ground matches whichever card it sits on. %>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        body, .u-ground { background:#100d13 !important; }
+        body { color:#d4ced3 !important; }
+        .u-card { background:#17131a !important; border-color:#34303a !important; }
+        .u-text { color:#d4ced3 !important; }
+        .u-muted { color:#968d97 !important; }
+        .u-rule { border-color:#34303a !important; }
+        .u-rule-soft { border-color:#2a262f !important; }
+        .u-rule-strong { border-color:#565060 !important; }
+        .u-accent { color:#38c08a !important; }
+        .u-warn { color:#f0837a !important; }
+        .u-btn { background:#38c08a !important; color:#17131a !important; border-color:#38c08a !important; }
+        .u-logo-light { display:none !important; width:0 !important; height:0 !important; max-height:0 !important; overflow:hidden !important; mso-hide:all; }
+        .u-logo-dark { display:inline-block !important; width:36px !important; height:36px !important; max-height:none !important; overflow:visible !important; }
+      }
+    </style>
   </head>
   <%# Mirrors the app's light theme: Space Mono (monospace identity, with a robust
       system-mono fallback since email clients can't be trusted to load a web font),
       cream ground, near-black text. Sharp corners + neutral hairlines + green-only-
-      for-interaction are carried by the inline styles in the digest body. %>
+      for-interaction are carried by the inline styles in the digest body; the dark
+      counterparts live in the <style> block above. %>
   <body style="margin:0; padding:0; background:#d8cfb2; -webkit-font-smoothing:antialiased; font-family:'Space Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace; color:#1d1620;">
     <%= yield %>
   </body>

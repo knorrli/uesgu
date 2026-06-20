@@ -1317,6 +1317,12 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.4ch;
+  /* The genre pills are boxed, so the body's uniform xsmall row-gap reads as
+     cramped against the line above — and downright tight when that line is itself
+     a box (a "Neues Datum" reschedule pill in the title). A small margin on top of
+     the flex gap gives the pill row consistent breathing room whether or not a
+     subtitle sits between it and the title. */
+  margin-top: var(--gap-xsmall);
 }
 
 .event-styles .sep,

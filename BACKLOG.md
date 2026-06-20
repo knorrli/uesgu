@@ -32,9 +32,6 @@
 
 ### Scrapers
 
-- **Fix Schueuer out-of-range error.** `schueuer.rb` still `raise`s on an
-  unparseable date, halting the scrape. Make it warn/skip the bad row instead.
-  (See memory `project-schueuer-scraper-out-of-range`.)
 - **Surface scraper errors in the logs.** Make sure failures (parse errors,
   HTTP/robots blocks, zero-result runs) are logged at warn/error level and are
   visible — not swallowed or buried at info. Cross-check against the ScrapeRun
@@ -42,9 +39,9 @@
 - **Maximize collected info per scraper.** Audit each scraper for fields it
   *could* be capturing but isn't (time, genres, subtitles, support acts, prices,
   ticket/detail URLs, images) and improve the ones leaving data on the table.
-- **Categorize scrapers by collected info.** Build a capability matrix of what
-  each scraper actually yields (genres yes/no, subtitle yes/no, time, price,
-  etc.) — informs the audit above and which sources to trust for which facets.
+  The `/admin/scraper_coverage` matrix now shows current fill-rates per
+  scraper — use it to spot the gaps. NB: prices / support acts / images have no
+  event column yet, so capturing them implies schema additions.
 
 ### Features / design (settled, unbuilt)
 

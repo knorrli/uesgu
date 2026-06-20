@@ -1,8 +1,19 @@
 <% content_for :title, t('inbox.title') %>
 
 <div class="flex flex-col gap-large">
-  <header class="flex flex-col gap-small">
+  <header class="notifications-header flex justify-between align-center gap-medium">
     <h1><%= t('inbox.title') %></h1>
+    <%# Ungelesen | Gelesen — same flat-text toggle as the list/calendar switcher,
+        top-right. Hidden until the user has at least one notification (no point
+        offering a read archive on a never-used inbox). %>
+    <% if @read_count.positive? || @unread_count.positive? %>
+      <nav class="segmented" aria-label="<%= t('notifications.index.view_label') %>">
+        <%= link_to t('notifications.index.tab_unread'), notifications_path,
+              class: class_names(active: !@show_read) %>
+        <%= link_to t('notifications.index.tab_read'), notifications_path(read: 1),
+              class: class_names(active: @show_read) %>
+      </nav>
+    <% end %>
   </header>
 
   <% if @notifications.any? %>
@@ -26,17 +37,11 @@
       </li>
     <% end %>
     </ul>
+  <% elsif @show_read %>
+    <p class="empty-state"><%= t('notifications.index.none_read') %></p>
   <% elsif @read_count.zero? %>
     <p class="empty-state"><%= t('notifications.index.empty') %></p>
   <% else %>
     <p class="empty-state"><%= t('notifications.index.all_read') %></p>
-  <% end %>
-
-  <% if @read_count.positive? %>
-    <% if @show_read %>
-      <%= link_to t('notifications.index.hide_read'), notifications_path, class: 'text-link notifications__read-toggle' %>
-    <% else %>
-      <%= link_to t('notifications.index.show_read', count: @read_count), notifications_path(read: 1), class: 'text-link notifications__read-toggle' %>
-    <% end %>
   <% end %>
 </div>

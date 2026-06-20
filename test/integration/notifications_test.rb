@@ -44,7 +44,7 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_select '.notification__meta', text: /1 Veranstaltung/
   end
 
-  test 'index hides read digests by default and reveals them via the toggle' do
+  test 'index splits unread and read into two tabs (Ungelesen | Gelesen)' do
     u = user
     sign_in_as u
     e = event(start_date: Date.current + 2)
@@ -54,18 +54,20 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     unread = u.notifications.create!(title: 'Fresh', event_ids: [e.id],
                                      period_start: 1.week.ago, period_end: Time.current)
 
+    # Default (Ungelesen): unread only; both tabs are offered.
     get notifications_path
     assert_response :success
     assert_select '.notification__name', text: /Fresh/
     assert_select '.notification__name', text: /Old read/, count: 0
-    # The toggle advertises the hidden read count and links to ?read=1.
-    assert_select 'a.notifications__read-toggle[href=?]', notifications_path(read: 1)
+    assert_select '.segmented a[href=?]', notifications_path
+    assert_select '.segmented a[href=?]', notifications_path(read: 1)
 
+    # Gelesen (?read=1): read only — a distinct slice, not unread + read.
     get notifications_path(read: 1)
     assert_response :success
     assert_select '.notification__name', text: /Old read/
-    assert_select '.notification__name', text: /Fresh/
-    assert_select 'a.notifications__read-toggle[href=?]', notifications_path
+    assert_select '.notification__name', text: /Fresh/, count: 0
+    assert_select '.segmented a[href=?]', notifications_path(read: 1)
     assert_not_nil read && unread
   end
 
@@ -100,7 +102,8 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     get notifications_path
     assert_response :success
     assert_select '.empty-state', text: /Alles gelesen/
-    assert_select 'a.notifications__read-toggle'
+    # The Gelesen tab is still offered so the read digest is reachable.
+    assert_select '.segmented a[href=?]', notifications_path(read: 1)
   end
 
   test 'show marks the digest read' do

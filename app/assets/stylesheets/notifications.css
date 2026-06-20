@@ -53,13 +53,13 @@
   white-space: nowrap;
 }
 
-/* Digest: relevance toggle as a plain text switch (matches the list/calendar
-   view switcher), not a boxed segmented control. */
+/* Flat-text toggle (Ungelesen | Gelesen on the inbox header) that matches the
+   list/calendar view switcher — plain links, active = bold accent, not a boxed
+   segmented control. Layout only; it sits inline in a flex header. */
 .segmented {
   display: flex;
   flex-wrap: wrap;
   gap: var(--gap-medium);
-  margin-bottom: var(--gap-large);
 }
 
 .segmented a {
@@ -74,13 +74,6 @@
 .segmented a.active {
   color: var(--theme-accent-color);
   font-weight: bold;
-}
-
-/* Show/hide-read switch under the list — uses the styleguide .text-link (accent
-   colour + underline) for a clear click affordance. This class now only handles
-   layout, keeping the link left-aligned so it doesn't stretch in the flex column. */
-.notifications__read-toggle {
-  align-self: flex-start;
 }
 
 .empty-state {

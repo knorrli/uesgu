@@ -3,6 +3,8 @@
 **Date:** 2026-06-13
 **Scope:** Every reusable UI element across the app, both the desktop/browser layout and the mobile (`< 600px`) layout. This is Phase 1 of the UI-unification effort: *extract and classify what exists today and flag where elements drift from a single, telegraphed purpose.* It is descriptive, not prescriptive — the intended look/purpose decisions live in the living styleguide (`/styleguide`).
 
+> ⚠️ **Historical snapshot (predates the 2026-06-20 taxonomy + saved-filters refactor).** Several elements below no longer exist: `notification_rules.css` is now `saved_filters.css`, the `.button-ghost` alias was removed, and the favorites/"favorites live" chips are gone (Favorites feature removed). The `/styleguide` page is the live source of truth.
+
 ## How the design system is wired
 
 The whole UI is plain CSS (no utility framework), mobile-first, with a small token layer:

@@ -10,6 +10,7 @@
      data-saved-filter-title-scope-all-value="<%= t('saved_filters.summary.scope_all') %>"
      data-saved-filter-title-added-label-value="<%= t('saved_filters.type.added') %>"
      data-action="change->saved-filter-title#update">
+  <%= link_to t('saved_filters.edit.back'), saved_filters_path, class: 'back-link' %>
   <header class="flex flex-col gap-small">
     <p class="muted saved-filter-kicker"><%= t('saved_filters.edit.title') %></p>
     <h1 data-saved-filter-title-target="title"><%= @rule.display_name %></h1>

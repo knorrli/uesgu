@@ -9,7 +9,7 @@
   <% if @rules.empty? %>
     <p class="empty-state"><%= t('saved_filters.empty_html', link: link_to(t('saved_filters.empty_link'), events_path)).html_safe %></p>
   <% else %>
-    <ul class="saved-filter-list flex flex-col gap-medium">
+    <ul class="saved-filter-list flex flex-col">
       <% @rules.each do |rule| %>
         <%# A saved filter is "silent" (a pure interest/scope) when its in-app
             channel is off — no digest is ever created. Notifying ones get the
@@ -17,8 +17,10 @@
         <li class="<%= class_names('saved-filter-card', 'flex', 'flex-col', 'gap-small', 'saved-filter-card--silent': !rule.notifying?) %>">
           <div class="flex flex-col gap-xsmall">
             <%# The name already encodes the type (… · Neue Events / … · Diese Woche),
-                so no separate type badge or repeated summary line is needed. %>
-            <span class="saved-filter-card__name"><%= rule.display_name %></span>
+                so no separate type badge or repeated summary line is needed. The
+                name itself links to the editor — the card's primary action — so the
+                button row below stays a clean action cluster (no lone Edit link). %>
+            <%= link_to rule.display_name, edit_saved_filter_path(rule), class: 'saved-filter-card__name' %>
             <span class="muted saved-filter-card__summary">
               <%= rule.notifying? ? rule_schedule_summary(rule) : t('saved_filters.silent') %>
             </span>
@@ -44,7 +46,6 @@
             <% end %>
             <%= button_to t('saved_filters.delete'), saved_filter_path(rule), method: :delete,
                   class: 'button-small danger', data: { turbo_confirm: t('saved_filters.delete_confirm') } %>
-            <%= link_to t('saved_filters.edit_button'), edit_saved_filter_path(rule), class: 'text-link' %>
           </div>
         </li>
       <% end %>

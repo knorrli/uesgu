@@ -8,24 +8,39 @@
   padding: 0;
 }
 
+/* Hairline-separated rows, not boxes — matches the notifications index (its
+   sibling list) so the two read as one family. The notifying-vs-silent state is
+   already legible in the row itself (the summary line says "Silent" or the
+   schedule, and notifying rows carry channel chips), so the old green left-border
+   — which read as meaningless decoration in the walkthrough — is dropped. */
 .saved-filter-card {
-  padding: var(--gap-medium);
-  border: var(--border-width) solid var(--theme-bg-muted);
+  padding: var(--gap-medium) 0;
+  border-bottom: var(--border-width) solid var(--rule-color);
 }
 
-/* A silent saved filter (notifications off) is a normal, valid interest — not a
-   disabled alert — so it isn't dimmed. A subtle left accent marks the notifying
-   ones instead, and the bell toggle carries the on/off state. */
-.saved-filter-card--silent {
-  border-left-color: var(--theme-bg-muted);
+.saved-filter-list > .saved-filter-card:first-child {
+  padding-top: 0;
 }
 
-.saved-filter-card:not(.saved-filter-card--silent) {
-  border-left: 3px solid var(--theme-accent-color);
+.saved-filter-list > .saved-filter-card:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 
+/* The card title is the link to the editor. Styled as a heading (bold, normal
+   foreground — not an accent link) so the row reads title-first; the underline on
+   hover/focus is the clickability cue. align-self keeps the hit area to the text,
+   not the full row width. */
 .saved-filter-card__name {
+  align-self: flex-start;
   font-weight: bold;
+  color: var(--theme-fg-color);
+  text-decoration: none;
+}
+
+.saved-filter-card__name:hover,
+.saved-filter-card__name:focus-visible {
+  text-decoration: underline;
 }
 
 .saved-filter-card__chips,
@@ -58,6 +73,17 @@
   padding: 0;
   font-weight: bold;
   margin-bottom: var(--gap-small);
+}
+
+/* Set the two builder sections (Filter / Benachrichtigungen) apart so the bold
+   legends read as section headers, not just another field label running into the
+   block above. A hairline rule + extra top space gives the Notifications section
+   its own footing. (Vertical-spacing convention: a section break = hairline +
+   --gap-large top — worth codifying in /styleguide.) */
+.saved-filter-fieldset + .saved-filter-fieldset {
+  margin-top: var(--gap-medium);
+  padding-top: var(--gap-large);
+  border-top: var(--border-width) solid var(--rule-color);
 }
 
 .saved-filter-row {
@@ -126,7 +152,7 @@
 
 /* "Save this filter" — an icon-only, opt-in action pinned to the right of the
    applied-filter chips (both the inline filter and the mobile sheets). The accent
-   star signals it's interactive; its context (sitting at the end of the filter you
+   funnel signals it's interactive; its context (sitting at the end of the filter you
    just built) carries the meaning, so it needs no label. Padding gives a
    finger-sized (~40px) hit area; the matching negative top/bottom margin cancels
    the vertical growth so the star rides the chip row's reserved one-line height
@@ -211,12 +237,4 @@
      "Worüber" legend (the turbo frame stacks these with no gap). */
   margin: var(--gap-medium) 0;
   line-height: 1.5;
-}
-
-/* Saved-filter card name carries an inline type badge. */
-.saved-filter-card__name {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap-small);
-  font-weight: bold;
 }

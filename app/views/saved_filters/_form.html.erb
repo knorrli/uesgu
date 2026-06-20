@@ -45,8 +45,11 @@
       <%= render 'tags/genre_sheet', filter: filter %>
       <%= render 'tags/location_sheet', filter: filter %>
 
-      <label class="field-label flex flex-col gap-xsmall">
-        <span><%= t('saved_filters.section_when') %></span>
+      <%# .field-label sits on the text span (not the wrapping label) so the bold
+          stays on the label and the select's value renders at normal weight, like
+          every other input — matches the app-wide label→input pattern. %>
+      <label class="flex flex-col gap-xsmall">
+        <span class="field-label"><%= t('saved_filters.section_when') %></span>
         <%= select_tag 'd[]', options_for_select(rule_window_options, filter.date_ranges.first),
               include_blank: t('saved_filters.window_none'),
               data: { 'saved-filter-form-target': 'window', action: 'saved-filter-form#update' } %>
@@ -65,9 +68,20 @@
         <%= form.check_box :notify_in_app, data: { 'notify-channels-target': 'master', action: 'notify-channels#sync' } %>
         <span><%= t('saved_filters.fields.notify_in_app') %></span>
       </label>
-      <label class="saved-filter-check saved-filter-check--sub flex gap-small">
-        <%= form.check_box :notify_push, data: { 'notify-channels-target': 'dependent' } %>
-        <span><%= t('saved_filters.fields.notify_push') %></span>
+      <% push_ready = WebPushConfig.configured? && current_user.push_subscriptions.any? %>
+      <%# Push has a second reason to be disabled (not set up on any device yet);
+          data-locked keeps it off even when in-app is on, so notify-channels never
+          re-enables it. Enabling push stays a deliberate action in Settings (linked
+          here) — we never trigger the browser permission flow from this checkbox. %>
+      <label class="<%= class_names('saved-filter-check', 'saved-filter-check--sub', 'flex', 'gap-small', 'saved-filter-check--disabled': !push_ready) %>">
+        <%= form.check_box :notify_push, disabled: !push_ready,
+              data: { 'notify-channels-target': 'dependent', locked: !push_ready } %>
+        <span>
+          <%= t('saved_filters.fields.notify_push') %>
+          <% unless push_ready %>
+            <span class="muted">— <%= link_to t('saved_filters.push_unavailable'), settings_path %></span>
+          <% end %>
+        </span>
       </label>
       <% email_ready = MailConfig.configured? && current_user.email_address.present? %>
       <%# Email has a second reason to be disabled (no address on file); data-locked

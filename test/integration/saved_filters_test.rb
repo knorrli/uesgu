@@ -257,10 +257,11 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
 
     get saved_filters_path
     assert_response :success
-    # The name is the derived filter description (no custom names).
+    # The name is the derived filter description (no custom names), and the name
+    # itself is the link to the editor (no separate Bearbeiten button in the row).
     assert_select '.saved-filter-card .saved-filter-card__name', /Dachstock/
     assert_select '.saved-filter-card__actions form' # fire/toggle/delete
-    assert_select ".saved-filter-card__actions a[href=?]", edit_saved_filter_path(r), text: I18n.t('saved_filters.edit_button')
+    assert_select "a.saved-filter-card__name[href=?]", edit_saved_filter_path(r)
   end
 
   test 'fire now creates an in-app notification when there are matches' do

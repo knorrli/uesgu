@@ -287,3 +287,12 @@
   font-size: var(--font-size-small);
   color: var(--theme-warn-color);
 }
+
+/* Scraper coverage matrix: low fill-rates get the warn colour (a scraper leaving
+   collectable data on the table, or a broken extractor), never green. */
+.coverage--low {
+  color: var(--theme-warn-color);
+}
+.scrape-table tr.is-empty td {
+  color: var(--theme-fg-muted);
+}

@@ -295,6 +295,7 @@ en:
       last_scrape: Last run
       no_scrapes: No scraper runs yet.
       discard_rules: Discard rules
+      scraper_coverage: Data coverage
       accounts_heading: Accounts & invitations
       users: Accounts
       open_invitations: Open invitations
@@ -342,6 +343,18 @@ en:
         duration: Time
         created_events: Events created
         no_created_events: This run created no new events.
+    scraper_coverage:
+      index:
+        title: Data coverage
+        intro: How much each scraper collects per event — computed live from the events, never hand-maintained. Low values mean the scraper could collect more, or broke.
+        empty: No events to measure yet.
+        col:
+          scraper: Scraper
+          events: Events
+          time: Time
+          subtitle: Subtitle
+          genres: Genres
+          distinct_genres: distinct genres
     users:
       admin_badge: Admin
       cant_delete_self: You can't delete your own account here.

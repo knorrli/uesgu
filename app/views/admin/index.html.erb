@@ -68,6 +68,11 @@
         <span class="stat__leader"></span>
         <dd class="muted"><%= DiscardRule.count %></dd>
       </div>
+      <div class="stat">
+        <dt><%= link_to t('.scraper_coverage'), admin_scraper_coverage_path, class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"></dd>
+      </div>
     </dl>
   </section>
 

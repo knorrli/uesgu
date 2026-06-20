@@ -136,6 +136,9 @@ Rails.application.routes.draw do
     end
     resources :locations, only: %i[index]
 
+    # Per-scraper data-coverage matrix (fill-rates computed live from events).
+    get 'scraper_coverage', to: 'scraper_coverage#index', as: :scraper_coverage
+
     # Admin-authored rules that auto-discard junk scraped events by text match.
     # preview is a live, save-less lookup of the events a (possibly unsaved) rule
     # would target, for spotting false positives before committing.

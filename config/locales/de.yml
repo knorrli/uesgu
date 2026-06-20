@@ -295,6 +295,7 @@ de:
       last_scrape: Letzter Lauf
       no_scrapes: Noch keine Scraper-Läufe.
       discard_rules: Filterregeln
+      scraper_coverage: Datenabdeckung
       accounts_heading: Konten & Einladungen
       users: Konten
       open_invitations: Offene Einladungen
@@ -342,6 +343,18 @@ de:
         duration: Zeit
         created_events: Erstellte Events
         no_created_events: Dieser Lauf hat keine neuen Events erstellt.
+    scraper_coverage:
+      index:
+        title: Datenabdeckung
+        intro: "Wie viel jeder Scraper pro Event liefert — live aus den Events berechnet, nie von Hand gepflegt. Niedrige Werte heissen: der Scraper könnte mehr sammeln, oder er ist kaputt."
+        empty: Noch keine Events zum Auswerten.
+        col:
+          scraper: Scraper
+          events: Events
+          time: Uhrzeit
+          subtitle: Untertitel
+          genres: Genres
+          distinct_genres: versch. Genres
     users:
       admin_badge: Admin
       cant_delete_self: Du kannst dein eigenes Konto hier nicht löschen.

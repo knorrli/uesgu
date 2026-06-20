@@ -100,7 +100,10 @@
             <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('saved_filters.fields.monthday') %>
           </label>
           <label class="flex flex-col gap-xsmall">
-            <%= form.time_field :time_string, value: rule.time_string, 'aria-label': t('saved_filters.fields.time'), data: { action: 'change->saved-filter-form#snapTime' } %>
+            <%# step=900 (15 min) matches the quarter-hourly scheduler — the picker
+                offers only times we can actually honour; snapTime is the fallback
+                for browsers/typed entry that ignore step. %>
+            <%= form.time_field :time_string, value: rule.time_string, step: 900, 'aria-label': t('saved_filters.fields.time'), data: { action: 'change->saved-filter-form#snapTime' } %>
           </label>
         </div>
       </div>

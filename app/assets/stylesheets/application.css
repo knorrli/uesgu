@@ -174,25 +174,24 @@ a {
   gap: var(--gap-small);
 }
 
-/* Copyable field (shared/_copy_field): a read-only URL input with an inline
-   Copy button. The input flexes to fill, the button hugs its label. */
+/* Copyable field (shared/_copy_field): a full-width read-only URL input with a
+   button row below it (long URLs would crowd a side-by-side button off the
+   edge). The row holds Copy plus any caller-supplied actions as one group. */
 .copy-field {
   display: flex;
   flex-direction: column;
   gap: var(--gap-small);
 }
 
-/* Input on its own line (long URLs would otherwise crowd the button off the
-   edge), the Copy button left-aligned on the line below. */
-.copy-field__row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-small);
-  align-items: flex-start;
-}
-
 .copy-field__input {
   width: 100%;
+}
+
+.copy-field__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small);
+  align-items: center;
 }
 
 .copy-field__button {

@@ -111,15 +111,16 @@
     <% if @user.calendar_feed_token.present? %>
       <div class="flex flex-col gap-small">
         <p class="muted"><%= t('settings.calendar_feed_hint_on') %></p>
-        <%= render "shared/copy_field",
-              label: t('settings.calendar_feed_url_label'),
-              value: public_calendar_feed_url(@user.calendar_feed_token, format: :ics, **share_url_options) %>
-        <div class="settings-actions flex gap-small wrap">
+        <% feed_actions = capture do %>
           <%= button_to t('calendar_feed.regenerate'), calendar_feed_path, method: :post,
                 data: { turbo_confirm: t('calendar_feed.regenerate_confirm') } %>
           <%= button_to t('calendar_feed.remove'), calendar_feed_path, method: :delete, class: "delete",
                 data: { turbo_confirm: t('calendar_feed.remove_confirm') } %>
-        </div>
+        <% end %>
+        <%= render "shared/copy_field",
+              label: t('settings.calendar_feed_url_label'),
+              value: public_calendar_feed_url(@user.calendar_feed_token, format: :ics, **share_url_options),
+              actions: feed_actions %>
       </div>
     <% else %>
       <p class="muted"><%= t('settings.calendar_feed_hint_off') %></p>

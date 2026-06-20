@@ -1,5 +1,29 @@
 require "active_support/core_ext/integer/time"
 
+# Rails' default production formatter (SimpleFormatter) emits only the bare
+# message, so every line reaches Render with no severity. Render only maps a line
+# to a dashboard log level reliably when it's logfmt or JSON with a `level` field;
+# a plain-text line is "best effort" and DEFAULTS TO INFO, so an `error` shows as
+# info (https://render.com/docs/log-streams). Emit logfmt (`time=… level=… msg=…`)
+# so the dashboard's level filter actually works while staying human-readable.
+#
+# We can't use config.log_formatter for this: Rails only applies it when it builds
+# the logger itself, and this app sets config.logger explicitly (see
+# Rails::Application::Bootstrap#initialize_logger), so the formatter is set on the
+# underlying logger before TaggedLogging wraps it — keeping both the level field
+# and the request-id tag (prepended into msg by TaggedLogging) on every line.
+class LogfmtFormatter < ActiveSupport::Logger::SimpleFormatter
+  # Rails severities → the level names Render's filter understands. The rest
+  # (DEBUG/INFO/ERROR) already match once downcased.
+  LEVELS = { 'WARN' => 'warning', 'FATAL' => 'critical', 'UNKNOWN' => 'info' }.freeze
+
+  def call(severity, timestamp, _progname, msg)
+    message = msg.is_a?(String) ? msg : msg.inspect
+    level   = LEVELS.fetch(severity, severity.downcase)
+    "time=#{timestamp.utc.iso8601(3)} level=#{level} msg=#{message.strip.inspect}\n"
+  end
+end
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -30,9 +54,13 @@ Rails.application.configure do
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
-  # Log to STDOUT with the current request id as a default log tag.
+  # Log to STDOUT with the current request id as a default log tag. The formatter
+  # is set on the underlying logger before TaggedLogging wraps it so that the
+  # severity prefix and the request-id tag both make it onto every line.
   config.log_tags = [ :request_id ]
-  config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)
+  config.logger   = ActiveSupport::TaggedLogging.new(
+    ActiveSupport::Logger.new(STDOUT).tap { |l| l.formatter = LogfmtFormatter.new }
+  )
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!)
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")

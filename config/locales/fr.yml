@@ -335,7 +335,7 @@ fr:
           new: Nouveaux
           updated: Mis à jour
           unchanged: Inchangés
-          skipped: Ignorés
+          errored: Erreurs
           filtered: Filtrés
           history: Historique
       show:

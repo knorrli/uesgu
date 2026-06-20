@@ -18,10 +18,8 @@ module Scrapers
     # The feed is a dict keyed by event id; each value is one occurrence carrying a
     # nested `rf_event`.
     def event_rows
-      body = JSON.parse(page.body)
-      (body.is_a?(Hash) ? body.values : Array(body))
-    rescue JSON::ParserError
-      []
+      body = parse_json(page.body, default: {})
+      body.is_a?(Hash) ? body.values : Array(body)
     end
 
     # No scrapable per-event page (the SPA route 404s to a plain GET), so key the

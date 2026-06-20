@@ -14,7 +14,7 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert_equal 2, result.created
     assert_equal 0, result.updated
     assert_equal 0, result.unchanged
-    assert_equal 0, result.skipped
+    assert_equal 0, result.errored
     created = Event.where(url: rows.map { |r| r[:url] })
     assert_equal created.pluck(:id).sort, result.created_ids.sort
 
@@ -41,7 +41,7 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert_equal 'Second Title', Event.find_by(url: url).title
   end
 
-  test 'a single bad event is skipped without aborting the rest' do
+  test 'a single bad event is errored without aborting the rest' do
     CountingScraperHarness.next_rows = [
       { url: 'https://fixture.test/good1' },
       { url: 'https://fixture.test/bad', bad: true },
@@ -52,7 +52,7 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
 
     assert_equal 3, result.seen
     assert_equal 2, result.created
-    assert_equal 1, result.skipped
+    assert_equal 1, result.errored
     assert_equal 2, result.created_ids.size
     assert_not Event.exists?(url: 'https://fixture.test/bad')
   end

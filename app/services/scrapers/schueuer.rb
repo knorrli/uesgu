@@ -86,9 +86,12 @@ module Scrapers
       minute = Regexp.last_match&.named_captures&.dig('minute')
 
       Time.zone.parse("#{year}-#{month_number(month: month)}-#{day}, #{hour}:#{minute}")
-    rescue ArgumentError
+    rescue ArgumentError => e
       # Day/month still out of range despite passing the field checks (e.g. a
-      # garbled "32. Juni"): treat as unparseable rather than aborting the run.
+      # garbled "32. Juni"): treat as unparseable rather than aborting the run,
+      # but log at ERROR — a date that looked valid yet blew up the parser is a
+      # data/parser fault worth surfacing, not a silently-dropped row.
+      Rails.logger.error("[#{self.class.location}] unparseable date #{text.inspect}: #{e.class}: #{e.message}")
       nil
     end
 

@@ -32,10 +32,6 @@
 
 ### Scrapers
 
-- **Surface scraper errors in the logs.** Make sure failures (parse errors,
-  HTTP/robots blocks, zero-result runs) are logged at warn/error level and are
-  visible — not swallowed or buried at info. Cross-check against the ScrapeRun
-  observability data. (See memory `project-scraper-run-observability`.)
 - **Maximize collected info per scraper.** Audit each scraper for fields it
   *could* be capturing but isn't, using the `/admin/scraper_coverage` matrix to
   spot low fill-rates. First-pass audit (2026-06-20): the 0%-genre venues

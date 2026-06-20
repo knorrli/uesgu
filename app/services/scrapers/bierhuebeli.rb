@@ -23,9 +23,7 @@ module Scrapers
     end
 
     def event_rows
-      JSON.parse(page.body)
-    rescue JSON::ParserError
-      []
+      parse_json(page.body)
     end
 
     # Skip rows with no event date (drafts / mis-entered events).

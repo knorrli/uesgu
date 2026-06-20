@@ -66,22 +66,26 @@ module Scrapers
       run.scrape_results.create!(
         scraper: slug, status: status, started_at: started, duration_ms: ms_since(started),
         rows_seen: result.seen, created_count: result.created, updated_count: result.updated,
-        unchanged_count: result.unchanged, skipped_count: result.skipped,
+        unchanged_count: result.unchanged, errored_count: result.errored,
         discarded_count: result.discarded
       )
       if result.created_ids.any?
         Event.where(id: result.created_ids).update_all(created_in_scrape_run_id: run.id)
       end
-      @out.puts format('[%s] %s in %.1fs (%d seen, +%d new, ~%d updated, %d skipped, %d filtered)',
+      @out.puts format('[%s] %s in %.1fs (%d seen, +%d new, ~%d updated, %d errored, %d filtered)',
                        slug, status.to_s.upcase, ms_since(started) / 1000.0,
-                       result.seen, result.created, result.updated, result.skipped, result.discarded)
+                       result.seen, result.created, result.updated, result.errored, result.discarded)
     rescue StandardError => e
-      # A total failure (site down, markup that breaks before the loop) raises out
-      # of #call; record it and carry on to the next venue.
+      # A total failure (site down, robots block, markup that breaks before the
+      # loop) raises out of #call; record it and carry on to the next venue. The
+      # @out.puts is the cron's plain summary stream; log at ERROR too so the
+      # failure carries a severity in Render's log stream, like every other
+      # handled scraper error.
       run.scrape_results.create!(
         scraper: slug, status: :failed, started_at: started, duration_ms: ms_since(started),
         error_class: e.class.name, error_message: e.message&.truncate(1000)
       )
+      Rails.logger.error("[#{slug}] scrape failed: #{e.class}: #{e.message}")
       @out.puts format('[%s] FAILED in %.1fs — %s: %s', slug, ms_since(started) / 1000.0, e.class, e.message)
     end
 

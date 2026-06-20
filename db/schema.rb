@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_20_170000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_20_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -153,7 +153,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_170000) do
     t.integer "rows_seen", default: 0, null: false
     t.integer "created_count", default: 0, null: false
     t.integer "updated_count", default: 0, null: false
-    t.integer "skipped_count", default: 0, null: false
+    t.integer "errored_count", default: 0, null: false
     t.string "error_class"
     t.text "error_message"
     t.datetime "created_at", null: false

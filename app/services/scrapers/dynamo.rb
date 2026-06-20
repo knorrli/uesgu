@@ -33,9 +33,7 @@ module Scrapers
     end
 
     def event_rows
-      Array(JSON.parse(page.body)['data'])
-    rescue JSON::ParserError
-      []
+      Array(parse_json(page.body, default: {})['data'])
     end
 
     # Drop courses/markets/workshops; keep only concert-tagged events.

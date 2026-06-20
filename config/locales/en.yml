@@ -335,7 +335,7 @@ en:
           new: New
           updated: Updated
           unchanged: Unchanged
-          skipped: Skipped
+          errored: Errors
           filtered: Filtered
           history: History
       show:

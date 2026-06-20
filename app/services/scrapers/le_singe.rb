@@ -74,9 +74,7 @@ module Scrapers
     private
 
     def data_from(body)
-      JSON.parse(body).fetch('data', [])
-    rescue JSON::ParserError
-      []
+      parse_json(body, default: {}).fetch('data', [])
     end
   end
 end

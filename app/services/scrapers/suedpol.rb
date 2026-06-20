@@ -64,9 +64,7 @@ module Scrapers
     private
 
     def data_from(body)
-      JSON.parse(body)
-    rescue JSON::ParserError
-      []
+      parse_json(body)
     end
 
     def event_stamp(row)

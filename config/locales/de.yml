@@ -335,7 +335,7 @@ de:
           new: Neu
           updated: Aktualisiert
           unchanged: Unverändert
-          skipped: Übersprungen
+          errored: Fehler
           filtered: Gefiltert
           history: Verlauf
       show:

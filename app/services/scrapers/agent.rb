@@ -55,13 +55,13 @@ module Scrapers
       process_events
 
       if @failures.positive?
-        Rails.logger.warn "Finished #{self.class.location} with #{@failures} skipped event(s)"
+        Rails.logger.warn "Finished #{self.class.location} with #{@failures} errored event(s)"
       else
         Rails.logger.info "Finished processing #{self.class.location}"
       end
 
       Result.new(seen: @seen, created: @created, updated: @updated,
-                 unchanged: @unchanged, skipped: @failures, discarded: @discarded,
+                 unchanged: @unchanged, errored: @failures, discarded: @discarded,
                  created_ids: @created_ids)
     end
 
@@ -339,6 +339,19 @@ module Scrapers
       Rails.logger.error(
         "[#{self.class.location}] Skipped event #{event&.url}: #{error.class}: #{error.message}"
       )
+    end
+
+    # Parse a JSON feed body, logging at ERROR and falling back to `default` when
+    # the source returns something unparseable (an error page, a truncated
+    # response, a changed content type). A bare `rescue JSON::ParserError` here
+    # would turn a broken feed into a silent zero-row run; routing every JSON-feed
+    # scraper through this one helper means a broken feed always surfaces as an
+    # ERROR line tagged with the venue — handled, but not swallowed.
+    def parse_json(body, default: [])
+      JSON.parse(body)
+    rescue JSON::ParserError => e
+      Rails.logger.error("[#{self.class.location}] feed returned unparseable JSON: #{e.message}")
+      default
     end
 
     # Ensure a Genre row exists for each tagged genre (so brand-new ones surface in

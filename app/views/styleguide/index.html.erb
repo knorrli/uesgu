@@ -148,17 +148,6 @@
     </div>
 
     <div class="sg-row">
-      <div class="sg-specimen flex gap-medium">
-        <a href="#buttons" class="notify-filter-link" aria-label="Notify me about this"><span class="ph ph-bell"></span></a>
-        <a href="#buttons" class="notify-filter-link active" aria-label="A rule watches this"><span class="notify-bell-fill"></span></a>
-      </div>
-      <div class="sg-spec">
-        <span class="sg-spec__name">Notify bell</span> · <code>.notify-filter-link</code>
-        <p class="sg-purpose">An icon-only accent action pinned to the right of the applied-filter chips — turns the current filter into a notification rule. Finger-sized hit area; hover/focus reveals a soft pill. <code>.active</code> (right) = a rule already watches this filter: a filled bell-ringing glyph, not the outline bell.</p>
-      </div>
-    </div>
-
-    <div class="sg-row">
       <div class="sg-specimen"><a href="#buttons" class="text-link">Open filter</a></div>
       <div class="sg-spec">
         <span class="sg-spec__name">Text link</span> · <code>.text-link</code>
@@ -417,12 +406,12 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <span class="notify-filter-link save-filter-link"><span class="ph ph-star" aria-hidden="true"></span></span>
-        <span class="notify-filter-link save-filter-link active"><span class="star-fill" aria-hidden="true"></span></span>
+        <span class="save-filter-link"><span class="save-filter-icon"><span class="ph ph-funnel" aria-hidden="true"></span><span class="save-filter-plus" aria-hidden="true">+</span></span></span>
+        <span class="save-filter-link active"><span class="funnel-fill" aria-hidden="true"></span></span>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Save-filter star</span> · <code>.star-fill</code>
-        <p class="sg-purpose">"Save this filter" — pinned by the applied-filter chips. Outline = not saved; solid <b>green</b> = saved (a 🔔 bell then appears beside it to add notifications).</p>
+        <span class="sg-spec__name">Save-filter funnel</span> · <code>.save-filter-link</code>, <code>.funnel-fill</code>
+        <p class="sg-purpose">"Save this filter" — pinned by the applied-filter chips. Outline funnel + <b>+</b> = not saved (opens the editor with the current filter as a draft); solid <b>green</b> funnel = saved (opens the saved filter's editor). Shares the funnel metaphor with the nav "Filter" section; notification channels live in the editor, not here.</p>
       </div>
     </div>
 

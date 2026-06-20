@@ -24,12 +24,6 @@
   border-left: 3px solid var(--theme-accent-color);
 }
 
-/* The notify toggle reads lit (accent) when notifications are on. */
-.rule-notify-toggle.active {
-  color: var(--theme-accent-color);
-  border-color: var(--theme-accent-color);
-}
-
 .rule-card__name {
   font-weight: bold;
 }
@@ -85,6 +79,16 @@
   align-items: center;
 }
 
+/* Push + e-mail depend on the in-app master above them — a small indent shows the
+   hierarchy (and they grey out via :disabled when in-app is off). */
+.rule-check--sub {
+  padding-left: var(--gap-medium);
+}
+
+.rule-check--sub:has(:disabled) {
+  opacity: 0.55;
+}
+
 /* A channel whose prerequisite is missing (e-mail with no address saved) is
    disabled; dim it so it reads as unavailable. */
 .rule-check--disabled {
@@ -120,14 +124,14 @@
   display: none;
 }
 
-/* "Notify me about this filter" — an icon-only, opt-in action pinned to the right
-   of the applied-filter chips (both the inline filter and the mobile sheets). The
-   accent bell signals it's interactive; its context (sitting at the end of the
-   filter you just built) carries the meaning, so it needs no label. Padding gives
-   a finger-sized (~40px) hit area; the matching negative top/bottom margin cancels
-   the vertical growth so the bell rides the chip row's reserved one-line height
+/* "Save this filter" — an icon-only, opt-in action pinned to the right of the
+   applied-filter chips (both the inline filter and the mobile sheets). The accent
+   star signals it's interactive; its context (sitting at the end of the filter you
+   just built) carries the meaning, so it needs no label. Padding gives a
+   finger-sized (~40px) hit area; the matching negative top/bottom margin cancels
+   the vertical growth so the star rides the chip row's reserved one-line height
    rather than making the row (and so the whole page) taller. */
-.notify-filter-link {
+.save-filter-link {
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
@@ -138,7 +142,7 @@
   text-decoration: none;
 }
 
-.notify-filter-link .ph {
+.save-filter-link .ph {
   font-size: 1.35rem;
   line-height: 1;
 }
@@ -146,43 +150,54 @@
 /* Hover/focus reveals the tap target as a soft pill — the state cue an icon-only
    control otherwise lacks (Phosphor is an icon font, so a bolder glyph isn't an
    option). */
-.notify-filter-link:hover,
-.notify-filter-link:focus-visible {
+.save-filter-link:hover,
+.save-filter-link:focus-visible {
   background: var(--theme-bg-emphasis);
   border-radius: 999px;
   outline: none;
 }
 
-/* Lit: a rule already exists for this exact filter. Instead of the unlit outline
-   bell, a filled bell-ringing glyph (masked SVG, accent-painted) — the "this is
-   on" cue, in the followed-star's fill language but without a heavy background.
-   Tapping it opens that rule rather than making a duplicate. Sized to match the
-   1.35rem font bell; the flex link centres it vertically. */
-.notify-filter-link.active .notify-bell-fill {
-  display: inline-block;
-  width: 1.35rem;
-  height: 1.35rem;
-  background-color: var(--theme-accent-color);
-  -webkit-mask: var(--bell-ringing-fill) center / contain no-repeat;
-  mask: var(--bell-ringing-fill) center / contain no-repeat;
-}
-
-/* The ★ save toggle sits just left of the 🔔, sharing the .notify-filter-link
-   chrome (pill hover, accent, hit area). Unsaved = outline star; saved = a filled
-   star (masked SVG, accent-painted), in the same fill language as the followed
-   star elsewhere. The two buttons together form the filter-actions cluster. */
 .filter-actions {
   flex: 0 0 auto;
   gap: 2px;
 }
 
-.save-filter-link.active .star-fill {
+/* "Add this filter": a funnel with a small + badge tucked into its corner — the
+   not-saved state of the single save control. The badge rides the glyph (relative
+   wrapper), accent disc with a bg-coloured +, so it reads as "add". */
+.save-filter-icon {
+  position: relative;
+  display: inline-flex;
+}
+
+.save-filter-plus {
+  position: absolute;
+  right: -2px;
+  bottom: -1px;
+  width: 0.72rem;
+  height: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--theme-accent-color);
+  color: var(--theme-bg-color);
+  font-size: 0.62rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Saved: a solid (filled) funnel (masked SVG, accent-painted) — the strong
+   filled-vs-outline state cue against the not-saved outline funnel. Links to the
+   existing saved filter's editor. Sized to match the 1.35rem outline funnel; the
+   flex link centres it vertically. */
+.save-filter-link.active .funnel-fill {
   display: inline-block;
   width: 1.35rem;
   height: 1.35rem;
   background-color: var(--theme-accent-color);
-  -webkit-mask: var(--star-fill) center / contain no-repeat;
-  mask: var(--star-fill) center / contain no-repeat;
+  -webkit-mask: var(--funnel-fill) center / contain no-repeat;
+  mask: var(--funnel-fill) center / contain no-repeat;
 }
 
 

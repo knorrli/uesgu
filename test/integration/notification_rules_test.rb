@@ -53,7 +53,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
 
   # --- create ----------------------------------------------------------------
 
-  test 'create saves the filter and lands on the live editor' do
+  test 'create saves the drafted filter and returns to the list' do
     u = sign_in_as user
 
     assert_difference -> { u.notification_rules.count }, 1 do
@@ -65,27 +65,27 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     end
 
     r = u.notification_rules.last
-    assert_redirected_to edit_notification_rule_path(r) # create-on-click → live editor
+    assert_redirected_to notification_rules_path # explicit Save → the Saved-filters list
     assert_equal 1050, r.time_of_day
     assert_equal ['Bern'], r.location_list
     assert_equal ['this_weekend'], r.date_ranges
     assert r.happening?
   end
 
-  test 'create from a click uses safe defaults — push/email off' do
+  test 'create uses safe defaults — in-app on, push/email off' do
     u = sign_in_as user
 
-    # The "Benachrichtigen" button POSTs only the filter (no notification_rule
-    # params); the rule is created on the in-app bell only.
+    # A draft saved with only the filter (no channel params) lands on the in-app
+    # channel only — notifying by default, but nothing intrusive.
     assert_difference -> { u.notification_rules.count }, 1 do
       post notification_rules_path, params: { s: ['Rock'] }
     end
 
     r = u.notification_rules.last
-    assert_redirected_to edit_notification_rule_path(r)
+    assert_redirected_to notification_rules_path
+    assert r.notify_in_app?
     refute r.notify_push?
     refute r.notify_email?
-    assert r.enabled?
   end
 
   test 'create rejects an empty firehose filter' do
@@ -93,7 +93,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_no_difference -> { u.notification_rules.count } do
       post notification_rules_path, params: { notification_rule: { cadence: 'daily', time_string: '09:00' } }
     end
-    assert_redirected_to events_path # bounced back, nothing created
+    assert_response :unprocessable_entity # re-renders the editor with the error
   end
 
   # --- one rule per filter set -----------------------------------------------
@@ -111,58 +111,22 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_notification_rule_path(existing)
   end
 
-  test 'the star lights when saved; the bell follows the notify state' do
+  test 'the save star is a single button: draft link when unsaved, edit link when saved' do
     u = sign_in_as user
 
-    # Unsaved: outline star (offers to save), no bell link yet.
+    # Unsaved: outline star linking to the editor with this filter as a draft.
     get events_path(g: ['Rock'])
-    assert_select "a.save-filter-link[data-turbo-method='post']"
+    assert_select "a.save-filter-link[href=?]", new_notification_rule_path(g: ['Rock'])
     assert_select 'a.save-filter-link.active', false
+
+    # Saved (any kind): the star is lit and links straight to that filter's editor.
+    r = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540)
+    r.filter_attributes = { g: ['Rock'] }
+    r.save!
+    get events_path(g: ['Rock'])
+    assert_select "a.save-filter-link.active[href=?]", edit_notification_rule_path(r)
+    # No separate notify control on the events page.
     assert_select 'a.notify-bell-link', false
-
-    # A silent saved filter (notifications off): star lit, bell present but unlit.
-    r = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540, enabled: false)
-    r.filter_attributes = { g: ['Rock'] }
-    r.save!
-    get events_path(g: ['Rock'])
-    assert_select 'a.save-filter-link.active'
-    assert_select "a.notify-bell-link[href=?]", notify_notification_rule_path(r)
-    assert_select 'a.notify-bell-link.active', false
-
-    # Notifying (enabled): both lit.
-    r.update!(enabled: true)
-    get events_path(g: ['Rock'])
-    assert_select 'a.save-filter-link.active'
-    assert_select 'a.notify-bell-link.active'
-  end
-
-  # --- save (★) / notify (🔔) lifecycle --------------------------------------
-
-  test 'the star toggles a silent saved filter in place' do
-    u = sign_in_as user
-
-    assert_difference -> { u.notification_rules.count }, 1 do
-      post toggle_save_notification_rules_path(g: ['Rock'])
-    end
-    r = u.notification_rules.last
-    refute r.enabled?, 'a ★-saved filter is silent (notifications off)'
-    assert_equal ['Rock'], r.genres
-
-    # Toggling the same filter again removes it.
-    assert_difference -> { u.notification_rules.count }, -1 do
-      post toggle_save_notification_rules_path(g: ['Rock'])
-    end
-  end
-
-  test 'the bell turns notifications on and opens the editor' do
-    u = sign_in_as user
-    r = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540, enabled: false)
-    r.filter_attributes = { g: ['Rock'] }
-    r.save!
-
-    post notify_notification_rule_path(r)
-    assert r.reload.enabled?
-    assert_redirected_to edit_notification_rule_path(r)
   end
 
   # --- edit / update ---------------------------------------------------------
@@ -326,14 +290,27 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_redirected_to notification_rules_path
   end
 
-  test 'toggle pauses and destroy removes' do
+  test 'editing in-app off makes a saved filter silent (and forces other channels off)' do
+    u = sign_in_as user
+    r = u.notification_rules.new(cadence: 'daily', time_of_day: 1, notify_push: true)
+    r.filter_attributes = { s: ['Rock'] }
+    r.save!
+    assert r.notifying?
+
+    patch notification_rule_path(r), params: {
+      notification_rule: { cadence: 'daily', time_string: '09:00', notify_in_app: '0', notify_push: '1' },
+      s: ['Rock']
+    }
+    r.reload
+    refute r.notifying?, 'in-app off → silent saved filter'
+    refute r.notify_push?, 'push is forced off without in-app'
+  end
+
+  test 'destroy removes a saved filter' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'daily', time_of_day: 1)
     r.filter_attributes = { s: ['Rock'] }
     r.save!
-
-    patch toggle_notification_rule_path(r)
-    refute r.reload.enabled?
 
     assert_difference -> { u.notification_rules.count }, -1 do
       delete notification_rule_path(r)

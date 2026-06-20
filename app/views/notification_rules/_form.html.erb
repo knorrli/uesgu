@@ -74,16 +74,27 @@
       </div>
     </fieldset>
 
-    <fieldset class="rule-fieldset flex flex-col gap-small">
+    <%# In-app is the MASTER channel: unchecking it makes this a silent saved
+        filter (never delivers), so push + email are forced off and disabled —
+        client-side here (notify-channels controller) and server-side
+        (NotificationRule#silence_other_channels). %>
+    <fieldset class="rule-fieldset flex flex-col gap-small" data-controller="notify-channels">
       <legend><%= t('notification_rules.section_channels') %></legend>
       <p class="muted rule-hint"><%= t('notification_rules.channels_hint') %></p>
       <label class="rule-check flex gap-small">
-        <%= form.check_box :notify_push %>
+        <%= form.check_box :notify_in_app, data: { 'notify-channels-target': 'master', action: 'notify-channels#sync' } %>
+        <span><%= t('notification_rules.fields.notify_in_app') %></span>
+      </label>
+      <label class="rule-check rule-check--sub flex gap-small">
+        <%= form.check_box :notify_push, data: { 'notify-channels-target': 'dependent' } %>
         <span><%= t('notification_rules.fields.notify_push') %></span>
       </label>
       <% email_ready = MailConfig.configured? && current_user.email_address.present? %>
-      <label class="<%= class_names('rule-check', 'flex', 'gap-small', 'rule-check--disabled': !email_ready) %>">
-        <%= form.check_box :notify_email, disabled: !email_ready %>
+      <%# Email has a second reason to be disabled (no address on file); data-locked
+          keeps it off even when in-app is on, so the controller never re-enables it. %>
+      <label class="<%= class_names('rule-check', 'rule-check--sub', 'flex', 'gap-small', 'rule-check--disabled': !email_ready) %>">
+        <%= form.check_box :notify_email, disabled: !email_ready,
+              data: { 'notify-channels-target': 'dependent', locked: !email_ready } %>
         <span>
           <%= t('notification_rules.fields.notify_email') %>
           <% unless email_ready %>

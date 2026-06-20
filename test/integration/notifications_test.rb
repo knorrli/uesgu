@@ -14,9 +14,8 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     get notifications_path
     assert_response :success
     assert_select '.notification__name', text: /My alert/
-    # The Inbox tabs tie the messages list and the rules together.
-    assert_select '.segmented a.active[href=?]', notifications_path
-    assert_select '.segmented a[href=?]', notification_rules_path
+    # The inbox is its own standalone section now — no Eingang/Filter tabs.
+    assert_select '.inbox-tabs', false
   end
 
   test 'index shows each digests own event count' do

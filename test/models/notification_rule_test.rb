@@ -115,16 +115,16 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert_nil r.fire!(at(18, 1)) # nothing new after the cursor
   end
 
-  test 'run_due! fires due rules and ignores disabled ones' do
+  test 'run_due! fires due rules and ignores silent (notify-off) ones' do
     u = user
-    # One event matching both styles, so the disabled rule *would* fire if enabled
+    # One event matching both styles, so the silent rule *would* fire if notifying
     # — distinct filters keep the two rules legal under the one-per-filter rule.
     event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['probe-rock', 'probe-techno'])
 
     due = rule(u, filter: { s: ['probe-rock'] }, time_of_day: 0)
     due.save!
     due.update_column(:last_fired_at, 1.day.ago)
-    off = rule(u, filter: { s: ['probe-techno'] }, time_of_day: 0, enabled: false)
+    off = rule(u, filter: { s: ['probe-techno'] }, time_of_day: 0, notify_in_app: false)
     off.save!
     off.update_column(:last_fired_at, 1.day.ago)
 
@@ -138,6 +138,20 @@ class NotificationRuleTest < ActiveSupport::TestCase
   test 'an empty filter is rejected' do
     refute rule(user, filter: {}).valid?, 'empty filter => invalid'
     assert rule(user, filter: { s: ['x'] }).valid?, 'any filter is valid'
+  end
+
+  # --- channels (in-app is the master) ---------------------------------------
+
+  test 'notifying? mirrors the in-app channel' do
+    assert rule(user, filter: { s: ['x'] }, notify_in_app: true).notifying?
+    refute rule(user, filter: { s: ['x'] }, notify_in_app: false).notifying?
+  end
+
+  test 'turning in-app off forces push and email off' do
+    r = rule(user, filter: { s: ['x'] }, notify_in_app: false, notify_push: true, notify_email: true)
+    r.save!
+    refute r.notify_push?, 'push cannot ride a digest that never fires'
+    refute r.notify_email?, 'email cannot ride a digest that never fires'
   end
 
   # --- dedupe (one rule per filter set) --------------------------------------

@@ -76,14 +76,6 @@
   font-weight: bold;
 }
 
-/* As Inbox tabs the switch sits inside a flex-column header, so the spacing
-   below it is owned by that column's gap — drop the standalone margin the
-   relevance toggle carries, otherwise it double-counts and the two Inbox
-   pages disagree on the heading-to-tabs gap. */
-.inbox-tabs.segmented {
-  margin-bottom: 0;
-}
-
 /* Show/hide-read switch under the list — a plain muted text link, not a
    button, matching the relevance/inbox text switches. */
 .notifications__read-toggle {

@@ -59,11 +59,9 @@
             <%= render 'filter_chip', name: 'd', value: range, label: date_range_label(range), icon: 'date' %>
           <% end %>
         </div>
-        <%# ★ save + 🔔 notify, in their own turbo frame so ★ can toggle a silent
-            saved filter in place without re-running the listing. %>
-        <%= turbo_frame_tag 'filter-save' do %>
-          <%= render 'save_notify' %>
-        <% end %>
+        <%# ★ save: a plain link to the editor (new draft, or the existing saved
+            filter). Navigates away, so no turbo frame. %>
+        <%= render 'save_notify' %>
       </div>
     <% end %>
 

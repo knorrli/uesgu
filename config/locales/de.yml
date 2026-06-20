@@ -4,7 +4,7 @@ de:
     admin: Admin
     notifications: Benachrichtigungen
     unread_notifications: Ungelesene Benachrichtigungen
-    notification_rules: Benachrichtigungen
+    filters: Filter
     saved: Merkliste
     settings: Einstellungen
     logout: Abmelden
@@ -92,8 +92,6 @@ de:
       body: Dies ist eine Test-Benachrichtigung — Push funktioniert. 🎉
   inbox:
     title: Benachrichtigungen
-    tab_messages: Eingang
-    tab_rules: Filter
   saved_events:
     title: Merkliste
     empty: Noch nichts gespeichert — tippe das Herz bei einer Veranstaltung.
@@ -120,15 +118,13 @@ de:
       other: "%{count} gespeicherte Veranstaltungen stehen an"
   notification_rules:
     title: Gespeicherte Filter
-    intro: Deine gespeicherten Filter. Wende einen an, um ihn durchzustöbern, schalte die Glocke ein für Benachrichtigungen, oder bearbeite den Zeitplan.
+    intro: Deine gespeicherten Filter. Wende einen an, um ihn durchzustöbern, oder bearbeite ihn, um zu ändern, wie und wann du benachrichtigt wirst.
     your_rules: Deine Regeln
     empty: Noch keine Regeln — erstell unten deine erste.
     add_rule: Regel hinzufügen
     save_button: Speichern
     window_none: Kein Zeitraum (neue Events)
     apply: Anwenden
-    notify_on: Benachrichtigen
-    notify_off: Nicht mehr benachrichtigen
     silent: Keine Benachrichtigung
     saved: Gespeichert.
     deleted: Gespeicherter Filter gelöscht.
@@ -167,7 +163,7 @@ de:
     section_channels: Wie
     content_hint: „Neu hinzugefügt“ meldet frisch eingetragene Veranstaltungen. „Findet statt“ zeigt, was in einem Zeitraum (z. B. dieses Wochenende) läuft — egal, wann es eingetragen wurde.
     filter_hint: Werte mit Komma trennen. Namen müssen denen auf der Seite entsprechen.
-    channels_hint: Die Glocke in der App ist immer an. Push und E-Mail kommen pro Regel dazu.
+    channels_hint: In-App aus = stiller Filter. Push und E-Mail brauchen In-App.
     cadences:
       daily: Täglich
       weekly: Wöchentlich
@@ -220,6 +216,7 @@ de:
       filter_locations_ph: z. B. Dachstock, Rössli
       filter_queries: Suchbegriffe
       filter_queries_ph: z. B. Bandname
+      notify_in_app: Benachrichtigungen in der App
       notify_push: Push auf meine Geräte
       notify_email: E-Mail an mich
   notification_mailer:
@@ -663,9 +660,7 @@ de:
         list: Liste
         calendar: Kalender
       save_filter: Filter speichern
-      save_filter_remove: Gespeichert — entfernen
-      notify_filter: Benachrichtigen
-      notify_filter_existing: Du wirst benachrichtigt — verwalten
+      save_filter_saved: Gespeichert — bearbeiten
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen

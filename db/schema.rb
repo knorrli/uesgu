@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_19_130000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_20_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -106,7 +106,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_130000) do
   create_table "notification_rules", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "name"
-    t.boolean "enabled", default: true, null: false
+    t.boolean "notify_in_app", default: true, null: false
     t.string "cadence", default: "weekly", null: false
     t.integer "weekday"
     t.integer "monthday"
@@ -117,7 +117,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_19_130000) do
     t.boolean "notify_email", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["enabled", "cadence"], name: "index_notification_rules_on_enabled_and_cadence"
+    t.index ["notify_in_app", "cadence"], name: "index_notification_rules_on_notify_in_app_and_cadence"
     t.index ["user_id"], name: "index_notification_rules_on_user_id"
   end
 

@@ -28,7 +28,10 @@ class NotificationRule < ApplicationRecord
   belongs_to :user
   has_many :notifications, dependent: :nullify
 
-  scope :enabled, -> { where(enabled: true) }
+  # Notifying = the in-app digest is created (notify_in_app on). It's the master
+  # channel: push/email require it (see silence_other_channels), so this scope is
+  # also "anything that can fire". A saved filter with it off is a silent scope.
+  scope :notifying, -> { where(notify_in_app: true) }
 
   validates :cadence, inclusion: { in: CADENCES }
   validates :time_of_day, numericality: { in: 0..1439 }
@@ -55,6 +58,10 @@ class NotificationRule < ApplicationRecord
   # :00/:15/:30/:45 — snap the chosen time to the nearest quarter so the saved
   # time matches when it actually fires (the form's input also steps by 15 min).
   before_validation :snap_time_to_quarter
+  # In-app is the master channel: with it off the saved filter is a silent scope,
+  # so push/email can't ride on a digest that never fires — force them off. Mirrors
+  # the editor's client-side disable (notify-channels controller).
+  before_validation :silence_other_channels
 
   def targets_something
     return if queries.any? || genres.any? || style_list.any? || location_list.any? || date_ranges.any?
@@ -71,11 +78,11 @@ class NotificationRule < ApplicationRecord
 
   before_create { self.last_fired_at ||= Time.current }
 
-  # Fire every enabled rule that's due as of `now` — the per-user-due sweep the
+  # Fire every notifying rule that's due as of `now` — the per-user-due sweep the
   # scheduler (Render cron, ~every 15 min) calls. Returns the Notifications
   # created (empty digests fire nothing and are dropped).
   def self.run_due!(now = Time.current)
-    enabled.includes(:user).find_each.filter_map do |rule|
+    notifying.includes(:user).find_each.filter_map do |rule|
       rule.fire!(now) if rule.due?(now)
     end
   end
@@ -158,8 +165,12 @@ class NotificationRule < ApplicationRecord
 
   # ── Scheduling ─────────────────────────────────────────────────────────────
 
+  # Whether this saved filter actually delivers (vs. a silent saved scope). In-app
+  # is the master, so notifying? == notify_in_app? — the single notify state.
+  def notifying? = notify_in_app?
+
   def due?(now = Time.current)
-    return false unless enabled?
+    return false unless notify_in_app?
     moment = previous_scheduled_at(now)
     moment.present? && (last_fired_at.nil? || last_fired_at < moment)
   end
@@ -247,6 +258,12 @@ class NotificationRule < ApplicationRecord
   private
 
   def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
+
+  def silence_other_channels
+    return if notify_in_app?
+    self.notify_push = false
+    self.notify_email = false
+  end
 
   def snap_time_to_quarter
     return if time_of_day.blank?

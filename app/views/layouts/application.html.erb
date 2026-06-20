@@ -93,13 +93,17 @@
             <details class="nav-menu" data-controller="menu" data-action="toggle->menu#toggle">
               <summary><%= current_user.username %><% if unread.positive? %> <span class="unread-dot" role="img" aria-label="<%= t('nav.unread_notifications') %>"></span><% end %></summary>
               <div class="nav-menu__items">
-                <%# Reused icons (bell/bookmark/heart/gear) so the labels scan at a
-                    glance — the heart/bookmark in particular tell the Interessen and
-                    Merkliste rows apart. Notification rules now live as a tab inside
-                    the Inbox; logout moved to Settings. %>
+                <%# Reused icons (bell/funnel/bookmark/gear) so the labels scan at a
+                    glance. Notifications = the received inbox; Filter = the saved
+                    filters that feed it (its own section now, no longer an inbox
+                    tab); logout moved to Settings. %>
                 <%= link_to notifications_path, class: 'nav-menu__item' do %>
                   <span class="ph ph-bell" aria-hidden="true"></span>
                   <span><%= t('nav.notifications') %></span><% if unread.positive? %> <span class="badge"><%= unread %></span><% end %>
+                <% end %>
+                <%= link_to notification_rules_path, class: 'nav-menu__item' do %>
+                  <span class="ph ph-funnel" aria-hidden="true"></span>
+                  <span><%= t('nav.filters') %></span>
                 <% end %>
                 <%= link_to saved_events_path, class: 'nav-menu__item' do %>
                   <span class="ph ph-bookmark-simple" aria-hidden="true"></span>

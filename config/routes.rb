@@ -47,22 +47,14 @@ Rails.application.routes.draw do
   get "calendar/:token", to: "calendar_feeds#show", as: :public_calendar_feed,
       constraints: { format: "ics" }, format: true
 
-  # User-defined notification funnels (WHEN·WHICH·FILTER·CHANNEL). toggle flips
-  # enabled; fire runs the rule on demand ("Fire now" — test without waiting for
-  # the schedule).
+  # Saved filters (a saved landing-page filter, with notification delivery
+  # optional — see NotificationRule). new/create save the current events filter;
+  # edit/update tune it; fire runs it on demand ("Fire now" — test without waiting
+  # for the schedule). There's no pause toggle: a filter delivers iff its in-app
+  # channel is on, edited on the form like any other channel.
   resources :notification_rules, only: %i[index new create edit update destroy] do
-    collection do
-      # The events-page ★: toggle a SILENT saved filter (notify off) for the
-      # current filter, in place — create if none matches the fingerprint, destroy
-      # if one does. Re-renders just the save/notify button frame.
-      post :toggle_save
-    end
     member do
-      patch :toggle
       post :fire
-      # The events-page 🔔: turn notifications on for an already-saved filter and
-      # land on the editor to set the schedule/channels.
-      post :notify
     end
   end
 

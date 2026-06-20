@@ -28,6 +28,6 @@ class StyleguideTest < ActionDispatch::IntegrationTest
     assert_select '.button-small.danger'
     assert_select '.icon-button.danger'
     assert_select '.scrape-badge--ok'
-    assert_select '.star-fill'
+    assert_select '.funnel-fill'
   end
 end

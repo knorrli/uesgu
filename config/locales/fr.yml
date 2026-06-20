@@ -4,7 +4,7 @@ fr:
     admin: Admin
     notifications: Notifications
     unread_notifications: Notifications non lues
-    notification_rules: Règles de notification
+    filters: Filtres
     saved: À voir
     settings: Paramètres
     logout: Déconnexion
@@ -92,8 +92,6 @@ fr:
       body: Ceci est une notification de test — le push fonctionne. 🎉
   inbox:
     title: Notifications
-    tab_messages: Reçues
-    tab_rules: Filtres
   saved_events:
     title: À voir
     empty: Rien d'enregistré — touche le cœur sur un événement.
@@ -120,15 +118,13 @@ fr:
       other: "%{count} événements enregistrés arrivent"
   notification_rules:
     title: Filtres enregistrés
-    intro: Tes filtres enregistrés. Applique-en un pour le parcourir, active la cloche pour être averti·e, ou modifie sa planification.
+    intro: Tes filtres enregistrés. Applique-en un pour le parcourir, ou modifie-le pour changer comment et quand tu es averti·e.
     your_rules: Tes règles
     empty: Aucune règle — crée ta première ci-dessous.
     add_rule: Ajouter une règle
     save_button: Enregistrer
     window_none: Sans période (nouveautés)
     apply: Appliquer
-    notify_on: M'avertir
-    notify_off: Ne plus m'avertir
     silent: Sans notification
     saved: Enregistré.
     deleted: Filtre enregistré supprimé.
@@ -167,7 +163,7 @@ fr:
     section_channels: Comment
     content_hint: « Nouvellement ajoutés » t'alerte des événements fraîchement listés. « En cours » montre ce qui se passe sur une période (p. ex. ce week-end), peu importe quand c'était ajouté.
     filter_hint: Sépare les valeurs par des virgules. Les noms doivent correspondre à ceux du site.
-    channels_hint: La cloche dans l'app est toujours active. Ajoute push et e-mail par règle.
+    channels_hint: Désactive l'app pour un filtre silencieux. Push et e-mail en ont besoin.
     cadences:
       daily: Quotidien
       weekly: Hebdomadaire
@@ -220,6 +216,7 @@ fr:
       filter_locations_ph: p. ex. Dachstock, Rössli
       filter_queries: Termes de recherche
       filter_queries_ph: p. ex. nom du groupe
+      notify_in_app: Notifications dans l'app
       notify_push: Push sur mes appareils
       notify_email: M'envoyer un e-mail
   notification_mailer:
@@ -663,9 +660,7 @@ fr:
         list: Liste
         calendar: Calendrier
       save_filter: Enregistrer le filtre
-      save_filter_remove: Enregistré — retirer
-      notify_filter: M'avertir
-      notify_filter_existing: Tu es averti·e — gérer
+      save_filter_saved: Enregistré — modifier
     day:
       empty: Aucun événement ce jour-là.
       close: Fermer

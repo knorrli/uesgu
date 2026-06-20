@@ -8,9 +8,10 @@ class EventsController < ApplicationController
   # GET /events
   def index
     @filter = build_filter
-    # A logged-in user gets the ★ save / 🔔 notify cluster for the active filter;
-    # @notify_rule is the saved filter matching this exact filter set, if any (lit
-    # ★, and 🔔 shown — see _save_notify + NotificationRule.matching).
+    # A logged-in user gets the ★ save control for the active filter. @notify_rule
+    # is the saved filter matching this exact filter set, if any: present → the ★
+    # is lit and links to its editor; nil → an outline ★ links to a fresh draft
+    # (see _save_notify + NotificationRule.matching).
     if current_user && @filter.active?
       @notify_rule = current_user.notification_rules.matching(NotificationRule.fingerprint_for(@filter))
     end

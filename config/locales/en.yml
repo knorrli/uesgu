@@ -4,7 +4,7 @@ en:
     admin: Admin
     notifications: Notifications
     unread_notifications: Unread notifications
-    notification_rules: Notification rules
+    filters: Filters
     saved: Watchlist
     settings: Settings
     logout: Log out
@@ -92,8 +92,6 @@ en:
       body: This is a test notification — push is working. 🎉
   inbox:
     title: Notifications
-    tab_messages: Inbox
-    tab_rules: Saved filters
   saved_events:
     title: Watchlist
     empty: Nothing saved yet — tap the heart on any show.
@@ -120,15 +118,13 @@ en:
       other: "%{count} saved shows coming up"
   notification_rules:
     title: Saved filters
-    intro: Filters you've saved. Apply one to browse it, switch on the bell to get notified, or edit its schedule.
+    intro: Filters you've saved. Apply one to browse it, or edit it to change how and when you're notified.
     your_rules: Your rules
     empty: No rules yet — make your first one below.
     add_rule: Add a rule
     save_button: Save
     window_none: No window (new events)
     apply: Apply
-    notify_on: Get notified
-    notify_off: Stop notifying
     silent: Not notifying
     saved: Saved.
     deleted: Saved filter deleted.
@@ -167,7 +163,7 @@ en:
     section_channels: How
     content_hint: "“Newly added” catches freshly listed events. “Happening” shows what's on in a window (e.g. this weekend), whenever it was added."
     filter_hint: Comma-separate values. Names must match those used on the site.
-    channels_hint: The in-app bell is always on. Add push and email per rule.
+    channels_hint: Turn off in-app for a silent saved filter. Push and email need it on.
     cadences:
       daily: Daily
       weekly: Weekly
@@ -220,6 +216,7 @@ en:
       filter_locations_ph: e.g. Dachstock, Rössli
       filter_queries: Search terms
       filter_queries_ph: e.g. band name
+      notify_in_app: In-app notifications
       notify_push: Push to my devices
       notify_email: Email me
   notification_mailer:
@@ -663,9 +660,7 @@ en:
         list: List
         calendar: Calendar
       save_filter: Save this filter
-      save_filter_remove: Saved — remove
-      notify_filter: Get notified
-      notify_filter_existing: You're notified — manage
+      save_filter_saved: Saved — edit
     day:
       empty: No events on this day.
       close: Close

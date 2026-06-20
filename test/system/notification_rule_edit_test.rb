@@ -89,4 +89,15 @@ class NotificationRuleEditTest < ApplicationSystemTestCase
     visit edit_notification_rule_path(@rule)
     assert_selector "input[name='notification_rule[notify_email]'][disabled]", visible: :all
   end
+
+  test "in-app is the master: unchecking it disables and clears push" do
+    visit edit_notification_rule_path(@rule)
+    push = find("input[type=checkbox][name='notification_rule[notify_push]']", visible: :all)
+    refute push.disabled?, "push starts enabled while in-app is on"
+
+    # Untick in-app → push is forced off and disabled client-side.
+    find("input[type=checkbox][name='notification_rule[notify_in_app]']", visible: :all).click
+    assert push.disabled?, "push disables when in-app goes off"
+    refute push.checked?, "push is unchecked when in-app goes off"
+  end
 end

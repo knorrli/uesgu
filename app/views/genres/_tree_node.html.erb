@@ -1,0 +1,18 @@
+<%# One node of the genre tree, rendered recursively. `children_map` is the
+    parent_id → [genres] map built once in the controller, so descending costs no
+    extra query. A root genre is bolded; every name links to its editor. %>
+<% children = children_map[genre.id] || [] %>
+<li class="genre-tree-node">
+  <div class="genre-tree-row flex align-baseline gap-small wrap">
+    <%= link_to genre.name, edit_genre_path(genre),
+          class: class_names('genre-tree-name', root: genre.parent_id.nil?) %>
+    <span class="muted genre-count" title="<%= t('genres.editor.usage', count: genre.events_count) %>"><%= genre.events_count %>&times;</span>
+  </div>
+  <% if children.any? %>
+    <ul class="genre-tree-children">
+      <% children.each do |child| %>
+        <%= render 'tree_node', genre: child, children_map: children_map %>
+      <% end %>
+    </ul>
+  <% end %>
+</li>

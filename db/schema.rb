@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_17_110354) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_20_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -70,20 +70,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_110354) do
     t.datetime "blocked_at"
     t.virtual "fingerprint", type: :string, as: "regexp_replace(translate(replace(replace(lower((name)::text), '&'::text, 'and'::text), '''n'''::text, 'and'::text), 'äöüàâéèêëïîôûç'::text, 'aouaaeeeeiiouc'::text), '[^a-z0-9]'::text, ''::text, 'g'::text)", stored: true
     t.bigint "canonical_id"
+    t.bigint "parent_id"
     t.index "lower((name)::text)", name: "index_genres_on_lower_name", unique: true
     t.index ["blocked_at"], name: "index_genres_on_blocked_at"
     t.index ["canonical_id"], name: "index_genres_on_canonical_id"
     t.index ["fingerprint"], name: "index_genres_on_fingerprint", unique: true
     t.index ["hidden_at"], name: "index_genres_on_hidden_at"
     t.index ["ignored_at"], name: "index_genres_on_ignored_at"
+    t.index ["parent_id"], name: "index_genres_on_parent_id"
     t.check_constraint "canonical_id IS NULL OR canonical_id <> id", name: "genres_canonical_not_self"
-  end
-
-  create_table "genres_styles", id: false, force: :cascade do |t|
-    t.bigint "genre_id", null: false
-    t.bigint "style_id", null: false
-    t.index ["genre_id", "style_id"], name: "index_genres_styles_on_genre_id_and_style_id", unique: true
-    t.index ["style_id"], name: "index_genres_styles_on_style_id"
+    t.check_constraint "parent_id IS NULL OR parent_id <> id", name: "genres_parent_not_self"
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -100,25 +96,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_110354) do
     t.index ["redeemed_by_id"], name: "index_invitations_on_redeemed_by_id"
   end
 
-  create_table "notification_rules", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.string "name"
-    t.boolean "enabled", default: true, null: false
-    t.string "cadence", default: "weekly", null: false
-    t.integer "weekday"
-    t.integer "monthday"
-    t.integer "time_of_day", default: 1080, null: false
-    t.datetime "last_fired_at"
-    t.jsonb "filter", default: {}, null: false
-    t.boolean "notify_push", default: true, null: false
-    t.boolean "notify_email", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.boolean "track_favorites", default: false, null: false
-    t.index ["enabled", "cadence"], name: "index_notification_rules_on_enabled_and_cadence"
-    t.index ["user_id"], name: "index_notification_rules_on_user_id"
-  end
-
   create_table "notifications", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.datetime "period_start", null: false
@@ -126,10 +103,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_110354) do
     t.datetime "read_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "notification_rule_id"
+    t.bigint "saved_filter_id"
     t.jsonb "event_ids", default: [], null: false
     t.string "title"
-    t.index ["notification_rule_id"], name: "index_notifications_on_notification_rule_id"
+    t.index ["saved_filter_id"], name: "index_notifications_on_saved_filter_id"
     t.index ["user_id", "period_end"], name: "index_notifications_on_user_id_and_period_end"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
@@ -146,6 +123,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_110354) do
     t.datetime "updated_at", null: false
     t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
     t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
+  end
+
+  create_table "saved_filters", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.boolean "notify_in_app", default: true, null: false
+    t.string "cadence", default: "weekly", null: false
+    t.integer "weekday"
+    t.integer "monthday"
+    t.integer "time_of_day", default: 1080, null: false
+    t.datetime "last_fired_at"
+    t.jsonb "filter", default: {}, null: false
+    t.boolean "notify_push", default: true, null: false
+    t.boolean "notify_email", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notify_in_app", "cadence"], name: "index_saved_filters_on_notify_in_app_and_cadence"
+    t.index ["user_id"], name: "index_saved_filters_on_user_id"
   end
 
   create_table "scrape_results", force: :cascade do |t|
@@ -189,12 +184,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_110354) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_sessions_on_user_id"
-  end
-
-  create_table "styles", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "taggings", force: :cascade do |t|
@@ -254,14 +243,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_17_110354) do
   add_foreign_key "events", "events", column: "canonical_event_id", on_delete: :nullify
   add_foreign_key "events", "scrape_runs", column: "created_in_scrape_run_id", on_delete: :nullify
   add_foreign_key "genres", "genres", column: "canonical_id"
-  add_foreign_key "genres_styles", "genres", on_delete: :cascade
-  add_foreign_key "genres_styles", "styles", on_delete: :cascade
+  add_foreign_key "genres", "genres", column: "parent_id"
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
-  add_foreign_key "notification_rules", "users"
-  add_foreign_key "notifications", "notification_rules"
+  add_foreign_key "notifications", "saved_filters"
   add_foreign_key "notifications", "users"
   add_foreign_key "push_subscriptions", "users"
+  add_foreign_key "saved_filters", "users"
   add_foreign_key "scrape_results", "scrape_runs", on_delete: :cascade
   add_foreign_key "sessions", "users"
   add_foreign_key "taggings", "tags"

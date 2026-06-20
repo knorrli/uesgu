@@ -1,58 +1,4 @@
 namespace :genres do
-  desc 'Backfill the first-class genre → style mapping from the previous ' \
-       "representation (a Style 'tagged with' genre strings via " \
-       'acts_as_taggable_on), register every genre currently on an event, and ' \
-       "recompute each event's derived styles. Safe to re-run (idempotent); the " \
-       'one-time step after introducing the Genre model.'
-  task backfill: :environment do
-    # Current mappings: genre name → the style ids it maps to.
-    mapping = Hash.new { |hash, name| hash[name] = [] }
-    ActsAsTaggableOn::Tagging
-      .where(context: 'genres', taggable_type: 'Style')
-      .joins(:tag)
-      .pluck('tags.name', :taggable_id)
-      .each { |name, style_id| mapping[name] << style_id }
-
-    mapping.each do |name, style_ids|
-      genre = Genre.create_or_find_by!(name: name)
-      genre.style_ids = style_ids.uniq
-    end
-    puts "Genre mappings backfilled: #{mapping.size}"
-
-    # Register every genre currently on an event (unmapped ones become the
-    # assignment queue) and cache usage counts.
-    Genre.reconcile!
-    puts "Genres in use: #{Genre.in_use.count} (#{Genre.unassigned.count} unassigned)"
-
-    # Re-derive every event's styles from the new mapping. Should reproduce the
-    # existing style tags exactly.
-    events_changed = 0
-    Event.find_each do |event|
-      before = event.style_list.sort
-      event.recompute_styles!
-      events_changed += 1 if event.reload.style_list.sort != before
-    end
-    puts "Events whose styles changed on recompute: #{events_changed}"
-  end
-
-  desc 'Import the style taxonomy from lib/genres.json: create each Style and ' \
-       'map its listed genres to it (matched/de-duplicated by fingerprint). The ' \
-       'clean-slate seed for a fresh database. Safe to re-run (idempotent).'
-  task import_taxonomy: :environment do
-    taxonomy = JSON.parse(File.read(Rails.root.join('lib/genres.json')))
-
-    taxonomy.each do |style_name, genre_names|
-      style = Style.find_or_create_by!(name: style_name)
-      Genre.ensure!(genre_names)
-      fingerprints = genre_names.map { |name| Genre.fingerprint_for(name) }.uniq
-      genres = Genre.where(fingerprint: fingerprints)
-      style.genre_ids = (style.genre_ids + genres.ids).uniq
-    end
-
-    Genre.reconcile!
-    puts "Imported #{taxonomy.size} styles, #{Genre.count} genres total"
-  end
-
   desc 'Merge known semantic aliases (lib/genre_aliases.json) into their ' \
        'canonical genres. Mechanical spelling variants are handled by the ' \
        'fingerprint and need no entry here. Idempotent.'
@@ -86,15 +32,15 @@ namespace :genres do
     puts "Applied dispositions: #{dispositions.transform_values(&:size)}"
   end
 
-  desc 'Seed the full genre taxonomy, aliases, and dispositions in order. The ' \
-       'one-shot seed for a fresh database. Idempotent.'
+  desc 'Seed the full genre taxonomy from the curated tree (db/genres.yml): the ' \
+       'one-shot seed for a fresh database. Loads the tree (which also applies its ' \
+       'own dispositions + aliases), then reconciles usage counts. Idempotent.'
   task seed: :environment do
-    # execute, not invoke: invoke no-ops a task already run once in this process,
-    # which would silently skip a step when seed is composed/re-run. The steps are
-    # individually idempotent, so always running them is safe.
-    Rake::Task['genres:import_taxonomy'].execute
-    Rake::Task['genres:import_aliases'].execute
-    Rake::Task['genres:import_dispositions'].execute
+    # The curated tree (taxonomy:import_tree / GenreTreeSeed) is the single source
+    # of truth now — it sets parents AND applies the hidden/blocked/ignored
+    # dispositions and aliases from the YAML, replacing the old flat Style→Genre
+    # import. execute (not invoke) so a re-run never silently no-ops.
+    Rake::Task['taxonomy:import_tree'].execute
     Genre.reconcile!
     puts 'Genre seed complete.'
   end

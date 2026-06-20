@@ -4,8 +4,8 @@ require 'test_helper'
 #
 # It exercises each scraper's `process_events` against a saved HTML fixture with
 # every I/O seam stubbed — `get`/`page`/`click` parse fixtures, `Event` is a plain
-# capture object, and `event_styles` echoes its input — so the run is fully offline
-# and touches no database. The captured per-event field assignments are compared to
+# capture object, and the genre/visibility derivation is no-op'd — so the run is fully
+# offline and touches no database. The captured per-event field assignments are compared to
 # a committed golden JSON.
 #
 # Crucially the harness only relies on seams shared by BOTH the old (inline) and new
@@ -27,7 +27,7 @@ class Scrapers::GoldenTest < Minitest::Test
 
   # Stand-in for an Event that records field assignments instead of persisting.
   class Capture
-    FIELDS = %i[start_time start_date title subtitle genre_list style_list location_list cancelled_at].freeze
+    FIELDS = %i[start_time start_date title subtitle genre_list location_list cancelled_at].freeze
     # :data_source / :hidden are set by build_event but aren't part of the golden output.
     attr_accessor(*FIELDS, :hidden, :data_source)
     attr_reader :url
@@ -51,7 +51,7 @@ class Scrapers::GoldenTest < Minitest::Test
 
     # Visibility is a DB-derived projection (Genre.hidden), not a parsing concern,
     # so the offline run treats every event as visible — mirroring the stubbed
-    # event_styles. The real derivation is covered by EventTest.
+    # ensure_genres_and_visibility. The real derivation is covered by EventTest.
     def hidden_by_genre? = false
 
     def to_h
@@ -109,8 +109,9 @@ class Scrapers::GoldenTest < Minitest::Test
       scraper.define_singleton_method(:get) { |*| nil }
       scraper.define_singleton_method(:page) { list_page }
       scraper.define_singleton_method(:click) { |*| detail_page } if detail_page
-      # Keep the run DB-free: style mapping is not under test, so echo the genres.
-      scraper.define_singleton_method(:event_styles) { |genres:| Array(genres) }
+      # Keep the run DB-free: the genre-row/visibility derivation hits the DB and
+      # isn't under test here (EventTest covers it), so no-op it.
+      scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
 
       # build_event filters consumption genres against existing rows; the closed-
       # vocab behaviour is covered DB-backed elsewhere, so here echo (parse-only).

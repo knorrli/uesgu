@@ -11,12 +11,6 @@
       "Classic Rock",
       "Roots Rock"
     ],
-    "style_list": [
-      "Externer Anlass",
-      "Southern Rock",
-      "Classic Rock",
-      "Roots Rock"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -31,10 +25,6 @@
     "title": "FEMMEtastique",
     "subtitle": "Berns einzigartigste Night Out für Frauen · DJs Nina Powlee & Curly Lisa",
     "genre_list": [
-      "Girlhood",
-      "Party für Frauen"
-    ],
-    "style_list": [
       "Girlhood",
       "Party für Frauen"
     ],
@@ -55,10 +45,6 @@
       "Girlhood",
       "Party für Frauen"
     ],
-    "style_list": [
-      "Girlhood",
-      "Party für Frauen"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -73,17 +59,6 @@
     "title": "BEST OF 2000ER PARTY",
     "subtitle": "DJs Skoob & Flink",
     "genre_list": [
-      "2000er",
-      "Mashup",
-      "Allstyle",
-      "Hits der 2000er – von Pop über Hip-Hop bis zu Dancefloor-Classics",
-      "jetzt mit Heartbeat-Faktor. Eine Nacht zwischen MP3-Player",
-      "Low-Rise-Jeans",
-      "R’n’B-Hooks",
-      "Schmetterlingen im Bauch und Refrains",
-      "die du bis heute auswendig kannst. Feier deine Jugend."
-    ],
-    "style_list": [
       "2000er",
       "Mashup",
       "Allstyle",
@@ -115,14 +90,6 @@
       "Rock & Disco – ikonische Sounds zwischen Neonlicht",
       "Drum Machines und unvergesslichen Refrains."
     ],
-    "style_list": [
-      "80s Disco",
-      "80er Hits",
-      "Synth-Pop",
-      "New Wave",
-      "Rock & Disco – ikonische Sounds zwischen Neonlicht",
-      "Drum Machines und unvergesslichen Refrains."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -140,10 +107,6 @@
       "Girlhood",
       "Party für Frauen"
     ],
-    "style_list": [
-      "Girlhood",
-      "Party für Frauen"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -158,13 +121,6 @@
     "title": "AUF DER COUCH MIT FELIZITAS AMBAUEN",
     "subtitle": "Mit der Psychotherapeutin im Gespräch - Talk mit Barbara Bleisch",
     "genre_list": [
-      "Externer Anlass",
-      "PsychologieLive",
-      "Psychologie",
-      "Philosophie",
-      "Persönlichkeitsentwicklung"
-    ],
-    "style_list": [
       "Externer Anlass",
       "PsychologieLive",
       "Psychologie",
@@ -189,11 +145,6 @@
       "Backen",
       "Storytelling"
     ],
-    "style_list": [
-      "Comedy",
-      "Backen",
-      "Storytelling"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -208,9 +159,6 @@
     "title": "FINALE",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -229,9 +177,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -246,9 +191,6 @@
     "title": "Halbfinale",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -267,9 +209,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -284,9 +223,6 @@
     "title": "Viertelfinale",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -305,9 +241,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -322,9 +255,6 @@
     "title": "Achtelfinale",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -343,9 +273,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -360,10 +287,6 @@
     "title": "Sechzehntelfinale",
     "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
-      "FIFA FUSSBALL WM",
-      "IM GUSTAV"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
     ],
@@ -384,10 +307,6 @@
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM",
-      "IM GUSTAV"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -404,9 +323,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -421,9 +337,6 @@
     "title": "Sechzehntelfinale",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -443,10 +356,6 @@
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM",
-      "IM GUSTAV"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -461,13 +370,6 @@
     "title": "«DER BUND» IM GESPRÄCH",
     "subtitle": "Thema und Talk-Gast folgt ...",
     "genre_list": [
-      "Podium",
-      "Polit-Talk",
-      "Zeitgeschehen",
-      "Sicherheitspolitik",
-      "Diskussion"
-    ],
-    "style_list": [
       "Podium",
       "Polit-Talk",
       "Zeitgeschehen",
@@ -493,12 +395,6 @@
       "Sprachakrobatik",
       "Theater"
     ],
-    "style_list": [
-      "Comedy",
-      "Pantomime",
-      "Sprachakrobatik",
-      "Theater"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -513,12 +409,6 @@
     "title": "PUB QUIZ",
     "subtitle": "mit The Great Quizbies · History-Special",
     "genre_list": [
-      "Quiz",
-      "Pub Quiz",
-      "Live-Entertainment Ein Mix aus klassischem Quiz",
-      "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
-    ],
-    "style_list": [
       "Quiz",
       "Pub Quiz",
       "Live-Entertainment Ein Mix aus klassischem Quiz",
@@ -543,12 +433,6 @@
       "Live-Entertainment Ein Mix aus klassischem Quiz",
       "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
     ],
-    "style_list": [
-      "Quiz",
-      "Pub Quiz",
-      "Live-Entertainment Ein Mix aus klassischem Quiz",
-      "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -568,12 +452,6 @@
       "Live-Entertainment Ein Mix aus klassischem Quiz",
       "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
     ],
-    "style_list": [
-      "Quiz",
-      "Pub Quiz",
-      "Live-Entertainment Ein Mix aus klassischem Quiz",
-      "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -588,15 +466,6 @@
     "title": "Offizielle BernPride Afterparty",
     "subtitle": "Rainbow Heartbeat · DJs Taylor Cruz und Nina Powlee",
     "genre_list": [
-      "Bernpride",
-      "Afterparty",
-      "Queer Pop",
-      "Dance",
-      "House",
-      "Pride Anthems",
-      "Feelgood Hits"
-    ],
-    "style_list": [
       "Bernpride",
       "Afterparty",
       "Queer Pop",
@@ -627,15 +496,6 @@
       "trocken",
       "gnadenlos präzise."
     ],
-    "style_list": [
-      "Externer Anlass",
-      "Comedy",
-      "Stand-up Comedy",
-      "Satire",
-      "Beobachtungshumor – intelligent",
-      "trocken",
-      "gnadenlos präzise."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -658,15 +518,6 @@
       "trocken",
       "gnadenlos präzise."
     ],
-    "style_list": [
-      "Externer Anlass",
-      "Comedy",
-      "Stand-up Comedy",
-      "Satire",
-      "Beobachtungshumor – intelligent",
-      "trocken",
-      "gnadenlos präzise."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -681,12 +532,6 @@
     "title": "PUB QUIZ",
     "subtitle": "mit The Great Quizbies · Musik-Special",
     "genre_list": [
-      "Quiz",
-      "Pub Quiz",
-      "Live-Entertainment Ein Mix aus klassischem Quiz",
-      "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
-    ],
-    "style_list": [
       "Quiz",
       "Pub Quiz",
       "Live-Entertainment Ein Mix aus klassischem Quiz",
@@ -716,17 +561,6 @@
       "Schmetterlingen im Bauch und Refrains",
       "die du bis heute auswendig kannst. Feier deine Jugend."
     ],
-    "style_list": [
-      "2000er",
-      "Mashup",
-      "Allstyle",
-      "Hits der 2000er – von Pop über Hip-Hop bis zu Dancefloor-Classics",
-      "jetzt mit Heartbeat-Faktor. Eine Nacht zwischen MP3-Player",
-      "Low-Rise-Jeans",
-      "R’n’B-Hooks",
-      "Schmetterlingen im Bauch und Refrains",
-      "die du bis heute auswendig kannst. Feier deine Jugend."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -741,10 +575,6 @@
     "title": "Sechzehntelfinale",
     "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
-      "FIFA FUSSBALL WM",
-      "IM GUSTAV"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
     ],
@@ -765,10 +595,6 @@
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM",
-      "IM GUSTAV"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -783,10 +609,6 @@
     "title": "MEXICO – SÜDAFRIKA",
     "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
-      "FIFA FUSSBALL WM",
-      "IM GUSTAV"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
     ],
@@ -806,9 +628,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -823,9 +642,6 @@
     "title": "Sechzehntelfinale",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -844,9 +660,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -861,9 +674,6 @@
     "title": "PORTUGAL – USBEKISTAN",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -882,9 +692,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -899,9 +706,6 @@
     "title": "DEUTSCHLAND – ELFENBEINKÜSTE",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -920,9 +724,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -937,9 +738,6 @@
     "title": "USA – AUSTRALIEN",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -958,9 +756,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -975,9 +770,6 @@
     "title": "TSCHECHIEN – SÜDAFRIKA",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -996,9 +788,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1013,9 +802,6 @@
     "title": "PORTUGAL – DR KONGO",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -1034,9 +820,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1051,9 +834,6 @@
     "title": "BELGIEN – ÄGYPTEN",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -1072,9 +852,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1089,9 +866,6 @@
     "title": "DEUTSCHLAND – CURAÇAO",
     "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
-      "FIFA FUSSBALL WM"
-    ],
-    "style_list": [
       "FIFA FUSSBALL WM"
     ],
     "location_list": [
@@ -1110,9 +884,6 @@
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
-    "style_list": [
-      "FIFA FUSSBALL WM"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1127,12 +898,6 @@
     "title": "JON CLEARY",
     "subtitle": null,
     "genre_list": [
-      "Blues",
-      "Soul",
-      "New Orleans Funk",
-      "R&B"
-    ],
-    "style_list": [
       "Blues",
       "Soul",
       "New Orleans Funk",
@@ -1156,11 +921,6 @@
       "Pop",
       "Emotional Pop"
     ],
-    "style_list": [
-      "Singer-Songwriter",
-      "Pop",
-      "Emotional Pop"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1175,16 +935,6 @@
     "title": "Generations",
     "subtitle": "DJs Pow & ZMi",
     "genre_list": [
-      "Ü-30 Party",
-      "All-Style",
-      "Party",
-      "All-Style-Clubnight – von Dancefloor-Klassikern über 80s & 90s Hits bis hin zu aktuellen Chartbreaker. Alles",
-      "was du kennst",
-      "alles",
-      "zu dem man tanzen kann",
-      "was gute Laune garantiert."
-    ],
-    "style_list": [
       "Ü-30 Party",
       "All-Style",
       "Party",
@@ -1215,14 +965,6 @@
       "mit den größten Hits",
       "die Clubs und Charts damals prägten."
     ],
-    "style_list": [
-      "90s",
-      "90er-Jahre Pop",
-      "Eurodance",
-      "Hip-Hop – die ultimative Hommage an die Musik der 90er",
-      "mit den größten Hits",
-      "die Clubs und Charts damals prägten."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1237,16 +979,6 @@
     "title": "Generations",
     "subtitle": "DJs Pow & ZMi",
     "genre_list": [
-      "Ü-30 Party",
-      "All-Style",
-      "Party",
-      "All-Style-Clubnight – von Dancefloor-Klassikern über 80s & 90s Hits bis hin zu aktuellen Chartbreaker. Alles",
-      "was du kennst",
-      "alles",
-      "zu dem man tanzen kann",
-      "was gute Laune garantiert."
-    ],
-    "style_list": [
       "Ü-30 Party",
       "All-Style",
       "Party",
@@ -1277,14 +1009,6 @@
       "der Generationen verbindet und gleichzeitig absolut zeitlos funktioniert: ikonische Refrains und genau die Tracks",
       "die sich kollektiv ins Gedächtnis eingebrannt haben."
     ],
-    "style_list": [
-      "Allstyle",
-      "Bravohits only",
-      "Ja Bravo – Hits ohne Ende",
-      "kuratiert für maximale Stimmung und maximale Nostalgie. Ein Soundkosmos",
-      "der Generationen verbindet und gleichzeitig absolut zeitlos funktioniert: ikonische Refrains und genau die Tracks",
-      "die sich kollektiv ins Gedächtnis eingebrannt haben."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1302,10 +1026,6 @@
       "Hits von 2010 bis heute",
       "Ab 16 Jahren"
     ],
-    "style_list": [
-      "Hits von 2010 bis heute",
-      "Ab 16 Jahren"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1320,12 +1040,6 @@
     "title": "CAVALERA",
     "subtitle": "CHAOS A.D. · Support: Anger in Defeat",
     "genre_list": [
-      "Metal",
-      "Thrash Metal",
-      "Death Metal",
-      "Groove Metal"
-    ],
-    "style_list": [
       "Metal",
       "Thrash Metal",
       "Death Metal",
@@ -1349,11 +1063,6 @@
       "Salsa",
       "Reaggaeton"
     ],
-    "style_list": [
-      "Latin",
-      "Salsa",
-      "Reaggaeton"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1370,9 +1079,6 @@
     "genre_list": [
       "Gourmet"
     ],
-    "style_list": [
-      "Gourmet"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1387,14 +1093,6 @@
     "title": "CHARLES NGUELA",
     "subtitle": "TIMING",
     "genre_list": [
-      "Comedy",
-      "Spoken Word",
-      "Stand-up – mit Pointen",
-      "die sitzen",
-      "und Momenten",
-      "die hängen bleiben."
-    ],
-    "style_list": [
       "Comedy",
       "Spoken Word",
       "Stand-up – mit Pointen",
@@ -1422,13 +1120,6 @@
       "World",
       "Ambient"
     ],
-    "style_list": [
-      "Singer-Songwriter",
-      "Indie-Folk",
-      "Acoustic",
-      "World",
-      "Ambient"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1449,13 +1140,6 @@
       "cineastischer Pop – zwischen archaischer Kraft",
       "atmosphärischer Tiefe und moderner Produktion."
     ],
-    "style_list": [
-      "Nordic Folk",
-      "Electronica",
-      "Ambient",
-      "cineastischer Pop – zwischen archaischer Kraft",
-      "atmosphärischer Tiefe und moderner Produktion."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1470,12 +1154,6 @@
     "title": "SVEN IVANIĆ",
     "subtitle": "«LUEGEMER SPONTI»",
     "genre_list": [
-      "Comedy",
-      "Stand-up",
-      "Stand-up Comedy",
-      "musikalische Comedy"
-    ],
-    "style_list": [
       "Comedy",
       "Stand-up",
       "Stand-up Comedy",
@@ -1503,15 +1181,6 @@
       "reduziert",
       "getragen von feinen Melodien und grosser Intimität."
     ],
-    "style_list": [
-      "Mundart",
-      "Indie",
-      "Singer-Songwriter",
-      "Mundart (Rätoromanisch)",
-      "Singer-Songwriter – ruhig",
-      "reduziert",
-      "getragen von feinen Melodien und grosser Intimität."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1526,10 +1195,6 @@
     "title": "KWAM.E",
     "subtitle": "DA IZZA WIEDER LIVE",
     "genre_list": [
-      "Hip-Hop",
-      "Rap"
-    ],
-    "style_list": [
       "Hip-Hop",
       "Rap"
     ],
@@ -1552,12 +1217,6 @@
       "Indie",
       "Akustik"
     ],
-    "style_list": [
-      "Soul",
-      "Pop",
-      "Indie",
-      "Akustik"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1572,9 +1231,6 @@
     "title": "THE BEATLES FACTORY",
     "subtitle": "Days in a life. · Kursaal Bern",
     "genre_list": [
-      "Externer Anlass"
-    ],
-    "style_list": [
       "Externer Anlass"
     ],
     "location_list": [
@@ -1594,10 +1250,6 @@
       "Hits ohne Geschmacksgrenze",
       "Gratis wenn dein Outfit stimmt"
     ],
-    "style_list": [
-      "Hits ohne Geschmacksgrenze",
-      "Gratis wenn dein Outfit stimmt"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1612,16 +1264,6 @@
     "title": "FUSE PARTY",
     "subtitle": "DJ Layla",
     "genre_list": [
-      "Afrobeats",
-      "Dancehall",
-      "Trap",
-      "2000's",
-      "Baile Funk",
-      "Amapiano",
-      "Shatta",
-      "French Rap"
-    ],
-    "style_list": [
       "Afrobeats",
       "Dancehall",
       "Trap",
@@ -1652,14 +1294,6 @@
       "improvisierte Klangforschung. Virtuos",
       "experimentell und stets am Puls neuer Technologien."
     ],
-    "style_list": [
-      "Electronic",
-      "Jazz",
-      "Ambient",
-      "Drum’n’Bass",
-      "improvisierte Klangforschung. Virtuos",
-      "experimentell und stets am Puls neuer Technologien."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1677,10 +1311,6 @@
       "Hits von 2010 bis heute",
       "Ab 16 Jahren"
     ],
-    "style_list": [
-      "Hits von 2010 bis heute",
-      "Ab 16 Jahren"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1695,15 +1325,6 @@
     "title": "BIERHÜBELI PFINGST PARTY",
     "subtitle": "DJs Nina Powlee & Layla & Kobragypsy",
     "genre_list": [
-      "Feiertagsmodus",
-      "Pfingstvergnügen",
-      "All Styles",
-      "Hit-Mix – von 80s & 90s über 2000er bis zu aktuellen Chart-Hits. Alles",
-      "was funktioniert",
-      "alles",
-      "was du kennst."
-    ],
-    "style_list": [
       "Feiertagsmodus",
       "Pfingstvergnügen",
       "All Styles",
@@ -1732,13 +1353,6 @@
       "die verbinden",
       "bewegen und gute Laune machen."
     ],
-    "style_list": [
-      "Queer Dance",
-      "Pop Classics",
-      "Feelgood Grooves – von zeitlosen Hits bis zu modernen Lieblingssongs",
-      "die verbinden",
-      "bewegen und gute Laune machen."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1753,10 +1367,6 @@
     "title": "NYNA DUBOIS & JONAS ZAHND",
     "subtitle": "Show im Gustav",
     "genre_list": [
-      "Pop",
-      "Soul"
-    ],
-    "style_list": [
       "Pop",
       "Soul"
     ],
@@ -1781,14 +1391,6 @@
       "treibenden Offbeats und zwei markanten Stimmen",
       "die zwischen Melodie und Message wechseln."
     ],
-    "style_list": [
-      "Reggae",
-      "Hip-Hop",
-      "Dub",
-      "Hip-Hop – getragen von tiefen Basslines",
-      "treibenden Offbeats und zwei markanten Stimmen",
-      "die zwischen Melodie und Message wechseln."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1806,10 +1408,6 @@
       "Girl Power",
       "Boyband"
     ],
-    "style_list": [
-      "Girl Power",
-      "Boyband"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1824,12 +1422,6 @@
     "title": "PUB QUIZ",
     "subtitle": "mit The Great Quizbies · Musik-Special",
     "genre_list": [
-      "Quiz",
-      "Pub Quiz",
-      "Live-Entertainment Ein Mix aus klassischem Quiz",
-      "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
-    ],
-    "style_list": [
       "Quiz",
       "Pub Quiz",
       "Live-Entertainment Ein Mix aus klassischem Quiz",
@@ -1854,12 +1446,6 @@
       "Live-Entertainment Ein Mix aus klassischem Quiz",
       "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
     ],
-    "style_list": [
-      "Quiz",
-      "Pub Quiz",
-      "Live-Entertainment Ein Mix aus klassischem Quiz",
-      "Showelementen und überraschenden Challenges – irgendwo zwischen Wissensduell und Erlebnisabend."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1874,10 +1460,6 @@
     "title": "STEFF LA CHEFFE",
     "subtitle": "Verschobene Show vom 20.11.2026 · STOFF",
     "genre_list": [
-      "Rap",
-      "Mundart"
-    ],
-    "style_list": [
       "Rap",
       "Mundart"
     ],
@@ -1897,9 +1479,6 @@
     "genre_list": [
       "Queerhübeli"
     ],
-    "style_list": [
-      "Queerhübeli"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1917,10 +1496,6 @@
       "5 Gang Menü",
       "Gustav"
     ],
-    "style_list": [
-      "5 Gang Menü",
-      "Gustav"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1935,14 +1510,6 @@
     "title": "BRAVO HITS PARTY",
     "subtitle": "DJs Kai und ZMi",
     "genre_list": [
-      "Allstyle",
-      "Bravohits only",
-      "Ja Bravo – Hits ohne Ende",
-      "kuratiert für maximale Stimmung und maximale Nostalgie. Ein Soundkosmos",
-      "der Generationen verbindet und gleichzeitig absolut zeitlos funktioniert: ikonische Refrains und genau die Tracks",
-      "die sich kollektiv ins Gedächtnis eingebrannt haben."
-    ],
-    "style_list": [
       "Allstyle",
       "Bravohits only",
       "Ja Bravo – Hits ohne Ende",
@@ -1971,14 +1538,6 @@
       "internationale Chartmusik – von Balladen bis Banger",
       "von ikonisch bis komplett drüber."
     ],
-    "style_list": [
-      "Eurovision-Hits",
-      "Pop",
-      "Camp",
-      "Guilty Pleasures",
-      "internationale Chartmusik – von Balladen bis Banger",
-      "von ikonisch bis komplett drüber."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -1993,9 +1552,6 @@
     "title": "BIERHÜBELI MERCHANDISING DAY 2026",
     "subtitle": "Merch von: Patent Ochsner, Stephan Eicher, Züri West, Chlyklass u.v.m.",
     "genre_list": [
-      "Merchandising"
-    ],
-    "style_list": [
       "Merchandising"
     ],
     "location_list": [
@@ -2019,14 +1575,6 @@
       "mit Einflüssen aus Country",
       "Folk und Funk."
     ],
-    "style_list": [
-      "Pop",
-      "Rock",
-      "Soul",
-      "Singer-Songwriter",
-      "mit Einflüssen aus Country",
-      "Folk und Funk."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2041,13 +1589,6 @@
     "title": "MARC SWAY",
     "subtitle": "UNPLUGGED 2026",
     "genre_list": [
-      "Pop",
-      "Soul",
-      "Worldmusic – warm",
-      "rhythmisch und getragen von einer kraftvollen",
-      "gefühlvollen Stimme."
-    ],
-    "style_list": [
       "Pop",
       "Soul",
       "Worldmusic – warm",
@@ -2077,16 +1618,6 @@
       "Dark Wave. Trentemøller bewegt sich frei zwischen Genres und verbindet analoge und digitale Elemente zu einer dichten",
       "cineastischen Soundwelt."
     ],
-    "style_list": [
-      "Electronic",
-      "Dream-Pop",
-      "Darkwave",
-      "Electronica",
-      "Post-Rock",
-      "Shoegaze",
-      "Dark Wave. Trentemøller bewegt sich frei zwischen Genres und verbindet analoge und digitale Elemente zu einer dichten",
-      "cineastischen Soundwelt."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2105,11 +1636,6 @@
       "Party",
       "Charts"
     ],
-    "style_list": [
-      "Sportstudi Party",
-      "Party",
-      "Charts"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2124,14 +1650,6 @@
     "title": "KLANGFARBENRAUSCH",
     "subtitle": "Show im Gustav",
     "genre_list": [
-      "Drum & Bass",
-      "Live Electronic",
-      "Bass Music. Treibende Beats treffen auf Live-Gesang",
-      "Bass und Keyboard",
-      "wodurch ein dynamischer Sound entsteht",
-      "der Clubkultur mit echter Live-Performance verbindet."
-    ],
-    "style_list": [
       "Drum & Bass",
       "Live Electronic",
       "Bass Music. Treibende Beats treffen auf Live-Gesang",
@@ -2158,12 +1676,6 @@
       "Rock",
       "Alternative-Pop mit Soul- und Rock-Einflüssen – getragen von atmosphärischen Gitarren und starken Melodien."
     ],
-    "style_list": [
-      "Alternative-Pop",
-      "Soul",
-      "Rock",
-      "Alternative-Pop mit Soul- und Rock-Einflüssen – getragen von atmosphärischen Gitarren und starken Melodien."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2182,11 +1694,6 @@
       "Alternative Rock",
       "classy British guitar music mit grossen Melodien und atmosphärischen Arrangements."
     ],
-    "style_list": [
-      "Post-Britpop",
-      "Alternative Rock",
-      "classy British guitar music mit grossen Melodien und atmosphärischen Arrangements."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2201,16 +1708,6 @@
     "title": "ANGÉLIQUE KIDJO",
     "subtitle": "HOPE TOUR",
     "genre_list": [
-      "Afropop",
-      "Afrobeat",
-      "Funk",
-      "World Music",
-      "Soul",
-      "Jazz. Ihre Musik verbindet westafrikanische Rhythmen mit Elementen aus Pop",
-      "Latin",
-      "Funk und Jazz."
-    ],
-    "style_list": [
       "Afropop",
       "Afrobeat",
       "Funk",
@@ -2240,13 +1737,6 @@
       "Dub",
       "Breakbeat"
     ],
-    "style_list": [
-      "Electronic",
-      "Downtempo",
-      "Trip-Hop",
-      "Dub",
-      "Breakbeat"
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2261,16 +1751,6 @@
     "title": "SEAN KOCH",
     "subtitle": "Europe 2026 – Support: Current Swell AcousticTrio",
     "genre_list": [
-      "Surf Folk",
-      "Indie-Folk",
-      "Reggae",
-      "Singer-Songwriter. Seans Klangwelt reicht von tanzbaren",
-      "leichten Tracks wie „Lift You Up“ (inkl. Remix von Double MZK & G DOM) bis hin zu verträumten",
-      "introspektiven Songs wie „Feel the Energy“. Akustische Gitarren",
-      "entspannte Grooves",
-      "sonnendurchflutete Melodien und eine organische Live-Energie prägen seinen Sound."
-    ],
-    "style_list": [
       "Surf Folk",
       "Indie-Folk",
       "Reggae",
@@ -2302,15 +1782,6 @@
       "Pumporgeln und Akkordeon sind fester Bestandteil ihres Klangbildes. Die Musik ist konzeptionell",
       "dramatisch und triumphal – ein Gesamterlebnis zwischen Rockkonzert und Theaterstück."
     ],
-    "style_list": [
-      "Rock",
-      "Alternative",
-      "Theatralischer Alternative Rock mit Folk-",
-      "Blues-",
-      "Indie- und Metal-Einflüssen. Ihr Sound verbindet skandinavische und osteuropäische Folk-Elemente mit energiegeladenem Rock – oft beschrieben als Ompa-Rock oder Kabarett-Rock. Ungewöhnliche Instrumente wie Ölfässer",
-      "Pumporgeln und Akkordeon sind fester Bestandteil ihres Klangbildes. Die Musik ist konzeptionell",
-      "dramatisch und triumphal – ein Gesamterlebnis zwischen Rockkonzert und Theaterstück."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2325,10 +1796,6 @@
     "title": "READY TO ROLL",
     "subtitle": "Show im Gustav",
     "genre_list": [
-      "Blues",
-      "Rock"
-    ],
-    "style_list": [
       "Blues",
       "Rock"
     ],
@@ -2350,11 +1817,6 @@
       "Würdigung der italienischen Musiker:innen",
       "DJs und Produzenten – von der Ballade bis zum Dancefloor-Heuler."
     ],
-    "style_list": [
-      "Italiana",
-      "Würdigung der italienischen Musiker:innen",
-      "DJs und Produzenten – von der Ballade bis zum Dancefloor-Heuler."
-    ],
     "location_list": [
       "Bierhübeli",
       "Bern",
@@ -2369,15 +1831,6 @@
     "title": "SCHILLER",
     "subtitle": "Voyage",
     "genre_list": [
-      "Elektronische Musik",
-      "Ambient",
-      "Melodic Techno",
-      "Synthwave",
-      "Klassik-Crossover. Drückende Bässe",
-      "pulsierende Beats",
-      "weitläufige Klangflächen und hymnische Melodien treffen auf gesprochene Vocals und cineastische Arrangements. SCHILLER verbindet Club-Energie mit emotionaler Tiefe."
-    ],
-    "style_list": [
       "Elektronische Musik",
       "Ambient",
       "Melodic Techno",

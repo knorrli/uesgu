@@ -32,9 +32,6 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create destroy]
   get 'signup', to: 'registrations#new'
   resource :settings, only: %i[show update]
-  resource :favorites, only: %i[show update] do
-    post :toggle
-  end
   resources :notifications, only: %i[index show]
 
   # "Save this show": the saved-shows list + an inline per-event save toggle.
@@ -50,12 +47,13 @@ Rails.application.routes.draw do
   get "calendar/:token", to: "calendar_feeds#show", as: :public_calendar_feed,
       constraints: { format: "ics" }, format: true
 
-  # User-defined notification funnels (WHEN·WHICH·FILTER·CHANNEL). toggle flips
-  # enabled; fire runs the rule on demand ("Fire now" — test without waiting for
-  # the schedule).
-  resources :notification_rules, only: %i[index new create edit update destroy] do
+  # Saved filters (a saved landing-page filter, with notification delivery
+  # optional — see SavedFilter). new/create save the current events filter;
+  # edit/update tune it; fire runs it on demand ("Fire now" — test without waiting
+  # for the schedule). There's no pause toggle: a filter delivers iff its in-app
+  # channel is on, edited on the form like any other channel.
+  resources :saved_filters, only: %i[index new create edit update destroy] do
     member do
-      patch :toggle
       post :fire
     end
   end
@@ -74,11 +72,6 @@ Rails.application.routes.draw do
   get "styleguide" => "styleguide#index", as: :styleguide
 
   resources :events, only: [:index, :destroy]
-  resources :styles, only: [] do
-    collection do
-      post :chips
-    end
-  end
   resources :tags, only: [:index, :edit] do
     collection do
       post :chips
@@ -88,12 +81,14 @@ Rails.application.routes.draw do
   scope :admin do
     get '', to: 'admin#index', as: :admin
 
-    # Genre → style mapping. index/edit are standard CRUD over all genres in
-    # use; queue is the "tinder" flow serving the next unmapped genre; update
-    # assigns styles; ignore/hide/block set a disposition, restore clears it;
-    # merge folds the genre into a canonical one (a semantic alias).
-    resources :genres, only: %i[index edit update] do
+    # Genre curation. index/edit browse + open the per-genre editor; queue is the
+    # "tinder" flow serving the next genre not yet filed into the tree; set_parent
+    # files a genre under a parent (the tree's curation action); ignore/hide/block
+    # set a disposition, restore clears it; merge folds the genre into a canonical
+    # one (a semantic alias).
+    resources :genres, only: %i[index edit] do
       member do
+        post :set_parent
         post :ignore
         post :hide
         post :block
@@ -102,6 +97,8 @@ Rails.application.routes.draw do
       end
       collection do
         get :queue
+        # Read-only hierarchy view of the curated genre tree.
+        get :tree
         # Selection chips for the per-event genre-override combobox (admin only).
         post :chips
       end
@@ -119,10 +116,10 @@ Rails.application.routes.draw do
     resources :scrape_runs, only: %i[index show create]
 
     # Catalogue browsers reached from the dashboard stats: events (the scraped
-    # table), styles (the curated vocabulary), and locations (derived from the
-    # location tags). Each mirrors the genres index idiom — filter / sort /
-    # search / paginate. (Genres keep their own legacy scoped route above, with
-    # edit/queue actions these three don't need.) Events additionally get
+    # table) and locations (derived from the location tags). Each mirrors the
+    # genres index idiom — filter / sort / search / paginate. (Genres keep their
+    # own legacy scoped route above, with edit/queue actions these two don't
+    # need.) Events additionally get
     # show/update for per-event manual correction; revert releases one locked
     # field back to the scraper; destroy dismisses (soft-deletes) it and undismiss
     # restores it.
@@ -134,7 +131,6 @@ Rails.application.routes.draw do
         patch :unmerge    # pin this event as standalone (split a wrong auto-merge)
       end
     end
-    resources :styles, only: %i[index]
     resources :locations, only: %i[index]
 
     # Admin-authored rules that auto-discard junk scraped events by text match.

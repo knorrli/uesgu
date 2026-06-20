@@ -1,0 +1,20 @@
+<% content_for :title, t('saved_filters.new.title') %>
+
+<%# Secondary entry (the events "Benachrichtigen" button creates the rule and
+    lands straight on the editor). The name is the derived filter description,
+    rendered server-side. %>
+<%# saved-filter-title live-updates the h1 from the picker as you build the draft (mirrors
+    SavedFilter#describe); the server re-derives the authoritative name on Save. %>
+<div class="saved-filters flex flex-col gap-large"
+     data-controller="saved-filter-title"
+     data-saved-filter-title-scope-all-value="<%= t('saved_filters.summary.scope_all') %>"
+     data-saved-filter-title-added-label-value="<%= t('saved_filters.type.added') %>"
+     data-action="change->saved-filter-title#update">
+  <header class="flex flex-col gap-small">
+    <p class="muted saved-filter-kicker"><%= t('saved_filters.new.title') %></p>
+    <h1 data-saved-filter-title-target="title"><%= @rule.display_name %></h1>
+    <p class="muted"><%= t('saved_filters.new.intro') %></p>
+  </header>
+
+  <%= render 'form', rule: @rule, filter: @filter %>
+</div>

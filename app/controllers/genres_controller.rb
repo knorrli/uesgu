@@ -2,8 +2,8 @@ class GenresController < ApplicationController
   before_action :require_admin
 
   STATUS_SCOPES = {
-    'unassigned' => :unassigned,
-    'assigned' => :assigned,
+    'unplaced' => :unplaced,
+    'placed' => :placed,
     'ignored' => :ignored,
     'hidden' => :hidden,
     'blocked' => :blocked
@@ -23,30 +23,52 @@ class GenresController < ApplicationController
     @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : 'name'
     scope = @status == 'all' ? Genre.all : Genre.public_send(STATUS_SCOPES[@status])
     scope = params[:q].present? ? scope.where('name ILIKE ?', "%#{params[:q]}%") : scope.listable
-    @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:styles).page(params[:page]).per(50)
+    @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:parent).page(params[:page]).per(50)
   end
 
-  # The assignment queue: serve the single highest-impact unmapped genre, plus
-  # style suggestions and the events it appears on. Assigning/ignoring it
-  # returns here, surfacing the next one — a "tinder" flow.
+  # Read-only hierarchy view: the curated genre tree, roots → descendants, for
+  # eyeballing the cultivation at a glance. Loads the whole placed taxonomy once
+  # (dispositions/aliases excluded — they sit outside the tree) and builds the
+  # parent→children map in memory, so the recursive render does no per-node query.
+  def tree
+    genres = Genre.where(hidden_at: nil, blocked_at: nil, ignored_at: nil, canonical_id: nil)
+                  .by_name.to_a
+    @children = genres.group_by(&:parent_id)
+    # A top-level genre is a tree *root* only if something points to it as a
+    # parent. This keeps the unplaced genres (parent_id nil, no children — the
+    # curation queue's backlog) out of the hierarchy view; they're summarised
+    # below and curated from the queue, not here.
+    parents = @children.keys.compact.to_set
+    @roots = (@children[nil] || []).select { |g| parents.include?(g.id) }
+    @placed = Genre.placed.count
+    @unplaced = Genre.unplaced.count
+  end
+
+  # The curation queue: serve the single highest-impact genre not yet filed into
+  # the tree (unplaced = in use, no parent, no disposition), plus alias suggestions
+  # and the events it appears on. Placing/ignoring it returns here, surfacing the
+  # next one — a "tinder" flow.
   def queue
-    @remaining = Genre.unassigned.count
-    @genre = Genre.unassigned.by_usage.first
-    @suggestions = @genre ? StyleSuggester.call(@genre) : []
+    @remaining = Genre.unplaced.count
+    @genre = Genre.unplaced.by_usage.first
     @alias_suggestions = @genre ? AliasSuggester.call(@genre) : []
     @sample_events = sample_events_for(@genre)
   end
 
   def edit
     @genre = Genre.find(params[:id])
-    @suggestions = StyleSuggester.call(@genre)
     @alias_suggestions = AliasSuggester.call(@genre)
     @sample_events = sample_events_for(@genre)
   end
 
-  def update
-    Genre.find(params[:id]).assign_styles!(genre_params[:style_ids])
+  # File a genre into the tree under a chosen parent. A blank parent makes it a
+  # top-level (root) genre. The
+  # combobox emits a single parent genre id. Rejects cycles (self/descendant).
+  def set_parent
+    Genre.find(params[:id]).set_parent!(genre_params[:parent_genre_id])
     redirect_to return_to
+  rescue ArgumentError => e
+    redirect_to return_to, alert: e.message
   end
 
   # Selection chips for the per-event genre-override combobox (admin/events#show).
@@ -87,7 +109,7 @@ class GenresController < ApplicationController
   private
 
   def genre_params
-    params.expect(genre: %i[style_ids canonical_genre_id])
+    params.expect(genre: %i[canonical_genre_id parent_genre_id])
   end
 
   # Where to land after an action. Constrained to internal paths so the

@@ -1,4 +1,4 @@
-# A per-user digest produced when a NotificationRule fires: it snapshots the
+# A per-user digest produced when a SavedFilter fires: it snapshots the
 # exact events it matched into event_ids, and title holds a frozen label so the
 # inbox reads well even if the rule is later renamed or deleted. period_start/
 # period_end record the coverage span for display.
@@ -8,7 +8,7 @@
 # inbox entries keep rendering.)
 class Notification < ApplicationRecord
   belongs_to :user
-  belongs_to :notification_rule, optional: true
+  belongs_to :saved_filter, optional: true
 
   scope :unread, -> { where(read_at: nil) }
   scope :read, -> { where.not(read_at: nil) }
@@ -17,7 +17,7 @@ class Notification < ApplicationRecord
   scope :ordered, -> { order(created_at: :desc) }
 
   def rule_based?
-    notification_rule_id.present? || event_ids.present?
+    saved_filter_id.present? || event_ids.present?
   end
 
   # The events in this digest, narrowed to what's *currently* visible (an event

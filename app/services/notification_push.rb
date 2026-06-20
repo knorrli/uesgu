@@ -20,7 +20,7 @@ class NotificationPush
 
     I18n.with_locale(user.locale.presence || I18n.default_locale) do
       title = I18n.t("push.digest.title")
-      body = I18n.t("notification_rules.push_body", name: @rule.display_name, count: @events.size)
+      body = I18n.t("saved_filters.push_body", name: @rule.display_name, count: @events.size)
       path = Rails.application.routes.url_helpers.notification_path(@notification)
       user.push_subscriptions.find_each { |sub| sub.deliver(title: title, body: body, path: path) }
     end

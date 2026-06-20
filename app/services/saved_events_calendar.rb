@@ -24,7 +24,7 @@ class SavedEventsCalendar
   def events
     @user.saved_events
          .where('events.start_date >= ?', @now.to_date - 1)
-         .includes(:locations, :styles)
+         .includes(:locations, :genres)
          .order(:start_date, :start_time, :title)
   end
 
@@ -90,7 +90,7 @@ class SavedEventsCalendar
   end
 
   def description_for(event)
-    [event.subtitle.presence, event.styles.map(&:name).presence&.join(', '), event.url]
+    [event.subtitle.presence, event.genres.map(&:name).presence&.join(', '), event.url]
       .compact.join("\n")
   end
 end

@@ -110,8 +110,8 @@ module Scrapers
         transact do
           build_event(event, row)
           # Attribute changes (title/time/cancellation/…) come from Rails' dirty
-          # tracking; tag changes (genres/styles) don't dirty the model, so diff
-          # the snapshot separately.
+          # tracking; tag changes (genres) don't dirty the model, so diff the
+          # snapshot separately.
           changed = event.changed? || (tags_before && tag_snapshot(event) != tags_before)
           event.save!
           if was_new
@@ -128,11 +128,10 @@ module Scrapers
       end
     end
 
-    # The event's tag lists, for comparing pre/post build_event. genres drive
-    # styles, but both are cheap and explicit; locations are a per-venue constant
-    # so they never change and aren't worth the extra load.
+    # The event's genre tags, for comparing pre/post build_event. Locations are a
+    # per-venue constant so they never change and aren't worth the extra load.
     def tag_snapshot(event)
-      { genres: event.genre_list.sort, styles: event.style_list.sort }
+      { genres: event.genre_list.sort }
     end
 
     # Assign every field from the event's content node. `event_content` is the row
@@ -160,14 +159,12 @@ module Scrapers
         event.genre_list  = Array(event_genres(content)) +
                             Genre.existing_only(event_consumption_genres(content))
       end
-      # Styles + visibility are a derived projection of whatever genres now stand
-      # — scraped or admin-pinned — so a pinned genre list still gets correct
-      # styles/hidden. Re-derived from source each scrape, mirroring
-      # Event#recompute_styles! — otherwise a freshly-scraped non-music event
-      # (hidden genre, no style) would stay publicly visible until a later
-      # disposition/recompute touched it.
-      event.style_list    = event_styles(genres: event.genre_list)
-      event.hidden        = event.hidden_by_genre?
+      # Visibility (the music gate) is a derived projection of whatever genres now
+      # stand — scraped or admin-pinned — so a pinned genre list still derives the
+      # right hidden flag. Re-derived from source each scrape, mirroring
+      # Event#recompute_visibility! — otherwise a freshly-scraped non-music event
+      # (only hidden genres) would stay publicly visible until a later recompute.
+      ensure_genres_and_visibility(event)
       event.location_list = event_locations(content)
       event.data_source   = self.class.source_key
       postprocess(event)
@@ -279,12 +276,11 @@ module Scrapers
       )
     end
 
-    # Derive styles from the genre → style mapping. Also registers any new
-    # genres (unmapped, so they surface in the assignment queue) — the styles
-    # of a still-unmapped genre are simply none.
-    def event_styles(genres:)
-      Genre.ensure!(genres)
-      Genre.styles_for(genres)
+    # Ensure a Genre row exists for each tagged genre (so brand-new ones surface in
+    # the curation queue) and set the music-gate visibility from their dispositions.
+    def ensure_genres_and_visibility(event)
+      Genre.ensure!(event.genre_list)
+      event.hidden = event.hidden_by_genre?
     end
 
     def month_number(month:)

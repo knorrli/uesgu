@@ -1,23 +1,26 @@
 # Plain query object built from request params (see EventsController#index).
 # Filters are no longer persisted, so this is not an ActiveRecord model.
 class Filter
-  attr_reader :queries, :style_list, :location_list, :date_ranges
+  attr_reader :queries, :genres, :location_list, :date_ranges
 
   def initialize
     @queries = []
-    @style_list = []
+    @genres = []
     @location_list = []
     @date_ranges = []
   end
 
-  # Construct from the four list inputs, skipping any passed as nil (so each
-  # caller sets only what it has). The one place the q/l/s/d shape is assembled —
-  # the events listing, a saved rule's edit filter, and the rule's own matcher all
+  # Construct from the list inputs, skipping any passed as nil (so each caller
+  # sets only what it has). The one place the q/g/l/d shape is assembled — the
+  # events listing, a saved rule's edit filter, and the rule's own matcher all
   # funnel through here instead of each repeating `new.tap { ... }`.
-  def self.build(queries: nil, style_list: nil, location_list: nil, date_ranges: nil)
+  #
+  # `genres` (g[]) is the tree-aware slot: each picked genre matches itself + every
+  # descendant (see expanded_genre_names).
+  def self.build(queries: nil, genres: nil, location_list: nil, date_ranges: nil)
     new.tap do |filter|
       filter.queries = queries unless queries.nil?
-      filter.style_list = style_list unless style_list.nil?
+      filter.genres = genres unless genres.nil?
       filter.location_list = location_list unless location_list.nil?
       filter.date_ranges = date_ranges unless date_ranges.nil?
     end
@@ -27,8 +30,8 @@ class Filter
     @queries = parse(new_queries)
   end
 
-  def style_list=(new_styles)
-    @style_list = parse(new_styles)
+  def genres=(new_genres)
+    @genres = parse(new_genres)
   end
 
   def location_list=(new_locations)
@@ -48,15 +51,26 @@ class Filter
   # psychedelic rock) instead of silently missing them the way an exact match would.
   # Meaningless on an unfiltered, all-events listing.
   def active?
-    [queries, style_list, location_list, date_ranges].any?(&:present?)
+    [queries, genres, location_list, date_ranges].any?(&:present?)
+  end
+
+  # The genre names a `genres` pick expands to: each picked genre plus every
+  # genre beneath it in the tree (exact-match set; events are tagged with the
+  # canonical Genre#name, so name-matching the subtree is reliable). Picking
+  # "Rock" thus also catches "Shoegaze", "Grunge", … without any name guessing.
+  def expanded_genre_names
+    return [] if genres.blank?
+
+    root_ids = Genre.where(fingerprint: genres.map { |name| Genre.fingerprint_for(name) }).ids
+    Genre.where(id: Genre.subtree_ids(root_ids)).pluck(:name)
   end
 
   def ransack_query
     {
       g: [
         {
-          title_or_subtitle_or_styles_name_or_genres_name_cont_any: queries,
-          styles_name_in: style_list.presence,
+          title_or_subtitle_or_genres_name_cont_any: queries,
+          genres_name_in: expanded_genre_names.presence,
           m: Ransack::Constants::OR
         },
         {
@@ -65,6 +79,10 @@ class Filter
         {}.tap do |date_group|
           if mapped_ranges = map_date_ranges(date_ranges).presence
             date_group[:start_date_between_any] = mapped_ranges
+            # A named/preset window ("this month", "this weekend") still hides the
+            # past — it intersects with [today, ∞). Only an explicitly typed
+            # absolute range reveals past events, so drop the floor just for that.
+            date_group[:start_date_gteq] = Date.current.beginning_of_day unless custom_range?
           else
             date_group[:start_date_gteq] = Date.current.beginning_of_day
           end
@@ -84,6 +102,13 @@ class Filter
   end
 
   private
+
+  # Whether the date filter holds an explicitly-typed absolute range (vs. only
+  # named presets). Such a range is the user asking for a specific window, which
+  # may be in the past — so it opts out of the future floor.
+  def custom_range?
+    date_ranges.any? { |range| !Datepicker.preset.key?(range) && range.to_s.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) }
+  end
 
   def parse(value)
     ActsAsTaggableOn.default_parser.new(value).parse

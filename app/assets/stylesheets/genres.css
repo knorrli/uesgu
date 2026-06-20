@@ -8,8 +8,8 @@
   padding: var(--gap-xsmall) var(--gap-small);
 }
 
-/* Genre index tab groups: a short vertical rule separating the assignment-status
-   filters (all / unassigned / assigned) from the parked dispositions. */
+/* Genre index tab groups: a short vertical rule separating the tree-status
+   filters (all / placed / unplaced) from the parked dispositions. */
 .genre-status-filters .filter-divider {
   align-self: center;
   height: 1.2em;
@@ -25,6 +25,47 @@
 
 .genre-sort-option.active {
   color: var(--theme-fg-color);
+  font-weight: bold;
+}
+
+/* Genre tree (admin hierarchy view): nested lists, no bullets, each level
+   indented behind a hairline so the parent → child structure reads at a glance.
+   Roots stand out in full colour + bold; deeper names stay quieter. */
+.genre-tree,
+.genre-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Scoped under .genre-tree so this out-specifies the `.genre-tree ul` reset
+   above (else its padding:0 would flatten every level to the same indent). Each
+   nested level compounds this inset, so depth reads at a glance; the hairline
+   traces each subtree back to its parent. */
+.genre-tree .genre-tree-children {
+  margin-left: var(--gap-medium);
+  padding-left: var(--gap-xlarge);
+  border-left: var(--border-width) solid var(--theme-accent-muted);
+}
+
+.genre-tree-node {
+  padding-block: var(--gap-small);
+}
+
+/* Roots get extra air above so each top-level subtree reads as its own block. */
+.genre-tree > .genre-tree-node {
+  padding-top: var(--gap-large);
+}
+
+.genre-tree > .genre-tree-node:first-child {
+  padding-top: 0;
+}
+
+.genre-tree-name {
+  text-decoration: none;
+}
+
+.genre-tree-name.root {
   font-weight: bold;
 }
 

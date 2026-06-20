@@ -34,7 +34,7 @@ module Admin
       scope = @status == 'all' ? Event.kept.canonical : STATUS_SCOPES[@status].call
       scope = scope.where('title ILIKE ?', "%#{params[:q]}%") if params[:q].present?
       @events = SORT_SCOPES[@sort].call(scope)
-                                  .includes(:locations, :styles, :discarded_by_rule, :canonical_event)
+                                  .includes(:locations, :genres, :discarded_by_rule, :canonical_event)
                                   .page(params[:page]).per(50)
       # How many duplicates fold into each canonical on this page — one grouped
       # query (no N+1) so rows can flag aggregated events at a glance.
@@ -60,7 +60,7 @@ module Admin
       locked << 'genres' if assign_genres(@event, attrs)
       @event.overridden_fields = (@event.overridden_fields + locked).uniq
       @event.save!
-      @event.recompute_styles! if locked.include?('genres')
+      @event.recompute_visibility! if locked.include?('genres')
       redirect_to admin_event_path(@event), notice: t('.saved')
     end
 

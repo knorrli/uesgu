@@ -1,0 +1,23 @@
+<%# One trigger button in the filter bar — opens its sheet (mobile) / dropdown
+    panel (desktop). Shared by the events filter bar and the rule editor, so both
+    read identically. Locals: field ('what'/'where'/'when'), icon (a tag context),
+    terms (array of label strings already applied), empty (placeholder text).
+
+    data-empty-label lets filter-sheets#refreshTrigger restore the placeholder when
+    the last pick is cleared in the no-submit (editor) path. %>
+<button type="button" class="filter-trigger" aria-haspopup="dialog"
+        data-action="filter-sheets#open" data-filter-sheets-field-param="<%= field %>"
+        data-empty-label="<%= empty %>">
+  <span class="filter-trigger__icon <%= tag_icon_class(context: icon) %>"></span>
+  <span class="filter-trigger__label <%= 'is-empty' if terms.empty? %>">
+    <% if terms.empty? %>
+      <%= empty %>
+    <% else %>
+      <%= terms.first %><% if terms.size > 1 %><span class="filter-trigger__more"> +<%= terms.size - 1 %></span><% end %>
+    <% end %>
+  </span>
+  <% if terms.any? %>
+    <span class="badge"><%= terms.size %></span>
+  <% end %>
+  <span class="filter-trigger__chevron ph ph-caret-right"></span>
+</button>

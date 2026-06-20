@@ -1,13 +1,13 @@
 require "application_system_test_case"
 
 # The mobile filter sheets (<600px). Companion to event_filter_test.rb, which
-# covers the desktop combobox; here we exercise the full-screen What sheet.
+# drives the same UI at desktop width; here we exercise the full-screen What sheet.
 class MobileFilterTest < ApplicationSystemTestCase
   # The keyboard's Enter / "search" key on the What field commits what you TYPED as
   # a free-text query — no need to first tap the "search for «X»" row. Mirrors the
   # desktop combobox's commit-on-Enter (filter_sheets#commitTyped).
   test "Enter in the What sheet commits the typed text as a free-text query" do
-    event(start_date: Date.current + 3, style_list: ["Rock"])
+    event(start_date: Date.current + 3, genre_list: ["Rock"])
 
     page.current_window.resize_to(390, 800) # below the 600px sheet breakpoint
     visit events_path
@@ -27,42 +27,42 @@ class MobileFilterTest < ApplicationSystemTestCase
     assert_selector ".filter-sheets__summary .filter-chip", text: "zzqx"
   end
 
-  # The What sheet lists in-use genres (q[]) alongside the curated styles (s[]),
-  # browsable like the desktop What dropdown; picking a genre commits a q[]
-  # substring filter. The search box filters the (long) list.
-  test "What sheet lists genres and applies a genre pick as q[]" do
-    e = event(start_date: Date.current + 3, style_list: ["Zynthwave"], genre_list: ["Zylodrone"])
-    style = e.style_list.first   # read back: genre_list= canonicalizes casing
-    genre = e.genre_list.first
+  # The What sheet renders the curated GENRE TREE (roots → children), like the
+  # Where sheet's canton tree. Picking a node commits a tree-expanding g[] filter:
+  # an ancestor pick catches events tagged with any descendant. The search box
+  # filters the tree.
+  test "What sheet renders the genre tree and applies a genre pick as g[]" do
+    rock = genre(name: "Zylorock", events_count: 1)
+    shoegaze = genre(name: "Zyloshoe", events_count: 1)
+    shoegaze.set_parent!(rock)
+    e = event(start_date: Date.current + 3, genre_list: [shoegaze.name])
 
     page.current_window.resize_to(390, 800) # below the 600px sheet breakpoint
     visit events_path
 
     open_what_sheet
-    # Both the curated style and the in-use genre are visible browse rows at rest.
-    assert_selector ".sheet[data-field=what] .opt", text: style, visible: true
-    assert_selector ".sheet[data-field=what] .opt", text: genre, visible: true
+    # The root is a visible browse row; its expand chevron reveals the child.
+    assert_selector ".sheet[data-field=what] .opt--canton", text: rock.name, visible: true
 
-    # Narrow with the search box (what you'd do with a long list), then pick the
-    # genre — commits q[]. Waiting on :checked avoids racing the click.
-    field = find(".sheet[data-field=what] .sheet__search-input")
-    field.click # settle focus before typing (open() parks it on the close button)
-    field.send_keys(genre[0, 4].downcase) # case-insensitive substring match
-    find(".sheet[data-field=what] .opt", text: genre, visible: true).click
-    assert_selector ".sheet[data-field=what] input[value='#{genre}']:checked", visible: :all
+    # Pick the root — subtree expansion must catch the child-tagged event. Waiting
+    # on :checked avoids racing the click.
+    find(".sheet[data-field=what] .opt--canton", text: rock.name).click
+    assert_selector ".sheet[data-field=what] input[value='#{rock.name}']:checked", visible: :all
 
     find(".sheet[data-field=what] .sheet__apply").click
 
-    # Server-rendered chip proves the genre round-tripped as a q[] filter.
-    assert_selector ".filter-sheets__summary .filter-chip", text: genre
-    assert_current_path(/q%5B%5D=/)
+    # Server-rendered chip proves the genre round-tripped as a g[] filter.
+    assert_selector ".filter-sheets__summary .filter-chip", text: rock.name
+    assert_current_path(/g%5B%5D=/)
+    # The descendant-tagged event matched the ancestor filter.
+    assert_text e.title
   end
 
   # The blank "type to search" hint at the top of the What sheet is a tap target:
   # people tap it expecting the search field to focus so they can type. It should,
   # rather than do nothing (filter_sheets#addQuery focuses the field when blank).
   test "tapping the blank type-to-search hint focuses the What search field" do
-    event(start_date: Date.current + 3, style_list: ["Zynthwave"])
+    event(start_date: Date.current + 3, genre_list: ["Zynthwave"])
 
     page.current_window.resize_to(390, 800) # below the 600px sheet breakpoint
     visit events_path

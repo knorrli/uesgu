@@ -8,9 +8,6 @@
     "genre_list": [
       "Hardcore/Punk"
     ],
-    "style_list": [
-      "Hardcore/Punk"
-    ],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -25,11 +22,6 @@
     "title": "Resonance Jam Session",
     "subtitle": null,
     "genre_list": [
-      "Pop",
-      "Hip-Hop",
-      "Rock/Indie"
-    ],
-    "style_list": [
       "Pop",
       "Hip-Hop",
       "Rock/Indie"
@@ -52,11 +44,6 @@
       "Rock/Indie",
       "Metal"
     ],
-    "style_list": [
-      "Pop",
-      "Rock/Indie",
-      "Metal"
-    ],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -71,7 +58,6 @@
     "title": "The Big Rockin' Bash",
     "subtitle": null,
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -86,9 +72,6 @@
     "title": "DON BROCO",
     "subtitle": null,
     "genre_list": [
-      "Rock/Indie"
-    ],
-    "style_list": [
       "Rock/Indie"
     ],
     "location_list": [
@@ -107,9 +90,6 @@
     "genre_list": [
       "Metal"
     ],
-    "style_list": [
-      "Metal"
-    ],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -124,10 +104,6 @@
     "title": "La Dispute & The Gauntlet",
     "subtitle": null,
     "genre_list": [
-      "Rock/Indie",
-      "Hardcore/Punk"
-    ],
-    "style_list": [
       "Rock/Indie",
       "Hardcore/Punk"
     ],
@@ -149,11 +125,6 @@
       "Hip-Hop",
       "Rock/Indie"
     ],
-    "style_list": [
-      "Pop",
-      "Hip-Hop",
-      "Rock/Indie"
-    ],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -168,9 +139,6 @@
     "title": "Basement",
     "subtitle": null,
     "genre_list": [
-      "Rock/Indie"
-    ],
-    "style_list": [
       "Rock/Indie"
     ],
     "location_list": [
@@ -189,9 +157,6 @@
     "genre_list": [
       "Metal"
     ],
-    "style_list": [
-      "Metal"
-    ],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -206,7 +171,6 @@
     "title": "Jorge Aragão (live) / Support: Vando Oliveira (live)",
     "subtitle": null,
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -223,9 +187,6 @@
     "genre_list": [
       "Hardcore/Punk"
     ],
-    "style_list": [
-      "Hardcore/Punk"
-    ],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -240,11 +201,6 @@
     "title": "Resonance Jam Session",
     "subtitle": null,
     "genre_list": [
-      "Pop",
-      "Hip-Hop",
-      "Rock/Indie"
-    ],
-    "style_list": [
       "Pop",
       "Hip-Hop",
       "Rock/Indie"
@@ -267,11 +223,6 @@
       "Hip-Hop",
       "Rock/Indie"
     ],
-    "style_list": [
-      "Pop",
-      "Hip-Hop",
-      "Rock/Indie"
-    ],
     "location_list": [
       "Dynamo",
       "Zürich",
@@ -286,10 +237,6 @@
     "title": "Starbenders",
     "subtitle": null,
     "genre_list": [
-      "Rock/Indie",
-      "Metal"
-    ],
-    "style_list": [
       "Rock/Indie",
       "Metal"
     ],

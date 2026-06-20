@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
   # index/chips power the public events filter autocomplete; edit is the inline
-  # (per-event) entry into the genre → style editor.
+  # (per-event) entry into the genre tree/curation editor.
   allow_unauthenticated_access only: %i[ index chips ]
   before_action :require_admin, only: %i[ edit ]
 
@@ -28,7 +28,6 @@ class TagsController < ApplicationController
   def edit
     tag = ActsAsTaggableOn::Tag.find(params[:id])
     @genre = Genre.create_or_find_by!(name: tag.name)
-    @suggestions = StyleSuggester.call(@genre)
     @alias_suggestions = AliasSuggester.call(@genre)
     @sample_events = Event.tagged_with(@genre.name, on: :genres).order(start_date: :desc).limit(5)
   end

@@ -4,7 +4,7 @@
     events.css); the inline combobox filter (_filter) takes over above it.
 
     It is a plain GET form whose option rows ARE the submitted inputs
-    (name="s[]/q[]/l[]/d[]"), so it produces the exact same params as the inline
+    (name="q[]/g[]/l[]/d[]"), so it produces the exact same params as the inline
     filter and EventsController#build_filter needs no changes. Selections are
     staged inside a sheet and committed (one Turbo navigation) when it closes;
     server-rendered state below keeps the bar, chips and results in sync.
@@ -14,7 +14,7 @@
     focused when the user taps it, never on open.
    ───────────────────────────────────────────────────────────────────────── %>
 
-<% what_terms  = @filter.queries + @filter.style_list %>
+<% what_terms  = @filter.queries + @filter.genres %>
 <% where_terms = @filter.location_list.map { |loc| location_display(loc) } %>
 <% when_terms  = @filter.date_ranges.map { |range| date_range_label(range) } %>
 <% custom_range = @filter.date_ranges.find { |r| r.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) } %>
@@ -35,21 +35,7 @@
            { field: 'where', icon: 'locations', terms: where_terms, empty: t('events.filter.where') },
            { field: 'when',  icon: 'date',      terms: when_terms,  empty: t('events.filter.when') },
          ].each do |trig| %>
-        <button type="button" class="filter-trigger" aria-haspopup="dialog"
-                data-action="filter-sheets#open" data-filter-sheets-field-param="<%= trig[:field] %>">
-          <span class="filter-trigger__icon <%= tag_icon_class(context: trig[:icon]) %>"></span>
-          <span class="filter-trigger__label <%= 'is-empty' if trig[:terms].empty? %>">
-            <% if trig[:terms].empty? %>
-              <%= trig[:empty] %>
-            <% else %>
-              <%= trig[:terms].first %><% if trig[:terms].size > 1 %><span class="filter-trigger__more"> +<%= trig[:terms].size - 1 %></span><% end %>
-            <% end %>
-          </span>
-          <% if trig[:terms].any? %>
-            <span class="badge"><%= trig[:terms].size %></span>
-          <% end %>
-          <span class="filter-trigger__chevron ph ph-caret-right"></span>
-        </button>
+        <%= render 'tags/filter_trigger', **trig %>
       <% end %>
     </div>
 
@@ -63,8 +49,8 @@
           <% @filter.queries.each do |query| %>
             <%= render 'filter_chip', name: 'q', value: query, label: query, icon: 'query' %>
           <% end %>
-          <% @filter.style_list.each do |style| %>
-            <%= render 'filter_chip', name: 's', value: style, label: style, icon: 'query' %>
+          <% @filter.genres.each do |genre| %>
+            <%= render 'filter_chip', name: 'g', value: genre, label: genre, icon: 'query' %>
           <% end %>
           <% @filter.location_list.each do |location| %>
             <%= render 'filter_chip', name: 'l', value: location, label: location_display(location), icon: Location.type_for(location) %>
@@ -73,133 +59,16 @@
             <%= render 'filter_chip', name: 'd', value: range, label: date_range_label(range), icon: 'date' %>
           <% end %>
         </div>
-        <%= render 'notify_button' %>
+        <%# ★ save: a plain link to the editor (new draft, or the existing saved
+            filter). Navigates away, so no turbo frame. %>
+        <%= render 'save_notify' %>
       </div>
     <% end %>
 
-    <%# ── WHAT sheet — styles + free-text query ── %>
-    <section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
-             aria-label="<%= t('events.filter.sheet.what') %>"
-             data-filter-sheets-target="sheet" data-field="what">
-      <header class="sheet__header">
-        <button type="button" class="sheet__close ph ph-x" data-action="filter-sheets#close" aria-label="<%= t('events.filter.close') %>"></button>
-        <h2 class="sheet__title"><%= t('events.filter.sheet.what') %></h2>
-        <button type="button" class="sheet__clear" data-action="filter-sheets#clear" data-filter-sheets-field-param="what"><%= t('events.filter.clear') %></button>
-      </header>
-      <div class="sheet__search">
-        <span class="sheet__search-icon ph ph-magnifying-glass"></span>
-        <input type="search" class="sheet__search-input" enterkeyhint="search" autocomplete="off"
-               placeholder="<%= t('events.filter.what') %>"
-               data-action="input->filter-sheets#filter keydown->filter-sheets#commitTyped">
-      </div>
-      <div class="sheet__body">
-        <%# The thing a fixed list can't do: turn whatever you typed into a search. %>
-        <button type="button" class="opt opt--newquery" hidden data-action="filter-sheets#addQuery">
-          <span class="opt__box"><span class="ph ph-magnifying-glass"></span></span>
-          <span class="opt__label" data-newquery-label></span>
-        </button>
-
-        <%# Applied free-text queries (how a tapped genre arrives). No type label:
-            styles, genres and free text are ONE descriptor vocabulary now, so the
-            s[]/q[] split stays invisible here — mirrors the unified desktop chip. %>
-        <div class="sheet__queries" data-filter-sheets-target="queries">
-          <% @filter.queries.each do |query| %>
-            <label class="opt opt--query">
-              <input type="checkbox" name="q[]" value="<%= query %>" checked>
-              <span class="opt__box"></span>
-              <span class="opt__label"><%= query %></span>
-            </label>
-          <% end %>
-        </div>
-
-        <%# Curated STYLES — the always-visible browse vocabulary (~15 buckets). A
-            pick commits its exact s[] bucket. %>
-        <% styles = available_tags(context: :styles).to_a %>
-        <% style_names = styles.map { |style| style.name.downcase } %>
-        <% styles.each do |style| %>
-          <label class="opt">
-            <input type="checkbox" name="s[]" value="<%= style.name %>" <%= 'checked' if @filter.style_list.include?(style.name) %>>
-            <span class="opt__box"></span>
-            <span class="opt__label"><%= style.name %></span>
-          </label>
-        <% end %>
-
-        <%# In-use GENRES — listed after the styles, same as the desktop What
-            dropdown (which carries the full styles + genres list and just filters it
-            live). A genre pick commits q[] (substring); styles commit their exact
-            s[] bucket. Deduped against the style names; applied queries already show
-            above (excluded). Long, but the search box filters it like desktop. %>
-        <% available_tags(context: :genres, applied: @filter.queries).each do |genre| %>
-          <% next if style_names.include?(genre.name.downcase) %>
-          <label class="opt">
-            <input type="checkbox" name="q[]" value="<%= genre.name %>">
-            <span class="opt__box"></span>
-            <span class="opt__label"><%= genre.name %></span>
-          </label>
-        <% end %>
-      </div>
-      <footer class="sheet__footer">
-        <button type="button" class="sheet__apply" data-action="filter-sheets#apply"><%= t('events.filter.apply') %></button>
-      </footer>
-    </section>
-
-    <%# ── WHERE sheet — canton > city > venue tree ── %>
-    <section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
-             aria-label="<%= t('events.filter.sheet.where') %>"
-             data-filter-sheets-target="sheet" data-field="where">
-      <header class="sheet__header">
-        <button type="button" class="sheet__close ph ph-x" data-action="filter-sheets#close" aria-label="<%= t('events.filter.close') %>"></button>
-        <h2 class="sheet__title"><%= t('events.filter.sheet.where') %></h2>
-        <button type="button" class="sheet__clear" data-action="filter-sheets#clear" data-filter-sheets-field-param="where"><%= t('events.filter.clear') %></button>
-      </header>
-      <div class="sheet__search">
-        <span class="sheet__search-icon ph ph-magnifying-glass"></span>
-        <input type="search" class="sheet__search-input" enterkeyhint="search" autocomplete="off"
-               placeholder="<%= t('events.filter.search_where') %>"
-               data-action="input->filter-sheets#filter">
-      </div>
-      <div class="sheet__body">
-        <% location_filter_tree.each do |canton| %>
-          <div class="loc-group collapsed" data-filter-sheets-target="group">
-            <div class="loc-group__head">
-              <label class="opt opt--canton" data-search="<%= canton[:search] %>">
-                <input type="checkbox" name="l[]" value="<%= canton[:value] %>" <%= 'checked' if @filter.location_list.include?(canton[:value]) %>>
-                <span class="opt__box"></span>
-                <span class="opt__label"><%= canton[:name] %></span>
-                <span class="opt__type"><%= t('events.filter.location_types.canton') %></span>
-              </label>
-              <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
-                      aria-label="<%= canton[:name] %>">
-                <span class="loc-group__count"><%= canton[:count] %></span>
-                <span class="loc-group__chevron ph ph-caret-down"></span>
-              </button>
-            </div>
-            <div class="loc-group__body">
-              <% canton[:children].each do |city| %>
-                <label class="opt opt--city" data-search="<%= city[:search] %>">
-                  <input type="checkbox" name="l[]" value="<%= city[:value] %>" <%= 'checked' if @filter.location_list.include?(city[:value]) %>>
-                  <span class="opt__box"></span>
-                  <span class="opt__label"><%= city[:name] %></span>
-                  <span class="opt__type"><%= t('events.filter.location_types.city') %></span>
-                  <span class="opt__count"><%= city[:count] %></span>
-                </label>
-                <% city[:children].each do |venue| %>
-                  <label class="opt opt--venue" data-search="<%= venue[:search] %>">
-                    <input type="checkbox" name="l[]" value="<%= venue[:value] %>" <%= 'checked' if @filter.location_list.include?(venue[:value]) %>>
-                    <span class="opt__box"></span>
-                    <span class="opt__label"><%= venue[:name] %></span>
-                    <span class="opt__count"><%= venue[:count] %></span>
-                  </label>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-      <footer class="sheet__footer">
-        <button type="button" class="sheet__apply" data-action="filter-sheets#apply"><%= t('events.filter.apply') %></button>
-      </footer>
-    </section>
+    <%# ── WHAT + WHERE sheets — the genre tree + the location tree, shared with
+        the rule editor so both read identically (tags/_genre_sheet, _location_sheet). ── %>
+    <%= render 'tags/genre_sheet', filter: @filter %>
+    <%= render 'tags/location_sheet', filter: @filter %>
 
     <%# ── WHEN sheet — presets + custom range (native OS date pickers) ── %>
     <section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"

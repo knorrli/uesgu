@@ -28,7 +28,7 @@ class AliasSuggester
     Genre
       .where.not(id: @genre.id)
       .where(canonical_id: nil, hidden_at: nil, blocked_at: nil)
-      .where('events_count > 0 OR id IN (SELECT genre_id FROM genres_styles)')
+      .where('events_count > 0 OR parent_id IS NOT NULL')
       .select("genres.*, #{distance} AS distance")
       .where("#{distance} <= #{bound}")
       .order('distance ASC, events_count DESC, name ASC')

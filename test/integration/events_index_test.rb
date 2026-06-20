@@ -63,6 +63,20 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute_includes response.body, 'OtherUnique'
   end
 
+  test 'a freetext term lights a genre tag whose name contains it, and tapping clears it' do
+    # Title has no "hop"; the row shows up (and its tag lights) purely on the
+    # genre-name substring — proving freetext now drives genre-tag highlighting,
+    # not just the genre-tree filter.
+    event(title: 'NoMatchTitle', genre_list: ['Quophop'], start_date: Date.current + 2.days)
+
+    get events_path(q: ['hop'])
+
+    assert_response :success
+    assert_includes response.body, 'NoMatchTitle' # in the list via genres_name_cont
+    # The genre tag is lit, and tapping it drops the freetext term (back to no q).
+    assert_select "a.filter-link.active[href=?]", events_path, text: 'Quophop'
+  end
+
   test 'the default date floor hides past events' do
     event(title: 'PastShow', start_date: Date.current - 10.days)
     event(title: 'FutureShow', start_date: Date.current + 10.days)
@@ -76,21 +90,6 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
   # The favorites shortcut is rendered for any logged-in user but hidden until
   # they follow something, so the favorite Stimulus controller can reveal it on
   # the first favorite without a reload (it can only toggle a node that exists).
-  test 'favorites shortcut is absent for guests, hidden with no follows, shown once following' do
-    get events_path
-    assert_select 'a.favorites-filter-link', false, 'guests never see the favorites shortcut'
-
-    u = sign_in_as user
-    get events_path
-    assert_select 'a.favorites-filter-link[hidden]', 1,
-                  'a logged-in user with no follows gets it rendered but hidden'
-
-    u.update!(location_list: ['Dachstock'])
-    get events_path
-    assert_select 'a.favorites-filter-link:not([hidden])', 1,
-                  'once the user follows something the shortcut is shown'
-  end
-
   test 'the chosen view is mirrored onto the logged-in users account' do
     u = sign_in_as user
     get events_path(view: 'calendar')

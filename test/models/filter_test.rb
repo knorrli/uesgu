@@ -7,17 +7,17 @@ class FilterTest < ActiveSupport::TestCase
   test 'list setters parse a comma string into a tag array' do
     f = Filter.new
     f.queries = 'rock, jazz'
-    f.style_list = 'wubstep, glimmercore'
+    f.genres = 'wubstep, glimmercore'
 
     assert_equal %w[rock jazz], f.queries
-    assert_equal %w[wubstep glimmercore], f.style_list
+    assert_equal %w[wubstep glimmercore], f.genres
   end
 
   test 'build sets the lists it is given and leaves nil ones at their default' do
-    f = Filter.build(queries: 'rock', style_list: %w[techno], location_list: nil)
+    f = Filter.build(queries: 'rock', genres: %w[techno], location_list: nil)
 
     assert_equal %w[rock], f.queries
-    assert_equal %w[techno], f.style_list
+    assert_equal %w[techno], f.genres
     assert_empty f.location_list, 'a nil list is left at its empty default'
     assert_empty f.date_ranges, 'an omitted list is left at its empty default'
   end
@@ -61,6 +61,18 @@ class FilterTest < ActiveSupport::TestCase
     assert_includes date_group[:start_date_between_any].first, Date.current.iso8601
   end
 
+  test 'a named preset keeps the future floor; an explicit absolute range drops it' do
+    preset = Filter.build(date_ranges: ['this_month']).ransack_query[:g]
+              .find { |h| h.key?(:start_date_between_any) }
+    assert_equal Date.current.beginning_of_day, preset[:start_date_gteq],
+                 'a preset window still hides past events'
+
+    custom = Filter.build(date_ranges: ['2020-01-01 - 2020-12-31']).ransack_query[:g]
+              .find { |h| h.key?(:start_date_between_any) }
+    refute custom.key?(:start_date_gteq),
+           'an explicitly typed absolute range reveals past events'
+  end
+
   test 'earliest_date resolves the soonest concrete date across presets' do
     f = Filter.new
     f.date_ranges = ['today']
@@ -69,5 +81,36 @@ class FilterTest < ActiveSupport::TestCase
 
   test 'earliest_date is nil when no date filter is active' do
     assert_nil Filter.new.earliest_date
+  end
+
+  test 'genres makes the filter active' do
+    assert Filter.build(genres: %w[anything]).active?
+  end
+
+  test 'expanded_genre_names returns the picked genre plus every descendant' do
+    rock = genre(name: 'filterrock')
+    indie = genre(name: 'filterindie'); indie.set_parent!(rock)
+    shoegaze = genre(name: 'filtershoegaze'); shoegaze.set_parent!(indie)
+    genre(name: 'filterpolka') # unrelated sibling tree
+
+    names = Filter.build(genres: [rock.name]).expanded_genre_names.sort
+
+    assert_equal [rock.name, indie.name, shoegaze.name].sort, names
+  end
+
+  test 'expanded_genre_names is empty with no genres picked' do
+    assert_empty Filter.new.expanded_genre_names
+  end
+
+  test 'filtering by a genre matches events tagged with any descendant' do
+    rock = genre(name: 'matchrock')
+    shoegaze = genre(name: 'matchshoegaze'); shoegaze.set_parent!(rock)
+    hit = event_with_genres(shoegaze.name)        # tagged only with the descendant
+    miss = event_with_genres(genre(name: 'matchpolka').name)
+
+    ids = Event.ransack(Filter.build(genres: [rock.name]).ransack_query).result.ids
+
+    assert_includes ids, hit.id, 'an ancestor pick catches a descendant-tagged event'
+    refute_includes ids, miss.id
   end
 end

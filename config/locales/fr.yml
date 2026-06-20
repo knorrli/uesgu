@@ -4,8 +4,7 @@ fr:
     admin: Admin
     notifications: Notifications
     unread_notifications: Notifications non lues
-    favorites: Intérêts
-    notification_rules: Règles de notification
+    filters: Filtres
     saved: À voir
     settings: Paramètres
     logout: Déconnexion
@@ -28,7 +27,7 @@ fr:
     steps_safari_desktop: 'Dans Safari : Fichier → Ajouter au Dock (Safari 17+). Sinon, ça tourne dans le navigateur.'
     steps_generic: 'Ouvre le menu du navigateur et choisis « Installer l''app » / « Ajouter à l''écran d''accueil ».'
     benefit_quick: Ouvert d'un tap, sans navigateur
-    benefit_notify: Notifications pour les nouveaux événements de tes intérêts
+    benefit_notify: Notifications pour les nouveaux événements de tes filtres enregistrés
     benefit_home: Sa propre icône sur ton écran d'accueil
   languages:
     de: Allemand
@@ -86,15 +85,13 @@ fr:
     digest:
       title: Nouveaux événements sur üsgu
       body:
-        one: 1 nouvel événement correspond à tes intérêts.
-        other: "%{count} nouveaux événements correspondent à tes intérêts."
+        one: 1 nouvel événement correspond à un filtre enregistré.
+        other: "%{count} nouveaux événements correspondent à tes filtres enregistrés."
     test:
       title: üsgu
       body: Ceci est une notification de test — le push fonctionne. 🎉
   inbox:
     title: Notifications
-    tab_messages: Reçues
-    tab_rules: Règles
   saved_events:
     title: À voir
     empty: Rien d'enregistré — touche le cœur sur un événement.
@@ -119,54 +116,48 @@ fr:
     push_body:
       one: 1 événement enregistré arrive
       other: "%{count} événements enregistrés arrivent"
-  notification_rules:
-    title: Règles de notification
-    intro: Crée tes propres alertes — quoi, quand et comment tu es prévenu. Lances-en autant que tu veux.
+  saved_filters:
+    title: Filtres enregistrés
+    intro: Tes filtres enregistrés. Applique-en un pour le parcourir, ou modifie-le pour changer comment et quand tu es averti·e.
     your_rules: Tes règles
     empty: Aucune règle — crée ta première ci-dessous.
     add_rule: Ajouter une règle
     save_button: Enregistrer
     window_none: Sans période (nouveautés)
-    deleted: Règle supprimée.
-    already_exists: Tu as déjà cette alerte — tu peux l'ajuster ici.
-    duplicate_edit: "Tu as aussi une autre règle pour exactement ce filtre :"
+    apply: Appliquer
+    silent: Sans notification
+    saved: Enregistré.
+    deleted: Filtre enregistré supprimé.
+    already_exists: Tu as déjà ce filtre enregistré — tu peux l'ajuster ici.
+    duplicate_edit: "Tu as aussi un autre filtre enregistré pour ça :"
     fired:
-      one: Règle exécutée — 1 événement dans le digest.
-      other: "Règle exécutée — %{count} événements dans le digest."
-    fired_empty: Règle exécutée — aucun événement correspondant pour le moment.
+      one: Filtre exécuté — 1 événement dans le digest.
+      other: "Filtre exécuté — %{count} événements dans le digest."
+    fired_empty: Filtre exécuté — aucun événement correspondant pour le moment.
     fire_now: Tester
-    enable: Activer
-    disable: Mettre en pause
-    disabled: En pause
     delete: Supprimer
-    delete_confirm: Vraiment supprimer cette règle ?
-    default_name: Notification
+    delete_confirm: Vraiment supprimer ce filtre enregistré ?
     edit_button: Modifier
     empty_link: Filtre les événements
-    empty_html: Aucune alerte. %{link} sur la page d'accueil, puis touche « M'avertir ».
-    favorites_live: Mes intérêts (toujours à jour)
-    track_favorites: Garder synchronisé avec mes intérêts
-    track_favorites_hint: inclut aussi les lieux/styles qui t'intéresseront plus tard
+    empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis touche l'entonnoir pour l'enregistrer.
     type:
       added: Nouveautés
       happening: À l'affiche
     errors:
-      empty_filter: Choisis d'abord un filtre (style, lieu, date …) ou synchronise avec tes intérêts.
-      duplicate: Tu as déjà une alerte pour ce filtre.
+      empty_filter: Choisis d'abord un filtre (genre, lieu, date …).
+      duplicate: Tu as déjà un filtre enregistré pour ça.
     new:
-      title: Configurer une notification
-      intro: À quelle fréquence et comment tu es prévenu.
+      title: Enregistrer un filtre
+      intro: Choisis ce qui correspond, puis si et comment tu es prévenu.
     edit:
-      title: Modifier la notification
-      intro: Ce qu'elle surveille, quand et comment tu es prévenu.
+      title: Modifier le filtre enregistré
+      intro: Ce qui correspond, et si et comment tu es prévenu.
     email_unavailable: ajoute une adresse e-mail dans les réglages
+    section_filter: Filtre
+    section_notifications: Notifications
     section_when: Quand
-    section_what: À propos de quoi
-    section_filter: Pour quoi
-    section_channels: Comment
-    content_hint: « Nouvellement ajoutés » t'alerte des événements fraîchement listés. « En cours » montre ce qui se passe sur une période (p. ex. ce week-end), peu importe quand c'était ajouté.
-    filter_hint: Sépare les valeurs par des virgules. Les noms doivent correspondre à ceux du site.
-    channels_hint: La cloche dans l'app est toujours active. Ajoute push et e-mail par règle.
+    schedule_label: À quelle fréquence
+    channels_hint: Désactive l'app pour un filtre silencieux. Push et e-mail en ont besoin.
     cadences:
       daily: Quotidien
       weekly: Hebdomadaire
@@ -214,11 +205,10 @@ fr:
       content_type: Type
       window: Période
       scope: Filtre
-      filter_styles: Styles
-      filter_styles_ph: p. ex. Rock, Jazz
       filter_locations_ph: p. ex. Dachstock, Rössli
       filter_queries: Termes de recherche
       filter_queries_ph: p. ex. nom du groupe
+      notify_in_app: Notifications dans l'app
       notify_push: Push sur mes appareils
       notify_email: M'envoyer un e-mail
   notification_mailer:
@@ -245,13 +235,6 @@ fr:
     more_venues:
       one: "+ 1 autre"
       other: "+ %{count} autres"
-  favorites:
-    title: Intérêts
-    intro: Choisis les styles et les lieux qui t'intéressent — les jours correspondants reçoivent une étoile, et tu peux filtrer le programme sur tes intérêts.
-    canton_label: "Canton %{code}"
-    saved: Intérêts enregistrés.
-    save: Enregistrer les intérêts
-    toggle: 'Ajouter ou retirer %{name} de tes intérêts'
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.
@@ -326,28 +309,35 @@ fr:
     index:
       title: Genres
       search: Rechercher des genres
-      queue_link: File d'assignation
+      queue_link: File de curation
+      tree_link: Arborescence
       status_all: tous
-      status_unassigned: non assigné
-      status_assigned: assigné
+      status_placed: classé
+      status_unplaced: non classé
       status_ignored: ignoré
       status_hidden: masqué
       status_blocked: bloqué
       status_merged: "fusionné avec %{canonical}"
+      placed_under: "sous %{parent}"
       sort_by: "Trier:"
       sort_name: A–Z
       sort_count: plus fréquents
+    tree:
+      title: Arborescence des genres
+      summary: "%{roots} racines · %{placed} genres classés"
+      unplaced: "%{count} non classés (dans la file)"
+      empty: Aucun genre encore classé.
     queue:
-      title: Assignation des genres
-      remaining: "%{count} non assignés"
-      empty: Rien à assigner — chaque genre utilisé est assigné ou traité.
+      title: Curation des genres
+      remaining: "%{count} non classés"
+      empty: Rien à classer — chaque genre utilisé est classé ou traité.
       restore: Restaurer
     editor:
       usage: "sur %{count} événements"
       status: "Statut :"
-      suggested: Suggestions
-      assign: Assigner
-      ignore: "Ignorer (garder, sans style)"
+      set_parent: Définir le parent
+      set_parent_into: "Classer sous un autre genre…"
+      ignore: "Ignorer (garder, non classé)"
       hide: "Masquer l'événement (non musical)"
       block: "Bloquer (retirer le tag)"
       merge: Fusionner
@@ -358,8 +348,8 @@ fr:
     back: "← Admin"
     index:
       title: Admin
-      assigned: Assignés
-      unassigned: Non assignés
+      placed: Classés
+      unplaced: Non classés
       ignored: Ignorés
       hidden: Masqués
       blocked: Bloqués
@@ -429,10 +419,9 @@ fr:
         joined: Inscrit le
         sessions: Sessions actives
         invited_by: Invité par
-        favorite_locations: Intérêts – Lieux
-        favorite_styles: Intérêts – Styles
+        saved_filters: Filtres enregistrés
         delete_heading: Supprimer le compte
-        delete_hint: Supprime définitivement ce compte et ses intérêts.
+        delete_hint: Supprime définitivement ce compte et ses données.
         delete: Supprimer le compte
         delete_confirm: "Supprimer définitivement le compte %{username} ?"
     invitations:
@@ -529,23 +518,6 @@ fr:
         merged: Événements fusionnés.
       unmerge:
         unmerged: Événement séparé comme autonome.
-    styles:
-      index:
-        title: Styles
-        status_all: Tous
-        status_assigned: Assignés
-        status_unassigned: Non assignés
-        search: Rechercher des styles…
-        sort_by: Trier par
-        sort_name: nom
-        sort_count: usage
-        usage:
-          one: marque 1 événement
-          other: marque %{count} événements
-        genre_count:
-          one: associé par 1 genre
-          other: associé par %{count} genres
-        empty: Aucun style correspondant.
     locations:
       index:
         title: Lieux
@@ -622,9 +594,6 @@ fr:
       invitation:
         one: Invitation
         other: Invitations
-      style:
-        one: Style
-        other: Styles
     attributes:
       user:
         username: Nom d'utilisateur
@@ -660,10 +629,8 @@ fr:
         label: Vue
         list: Liste
         calendar: Calendrier
-      favorites_filter:
-        label: Mes intérêts
-      notify_filter: M'avertir
-      notify_filter_existing: Tu es averti·e — gérer
+      save_filter: Enregistrer le filtre
+      save_filter_saved: Enregistré — modifier
     day:
       empty: Aucun événement ce jour-là.
       close: Fermer

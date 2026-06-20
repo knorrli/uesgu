@@ -42,7 +42,7 @@
             <%= link_to event.title, admin_event_path(event), class: 'event-row__title' %>
             <div class="event-row__meta">
               <% if event.venue %><span><%= event.venue.name %></span><% end %>
-              <% event.styles.each do |style| %><span><%= style.name %></span><% end %>
+              <% event.genres.each do |genre| %><span><%= genre.name %></span><% end %>
               <% if event.cancelled? %><span class="event-row__flag-warn"><%= t('.cancelled_badge') %></span><% end %>
               <% if event.hidden? %><span><%= t('.hidden_badge') %></span><% end %>
               <% if event.discarded? %><span><%= t('.discarded_badge', pattern: event.discarded_by_rule&.pattern) %></span><% end %>

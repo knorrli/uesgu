@@ -2,8 +2,8 @@ require 'db_test_helper'
 
 # Locks Event's non-taxonomy mechanics: presence validations, the visible /
 # cancelled scopes, cancellation predicate, venue extraction from the flat
-# location tags, and the to_s summary. Style derivation lives in
-# event_styles_test.rb.
+# location tags, and the to_s summary. Visibility derivation (the music gate) is
+# covered by genre_disposition_test.
 class EventTest < ActiveSupport::TestCase
   test 'title, start_date and url are required' do
     e = Event.new
@@ -109,6 +109,7 @@ class EventTest < ActiveSupport::TestCase
   test 'ransackable allowlists expose only the intended fields' do
     assert_equal %w[title subtitle start_date].sort, Event.ransackable_attributes.sort
     assert_includes Event.ransackable_associations, 'locations'
-    assert_includes Event.ransackable_associations, 'styles'
+    assert_includes Event.ransackable_associations, 'genres'
+    refute_includes Event.ransackable_associations, 'styles'
   end
 end

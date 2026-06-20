@@ -1,0 +1,120 @@
+<%# Shared by new + edit. form_with infers POST (create) vs PATCH (update) from
+    the record. The saved filter (q/g/l/d) posts as top-level fields (read by the
+    controller's filter_params, not nested under saved_filter).
+
+    A plain form with an explicit Save — no autosave. The What/Where pickers are the
+    SAME genre/location tree the events filter uses (tags/_genre_sheet, _location_sheet
+    via the filter-sheets controller), with submit-on-apply OFF: picking a genre
+    stages it into this form as a checked g[]/l[] input and commits only on Save.
+    (Autosave existed to tame the old combobox's client-side chip drift; the tree is
+    plain server-rendered checkboxes, so there's nothing to drift — see the redesign
+    doc.) saved-filter-form keys the schedule off the window select. %>
+<%# .filter-sheets pulls in the same desktop dropdown-panel + mobile full-screen
+    sheet CSS the events filter uses (keyed off that class). %>
+<div class="saved-filter-picker filter-sheets"
+     data-controller="filter-sheets"
+     data-filter-sheets-submit-on-apply-value="false"
+     data-filter-sheets-search-for-template-value="<%= t('events.filter.search_for', query: '%{query}') %>"
+     data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>">
+  <%# `filter` is the rule's saved filter (SavedFiltersController#filter_for). %>
+  <%= form_with model: rule, class: 'saved-filter-form account-form flex flex-col gap-medium',
+        data: { controller: 'saved-filter-form', 'saved-filter-form-rhythms-value': SavedFilter::WINDOW_RHYTHM.to_json,
+                'filter-sheets-target': 'form' } do |form| %>
+    <% if rule.errors.any? %>
+      <ul class="form-errors">
+        <% rule.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
+      </ul>
+    <% end %>
+
+    <%# ── FILTER ── what this saved filter matches: the same trigger bar + tree
+        sheets as the events page, so the two read identically, plus the date
+        window. (The window is a preset select — a recurring filter takes no custom
+        range — and it also drives the notification cadence below.) %>
+    <fieldset class="saved-filter-fieldset flex flex-col gap-medium">
+      <legend><%= t('saved_filters.section_filter') %></legend>
+
+      <% what_terms  = filter.queries + filter.genres %>
+      <% where_terms = filter.location_list.map { |loc| location_display(loc) } %>
+      <div class="filter-sheets__bar">
+        <%= render 'tags/filter_trigger', field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') %>
+        <%= render 'tags/filter_trigger', field: 'where', icon: 'locations', terms: where_terms, empty: t('events.filter.where') %>
+      </div>
+
+      <%# The sheets sit right under the bar so the desktop dropdown panel lands
+          beneath its trigger. (Mobile sheets are fixed full-screen — order is moot.) %>
+      <%= render 'tags/genre_sheet', filter: filter %>
+      <%= render 'tags/location_sheet', filter: filter %>
+
+      <label class="field-label flex flex-col gap-xsmall">
+        <span><%= t('saved_filters.section_when') %></span>
+        <%= select_tag 'd[]', options_for_select(rule_window_options, filter.date_ranges.first),
+              include_blank: t('saved_filters.window_none'),
+              data: { 'saved-filter-form-target': 'window', action: 'saved-filter-form#update' } %>
+      </label>
+    </fieldset>
+
+    <%# ── NOTIFICATIONS ── delivery is OPTIONAL: in-app is the MASTER channel, and
+        unchecking it makes this a silent saved filter (never delivers), so push +
+        email are forced off and disabled — client-side (notify-channels) and
+        server-side (SavedFilter#silence_other_channels). The schedule (how often /
+        when) lives here too, reactive to the window above (saved-filter-form). %>
+    <fieldset class="saved-filter-fieldset flex flex-col gap-small" data-controller="notify-channels">
+      <legend><%= t('saved_filters.section_notifications') %></legend>
+      <p class="muted saved-filter-hint"><%= t('saved_filters.channels_hint') %></p>
+      <label class="saved-filter-check flex gap-small">
+        <%= form.check_box :notify_in_app, data: { 'notify-channels-target': 'master', action: 'notify-channels#sync' } %>
+        <span><%= t('saved_filters.fields.notify_in_app') %></span>
+      </label>
+      <label class="saved-filter-check saved-filter-check--sub flex gap-small">
+        <%= form.check_box :notify_push, data: { 'notify-channels-target': 'dependent' } %>
+        <span><%= t('saved_filters.fields.notify_push') %></span>
+      </label>
+      <% email_ready = MailConfig.configured? && current_user.email_address.present? %>
+      <%# Email has a second reason to be disabled (no address on file); data-locked
+          keeps it off even when in-app is on, so the controller never re-enables it. %>
+      <label class="<%= class_names('saved-filter-check', 'saved-filter-check--sub', 'flex', 'gap-small', 'saved-filter-check--disabled': !email_ready) %>">
+        <%= form.check_box :notify_email, disabled: !email_ready,
+              data: { 'notify-channels-target': 'dependent', locked: !email_ready } %>
+        <span>
+          <%= t('saved_filters.fields.notify_email') %>
+          <% unless email_ready %>
+            <span class="muted">— <%= link_to t('saved_filters.email_unavailable'), settings_path %></span>
+          <% end %>
+        </span>
+      </label>
+
+      <%# The schedule: with a window the cadence is derived (picker hidden, model
+          forces it), without one the user picks freely. weekday shows for
+          weekly/biweekly, monthday for monthly. aria-labels name each control; the
+          time snaps to the quarter hour on blur (the scheduler runs quarter-hourly). %>
+      <div class="saved-filter-schedule flex flex-col gap-xsmall">
+        <span class="muted saved-filter-hint"><%= t('saved_filters.schedule_label') %></span>
+        <div class="saved-filter-row flex gap-small">
+          <label class="flex flex-col gap-xsmall" data-saved-filter-form-target="cadenceField">
+            <%= form.select :cadence, rule_cadence_options, {}, data: { 'saved-filter-form-target': 'cadence', action: 'saved-filter-form#update' }, 'aria-label': t('saved_filters.fields.cadence') %>
+          </label>
+          <label class="flex flex-col gap-xsmall" data-saved-filter-form-target="weekday">
+            <%= form.select :weekday, rule_weekday_options, {}, 'aria-label': t('saved_filters.fields.weekday') %>
+          </label>
+          <label class="flex flex-col gap-xsmall" data-saved-filter-form-target="monthday">
+            <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('saved_filters.fields.monthday') %>
+          </label>
+          <label class="flex flex-col gap-xsmall">
+            <%= form.time_field :time_string, value: rule.time_string, 'aria-label': t('saved_filters.fields.time'), data: { action: 'change->saved-filter-form#snapTime' } %>
+          </label>
+        </div>
+      </div>
+    </fieldset>
+
+    <%# Explicit Save (the form commits everything at once); "Löschen" removes the
+        rule. Delete is a turbo_method link (not button_to, which would nest a form). %>
+    <div class="flex gap-small saved-filter-actions">
+      <%= form.submit t('saved_filters.save_button'), class: 'button-small primary' %>
+      <% if rule.persisted? %>
+        <%= link_to t('saved_filters.delete'), saved_filter_path(rule),
+              class: 'button-small button-ghost danger',
+              data: { turbo_method: :delete, turbo_confirm: t('saved_filters.delete_confirm') } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

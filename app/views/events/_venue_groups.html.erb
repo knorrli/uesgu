@@ -22,14 +22,13 @@
         <div class="venue-header flex flex-col gap-xsmall">
           <div class="event-where">
             <%= event_filter_tag anchor.name, field: 'l[]', value: anchor.name, interactive: interactive,
-                  modifier: 'venue', favorite_type: :location %>
+                  modifier: 'venue' %>
           </div>
           <% if meta_locations.any? %>
             <div class="event-where-meta">
               <% meta_locations.each_with_index do |location, i| %>
                 <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-                <%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive,
-                      favorite_type: :location %>
+                <%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive %>
               <% end %>
             </div>
           <% end %>

@@ -44,7 +44,7 @@ module Scrapers
     end
 
     # Union the duplicates' genres onto the canonical (PETZI re-set its own genres
-    # this sweep, so the result is PETZI ∪ duplicates), then re-derive styles/hidden.
+    # this sweep, so the result is PETZI ∪ duplicates), then re-derive visibility.
     def merge_genres(canonical, dups)
       return if dups.empty?
 
@@ -53,7 +53,7 @@ module Scrapers
 
       canonical.genre_list = merged
       canonical.save!
-      canonical.recompute_styles!
+      canonical.recompute_visibility!
     end
 
     # Best PETZI event for a bespoke event: same date, highest title similarity,

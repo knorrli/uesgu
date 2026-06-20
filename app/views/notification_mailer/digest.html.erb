@@ -2,8 +2,8 @@
     cream ground (#e8e1cd) framed by neutral hairlines, SHARP corners (no radius),
     near-black text. Green (#0e7a4a) is spent ONLY on interaction — the ↗ link
     marker, the primary CTA, footer links — never on structure or metadata, which
-    stay neutral. Time is muted (not green), styles bold-fg, genres muted, exactly
-    as in the list view. Inline styles only — clients strip <style>/external CSS. %>
+    stay neutral. Time is muted (not green), genres bold-fg, exactly as in the
+    list view. Inline styles only — clients strip <style>/external CSS. %>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="u-ground" style="background:#e8e1cd; padding:24px 12px;">
   <tr>
     <td align="center">
@@ -60,13 +60,8 @@
                       <% if city %><%= city %><% end %>
                     </div>
                   <% end %>
-                  <% if event.styles.any? %>
-                    <div class="u-text" style="margin-top:6px; font-size:12px; font-weight:700; color:#1d1620;">
-                      <%= event.styles.map(&:name).join("  ·  ") %>
-                    </div>
-                  <% end %>
                   <% if event.genres.any? %>
-                    <div class="u-muted" style="margin-top:4px; font-size:12px; color:#5b515a;">
+                    <div class="u-text" style="margin-top:6px; font-size:12px; font-weight:700; color:#1d1620;">
                       <%= event.genres.map(&:name).join("  ·  ") %>
                     </div>
                   <% end %>

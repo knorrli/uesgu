@@ -9,10 +9,6 @@
       "Konzert",
       "Punk"
     ],
-    "style_list": [
-      "Konzert",
-      "Punk"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -31,11 +27,6 @@
       "Post Punk",
       "Punk"
     ],
-    "style_list": [
-      "Konzert",
-      "Post Punk",
-      "Punk"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -50,13 +41,6 @@
     "title": "«Out Of Scale» – Annie Taylor, support by The Attycs",
     "subtitle": null,
     "genre_list": [
-      "Alternative",
-      "Grunge",
-      "Konzert",
-      "Psychedelic",
-      "Rock"
-    ],
-    "style_list": [
       "Alternative",
       "Grunge",
       "Konzert",
@@ -83,13 +67,6 @@
       "Konzert",
       "Space Grind"
     ],
-    "style_list": [
-      "1-A-Grind",
-      "Grind",
-      "Grindpunks",
-      "Konzert",
-      "Space Grind"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -106,9 +83,6 @@
     "genre_list": [
       "Acoustic"
     ],
-    "style_list": [
-      "Acoustic"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -123,10 +97,6 @@
     "title": "A Dream of Drag",
     "subtitle": null,
     "genre_list": [
-      "Drag Show",
-      "Performance"
-    ],
-    "style_list": [
       "Drag Show",
       "Performance"
     ],
@@ -149,12 +119,6 @@
       "Shibari",
       "Workshop"
     ],
-    "style_list": [
-      "Afterparty",
-      "Performance",
-      "Shibari",
-      "Workshop"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -169,13 +133,6 @@
     "title": "Patchwork Night – Maurice Fulton, Sassy J",
     "subtitle": null,
     "genre_list": [
-      "Disco",
-      "Garage",
-      "House",
-      "Party",
-      "Underground-Dance"
-    ],
-    "style_list": [
       "Disco",
       "Garage",
       "House",
@@ -203,14 +160,6 @@
       "Rap",
       "UK Garage"
     ],
-    "style_list": [
-      "Afrohouse",
-      "Breakbeat",
-      "Miami Bass",
-      "Party",
-      "Rap",
-      "UK Garage"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -225,10 +174,6 @@
     "title": "Bölz No Eis Team — Rössli Sommerserie",
     "subtitle": null,
     "genre_list": [
-      "Party",
-      "Synthwave"
-    ],
-    "style_list": [
       "Party",
       "Synthwave"
     ],
@@ -250,11 +195,6 @@
       "House",
       "Minimal"
     ],
-    "style_list": [
-      "Deep Tech",
-      "House",
-      "Minimal"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -269,10 +209,6 @@
     "title": "Sommerkaraoke — Rössli Sommerserie",
     "subtitle": null,
     "genre_list": [
-      "Acoustic",
-      "Karaoke"
-    ],
-    "style_list": [
       "Acoustic",
       "Karaoke"
     ],
@@ -292,9 +228,6 @@
     "genre_list": [
       "Trance"
     ],
-    "style_list": [
-      "Trance"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -309,11 +242,6 @@
     "title": "Löie Fest — Rössli Sommerserie",
     "subtitle": null,
     "genre_list": [
-      "80s",
-      "90s",
-      "Trash and Treasures"
-    ],
-    "style_list": [
       "80s",
       "90s",
       "Trash and Treasures"
@@ -335,10 +263,6 @@
       "Hardcore",
       "Punk"
     ],
-    "style_list": [
-      "Hardcore",
-      "Punk"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -353,14 +277,6 @@
     "title": "Rössli Nighter — Rössli Sommerserie",
     "subtitle": null,
     "genre_list": [
-      "60s",
-      "Early Reggae",
-      "Party",
-      "Rocksteady",
-      "Ska",
-      "Soul"
-    ],
-    "style_list": [
       "60s",
       "Early Reggae",
       "Party",
@@ -388,13 +304,6 @@
       "Rock",
       "Shoegaze"
     ],
-    "style_list": [
-      "Doomgaze",
-      "Konzert",
-      "Noise",
-      "Rock",
-      "Shoegaze"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -415,13 +324,6 @@
       "Punkrock",
       "Sumerian Rec"
     ],
-    "style_list": [
-      "House of the Dead",
-      "Konzert",
-      "Post Punk",
-      "Punkrock",
-      "Sumerian Rec"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -436,12 +338,6 @@
     "title": "Tight Finks – Rockin‘ Rössli – Vol. 5 Support; The Melmacs",
     "subtitle": null,
     "genre_list": [
-      "'77",
-      "Legende",
-      "Powerpop",
-      "Punk"
-    ],
-    "style_list": [
       "'77",
       "Legende",
       "Powerpop",
@@ -468,14 +364,6 @@
       "Third Wave Ska",
       "Two Tone"
     ],
-    "style_list": [
-      "Hard Swing",
-      "Konzert",
-      "Mundart",
-      "Reunion",
-      "Third Wave Ska",
-      "Two Tone"
-    ],
     "location_list": [
       "Rössli",
       "Bern",
@@ -490,12 +378,6 @@
     "title": "Ami Warning «Wellen Tour 2027»",
     "subtitle": null,
     "genre_list": [
-      "Indie",
-      "Pop",
-      "Reggae",
-      "Soul"
-    ],
-    "style_list": [
       "Indie",
       "Pop",
       "Reggae",

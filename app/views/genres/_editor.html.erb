@@ -1,9 +1,8 @@
-<%# Shared genre → style editor (tinder queue, per-genre CRUD edit, inline edit).
-    A few quick-select suggestion buttons cover the common case; the combobox
-    handles anything else (and multi-style genres). `return_to` decides where
-    each action lands: the queue passes its own path (next genre), the others
-    return to their page. %>
-<section class="flex flex-col gap-medium" data-controller="style-picker">
+<%# Shared genre editor (tinder queue, per-genre edit, inline edit). The primary
+    action files the genre into the tree under a parent; the rest are dispositions
+    + merge. `return_to` decides where each action lands: the queue passes its own
+    path (next genre), the others return to their page. %>
+<section class="flex flex-col gap-medium">
   <div class="flex justify-between align-baseline gap-medium wrap">
     <h2><%= genre.name %></h2>
     <span class="muted"><%= t('genres.editor.usage', count: genre.events_count) %></span>
@@ -23,42 +22,36 @@
       <span class="muted"><%= t('genres.editor.status') %> <strong><%= t("genres.index.#{status_key}") %></strong></span>
       <%= button_to t('genres.queue.restore'), restore_genre_path(genre), params: { return_to: return_to } %>
     </div>
-  <% end %>
-
-  <% if suggestions.any? %>
-    <div class="flex flex-col gap-small">
-      <h4><%= t('genres.editor.suggested') %></h4>
-      <div class="flex gap-small wrap">
-        <%# A click adds the style to the combobox below (composes with it),
-            rather than committing — Assign commits the whole selection. %>
-        <% suggestions.each do |style| %>
-          <button type="button" class="tag"
-                  data-action="style-picker#add"
-                  data-style-picker-style-id-param="<%= style.id %>"><%= style.name %></button>
-        <% end %>
-      </div>
+  <% elsif genre.placed? %>
+    <div class="flex gap-medium align-baseline wrap genre-current-status">
+      <span class="muted"><%= t('genres.editor.status') %> <strong><%= t('genres.index.placed_under', parent: genre.parent.name) %></strong></span>
+      <%= button_to t('genres.queue.restore'), restore_genre_path(genre), params: { return_to: return_to } %>
     </div>
   <% end %>
 
-  <%= form_with model: genre, url: genre_path(genre), method: :patch,
-        class: 'flex justify-between gap-medium wrap align-end' do |f| %>
+  <%# Primary curation action: file this genre into the tree under a parent (e.g.
+      Crustpunk → Punk). Blank = a top-level (root) genre. Parents exclude this
+      genre and its own descendants (which would form a cycle) and any
+      hidden/blocked/aliased genre. The parent-based successor to "Assign". %>
+  <% parent_options = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
+                           .where.not(id: [genre.id, *genre.descendant_ids]).by_name %>
+  <%= form_with url: set_parent_genre_path(genre), method: :post, scope: :genre,
+        class: 'flex justify-between gap-medium wrap align-end genre-set-parent' do |f| %>
     <%= hidden_field_tag :return_to, return_to %>
     <div class="input-wrapper flex flex-grow">
-      <%= f.combobox :style_ids, Style.order(name: :asc),
-            value: genre.style_ids.join(','),
-            id: "genre_#{genre.id}",
-            placeholder: Style.model_name.human(count: :many),
-            multiselect_chip_src: chips_styles_path do |combobox| %>
+      <%= f.combobox :parent_genre_id, parent_options,
+            value: genre.parent_id,
+            placeholder: t('genres.editor.set_parent_into') do |combobox| %>
         <% combobox.customize_fieldset class: 'flex-grow' %>
         <% combobox.customize_input class: 'flex-grow' %>
       <% end %>
     </div>
-    <%= f.submit t('genres.editor.assign') %>
+    <%= f.submit t('genres.editor.set_parent') %>
   <% end %>
 
-  <%# Three terminal dispositions besides Assign (which lives in the form above):
-      ignore = keep the genre but leave it unmapped; hide = non-music, drop the
-      event; block = scraper noise, strip the tag entirely. %>
+  <%# Three terminal dispositions besides "set parent" (the form above): ignore =
+      keep the genre but leave it unfiled; hide = non-music, drop the event; block
+      = scraper noise, strip the tag entirely. %>
   <div class="flex gap-small wrap genre-dispositions">
     <%= button_to t('genres.editor.ignore'), ignore_genre_path(genre), params: { return_to: return_to } %>
     <%= button_to t('genres.editor.hide'), hide_genre_path(genre), params: { return_to: return_to } %>

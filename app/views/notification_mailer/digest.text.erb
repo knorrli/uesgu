@@ -7,7 +7,7 @@
 <% venue = event.venue %><% city = event.locations.to_a.reject { |loc| loc == venue }.map(&:name).first %>
 - <% if event.start_time.present? %><%= l event.start_time, format: :time %> <% end %><%= event.title %><% if event.cancelled? %> [<%= t('events.cancelled') %>]<% end %>
   <% if venue %><%= venue.name %><% end %><% if venue && city %> · <% end %><% if city %><%= city %><% end %>
-  <% if event.styles.any? %><%= event.styles.map(&:name).join(" · ") %>
+  <% if event.genres.any? %><%= event.genres.map(&:name).join(" · ") %>
   <% end %><%= digest_event_href(event) %>
 <% end %>
 <% end %>

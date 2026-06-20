@@ -9,10 +9,6 @@
       "Orchestre",
       "Classique"
     ],
-    "style_list": [
-      "Orchestre",
-      "Classique"
-    ],
     "location_list": [
       "FriSon",
       "Fribourg",
@@ -27,10 +23,6 @@
     "title": "PREWN (US)",
     "subtitle": "Only Show en Suisse Romande",
     "genre_list": [
-      "Indie-Folk",
-      "Experimental Indie Rock"
-    ],
-    "style_list": [
       "Indie-Folk",
       "Experimental Indie Rock"
     ],
@@ -52,11 +44,6 @@
       "Electronic",
       "Trip-hop"
     ],
-    "style_list": [
-      "Avant-Pop",
-      "Electronic",
-      "Trip-hop"
-    ],
     "location_list": [
       "FriSon",
       "Fribourg",
@@ -71,9 +58,6 @@
     "title": "HUBRIS. (CH)",
     "subtitle": "",
     "genre_list": [
-      "Post-Rock"
-    ],
-    "style_list": [
       "Post-Rock"
     ],
     "location_list": [
@@ -94,11 +78,6 @@
       "Folk",
       "Jazz"
     ],
-    "style_list": [
-      "Música Popular Brasileira",
-      "Folk",
-      "Jazz"
-    ],
     "location_list": [
       "FriSon",
       "Fribourg",
@@ -115,9 +94,6 @@
     "genre_list": [
       "Japanese Neo-Folk meets Psych & cinematic soundscapes"
     ],
-    "style_list": [
-      "Japanese Neo-Folk meets Psych & cinematic soundscapes"
-    ],
     "location_list": [
       "FriSon",
       "Fribourg",
@@ -132,11 +108,6 @@
     "title": "Daudi Matsiko (UK) + Momoko Gill (UK)",
     "subtitle": "Co-plateau / Doppelkonzert",
     "genre_list": [
-      "Modern Folk",
-      "Jazz",
-      "Trip-hop"
-    ],
-    "style_list": [
       "Modern Folk",
       "Jazz",
       "Trip-hop"
@@ -159,11 +130,6 @@
       "Post-Punk",
       "New Wave"
     ],
-    "style_list": [
-      "Goth Rock",
-      "Post-Punk",
-      "New Wave"
-    ],
     "location_list": [
       "FriSon",
       "Fribourg",
@@ -178,10 +144,6 @@
     "title": "SNIPER (FR)",
     "subtitle": "",
     "genre_list": [
-      "Hip-Hop",
-      "Rap"
-    ],
-    "style_list": [
       "Hip-Hop",
       "Rap"
     ],
@@ -203,11 +165,6 @@
       "Drone",
       "Noise"
     ],
-    "style_list": [
-      "Experimental Rock",
-      "Drone",
-      "Noise"
-    ],
     "location_list": [
       "FriSon",
       "Fribourg",
@@ -222,11 +179,6 @@
     "title": "MARIA BC (US)",
     "subtitle": "Only Show en Suisse Romande",
     "genre_list": [
-      "Ambient Folk",
-      "Dream Pop",
-      "Slowcore"
-    ],
-    "style_list": [
       "Ambient Folk",
       "Dream Pop",
       "Slowcore"

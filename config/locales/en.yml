@@ -4,8 +4,7 @@ en:
     admin: Admin
     notifications: Notifications
     unread_notifications: Unread notifications
-    favorites: Interests
-    notification_rules: Notification rules
+    filters: Filters
     saved: Watchlist
     settings: Settings
     logout: Log out
@@ -28,7 +27,7 @@ en:
     steps_safari_desktop: 'In Safari: File → Add to Dock (Safari 17+). Otherwise it just runs in the browser.'
     steps_generic: 'Open your browser menu and choose “Install app” / “Add to Home screen”.'
     benefit_quick: Opens with one tap, no browser
-    benefit_notify: Notifications for new events from your interests
+    benefit_notify: Notifications for new events from your saved filters
     benefit_home: Its own icon on your home screen
   languages:
     de: German
@@ -86,15 +85,13 @@ en:
     digest:
       title: New events on üsgu
       body:
-        one: 1 new event matches your interests.
-        other: "%{count} new events match your interests."
+        one: 1 new event matches a saved filter.
+        other: "%{count} new events match your saved filters."
     test:
       title: üsgu
       body: This is a test notification — push is working. 🎉
   inbox:
     title: Notifications
-    tab_messages: Inbox
-    tab_rules: Rules
   saved_events:
     title: Watchlist
     empty: Nothing saved yet — tap the heart on any show.
@@ -119,54 +116,48 @@ en:
     push_body:
       one: 1 saved show coming up
       other: "%{count} saved shows coming up"
-  notification_rules:
-    title: Notification rules
-    intro: Build your own alerts — pick what, when, and how you hear about it. Run as many as you like.
+  saved_filters:
+    title: Saved filters
+    intro: Filters you've saved. Apply one to browse it, or edit it to change how and when you're notified.
     your_rules: Your rules
     empty: No rules yet — make your first one below.
     add_rule: Add a rule
     save_button: Save
     window_none: No window (new events)
-    deleted: Rule deleted.
-    already_exists: You already have this alert — here you can tweak it.
-    duplicate_edit: "You also have another rule for this exact filter:"
+    apply: Apply
+    silent: Not notifying
+    saved: Saved.
+    deleted: Saved filter deleted.
+    already_exists: You already have this saved filter — tweak it here.
+    duplicate_edit: "You also have another saved filter for this:"
     fired:
-      one: Rule run — 1 event in the digest.
-      other: "Rule run — %{count} events in the digest."
-    fired_empty: Rule run — no matching events right now.
+      one: Filter run — 1 event in the digest.
+      other: "Filter run — %{count} events in the digest."
+    fired_empty: Filter run — no matching events right now.
     fire_now: Test now
-    enable: Enable
-    disable: Pause
-    disabled: Paused
     delete: Delete
-    delete_confirm: Really delete this rule?
-    default_name: Notification
+    delete_confirm: Really delete this saved filter?
     edit_button: Edit
     empty_link: Filter the events
-    empty_html: No alerts yet. %{link} on the home page, then tap “Notify me”.
-    favorites_live: My interests (kept current)
-    track_favorites: Keep in sync with my interests
-    track_favorites_hint: also includes venues/styles that interest you later
+    empty_html: No saved filters yet. %{link} on the home page, then tap the funnel to save it.
     type:
       added: New events
       happening: What's on
     errors:
-      empty_filter: Pick a filter first (style, location, date …) or sync with your interests.
-      duplicate: You already have an alert for this filter.
+      empty_filter: Pick a filter first (genre, location, date …).
+      duplicate: You already have a saved filter for this.
     new:
-      title: Set up a notification
-      intro: How often and how you hear about this.
+      title: Save a filter
+      intro: Pick what to match, then choose if and how you're notified.
     edit:
-      title: Edit notification
-      intro: What it watches, when, and how you're notified.
+      title: Edit saved filter
+      intro: What it matches, and if and how you're notified.
     email_unavailable: add an email address in settings
+    section_filter: Filter
+    section_notifications: Notifications
     section_when: When
-    section_what: About what
-    section_filter: For what
-    section_channels: How
-    content_hint: "“Newly added” catches freshly listed events. “Happening” shows what's on in a window (e.g. this weekend), whenever it was added."
-    filter_hint: Comma-separate values. Names must match those used on the site.
-    channels_hint: The in-app bell is always on. Add push and email per rule.
+    schedule_label: How often
+    channels_hint: Turn off in-app for a silent saved filter. Push and email need it on.
     cadences:
       daily: Daily
       weekly: Weekly
@@ -214,11 +205,10 @@ en:
       content_type: Type
       window: Window
       scope: Filter
-      filter_styles: Styles
-      filter_styles_ph: e.g. Rock, Jazz
       filter_locations_ph: e.g. Dachstock, Rössli
       filter_queries: Search terms
       filter_queries_ph: e.g. band name
+      notify_in_app: In-app notifications
       notify_push: Push to my devices
       notify_email: Email me
   notification_mailer:
@@ -245,13 +235,6 @@ en:
     more_venues:
       one: "+ 1 more"
       other: "+ %{count} more"
-  favorites:
-    title: Interests
-    intro: Pick the styles and places that interest you — matching days get a star, and you can filter the programme down to your interests.
-    canton_label: "Canton %{code}"
-    saved: Interests saved.
-    save: Save interests
-    toggle: 'Add or remove %{name} from your interests'
   settings:
     title: Settings
     saved: Settings saved.
@@ -327,27 +310,34 @@ en:
       title: Genres
       search: Search genres
       queue_link: Assignment queue
+      tree_link: Tree
       status_all: all
-      status_unassigned: unassigned
-      status_assigned: assigned
+      status_placed: placed
+      status_unplaced: unplaced
       status_ignored: ignored
       status_hidden: hidden
       status_blocked: blocked
       status_merged: "merged into %{canonical}"
+      placed_under: "under %{parent}"
       sort_by: "Sort:"
       sort_name: A–Z
       sort_count: most used
+    tree:
+      title: Genre tree
+      summary: "%{roots} roots · %{placed} genres placed"
+      unplaced: "%{count} unplaced (in queue)"
+      empty: No genres placed yet.
     queue:
-      title: Genre assignment
-      remaining: "%{count} unassigned"
-      empty: Nothing to assign — every genre in use is mapped or handled.
+      title: Genre curation
+      remaining: "%{count} unplaced"
+      empty: Nothing to file — every genre in use is placed or handled.
       restore: Restore
     editor:
       usage: "on %{count} events"
       status: "Status:"
-      suggested: Suggested
-      assign: Assign
-      ignore: "Ignore (keep, no style)"
+      set_parent: Set parent
+      set_parent_into: "File under another genre…"
+      ignore: "Ignore (keep, unfiled)"
       hide: "Hide event (non-music)"
       block: "Block (strip the tag)"
       merge: Merge
@@ -358,8 +348,8 @@ en:
     back: "← Admin"
     index:
       title: Admin
-      assigned: Assigned
-      unassigned: Unassigned
+      placed: Placed
+      unplaced: Unplaced
       ignored: Ignored
       hidden: Hidden
       blocked: Blocked
@@ -429,10 +419,9 @@ en:
         joined: Joined
         sessions: Active sessions
         invited_by: Invited by
-        favorite_locations: Interests – Places
-        favorite_styles: Interests – Styles
+        saved_filters: Saved filters
         delete_heading: Delete account
-        delete_hint: This permanently removes this account and its interests.
+        delete_hint: This permanently removes this account and its data.
         delete: Delete account
         delete_confirm: "Permanently delete account %{username}?"
     invitations:
@@ -529,23 +518,6 @@ en:
         merged: Events merged.
       unmerge:
         unmerged: Event split out as standalone.
-    styles:
-      index:
-        title: Styles
-        status_all: All
-        status_assigned: Assigned
-        status_unassigned: Unassigned
-        search: Search styles…
-        sort_by: Sort by
-        sort_name: name
-        sort_count: usage
-        usage:
-          one: tags 1 event
-          other: tags %{count} events
-        genre_count:
-          one: mapped by 1 genre
-          other: mapped by %{count} genres
-        empty: No styles match.
     locations:
       index:
         title: Locations
@@ -622,9 +594,6 @@ en:
       invitation:
         one: Invitation
         other: Invitations
-      style:
-        one: Style
-        other: Styles
     attributes:
       user:
         username: Username
@@ -660,10 +629,8 @@ en:
         label: View
         list: List
         calendar: Calendar
-      favorites_filter:
-        label: My interests
-      notify_filter: Notify me
-      notify_filter_existing: You're notified about this — manage
+      save_filter: Save this filter
+      save_filter_saved: Saved — edit
     day:
       empty: No events on this day.
       close: Close

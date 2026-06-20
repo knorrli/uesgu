@@ -8,11 +8,12 @@ class EventsController < ApplicationController
   # GET /events
   def index
     @filter = build_filter
-    # A logged-in user gets a "notify me about this filter" bell; if they already
-    # have a rule for exactly this filter set, it's lit and links to that rule
-    # instead of creating a clone (see _notify_button + NotificationRule.matching).
+    # A logged-in user gets the ★ save control for the active filter. @saved_filter
+    # is the saved filter matching this exact filter set, if any: present → the ★
+    # is lit and links to its editor; nil → an outline ★ links to a fresh draft
+    # (see _save_notify + SavedFilter.matching).
     if current_user && @filter.active?
-      @notify_rule = current_user.notification_rules.matching(NotificationRule.fingerprint_for(@filter))
+      @saved_filter = current_user.saved_filters.matching(SavedFilter.fingerprint_for(@filter))
     end
     @q = Event.visible.ransack(@filter.ransack_query)
 
@@ -26,17 +27,14 @@ class EventsController < ApplicationController
       @calendar_start = (Date.parse(params[:start_date]) rescue nil) || @filter.earliest_date || Date.current
       # simple_calendar navigates via params[:start_date]; load the focused
       # month plus a week of padding so adjacent-month grid cells are covered.
-      @events = events.includes(:locations, :styles).where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))
-      # Followed locations surface venues first in each cell; the per-day heart
-      # marker (locations or styles) is computed in the calendar partial.
-      @favorites = current_user&.location_list.to_a
+      @events = events.includes(:locations, :genres).where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))
       # A day's expansion is URL state (params[:day]), so the server renders the
       # open day's detail inline in the grid — linkable, reload-safe, and the
       # source of truth (no client-side drawer to preserve). See #day_events.
       @open_day = (Date.parse(params[:day]) rescue nil) if params[:day].present?
       @open_day_events = day_events(@open_day) if @open_day
     else
-      @events = events.includes(:locations, :styles, :genres).page(params[:page])
+      @events = events.includes(:locations, :genres).page(params[:page])
     end
   end
 
@@ -58,7 +56,7 @@ class EventsController < ApplicationController
     filter.date_ranges = ["#{date.iso8601} - #{date.iso8601}"]
     Event.visible.ransack(filter.ransack_query)
          .result(distinct: true)
-         .includes(:locations, :styles, :genres)
+         .includes(:locations, :genres)
          .order(:start_time, :title)
   end
 
@@ -68,8 +66,8 @@ class EventsController < ApplicationController
     # Anything absent stays nil, so Filter.build leaves that list at its default.
     Filter.build(
       queries: params[:q].present? ? Array(params[:q]).compact_blank : nil,
+      genres: params[:g].presence,
       location_list: params[:l].presence,
-      style_list: params[:s].presence,
       date_ranges: params[:d].present? ? Array(params[:d]).compact_blank : nil
     )
   end

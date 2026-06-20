@@ -9,11 +9,6 @@
       <dd class="muted"><%= Event.count %></dd>
     </div>
     <div class="stat">
-      <dt><%= link_to Style.model_name.human(count: :many), admin_styles_path, class: 'stat-link' %></dt>
-      <span class="stat__leader"></span>
-      <dd class="muted"><%= Style.count %></dd>
-    </div>
-    <div class="stat">
       <dt><%= link_to Location.model_name.human(count: :many), admin_locations_path, class: 'stat-link' %></dt>
       <span class="stat__leader"></span>
       <dd class="muted"><%= @event_tag_stats.location_tags.count %></dd>
@@ -24,14 +19,14 @@
     <h2><%= link_to Genre.model_name.human(count: :many), genres_path, class: 'heading-link' %> <span class="muted"><%= @event_tag_stats.genre_tags.count %></span></h2>
     <dl class="flex flex-col gap-small">
       <div class="stat">
-        <dt><%= link_to t('.assigned'), genres_path(status: 'assigned'), class: 'stat-link' %></dt>
+        <dt><%= link_to t('.placed'), genres_path(status: 'placed'), class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
-        <dd class="muted"><%= @event_tag_stats.assigned_genre_tags.count %></dd>
+        <dd class="muted"><%= @event_tag_stats.placed_genre_tags.count %></dd>
       </div>
       <div class="stat">
-        <dt><%= link_to t('.unassigned'), genres_path(status: 'unassigned'), class: 'stat-link' %></dt>
+        <dt><%= link_to t('.unplaced'), genres_path(status: 'unplaced'), class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
-        <dd class="muted"><%= @event_tag_stats.unassigned_genre_tags.count %></dd>
+        <dd class="muted"><%= @event_tag_stats.unplaced_genre_tags.count %></dd>
       </div>
       <div class="stat">
         <dt><%= link_to t('.ignored'), genres_path(status: 'ignored'), class: 'stat-link' %></dt>

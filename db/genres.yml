@@ -1,0 +1,366 @@
+# Curated genre tree — the backbone seed loaded by `rake taxonomy:import_tree`.
+#
+# Hand-cultivated (a tight set; the flat ~5.7k-tag draft from `taxonomy:draft_tree`
+# was pruned down to genres people actually browse by). Anything not here still
+# arrives *unplaced* in the admin curation queue on the next scrape — nothing is
+# lost by omission, so prune freely and file new leaves from the queue over time.
+#
+#   genres:  nested name/children tree (roots = top-level genres, no parent)
+#   hidden:  non-music genres (event hidden iff it has only hidden genres)
+#   blocked: scraper noise, never a real genre (tag stripped on sight)
+#   ignored: real, publicly-shown genres deliberately left unplaced
+#   aliases: canonical => [spelling variants] the fingerprint can't catch
+genres:
+- name: Rock
+  children:
+  - Classic Rock
+  - Rock & Roll
+  - Rockabilly
+  - Hard Rock
+  - Glam Rock
+  - Psych Rock
+  - Prog Rock
+  - Art Rock
+  - Surf Rock
+  - Garage Rock
+  - Krautrock
+  - New Wave
+  - Post-Rock
+  - Stoner Rock
+  - name: Indie Rock
+    children:
+    - Shoegaze
+    - Noise Rock
+    - Math Rock
+    - Indie Surf
+  - name: Alternative Rock
+    children:
+    - Grunge
+    - Britpop
+
+- name: Punk & Hardcore
+  children:
+  - Punk Rock
+  - Pop Punk
+  - Garage Punk
+  - Skate Punk
+  - Riot Grrrl
+  - Oi
+  - name: Hardcore Punk
+    children:
+    - Crustpunk
+    - D-Beat
+    - Powerviolence
+    - Post-Hardcore
+  - name: Post-Punk
+    children:
+    - Gothic Rock
+    - No Wave
+  - name: Emo
+    children:
+    - Midwest Emo
+    - Screamo
+
+- name: Metal
+  children:
+  - Heavy Metal
+  - Thrash Metal
+  - Power Metal
+  - Prog Metal
+  - Speed Metal
+  - Folk Metal
+  - Symphonic Metal
+  - Nu-Metal
+  - Groove Metal
+  - Industrial Metal
+  - Gothic Metal
+  - name: Death Metal
+    children:
+    - Melodic Death Metal
+    - Technical Death Metal
+  - name: Black Metal
+    children:
+    - Atmospheric Black Metal
+  - name: Doom Metal
+    children:
+    - Sludge Metal
+    - Stoner Metal
+  - name: Metalcore
+    children:
+    - Deathcore
+
+- name: Pop
+  children:
+  - Synth Pop
+  - Indie Pop
+  - Dream Pop
+  - Art Pop
+  - Electropop
+  - Dance Pop
+  - Power Pop
+  - Bedroom Pop
+  - Chamber Pop
+  - Hyperpop
+  - K-Pop
+  - J-Pop
+
+- name: Electronic
+  children:
+  - IDM
+  - Electro
+  - Synthwave
+  - EBM
+  - Industrial
+  - Hardstyle
+  - name: House
+    children:
+    - Deep House
+    - Tech House
+    - Acid House
+    - Progressive House
+    - Disco House
+  - name: Techno
+    children:
+    - Minimal Techno
+    - Melodic Techno
+  - name: Trance
+    children:
+    - Psytrance
+  - name: Drum & Bass
+    children:
+    - Liquid Funk
+    - Jungle
+  - name: Dubstep
+    children:
+    - Future Bass
+  - name: Breakbeat
+    children:
+    - Big Beat
+  - name: Ambient
+    children:
+    - Downtempo
+    - Trip Hop
+  - name: UK Garage
+    children:
+    - Grime
+  - name: Disco
+    children:
+    - Italo Disco
+    - Nu-Disco
+
+- name: Hip Hop & Rap
+  children:
+  - Rap
+  - Trap
+  - Boom Bap
+  - Conscious Hip Hop
+  - Gangsta Rap
+  - Cloud Rap
+  - Jazz Rap
+  - Experimental Hip Hop
+  - Lo-Fi Hip Hop
+  - Old School Hip Hop
+  - name: Drill
+    children:
+    - UK Drill
+
+- name: Soul, Funk & R&B
+  children:
+  - Soul
+  - Neo Soul
+  - Northern Soul
+  - Funk
+  - R&B
+  - Contemporary R&B
+  - Alternative R&B
+  - Motown
+  - Gospel
+
+- name: Jazz
+  children:
+  - Bebop
+  - Swing
+  - Big Band
+  - Cool Jazz
+  - Hard Bop
+  - Free Jazz
+  - Modal Jazz
+  - Jazz Fusion
+  - Soul Jazz
+  - Spiritual Jazz
+  - Nu Jazz
+  - Smooth Jazz
+  - Gypsy Jazz
+  - Avant-Garde Jazz
+
+- name: Blues
+  children:
+  - Delta Blues
+  - Chicago Blues
+  - Electric Blues
+  - Country Blues
+  - Blues Rock
+  - Jump Blues
+  - Boogie-Woogie
+
+- name: Folk & Singer-Songwriter
+  children:
+  - Singer-Songwriter
+  - Liedermacher
+  - Mundart
+  - Chanson
+  - Anti-Folk
+  - Freak Folk
+  - name: Folk
+    children:
+    - Folk Rock
+    - Indie Folk
+    - Contemporary Folk
+    - Traditional Folk
+    - Celtic Folk
+
+- name: Country & Americana
+  children:
+  - Americana
+  - Bluegrass
+  - Alt-Country
+  - Outlaw Country
+  - Honky Tonk
+  - Country Rock
+
+- name: Reggae, Dub & Ska
+  children:
+  - Dub
+  - name: Reggae
+    children:
+    - Roots Reggae
+    - Dancehall
+    - Lovers Rock
+  - name: Ska
+    children:
+    - Ska Punk
+    - Two Tone
+    - Rocksteady
+
+- name: Classical & Contemporary
+  children:
+  - Baroque
+  - Romantic
+  - Opera
+  - Chamber Music
+  - Orchestral
+  - Choral
+  - Early Music
+  - Contemporary Classical
+  - Minimalism
+  - Neo-Classical
+  - Soundtrack
+
+- name: Experimental & Avant-Garde
+  children:
+  - Noise
+  - Drone
+  - Musique Concrète
+  - Sound Art
+  - Free Improvisation
+  - Avant-Garde
+
+- name: Latin American
+  children:
+  - Salsa
+  - Cumbia
+  - Reggaeton
+  - Latin Pop
+  - Latin Rock
+  - Bossa Nova
+  - Samba
+  - MPB
+  - Bachata
+  - Merengue
+  - Tango
+  - Bolero
+  - Mariachi
+  - Forró
+
+- name: African
+  children:
+  - Afrobeat
+  - Afrobeats
+  - Highlife
+  - Soukous
+  - Amapiano
+  - Mbalax
+  - Gqom
+  - Desert Blues
+
+- name: Global & Traditional
+  children:
+  - World
+  - Traditional
+  - Klezmer
+  - Balkan
+  - Flamenco
+  - Fado
+  - Roma
+  - Middle Eastern
+  - Indian Classical
+  - Bhangra
+  - Gamelan
+
+- name: Schlager & Volksmusik
+  children:
+  - Schlager
+  - Volksmusik
+  - Discofox
+  - Partyschlager
+
+# non-music / junk handled by disposition, not parenting
+hidden:
+- Public-Viewing
+- Lesung
+- Pup Quiz
+- Schachturnier
+- Spieleabend
+- E-Sports
+- Workshop
+- Drag Show
+- Shibari
+- Politik
+- Picnic
+- Humor
+- Comedy
+- Clean Comedy
+- Australian Comedy
+- British Comedy
+- Canadian Comedy
+- Latino Comedy
+- New Comedy
+- Black Comedy
+- Talent Show
+- Deep Talent Show
+- Nursery
+- Lullaby
+- Instrumental Lullaby
+- ASMR
+- Meditation
+- Guided Meditation
+- World Meditation
+blocked:
+- Konzert
+- Music
+ignored:
+- Festival
+- Mini-Festival
+
+# semantic merges the fingerprint can't catch
+aliases:
+  R&B:
+  - Rnb
+  Synth Pop:
+  - Synthie-Pop
+  Electronic:
+  - Elektronik
+  Psych Rock:
+  - Rock Psyché
+  Psychedelic:
+  - Psyché

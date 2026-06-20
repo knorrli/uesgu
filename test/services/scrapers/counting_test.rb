@@ -143,7 +143,7 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     refute event.reload.discarded?
   end
 
-  test 'a re-scrape leaves an admin-pinned genre list alone but re-derives styles' do
+  test 'a re-scrape leaves an admin-pinned genre list alone' do
     url = 'https://fixture.test/pinned-genres'
     CountingScraperHarness.next_rows = [{ url: url, title: 'Show', genres: ['Aaa'] }]
     CountingScraperHarness.new.call

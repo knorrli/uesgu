@@ -2,7 +2,7 @@ require 'db_test_helper'
 
 # Locks the notifications inbox: the index lists the user's digests with their
 # name + event count, and show marks a digest read. (Digests are created by
-# NotificationRule#fire!, not lazily on visit.)
+# SavedFilter#fire!, not lazily on visit.)
 class NotificationsTest < ActionDispatch::IntegrationTest
   test 'index lists the users digests by name' do
     u = user
@@ -14,9 +14,8 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     get notifications_path
     assert_response :success
     assert_select '.notification__name', text: /My alert/
-    # The Inbox tabs tie the messages list and the rules together.
-    assert_select '.segmented a.active[href=?]', notifications_path
-    assert_select '.segmented a[href=?]', notification_rules_path
+    # The inbox is its own standalone section now — no Eingang/Filter tabs.
+    assert_select '.inbox-tabs', false
   end
 
   test 'index shows each digests own event count' do

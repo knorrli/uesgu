@@ -1,0 +1,83 @@
+<%# The "What" sheet/panel: free-text queries + the curated genre tree. Shared by
+    the events filter (filter: @filter) and the rule editor (filter: the rule's
+    saved filter). The option rows ARE the submitted inputs (q[]/g[]); the parent
+    filter-sheets controller handles open/close, in-sheet search, and the free-text
+    "search for X" row. Local: filter. %>
+<section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
+         aria-label="<%= t('events.filter.sheet.what') %>"
+         data-filter-sheets-target="sheet" data-field="what">
+  <header class="sheet__header">
+    <button type="button" class="sheet__close ph ph-x" data-action="filter-sheets#close" aria-label="<%= t('events.filter.close') %>"></button>
+    <h2 class="sheet__title"><%= t('events.filter.sheet.what') %></h2>
+    <button type="button" class="sheet__clear" data-action="filter-sheets#clear" data-filter-sheets-field-param="what"><%= t('events.filter.clear') %></button>
+  </header>
+  <div class="sheet__search">
+    <span class="sheet__search-icon ph ph-magnifying-glass"></span>
+    <input type="search" class="sheet__search-input" enterkeyhint="search" autocomplete="off"
+           placeholder="<%= t('events.filter.what') %>"
+           data-action="input->filter-sheets#filter keydown->filter-sheets#commitTyped">
+  </div>
+  <div class="sheet__body">
+    <%# The thing a fixed list can't do: turn whatever you typed into a search. %>
+    <button type="button" class="opt opt--newquery" hidden data-action="filter-sheets#addQuery">
+      <span class="opt__box"><span class="ph ph-magnifying-glass"></span></span>
+      <span class="opt__label" data-newquery-label></span>
+    </button>
+
+    <%# Applied free-text queries (how a tapped genre arrives). Genres (g[]) and
+        free text (q[]) are one What vocabulary on the row, so no type label —
+        mirrors the unified chip. %>
+    <div class="sheet__queries" data-filter-sheets-target="queries">
+      <% filter.queries.each do |query| %>
+        <label class="opt opt--query">
+          <input type="checkbox" name="q[]" value="<%= query %>" checked>
+          <span class="opt__box"></span>
+          <span class="opt__label"><%= query %></span>
+        </label>
+      <% end %>
+    </div>
+
+    <%# Curated GENRE TREE — roots → children → grandchildren, rendered through the
+        same collapsible markup as the Where sheet's canton > city > venue so What
+        and Where read identically. A pick commits its g[] genre, which matches that
+        genre + every descendant (Filter#expanded_genre_names). The search box
+        filters the whole tree live (data-search). %>
+    <% genre_filter_tree.each do |root| %>
+      <div class="loc-group collapsed" data-filter-sheets-target="group">
+        <div class="loc-group__head">
+          <label class="opt opt--canton" data-search="<%= root[:search] %>">
+            <input type="checkbox" name="g[]" value="<%= root[:value] %>" <%= 'checked' if filter.genres.include?(root[:value]) %>>
+            <span class="opt__box"></span>
+            <span class="opt__label"><%= root[:name] %></span>
+          </label>
+          <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
+                  aria-label="<%= root[:name] %>">
+            <span class="loc-group__count"><%= root[:count] %></span>
+            <span class="loc-group__chevron ph ph-caret-down"></span>
+          </button>
+        </div>
+        <div class="loc-group__body">
+          <% root[:children].each do |child| %>
+            <label class="opt opt--city" data-search="<%= child[:search] %>">
+              <input type="checkbox" name="g[]" value="<%= child[:value] %>" <%= 'checked' if filter.genres.include?(child[:value]) %>>
+              <span class="opt__box"></span>
+              <span class="opt__label"><%= child[:name] %></span>
+              <span class="opt__count"><%= child[:count] %></span>
+            </label>
+            <% child[:children].each do |grandchild| %>
+              <label class="opt opt--venue" data-search="<%= grandchild[:search] %>">
+                <input type="checkbox" name="g[]" value="<%= grandchild[:value] %>" <%= 'checked' if filter.genres.include?(grandchild[:value]) %>>
+                <span class="opt__box"></span>
+                <span class="opt__label"><%= grandchild[:name] %></span>
+                <span class="opt__count"><%= grandchild[:count] %></span>
+              </label>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <footer class="sheet__footer">
+    <button type="button" class="sheet__apply" data-action="filter-sheets#apply"><%= t('events.filter.apply') %></button>
+  </footer>
+</section>

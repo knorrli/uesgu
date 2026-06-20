@@ -5,23 +5,18 @@ class EventTagStatsPresenter
       .where(taggings: { context: 'locations', taggable_type: Event.name })
   end
 
-  def style_tags
-    ActsAsTaggableOn::Tag
-      .includes(:taggings)
-      .where(taggings: { context: 'styles', taggable_type: Event.name })
-  end
-
   # Genres are now first-class; "in use" means present on at least one event.
   def genre_tags
     Genre.in_use
   end
 
-  def assigned_genre_tags
-    Genre.in_use.assigned
+  # Filed into the tree (placed under a parent) vs. still waiting in the queue.
+  def placed_genre_tags
+    Genre.in_use.placed
   end
 
-  def unassigned_genre_tags
-    Genre.unassigned
+  def unplaced_genre_tags
+    Genre.unplaced
   end
 
   def ignored_genre_tags

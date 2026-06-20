@@ -5,8 +5,8 @@ class NotificationMailer < ApplicationMailer
   def digest(notification)
     @notification = notification
     @user = notification.user
-    @rule = notification.notification_rule
-    @events = notification.events.includes(:locations, :styles, :genres).to_a
+    @rule = notification.saved_filter
+    @events = notification.events.includes(:locations, :genres).to_a
     @notification_url = notification_url(@notification)
     @browse_url = root_url
 

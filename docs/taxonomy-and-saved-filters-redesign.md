@@ -106,12 +106,18 @@ batched per filter over the visible window rather than a set lookup. Bounded, bu
 
 Each phase is independently shippable and testable.
 
-- **Phase 0 — Seed bootstrap (tooling).** Generate a *draft* tree seed from today's
-  `Style→Genre` data (styles → roots, their genres → children; dispositions/aliases
-  preserved) as the YAML the user then cultivates by hand. No app change.
-- **Phase 1 — Genre tree.** Add `parent_id`; tree-expansion helper (`descendant_ids`,
-  cached); reframe dispositions ("assign" → "set parent"); admin curation updated to
-  parenting; idempotent seed loader. Style still present, untouched.
+- **Phase 0 — Seed bootstrap (tooling). ✅ DONE.** `rake taxonomy:draft_tree` reads
+  `lib/genres.json` + `genre_aliases.json` + `genre_dispositions.json` and emits
+  `db/genres.yml` (styles → roots, their genres → children, deduped by fingerprint;
+  dispositions/aliases carried over). A first *draft* to cultivate by hand — it is a
+  flat dump of today's 15 styles × ~5.7k genres; the real work is nesting/pruning it.
+- **Phase 1 — Genre tree. ✅ DONE.** `genres.parent_id` (self-ref FK + not-self check);
+  `Genre.subtree_ids` (recursive CTE) / `#descendant_ids`; `Genre#set_parent!` (the
+  "assign" → "set parent" reframe, with a cycle guard) clearing dispositions; `unplaced`
+  scope = the new curation queue; dispositions/merge/restore detach from the tree; admin
+  curation parents via a combobox (`GenresController#set_parent`); idempotent loader
+  `GenreTreeSeed` / `rake taxonomy:import_tree`. Style still present, untouched.
+  Tests: `genre_tree_test`, `genre_tree_seed_test`, `genres_admin_test`.
 - **Phase 2 — Filter on the tree.** `Filter` gains genre tree-expansion (`genres` slot);
   What picker renders the tree big-first; row shows genres only + descendant highlight;
   music gate reads genre dispositions. **Remove `Style`** (model, HABTM, styles

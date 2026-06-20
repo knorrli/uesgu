@@ -22,11 +22,11 @@ class HeaderTest < ActionDispatch::IntegrationTest
     assert_select '.site-nav > a[href=?]', notifications_path, false
   end
 
-  test 'the account menu drops the rules and logout rows (folded into Inbox / Settings)' do
+  test 'the account menu has its own Filter row and drops logout (folded into Settings)' do
     sign_in_as user
     get root_path
-    # Notification rules are now a tab inside the Inbox, not a menu row.
-    assert_select '.nav-menu__items a[href=?]', notification_rules_path, false
+    # Saved filters are their own nav section now (no longer an inbox tab).
+    assert_select '.nav-menu__items a[href=?]', saved_filters_path, 1
     # Logout moved to the Settings page.
     assert_select '.nav-menu__items a[href=?]', session_path, false
   end

@@ -36,10 +36,9 @@ module EventsHelper
   # FILTERS the programme by that term ("tap rock → rock events"), the behaviour
   # cold users expect. One action per tag: the whole tag is the filter link, so a
   # tag means exactly one thing (no tiny secondary follow target crammed onto a
-  # finger-sized chip). Following moved off the tag onto the dedicated "follow this
-  # filter" control (see _notify_button), which frees colour to mean the app's
-  # usual "this is interactive" again. favorite_type: is kept for call-site
-  # compatibility.
+  # finger-sized chip). Following was removed entirely (the ★ saves a whole filter
+  # instead — see _save_notify), which frees colour to mean the app's usual "this
+  # is interactive" again.
   #
   # The tap TOGGLES the filter by this term, and the highlight follows MATCHING,
   # not exact equality. A tag lights green when an applied filter matches it — for
@@ -53,7 +52,7 @@ module EventsHelper
   # reset so you land on page 1. In a read-only context (no filter form, e.g. a
   # notification digest passing interactive: false) it stays a plain single-value
   # link into the listing — a way back into the site.
-  def event_filter_tag(label, field:, value:, interactive: true, modifier: nil, favorite_type: nil)
+  def event_filter_tag(label, field:, value:, interactive: true, modifier: nil)
     param = field.delete_suffix('[]')
 
     unless interactive
@@ -63,17 +62,25 @@ module EventsHelper
 
     applied = request.query_parameters.except('page')
 
-    # A descriptor (q[]) is part of the "What" axis, so it's matched by EVERY What
-    # term — freetext q[] AND a picked style s[] — by the same CONTAINS rule. That's
-    # why applying the style "Rock" lights the "Rock" / "Punk Rock" descriptors, not
-    # only a typed freetext. Locations match their own param, exactly.
-    match_params = param == 'q' ? %w[q s] : [param]
-    matched = match_params.to_h { |p| [p, filter_terms_matching(Array(applied[p]), value, param: param)] }
+    # Which applied filter params light this tag, and the match RULE for each (the
+    # rule is keyed to the APPLIED param, not the tag, so one tag can answer to two
+    # axes). A genre tag (g) lights from a genre filter (g, subtree match) OR a
+    # freetext term (q, CONTAINS on the genre name) — so typing "hop" lights
+    # "Hip Hop" just like picking a parent genre does. Anything else matches its
+    # own param exactly (locations).
+    matchers =
+      case param
+      when 'g' then { 'g' => 'g', 'q' => 'q' }
+      else { param => param }
+      end
+    matched = matchers.to_h { |p, rule| [p, filter_terms_matching(Array(applied[p]), value, param: rule)] }
     active = matched.values.any?(&:present?)
 
     query = applied.dup
     if active
-      # Tap GREEN → drop every applied term that lit this tag, across q[] and s[].
+      # Tap GREEN → drop every applied term that lit this tag, across all the axes
+      # that matched it (e.g. a genre tag lit by both a g[] ancestor and a q[]
+      # freetext clears both).
       matched.each do |p, terms|
         next if terms.empty?
         rest = Array(applied[p]) - terms
@@ -90,78 +97,34 @@ module EventsHelper
   end
 
   # The applied terms that "match" a tag — the ones that light it green and that
-  # tapping it removes. The What axis (q[] freetext + s[] styles, passed as param
-  # 'q') matches by CONTAINS (the tag contains the applied term), so sibling
-  # descriptors light up instead of only exact hits; locations match exactly.
+  # tapping it removes. Free text (param 'q') matches by CONTAINS (the tag contains
+  # the applied term), so sibling descriptors light up instead of only exact hits;
+  # genres (param 'g') match by subtree membership; locations match exactly.
   # Case-insensitive.
   def filter_terms_matching(applied_terms, value, param:)
-    if param == 'q'
+    case param
+    when 'q'
       haystack = value.to_s.downcase
       applied_terms.select { |term| haystack.include?(term.to_s.downcase) }
+    when 'g'
+      # A genre tag lights when an applied genre filter's SUBTREE contains it —
+      # descendant-set membership, reusing the same tree expansion Filter matches
+      # with (so filtering "Rock" lights a row's "Shoegaze"). Tapping it removes
+      # that ancestor term, broadening the filter (the toggle semantics below).
+      applied_terms.select { |term| genre_subtree_names(term).include?(value.to_s) }
     else
       applied_terms.select { |term| term.to_s == value.to_s }
     end
   end
 
-  # The whole tag is the follow toggle: clicking the venue/style name (a big,
-  # obvious target, not a tiny icon) follows/unfollows it, shown by a trailing
-  # heart that inherits the tag's size. Optimistic — the favorite Stimulus
-  # controller flips every matching tag on the page and POSTs in the background,
-  # so nothing reloads. At rest a followable tag looks like plain info (a faint
-  # outline heart is the only "you can follow this" cue, so the list reads the same
-  # logged in or out); following it fills the heart and lights the tag in the
-  # accent colour — the one place colour now means "this is yours".
-  def favorite_tag(label, type, value, modifier = nil)
-    followed = followed_tag?(type, value)
-    button_tag type: :button,
-               class: class_names('event-tag', 'fav', modifier, followed: followed),
-               'aria-pressed': followed.to_s,
-               'aria-label': t('favorites.toggle', name: value),
-               data: { action: 'favorite#toggle', favorite_type_param: type, favorite_value_param: value } do
-      safe_join([
-        content_tag(:span, label, class: 'fav-label'),
-        content_tag(:span, '', class: 'fav-star', 'aria-hidden': true)
-      ])
+  # The set of genre names in the subtree rooted at `term` (the genre itself plus
+  # every descendant), matched by fingerprint. Memoised per request so a genre
+  # repeated across many rows costs one lookup, not one per tag.
+  def genre_subtree_names(term)
+    (@genre_subtree_names ||= {})[term.to_s] ||= begin
+      root_ids = Genre.where(fingerprint: Genre.fingerprint_for(term)).ids
+      Set.new(Genre.where(id: Genre.subtree_ids(root_ids)).pluck(:name))
     end
-  end
-
-  def followed_tag?(type, value)
-    case type.to_sym
-    when :location then followed_locations.include?(value)
-    when :style then followed_styles.include?(value)
-    else false
-    end
-  end
-
-  # The current user's follows, loaded once per request and reused across every
-  # tag in the list (a style repeats on many events; a venue on many days).
-  def followed_locations
-    @followed_locations ||= Set.new(current_user&.location_list)
-  end
-
-  def followed_styles
-    @followed_styles ||= Set.new(current_user&.style_list)
-  end
-
-  # The user's follows as namespaced keys ("l:<location>" / "s:<style>"). Used to
-  # render each day's heart marker server-side (the authoritative source on every
-  # render) and handed to the favorite Stimulus controller so it can flip those
-  # markers the instant a tag is toggled. See CalendarHelper#calendar_day_favorite_keys.
-  def favorite_followed_keys
-    followed_locations.map { |name| "l:#{name}" } + followed_styles.map { |name| "s:#{name}" }
-  end
-
-  # Offer the "filter to my favorites" shortcut only to a logged-in user who has
-  # at least one followed location or style — otherwise there is nothing to apply.
-  def favorites_filter_available?
-    current_user.present? && (followed_locations.any? || followed_styles.any?)
-  end
-
-  # True when the active filter is exactly the user's favorites (locations and
-  # styles, order-independent, and no extra free-text query). When on, the control
-  # reads as active and a click clears it back to the full programme.
-  def favorites_filter_active?
-    favorites_filter_available? && current_user.favorites_filter?(@filter)
   end
 
   # The current user's saved event ids, loaded once so the per-event save button
@@ -172,15 +135,6 @@ module EventsHelper
 
   def event_saved?(event)
     saved_event_ids.include?(event.id)
-  end
-
-  # True when an event touches one of the user's follows — a followed location or
-  # style. In-memory over already-loaded associations + the cached followed sets,
-  # so it stays cheap across a calendar month. Used to pick a cell's interest
-  # headline (see CalendarHelper#calendar_day_headline).
-  def event_matches_follow?(event)
-    event.locations.any? { |location| followed_locations.include?(location.name) } ||
-      event.styles.any? { |style| followed_styles.include?(style.name) }
   end
 
   # The bookmark toggle on an event. Logged-in only; optimistic via the `save`

@@ -6,7 +6,6 @@
     "title": "Sommerpause",
     "subtitle": null,
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Bar 59",
       "Luzern",
@@ -21,7 +20,6 @@
     "title": "Sommerpause",
     "subtitle": null,
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Bar 59",
       "Luzern",
@@ -38,9 +36,6 @@
     "genre_list": [
       "Karaoke"
     ],
-    "style_list": [
-      "Karaoke"
-    ],
     "location_list": [
       "Bar 59",
       "Luzern",
@@ -55,7 +50,6 @@
     "title": "Sommerpause",
     "subtitle": null,
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Bar 59",
       "Luzern",
@@ -70,9 +64,6 @@
     "title": "B59 Tanznacht",
     "subtitle": null,
     "genre_list": [
-      "Open Format"
-    ],
-    "style_list": [
       "Open Format"
     ],
     "location_list": [
@@ -91,9 +82,6 @@
     "genre_list": [
       "Hip-Hop & Classics"
     ],
-    "style_list": [
-      "Hip-Hop & Classics"
-    ],
     "location_list": [
       "Bar 59",
       "Luzern",
@@ -108,9 +96,6 @@
     "title": "B59 Party Tunes",
     "subtitle": null,
     "genre_list": [
-      "Open Format"
-    ],
-    "style_list": [
       "Open Format"
     ],
     "location_list": [
@@ -131,11 +116,6 @@
       "Bachata",
       "Reggaeton"
     ],
-    "style_list": [
-      "Salsa",
-      "Bachata",
-      "Reggaeton"
-    ],
     "location_list": [
       "Bar 59",
       "Luzern",
@@ -152,9 +132,6 @@
     "genre_list": [
       "Open Format"
     ],
-    "style_list": [
-      "Open Format"
-    ],
     "location_list": [
       "Bar 59",
       "Luzern",
@@ -169,9 +146,6 @@
     "title": "Baraoke 59 - Karaoke",
     "subtitle": null,
     "genre_list": [
-      "Karaoke"
-    ],
-    "style_list": [
       "Karaoke"
     ],
     "location_list": [

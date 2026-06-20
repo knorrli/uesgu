@@ -11,7 +11,7 @@ Rails.application.configure do
     policy.img_src         :self, :data, :https
     policy.object_src      :none
     policy.script_src      :self                 # all JS is vendored via importmap
-    policy.style_src       :self, :unsafe_inline # easepick/calendar set inline styles
+    policy.style_src       :self, :unsafe_inline # some views use inline style= attrs
     policy.base_uri        :self
     policy.form_action     :self
     policy.frame_ancestors :self                 # clickjacking guard

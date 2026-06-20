@@ -276,8 +276,8 @@ de:
       set_parent: Übergeordnetes Genre setzen
       set_parent_into: "Unter ein Genre einordnen…"
       ignore: "Ignorieren"
-      hide: "Event verbergen (keine Musik)"
-      block: "Tag entfernen"
+      hide: "Event verbergen"
+      block: "Genre verbergen"
       merge: Zusammenführen
       merge_into: "Mit anderem Genre zusammenführen…"
       merge_suggested: "Mit ähnlichem Genre zusammenführen"

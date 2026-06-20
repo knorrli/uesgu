@@ -276,8 +276,8 @@ fr:
       set_parent: Définir le parent
       set_parent_into: "Classer sous un autre genre…"
       ignore: "Ignorer"
-      hide: "Masquer l'événement (non musical)"
-      block: "Retirer le tag"
+      hide: "Masquer l'événement"
+      block: "Masquer le genre"
       merge: Fusionner
       merge_into: "Fusionner avec un autre genre…"
       merge_suggested: "Fusionner avec un genre similaire"

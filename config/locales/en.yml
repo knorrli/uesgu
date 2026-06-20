@@ -276,8 +276,8 @@ en:
       set_parent: Set parent
       set_parent_into: "File under another genre…"
       ignore: "Ignore"
-      hide: "Hide event (non-music)"
-      block: "Strip the tag"
+      hide: "Hide event"
+      block: "Hide the genre"
       merge: Merge
       merge_into: "Merge into another genre…"
       merge_suggested: "Merge into a similar genre"

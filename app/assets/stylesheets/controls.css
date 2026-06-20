@@ -14,6 +14,11 @@ button, a.button {
   align-content: center;
   cursor: pointer;
   text-decoration: none;
+  /* Match the reset's native-control line-height (button/input get 1.1, but <a>
+     doesn't) so an a.button is exactly as tall as a native <button>/submit at the
+     same padding — otherwise the link inherits the body's looser line-height and
+     renders a few px taller (the calendar Subscribe link beside Copy/Deactivate). */
+  line-height: 1.1;
   padding: 5px;
   border: var(--border-width) solid var(--theme-accent-color);
   border-radius: var(--border-radius);

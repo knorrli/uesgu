@@ -37,11 +37,16 @@
   visible — not swallowed or buried at info. Cross-check against the ScrapeRun
   observability data. (See memory `project-scraper-run-observability`.)
 - **Maximize collected info per scraper.** Audit each scraper for fields it
-  *could* be capturing but isn't (time, genres, subtitles, support acts, prices,
-  ticket/detail URLs, images) and improve the ones leaving data on the table.
-  The `/admin/scraper_coverage` matrix now shows current fill-rates per
-  scraper — use it to spot the gaps. NB: prices / support acts / images have no
-  event column yet, so capturing them implies schema additions.
+  *could* be capturing but isn't, using the `/admin/scraper_coverage` matrix to
+  spot low fill-rates. First-pass audit (2026-06-20): the 0%-genre venues
+  (Bad Bonn, Böröm, Dampfzentrale) and bar59's 0% subtitle are **genuine** — the
+  sources don't expose those fields, not bugs. The real finds are *richer fields
+  some sources expose but we drop*: **Bad Bonn** has `data-price`; **bar59**
+  (Firestore) has `artists` (lineup/support), `htmlText` (description), and
+  `picture` (image). Capturing these needs **new event columns first**
+  (`price` / `lineup` / `description` / `image` — none exist today), so this is a
+  schema decision, not just a parser tweak. Re-run the audit across the rest of
+  the scrapers once that's decided.
 
 ### Features / design (settled, unbuilt)
 

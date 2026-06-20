@@ -7,7 +7,6 @@ de:
     filters: Filter
     saved: Merkliste
     settings: Einstellungen
-    logout: Abmelden
     login: Anmelden
     theme: Erscheinungsbild
     install: App installieren
@@ -74,7 +73,6 @@ de:
     log_in_link: Anmelden
     invalid_credentials: Versuche es mit einem anderen Benutzernamen oder Passwort.
     rate_limited: Versuche es später erneut.
-    notify_label: Nicht über neue Veranstaltungen informieren
     invite_label: Einladungscode
     invite_hint: Die Registrierung ist nur mit Einladung möglich.
   registrations:
@@ -84,9 +82,6 @@ de:
   push:
     digest:
       title: Neue Veranstaltungen auf üsgu
-      body:
-        one: 1 neue Veranstaltung passt zu einem gespeicherten Filter.
-        other: "%{count} neue Veranstaltungen passen zu deinen gespeicherten Filtern."
     test:
       title: üsgu
       body: Dies ist eine Test-Benachrichtigung — Push funktioniert. 🎉
@@ -120,9 +115,6 @@ de:
       other: "%{count} gespeicherte Veranstaltungen stehen an"
   saved_filters:
     title: Gespeicherte Filter
-    your_rules: Deine Filter
-    empty: Noch keine Filter — leg unten deinen ersten an.
-    add_rule: Regel hinzufügen
     save_button: Speichern
     window_none: Kein Zeitraum (neue Events)
     apply: Anwenden
@@ -138,12 +130,10 @@ de:
     fire_now: Jetzt testen
     delete: Löschen
     delete_confirm: Diesen gespeicherten Filter wirklich löschen?
-    edit_button: Bearbeiten
     empty_link: Filtere die Veranstaltungen
     empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite und speichere ihn dann.
     type:
       added: Neue Events
-      happening: Was läuft
     errors:
       empty_filter: Wähle zuerst einen Filter (Genre, Ort, Datum …).
       duplicate: Für diesen Filter hast du schon einen gespeicherten Filter.
@@ -163,19 +153,7 @@ de:
       weekly: Wöchentlich
       biweekly: Alle zwei Wochen
       monthly: Monatlich
-    content_types:
-      added: Neu hinzugefügte Veranstaltungen
-      happening: Veranstaltungen in einem Zeitraum
-    scopes:
-      all: Alle Veranstaltungen
-      favorites: Meine Interessen
-      custom: Eigener Filter
     monthday_option: "Am %{day}."
-    rhythm_note: "Du wirst %{rhythm} benachrichtigt."
-    rhythm:
-      daily: täglich
-      weekly: wöchentlich
-      monthly: monatlich
     push_body:
       one: "%{name}: 1 neue Veranstaltung. Tippen zum Ansehen."
       other: "%{name}: %{count} neue Veranstaltungen. Tippen zum Ansehen."
@@ -189,26 +167,13 @@ de:
       weekly: "Jeden %{day}"
       biweekly: "Alle zwei Wochen (%{day})"
       monthly: "Monatlich am %{day}."
-      added: neu hinzugefügt
-      happening: "läuft %{window}"
       scope_all: Alle Events
-      scope_favorites: deine Interessen
-      scope_custom: "%{detail}"
     fields:
-      name: Name
-      name_optional: optional
-      name_placeholder: z. B. Bern am Wochenende
       cadence: Häufigkeit
       weekday: Wochentag
       monthday: Tag im Monat
       time_hour: Stunde
       time_minute: Minute
-      content_type: Art
-      window: Zeitraum
-      scope: Filter
-      filter_locations_ph: z. B. Dachstock, Rössli
-      filter_queries: Suchbegriffe
-      filter_queries_ph: z. B. Bandname
       notify_in_app: Benachrichtigungen in der App
       notify_push: Push auf meine Geräte
       notify_email: E-Mail an mich
@@ -223,12 +188,6 @@ de:
       cta: In der App ansehen
       footer_reason: Du bekommst das wegen eines Filters, den du erstellt hast.
       footer_manage: Deine Filter verwalten
-  frequencies:
-    daily: Täglich
-    weekly: Wöchentlich
-    biweekly: Alle zwei Wochen
-    monthly: Monatlich
-    never: Nie
   simple_calendar:
     previous: Zurück
     today: Heute
@@ -242,13 +201,8 @@ de:
     account_heading: Konto
     push_test: Test senden
     notifications_heading: Push-Benachrichtigungen
-    frequency_label: Wie oft sollen wir dich über neue Veranstaltungen informieren?
     language_heading: Sprache
     language_auto: Automatisch (Browser)
-    favorite_locations_heading: Orte
-    follow_all: Alle in %{name}
-    other_locations: Weitere Orte
-    favorite_styles_heading: Stile
     email_heading: E-Mail
     email_hint: Optional — nur für Updates per Mail. Geht an unseren Mail-Dienst resend.com, sonst nichts.
     email_placeholder: du@beispiel.ch
@@ -274,7 +228,6 @@ de:
     delete_account_confirm: Konto endgültig löschen? Das kann nicht rückgängig gemacht werden.
   notifications:
     index:
-      title: Benachrichtigungen
       empty: Noch nichts da — neue Veranstaltungen landen hier.
       all_read: Alles gelesen — neue Benachrichtigungen landen hier.
       unread_badge: Neu
@@ -286,21 +239,10 @@ de:
       event_count:
         one: 1 Veranstaltung
         other: "%{count} Veranstaltungen"
-      new_events:
-        one: 1 neue Veranstaltung
-        other: "%{count} neue Veranstaltungen"
     show:
       back: ← Alle Benachrichtigungen
       title: Neue Veranstaltungen
-      all: Alle neuen Veranstaltungen
-      relevant: Nur meine Interessen
       empty_all: Keine neuen Veranstaltungen in diesem Zeitraum.
-      empty_relevant: In diesem Zeitraum passte nichts zu deinen Interessen.
-  actions:
-    assign: Zuweisen
-    save: Speichern
-    cancel: Abbrechen
-    delete: Löschen
   genres:
     index:
       title: Genres
@@ -411,7 +353,6 @@ de:
         back: ← Alle Konten
         email: E-Mail
         no_email: keine
-        frequency: Benachrichtigungen
         joined: Beigetreten
         sessions: Aktive Sitzungen
         invited_by: Eingeladen von
@@ -631,13 +572,6 @@ de:
     day:
       empty: Keine Events an diesem Tag.
       close: Schliessen
-    calendar:
-      events:
-        one: "%{count} Event"
-        other: "%{count} Events"
-      more:
-        one: +1 mehr
-        other: "+%{count} mehr"
     filter:
       what: "Acts, Stile, alles suchen…"
       when: Wann?
@@ -654,12 +588,9 @@ de:
       apply: Anwenden
       clear: Zurücksetzen
       close: Schliessen
-      free_text: Freitext
       search_for: 'Suchen nach „%{query}“'
       search_anything: Tippe, um nach allem zu suchen
       custom_range: Eigener Zeitraum
-      date_from: Von
-      date_to: Bis
   helpers:
     page_entries_info:
       more_pages:

@@ -1,0 +1,34 @@
+# i18n-tasks config. Run `i18n-tasks missing` / `i18n-tasks unused` from the
+# project root. The gem is not bundled (installed globally); this file is read
+# regardless.
+base_locale: de
+locales: [de, fr, en]
+
+data:
+  read:
+    - config/locales/%{locale}.yml
+  write:
+    - config/locales/%{locale}.yml
+
+search:
+  paths:
+    - app/
+
+ignore_missing:
+  # Provided at runtime by rails-i18n (de/fr) and Rails core (en); intentionally
+  # not duplicated into our own locale files.
+  - 'date.day_names'
+  - 'date.abbr_day_names'
+  - 'date.month_names'
+
+ignore_unused:
+  # Framework / gem-convention keys used implicitly (not via an explicit t(...)
+  # call the scanner can see): ActiveRecord/ActiveModel model + attribute names
+  # (error messages, form labels), Kaminari pagination, and the custom date/time
+  # formats referenced via `l(x, format: :detailed)` etc.
+  - 'activerecord.*'
+  - 'activemodel.*'
+  - 'helpers.page_entries_info.*'
+  - 'views.pagination.*'
+  - 'date.formats.*'
+  - 'time.formats.*'

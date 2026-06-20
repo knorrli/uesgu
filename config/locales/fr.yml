@@ -7,7 +7,6 @@ fr:
     filters: Filtres
     saved: À voir
     settings: Paramètres
-    logout: Déconnexion
     login: Connexion
     theme: Thème
     install: Installer l'app
@@ -74,7 +73,6 @@ fr:
     log_in_link: Se connecter
     invalid_credentials: Essaie un autre nom d'utilisateur ou mot de passe.
     rate_limited: Réessaie plus tard.
-    notify_label: Ne pas m'informer des nouveaux événements
     invite_label: Code d'invitation
     invite_hint: L'inscription se fait uniquement sur invitation.
   registrations:
@@ -84,9 +82,6 @@ fr:
   push:
     digest:
       title: Nouveaux événements sur üsgu
-      body:
-        one: 1 nouvel événement correspond à un filtre enregistré.
-        other: "%{count} nouveaux événements correspondent à tes filtres enregistrés."
     test:
       title: üsgu
       body: Ceci est une notification de test — le push fonctionne. 🎉
@@ -120,9 +115,6 @@ fr:
       other: "%{count} événements enregistrés arrivent"
   saved_filters:
     title: Filtres enregistrés
-    your_rules: Tes filtres
-    empty: Aucun filtre — crée ton premier ci-dessous.
-    add_rule: Ajouter une règle
     save_button: Enregistrer
     window_none: Sans période (nouveautés)
     apply: Appliquer
@@ -138,12 +130,10 @@ fr:
     fire_now: Tester
     delete: Supprimer
     delete_confirm: Vraiment supprimer ce filtre enregistré ?
-    edit_button: Modifier
     empty_link: Filtre les événements
     empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis enregistre-le.
     type:
       added: Nouveautés
-      happening: À l'affiche
     errors:
       empty_filter: Choisis d'abord un filtre (genre, lieu, date …).
       duplicate: Tu as déjà un filtre enregistré pour ça.
@@ -163,19 +153,7 @@ fr:
       weekly: Hebdomadaire
       biweekly: Toutes les deux semaines
       monthly: Mensuel
-    content_types:
-      added: Événements nouvellement ajoutés
-      happening: Événements sur une période
-    scopes:
-      all: Tous les événements
-      favorites: Mes intérêts
-      custom: Filtre personnalisé
     monthday_option: "Le %{day}"
-    rhythm_note: "Tu seras averti %{rhythm}."
-    rhythm:
-      daily: chaque jour
-      weekly: chaque semaine
-      monthly: chaque mois
     push_body:
       one: "%{name} : 1 nouvel événement. Touche pour voir."
       other: "%{name} : %{count} nouveaux événements. Touche pour voir."
@@ -189,26 +167,13 @@ fr:
       weekly: "Chaque %{day}"
       biweekly: "Toutes les deux semaines (%{day})"
       monthly: "Mensuel le %{day}"
-      added: nouvellement ajoutés
-      happening: "en cours %{window}"
       scope_all: Tous les events
-      scope_favorites: tes intérêts
-      scope_custom: "%{detail}"
     fields:
-      name: Nom
-      name_optional: facultatif
-      name_placeholder: p. ex. Berne le week-end
       cadence: Fréquence
       weekday: Jour de la semaine
       monthday: Jour du mois
       time_hour: Heure
       time_minute: Minute
-      content_type: Type
-      window: Période
-      scope: Filtre
-      filter_locations_ph: p. ex. Dachstock, Rössli
-      filter_queries: Termes de recherche
-      filter_queries_ph: p. ex. nom du groupe
       notify_in_app: Notifications dans l'app
       notify_push: Push sur mes appareils
       notify_email: M'envoyer un e-mail
@@ -223,12 +188,6 @@ fr:
       cta: Voir dans l'app
       footer_reason: Tu reçois ceci à cause d'un filtre que tu as créé.
       footer_manage: Gérer tes filtres
-  frequencies:
-    daily: Quotidien
-    weekly: Hebdomadaire
-    biweekly: Toutes les deux semaines
-    monthly: Mensuel
-    never: Jamais
   simple_calendar:
     previous: Précédent
     today: Aujourd'hui
@@ -242,13 +201,8 @@ fr:
     account_heading: Compte
     push_test: Envoyer un test
     notifications_heading: Notifications push
-    frequency_label: À quelle fréquence veux-tu être informé des nouveaux événements ?
     language_heading: Langue
     language_auto: Automatique (navigateur)
-    favorite_locations_heading: Lieux
-    follow_all: Tout %{name}
-    other_locations: Autres lieux
-    favorite_styles_heading: Styles
     email_heading: E-mail
     email_hint: Facultatif — seulement pour des mises à jour par e-mail. Va à notre service e-mail resend.com, rien d'autre.
     email_placeholder: toi@exemple.ch
@@ -274,7 +228,6 @@ fr:
     delete_account_confirm: Supprimer définitivement ton compte ? Cette action est irréversible.
   notifications:
     index:
-      title: Notifications
       empty: Rien pour l'instant — les nouveaux événements arriveront ici.
       all_read: Tout est lu — les nouvelles notifications arriveront ici.
       unread_badge: Nouveau
@@ -286,21 +239,10 @@ fr:
       event_count:
         one: 1 événement
         other: "%{count} événements"
-      new_events:
-        one: 1 nouvel événement
-        other: "%{count} nouveaux événements"
     show:
       back: ← Toutes les notifications
       title: Nouveaux événements
-      all: Tous les nouveaux événements
-      relevant: Seulement mes intérêts
       empty_all: Aucun nouvel événement durant cette période.
-      empty_relevant: Rien ne correspondait à tes intérêts durant cette période.
-  actions:
-    assign: Assigner
-    save: Enregistrer
-    cancel: Annuler
-    delete: Supprimer
   genres:
     index:
       title: Genres
@@ -411,7 +353,6 @@ fr:
         back: ← Tous les comptes
         email: E-mail
         no_email: aucun
-        frequency: Notifications
         joined: Inscrit le
         sessions: Sessions actives
         invited_by: Invité par
@@ -631,13 +572,6 @@ fr:
     day:
       empty: Aucun événement ce jour-là.
       close: Fermer
-    calendar:
-      events:
-        one: "%{count} événement"
-        other: "%{count} événements"
-      more:
-        one: +1 de plus
-        other: "+%{count} de plus"
     filter:
       what: "Rechercher : artistes, styles…"
       when: Quand ?
@@ -654,12 +588,9 @@ fr:
       apply: Appliquer
       clear: Effacer
       close: Fermer
-      free_text: texte libre
       search_for: 'Rechercher « %{query} »'
       search_anything: Tape pour tout rechercher
       custom_range: Période personnalisée
-      date_from: Du
-      date_to: Au
   helpers:
     page_entries_info:
       more_pages:

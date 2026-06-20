@@ -7,7 +7,6 @@ en:
     filters: Filters
     saved: Watchlist
     settings: Settings
-    logout: Log out
     login: Log in
     theme: Theme
     install: Install app
@@ -74,7 +73,6 @@ en:
     log_in_link: Log in
     invalid_credentials: Try another username or password.
     rate_limited: Try again later.
-    notify_label: Don't notify me about new events
     invite_label: Invitation code
     invite_hint: Sign-up is invitation only.
   registrations:
@@ -84,9 +82,6 @@ en:
   push:
     digest:
       title: New events on üsgu
-      body:
-        one: 1 new event matches a saved filter.
-        other: "%{count} new events match your saved filters."
     test:
       title: üsgu
       body: This is a test notification — push is working. 🎉
@@ -120,9 +115,6 @@ en:
       other: "%{count} saved shows coming up"
   saved_filters:
     title: Saved filters
-    your_rules: Your filters
-    empty: No filters yet — make your first one below.
-    add_rule: Add a rule
     save_button: Save
     window_none: No window (new events)
     apply: Apply
@@ -138,12 +130,10 @@ en:
     fire_now: Test now
     delete: Delete
     delete_confirm: Really delete this saved filter?
-    edit_button: Edit
     empty_link: Filter the events
     empty_html: No saved filters yet. %{link} on the home page, then save it.
     type:
       added: New events
-      happening: What's on
     errors:
       empty_filter: Pick a filter first (genre, location, date …).
       duplicate: You already have a saved filter for this.
@@ -163,19 +153,7 @@ en:
       weekly: Weekly
       biweekly: Every two weeks
       monthly: Monthly
-    content_types:
-      added: Newly added events
-      happening: Events in a window
-    scopes:
-      all: All events
-      favorites: My interests
-      custom: Custom filter
     monthday_option: "On the %{day}."
-    rhythm_note: "You'll be notified %{rhythm}."
-    rhythm:
-      daily: daily
-      weekly: weekly
-      monthly: monthly
     push_body:
       one: "%{name}: 1 new event. Tap to view."
       other: "%{name}: %{count} new events. Tap to view."
@@ -189,26 +167,13 @@ en:
       weekly: "Every %{day}"
       biweekly: "Every two weeks (%{day})"
       monthly: "Monthly on the %{day}."
-      added: newly added
-      happening: "happening %{window}"
       scope_all: All events
-      scope_favorites: your interests
-      scope_custom: "%{detail}"
     fields:
-      name: Name
-      name_optional: optional
-      name_placeholder: e.g. Bern on the weekend
       cadence: Frequency
       weekday: Weekday
       monthday: Day of month
       time_hour: Hour
       time_minute: Minute
-      content_type: Type
-      window: Window
-      scope: Filter
-      filter_locations_ph: e.g. Dachstock, Rössli
-      filter_queries: Search terms
-      filter_queries_ph: e.g. band name
       notify_in_app: In-app notifications
       notify_push: Push to my devices
       notify_email: Email me
@@ -223,12 +188,6 @@ en:
       cta: View in the app
       footer_reason: You're getting this from a filter you set up.
       footer_manage: Manage your filters
-  frequencies:
-    daily: Daily
-    weekly: Weekly
-    biweekly: Every two weeks
-    monthly: Monthly
-    never: Never
   simple_calendar:
     previous: Previous
     today: Today
@@ -242,13 +201,8 @@ en:
     account_heading: Account
     push_test: Send a test
     notifications_heading: Push notifications
-    frequency_label: How often should we tell you about new events?
     language_heading: Language
     language_auto: Automatic (browser)
-    favorite_locations_heading: Places
-    follow_all: All of %{name}
-    other_locations: Other locations
-    favorite_styles_heading: Styles
     email_heading: Email
     email_hint: Optional — only for email updates. Goes to our mail service resend.com, nothing else.
     email_placeholder: you@example.com
@@ -274,7 +228,6 @@ en:
     delete_account_confirm: Permanently delete your account? This cannot be undone.
   notifications:
     index:
-      title: Notifications
       empty: Nothing yet — new events will land here.
       all_read: All caught up — new notifications will land here.
       unread_badge: New
@@ -286,21 +239,10 @@ en:
       event_count:
         one: 1 event
         other: "%{count} events"
-      new_events:
-        one: 1 new event
-        other: "%{count} new events"
     show:
       back: ← All notifications
       title: New events
-      all: All new events
-      relevant: Only my interests
       empty_all: No new events this period.
-      empty_relevant: Nothing matched your interests this period.
-  actions:
-    assign: Assign
-    save: Save
-    cancel: Cancel
-    delete: Delete
   genres:
     index:
       title: Genres
@@ -411,7 +353,6 @@ en:
         back: ← All accounts
         email: Email
         no_email: none
-        frequency: Notifications
         joined: Joined
         sessions: Active sessions
         invited_by: Invited by
@@ -631,13 +572,6 @@ en:
     day:
       empty: No events on this day.
       close: Close
-    calendar:
-      events:
-        one: "%{count} event"
-        other: "%{count} events"
-      more:
-        one: +1 more
-        other: "+%{count} more"
     filter:
       what: "Search acts, styles, anything…"
       when: When?
@@ -654,12 +588,9 @@ en:
       apply: Apply
       clear: Clear
       close: Close
-      free_text: free text
       search_for: 'Search for “%{query}”'
       search_anything: Type to search for anything
       custom_range: Custom range
-      date_from: From
-      date_to: To
   helpers:
     page_entries_info:
       more_pages:

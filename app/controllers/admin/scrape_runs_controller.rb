@@ -46,11 +46,14 @@ module Admin
       match ? { match[0] => match[1] } : {}
     end
 
+    # Relative keys (`t('.started')`) would scope to this helper's name under
+    # i18n static analysis; at runtime they resolve against the `create` action.
+    # Spell them out so the scanner and runtime agree.
     def trigger_notice(scrapers)
       if params[:scraper].present?
-        t('.started_one', scraper: scrapers.keys.first.underscore)
+        t('admin.scrape_runs.create.started_one', scraper: scrapers.keys.first.underscore)
       else
-        t('.started')
+        t('admin.scrape_runs.create.started')
       end
     end
   end

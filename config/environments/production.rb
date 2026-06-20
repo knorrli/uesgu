@@ -1,26 +1,27 @@
 require "active_support/core_ext/integer/time"
 
 # Rails' default production formatter (SimpleFormatter) emits only the bare
-# message, so every line reaches Render with no severity. Render only maps a line
-# to a dashboard log level reliably when it's logfmt or JSON with a `level` field;
-# a plain-text line is "best effort" and DEFAULTS TO INFO, so an `error` shows as
-# info (https://render.com/docs/log-streams). Emit logfmt (`time=… level=… msg=…`)
-# so the dashboard's level filter actually works while staying human-readable.
+# message, so every line reaches Render with no severity and an `error` shows up
+# indistinguishable from `info`. We lead each line with a `level=<level>` token —
+# the one thing Render needs to classify the line for its dashboard level filter
+# (https://render.com/docs/log-streams) — and then print the message as-is. We
+# deliberately do NOT emit `time=` (Render already timestamps every line) or wrap
+# the message in `msg="…"` (that just double-escapes the quotes Rails' own request
+# logs contain, e.g. Started GET "/…"), so the line stays human-readable.
 #
 # We can't use config.log_formatter for this: Rails only applies it when it builds
 # the logger itself, and this app sets config.logger explicitly (see
 # Rails::Application::Bootstrap#initialize_logger), so the formatter is set on the
-# underlying logger before TaggedLogging wraps it — keeping both the level field
-# and the request-id tag (prepended into msg by TaggedLogging) on every line.
-class LogfmtFormatter < ActiveSupport::Logger::SimpleFormatter
+# underlying logger before TaggedLogging wraps it — keeping both the level token
+# and the request-id tag (prepended into the message by TaggedLogging) on every line.
+class RenderLogFormatter < ActiveSupport::Logger::SimpleFormatter
   # Rails severities → the level names Render's filter understands. The rest
   # (DEBUG/INFO/ERROR) already match once downcased.
   LEVELS = { 'WARN' => 'warning', 'FATAL' => 'critical', 'UNKNOWN' => 'info' }.freeze
 
-  def call(severity, timestamp, _progname, msg)
+  def call(severity, _timestamp, _progname, msg)
     message = msg.is_a?(String) ? msg : msg.inspect
-    level   = LEVELS.fetch(severity, severity.downcase)
-    "time=#{timestamp.utc.iso8601(3)} level=#{level} msg=#{message.strip.inspect}\n"
+    "level=#{LEVELS.fetch(severity, severity.downcase)} #{message.strip}\n"
   end
 end
 
@@ -59,7 +60,7 @@ Rails.application.configure do
   # severity prefix and the request-id tag both make it onto every line.
   config.log_tags = [ :request_id ]
   config.logger   = ActiveSupport::TaggedLogging.new(
-    ActiveSupport::Logger.new(STDOUT).tap { |l| l.formatter = LogfmtFormatter.new }
+    ActiveSupport::Logger.new(STDOUT).tap { |l| l.formatter = RenderLogFormatter.new }
   )
 
   # Change to "debug" to log everything (including potentially personally-identifiable information!)

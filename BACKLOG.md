@@ -47,6 +47,14 @@
 
 ### UI polish
 
+- **Typographic hierarchy pass.** Every page *except the main events page* should
+  use a correct, consistent heading hierarchy (`h1`–`h6`, no level skips, one
+  `h1` per page). Audit + fix across the app, then **document the scale and rules
+  in `/styleguide`** so it stays enforced.
+- **Uniform spacing pass.** Establish and apply consistent vertical/section
+  spacing across all pages and their sections (page padding, section gaps,
+  field/stack rhythm). Codify the spacing scale + rules in `/styleguide` and
+  apply via shared utilities/tokens (not per-page one-offs).
 - **General mobile-first sweep** of the app — ongoing direction, not a discrete
   ticket. Enforce the visual invariants: what's clickable is unambiguous; one
   visual representation per element; green only ever means "interested" (heart =
@@ -55,6 +63,14 @@
   yet. (See memory `project-pwa-install-affordance`.)
 - **Dark PWA icon not wired into the manifest** — `icon-192-dark.png` exists but
   `manifest.json.erb` references only the single-theme icons. Minor.
+
+### Discuss / experiment
+
+- **Filter menu floats over content instead of pushing it down.** Currently
+  opening the filter shifts the results list downward. Experiment with an
+  overlay/floating panel that sits *above* the content (no layout push). Decide
+  the interaction (anchored popover vs. sheet, desktop vs. mobile) before
+  committing — relates to the existing reserved-summary-row layout work.
 
 ### Maybe-later (explicitly deferred)
 

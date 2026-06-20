@@ -1,0 +1,19 @@
+{
+  "comment": "Hygiene/dedupe only — surfaces duplicates and dead rules, NOT stylistic nits. stylelint is installed globally (not a repo dependency); run: stylelint 'app/assets/stylesheets/**/*.css'.",
+  "rules": {
+    "no-duplicate-selectors": true,
+    "declaration-block-no-duplicate-properties": [true, { "ignore": ["consecutive-duplicates-with-different-values"] }],
+    "declaration-block-no-shorthand-property-overrides": true,
+    "shorthand-property-no-redundant-values": true,
+    "block-no-empty": true,
+    "no-duplicate-at-import-rules": true,
+    "no-invalid-double-slash-comments": true,
+    "color-no-invalid-hex": true,
+    "no-empty-source": true,
+    "comment-no-empty": true,
+    "font-family-no-duplicate-names": true,
+    "keyframe-block-no-duplicate-selectors": true,
+    "no-irregular-whitespace": true
+  },
+  "ignoreFiles": ["app/assets/stylesheets/phosphor.css"]
+}

@@ -9,9 +9,6 @@
   max-width: var(--content-max-width);
   margin-inline: auto;
   padding: var(--gap-medium) var(--content-padding);
-}
-
-.site-header__inner {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;

@@ -1,0 +1,591 @@
+/* Filter fields as underlined inputs rather than full boxes — lighter, reads as
+   a form line, consistent with the de-boxed list below. */
+.input-wrapper {
+  /* A little horizontal breathing room so the caret/placeholder doesn't sit flush
+     on the field edge; the underline still spans the full width. */
+  padding: var(--gap-small) var(--gap-small);
+  border-bottom: var(--border-width) solid var(--field-border-color);
+  line-height: var(--filter-input-line-height);
+  position: relative;
+}
+
+/* Neutral at rest; the underline lights accent when the field is focused — same
+   language as the account-form fields. */
+.input-wrapper:focus-within {
+  border-bottom-color: var(--theme-accent-color);
+}
+
+/* Filter field handle glyph (search / where / when): GREEN — each field opens a
+   dropdown/picker, so the glyph reads as an interactive affordance ("click to
+   open"), consistent with green = interaction. */
+.filter-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  color: var(--theme-accent-color);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Mobile filter sheets (_filter_sheets.html.erb). Mobile-first: the sheet UI is
+   the default; the inline combobox filter (wrapped in .filter-desktop) takes over
+   at the tablet breakpoint — 600px, matching the calendar breakpoint above.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Chips take the row and wrap within it; the notify bell stays pinned right. */
+.filter .chips {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (min-width: 600px) {
+  /* Wider columns can carry the taller cell without looking squashed; restore the
+     roomier desktop calendar height (mobile keeps the compact 4.25rem above). */
+  .simple-calendar .day { height: 7rem; }
+  /* Room for the venue headline only at desktop width. */
+  .simple-calendar .day-headline,
+  .simple-calendar .day-headline-more { display: block; }
+  /* Wider cell: the marker rides up beside the date (no today-badge crowding here). */
+  .simple-calendar .day-markers { top: var(--gap-small); bottom: auto; }
+}
+
+/* ── Trigger bar ── three underlined rows echoing the inline filter, but each
+   whole row is a tap target opening its sheet. */
+.filter-sheets__bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+}
+
+.filter-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  width: 100%;
+  padding: var(--gap-small) 0;
+  border: 0;
+  border-bottom: var(--border-width) solid var(--field-border-color);
+  background: none;
+  color: var(--theme-fg-color);
+  font: inherit;
+  line-height: var(--filter-input-line-height);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Accent underline when the trigger is focused (keyboard) — matches the inline
+   filter fields' focus language. */
+.filter-trigger:focus-visible {
+  outline: none;
+  border-bottom-color: var(--theme-accent-color);
+}
+
+.filter-trigger__icon {
+  font-size: var(--filter-icon-size);
+  /* Green: the trigger opens a sheet — an interactive affordance (matches the
+     inline .filter-icon). */
+  color: var(--theme-accent-color);
+}
+
+.filter-trigger__label {
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Empty field reads as a muted prompt — this is the search affordance for What. */
+.filter-trigger__label.is-empty { color: var(--theme-fg-muted); }
+
+.filter-trigger__more { color: var(--theme-fg-muted); }
+
+/* The applied-filter count uses the shared .badge (layout.css). */
+
+.filter-trigger__chevron {
+  flex-shrink: 0;
+  color: var(--theme-fg-muted);
+}
+
+/* ── Applied-filter chips ── mirror the inline filter's .tag.active. The chips
+   wrap inside their own container; the notify bell is pinned to the right of the
+   same row (flex-start so it holds the top when chips wrap). */
+.filter-sheets__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  margin-top: var(--gap-medium);
+  /* Reserve the row's one-line height even with no filter active, so applying a
+     filter fills space that was already held rather than pushing the toolbar +
+     results down (the chips/save control ride this same one-line height). */
+  min-height: 1.5rem;
+}
+
+.filter-sheets__summary-chips {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small);
+}
+
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gap-small);
+  padding: 5px;
+  border: 0;
+  background: var(--theme-accent-color);
+  color: var(--theme-on-accent);
+  font: inherit;
+  font-size: 75%;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* Tapping/clicking the chip removes that filter — give it a hover/focus cue so
+   the "× to remove" affordance reads (it had none before). */
+.filter-chip:hover,
+.filter-chip:focus-visible {
+  opacity: 0.82;
+}
+
+.filter-chip__remove { font-size: 1.1em; }
+
+/* ── The sheet ── full-screen, slides up from the bottom. */
+/* Mobile only: the full-screen sheet locks the page behind it. On desktop the
+   sheet is an inline dropdown panel, so the page must stay scrollable. */
+@media (max-width: 599px) {
+  body.filter-sheet-open { overflow: hidden; }
+}
+
+/* ── Desktop (≥600px): the same sheet markup, presented as a horizontal trigger
+   bar whose panels drop down inline below the bar instead of a full-screen sheet.
+   One filter UI for both platforms; only the presentation differs. ── */
+@media (min-width: 600px) {
+  /* Triggers sit in a row, each a field-like cell. */
+  .filter-sheets__bar { flex-direction: row; gap: var(--gap-medium); }
+  .filter-trigger { flex: 1 1 0; min-width: 0; }
+
+  /* A sheet becomes an inline panel in normal flow: since the closed sheets are
+     display:none, the open one drops in right under the bar (and the summary
+     chips). Full filter width, bordered, its body scrolls. No slide transform. */
+  .filter-sheets .sheet {
+    position: static;
+    inset: auto;
+    max-height: 26rem;
+    margin-top: var(--gap-small);
+    transform: none;
+    visibility: visible;
+    display: none;
+    border: var(--border-width) solid var(--rule-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .filter-sheets .sheet--open { display: flex; }
+
+  /* Keep the × close on desktop too (alongside Apply, click-outside and Esc) — an
+     explicit, familiar way to dismiss the panel. The header keeps its base
+     close/title/clear grid; only the title aligns left inline. */
+  .filter-sheets .sheet__title { text-align: left; }
+}
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  background: var(--theme-bg-color);
+  transform: translateY(100%);
+  visibility: hidden;
+  transition: transform 0.22s ease, visibility 0.22s;
+}
+
+.sheet--open {
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.sheet__header {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  align-items: center;
+  gap: var(--gap-small);
+  padding: var(--gap-medium) var(--content-padding);
+  border-bottom: var(--border-width) solid var(--rule-color);
+}
+
+.sheet__title {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: bold;
+  text-align: center;
+}
+
+.sheet__close {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme-fg-color);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sheet__clear {
+  justify-self: end;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--theme-fg-muted);
+  font: inherit;
+  font-size: var(--font-size-small);
+  cursor: pointer;
+}
+
+.sheet__search {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  padding: var(--gap-small) var(--content-padding);
+  border-bottom: var(--tag-border-width) solid var(--border-color);
+}
+
+.sheet__search-icon {
+  font-size: 1.3rem;
+  color: var(--theme-fg-muted);
+}
+
+.sheet__search-input {
+  flex-grow: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+}
+
+.sheet__search-input:focus { outline: none; }
+
+.sheet__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--gap-small) 0;
+}
+
+.sheet__footer {
+  padding: var(--gap-medium) var(--content-padding);
+  border-top: var(--tag-border-width) solid var(--border-color);
+}
+
+.sheet__apply {
+  width: 100%;
+  padding: var(--gap-medium);
+  border: 0;
+  background: var(--theme-accent-color);
+  color: var(--theme-on-accent);
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ── Option rows ── a checkable row; native box hidden, custom box drawn. */
+.opt {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-medium);
+  padding: var(--gap-medium) var(--content-padding);
+  cursor: pointer;
+}
+
+.opt--hidden { display: none; }
+
+/* `.opt { display: flex }` is an author rule, so it would beat the UA's
+   `[hidden] { display: none }` (equal specificity) and leave a `hidden` row
+   visible. Re-assert hiding at higher specificity so both the initial state and
+   the JS-toggled `hidden` (the free-text row) actually hide. */
+.opt[hidden] { display: none; }
+
+.opt input[type="checkbox"] {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.opt__box {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: var(--border-width) solid var(--border-color);
+}
+
+.opt input:checked ~ .opt__box {
+  background: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
+}
+
+.opt input:checked ~ .opt__box::before {
+  content: "";
+  width: 0.8rem;
+  height: 0.8rem;
+  background-color: var(--theme-on-accent);
+  -webkit-mask: var(--check-mask) center / contain no-repeat;
+  mask: var(--check-mask) center / contain no-repeat;
+}
+
+.opt__label {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.opt__type {
+  flex-shrink: 0;
+  color: var(--theme-fg-muted);
+  font-size: 75%;
+}
+
+.opt__count {
+  flex-shrink: 0;
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+/* Tree depth: cities indent one step, venues two; venues read a touch quieter. */
+.opt--city  { padding-left: calc(var(--content-padding) + 1.5rem); }
+.opt--venue { padding-left: calc(var(--content-padding) + 3rem); }
+.opt--venue .opt__label { font-size: var(--font-size-small); }
+
+/* ── Location group ── canton row + expand toggle; collapsed hides its body. */
+.loc-group--hidden { display: none; }
+
+.loc-group__head { display: flex; align-items: center; }
+
+.loc-group__head .opt { flex-grow: 1; }
+
+.loc-group__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  align-self: stretch;
+  padding: 0 var(--content-padding);
+  border: 0;
+  background: none;
+  color: var(--theme-fg-muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.loc-group__count { font-size: var(--font-size-small); }
+
+.loc-group__chevron { transition: transform 0.15s ease; }
+
+.loc-group:not(.collapsed) .loc-group__chevron { transform: rotate(180deg); }
+
+.loc-group.collapsed .loc-group__body { display: none; }
+
+.loc-group__body { border-bottom: var(--tag-border-width) solid var(--theme-bg-muted); }
+
+/* ── Free-text "search for X" row ── the thing a fixed list can't do. */
+.opt--newquery {
+  width: 100%;
+  border: 0;
+  background: var(--theme-bg-muted);
+  font: inherit;
+  text-align: left;
+}
+
+/* The search-glyph box marks this as a search action, not a checkable option;
+   keep it neutral (green = selection/state in this UI, which this row is not). */
+.opt--newquery .opt__box {
+  border-color: var(--border-color);
+  color: var(--theme-fg-muted);
+}
+
+/* Desktop (inline dropdown panel): the prompt row just echoes the placeholder of
+   the search field sitting directly above it, so hide it — pressing Enter still
+   commits typed text (filter-sheets#commitTyped). On mobile the row stays as a
+   tap target (focuses the field, opens the keyboard). */
+@media (min-width: 600px) {
+  .opt--newquery { display: none; }
+}
+
+/* ── Custom date range ── a self-contained month calendar (range_calendar
+   controller) that writes "start - end" into a hidden d[] checkbox. Identical on
+   the mobile sheet and the desktop panel; green = selection, sand pill = today. */
+.opt--custom {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--gap-small);
+  cursor: default;
+}
+
+.range-cal {
+  width: 100%;
+  max-width: 20rem;
+  margin: var(--gap-small) auto 0;
+}
+
+.range-cal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-small);
+  margin-bottom: var(--gap-small);
+}
+
+.range-cal__month { font-weight: bold; }
+
+.range-cal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  background: none;
+  color: var(--theme-fg-color);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.range-cal__nav:hover { background: var(--theme-bg-muted); }
+
+.range-cal__weekdays,
+.range-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.range-cal__weekday {
+  padding: var(--gap-xsmall) 0;
+  text-align: center;
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
+}
+
+.range-cal__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.range-cal__day:hover { background: var(--theme-bg-muted); }
+
+.range-cal__day:focus-visible {
+  outline: var(--border-width) solid var(--theme-accent-color);
+  outline-offset: -2px;
+}
+
+.range-cal__day.is-other-month { color: var(--theme-fg-muted); opacity: 0.5; }
+
+/* today: the same sand pill the events calendar uses (green is reserved for the
+   selection below, which overrides this when today is the picked day). */
+.range-cal__day.is-today { background: var(--theme-bg-emphasis); }
+
+.range-cal__day.is-in-range {
+  background: color-mix(in srgb, var(--theme-accent-color) 16%, transparent);
+}
+
+.range-cal__day.is-start,
+.range-cal__day.is-end {
+  background: var(--theme-accent-color);
+  color: var(--theme-on-accent);
+  font-weight: bold;
+}
+
+/* Fixed one-line height (not min-height) so the row reserves the exact same space
+   empty or filled — the panel never grows when a range's summary appears. */
+.range-cal__summary {
+  margin-top: var(--gap-small);
+  height: 1.25rem;
+  line-height: 1.25rem;
+  text-align: center;
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
+}
+
+/* Desktop: split the When body into presets (left) + calendar (right) so the
+   calendar is visible at rest, not stranded below 8 preset rows in the panel's
+   scroll fold. Mobile keeps the simple vertical stack. */
+@media (min-width: 600px) {
+  /* The calendar is taller than the other sheets' content, so lift the When
+     panel's height cap (base .sheet is 26rem) enough that the body — which only
+     gets the panel height minus the ~6rem header+footer — fits all 8 presets and
+     the full month (at the 22rem calendar width below) with no internal scrollbar. */
+  .filter-sheets .sheet[data-field="when"] { max-height: 34rem; }
+
+  /* Center the presets + calendar as one compact cluster so it reads as a
+     deliberate panel rather than two boxes stranded at the left edge of a wide
+     dropdown. align-items: stretch runs the divider the full column height. */
+  /* Presets stay pinned to the panel's left edge; the calendar is centered in the
+     space that's left, so it reads as deliberate instead of left-stranded in a
+     wide dropdown. */
+  .when-body {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: var(--gap-large);
+  }
+
+  .when-presets {
+    flex: 0 0 auto;          /* size to the widest label — never wrap */
+    padding-block: var(--gap-small);
+    white-space: nowrap;
+    border-right: var(--border-width) solid var(--rule-color);
+  }
+
+  .when-custom {
+    flex: 1 1 auto;          /* take the rest of the panel… */
+    display: flex;
+    justify-content: center; /* …and center the calendar within it */
+  }
+  /* A touch larger than the mobile 20rem so it holds the centre of the panel. */
+  .when-custom .range-cal { margin-top: 0; max-width: 22rem; }
+}
+
+/* "Save this show" toggle in the event-actions cluster — the HEART now (the rare,
+   powerful signal). A faint outline at rest, a SOLID fill when saved (fill =
+   active). In the favorite colour (raspberry), never green. The follow STAR and
+   this save HEART share the raspberry family but differ in shape, so the two
+   personal signals never rely on colour alone. Masked SVG because Phosphor
+   Regular has no fill weight. (Class still named .save-heart — glyph swapped
+   bookmark→heart; rename is non-visual cleanup.) */
+.save-heart {
+  display: inline-block;
+  line-height: 0;
+}
+
+.save-heart::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  background-color: var(--theme-fg-muted);
+  -webkit-mask: var(--heart-outline) center / contain no-repeat;
+  mask: var(--heart-outline) center / contain no-repeat;
+}
+
+.event-save:hover .save-heart::before {
+  background-color: var(--theme-saved-color);
+}
+
+/* Saved: solid fill, favorite colour — a filled heart = "saved". */
+.event-save.saved .save-heart::before {
+  background-color: var(--theme-saved-color);
+  -webkit-mask-image: var(--heart-fill);
+  mask-image: var(--heart-fill);
+}

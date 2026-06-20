@@ -1,0 +1,241 @@
+.simple-calendar {
+  .table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .calendar-heading {
+    margin-bottom: var(--gap-small);
+  }
+
+  /* The month anchors the calendar — bold, but no taller than the toolbar so the
+     view switcher stays pinned to the same spot as in list view. */
+  .calendar-title {
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+  }
+
+  th {
+    padding: var(--gap-small);
+    text-align: center;
+    font-weight: normal;
+    color: var(--theme-fg-muted);
+    /* A neutral rule under the weekday header, mirroring the list date divider
+       (both now use the prominent neutral --rule-color, not green). */
+    border-bottom: var(--border-width) solid var(--rule-color);
+  }
+
+  /* A defined hairline grid (no fills) keeps cells distinguishable without the
+     heavy filled boxes of before. */
+  .day {
+    position: relative;
+    border: var(--calendar-border-width) solid var(--calendar-border-color);
+    /* Minimum height; busy cells grow to fit their in-flow .day-content. On a
+       narrow (mobile) column 7rem reads as a tall, empty, squashed box, so the
+       cells shrink to a more square proportion below the calendar breakpoint. */
+    height: 4.25rem;
+    vertical-align: top;
+
+    /* Adjacent-month days recede instead of being filled differently. */
+    &.prev-month, &.next-month {
+      opacity: 0.4;
+    }
+
+    /* Hover: the same muted-background wash as the dropdown's highlighted option
+       (--theme-bg-muted / --hw-active-bg-color), so picking a day and picking a
+       combobox option feel like one interaction language. */
+    &:has(.calendar-day-link:hover) {
+      background-color: var(--theme-bg-muted);
+    }
+
+    /* Selected: the same wash plus an inset accent frame that ties the day to its
+       drawer below (the frame, not the colour, marks it as selected vs hovered). */
+    &:has(.calendar-day-link.selected) {
+      background-color: var(--theme-bg-muted);
+      box-shadow: inset 0 0 0 var(--border-width) var(--theme-accent-color);
+    }
+  }
+
+  /* Sits above the busyness meter but below the click target, so the date/count
+     read clearly while taps still fall through to the day link. */
+  .day-content {
+    position: relative;
+    z-index: 1;
+    padding: var(--gap-small);
+  }
+
+  /* Desktop-only relevance headline: the day's top-priority venue (saved >
+     interest). Hidden on mobile — the marker carries the signal there and a name
+     won't fit. One line, truncated to the cell width. Muted so it supports the
+     date + marker rather than competing; click-through (sits below the day link). */
+  .day-headline {
+    display: none;
+    margin-top: var(--gap-xsmall);
+    font-size: var(--font-size-small);
+    line-height: 1.2;
+    color: var(--theme-fg-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* A second stacked venue sits directly under the first — no extra gap. */
+  .day-headline + .day-headline {
+    margin-top: 0;
+  }
+
+  /* Overflow line ("+N more") for days with three or more relevant venues.
+     Fainter than the named venues so it reads as a count, not a name. */
+  .day-headline-more {
+    display: none;
+    margin-top: var(--gap-xsmall);
+    font-size: var(--font-size-small);
+    line-height: 1.2;
+    color: color-mix(in srgb, var(--theme-fg-muted) 70%, transparent);
+  }
+
+  /* Transparent click target covering the cell's full (row) height. */
+  .calendar-day-link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    cursor: pointer;
+  }
+
+  .calendar-day-number {
+    display: block;
+    text-align: left;
+    /* The cell's anchor: a step larger than the muted venue line below it, so the
+       date clearly leads and the cell doesn't read as two competing small numbers. */
+    font-size: var(--font-size-base);
+    font-weight: bold;
+
+    /* No events that day: fade the date right back (and the cell has no click
+       target). Full date = "something's on, tap me", faded = "nothing here" — a
+       strong opacity contrast, not a subtle colour shift, so clickable days are
+       obvious. Declared before &.today so today keeps its badge even when empty. */
+    &.empty {
+      opacity: 0.35;
+      font-weight: normal;
+    }
+
+    /* Today: a filled accent badge so it can't get lost in the grid. Stays
+       display:block (shrink-wrapped) so it keeps the same line height as plain
+       day numbers — an inline-block badge would push the cell's venues down. */
+    &.today {
+      width: fit-content;
+      font-weight: bold;
+      padding: 0 0.45em;
+      /* Sand badge (not green): green is for interaction/follows, so a green today
+         pill clashed with the green interest stars. Uses --theme-bg-emphasis (a
+         stronger sand than the muted wash) so it stays clearly readable on the dark
+         theme and on a hovered/selected cell, while staying calm and on-palette. */
+      color: var(--theme-fg-color);
+      background-color: var(--theme-bg-emphasis);
+    }
+  }
+
+  /* Personal marker tucked into the cell's top-right corner: the saved-show heart.
+     Decorative and click-through, so the full-cell day link underneath still
+     receives the tap. */
+  /* Mobile: the marker sits BOTTOM-right so it never crowds the date's top row —
+     the today badge (a padded green pill) otherwise collides with it on a narrow
+     cell. Desktop moves it back up to top-right (see the breakpoint block), where
+     the wider cell has room beside the date. */
+  .day-markers {
+    position: absolute;
+    z-index: 3;
+    bottom: var(--gap-small);
+    right: var(--gap-small);
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    pointer-events: none;
+  }
+
+  /* You've saved a show playing this day: a solid HEART in the favorite colour —
+     the same fill = "saved" language as the per-event save button. The heart is
+     the strong, rare signal (saved), so it leads the slot and pops above the
+     quieter follow dot. Raspberry, never green (green = interaction/state). */
+  .day-saved-marker {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    font-size: var(--font-size-small);
+    line-height: 1;
+    color: var(--theme-saved-color);
+
+    &::before {
+      content: "";
+      display: block;
+      width: 1em;
+      height: 1em;
+      background-color: currentColor;
+      -webkit-mask: var(--heart-fill) center / contain no-repeat;
+      mask: var(--heart-fill) center / contain no-repeat;
+    }
+  }
+
+  /* Only shown when more than one show is saved that day. */
+  .day-saved-count {
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+
+  /* Inline expanding row: the day-detail frame rendered full-width beneath the
+     week of the clicked day. The lighter page background (vs. the muted cells)
+     plus bold accent rules top and bottom frame it as a distinct drawer lifted
+     out of the calendar grid, rather than blending in as just another cell. */
+  .day-detail-row td {
+    border: 0;
+    border-block: var(--border-width) solid var(--rule-color);
+    /* Full-width horizontally so the drawer's events line up with the List view
+       (same partial) and the page's left/right edges; the bold accent rules and
+       lighter background still read it as lifted out of the grid. */
+    padding-block: var(--gap-large);
+    padding-inline: 0;
+    background-color: var(--theme-bg-color);
+  }
+}
+
+.day-detail {
+  border-top: var(--border-width) solid var(--rule-color);
+  padding-top: var(--gap-medium);
+}
+
+/* Inside the inline row the cell already supplies the frame; the accent divider
+   and padding above would be redundant. */
+.day-detail-row .day-detail {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.day-detail-header {
+  /* Bottom-align so the close button sits down on the date's double rule,
+     capping the end of the line instead of floating in the vertical middle. */
+  align-items: flex-end;
+  gap: var(--gap-small);
+}
+
+/* The date keeps its full-width double underline; the close button caps it. */
+.day-detail-header .date {
+  flex: 1;
+}
+
+.day-detail-close {
+  flex: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--theme-accent-color);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.day-detail-close:hover,
+.day-detail-close:focus-visible {
+  color: var(--theme-fg-color);
+}

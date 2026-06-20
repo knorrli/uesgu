@@ -1,0 +1,464 @@
+/* Saved-shows day-of reminder opt-in: a quiet block under the page header. The
+   checkbox draws itself via the global custom-checkbox; the hint aligns under the
+   label text (past the box + its gap) and stays muted/small so it supports the
+   toggle without competing with the show list below. */
+.saved-reminder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}
+
+.saved-reminder__hint {
+  /* Indent under the label text: checkbox width (1em-ish via the global box) + the
+     label's gap-small, so the hint reads as belonging to the toggle. */
+  margin: 0;
+  padding-left: calc(1.1em + var(--gap-small));
+  font-size: var(--font-size-small);
+}
+
+/* Date group heading: a single hairline rule instead of the old 5px double
+   border — a quiet section divider, not a decorative slab. */
+.date {
+  align-items: baseline;
+  gap: var(--gap-small);
+  color: var(--theme-fg-color);
+  font-weight: bold;
+  padding-bottom: var(--gap-small);
+  border-bottom: var(--border-width) solid var(--rule-color);
+}
+
+/* List view only: pin each date header to the top while scrolling through its
+   own day group, then let the next group push it away. Scoped to .event-list so
+   the calendar day panel's header (.day-detail-header .date) is unaffected. The
+   solid background keeps event rows from showing through the pinned header, and a
+   small top padding stops the text sitting flush against the viewport edge. The
+   live ♥ saved count rides inside the header, so it stays correct while pinned. */
+.event-list .date {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-top: var(--gap-small);
+  background: var(--theme-bg-color);
+}
+
+/* Per-day saved (♥) count sitting just after a date header's date, hidden when
+   zero. Same glyph language as the calendar markers — raspberry heart = saved —
+   just carried as a count. Normal weight + small so it supports the date rather
+   than competes. Collapses entirely (no trailing gap) on a day with no saved
+   shows, so the date keeps its flush-left place; :has lets a live save bring it
+   back without the controller touching the wrapper. */
+.day-summary {
+  display: none;
+  align-items: center;
+  gap: 0.8ch;
+  flex: none;
+  font-size: var(--font-size-small);
+  font-weight: normal;
+}
+
+.day-summary:has(.day-summary__count:not([hidden])) {
+  display: flex;
+}
+
+.day-summary__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3ch;
+  line-height: 1;
+}
+
+.day-summary__count::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+}
+
+.day-summary__count--saved {
+  color: var(--theme-saved-color);
+}
+
+.day-summary__count--saved::before {
+  -webkit-mask: var(--heart-fill) center / contain no-repeat;
+  mask: var(--heart-fill) center / contain no-repeat;
+}
+
+/* Venue-led row, zero boxes. Hierarchy comes from structure + weight — the venue
+   anchor (bold ink) on its own line, the underlined event title as the primary
+   link, a quiet metadata line (city/canton) beneath. Colour is rationed: green
+   marks an *applied* filter term (.filter-link.active) and nothing else on the row;
+   muted grey = passive info; ink = structure and the event itself. */
+.event {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-medium);
+}
+
+.event-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}
+
+/* Plain informational tags: genres, and tags for logged-out visitors who can't
+   follow. Muted; the venue stays foreground as the headline. */
+.event-tag {
+  color: var(--theme-fg-muted);
+}
+
+.event-tag.venue {
+  color: var(--theme-fg-color);
+}
+
+/* Every taxonomy term (venue, city/canton, style, genre) is a filter link:
+   tapping it toggles the programme's filter by that term. At REST it carries no
+   colour of its own — it inherits its context (venue = fg, city/canton = muted,
+   styles = fg bold, genres = muted), so the row reads as calm structure, not a
+   field of green. Affordance comes from weight/hierarchy + a hover underline on
+   desktop and tap convention on touch. Colour is spent only on .active below. */
+.filter-link {
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.filter-link:hover {
+  text-decoration: underline;
+}
+
+/* An APPLIED term — this tag is in your active filter — lights GREEN. It's the one
+   place green is earned on a row, so green now means "your filter" (resting tags
+   stay neutral). Lit ⇔ tapping removes it (see EventsHelper#event_filter_tag). Two
+   classes outrank the contextual muted/fg, so an active city/canton or genre lights
+   up regardless of its rest colour. */
+.filter-link.active {
+  color: var(--theme-accent-color);
+}
+
+/* Venue is the headline: the largest, boldest thing in the row, alone on its line
+   so it reads as the anchor (not one oversized token in a mixed-size row). */
+.event-where .venue {
+  font-size: var(--font-size-lg);
+  font-weight: bold;
+}
+
+/* City / canton: a quiet metadata line beneath the venue. Small + muted so it
+   informs without competing — and still followable (each is a tag). */
+.event-where-meta {
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
+}
+
+.event-title {
+  font-weight: bold;
+  overflow-wrap: anywhere;
+}
+
+/* The title is the row's PRIMARY action — the link to the event itself — so it
+   gets the strongest, most honest affordance: bold ink (headline weight) +
+   a persistent underline (the web's universal link signal), with the green ↗
+   marking that it leaves the site. Underline-at-rest, not on-hover, because this
+   is the one target that must read as tappable without a pointer (mobile) and
+   without leaning on colour (accessible). */
+.event-title a {
+  color: var(--theme-fg-color);
+  text-decoration: underline;
+}
+
+.event-link-marker {
+  /* Marks the title as an OFF-SITE link. The underline already carries the
+     "this is a link" affordance, so the arrow stays ink (inherits the title) —
+     green is now reserved for an applied filter, and a green arrow on every
+     title would dilute that. Typographic, not icon-sized; line-height:1 keeps the
+     larger glyph from inflating the title's line. */
+  font-size: 1.2em;
+  line-height: 1;
+  color: inherit;
+  font-weight: normal;
+}
+
+/* Time leads the title at full size but in muted grey, so it reads before the
+   act without competing with the venue headline above it. */
+.event-time {
+  margin-right: 0.8ch;
+  color: var(--theme-fg-muted);
+  font-weight: normal;
+}
+
+.event-subtitle {
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+.event-subtitle p {
+  margin: 0;
+}
+
+.event-styles,
+.event-genres {
+  font-size: var(--font-size-small);
+}
+
+/* Styles are the primary, followable descriptor — bold AND full foreground colour
+   so they assert a clear tier above the muted, regular-weight subtitle and genres
+   they sit between, without adding another font size to the row. The fg colour
+   lives on the tags themselves (not the container) so it beats the base .event-tag
+   muted. */
+.event-styles {
+  font-weight: bold;
+}
+
+.event-styles .event-tag {
+  color: var(--theme-fg-color);
+}
+
+/* Genres: the quietest descriptor tier — muted at rest, a step below the bold
+   styles above them. They're filter links (.filter-link) like everything else, so
+   an applied genre lights green via .filter-link.active. */
+.event-genres {
+  color: var(--theme-fg-muted);
+}
+
+/* A genre and its (admin-only) edit gear, grouped as one inline unit so the gear
+   stays attached to its own tag and the row's wrap-gap falls between genre units. */
+.event-genre {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* The genre tag's inline edit gear (an .icon-button); only the inline layout is
+   local — colour and hover come from the shared role. It reads as a second segment
+   butted onto the tag: same outline, sharing the tag's right edge (no double
+   border), centred to the tag's height. Scoped to .event-genre so it out-specifies
+   `a.icon-button { border:0 }`. Admin-only, cheap. */
+.event-genre .meta-edit {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 5px;
+  border: var(--tag-border-width) solid var(--border-color);
+  border-left: 0;
+}
+
+/* Real, inert separator between terms — a sibling element, not a pseudo on the
+   button, so only the link text is hoverable/clickable, never the dot. */
+.sep {
+  margin: 0 0.5ch;
+  color: var(--theme-fg-muted);
+  font-weight: normal;
+}
+
+/* Admin actions column: the edit gear and delete trash sit together, top-aligned
+   with the event title. The icons use the shared .icon-button role; the delete is
+   a button_to, so flatten its wrapping form to a zero-margin flex box that
+   shrink-wraps the button and lines up with the bare anchor gear. */
+.event-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--gap-small);
+}
+
+.event-actions form {
+  margin: 0;
+  display: flex;
+}
+
+/* In the row-action column the gear (<a>) and trash (<button>) must line up, so
+   give each a tight centred box (the icon-button base is layout-free) plus a
+   small symmetric pad for a comfortable tap target. */
+.event-actions .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: var(--gap-xsmall);
+}
+
+/* Past events recede but stay legible. */
+.event.past,
+.date-events.past .date {
+  opacity: 0.5;
+}
+
+/* Cancelled events stay listed (so a follower sees the show was called off) but
+   the title is struck through and prefixed with a warning-coloured badge. */
+.event.cancelled .event-title a {
+  text-decoration: line-through;
+}
+
+.event-cancelled {
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--theme-warn-color);
+}
+
+/* Rescheduled events stay listed at their NEW date with an informational badge —
+   no strikethrough, the show is still on. A sand emphasis pill rather than the
+   cancellation's warn-red, so "date moved" reads as a heads-up, not a call-off. */
+.event-rescheduled {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: var(--font-size-small);
+  padding: 0 0.4em;
+  background: var(--theme-bg-emphasis);
+  color: var(--theme-fg-color);
+}
+
+/* Toolbar row above the programme: the favorites/notify shortcuts and the empty
+   message on the left, the view switcher on the right. Allow it to wrap so a
+   visible "Meine Favoriten" shortcut (plus the view switcher) doesn't overflow on
+   narrow screens, and let the left cluster shrink so a long empty message flows
+   onto the next line instead of pushing the row past the viewport. */
+.events-toolbar {
+  flex-wrap: wrap;
+}
+
+/* Empty-result message: its own line under the toolbar so a long sentence can't
+   push the view switcher around. */
+.events-empty {
+  margin: 0;
+}
+
+/* List / Calendar as a plain text toggle, not filled buttons: the active view
+   is bold accent, the other a muted link. Its own class (was the generic
+   .button, which now means a real boxed button). */
+.view-switcher {
+  gap: var(--gap-medium);
+
+  .view-switch__item {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--theme-fg-muted);
+    text-decoration: none;
+  }
+
+  .view-switch__item:hover {
+    text-decoration: underline;
+  }
+
+  .view-switch__item.active {
+    color: var(--theme-accent-color);
+    font-weight: bold;
+    background: none;
+  }
+}
+
+/* ── Pagination ── Kaminari's default markup, styled as a compact centered row
+   of square tap targets. On phones it collapses to ‹ prev · current · next ›
+   (numbered links, gap, first/last hidden) so the nav never wraps to a 2nd line. */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap-small);
+}
+
+.pagination a,
+.pagination .current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  padding: 0 var(--gap-small);
+  border: var(--tag-border-width) solid var(--border-color);
+  color: var(--theme-fg-color);
+  text-decoration: none;
+}
+
+.pagination a:hover { background: var(--theme-bg-muted); }
+
+.pagination .current {
+  background: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
+  color: var(--theme-on-accent);
+}
+
+.pagination .gap {
+  min-width: 0;
+  border: 0;
+  color: var(--theme-fg-muted);
+}
+
+@media (max-width: 600px) {
+  .pagination .page:not(.current),
+  .pagination .first,
+  .pagination .last { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROTOTYPE (uncommitted, easy to revert): two click-affordance systems.
+   - Big text links use the UNDERLINE family: event title = solid (primary),
+     venue = dotted (the same language, a weaker member) — so a venue reads as
+     tappable without a pill, which would be clunky at headline size.
+   - Small filter tokens (styles, genres, city/canton) use the PILL family: an
+     outline pill at rest = "tap me", and when applied it fills green — which is
+     exactly the filter CHIP in the chips row, so the tag and the chip are one
+     object in two states. Mobile-first: the pill outline carries the affordance
+     with no hover needed, and it doesn't saturate the page the way coloured text
+     did (the colour is spent only on the rare applied state).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Descriptor rows become wrapping flex so pills space by gap, not · separators. */
+.event-styles,
+.event-genres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.4ch;
+  /* The genre pills are boxed, so the body's uniform xsmall row-gap reads as
+     cramped against the line above — and downright tight when that line is itself
+     a box (a "Neues Datum" reschedule pill in the title). A small margin on top of
+     the flex gap gives the pill row consistent breathing room whether or not a
+     subtitle sits between it and the title. */
+  margin-top: var(--gap-xsmall);
+}
+
+.event-styles .sep,
+.event-genres .sep { display: none; }
+
+/* Resting pill: a sharp (on-brand) outline token. Ink text (not muted) — the
+   descriptors are the row's only content now (genres-only union), so they earn
+   full foreground; the outline + small size keep them clearly secondary to the
+   bold venue/title without going quiet enough to read as disabled. */
+.event-styles .filter-link,
+.event-genres .filter-link {
+  padding: 1px 6px;
+  border: var(--tag-border-width) solid var(--border-color);
+  color: var(--theme-fg-color);
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.event-styles .filter-link:hover,
+.event-genres .filter-link:hover {
+  text-decoration: none;
+  background: var(--theme-bg-muted);
+}
+
+/* Applied pill = the filled green chip. Outranks the base .filter-link.active
+   (which only recolours text) so the small tokens fill instead. */
+.event-styles .filter-link.active,
+.event-genres .filter-link.active {
+  background: var(--theme-accent-color);
+  border-color: var(--theme-accent-color);
+  color: var(--theme-on-accent);
+}
+
+/* Locations (venue + city/canton) use the UNDERLINE family: dotted = tappable,
+   deliberately distinct from the event title's solid underline so the two link
+   tiers never blur. City/canton stay muted text (not pills) — same affordance as
+   the venue, just quieter, which also keeps the metadata line from boxing up. */
+.event-where .filter-link,
+.event-where-meta .filter-link {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}

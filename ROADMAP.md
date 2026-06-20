@@ -10,6 +10,7 @@
 ## Where we are
 
 **Live on `main`:**
+
 - **Data ingestion** — venue scrapers (+ PETZI aggregator with non-destructive
   dedup), genre-tree taxonomy + normalization, location hierarchy
   (venue/city/canton), cancellation detection, discard rules, scrape-run admin
@@ -53,7 +54,9 @@ The bounded set where the tool serves daily use. All three pieces shipped to
 ## Punch list (ordered toward functional completeness)
 
 ### §1 — Notifications close-out (from the code review) — ✅ DONE (commit `132390a`)
-- [x] **Wire the scheduler** — `notify-due` Render cron (`*/15`) runs `notification_rules:tick`.
+
+- [x] **Wire the scheduler** — `notify-due` Render cron (`*/15`) runs `saved_filters:tick`
+      (`lib/tasks/saved_filters.rake`; renamed from the old `notification_rules:tick`).
 - [x] **Retire the legacy digest system** — dropped `notification_frequency` +
       `last_notified_at`, `Notification.generate_for`, `WebPushNotifier`,
       `GenerateNotificationsJob`, and the frequency selectors (signup/settings/admin).
@@ -66,16 +69,19 @@ The bounded set where the tool serves daily use. All three pieces shipped to
       no event-dedup needed. The form hides the cadence picker for windowed rules.
 
 ### §2 — Per-event saving — ✅ DONE (commit `32eb6e0`)
+
 - [x] Save / unsave a single event — `EventSave` join + bookmark toggle on every
       event (list / calendar / digest) for logged-in users.
 - [x] "My saved shows" view (`/saved_events`, upcoming saved events) + nav link.
 
 ### §3 — Email third-party disclaimer — ✅ DONE (already shipped `e516a2a`)
+
 - [x] Inline, opt-in `settings.email_third_party` disclosure (names Resend) above
       the Settings email field — the only end-user email-entry point. de/en/fr.
       The digest email's "Manage rules" footer link is the paired opt-out.
 
 ### §4 — Deploy — ✅ DONE
+
 - [x] Merged `notification-rules` → `main`, pushed (auto-deploys to Render).
 
 ## After functional: UI polish pass (required for "complete")
@@ -92,17 +98,15 @@ The bounded set where the tool serves daily use. All three pieces shipped to
 > The items below are symptoms of these, not an independent checklist.
 
 Still open:
+
 - **Saved-filter card visual hierarchy** — info chips vs. action buttons vs.
   links vs. destructive still read as similar squares (`saved_filters/index`).
-- **`.button-ghost` alias** — a documented no-op alias (controls.css comment +
-  styleguide). Dropping it is a 13-file app-wide sweep, provably visually
-  identical. NOTE: the calendar-feed buttons in `settings/show` use a *standalone*
-  `button-ghost` (no `button-small`) with no matching CSS rule → they render
-  unstyled. Real pre-existing bug; decide the fix (likely `button-small
-  button-ghost`) when sweeping.
+  Detail + the green-left-border / Bearbeiten-link gripes in the session backlog
+  below (2026-06-20).
 - **General mobile-first pass** — sweep the app (`/favorites` is gone now).
 
 Done since this list was written (verified in code 2026-06-20):
+
 - Monthly day-of-month picker; 15-min notify-time `step="900"`; inbox-count N+1
   (now batched via `Notification.visible_event_counts`); duplicated `build_filter`
   (deduped — `SavedFiltersController` uses `filter_for`); dead `display_name`
@@ -112,13 +116,104 @@ Done since this list was written (verified in code 2026-06-20):
   `Time.zone.local`); per-user email locale (`I18n.with_locale`). The
   favorites-OR query is moot (favorites removed).
 
+## Session backlog — captured 2026-06-20 (post-taxonomy-followups walkthrough)
+
+Findings from a live click-through of the shipped redesign. Unverified in code
+unless noted — a fresh session should confirm specifics before acting. Roughly
+ordered bugs-first, then UX, then polish.
+
+### Bugs / correctness
+
+- **What-filter freetext leaks onto Apply.** Apply unconditionally promotes the
+  search-box text to a freetext term — even when that text was only used to
+  *locate* a genre the user then ticked. Repro: type `ber`, tick **Chamber Pop**,
+  Apply → filter ends up with both `Chamber Pop` (intended) **and** `ber`
+  (stray). This has already polluted real saved filters (e.g. one titled
+  "hop · Neue Events" — `hop` is a truncated **Hip Hop** search).
+  - *Fix opt 1 (preferred):* on Apply, promote leftover freetext only if **no
+    checkbox was toggled during the current open session**. Must be
+    session-scoped — genres already applied before opening the filter must NOT
+    suppress a genuinely-typed freetext term.
+  - *Fix opt 2 (fallback):* keep the "Tippe, um nach allem zu suchen / Suchen
+    nach „…"" prompt row as the **explicit** trigger to add freetext; never
+    auto-add on Apply.
+  - **Couples with the desktop-row item below** — opt 1 lets us hide the prompt
+    row; opt 2 makes it load-bearing. Decide this first.
+- **Filter chip render jumps content down** (regression after the redesign
+  refactor). On the main events page, rendering the active-filter chip pushes the
+  results list downward. Reserve the space / fix layout shift.
+- **Some scrapers always report event-data updates.** Per-run "updated" counts
+  are too high to be real data changes — likely a field that's compared
+  unstably (normalization, ordering, timestamp, whitespace) so events look
+  changed every sweep. Find the over-eager diff and stabilise it.
+- **Deleted event referenced by a notification.** Find out what happens when a
+  notification links to an event that's since been deleted; degrade gracefully
+  (e.g. "no longer available") instead of a broken/blank link. **Constraint:**
+  only if it needs **no schema change**.
+
+### Notifications / filters UX
+
+- **Push checkbox must check push is actually set up.** In the filter
+  Benachrichtigungen section, "Push auf meine Geräte" should verify push is
+  enabled (per device/user); if not, mirror the email-checkbox pattern — show a
+  message + link to settings rather than silently accepting. **Decision:** do
+  NOT auto-trigger the browser enable-push flow from the checkbox; keep enabling
+  push a deliberate, separate user action.
+- **"Remind me about upcoming events" is in the wrong place** (currently on
+  Settings). Either move it into the Notifications section, or make it
+  per-filter — goal is *all notification user-choices in one place*, leaving
+  Settings for setup/config only.
+- **Detect & highlight "date changed / new date" events**, like the existing
+  cancelled-event treatment, if a date change is detectable during scraping.
+
+### Copy
+
+- **Full copy pass over all UI text** (DE/FR/EN). Make every string cool and
+  friendly, not business-y; strip technical jargon — nobody knows what a
+  "funnel" is. Respect the established voice (informal, `tu` in French).
+
+### UI polish
+
+- **Hide the redundant prompt row on desktop** — the "Tippe, um nach allem zu
+  suchen" first row of the What dropdown duplicates the search-input placeholder
+  directly above it. **Contingent on the freetext bug above** (see opt 1 vs 2).
+- **Sticky list-view date headers.** In list view (not the calendar day panel),
+  pin each date header to the top while scrolling its group (`position: sticky` —
+  still the right tool). Must keep the live-updating `♥saved ★interest` counts.
+- **Merkliste icon → heart, not bookmark.** Switch the saved-shows toggle glyph.
+  ⚠️ Do a quick save-vs-interest **icon audit** first — heart/green already carry
+  meaning elsewhere (date headers render `♥` for saved; green = follows/state).
+  Reconcile the whole system in one pass, don't flip just this spot. (Relates to
+  the green-only-means-interested invariant in the UI-polish direction above.)
+- **Admin gear icons in the genre row** (admin-only) are vertically misaligned
+  and sit awkwardly *outside* the now-outlined genre tags. Consider a "button
+  add-on" (a second segment of the tag button, no gap). Keep it cheap — admin
+  only.
+- **"N gelesene anzeigen" (show read notifications) link** on the inbox empty
+  state has no click affordance and reads as plain grey body text — restyle to a
+  styleguide-compliant link/button.
+- **Saved-filters (Regeln) index cards** (`saved_filters/index`): (1) the
+  fieldset/box container is a UI element used nowhere else — reconsider; (2) the
+  green left border has no apparent meaning — give it purpose or drop it; (3) the
+  "Bearbeiten" link clashes with the action buttons — the link-vs-button
+  distinction won't read to users; reconcile even if it bends the styleguide
+  rule. (Overlaps the "Saved-filter card visual hierarchy" item above.)
+- **Edit-filter page** (`saved_filters/edit`): (1) add **back navigation**;
+  (2) separate the **Filter** and **Benachrichtigungen** sections — they run
+  together and the bold section headers read as form labels; add spacing/divider
+  and consider codifying **vertical-spacing rules** in `/styleguide`; (3) the
+  "Wann" select renders its value in **bold** unlike other inputs — match the
+  regular input font weight.
+
 ## v2 / nice-to-have (explicitly later)
+
 - Calendar export (ICS) of saved events + "your saved show is tonight" reminders
   are **DONE** (shipped 2026-06-16) — kept here only as a pointer.
 - Session "Update the filter I just applied" soft-pointer (redesign decision 8).
 - `featured`/`main_genre` flag + subtree-count browse ranking (redesign decision 6).
 
 ## Out of scope (not "incomplete")
+
 - More scraper venues (backlog in `docs/scraper-backlog.md`).
 - Vanished-event sweep / ratio alerting (declined as over-engineering).
 - Password reset (no recovery flow by design).

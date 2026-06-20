@@ -7,17 +7,17 @@ class FilterTest < ActiveSupport::TestCase
   test 'list setters parse a comma string into a tag array' do
     f = Filter.new
     f.queries = 'rock, jazz'
-    f.style_list = 'wubstep, glimmercore'
+    f.genres = 'wubstep, glimmercore'
 
     assert_equal %w[rock jazz], f.queries
-    assert_equal %w[wubstep glimmercore], f.style_list
+    assert_equal %w[wubstep glimmercore], f.genres
   end
 
   test 'build sets the lists it is given and leaves nil ones at their default' do
-    f = Filter.build(queries: 'rock', style_list: %w[techno], location_list: nil)
+    f = Filter.build(queries: 'rock', genres: %w[techno], location_list: nil)
 
     assert_equal %w[rock], f.queries
-    assert_equal %w[techno], f.style_list
+    assert_equal %w[techno], f.genres
     assert_empty f.location_list, 'a nil list is left at its empty default'
     assert_empty f.date_ranges, 'an omitted list is left at its empty default'
   end

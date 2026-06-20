@@ -1,10 +1,8 @@
 class Genre < ApplicationRecord
-  # A genre is a raw, scraped descriptor (e.g. "indie-rock", "techno"). It maps
-  # to zero or more curated Styles; an event's styles are derived from the styles
-  # of its genres (see Event#recompute_styles!). Genres live alongside the AATO
-  # genre tags on events and are matched to them by *fingerprint* (see
-  # fingerprint_for) so spelling variants collapse to one row.
-  has_and_belongs_to_many :styles
+  # A genre is a raw, scraped descriptor (e.g. "indie-rock", "techno"), filed into
+  # a curated tree (see parent below). Genres live alongside the AATO genre tags on
+  # events and are matched to them by *fingerprint* (see fingerprint_for) so
+  # spelling variants collapse to one row.
 
   # An alias points at the canonical genre it should be treated as (e.g.
   # "Elektronik" → "Electronic"): semantic merges the fingerprint can't catch.
@@ -22,23 +20,12 @@ class Genre < ApplicationRecord
   has_many :children, class_name: 'Genre', foreign_key: :parent_id,
                       inverse_of: :parent, dependent: :nullify
 
-  # Unassigned = the assignment queue: in active use, mapped to no style, and
-  # carrying no disposition (including not an alias). Ordered most-used first so
-  # the highest-impact genres surface.
   scope :in_use, -> { where('events_count > 0') }
-  scope :unassigned, lambda {
-    in_use.left_joins(:styles)
-          .where(styles: { id: nil }, ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
-          .distinct
-  }
-  scope :assigned, -> { joins(:styles).distinct }
   # Tree curation queue: in active use, sitting under no parent, carrying no
   # disposition or alias, AND not itself a parent of other genres — the genres
   # still waiting to be filed into the tree. Excluding parents is what separates
   # an unfiled leaf from a deliberate top-level root (a root has children but no
-  # parent, so it would otherwise look unplaced). The parent-based successor to
-  # `unassigned` (which keys off Style); both coexist until Style is removed
-  # (Phase 2). Ordered most-used first by by_usage.
+  # parent, so it would otherwise look unplaced). Ordered most-used first by by_usage.
   scope :unplaced, lambda {
     in_use.where(parent_id: nil, ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
           .where.not(id: Genre.where.not(parent_id: nil).select(:parent_id))
@@ -88,10 +75,6 @@ class Genre < ApplicationRecord
 
   def to_combobox_display
     name
-  end
-
-  def assigned?
-    styles.exists?
   end
 
   def ignored?
@@ -161,16 +144,6 @@ class Genre < ApplicationRecord
     str.to_s.strip.split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
   end
 
-  # The style names mapped to the given genre names, matched by fingerprint (the
-  # single source of truth used by both Event#recompute_styles! and the scrape
-  # path). Robust to spelling variants without any per-variant upkeep.
-  def self.styles_for(names)
-    fingerprints = Array(names).map { |name| fingerprint_for(name) }.uniq.reject(&:blank?)
-    return [] if fingerprints.empty?
-
-    Style.joins(:genres).where(genres: { fingerprint: fingerprints }).distinct.pluck(:name)
-  end
-
   # Replace each scraped name with the canonical *display* name of the Genre it
   # resolves to (by fingerprint): the collapsed spelling for known genres, the
   # canonical for semantic aliases, or a titleized form for brand-new ones. This
@@ -190,21 +163,9 @@ class Genre < ApplicationRecord
     end
   end
 
-  # Set this genre's styles (clearing any disposition/alias) and re-derive the
-  # styles (and visibility) of every event carrying it.
-  def assign_styles!(ids)
-    # Accepts the combobox's comma-joined string ("3,7") or a single id.
-    ids = Array(ids).join(',').split(',').map(&:strip).reject(&:blank?)
-    transaction do
-      self.style_ids = ids
-      update!(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
-    end
-    recompute_events!
-  end
-
   # File this genre into the tree under `parent` (a Genre or its id; nil detaches
-  # it back to a root). The parent-based successor to assign_styles! — a placed
-  # genre carries no disposition or alias, so clear those. Rejects parenting a
+  # it back to a root). A placed genre carries no disposition or alias, so clear
+  # those. Rejects parenting a
   # genre under itself or its own descendant (which would form a cycle). Re-derives
   # events so a previously-hidden genre re-surfaces once it's placed.
   def set_parent!(parent)
@@ -220,41 +181,38 @@ class Genre < ApplicationRecord
   end
 
   # "Ignore" it for mapping: a real, publicly-shown genre we deliberately leave
-  # unmapped. Clear styles, set ignored_at, re-derive events.
+  # unfiled. Set ignored_at, re-derive events.
   def ignore!
     transaction do
-      styles.clear
       update!(ignored_at: Time.current, hidden_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
     end
     recompute_events!
   end
 
-  # "Hide": mark as non-music. Clear styles, set hidden_at. Events carrying only
-  # this (and no music style) drop out of public listings — see Event#recompute_styles!.
+  # "Hide": mark as non-music. Set hidden_at. Events carrying only this (and no
+  # other non-hidden genre) drop out of public listings — see Event#hidden_by_genre?.
   def hide!
     transaction do
-      styles.clear
       update!(hidden_at: Time.current, ignored_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
     end
     recompute_events!
   end
 
-  # "Block" scraper noise (never a real genre): clear styles, set blocked_at, and
-  # strip this genre's taggings off every event that carries it. The event itself
-  # stays untouched and visible — only the junk tag goes. Event#genre_list= then
-  # keeps it out on every future scrape, since scrapers re-tag by name.
+  # "Block" scraper noise (never a real genre): set blocked_at, and strip this
+  # genre's taggings off every event that carries it. The event itself stays
+  # untouched and visible — only the junk tag goes. Event#genre_list= then keeps
+  # it out on every future scrape, since scrapers re-tag by name.
   def block!
     transaction do
-      styles.clear
       update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil, canonical_id: nil, parent_id: nil)
     end
-    # Snapshot ids first: recompute_styles! drops this genre's tagging from each
+    # Snapshot ids first: recompute_visibility! drops this genre's tagging from each
     # event, shrinking the tagged_with set find_each would page over — which would
     # skip events and leave the blocked tag attached (cf. merge_into!).
     affected = Event.tagged_with(name, on: :genres).pluck(:id)
     Event.where(id: affected).find_each do |event|
       event.genre_list.remove(name)
-      event.recompute_styles! # persists the dropped tagging + re-derives styles
+      event.recompute_visibility! # persists the dropped tagging + re-derives visibility
     end
     update_columns(events_count: 0)
   end
@@ -283,10 +241,9 @@ class Genre < ApplicationRecord
         taggings.where(taggable_id: dup_ids).delete_all
         taggings.update_all(tag_id: canonical_tag.id)
       end
-      styles.clear
       update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil, parent_id: nil)
     end
-    Event.where(id: affected).find_each(&:recompute_styles!)
+    Event.where(id: affected).find_each(&:recompute_visibility!)
     Genre.reconcile!
   end
 
@@ -362,6 +319,6 @@ class Genre < ApplicationRecord
   private
 
   def recompute_events!
-    Event.tagged_with(name, on: :genres).find_each(&:recompute_styles!)
+    Event.tagged_with(name, on: :genres).find_each(&:recompute_visibility!)
   end
 end

@@ -51,7 +51,7 @@ class EventReminder
   def target_events
     @user.saved_events
          .where(start_date: target_date, cancelled_at: nil, dismissed_at: nil)
-         .includes(:locations, :styles, :genres)
+         .includes(:locations, :genres)
          .order(:start_time, :title)
   end
 

@@ -1,63 +1,40 @@
 require 'db_test_helper'
 
-# Locks the disposition state machine on Genre: assign_styles!, ignore!, hide!,
-# block!, restore! and the scopes that surface each disposition. These are pure
+# Locks the disposition state machine on Genre: ignore!, hide!, block!, restore!,
+# set_parent! and the visibility they re-derive on events. These are pure
 # mechanics — the curation behaviour the app is built on — so they're tested with
-# invented genre/style names and never reference real taxonomy content (which the
+# invented genre names and never reference real taxonomy content (which the
 # parallel session is rewriting).
 class GenreDispositionTest < ActiveSupport::TestCase
-  test 'assign_styles! maps the genre and clears any prior disposition' do
+  test 'set_parent! files the genre and clears any prior disposition' do
+    root = genre(events_count: 3)
     g = genre(events_count: 3)
     g.ignore!
-    s1 = style
-    s2 = style
 
-    g.assign_styles!([s1.id, s2.id])
+    g.set_parent!(root)
 
-    assert g.assigned?
-    assert_equal [s1, s2].map(&:id).sort, g.reload.styles.pluck(:id).sort
+    assert g.placed?
+    assert_equal root.id, g.reload.parent_id
     refute g.ignored?
     refute g.hidden?
     refute g.blocked?
   end
 
-  test 'assign_styles! accepts the combobox comma-joined string form' do
-    g = genre
-    s1 = style
-    s2 = style
-
-    g.assign_styles!("#{s1.id},#{s2.id}")
-
-    assert_equal [s1, s2].map(&:id).sort, g.reload.styles.pluck(:id).sort
-  end
-
-  test 'assign_styles! re-derives styles on events carrying the genre' do
-    g = genre(name: 'flarejazz')
-    s = style
-    event = event_with_genres(g.name)
-    event.recompute_styles!
-    assert_empty event.reload.style_list, 'unmapped genre yields no styles'
-
-    g.assign_styles!([s.id])
-
-    assert_equal [s.name], event.reload.style_list
-  end
-
-  test 'ignore! clears styles and marks the genre ignored' do
-    g = genre(styles: [style])
-    assert g.assigned?
+  test 'ignore! marks the genre ignored and detaches it from the tree' do
+    root = genre
+    g = genre(parent: root)
+    assert g.placed?
 
     g.ignore!
 
-    refute g.assigned?
+    refute g.placed?
     assert g.ignored?
-    assert_empty g.reload.styles
   end
 
   test 'hide! hides an event whose only genre is the hidden one' do
     g = genre(name: 'poetry-slam')
     event = event_with_genres(g.name)
-    event.recompute_styles!
+    event.recompute_visibility!
     refute event.reload.hidden
 
     g.hide!
@@ -66,22 +43,22 @@ class GenreDispositionTest < ActiveSupport::TestCase
     assert event.reload.hidden, 'non-music event drops out of public listings'
   end
 
-  test 'hide! keeps an event visible when another genre maps to a music style' do
-    music = genre(name: 'glimmercore', styles: [style])
+  test 'hide! keeps an event visible when another genre is non-hidden' do
+    music = genre(name: 'glimmercore')
     spoken = genre(name: 'lecture')
     event = event_with_genres(music.name, spoken.name)
-    event.recompute_styles!
+    event.recompute_visibility!
 
     spoken.hide!
 
-    refute event.reload.hidden, 'a real style always wins over a hidden genre'
+    refute event.reload.hidden, 'any non-hidden genre keeps the event visible'
   end
 
   test 'block! strips the genre tagging off events but keeps the event visible' do
     noise = genre(name: 'us') # scraper noise, e.g. a country code
-    real = genre(name: 'indie', styles: [style])
+    real = genre(name: 'indie')
     event = event_with_genres(noise.name, real.name)
-    event.recompute_styles!
+    event.recompute_visibility!
     assert_includes event.reload.genre_list, noise.name
 
     noise.block!
@@ -106,7 +83,7 @@ class GenreDispositionTest < ActiveSupport::TestCase
   test 'restore! lifts every disposition mark and un-hides events' do
     g = genre(name: 'spoken-word')
     event = event_with_genres(g.name)
-    event.recompute_styles!
+    event.recompute_visibility!
     g.hide!
     assert event.reload.hidden
 

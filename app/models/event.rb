@@ -1,5 +1,5 @@
 class Event < ApplicationRecord
-  acts_as_taggable_on :locations, :styles, :genres
+  acts_as_taggable_on :locations, :genres
 
   # The scrape run that first created this event (nil for events predating run
   # tracking, or whose run has since been pruned). Set once, on insert, by the
@@ -98,8 +98,8 @@ class Event < ApplicationRecord
   # Tag lists an admin may pin against the scraper. Not real columns (so they
   # never show up in `changed`), but they sit in overridden_fields alongside the
   # scalars and gate the scrape the same way (see Scrapers::Agent#build_event).
-  # A pinned genre list keeps its derived styles/visibility, recomputed from it
-  # — styles and the `hidden`/`cancelled` flags stay source-derived projections.
+  # A pinned genre list keeps its derived visibility, recomputed from it — the
+  # `hidden`/`cancelled` flags stay source-derived projections.
   OVERRIDABLE_TAG_FIELDS = %w[genres].freeze
 
   # The dedup link an admin may pin: a manual merge/un-merge that Scrapers::Dedup
@@ -138,7 +138,7 @@ class Event < ApplicationRecord
 
   # Genre-model ids matching this event's current genre tags (by fingerprint) —
   # the selection the admin override combobox shows. ensure! guarantees a Genre
-  # row per tagged genre on every scrape (Scrapers::Agent#event_styles), so this
+  # row per tagged genre on every scrape (Scrapers::Agent#build_event), so this
   # never silently drops one. The matching setter lives in the controller, which
   # maps the submitted ids back to names through genre_list=.
   def override_genre_ids
@@ -150,7 +150,7 @@ class Event < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ['taggings', 'locations', 'styles', 'genres']
+    ['taggings', 'locations', 'genres']
   end
 
   # The venue location among this event's flat location tags (the rest are
@@ -180,14 +180,13 @@ class Event < ApplicationRecord
     genre_list.reject! { |name| blocked.include?(Genre.fingerprint_for(name)) } if blocked.any?
   end
 
-  # Styles are a derived projection of this event's genres: the union of the
-  # styles each genre maps to, matched by fingerprint (Genre.styles_for — the
-  # same path the scraper uses). Recomputing from source (rather than nudging the
-  # style list incrementally) is what keeps re-mapping a genre correct even when
-  # several genres on the same event point at the same style.
-  def recompute_styles!
+  # Re-derive this event's visibility (the music gate) from its genres'
+  # dispositions, and ensure a Genre row exists per tag (so new genres surface in
+  # the curation queue). Recomputed from source rather than nudged incrementally,
+  # mirroring the scrape path (Scrapers::Agent#build_event), so a freshly-scraped
+  # non-music event (only hidden genres) drops out of public listings at once.
+  def recompute_visibility!
     Genre.ensure!(genre_list)
-    self.style_list = Genre.styles_for(genre_list)
     self.hidden = hidden_by_genre?
     save!
   end
@@ -195,9 +194,9 @@ class Event < ApplicationRecord
   # Non-music: every genre the event carries is hidden-dispositioned, so it has no
   # genre worth showing. Any single non-hidden genre (a real music genre) keeps it
   # visible — a "reading + concert" stays up — and an event with no genres at all
-  # stays visible too. Reads genre_list directly off genre dispositions (no
-  # dependence on the soon-removed style layer), so recompute_styles! and the
-  # scrape path (Scrapers::Agent#build_event) derive `hidden` identically.
+  # stays visible too. Reads genre_list directly off genre dispositions, so
+  # recompute_visibility! and the scrape path (Scrapers::Agent#build_event) derive
+  # `hidden` identically.
   def hidden_by_genre?
     fingerprints = genre_list.map { |name| Genre.fingerprint_for(name) }
     return false if fingerprints.empty?

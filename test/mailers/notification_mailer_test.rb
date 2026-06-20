@@ -28,7 +28,7 @@ class NotificationMailerTest < ActionMailer::TestCase
     # The rule's name freezes under the test's default locale (de): "… · Neue Events".
     rule = u.notification_rules.new(cadence: 'daily', time_of_day: 600,
                                     notify_push: false, notify_email: false)
-    rule.filter_attributes = { s: ['Rock'] }
+    rule.filter_attributes = { q: ['Rock'] }
     rule.save!
     assert_match 'Neue Events', rule.name, 'name is frozen in de here'
 

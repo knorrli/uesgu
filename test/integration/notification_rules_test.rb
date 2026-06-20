@@ -78,7 +78,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     # A draft saved with only the filter (no channel params) lands on the in-app
     # channel only — notifying by default, but nothing intrusive.
     assert_difference -> { u.notification_rules.count }, 1 do
-      post notification_rules_path, params: { s: ['Rock'] }
+      post notification_rules_path, params: { q: ['Rock'] }
     end
 
     r = u.notification_rules.last
@@ -101,12 +101,12 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
   test 'create on a filter that already has a rule lands on the existing one, no duplicate' do
     u = sign_in_as user
     existing = u.notification_rules.new(name: 'x', cadence: 'daily', time_of_day: 540)
-    existing.filter_attributes = { s: ['Rock'], l: ['Bern'] }
+    existing.filter_attributes = { q: ['Rock'], l: ['Bern'] }
     existing.save!
 
     # Same filter set, order flipped → still the same rule.
     assert_no_difference -> { u.notification_rules.count } do
-      post notification_rules_path, params: { l: ['Bern'], s: ['Rock'] }
+      post notification_rules_path, params: { l: ['Bern'], q: ['Rock'] }
     end
     assert_redirected_to edit_notification_rule_path(existing)
   end
@@ -265,9 +265,9 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
 
   test 'fire now creates an in-app notification when there are matches' do
     u = sign_in_as user
-    event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['Rock'])
+    event(created_at: 1.hour.ago, start_date: Date.current + 3, genre_list: ['Rock'])
     r = u.notification_rules.new(cadence: 'daily', time_of_day: 1, notify_push: false, notify_email: false)
-    r.filter_attributes = { s: ['Rock'] }
+    r.filter_attributes = { q: ['Rock'] }
     r.save!
     r.update_column(:last_fired_at, 2.hours.ago)
 
@@ -280,7 +280,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
   test 'fire with no matches stays on the list with an empty notice' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'daily', time_of_day: 1, notify_push: false)
-    r.filter_attributes = { s: ['nothing-matches-this'] }
+    r.filter_attributes = { q: ['nothing-matches-this'] }
     r.save!
 
     assert_no_difference -> { u.notifications.count } do
@@ -292,13 +292,13 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
   test 'editing in-app off makes a saved filter silent (and forces other channels off)' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'daily', time_of_day: 1, notify_push: true)
-    r.filter_attributes = { s: ['Rock'] }
+    r.filter_attributes = { q: ['Rock'] }
     r.save!
     assert r.notifying?
 
     patch notification_rule_path(r), params: {
       notification_rule: { cadence: 'daily', time_string: '09:00', notify_in_app: '0', notify_push: '1' },
-      s: ['Rock']
+      q: ['Rock']
     }
     r.reload
     refute r.notifying?, 'in-app off → silent saved filter'
@@ -308,7 +308,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
   test 'destroy removes a saved filter' do
     u = sign_in_as user
     r = u.notification_rules.new(cadence: 'daily', time_of_day: 1)
-    r.filter_attributes = { s: ['Rock'] }
+    r.filter_attributes = { q: ['Rock'] }
     r.save!
 
     assert_difference -> { u.notification_rules.count }, -1 do

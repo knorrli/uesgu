@@ -72,11 +72,6 @@ Rails.application.routes.draw do
   get "styleguide" => "styleguide#index", as: :styleguide
 
   resources :events, only: [:index, :destroy]
-  resources :styles, only: [] do
-    collection do
-      post :chips
-    end
-  end
   resources :tags, only: [:index, :edit] do
     collection do
       post :chips
@@ -86,13 +81,12 @@ Rails.application.routes.draw do
   scope :admin do
     get '', to: 'admin#index', as: :admin
 
-    # Genre curation. index/edit are standard CRUD over all genres in use; queue
-    # is the "tinder" flow serving the next genre not yet filed into the tree;
-    # update assigns styles (legacy, removed with Style in Phase 2); set_parent
+    # Genre curation. index/edit browse + open the per-genre editor; queue is the
+    # "tinder" flow serving the next genre not yet filed into the tree; set_parent
     # files a genre under a parent (the tree's curation action); ignore/hide/block
     # set a disposition, restore clears it; merge folds the genre into a canonical
     # one (a semantic alias).
-    resources :genres, only: %i[index edit update] do
+    resources :genres, only: %i[index edit] do
       member do
         post :set_parent
         post :ignore
@@ -122,10 +116,10 @@ Rails.application.routes.draw do
     resources :scrape_runs, only: %i[index show create]
 
     # Catalogue browsers reached from the dashboard stats: events (the scraped
-    # table), styles (the curated vocabulary), and locations (derived from the
-    # location tags). Each mirrors the genres index idiom — filter / sort /
-    # search / paginate. (Genres keep their own legacy scoped route above, with
-    # edit/queue actions these three don't need.) Events additionally get
+    # table) and locations (derived from the location tags). Each mirrors the
+    # genres index idiom — filter / sort / search / paginate. (Genres keep their
+    # own legacy scoped route above, with edit/queue actions these two don't
+    # need.) Events additionally get
     # show/update for per-event manual correction; revert releases one locked
     # field back to the scraper; destroy dismisses (soft-deletes) it and undismiss
     # restores it.
@@ -137,7 +131,6 @@ Rails.application.routes.draw do
         patch :unmerge    # pin this event as standalone (split a wrong auto-merge)
       end
     end
-    resources :styles, only: %i[index]
     resources :locations, only: %i[index]
 
     # Admin-authored rules that auto-discard junk scraped events by text match.

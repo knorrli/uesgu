@@ -26,7 +26,7 @@
       <%# Not saved: a funnel with a small + badge ("add this filter") — opens the
           editor with the current filter as a draft. %>
       <%= link_to new_notification_rule_path(q: @filter.queries, g: @filter.genres,
-                    l: @filter.location_list, s: @filter.style_list, d: @filter.date_ranges),
+                    l: @filter.location_list, d: @filter.date_ranges),
             class: 'save-filter-link',
             'aria-label': t('events.index.save_filter') do %>
         <span class="save-filter-icon">

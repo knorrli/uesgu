@@ -211,8 +211,6 @@ en:
       content_type: Type
       window: Window
       scope: Filter
-      filter_styles: Styles
-      filter_styles_ph: e.g. Rock, Jazz
       filter_locations_ph: e.g. Dachstock, Rössli
       filter_queries: Search terms
       filter_queries_ph: e.g. band name
@@ -320,13 +318,13 @@ en:
       queue_link: Assignment queue
       tree_link: Tree
       status_all: all
-      status_unassigned: unassigned
-      status_assigned: assigned
+      status_placed: placed
+      status_unplaced: unplaced
       status_ignored: ignored
       status_hidden: hidden
       status_blocked: blocked
       status_merged: "merged into %{canonical}"
-      status_placed: "under %{parent}"
+      placed_under: "under %{parent}"
       sort_by: "Sort:"
       sort_name: A–Z
       sort_count: most used
@@ -336,18 +334,16 @@ en:
       unplaced: "%{count} unplaced (in queue)"
       empty: No genres placed yet.
     queue:
-      title: Genre assignment
-      remaining: "%{count} unassigned"
-      empty: Nothing to assign — every genre in use is mapped or handled.
+      title: Genre curation
+      remaining: "%{count} unplaced"
+      empty: Nothing to file — every genre in use is placed or handled.
       restore: Restore
     editor:
       usage: "on %{count} events"
       status: "Status:"
-      suggested: Suggested
       set_parent: Set parent
       set_parent_into: "File under another genre…"
-      assign: Assign
-      ignore: "Ignore (keep, no style)"
+      ignore: "Ignore (keep, unfiled)"
       hide: "Hide event (non-music)"
       block: "Block (strip the tag)"
       merge: Merge
@@ -358,8 +354,8 @@ en:
     back: "← Admin"
     index:
       title: Admin
-      assigned: Assigned
-      unassigned: Unassigned
+      placed: Placed
+      unplaced: Unplaced
       ignored: Ignored
       hidden: Hidden
       blocked: Blocked
@@ -528,23 +524,6 @@ en:
         merged: Events merged.
       unmerge:
         unmerged: Event split out as standalone.
-    styles:
-      index:
-        title: Styles
-        status_all: All
-        status_assigned: Assigned
-        status_unassigned: Unassigned
-        search: Search styles…
-        sort_by: Sort by
-        sort_name: name
-        sort_count: usage
-        usage:
-          one: tags 1 event
-          other: tags %{count} events
-        genre_count:
-          one: mapped by 1 genre
-          other: mapped by %{count} genres
-        empty: No styles match.
     locations:
       index:
         title: Locations
@@ -621,9 +600,6 @@ en:
       invitation:
         one: Invitation
         other: Invitations
-      style:
-        one: Style
-        other: Styles
     attributes:
       user:
         username: Username

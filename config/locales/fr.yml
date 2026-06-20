@@ -211,8 +211,6 @@ fr:
       content_type: Type
       window: Période
       scope: Filtre
-      filter_styles: Styles
-      filter_styles_ph: p. ex. Rock, Jazz
       filter_locations_ph: p. ex. Dachstock, Rössli
       filter_queries: Termes de recherche
       filter_queries_ph: p. ex. nom du groupe
@@ -317,16 +315,16 @@ fr:
     index:
       title: Genres
       search: Rechercher des genres
-      queue_link: File d'assignation
+      queue_link: File de curation
       tree_link: Arborescence
       status_all: tous
-      status_unassigned: non assigné
-      status_assigned: assigné
+      status_placed: classé
+      status_unplaced: non classé
       status_ignored: ignoré
       status_hidden: masqué
       status_blocked: bloqué
       status_merged: "fusionné avec %{canonical}"
-      status_placed: "sous %{parent}"
+      placed_under: "sous %{parent}"
       sort_by: "Trier:"
       sort_name: A–Z
       sort_count: plus fréquents
@@ -336,18 +334,16 @@ fr:
       unplaced: "%{count} non classés (dans la file)"
       empty: Aucun genre encore classé.
     queue:
-      title: Assignation des genres
-      remaining: "%{count} non assignés"
-      empty: Rien à assigner — chaque genre utilisé est assigné ou traité.
+      title: Curation des genres
+      remaining: "%{count} non classés"
+      empty: Rien à classer — chaque genre utilisé est classé ou traité.
       restore: Restaurer
     editor:
       usage: "sur %{count} événements"
       status: "Statut :"
-      suggested: Suggestions
       set_parent: Définir le parent
       set_parent_into: "Classer sous un autre genre…"
-      assign: Assigner
-      ignore: "Ignorer (garder, sans style)"
+      ignore: "Ignorer (garder, non classé)"
       hide: "Masquer l'événement (non musical)"
       block: "Bloquer (retirer le tag)"
       merge: Fusionner
@@ -358,8 +354,8 @@ fr:
     back: "← Admin"
     index:
       title: Admin
-      assigned: Assignés
-      unassigned: Non assignés
+      placed: Classés
+      unplaced: Non classés
       ignored: Ignorés
       hidden: Masqués
       blocked: Bloqués
@@ -528,23 +524,6 @@ fr:
         merged: Événements fusionnés.
       unmerge:
         unmerged: Événement séparé comme autonome.
-    styles:
-      index:
-        title: Styles
-        status_all: Tous
-        status_assigned: Assignés
-        status_unassigned: Non assignés
-        search: Rechercher des styles…
-        sort_by: Trier par
-        sort_name: nom
-        sort_count: usage
-        usage:
-          one: marque 1 événement
-          other: marque %{count} événements
-        genre_count:
-          one: associé par 1 genre
-          other: associé par %{count} genres
-        empty: Aucun style correspondant.
     locations:
       index:
         title: Lieux
@@ -621,9 +600,6 @@ fr:
       invitation:
         one: Invitation
         other: Invitations
-      style:
-        one: Style
-        other: Styles
     attributes:
       user:
         username: Nom d'utilisateur

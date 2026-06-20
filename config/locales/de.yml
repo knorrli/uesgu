@@ -211,8 +211,6 @@ de:
       content_type: Art
       window: Zeitraum
       scope: Filter
-      filter_styles: Stile
-      filter_styles_ph: z. B. Rock, Jazz
       filter_locations_ph: z. B. Dachstock, Rössli
       filter_queries: Suchbegriffe
       filter_queries_ph: z. B. Bandname
@@ -317,16 +315,16 @@ de:
     index:
       title: Genres
       search: Genres suchen
-      queue_link: Zuweisungs-Queue
+      queue_link: Kuratierungs-Queue
       tree_link: Baum
       status_all: alle
-      status_unassigned: nicht zugewiesen
-      status_assigned: zugewiesen
+      status_placed: eingeordnet
+      status_unplaced: nicht eingeordnet
       status_ignored: ignoriert
       status_hidden: verborgen
       status_blocked: blockiert
       status_merged: "zusammengeführt mit %{canonical}"
-      status_placed: "unter %{parent}"
+      placed_under: "unter %{parent}"
       sort_by: "Sortieren:"
       sort_name: A–Z
       sort_count: am häufigsten
@@ -336,18 +334,16 @@ de:
       unplaced: "%{count} nicht eingeordnet (in Queue)"
       empty: Noch keine Genres eingeordnet.
     queue:
-      title: Genre-Zuweisung
-      remaining: "%{count} nicht zugewiesen"
-      empty: Nichts zuzuweisen — jedes verwendete Genre ist zugewiesen oder bearbeitet.
+      title: Genre-Kuratierung
+      remaining: "%{count} nicht eingeordnet"
+      empty: Nichts einzuordnen — jedes verwendete Genre ist eingeordnet oder bearbeitet.
       restore: Wiederherstellen
     editor:
       usage: "auf %{count} Events"
       status: "Status:"
-      suggested: Vorschläge
       set_parent: Übergeordnetes Genre setzen
       set_parent_into: "Unter ein Genre einordnen…"
-      assign: Zuweisen
-      ignore: "Ignorieren (behalten, kein Style)"
+      ignore: "Ignorieren (behalten, nicht eingeordnet)"
       hide: "Event verbergen (keine Musik)"
       block: "Blockieren (Tag entfernen)"
       merge: Zusammenführen
@@ -358,8 +354,8 @@ de:
     back: "← Admin"
     index:
       title: Admin
-      assigned: Zugewiesen
-      unassigned: Nicht zugewiesen
+      placed: Eingeordnet
+      unplaced: Nicht eingeordnet
       ignored: Ignoriert
       hidden: Verborgen
       blocked: Blockiert
@@ -528,23 +524,6 @@ de:
         merged: Veranstaltungen zusammengeführt.
       unmerge:
         unmerged: Veranstaltung als eigenständig getrennt.
-    styles:
-      index:
-        title: Stile
-        status_all: Alle
-        status_assigned: Zugewiesen
-        status_unassigned: Nicht zugewiesen
-        search: Stile suchen…
-        sort_by: Sortieren nach
-        sort_name: Name
-        sort_count: Nutzung
-        usage:
-          one: markiert 1 Veranstaltung
-          other: markiert %{count} Veranstaltungen
-        genre_count:
-          one: von 1 Genre zugeordnet
-          other: von %{count} Genres zugeordnet
-        empty: Keine passenden Stile.
     locations:
       index:
         title: Orte
@@ -621,9 +600,6 @@ de:
       invitation:
         one: Einladung
         other: Einladungen
-      style:
-        one: Style
-        other: Styles
     attributes:
       user:
         username: Benutzername

@@ -1,23 +1,12 @@
 require 'db_test_helper'
 
-# Locks the admin genre-curation flow through the controller: the assignment
-# write path, each disposition endpoint, the queue that serves the next
-# highest-impact unmapped genre, and the internal-only return_to. Disposition
+# Locks the admin genre-curation flow through the controller: the set_parent
+# (tree-filing) write path, each disposition endpoint, the queue that serves the
+# next highest-impact unplaced genre, and the internal-only return_to. Disposition
 # *behaviour* is unit-tested in genre_disposition_test; here we prove the
 # endpoints wire through and redirect. Synthetic taxonomy only.
 class GenresAdminTest < ActionDispatch::IntegrationTest
   setup { sign_in_as user(admin: true) }
-
-  test 'update assigns the chosen styles to the genre' do
-    g = genre(events_count: 2)
-    s1 = style
-    s2 = style
-
-    patch genre_path(g), params: { genre: { style_ids: "#{s1.id},#{s2.id}" }, return_to: genres_path }
-
-    assert_redirected_to genres_path
-    assert_equal [s1, s2].map(&:id).sort, g.reload.styles.pluck(:id).sort
-  end
 
   test 'ignore, hide, block and restore each flip the genre state' do
     g = genre(events_count: 1)
@@ -57,14 +46,14 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     assert_nil parent.reload.parent_id, 'the rejected re-parent left parent a root'
   end
 
-  test 'queue serves the highest-impact unmapped genre' do
+  test 'queue serves the highest-impact unplaced genre' do
     genre(name: 'light', events_count: 2)
     heavy = genre(name: 'heavy', events_count: 99)
 
     get queue_genres_path
 
     assert_response :success
-    assert_includes response.body, heavy.name, 'the most-used unmapped genre surfaces first'
+    assert_includes response.body, heavy.name, 'the most-used unplaced genre surfaces first'
   end
 
   test 'tree renders the placed hierarchy for an admin' do

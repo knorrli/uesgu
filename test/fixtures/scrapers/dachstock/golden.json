@@ -6,7 +6,6 @@
     "title": "DACHSTOCK & SOUS LE PONT PRESENT: SCHACHTURNIER IM SOULI",
     "subtitle": "",
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -21,13 +20,6 @@
     "title": "NEOPERREO",
     "subtitle": "LIZZ (Santiago), TOMASA DEL REAL (LIVE) (Mexico City), Orfigyal (Madrid), PAPI SCORPIO (Mexico City), Mafia Princess, Crybbys (Bern)",
     "genre_list": [
-      "Party",
-      "Neoperreo",
-      "Latincore",
-      "GLOBALPERREO",
-      "LATINCLUB"
-    ],
-    "style_list": [
       "Party",
       "Neoperreo",
       "Latincore",
@@ -52,11 +44,6 @@
       "Hip Hop",
       "Rap"
     ],
-    "style_list": [
-      "Konzert",
-      "Hip Hop",
-      "Rap"
-    ],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -71,12 +58,6 @@
     "title": "Dachstock and Grosse Halle present: Edwin Rosen Live 2026",
     "subtitle": "Edwin Rosen (Stuttgart), Farce (Wien)",
     "genre_list": [
-      "Konzert",
-      "Post-Punk",
-      "New Wave",
-      "Synth Pop"
-    ],
-    "style_list": [
       "Konzert",
       "Post-Punk",
       "New Wave",
@@ -104,15 +85,6 @@
       "Bounce",
       "Speedhouse"
     ],
-    "style_list": [
-      "Party",
-      "HardBounce",
-      "HardGroove",
-      "PsyGroove",
-      "HardHouse",
-      "Bounce",
-      "Speedhouse"
-    ],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -127,10 +99,6 @@
     "title": "Darkside",
     "subtitle": "PYTHIUS (Utrecht), COPPA (UK), Deejay MF (Bern), Konfront.Audio (Bern), DAYNI (Luzern), MC Resc (Freiburg)",
     "genre_list": [
-      "Party",
-      "Drum and Bass"
-    ],
-    "style_list": [
       "Party",
       "Drum and Bass"
     ],
@@ -153,12 +121,6 @@
       "Y2K",
       "Summervibes"
     ],
-    "style_list": [
-      "Party",
-      "90ties",
-      "Y2K",
-      "Summervibes"
-    ],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -173,10 +135,6 @@
     "title": "Dachstock & Sous le Pont present: Schachturnier im Souli",
     "subtitle": "",
     "genre_list": [
-      "Schachturnier",
-      "Spieleabend"
-    ],
-    "style_list": [
       "Schachturnier",
       "Spieleabend"
     ],
@@ -196,9 +154,6 @@
     "genre_list": [
       "Festival"
     ],
-    "style_list": [
-      "Festival"
-    ],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -213,14 +168,6 @@
     "title": "Six Sex (Buenos Aires)",
     "subtitle": null,
     "genre_list": [
-      "Konzert",
-      "Electronica",
-      "Hyperpop",
-      "Perreo",
-      "PERREORAVE",
-      "HOT CLUB"
-    ],
-    "style_list": [
       "Konzert",
       "Electronica",
       "Hyperpop",
@@ -245,10 +192,6 @@
       "Party",
       "Drum and Bass"
     ],
-    "style_list": [
-      "Party",
-      "Drum and Bass"
-    ],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -268,12 +211,6 @@
       "Reggae",
       "Baile"
     ],
-    "style_list": [
-      "Party",
-      "Konzert",
-      "Reggae",
-      "Baile"
-    ],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -288,7 +225,6 @@
     "title": "Bermuda Dreieck",
     "subtitle": "",
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -307,11 +243,6 @@
       "Cumbia",
       "Queerpunk"
     ],
-    "style_list": [
-      "Konzert",
-      "Cumbia",
-      "Queerpunk"
-    ],
     "location_list": [
       "Dachstock",
       "Bern",
@@ -326,12 +257,6 @@
     "title": "SIBCITY TOUR",
     "subtitle": "ETO (Bern), Nik* (Zürich)",
     "genre_list": [
-      "Konzert",
-      "Electro",
-      "Rap",
-      "empowering rap"
-    ],
-    "style_list": [
       "Konzert",
       "Electro",
       "Rap",

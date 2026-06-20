@@ -66,7 +66,7 @@ class NotificationRule < ApplicationRecord
   before_validation :silence_other_channels
 
   def targets_something
-    return if queries.any? || genres.any? || style_list.any? || location_list.any? || date_ranges.any?
+    return if queries.any? || genres.any? || location_list.any? || date_ranges.any?
 
     errors.add(:base, I18n.t("notification_rules.errors.empty_filter"))
   end
@@ -94,12 +94,9 @@ class NotificationRule < ApplicationRecord
   def filter_attributes=(params)
     self.filter = {
       "queries" => clean(params[:q]),
-      # genres (g[]) is the tree-aware slot the events page + editor now feed: each
+      # genres (g[]) is the tree-aware slot the events page + editor feed: each
       # picked genre matches itself + every descendant (see Filter#expanded_genre_names).
-      # style_list (s[]) is the legacy flat-style slot — kept so any pre-migration
-      # rule still round-trips, but the UI no longer sets it, so it stays empty.
       "genres" => clean(params[:g]),
-      "style_list" => clean(params[:s]),
       "location_list" => clean(params[:l]),
       # Rules only do relative windows (re-resolved each fire); a fixed absolute
       # range makes no sense for a recurring alert (and would silently die once
@@ -110,7 +107,6 @@ class NotificationRule < ApplicationRecord
 
   def queries       = Array(filter["queries"])
   def genres        = Array(filter["genres"])
-  def style_list    = Array(filter["style_list"])
   def location_list = Array(filter["location_list"])
   def date_ranges   = Array(filter["date_ranges"])
 
@@ -130,11 +126,10 @@ class NotificationRule < ApplicationRecord
   # keeps. Two rules with the same fingerprint are the same saved filter — the
   # basis for "you already have this" both at save (no duplicate is made) and on
   # the events page (the ★ lights up).
-  def self.fingerprint(queries:, location_list:, date_ranges:, genres: [], style_list: [])
+  def self.fingerprint(queries:, location_list:, date_ranges:, genres: [])
     {
       queries: Set.new(Array(queries).map { |q| q.to_s.strip }.reject(&:blank?)),
       genres: Set.new(Array(genres)),
-      style_list: Set.new(Array(style_list)),
       location_list: Set.new(Array(location_list)),
       date_ranges: Set.new(Array(date_ranges).select { |range| Datepicker.preset.key?(range) })
     }
@@ -143,12 +138,12 @@ class NotificationRule < ApplicationRecord
   # Fingerprint for a landing-page Filter, so the events controller can ask "is
   # there a saved filter for this exact filter?".
   def self.fingerprint_for(filter)
-    fingerprint(queries: filter.queries, genres: filter.genres, style_list: filter.style_list,
+    fingerprint(queries: filter.queries, genres: filter.genres,
                 location_list: filter.location_list, date_ranges: filter.date_ranges)
   end
 
   def fingerprint
-    self.class.fingerprint(queries: queries, genres: genres, style_list: style_list,
+    self.class.fingerprint(queries: queries, genres: genres,
                            location_list: location_list, date_ranges: date_ranges)
   end
 
@@ -240,7 +235,7 @@ class NotificationRule < ApplicationRecord
   # genres + free-text queries, or "Alle Events" when none; the last part is the
   # time window for a happening filter, else the new-events label.
   def describe
-    what = (genres + style_list + queries).join(", ")
+    what = (genres + queries).join(", ")
     parts = [what.presence || I18n.t("notification_rules.summary.scope_all")]
     parts << location_list.join(", ") if location_list.any?
     parts << temporal_label
@@ -322,7 +317,7 @@ class NotificationRule < ApplicationRecord
     # (see filter_attributes=). active_windows also covers any legacy rule that
     # still has one stored, so it falls back to the new-events floor rather than a
     # dead past range.
-    Filter.build(queries: queries, genres: genres, style_list: style_list,
+    Filter.build(queries: queries, genres: genres,
                  location_list: location_list, date_ranges: active_windows)
   end
 

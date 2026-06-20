@@ -15,11 +15,6 @@ class PublicFilterRobustnessTest < ActionDispatch::IntegrationTest
     assert_select 'article.event', minimum: 1
   end
 
-  test 'the styles chips endpoint tolerates a missing combobox_values param' do
-    post chips_styles_path, as: :turbo_stream
-    assert_response :success
-  end
-
   test 'the tags chips endpoint tolerates a missing combobox_values param' do
     post chips_tags_path, as: :turbo_stream
     assert_response :success

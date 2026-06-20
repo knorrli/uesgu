@@ -87,28 +87,31 @@ class GenreQueryTest < ActiveSupport::TestCase
 
   # --- scopes ----------------------------------------------------------------
 
-  test 'unassigned surfaces in-use genres with no style and no disposition' do
+  test 'unplaced surfaces in-use genres with no parent and no disposition' do
     queued = genre(name: 'queued', events_count: 5)
-    genre(name: 'mapped', events_count: 5, styles: [style])
+    root = genre(name: 'root', events_count: 5)
+    placed = genre(name: 'placed', events_count: 5, parent: root)
     genre(name: 'dormant', events_count: 0) # not in use → excluded
     parked = genre(name: 'parked', events_count: 3)
     parked.ignore!
 
-    names = Genre.unassigned.pluck(:name)
+    names = Genre.unplaced.pluck(:name)
 
     assert_includes names, queued.name
-    refute_includes names, 'mapped'
+    refute_includes names, placed.name # filed under a parent
+    refute_includes names, root.name   # IS a parent (has a child) → a root, not unplaced
     refute_includes names, 'dormant'
-    refute_includes names, 'parked'
+    refute_includes names, parked.name
   end
 
-  test 'assigned includes only genres mapped to a style' do
-    mapped = genre(styles: [style])
+  test 'placed includes only genres filed under a parent' do
+    root = genre
+    child = genre(parent: root)
     bare = genre
 
-    names = Genre.assigned.pluck(:name)
+    names = Genre.placed.pluck(:name)
 
-    assert_includes names, mapped.name
+    assert_includes names, child.name
     refute_includes names, bare.name
   end
 

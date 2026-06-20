@@ -4,15 +4,13 @@ module TagsHelper
 
   # The Phosphor glyph class for a tag context, without the ICON_BASE weight,
   # e.g. 'ph-house'. Kept separate so JS can swap a single glyph class on an
-  # element that already carries ICON_BASE (see style_picker_controller.js).
+  # element that already carries ICON_BASE.
   def tag_icon_glyph(context:)
     case context.to_s
     when 'query'
       'ph-magnifying-glass'
     when 'date'
       'ph-calendar-dots'
-    when 'styles'
-      'ph-music-notes'
     when 'genres'
       'ph-tag'
     when 'locations', 'venue'
@@ -33,13 +31,10 @@ module TagsHelper
 
   # The leading icon on an applied-filter chip, derived from its param so the
   # events filter and the rule form render the same glyph for the same kind of
-  # token. The whole WHAT axis — a picked style (s[]) and a freetext/genre (q[]) —
-  # shares ONE icon (the search glyph), because styles and genres are unified on the
-  # row; surfacing the internal s[]/q[] split only on the chip would re-leak the very
-  # distinction the row hides. Locations (l[]) resolve PER-TYPE from the value
-  # (canton/city/venue), so a location chip's icon tells you which kind of place.
+  # token. Freetext + genre (q[]) share the search glyph. Locations (l[]) resolve
+  # PER-TYPE from the value (canton/city/venue), so a location chip's icon tells
+  # you which kind of place.
   FILTER_CHIP_GLYPH = {
-    's[]' => 'ph-magnifying-glass',
     'q[]' => 'ph-magnifying-glass',
     'd[]' => 'ph-calendar-dots'
   }.freeze

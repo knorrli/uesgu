@@ -8,10 +8,10 @@
     </div>
   </div>
 
-  <%# Two groups: assignment status (all / assigned / unassigned), then the
-      parked dispositions (ignored / hidden / blocked) where Restore lives. %>
+  <%# Two groups: tree status (all / placed / unplaced), then the parked
+      dispositions (ignored / hidden / blocked) where Restore lives. %>
   <div class="flex gap-small wrap align-baseline genre-status-filters">
-    <% %w[all assigned unassigned].each do |status| %>
+    <% %w[all placed unplaced].each do |status| %>
       <%= link_to t(".status_#{status}"),
             genres_path(status: (status == 'all' ? nil : status), q: params[:q].presence),
             class: class_names(:tag, active: @status == status) %>
@@ -59,10 +59,10 @@
             <span class="muted"><%= t(status_key) %></span>
             <%= button_to t('genres.queue.restore'), restore_genre_path(genre),
                   params: { return_to: genres_path(status: params[:status].presence, q: params[:q].presence, sort: params[:sort].presence) } %>
-          <% elsif genre.styles.any? %>
-            <% genre.styles.each do |style| %><span class="chip"><%= style.name %></span><% end %>
+          <% elsif genre.placed? %>
+            <span class="muted"><%= t('.placed_under', parent: genre.parent.name) %></span>
           <% else %>
-            <span class="muted"><%= t('.status_unassigned') %></span>
+            <span class="muted"><%= t('.status_unplaced') %></span>
           <% end %>
         </div>
       </div>

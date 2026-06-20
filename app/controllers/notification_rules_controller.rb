@@ -105,13 +105,13 @@ class NotificationRulesController < ApplicationController
 
   # The landing-page filter, carried straight through (same keys as events#index).
   def filter_params
-    params.permit(q: [], g: [], l: [], s: [], d: []).to_h.symbolize_keys
+    params.permit(q: [], g: [], l: [], d: []).to_h.symbolize_keys
   end
 
   # The filter shown on the edit form, built from the rule's saved filter.
   def filter_for(rule)
-    Filter.build(queries: rule.queries, genres: rule.genres, location_list: rule.location_list,
-                 style_list: rule.style_list, date_ranges: rule.date_ranges)
+    Filter.build(queries: rule.queries, genres: rule.genres,
+                 location_list: rule.location_list, date_ranges: rule.date_ranges)
   end
 
   # Another of the user's rules with the same filter as `rule`, if any — the

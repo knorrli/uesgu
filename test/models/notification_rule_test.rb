@@ -24,18 +24,18 @@ class NotificationRuleTest < ActiveSupport::TestCase
   test 'a relative date window infers happening; no date infers added' do
     u = user
     assert rule(u, filter: { d: ['this_week'] }).happening?
-    assert rule(u, filter: { s: ['some-style'] }).added?
+    assert rule(u, filter: { q: ['some-style'] }).added?
     assert rule(u, filter: { l: ['Some Venue'] }).added?
   end
 
   test 'a custom absolute date range is dropped on save (falls back to new events)' do
-    r = rule(user, filter: { s: ['some-style'], d: ['2030-06-20 - 2030-06-25'] })
+    r = rule(user, filter: { q: ['some-style'], d: ['2030-06-20 - 2030-06-25'] })
     assert_empty r.date_ranges, 'the absolute range is not stored as a window'
     assert r.added?
   end
 
   test 'a legacy stored custom range is ignored as a window (no dead past range)' do
-    r = rule(user, filter: { s: ['some-style'] })
+    r = rule(user, filter: { q: ['some-style'] })
     # Simulate an old row that stored an absolute range directly in the jsonb.
     r.filter = r.filter.merge('date_ranges' => ['2020-01-01 - 2020-01-02'])
     assert_empty r.active_windows
@@ -48,11 +48,11 @@ class NotificationRuleTest < ActiveSupport::TestCase
   # Filter#ransack_query, whose future floor is the real Date.current.
   test 'added matches events created since last fire that are not in the past' do
     u = user
-    fresh = event(created_at: 1.hour.ago,  start_date: Date.current + 5, style_list: ['probe-rock'])
-    stale = event(created_at: 5.hours.ago, start_date: Date.current + 5, style_list: ['probe-rock'])
-    past  = event(created_at: 1.hour.ago,  start_date: Date.current - 5, style_list: ['probe-rock'])
+    fresh = event(created_at: 1.hour.ago,  start_date: Date.current + 5, genre_list: ['probe-rock'])
+    stale = event(created_at: 5.hours.ago, start_date: Date.current + 5, genre_list: ['probe-rock'])
+    past  = event(created_at: 1.hour.ago,  start_date: Date.current - 5, genre_list: ['probe-rock'])
 
-    r = rule(u, filter: { s: ['probe-rock'] })
+    r = rule(u, filter: { q: ['probe-rock'] })
     r.save!
     r.update_column(:last_fired_at, 2.hours.ago)
 
@@ -74,7 +74,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
   # --- due? ------------------------------------------------------------------
 
   test 'daily rule is due after its time and not before' do
-    r = rule(user, filter: { s: ['x'] }, cadence: 'daily', time_of_day: 18 * 60)
+    r = rule(user, filter: { q: ['x'] }, cadence: 'daily', time_of_day: 18 * 60)
     r.last_fired_at = at(12)
     assert r.due?(at(18, 30))
     refute r.due?(at(17, 0))
@@ -86,7 +86,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
     # CET→CEST on Sun 2026-03-29: clocks jump 02:00→03:00. Adding 18h to local
     # midnight lands at 19:00 (the skipped hour double-counts); a daily 18:00 rule
     # must still resolve to 18:00 wall-clock.
-    r = rule(user, filter: { s: ['x'] }, cadence: 'daily', time_of_day: 18 * 60)
+    r = rule(user, filter: { q: ['x'] }, cadence: 'daily', time_of_day: 18 * 60)
     scheduled = r.previous_scheduled_at(Time.zone.local(2026, 3, 29, 20, 0))
 
     assert_equal [18, 0], [scheduled.hour, scheduled.min],
@@ -94,7 +94,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
   end
 
   test 'weekly rule fires on its weekday after its time' do
-    r = rule(user, filter: { s: ['x'] }, cadence: 'weekly', weekday: TODAY.wday, time_of_day: 11 * 60)
+    r = rule(user, filter: { q: ['x'] }, cadence: 'weekly', weekday: TODAY.wday, time_of_day: 11 * 60)
     r.last_fired_at = at(0)
     assert r.due?(at(12))
     refute r.due?(at(10))
@@ -104,8 +104,8 @@ class NotificationRuleTest < ActiveSupport::TestCase
 
   test 'fire! snapshots matched events, advances the cursor, and skips empties' do
     u = user
-    show = event(created_at: at(13), start_date: TODAY + 5, style_list: ['probe-rock'])
-    r = rule(u, filter: { s: ['probe-rock'] }, time_of_day: 18 * 60)
+    show = event(created_at: at(13), start_date: TODAY + 5, genre_list: ['probe-rock'])
+    r = rule(u, filter: { q: ['probe-rock'] }, time_of_day: 18 * 60)
     r.save!
     r.update_column(:last_fired_at, at(12))
 
@@ -119,12 +119,12 @@ class NotificationRuleTest < ActiveSupport::TestCase
     u = user
     # One event matching both styles, so the silent rule *would* fire if notifying
     # — distinct filters keep the two rules legal under the one-per-filter rule.
-    event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['probe-rock', 'probe-techno'])
+    event(created_at: 1.hour.ago, start_date: Date.current + 3, genre_list: ['probe-rock', 'probe-techno'])
 
-    due = rule(u, filter: { s: ['probe-rock'] }, time_of_day: 0)
+    due = rule(u, filter: { q: ['probe-rock'] }, time_of_day: 0)
     due.save!
     due.update_column(:last_fired_at, 1.day.ago)
-    off = rule(u, filter: { s: ['probe-techno'] }, time_of_day: 0, notify_in_app: false)
+    off = rule(u, filter: { q: ['probe-techno'] }, time_of_day: 0, notify_in_app: false)
     off.save!
     off.update_column(:last_fired_at, 1.day.ago)
 
@@ -137,18 +137,18 @@ class NotificationRuleTest < ActiveSupport::TestCase
 
   test 'an empty filter is rejected' do
     refute rule(user, filter: {}).valid?, 'empty filter => invalid'
-    assert rule(user, filter: { s: ['x'] }).valid?, 'any filter is valid'
+    assert rule(user, filter: { q: ['x'] }).valid?, 'any filter is valid'
   end
 
   # --- channels (in-app is the master) ---------------------------------------
 
   test 'notifying? mirrors the in-app channel' do
-    assert rule(user, filter: { s: ['x'] }, notify_in_app: true).notifying?
-    refute rule(user, filter: { s: ['x'] }, notify_in_app: false).notifying?
+    assert rule(user, filter: { q: ['x'] }, notify_in_app: true).notifying?
+    refute rule(user, filter: { q: ['x'] }, notify_in_app: false).notifying?
   end
 
   test 'turning in-app off forces push and email off' do
-    r = rule(user, filter: { s: ['x'] }, notify_in_app: false, notify_push: true, notify_email: true)
+    r = rule(user, filter: { q: ['x'] }, notify_in_app: false, notify_push: true, notify_email: true)
     r.save!
     refute r.notify_push?, 'push cannot ride a digest that never fires'
     refute r.notify_email?, 'email cannot ride a digest that never fires'
@@ -157,58 +157,58 @@ class NotificationRuleTest < ActiveSupport::TestCase
   # --- dedupe (one rule per filter set) --------------------------------------
 
   test 'fingerprint is order-independent and ignores absolute date ranges' do
-    a = rule(user, filter: { s: ['Rock', 'Jazz'], l: ['Bern'] })
-    b = rule(user, filter: { l: ['Bern'], s: ['Jazz', 'Rock'] })
+    a = rule(user, filter: { q: ['Rock', 'Jazz'], l: ['Bern'] })
+    b = rule(user, filter: { l: ['Bern'], q: ['Jazz', 'Rock'] })
     assert_equal a.fingerprint, b.fingerprint
 
     # An absolute range isn't kept by a rule, so it doesn't affect identity.
-    windowed = rule(user, filter: { s: ['Rock'], d: ['2030-01-01 - 2030-01-02'] })
-    plain    = rule(user, filter: { s: ['Rock'] })
+    windowed = rule(user, filter: { q: ['Rock'], d: ['2030-01-01 - 2030-01-02'] })
+    plain    = rule(user, filter: { q: ['Rock'] })
     assert_equal plain.fingerprint, windowed.fingerprint
 
     # A preset window *does* change identity.
-    refute_equal plain.fingerprint, rule(user, filter: { s: ['Rock'], d: ['this_weekend'] }).fingerprint
+    refute_equal plain.fingerprint, rule(user, filter: { q: ['Rock'], d: ['this_weekend'] }).fingerprint
   end
 
   test 'a second rule for the same filter set is invalid' do
     u = user
-    rule(u, filter: { s: ['Rock'], l: ['Bern'] }).save!
+    rule(u, filter: { q: ['Rock'], l: ['Bern'] }).save!
 
-    dup = rule(u, filter: { l: ['Bern'], s: ['Rock'] }) # order flipped, same set
+    dup = rule(u, filter: { l: ['Bern'], q: ['Rock'] }) # order flipped, same set
     refute dup.valid?
     assert_includes dup.errors[:base], I18n.t('notification_rules.errors.duplicate')
 
-    assert rule(u, filter: { s: ['Rock'] }).valid?, 'a different filter is fine'
+    assert rule(u, filter: { q: ['Rock'] }).valid?, 'a different filter is fine'
   end
 
   test 'editing a filter to collide with another rule is invalid; schedule-only edits are fine' do
     u = user
-    a = rule(u, filter: { s: ['Rock'] }).tap(&:save!)
-    b = rule(u, filter: { s: ['Jazz'] }).tap(&:save!)
+    a = rule(u, filter: { q: ['Rock'] }).tap(&:save!)
+    b = rule(u, filter: { q: ['Jazz'] }).tap(&:save!)
 
     # Editing only the schedule never self-collides (excluded by id).
     b.time_of_day = 600
     assert b.valid?, 'a schedule-only edit is allowed'
 
     # Editing B's filter to match A's is rejected.
-    b.filter_attributes = { s: ['Rock'] }
+    b.filter_attributes = { q: ['Rock'] }
     refute b.valid?
     assert_includes b.errors[:base], I18n.t('notification_rules.errors.duplicate')
   end
 
   test 'matching finds the rule for a filter, or nil' do
     u = user
-    r = rule(u, filter: { s: ['Rock'] }).tap(&:save!)
+    r = rule(u, filter: { q: ['Rock'] }).tap(&:save!)
 
-    fp = NotificationRule.fingerprint_for(Filter.build(style_list: ['Rock']))
+    fp = NotificationRule.fingerprint_for(Filter.build(queries: ['Rock']))
     assert_equal r, u.notification_rules.matching(fp)
-    assert_nil u.notification_rules.matching(NotificationRule.fingerprint_for(Filter.build(style_list: ['Jazz'])))
+    assert_nil u.notification_rules.matching(NotificationRule.fingerprint_for(Filter.build(queries: ['Jazz'])))
   end
 
   # --- auto-naming -----------------------------------------------------------
 
   test 'describe auto-names from the filter, localized' do
-    r = rule(user, filter: { s: ['Rock'], l: ['Dachstock'], d: ['this_weekend'] })
+    r = rule(user, filter: { q: ['Rock'], l: ['Dachstock'], d: ['this_weekend'] })
     assert_includes r.describe, 'Rock'
     assert_includes r.describe, 'Dachstock'
     I18n.with_locale(:en) { assert_includes r.describe, I18n.t('datepicker.this_weekend') }
@@ -220,10 +220,10 @@ class NotificationRuleTest < ActiveSupport::TestCase
     # no what → "Alle Events" leads; location-only still leads with it
     assert_equal "#{all} · Bern · #{added}", rule(user, filter: { l: ['Bern'] }).describe
     # added rule always ends with the new-events label
-    assert_equal "Rock · #{added}", rule(user, filter: { s: ['Rock'] }).describe
+    assert_equal "Rock · #{added}", rule(user, filter: { q: ['Rock'] }).describe
     # happening rule ends with the window label
     assert_equal "Rock · Bern · #{I18n.t('datepicker.this_week')}",
-                 rule(user, filter: { s: ['Rock'], l: ['Bern'], d: ['this_week'] }, weekday: 5).describe
+                 rule(user, filter: { q: ['Rock'], l: ['Bern'], d: ['this_week'] }, weekday: 5).describe
   end
 
   test 'the name always mirrors the filter on save (no custom names)' do
@@ -232,14 +232,14 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert_equal r.describe, r.name
 
     # A name passed in is ignored — re-derived from the filter on save.
-    given = rule(user, filter: { s: ['Rock'] }, name: 'Keep me')
+    given = rule(user, filter: { q: ['Rock'] }, name: 'Keep me')
     given.save!
     assert_equal given.describe, given.name
     refute_equal 'Keep me', given.name
   end
 
   test 'name re-derives when the filter changes' do
-    r = rule(user, filter: { s: ['Rock'] }, weekday: 5) # weekday set for the weekly window below
+    r = rule(user, filter: { q: ['Rock'] }, weekday: 5) # weekday set for the weekly window below
     r.save!
     before = r.name
 
@@ -251,8 +251,8 @@ class NotificationRuleTest < ActiveSupport::TestCase
 
   test 'a fired notification snapshots the auto-name as its title' do
     u = user
-    event(created_at: 1.hour.ago, start_date: Date.current + 3, style_list: ['Rock'])
-    r = rule(u, filter: { s: ['Rock'] }, time_of_day: 1)
+    event(created_at: 1.hour.ago, start_date: Date.current + 3, genre_list: ['Rock'])
+    r = rule(u, filter: { q: ['Rock'] }, time_of_day: 1)
     r.save!
     r.update_column(:last_fired_at, 2.hours.ago)
     note = r.fire!(Time.current)
@@ -279,7 +279,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
   test 'window_rhythm reflects the window; nil for added rules' do
     assert_equal 'weekly', rule(user, filter: { d: ['this_weekend'] }).window_rhythm
     assert_equal 'monthly', rule(user, filter: { d: ['next_month'] }).window_rhythm
-    assert_nil rule(user, filter: { s: ['Rock'] }).window_rhythm
+    assert_nil rule(user, filter: { q: ['Rock'] }).window_rhythm
   end
 
   test 'time_string parses to minutes-since-midnight' do
@@ -290,7 +290,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
   end
 
   test 'time snaps to the quarter hour on save (the scheduler runs quarterly)' do
-    r = rule(user, filter: { s: ['Rock'] })
+    r = rule(user, filter: { q: ['Rock'] })
     r.time_string = '17:03'
     r.save!
     assert_equal((17 * 60), r.time_of_day) # 17:03 → 17:00

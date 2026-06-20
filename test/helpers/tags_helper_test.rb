@@ -7,7 +7,6 @@ class TagsHelperTest < ActionView::TestCase
   test 'tag_icon_glyph maps known contexts and falls back for the rest' do
     assert_equal 'ph-magnifying-glass', tag_icon_glyph(context: 'query')
     assert_equal 'ph-calendar-dots', tag_icon_glyph(context: 'date')
-    assert_equal 'ph-music-notes', tag_icon_glyph(context: 'styles')
     assert_equal 'ph-tag', tag_icon_glyph(context: 'genres')
     assert_equal 'ph-house', tag_icon_glyph(context: 'venue')
     assert_equal 'ph-map-pin', tag_icon_glyph(context: 'city')

@@ -12,7 +12,7 @@ class SavedEventsController < ApplicationController
     # behaving differently on this one page.
     @calendar_interactive = true
 
-    scope = current_user.saved_events.includes(:locations, :styles, :genres)
+    scope = current_user.saved_events.includes(:locations, :genres)
     if @view == 'calendar'
       @calendar_start = (Date.parse(params[:start_date]) rescue nil) || Date.current
       # The focused month plus a week of padding so adjacent-month grid cells are

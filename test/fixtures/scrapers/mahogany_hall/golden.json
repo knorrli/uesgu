@@ -8,9 +8,6 @@
     "genre_list": [
       "Any Stile"
     ],
-    "style_list": [
-      "Any Stile"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -25,10 +22,6 @@
     "title": "Jazzorchester der Universität Bern feat. Stewy von Wattenwyl (Piano)",
     "subtitle": "big band jazz - move and groove",
     "genre_list": [
-      "Move",
-      "Groove"
-    ],
-    "style_list": [
       "Move",
       "Groove"
     ],
@@ -52,13 +45,6 @@
       "Soul",
       "Blues"
     ],
-    "style_list": [
-      "Bluesrock",
-      "Southernrock",
-      "Funk",
-      "Soul",
-      "Blues"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -73,7 +59,6 @@
     "title": "GROOVE EXTRAVAGANZA – Intercity Jazz Orchestra feat. Anatole Muster",
     "subtitle": "big band goes modern grooves",
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -88,11 +73,6 @@
     "title": "PETER “PESCHE” FRIEDLI (1965–2026) MEMORIAL CONCERT",
     "subtitle": "four decades of music by peter “pesche” friedli — jazz, blues, soul & funk",
     "genre_list": [
-      "Blues",
-      "Soul",
-      "Funk"
-    ],
-    "style_list": [
       "Blues",
       "Soul",
       "Funk"
@@ -113,9 +93,6 @@
     "genre_list": [
       "Latin"
     ],
-    "style_list": [
-      "Latin"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -130,13 +107,6 @@
     "title": "Wolverines Jazz Band",
     "subtitle": "dixieland, blues, boogie-woogie, gospel und swing",
     "genre_list": [
-      "Dixieland",
-      "Blues",
-      "Boogie Woogie",
-      "Gospel",
-      "Swing"
-    ],
-    "style_list": [
       "Dixieland",
       "Blues",
       "Boogie Woogie",
@@ -160,10 +130,6 @@
       "Blues Rock",
       "Dark Country"
     ],
-    "style_list": [
-      "Blues Rock",
-      "Dark Country"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -178,9 +144,6 @@
     "title": "Fränk & Bänd",
     "subtitle": "berner mundartrock",
     "genre_list": [
-      "Berner Mundartrock"
-    ],
-    "style_list": [
       "Berner Mundartrock"
     ],
     "location_list": [
@@ -199,9 +162,6 @@
     "genre_list": [
       "Any Stile"
     ],
-    "style_list": [
-      "Any Stile"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -218,9 +178,6 @@
     "genre_list": [
       "Liedermacher"
     ],
-    "style_list": [
-      "Liedermacher"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -235,9 +192,6 @@
     "title": "BeBluesed Festival",
     "subtitle": "blues",
     "genre_list": [
-      "Blues"
-    ],
-    "style_list": [
       "Blues"
     ],
     "location_list": [
@@ -257,10 +211,6 @@
       "Soul",
       "Blues"
     ],
-    "style_list": [
-      "Soul",
-      "Blues"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -275,9 +225,6 @@
     "title": "Mondayblues",
     "subtitle": "blues",
     "genre_list": [
-      "Blues"
-    ],
-    "style_list": [
       "Blues"
     ],
     "location_list": [
@@ -296,9 +243,6 @@
     "genre_list": [
       "Spoken Word"
     ],
-    "style_list": [
-      "Spoken Word"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -313,9 +257,6 @@
     "title": "Taxibrousse",
     "subtitle": "world",
     "genre_list": [
-      "World"
-    ],
-    "style_list": [
       "World"
     ],
     "location_list": [
@@ -334,9 +275,6 @@
     "genre_list": [
       "Salsa Namá"
     ],
-    "style_list": [
-      "Salsa Namá"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -351,10 +289,6 @@
     "title": "Ronny Rast",
     "subtitle": "blues, rock",
     "genre_list": [
-      "Blues",
-      "Rock"
-    ],
-    "style_list": [
       "Blues",
       "Rock"
     ],
@@ -375,10 +309,6 @@
       "Hardrock",
       "Metal"
     ],
-    "style_list": [
-      "Hardrock",
-      "Metal"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -395,9 +325,6 @@
     "genre_list": [
       "Salsa Namá"
     ],
-    "style_list": [
-      "Salsa Namá"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -412,13 +339,6 @@
     "title": "Wolverines Jazz Band",
     "subtitle": "dixieland, blues, boogie-woogie, gospel und swing",
     "genre_list": [
-      "Dixieland",
-      "Blues",
-      "Boogie Woogie",
-      "Gospel",
-      "Swing"
-    ],
-    "style_list": [
       "Dixieland",
       "Blues",
       "Boogie Woogie",
@@ -443,11 +363,6 @@
       "Music",
       "Comedy"
     ],
-    "style_list": [
-      "Entertainment",
-      "Music",
-      "Comedy"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -462,11 +377,6 @@
     "title": "FASTLANE ROCK-NIGHT support by R-A-C",
     "subtitle": "rock / hard rock / acoustic cover",
     "genre_list": [
-      "Rock",
-      "Hard Rock",
-      "Acoustic Cover"
-    ],
-    "style_list": [
       "Rock",
       "Hard Rock",
       "Acoustic Cover"
@@ -487,9 +397,6 @@
     "genre_list": [
       "Salsa Namá"
     ],
-    "style_list": [
-      "Salsa Namá"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -506,9 +413,6 @@
     "genre_list": [
       "Any Stile"
     ],
-    "style_list": [
-      "Any Stile"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -523,7 +427,6 @@
     "title": "Woodlands Bäckafall",
     "subtitle": "nordic celtic folk",
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -538,7 +441,6 @@
     "title": "RICCARDO GROSSO BAND",
     "subtitle": "harmonica-driven electric blues band with an unapologetically raw sound",
     "genre_list": [],
-    "style_list": [],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -553,9 +455,6 @@
     "title": "Philipp Moll Sunday 12PM Jazz",
     "subtitle": "mainstream jazz",
     "genre_list": [
-      "Mainstream Jazz"
-    ],
-    "style_list": [
       "Mainstream Jazz"
     ],
     "location_list": [
@@ -574,9 +473,6 @@
     "genre_list": [
       "Spoken Word"
     ],
-    "style_list": [
-      "Spoken Word"
-    ],
     "location_list": [
       "Mahogany Hall",
       "Bern",
@@ -591,9 +487,6 @@
     "title": "Painted Blue",
     "subtitle": "blues",
     "genre_list": [
-      "Blues"
-    ],
-    "style_list": [
       "Blues"
     ],
     "location_list": [

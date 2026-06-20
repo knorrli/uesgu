@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_20_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_20_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -80,13 +80,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_120000) do
     t.index ["parent_id"], name: "index_genres_on_parent_id"
     t.check_constraint "canonical_id IS NULL OR canonical_id <> id", name: "genres_canonical_not_self"
     t.check_constraint "parent_id IS NULL OR parent_id <> id", name: "genres_parent_not_self"
-  end
-
-  create_table "genres_styles", id: false, force: :cascade do |t|
-    t.bigint "genre_id", null: false
-    t.bigint "style_id", null: false
-    t.index ["genre_id", "style_id"], name: "index_genres_styles_on_genre_id_and_style_id", unique: true
-    t.index ["style_id"], name: "index_genres_styles_on_style_id"
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -193,12 +186,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_120000) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "styles", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "taggings", force: :cascade do |t|
     t.bigint "tag_id"
     t.string "taggable_type"
@@ -257,8 +244,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_120000) do
   add_foreign_key "events", "scrape_runs", column: "created_in_scrape_run_id", on_delete: :nullify
   add_foreign_key "genres", "genres", column: "canonical_id"
   add_foreign_key "genres", "genres", column: "parent_id"
-  add_foreign_key "genres_styles", "genres", on_delete: :cascade
-  add_foreign_key "genres_styles", "styles", on_delete: :cascade
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
   add_foreign_key "notification_rules", "users"

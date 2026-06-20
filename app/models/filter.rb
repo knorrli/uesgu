@@ -1,30 +1,26 @@
 # Plain query object built from request params (see EventsController#index).
 # Filters are no longer persisted, so this is not an ActiveRecord model.
 class Filter
-  attr_reader :queries, :genres, :style_list, :location_list, :date_ranges
+  attr_reader :queries, :genres, :location_list, :date_ranges
 
   def initialize
     @queries = []
     @genres = []
-    @style_list = []
     @location_list = []
     @date_ranges = []
   end
 
   # Construct from the list inputs, skipping any passed as nil (so each caller
-  # sets only what it has). The one place the q/g/l/s/d shape is assembled — the
+  # sets only what it has). The one place the q/g/l/d shape is assembled — the
   # events listing, a saved rule's edit filter, and the rule's own matcher all
   # funnel through here instead of each repeating `new.tap { ... }`.
   #
-  # `genres` (g[]) is the tree-aware slot the events page now uses: each picked
-  # genre matches itself + every descendant (see expanded_genre_names). `style_list`
-  # (s[]) is the legacy flat-style slot, kept only so saved NotificationRules keep
-  # matching until they migrate to genres (Phase 3); the events UI no longer sets it.
-  def self.build(queries: nil, genres: nil, style_list: nil, location_list: nil, date_ranges: nil)
+  # `genres` (g[]) is the tree-aware slot: each picked genre matches itself + every
+  # descendant (see expanded_genre_names).
+  def self.build(queries: nil, genres: nil, location_list: nil, date_ranges: nil)
     new.tap do |filter|
       filter.queries = queries unless queries.nil?
       filter.genres = genres unless genres.nil?
-      filter.style_list = style_list unless style_list.nil?
       filter.location_list = location_list unless location_list.nil?
       filter.date_ranges = date_ranges unless date_ranges.nil?
     end
@@ -36,10 +32,6 @@ class Filter
 
   def genres=(new_genres)
     @genres = parse(new_genres)
-  end
-
-  def style_list=(new_styles)
-    @style_list = parse(new_styles)
   end
 
   def location_list=(new_locations)
@@ -59,7 +51,7 @@ class Filter
   # psychedelic rock) instead of silently missing them the way an exact match would.
   # Meaningless on an unfiltered, all-events listing.
   def active?
-    [queries, genres, style_list, location_list, date_ranges].any?(&:present?)
+    [queries, genres, location_list, date_ranges].any?(&:present?)
   end
 
   # The genre names a `genres` pick expands to: each picked genre plus every
@@ -77,8 +69,7 @@ class Filter
     {
       g: [
         {
-          title_or_subtitle_or_styles_name_or_genres_name_cont_any: queries,
-          styles_name_in: style_list.presence,
+          title_or_subtitle_or_genres_name_cont_any: queries,
           genres_name_in: expanded_genre_names.presence,
           m: Ransack::Constants::OR
         },

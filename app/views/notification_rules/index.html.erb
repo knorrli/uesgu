@@ -37,7 +37,7 @@
             <%# Apply copies the saved filter into the events URL (the link is then
                 severed — the main page stays ephemeral). It's navigation, so a link. %>
             <%= link_to t('notification_rules.apply'),
-                  events_path(q: rule.queries, g: rule.genres, l: rule.location_list, s: rule.style_list, d: rule.date_ranges),
+                  events_path(q: rule.queries, g: rule.genres, l: rule.location_list, d: rule.date_ranges),
                   class: 'button-small' %>
             <% if rule.notifying? %>
               <%= button_to t('notification_rules.fire_now'), fire_notification_rule_path(rule), class: 'button-small button-ghost' %>

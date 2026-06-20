@@ -7,7 +7,7 @@ class MobileFilterTest < ApplicationSystemTestCase
   # a free-text query — no need to first tap the "search for «X»" row. Mirrors the
   # desktop combobox's commit-on-Enter (filter_sheets#commitTyped).
   test "Enter in the What sheet commits the typed text as a free-text query" do
-    event(start_date: Date.current + 3, style_list: ["Rock"])
+    event(start_date: Date.current + 3, genre_list: ["Rock"])
 
     page.current_window.resize_to(390, 800) # below the 600px sheet breakpoint
     visit events_path
@@ -62,7 +62,7 @@ class MobileFilterTest < ApplicationSystemTestCase
   # people tap it expecting the search field to focus so they can type. It should,
   # rather than do nothing (filter_sheets#addQuery focuses the field when blank).
   test "tapping the blank type-to-search hint focuses the What search field" do
-    event(start_date: Date.current + 3, style_list: ["Zynthwave"])
+    event(start_date: Date.current + 3, genre_list: ["Zynthwave"])
 
     page.current_window.resize_to(390, 800) # below the 600px sheet breakpoint
     visit events_path

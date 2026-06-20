@@ -14,7 +14,7 @@ class NotificationsController < ApplicationController
     @notification = current_user.notifications.find(params[:id])
     @notification.mark_read!
     # Eager-load what the venue_groups/_event partials render, to avoid an N+1.
-    @events = @notification.events.includes(:locations, :styles, :genres)
+    @events = @notification.events.includes(:locations, :genres)
   end
 
 end

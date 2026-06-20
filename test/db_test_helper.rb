@@ -7,9 +7,9 @@
 # ActiveSupport::TestCase) without coupling the scraper suites to the DB.
 #
 # Taxonomy rule (see project memory): assert against *mechanics* using invented
-# genre/style names only — never real taxonomy content — so taxonomy edits in
-# the parallel refactor can't break these tests. The TaxonomyFixtures helper
-# below makes the synthetic data obvious at every call site.
+# genre names only — never real taxonomy content — so taxonomy edits in the
+# parallel refactor can't break these tests. The TaxonomyFixtures helper below
+# makes the synthetic data obvious at every call site.
 require_relative 'test_helper'
 require 'rails/test_help'
 
@@ -21,17 +21,12 @@ module TaxonomyFixtures
     @seq = (@seq || 0) + 1
   end
 
-  # A curated Style with an invented name (e.g. "wubstep-1").
-  def style(name: "wubstep")
-    Style.create!(name: "#{name}-#{TaxonomyFixtures.next_seq}")
-  end
-
   # A raw Genre row with an invented name. Pass events_count: to simulate usage
   # without having to tag real events (events_count is reconciled, not a
-  # counter-cache), or styles: to pre-map it.
-  def genre(name: "zorptronic", events_count: 0, styles: [])
+  # counter-cache), or parent: to file it under a parent genre.
+  def genre(name: "zorptronic", events_count: 0, parent: nil)
     g = Genre.create!(name: "#{name}-#{TaxonomyFixtures.next_seq}", events_count: events_count)
-    g.styles = Array(styles) if styles.present?
+    g.set_parent!(parent) if parent
     g
   end
 

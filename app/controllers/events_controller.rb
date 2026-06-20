@@ -27,14 +27,14 @@ class EventsController < ApplicationController
       @calendar_start = (Date.parse(params[:start_date]) rescue nil) || @filter.earliest_date || Date.current
       # simple_calendar navigates via params[:start_date]; load the focused
       # month plus a week of padding so adjacent-month grid cells are covered.
-      @events = events.includes(:locations, :styles).where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))
+      @events = events.includes(:locations, :genres).where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))
       # A day's expansion is URL state (params[:day]), so the server renders the
       # open day's detail inline in the grid — linkable, reload-safe, and the
       # source of truth (no client-side drawer to preserve). See #day_events.
       @open_day = (Date.parse(params[:day]) rescue nil) if params[:day].present?
       @open_day_events = day_events(@open_day) if @open_day
     else
-      @events = events.includes(:locations, :styles, :genres).page(params[:page])
+      @events = events.includes(:locations, :genres).page(params[:page])
     end
   end
 
@@ -56,7 +56,7 @@ class EventsController < ApplicationController
     filter.date_ranges = ["#{date.iso8601} - #{date.iso8601}"]
     Event.visible.ransack(filter.ransack_query)
          .result(distinct: true)
-         .includes(:locations, :styles, :genres)
+         .includes(:locations, :genres)
          .order(:start_time, :title)
   end
 
@@ -68,7 +68,6 @@ class EventsController < ApplicationController
       queries: params[:q].present? ? Array(params[:q]).compact_blank : nil,
       genres: params[:g].presence,
       location_list: params[:l].presence,
-      style_list: params[:s].presence,
       date_ranges: params[:d].present? ? Array(params[:d]).compact_blank : nil
     )
   end

@@ -123,6 +123,20 @@ class Genre < ApplicationRecord
     @descendant_ids ||= self.class.subtree_ids([id]) - [id]
   end
 
+  # Descendant count for every genre that has any, in one pass over the adjacency
+  # list: a single `pluck(:id, :parent_id)` plus an in-memory tree walk — no
+  # per-row query. Powers the "set parent" picker, where candidates with the most
+  # sub-genres (the umbrella genres you usually file into) sort first and show the
+  # count. Cheap: one lightweight query over the whole (few-hundred-row) table.
+  def self.descendant_counts
+    children = Hash.new { |hash, key| hash[key] = [] }
+    pluck(:id, :parent_id).each { |id, parent_id| children[parent_id] << id if parent_id }
+    counts = Hash.new(0)
+    walk = ->(id) { children.fetch(id, []).sum { |child| 1 + walk.call(child) } }
+    children.keys.each { |parent_id| counts[parent_id] = walk.call(parent_id) }
+    counts
+  end
+
   # The normalized matching key. MUST reproduce the SQL `fingerprint` generated
   # column exactly (AddFingerprintToGenres) — verified by test. Used at ingest on
   # raw scraped strings that have no row to read the stored column off.

@@ -271,13 +271,13 @@ fr:
       empty: Rien à classer — chaque genre utilisé est classé ou traité.
       restore: Restaurer
     editor:
-      usage: "sur %{count} événements"
+      usage: "%{count} événements"
       status: "Statut :"
       set_parent: Définir le parent
       set_parent_into: "Classer sous un autre genre…"
-      ignore: "Ignorer (garder, non classé)"
+      ignore: "Ignorer"
       hide: "Masquer l'événement (non musical)"
-      block: "Bloquer (retirer le tag)"
+      block: "Retirer le tag"
       merge: Fusionner
       merge_into: "Fusionner avec un autre genre…"
       merge_suggested: "Fusionner avec un genre similaire"

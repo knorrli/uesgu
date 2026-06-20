@@ -271,13 +271,13 @@ de:
       empty: Nichts einzuordnen — jedes verwendete Genre ist eingeordnet oder bearbeitet.
       restore: Wiederherstellen
     editor:
-      usage: "auf %{count} Events"
+      usage: "%{count} Events"
       status: "Status:"
       set_parent: Übergeordnetes Genre setzen
       set_parent_into: "Unter ein Genre einordnen…"
-      ignore: "Ignorieren (behalten, nicht eingeordnet)"
+      ignore: "Ignorieren"
       hide: "Event verbergen (keine Musik)"
-      block: "Blockieren (Tag entfernen)"
+      block: "Tag entfernen"
       merge: Zusammenführen
       merge_into: "Mit anderem Genre zusammenführen…"
       merge_suggested: "Mit ähnlichem Genre zusammenführen"

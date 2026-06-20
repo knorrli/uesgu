@@ -271,13 +271,13 @@ en:
       empty: Nothing to file — every genre in use is placed or handled.
       restore: Restore
     editor:
-      usage: "on %{count} events"
+      usage: "%{count} events"
       status: "Status:"
       set_parent: Set parent
       set_parent_into: "File under another genre…"
-      ignore: "Ignore (keep, unfiled)"
+      ignore: "Ignore"
       hide: "Hide event (non-music)"
-      block: "Block (strip the tag)"
+      block: "Strip the tag"
       merge: Merge
       merge_into: "Merge into another genre…"
       merge_suggested: "Merge into a similar genre"

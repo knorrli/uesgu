@@ -69,10 +69,33 @@
   font-weight: bold;
 }
 
-/* Genre editor — the "appears on" sample events. A hairline above each gives a
-   clear break between events, whose muted date/venue header otherwise blends
-   into the previous event's (equally muted) genre/style meta. */
-.genre-sample-event {
+/* "Set parent" picker — lay each option out as name (left) + descendant count
+   (right), so the umbrella genres (which also sort to the top) read at a glance.
+   Scoped to this form so the merge picker and other comboboxes are untouched. */
+.genre-set-parent .hw-combobox__option {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap-medium);
+}
+
+.genre-option-count {
+  color: var(--theme-fg-muted);
+  font-size: 0.85em;
+}
+
+/* Genre editor — separate the three task groups (file under a parent / merge /
+   sample events) with a hairline + generous space, so the dense stack of form
+   rows reads as distinct decisions instead of one cramped block. */
+.genre-editor-section {
+  border-top: var(--border-width) solid var(--theme-accent-muted);
+  padding-top: var(--gap-large);
+}
+
+/* The "appears on" sample events. A hairline *between* events (not above the
+   first — that would double the section divider under the header) gives a clear
+   break, whose muted date/venue header otherwise blends into the previous
+   event's (equally muted) genre/style meta. */
+.genre-sample-event + .genre-sample-event {
   border-top: var(--border-width) solid var(--theme-accent-muted);
   padding-top: var(--gap-medium);
 }

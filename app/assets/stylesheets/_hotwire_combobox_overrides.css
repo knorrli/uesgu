@@ -3,6 +3,27 @@
   --hw-combobox-width--multiple: unset;
 }
 
+/* The gem hides its aria-live announcer (and the pagination sentinel) via a
+   per-component inline <style nonce>, but our CSP applies the nonce to
+   script-src only — style-src is a flat :self — so the browser blocks that
+   block. Without it the announcer's "…, selected" text renders in-flow,
+   garbling the field and wrapping the submit button (see the queue editor).
+   Re-home the two essential rules here, in external CSS the CSP allows. */
+.hw-combobox__announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.hw_combobox__pagination__wrapper {
+  height: 1px;
+}
+
 body {
   --hw-border-width--slim: var(--border-width);
   --hw-border-radius: 0px;

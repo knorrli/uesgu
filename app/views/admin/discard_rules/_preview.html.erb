@@ -12,7 +12,7 @@
                 <% if event.venue %>&middot; <%= event.venue.name %><% end %>
                 <% saves = event.event_saves.size %>
                 <% if saves.positive? %>
-                  &middot; <span class="preview-saved">★ <%= t('.saved', count: saves) %></span>
+                  &middot; <span class="preview-saved">♥ <%= t('.saved', count: saves) %></span>
                 <% end %>
               </span>
             </div>

@@ -137,8 +137,8 @@ module EventsHelper
     saved_event_ids.include?(event.id)
   end
 
-  # The bookmark toggle on an event. Logged-in only; optimistic via the `save`
-  # Stimulus controller (one self-contained controller per button, no cross-sync).
+  # The saved-show heart toggle on an event. Logged-in only; optimistic via the
+  # `save` Stimulus controller (one self-contained controller per button, no cross-sync).
   def event_save_button(event)
     return unless authenticated?
 
@@ -149,8 +149,8 @@ module EventsHelper
                'aria-label': t('saved_events.toggle'),
                data: { controller: 'save', action: 'save#toggle',
                        save_event_id_value: event.id, save_saved_value: saved } do
-      # A masked bookmark (not the ph font glyph) so the saved state can fill
-      # solid, mirroring the follow heart's outline→fill — see .save-heart.
+      # A masked heart (not the ph font glyph) so the saved state can fill solid,
+      # outline→fill — see .save-heart.
       content_tag(:span, '', class: 'save-heart', 'aria-hidden': true)
     end
   end

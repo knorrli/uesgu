@@ -20,7 +20,10 @@
       <div class="event-genres">
         <% event.genres.each_with_index do |genre, i| %>
           <% if i.positive? %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %>
+          <%# Tag + (admin) edit gear are one unit so the gear rides flush against
+              its own tag — the row's wrap-gap falls between genre units, not between
+              a tag and its gear. %>
+          <span class="event-genre"><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
         <% end %>
       </div>
     <% end %>

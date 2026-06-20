@@ -2,8 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="day-summary" on a day container — a list date block
 // or the calendar day panel. Keeps that header's saved (♥) count in step with the
-// save toggles inside the day, which bubble up as save:toggled. The interest (★)
-// count is favorite_controller's job (it owns the followed set); this owns ♥.
+// save toggles inside the day, which bubble up as save:toggled. Saved is the only
+// per-day relevance signal now (the interest/favourites ★ count was removed).
 export default class extends Controller {
   static targets = ["saved"]
 

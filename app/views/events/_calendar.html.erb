@@ -35,10 +35,9 @@
       <% end %>
       <div class="day-content">
         <div class="<%= number %>"><%= date.day %></div>
-        <%# Desktop-only relevance headline: up to two venues of the day's top-
-            priority personal events (saved > interest), with any remainder spilled
-            into a "+N more" line. Hidden on mobile (no room — the marker carries the
-            signal there). Only on relevant days. %>
+        <%# Desktop-only relevance headline: up to two venues of the day's saved
+            shows, with any remainder spilled into a "+N more" line. Hidden on mobile
+            (no room — the marker carries the signal there). Only on relevant days. %>
         <% if day_events.any? && (headline = calendar_day_headline(day_events)) %>
           <% headline.venues.each do |venue| %>
             <span class="day-headline"><%= venue %></span>

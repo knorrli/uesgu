@@ -93,7 +93,7 @@
             <details class="nav-menu" data-controller="menu" data-action="toggle->menu#toggle">
               <summary><%= current_user.username %><% if unread.positive? %> <span class="unread-dot" role="img" aria-label="<%= t('nav.unread_notifications') %>"></span><% end %></summary>
               <div class="nav-menu__items">
-                <%# Reused icons (bell/funnel/bookmark/gear) so the labels scan at a
+                <%# Reused icons (bell/funnel/heart/gear) so the labels scan at a
                     glance. Notifications = the received inbox; Filter = the saved
                     filters that feed it (its own section now, no longer an inbox
                     tab); logout moved to Settings. %>
@@ -106,7 +106,7 @@
                   <span><%= t('nav.filters') %></span>
                 <% end %>
                 <%= link_to saved_events_path, class: 'nav-menu__item' do %>
-                  <span class="ph ph-bookmark-simple" aria-hidden="true"></span>
+                  <span class="ph ph-heart" aria-hidden="true"></span>
                   <span><%= t('nav.saved') %></span>
                 <% end %>
                 <%= link_to settings_path, class: 'nav-menu__item' do %>

@@ -66,13 +66,26 @@
   border-bottom: var(--border-width) solid var(--rule-color);
 }
 
-/* Per-day relevance counts sitting just after a date header's date: a saved (♥)
-   tally and an interest (★) tally, each hidden when zero. Same glyph language as the
-   calendar markers — raspberry heart = saved, green star = interest — just carried
-   as counts. Normal weight + small so they support the date rather than compete.
-   Collapses entirely (no trailing gap) on a day with neither, so the date keeps its
-   flush-left place; :has lets a live follow/save bring it back without the
-   controller touching the wrapper. */
+/* List view only: pin each date header to the top while scrolling through its
+   own day group, then let the next group push it away. Scoped to .event-list so
+   the calendar day panel's header (.day-detail-header .date) is unaffected. The
+   solid background keeps event rows from showing through the pinned header, and a
+   small top padding stops the text sitting flush against the viewport edge. The
+   live ♥ saved count rides inside the header, so it stays correct while pinned. */
+.event-list .date {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding-top: var(--gap-small);
+  background: var(--theme-bg-color);
+}
+
+/* Per-day saved (♥) count sitting just after a date header's date, hidden when
+   zero. Same glyph language as the calendar markers — raspberry heart = saved —
+   just carried as a count. Normal weight + small so it supports the date rather
+   than competes. Collapses entirely (no trailing gap) on a day with no saved
+   shows, so the date keeps its flush-left place; :has lets a live save bring it
+   back without the controller touching the wrapper. */
 .day-summary {
   display: none;
   align-items: center;
@@ -251,13 +264,24 @@
   color: var(--theme-fg-muted);
 }
 
+/* A genre and its (admin-only) edit gear, grouped as one inline unit so the gear
+   stays attached to its own tag and the row's wrap-gap falls between genre units. */
+.event-genre {
+  display: inline-flex;
+  align-items: stretch;
+}
+
 /* The genre tag's inline edit gear (an .icon-button); only the inline layout is
-   local — colour, hover, and the underline reset come from the shared role. The
-   gear is a baseline-aligned icon glyph, so centre it to the text's middle
-   (otherwise it sits low, dipping below the tag's baseline). */
-.meta-edit {
-  margin-left: 0.4ch;
-  vertical-align: middle;
+   local — colour and hover come from the shared role. It reads as a second segment
+   butted onto the tag: same outline, sharing the tag's right edge (no double
+   border), centred to the tag's height. Scoped to .event-genre so it out-specifies
+   `a.icon-button { border:0 }`. Admin-only, cheap. */
+.event-genre .meta-edit {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 5px;
+  border: var(--tag-border-width) solid var(--border-color);
+  border-left: 0;
 }
 
 /* Real, inert separator between terms — a sibling element, not a pseudo on the
@@ -497,9 +521,9 @@
     }
   }
 
-  /* Personal markers tucked into the cell's top-right corner: a saved-show
-     bookmark and/or a followed-tag dot, laid out in one slot. Decorative and
-     click-through, so the full-cell day link underneath still receives the tap. */
+  /* Personal marker tucked into the cell's top-right corner: the saved-show heart.
+     Decorative and click-through, so the full-cell day link underneath still
+     receives the tap. */
   /* Mobile: the marker sits BOTTOM-right so it never crowds the date's top row —
      the today badge (a padded green pill) otherwise collides with it on a narrow
      cell. Desktop moves it back up to top-right (see the breakpoint block), where

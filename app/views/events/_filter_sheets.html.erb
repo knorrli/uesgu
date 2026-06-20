@@ -4,7 +4,7 @@
     events.css); the inline combobox filter (_filter) takes over above it.
 
     It is a plain GET form whose option rows ARE the submitted inputs
-    (name="s[]/q[]/l[]/d[]"), so it produces the exact same params as the inline
+    (name="q[]/g[]/l[]/d[]"), so it produces the exact same params as the inline
     filter and EventsController#build_filter needs no changes. Selections are
     staged inside a sheet and committed (one Turbo navigation) when it closes;
     server-rendered state below keeps the bar, chips and results in sync.

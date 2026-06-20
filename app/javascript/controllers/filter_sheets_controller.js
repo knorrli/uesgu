@@ -4,7 +4,7 @@ import { searchForSuggestion } from "lib/search_for"
 // Connects to data-controller="filter-sheets"
 //
 // Drives the mobile filter sheets (app/views/events/_filter_sheets.html.erb).
-// The option rows are real form inputs (name="s[]/q[]/l[]/d[]"), so committing is
+// The option rows are real form inputs (name="q[]/g[]/l[]/d[]"), so committing is
 // just a GET submit — same params as the inline combobox filter. This controller
 // only handles presentation: opening/closing sheets, in-sheet search, the
 // free-text "search for X" row, the custom date range, and removing a chip.
@@ -125,9 +125,7 @@ export default class extends Controller {
     const value = row.dataset.value
     if (!value) { search?.focus(); return }
 
-    const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
-      .some((input) => input.value === value)
-    if (!exists) { this.queriesTarget.prepend(this.#queryRow(value)); this.#notifyChanged() }
+    this.#addQueryValue(value)
 
     if (search) { search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true })) }
   }
@@ -144,9 +142,7 @@ export default class extends Controller {
     const input = event.target
     const { value, blank } = searchForSuggestion(input.value, this.searchForTemplateValue, this.searchAnythingValue)
     if (!blank) {
-      const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
-        .some((row) => row.value === value)
-      if (!exists) { this.queriesTarget.prepend(this.#queryRow(value)); this.#notifyChanged() }
+      this.#addQueryValue(value)
       input.value = ""
     }
     this.#submit()
@@ -191,6 +187,17 @@ export default class extends Controller {
     row.hidden = false
   }
 
+  // Add a resolved value as a checked q[] row (deduped), and tell the live title
+  // to recompute. The single place text becomes a query — shared by the
+  // "search for X" row, Enter, and commit-time staging.
+  #addQueryValue(value) {
+    const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
+      .some((input) => input.value === value)
+    if (exists) return
+    this.queriesTarget.prepend(this.#queryRow(value))
+    this.#notifyChanged()
+  }
+
   #queryRow(value) {
     const label = document.createElement("label")
     label.className = "opt opt--query"
@@ -227,8 +234,7 @@ export default class extends Controller {
 
     const { value, blank } = searchForSuggestion(input.value, this.searchForTemplateValue, this.searchAnythingValue)
     if (blank) return
-    const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')].some((row) => row.value === value)
-    if (!exists) { this.queriesTarget.prepend(this.#queryRow(value)); this.#notifyChanged() }
+    this.#addQueryValue(value)
     input.value = ""
   }
 

@@ -2,7 +2,7 @@
     list. Reuses the same editor as the assignment queue; on save the controller
     redirects back to where you came from. %>
 <div class="flex flex-col gap-medium">
-  <%= render 'genres/editor', genre: @genre, suggestions: @suggestions,
+  <%= render 'genres/editor', genre: @genre,
         alias_suggestions: @alias_suggestions,
         sample_events: @sample_events, return_to: root_path %>
 </div>

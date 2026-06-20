@@ -6,7 +6,7 @@
   </div>
 
   <% if @genre %>
-    <%= render 'genres/editor', genre: @genre, suggestions: @suggestions,
+    <%= render 'genres/editor', genre: @genre,
           alias_suggestions: @alias_suggestions,
           sample_events: @sample_events, return_to: queue_genres_path %>
   <% else %>

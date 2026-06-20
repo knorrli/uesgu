@@ -8,8 +8,8 @@
   padding: var(--gap-xsmall) var(--gap-small);
 }
 
-/* Genre index tab groups: a short vertical rule separating the assignment-status
-   filters (all / unassigned / assigned) from the parked dispositions. */
+/* Genre index tab groups: a short vertical rule separating the tree-status
+   filters (all / placed / unplaced) from the parked dispositions. */
 .genre-status-filters .filter-divider {
   align-self: center;
   height: 1.2em;

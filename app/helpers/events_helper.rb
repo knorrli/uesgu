@@ -66,12 +66,11 @@ module EventsHelper
     # rule is keyed to the APPLIED param, not the tag, so one tag can answer to two
     # axes). A genre tag (g) lights from a genre filter (g, subtree match) OR a
     # freetext term (q, CONTAINS on the genre name) — so typing "hop" lights
-    # "Hip Hop" just like picking a parent genre does. A legacy descriptor tag (q)
-    # is the What axis (q + s, both CONTAINS). Anything else matches its own param.
+    # "Hip Hop" just like picking a parent genre does. Anything else matches its
+    # own param exactly (locations).
     matchers =
       case param
       when 'g' then { 'g' => 'g', 'q' => 'q' }
-      when 'q' then { 'q' => 'q', 's' => 'q' }
       else { param => param }
       end
     matched = matchers.to_h { |p, rule| [p, filter_terms_matching(Array(applied[p]), value, param: rule)] }
@@ -98,9 +97,9 @@ module EventsHelper
   end
 
   # The applied terms that "match" a tag — the ones that light it green and that
-  # tapping it removes. The What axis (q[] freetext + s[] styles, passed as param
-  # 'q') matches by CONTAINS (the tag contains the applied term), so sibling
-  # descriptors light up instead of only exact hits; locations match exactly.
+  # tapping it removes. Free text (param 'q') matches by CONTAINS (the tag contains
+  # the applied term), so sibling descriptors light up instead of only exact hits;
+  # genres (param 'g') match by subtree membership; locations match exactly.
   # Case-insensitive.
   def filter_terms_matching(applied_terms, value, param:)
     case param

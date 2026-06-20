@@ -71,6 +71,22 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_selector ".filter-sheets__summary .filter-chip", text: "zzqx"
   end
 
+  test "clicking Apply commits typed text not submitted with Enter or the row" do
+    event(start_date: Date.current + 3, genre_list: ["Zylogenre"])
+
+    visit events_path
+    open_sheet("what")
+    field = find(".sheet[data-field=what] .sheet__search-input")
+    field.click # settle focus before typing (open() parks focus elsewhere)
+    field.send_keys("wubz")
+    assert_selector ".sheet[data-field=what] .opt--newquery", text: /wubz/
+    # Apply (not Enter, not the "search for X" row) still keeps the typed text.
+    find(".sheet[data-field=what] .sheet__apply").click
+
+    assert_current_path(/q%5B%5D=wubz/)
+    assert_selector ".filter-sheets__summary .filter-chip", text: "wubz"
+  end
+
   test "a filter panel closes via its × and via click-outside (desktop)" do
     rock = genre(name: "Closerock", events_count: 1)
     genre(name: "Closekid", events_count: 1).set_parent!(rock)

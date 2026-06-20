@@ -206,11 +206,30 @@ export default class extends Controller {
 
   #commit(sheet) {
     if (!sheet) return
+    // Fold any text still sitting in the What search field into a q[] query first,
+    // so committing keeps it (Apply, ×, or click-outside) — matching what Enter and
+    // the "search for X" row already do.
+    this.#stagePendingQuery(sheet)
     const changed = this.snapshot !== undefined && this.#serialize(sheet) !== this.snapshot
     this.#closeSheet(sheet)
     if (!changed) return
     this.#submit()
     if (!this.submitOnApplyValue) this.#refreshTrigger(sheet)
+  }
+
+  // Only the What sheet carries the free-text affordance (.opt--newquery); other
+  // sheets' search box just filters their rows, so leave those alone. Staged BEFORE
+  // the change check in #commit so the new row counts as a change and commits.
+  #stagePendingQuery(sheet) {
+    if (!this.hasQueriesTarget || !sheet.querySelector(".opt--newquery")) return
+    const input = sheet.querySelector(".sheet__search-input")
+    if (!input || !input.value.trim()) return
+
+    const { value, blank } = searchForSuggestion(input.value, this.searchForTemplateValue, this.searchAnythingValue)
+    if (blank) return
+    const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')].some((row) => row.value === value)
+    if (!exists) { this.queriesTarget.prepend(this.#queryRow(value)); this.#notifyChanged() }
+    input.value = ""
   }
 
   // Update a trigger's label + count from its sheet's checked rows — the live

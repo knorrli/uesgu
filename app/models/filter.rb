@@ -79,6 +79,10 @@ class Filter
         {}.tap do |date_group|
           if mapped_ranges = map_date_ranges(date_ranges).presence
             date_group[:start_date_between_any] = mapped_ranges
+            # A named/preset window ("this month", "this weekend") still hides the
+            # past — it intersects with [today, ∞). Only an explicitly typed
+            # absolute range reveals past events, so drop the floor just for that.
+            date_group[:start_date_gteq] = Date.current.beginning_of_day unless custom_range?
           else
             date_group[:start_date_gteq] = Date.current.beginning_of_day
           end
@@ -98,6 +102,13 @@ class Filter
   end
 
   private
+
+  # Whether the date filter holds an explicitly-typed absolute range (vs. only
+  # named presets). Such a range is the user asking for a specific window, which
+  # may be in the past — so it opts out of the future floor.
+  def custom_range?
+    date_ranges.any? { |range| !Datepicker.preset.key?(range) && range.to_s.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) }
+  end
 
   def parse(value)
     ActsAsTaggableOn.default_parser.new(value).parse

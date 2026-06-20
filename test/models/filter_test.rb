@@ -61,6 +61,18 @@ class FilterTest < ActiveSupport::TestCase
     assert_includes date_group[:start_date_between_any].first, Date.current.iso8601
   end
 
+  test 'a named preset keeps the future floor; an explicit absolute range drops it' do
+    preset = Filter.build(date_ranges: ['this_month']).ransack_query[:g]
+              .find { |h| h.key?(:start_date_between_any) }
+    assert_equal Date.current.beginning_of_day, preset[:start_date_gteq],
+                 'a preset window still hides past events'
+
+    custom = Filter.build(date_ranges: ['2020-01-01 - 2020-12-31']).ransack_query[:g]
+              .find { |h| h.key?(:start_date_between_any) }
+    refute custom.key?(:start_date_gteq),
+           'an explicitly typed absolute range reveals past events'
+  end
+
   test 'earliest_date resolves the soonest concrete date across presets' do
     f = Filter.new
     f.date_ranges = ['today']

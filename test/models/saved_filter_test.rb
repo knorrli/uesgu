@@ -299,4 +299,16 @@ class SavedFilterTest < ActiveSupport::TestCase
     r.save!
     assert_equal((17 * 60) + 15, r.time_of_day) # 17:08 → 17:15
   end
+
+  test 'time_hour + time_minute combine into time_of_day (the two-select picker)' do
+    r = SavedFilter.new
+    r.assign_attributes(time_hour: '18', time_minute: '45')
+    assert_equal((18 * 60) + 45, r.time_of_day)
+  end
+
+  test 'time_hour / time_minute read back the stored time, zero-padded' do
+    r = SavedFilter.new(time_of_day: (8 * 60) + 15) # 08:15
+    assert_equal '08', r.time_hour
+    assert_equal '15', r.time_minute
+  end
 end

@@ -13,7 +13,6 @@
   <header class="flex flex-col gap-small">
     <p class="muted saved-filter-kicker"><%= t('saved_filters.new.title') %></p>
     <h1 data-saved-filter-title-target="title"><%= @rule.display_name %></h1>
-    <p class="muted"><%= t('saved_filters.new.intro') %></p>
   </header>
 
   <%= render 'form', rule: @rule, filter: @filter %>

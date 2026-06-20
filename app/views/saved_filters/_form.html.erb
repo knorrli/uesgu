@@ -63,7 +63,6 @@
         when) lives here too, reactive to the window above (saved-filter-form). %>
     <fieldset class="saved-filter-fieldset flex flex-col gap-small" data-controller="notify-channels">
       <legend><%= t('saved_filters.section_notifications') %></legend>
-      <p class="muted saved-filter-hint"><%= t('saved_filters.channels_hint') %></p>
       <label class="saved-filter-check flex gap-small">
         <%= form.check_box :notify_in_app, data: { 'notify-channels-target': 'master', action: 'notify-channels#sync' } %>
         <span><%= t('saved_filters.fields.notify_in_app') %></span>
@@ -102,7 +101,7 @@
           weekly/biweekly, monthday for monthly. aria-labels name each control; the
           time snaps to the quarter hour on blur (the scheduler runs quarter-hourly). %>
       <div class="saved-filter-schedule flex flex-col gap-xsmall">
-        <span class="muted saved-filter-hint"><%= t('saved_filters.schedule_label') %></span>
+        <span class="field-label"><%= t('saved_filters.schedule_label') %></span>
         <div class="saved-filter-row flex gap-small">
           <label class="flex flex-col gap-xsmall" data-saved-filter-form-target="cadenceField">
             <%= form.select :cadence, rule_cadence_options, {}, data: { 'saved-filter-form-target': 'cadence', action: 'saved-filter-form#update' }, 'aria-label': t('saved_filters.fields.cadence') %>
@@ -113,12 +112,19 @@
           <label class="flex flex-col gap-xsmall" data-saved-filter-form-target="monthday">
             <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('saved_filters.fields.monthday') %>
           </label>
-          <label class="flex flex-col gap-xsmall">
-            <%# step=900 (15 min) matches the quarter-hourly scheduler — the picker
-                offers only times we can actually honour; snapTime is the fallback
-                for browsers/typed entry that ignore step. %>
-            <%= form.time_field :time_string, value: rule.time_string, step: 900, 'aria-label': t('saved_filters.fields.time'), data: { action: 'change->saved-filter-form#snapTime' } %>
-          </label>
+          <%# Time as hour + quarter-minute selects, not a native time input: reads
+              identically on every device and only offers the quarter values the
+              scheduler honours, so nothing clamps silently. The pair is folded into
+              time_of_day server-side (SavedFilter#time_hour). %>
+          <div class="saved-filter-time flex gap-xsmall">
+            <label class="flex flex-col gap-xsmall">
+              <%= form.select :time_hour, rule_time_hour_options, {}, 'aria-label': t('saved_filters.fields.time_hour') %>
+            </label>
+            <span class="saved-filter-time__colon" aria-hidden="true">:</span>
+            <label class="flex flex-col gap-xsmall">
+              <%= form.select :time_minute, rule_time_minute_options, {}, 'aria-label': t('saved_filters.fields.time_minute') %>
+            </label>
+          </div>
         </div>
       </div>
     </fieldset>

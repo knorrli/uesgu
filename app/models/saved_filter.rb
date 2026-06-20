@@ -254,7 +254,32 @@ class SavedFilter < ApplicationRecord
     self.time_of_day = (hours * 60) + minutes.to_i
   end
 
+  # The rule form edits the time as two selects — hour (00–23) and quarter-minute
+  # (00/15/30/45) — instead of a native time input, so it reads identically on every
+  # device and only the values the scheduler honours are offered (no silent clamp).
+  # Each select posts its part; we fold the pair into time_of_day once both arrive
+  # (Rails assigns them together from params). time_string stays the single-string
+  # view used by the summary helper + tests.
+  def time_hour = format("%02d", time_of_day / 60)
+
+  def time_minute = format("%02d", time_of_day % 60)
+
+  def time_hour=(value)
+    @time_hour = value
+    combine_time_parts
+  end
+
+  def time_minute=(value)
+    @time_minute = value
+    combine_time_parts
+  end
+
   private
+
+  def combine_time_parts
+    return if @time_hour.blank? || @time_minute.blank?
+    self.time_of_day = (@time_hour.to_i * 60) + @time_minute.to_i
+  end
 
   def clean(value) = Array(value).map { |v| v.to_s.strip }.reject(&:blank?)
 

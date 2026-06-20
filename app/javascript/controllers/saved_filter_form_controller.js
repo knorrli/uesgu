@@ -35,21 +35,4 @@ export default class extends Controller {
     this.windowTarget.value = ""
     this.windowTarget.dispatchEvent(new Event("change", { bubbles: true }))
   }
-
-  // Snap the entered time to the nearest quarter hour on blur — the scheduler
-  // sweeps quarter-hourly, so finer times would just fire late. Mirrors the
-  // server-side snap; here it gives immediate feedback (18:04 → 18:00) instead
-  // of a blocking step= validation error.
-  snapTime(event) {
-    const input = event.target
-    if (!input.value) return
-
-    const [hours, minutes] = input.value.split(":").map(Number)
-    let snapped = Math.round((hours * 60 + minutes) / 15) * 15
-    if (snapped >= 1440) snapped -= 15
-
-    const hh = String(Math.floor(snapped / 60)).padStart(2, "0")
-    const mm = String(snapped % 60).padStart(2, "0")
-    input.value = `${hh}:${mm}`
-  }
 }

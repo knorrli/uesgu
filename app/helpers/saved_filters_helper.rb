@@ -21,6 +21,13 @@ module SavedFiltersHelper
     SavedFilter::WINDOW_RHYTHM.keys.map { |key| [t("datepicker.#{key}"), key] }
   end
 
+  # The notification time, split into two selects (see SavedFilter#time_hour). The
+  # minute list is only the quarter hours the scheduler can honour, so the time can
+  # never be set to a value that would silently snap.
+  def rule_time_hour_options = (0..23).map { |h| format("%02d", h) }
+
+  def rule_time_minute_options = %w[00 15 30 45]
+
   # --- alert descriptions (the read-only list + the new-alert preview) -------
 
   # "Weekly on Friday at 17:30"

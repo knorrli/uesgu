@@ -28,19 +28,22 @@
 }
 
 /* The card title is the link to the editor. Styled as a heading (bold, normal
-   foreground — not an accent link) so the row reads title-first; the underline on
-   hover/focus is the clickability cue. align-self keeps the hit area to the text,
-   not the full row width. */
+   foreground — not an accent link) so the row reads title-first; a persistent
+   muted underline is the at-rest clickability cue, which sharpens to the accent
+   on hover/focus. align-self keeps the hit area to the text, not the full row
+   width. */
 .saved-filter-card__name {
   align-self: flex-start;
   font-weight: bold;
   color: var(--theme-fg-color);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: var(--theme-fg-muted);
+  text-underline-offset: 0.2em;
 }
 
 .saved-filter-card__name:hover,
 .saved-filter-card__name:focus-visible {
-  text-decoration: underline;
+  text-decoration-color: var(--theme-accent-color);
 }
 
 .saved-filter-card__chips,
@@ -69,21 +72,26 @@
   min-width: 0;
 }
 
+/* The section legend (Filter / Benachrichtigungen) is the page's h2 tier — a step
+   LARGER than the bold .field-label ("Wann" / "Wie oft") so it reads as a section
+   header, not just another field label. (Size, not a rule line: an earlier hairline
+   divider here read as one more input underline and muddied the split — see the
+   adjacent-sibling spacing below, which now separates the sections with whitespace
+   alone.) */
 .saved-filter-fieldset legend {
   padding: 0;
   font-weight: bold;
-  margin-bottom: var(--gap-small);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--gap-medium);
 }
 
-/* Set the two builder sections (Filter / Benachrichtigungen) apart so the bold
-   legends read as section headers, not just another field label running into the
-   block above. A hairline rule + extra top space gives the Notifications section
-   its own footing. (Vertical-spacing convention: a section break = hairline +
-   --gap-large top — worth codifying in /styleguide.) */
+/* Set the two builder sections (Filter / Benachrichtigungen) apart with generous
+   whitespace alone — the larger legend above carries the "new section" signal, so
+   no divider line is needed (and a line here looked like a stray field underline).
+   This margin stacks on the form's own gap, giving the Notifications section clear
+   footing below the Filter block. */
 .saved-filter-fieldset + .saved-filter-fieldset {
-  margin-top: var(--gap-medium);
-  padding-top: var(--gap-large);
-  border-top: var(--border-width) solid var(--rule-color);
+  margin-top: var(--gap-large);
 }
 
 .saved-filter-row {
@@ -94,6 +102,25 @@
 .saved-filter-row > label {
   flex: 1 1 8rem;
   min-width: 0;
+}
+
+/* The notification time is two selects (hour : minute) sharing one row cell, so
+   the group takes the same flex basis as a sibling label and the two selects split
+   it; align-end + a padded colon keep all three baselines on the underline. */
+.saved-filter-row > .saved-filter-time {
+  flex: 1 1 8rem;
+  min-width: 0;
+  align-items: flex-end;
+}
+
+.saved-filter-time > label {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.saved-filter-time__colon {
+  padding: var(--gap-small) 0;
+  line-height: var(--filter-input-line-height);
 }
 
 .saved-filter-custom {
@@ -129,10 +156,12 @@
   padding: 0;
 }
 
-/* Give the window select the same line metrics as the what/where comboboxes so
-   all three filter fields are exactly the same height in every browser (some
-   render a bare <select> shorter by default). */
-.saved-filter-form select[name="d[]"] {
+/* Give EVERY select in the form the same line metrics as the what/where
+   comboboxes, so all fields are exactly the same height in every browser (some
+   render a bare <select> shorter by default). Applying it only to the window
+   select left the schedule selects (cadence/weekday/monthday) shorter — enough to
+   clip a descender (the "g" in "Freitag") while the taller window select didn't. */
+.saved-filter-form select {
   line-height: var(--filter-input-line-height);
 }
 

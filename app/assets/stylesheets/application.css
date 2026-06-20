@@ -182,15 +182,17 @@ a {
   gap: var(--gap-small);
 }
 
+/* Input on its own line (long URLs would otherwise crowd the button off the
+   edge), the Copy button left-aligned on the line below. */
 .copy-field__row {
   display: flex;
+  flex-direction: column;
   gap: var(--gap-small);
-  align-items: stretch;
+  align-items: flex-start;
 }
 
 .copy-field__input {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
 }
 
 .copy-field__button {

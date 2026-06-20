@@ -63,6 +63,20 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute_includes response.body, 'OtherUnique'
   end
 
+  test 'a freetext term lights a genre tag whose name contains it, and tapping clears it' do
+    # Title has no "hop"; the row shows up (and its tag lights) purely on the
+    # genre-name substring — proving freetext now drives genre-tag highlighting,
+    # not just the genre-tree filter.
+    event(title: 'NoMatchTitle', genre_list: ['Quophop'], start_date: Date.current + 2.days)
+
+    get events_path(q: ['hop'])
+
+    assert_response :success
+    assert_includes response.body, 'NoMatchTitle' # in the list via genres_name_cont
+    # The genre tag is lit, and tapping it drops the freetext term (back to no q).
+    assert_select "a.filter-link.active[href=?]", events_path, text: 'Quophop'
+  end
+
   test 'the default date floor hides past events' do
     event(title: 'PastShow', start_date: Date.current - 10.days)
     event(title: 'FutureShow', start_date: Date.current + 10.days)

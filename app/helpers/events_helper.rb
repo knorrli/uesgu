@@ -62,17 +62,26 @@ module EventsHelper
 
     applied = request.query_parameters.except('page')
 
-    # A descriptor (q[]) is part of the "What" axis, so it's matched by EVERY What
-    # term — freetext q[] AND a picked style s[] — by the same CONTAINS rule. That's
-    # why applying the style "Rock" lights the "Rock" / "Punk Rock" descriptors, not
-    # only a typed freetext. Locations match their own param, exactly.
-    match_params = param == 'q' ? %w[q s] : [param]
-    matched = match_params.to_h { |p| [p, filter_terms_matching(Array(applied[p]), value, param: param)] }
+    # Which applied filter params light this tag, and the match RULE for each (the
+    # rule is keyed to the APPLIED param, not the tag, so one tag can answer to two
+    # axes). A genre tag (g) lights from a genre filter (g, subtree match) OR a
+    # freetext term (q, CONTAINS on the genre name) — so typing "hop" lights
+    # "Hip Hop" just like picking a parent genre does. A legacy descriptor tag (q)
+    # is the What axis (q + s, both CONTAINS). Anything else matches its own param.
+    matchers =
+      case param
+      when 'g' then { 'g' => 'g', 'q' => 'q' }
+      when 'q' then { 'q' => 'q', 's' => 'q' }
+      else { param => param }
+      end
+    matched = matchers.to_h { |p, rule| [p, filter_terms_matching(Array(applied[p]), value, param: rule)] }
     active = matched.values.any?(&:present?)
 
     query = applied.dup
     if active
-      # Tap GREEN → drop every applied term that lit this tag, across q[] and s[].
+      # Tap GREEN → drop every applied term that lit this tag, across all the axes
+      # that matched it (e.g. a genre tag lit by both a g[] ancestor and a q[]
+      # freetext clears both).
       matched.each do |p, terms|
         next if terms.empty?
         rest = Array(applied[p]) - terms

@@ -141,7 +141,7 @@ en:
       title: Save a filter
     edit:
       title: Edit saved filter
-      back: ← All saved filters
+      back: All saved filters
     email_unavailable: add an email address in settings
     push_unavailable: turn on push in settings
     section_filter: Filter
@@ -240,7 +240,7 @@ en:
         one: 1 event
         other: "%{count} events"
     show:
-      back: ← All notifications
+      back: All notifications
       title: New events
       empty_all: No new events this period.
   genres:
@@ -283,7 +283,7 @@ en:
       merge_suggested: "Merge into a similar genre"
       appears_on: Appears on
   admin:
-    back: "← Admin"
+    back: "Admin"
     index:
       title: Admin
       placed: Placed
@@ -338,7 +338,7 @@ en:
           filtered: Filtered
           history: History
       show:
-        back: ← All runs
+        back: All runs
         duration: Time
         created_events: Events created
         no_created_events: This run created no new events.
@@ -350,7 +350,7 @@ en:
         title: Accounts
         empty: No accounts yet.
       show:
-        back: ← All accounts
+        back: All accounts
         email: Email
         no_email: none
         joined: Joined

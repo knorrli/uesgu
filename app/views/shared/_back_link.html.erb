@@ -1,0 +1,5 @@
+<%# A page's "up" navigation — a link back to the parent list/section. The ←
+    glyph is decorative and lives here (not baked into the i18n string) so every
+    back link across the app renders identically. See app/views/shared/_page_header. %>
+<%# locals: (path:, label:) %>
+<%= link_to path, class: "back-link" do %><span class="back-link__arrow" aria-hidden="true">←</span> <%= label %><% end %>

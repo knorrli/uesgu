@@ -5,23 +5,23 @@
     <div data-controller="refresh" data-refresh-interval-value="5000" hidden></div>
   <% end %>
 
-  <%= render 'admin/back', path: admin_scrape_runs_path, label: t('.back') %>
-
-  <h1 class="flex gap-small wrap align-center">
-    <%= l(@run.started_at) %>
-    <%= render 'admin/scrape_runs/run_badge', run: @run %>
-  </h1>
-  <p class="muted">
-    <%# Derived from the loaded results so the counts are live during a run,
-        before finalize writes the denormalized totals. %>
-    <%= t('admin.scrape_runs.index.tally', total: @results.size, ok: @results.count(&:ok?),
-                                           empty: @results.count(&:empty?), failed: @results.count(&:failed?)) %>
-    <% if @run.running? %>
-      · <%= t('admin.scrape_runs.index.auto_refreshing') %>
-    <% elsif @run.duration %>
-      · <%= t('admin.scrape_runs.index.took', seconds: @run.duration.round) %>
-    <% end %>
-  </p>
+  <%= render layout: "shared/page_header", locals: { back_path: admin_scrape_runs_path, back_label: t(".back") } do %>
+    <h1 class="flex gap-small wrap align-center">
+      <%= l(@run.started_at) %>
+      <%= render 'admin/scrape_runs/run_badge', run: @run %>
+    </h1>
+    <p class="muted">
+      <%# Derived from the loaded results so the counts are live during a run,
+          before finalize writes the denormalized totals. %>
+      <%= t('admin.scrape_runs.index.tally', total: @results.size, ok: @results.count(&:ok?),
+                                             empty: @results.count(&:empty?), failed: @results.count(&:failed?)) %>
+      <% if @run.running? %>
+        · <%= t('admin.scrape_runs.index.auto_refreshing') %>
+      <% elsif @run.duration %>
+        · <%= t('admin.scrape_runs.index.took', seconds: @run.duration.round) %>
+      <% end %>
+    </p>
+  <% end %>
 
   <div class="scrape-table-wrap">
     <table class="scrape-table">

@@ -141,7 +141,7 @@ fr:
       title: Enregistrer un filtre
     edit:
       title: Modifier le filtre enregistré
-      back: ← Tous les filtres
+      back: Tous les filtres
     email_unavailable: ajoute une adresse e-mail dans les réglages
     push_unavailable: active le push dans les réglages
     section_filter: Filtre
@@ -240,7 +240,7 @@ fr:
         one: 1 événement
         other: "%{count} événements"
     show:
-      back: ← Toutes les notifications
+      back: Toutes les notifications
       title: Nouveaux événements
       empty_all: Aucun nouvel événement durant cette période.
   genres:
@@ -283,7 +283,7 @@ fr:
       merge_suggested: "Fusionner avec un genre similaire"
       appears_on: Apparaît sur
   admin:
-    back: "← Admin"
+    back: "Admin"
     index:
       title: Admin
       placed: Classés
@@ -338,7 +338,7 @@ fr:
           filtered: Filtrés
           history: Historique
       show:
-        back: ← Tous les passages
+        back: Tous les passages
         duration: Durée
         created_events: Events créés
         no_created_events: Ce passage n'a créé aucun nouvel event.
@@ -350,7 +350,7 @@ fr:
         title: Comptes
         empty: Aucun compte pour l'instant.
       show:
-        back: ← Tous les comptes
+        back: Tous les comptes
         email: E-mail
         no_email: aucun
         joined: Inscrit le

@@ -1,0 +1,23 @@
+/* Shared page header — see app/views/shared/_page_header + _back_link.
+   The "up" back link sits above an optional title/meta block, grouped in
+   .page-head so the pair is a single item of the page's gap-large column. */
+
+.page-head {
+  display: flex;
+  flex-direction: column;
+}
+
+/* The back link is the parent-section "up" navigation. inline-block + flex-start
+   so it stays its own width (doesn't stretch) in the column. */
+.back-link {
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: var(--gap-medium);
+}
+
+/* Title block: kicker / h1 / meta stacked tight. */
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}

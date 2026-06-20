@@ -1,6 +1,7 @@
 <% content_for :title, t('.title') %>
 <div class="flex flex-col gap-large">
-  <%= render 'admin/back', path: admin_discard_rules_path, label: t('admin.discard_rules.index.title') %>
-  <h1><%= t('.title') %></h1>
+  <%= render layout: "shared/page_header", locals: { back_path: admin_discard_rules_path, back_label: t("admin.discard_rules.index.title") } do %>
+    <h1><%= t('.title') %></h1>
+  <% end %>
   <%= render 'form' %>
 </div>

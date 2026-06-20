@@ -10,10 +10,10 @@
      data-saved-filter-title-scope-all-value="<%= t('saved_filters.summary.scope_all') %>"
      data-saved-filter-title-added-label-value="<%= t('saved_filters.type.added') %>"
      data-action="change->saved-filter-title#update">
-  <header class="flex flex-col gap-small">
+  <%= render layout: "shared/page_header" do %>
     <p class="muted saved-filter-kicker"><%= t('saved_filters.new.title') %></p>
     <h1 data-saved-filter-title-target="title"><%= @rule.display_name %></h1>
-  </header>
+  <% end %>
 
   <%= render 'form', rule: @rule, filter: @filter %>
 </div>

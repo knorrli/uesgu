@@ -1,0 +1,14 @@
+<%# Shared page header: an optional "back" link above the title block, grouped in
+    one wrapper so it's a single item of the page's gap-large column. Use via
+    `render layout:` and put the <h1> (plus any kicker / meta / inline action) in
+    the block — the header bodies vary too much to parametrise. Specimen lives in
+    the styleguide (/styleguide #page-header). %>
+<%# locals: (back_path: nil, back_label: nil) %>
+<div class="page-head">
+  <% if back_path.present? %>
+    <%= render "shared/back_link", path: back_path, label: back_label %>
+  <% end %>
+  <header class="page-header">
+    <%= yield %>
+  </header>
+</div>

@@ -1,4 +1,0 @@
-<%# Back link for admin pages. Defaults to the admin start page; pass path/label
-    to point a detail page at its own list instead (which itself links home). %>
-<%# locals: (path: nil, label: nil) %>
-<p class="admin-back"><%= link_to label || t('admin.back'), path || admin_path %></p>

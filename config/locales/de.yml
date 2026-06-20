@@ -141,7 +141,7 @@ de:
       title: Filter speichern
     edit:
       title: Gespeicherten Filter bearbeiten
-      back: ← Alle Filter
+      back: Alle Filter
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
     push_unavailable: Push in den Einstellungen aktivieren
     section_filter: Filter
@@ -240,7 +240,7 @@ de:
         one: 1 Veranstaltung
         other: "%{count} Veranstaltungen"
     show:
-      back: ← Alle Benachrichtigungen
+      back: Alle Benachrichtigungen
       title: Neue Veranstaltungen
       empty_all: Keine neuen Veranstaltungen in diesem Zeitraum.
   genres:
@@ -283,7 +283,7 @@ de:
       merge_suggested: "Mit ähnlichem Genre zusammenführen"
       appears_on: Erscheint bei
   admin:
-    back: "← Admin"
+    back: "Admin"
     index:
       title: Admin
       placed: Eingeordnet
@@ -338,7 +338,7 @@ de:
           filtered: Gefiltert
           history: Verlauf
       show:
-        back: ← Alle Läufe
+        back: Alle Läufe
         duration: Zeit
         created_events: Erstellte Events
         no_created_events: Dieser Lauf hat keine neuen Events erstellt.
@@ -350,7 +350,7 @@ de:
         title: Konten
         empty: Noch keine Konten.
       show:
-        back: ← Alle Konten
+        back: Alle Konten
         email: E-Mail
         no_email: keine
         joined: Beigetreten

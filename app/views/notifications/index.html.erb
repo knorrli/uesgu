@@ -34,9 +34,9 @@
 
   <% if @read_count.positive? %>
     <% if @show_read %>
-      <%= link_to t('notifications.index.hide_read'), notifications_path, class: 'notifications__read-toggle' %>
+      <%= link_to t('notifications.index.hide_read'), notifications_path, class: 'text-link notifications__read-toggle' %>
     <% else %>
-      <%= link_to t('notifications.index.show_read', count: @read_count), notifications_path(read: 1), class: 'notifications__read-toggle' %>
+      <%= link_to t('notifications.index.show_read', count: @read_count), notifications_path(read: 1), class: 'text-link notifications__read-toggle' %>
     <% end %>
   <% end %>
 </div>

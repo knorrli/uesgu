@@ -4,7 +4,7 @@
       account plumbing, one tap, no heading/hint needed. %>
   <div class="flex justify-between align-center wrap gap-medium">
     <h1><%= t('settings.title') %></h1>
-    <%= button_to t('settings.signout_button'), session_path, method: :delete, class: "button-small button-ghost" %>
+    <%= button_to t('settings.signout_button'), session_path, method: :delete, class: "button-small" %>
   </div>
 
   <% if @user.errors.any? %>
@@ -116,9 +116,9 @@
               value: public_calendar_feed_url(@user.calendar_feed_token, format: :ics, **share_url_options) %>
         <div class="settings-actions flex gap-small wrap">
           <%= button_to t('calendar_feed.regenerate'), calendar_feed_path, method: :post,
-                class: "button-ghost",
                 data: { turbo_confirm: t('calendar_feed.regenerate_confirm') } %>
-          <%= button_to t('calendar_feed.remove'), calendar_feed_path, method: :delete, class: "button-ghost" %>
+          <%= button_to t('calendar_feed.remove'), calendar_feed_path, method: :delete, class: "delete",
+                data: { turbo_confirm: t('calendar_feed.remove_confirm') } %>
         </div>
       </div>
     <% else %>

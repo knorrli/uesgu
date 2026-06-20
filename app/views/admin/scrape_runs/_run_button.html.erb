@@ -1,5 +1,5 @@
 <%# Re-run a single scraper (e.g. after fixing its parser). %>
 <%# locals: (scraper:) %>
 <%= button_to t('admin.scrape_runs.index.run_one'), admin_scrape_runs_path,
-      params: { scraper: scraper }, class: 'button-small button-ghost',
+      params: { scraper: scraper }, class: 'button-small',
       title: t('admin.scrape_runs.index.run_one_title', scraper: scraper) %>

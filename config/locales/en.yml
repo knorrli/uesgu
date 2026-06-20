@@ -107,6 +107,7 @@ en:
     regenerate: New link
     regenerate_confirm: Replace the link? Your calendar app will need the new one.
     remove: Remove link
+    remove_confirm: Remove the subscription link? Your calendar will stop updating.
     created: Subscription link ready.
     removed: Subscription link removed.
   event_reminder:

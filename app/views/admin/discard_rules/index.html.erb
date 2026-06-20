@@ -22,9 +22,9 @@
             </span>
           </div>
           <div class="flex gap-small">
-            <%= link_to t('.edit'), edit_admin_discard_rule_path(rule), class: 'button-small button-ghost' %>
+            <%= link_to t('.edit'), edit_admin_discard_rule_path(rule), class: 'button-small' %>
             <%= button_to t('.delete'), admin_discard_rule_path(rule), method: :delete,
-                  class: 'button-small button-ghost', data: { turbo_confirm: t('.delete_confirm') } %>
+                  class: 'button-small', data: { turbo_confirm: t('.delete_confirm') } %>
           </div>
         </li>
       <% end %>

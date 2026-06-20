@@ -109,17 +109,20 @@ module Scrapers
         tags_before = was_new ? nil : tag_snapshot(event)
         transact do
           build_event(event, row)
-          # Attribute changes (title/time/cancellation/…) come from Rails' dirty
-          # tracking; tag changes (genres) don't dirty the model, so diff the
-          # snapshot separately.
-          changed = event.changed? || (tags_before && tag_snapshot(event) != tags_before)
           event.save!
+          # Decide updated-vs-unchanged from what actually PERSISTED, not from
+          # event.changed?: AATO re-flags the virtual genre_list/location_list
+          # attributes dirty whenever the raw scraped spelling differs from the
+          # stored canonical one (e.g. "indie rock" → stored "Indie Rock"), a no-op
+          # that canonicalizes straight back and persists nothing. changed_fields
+          # ignores that flag and compares real columns + the tag-set snapshot.
+          fields = was_new ? nil : changed_fields(event, tags_before)
           if was_new
             @created += 1
             @created_ids << event.id
-          elsif changed
+          elsif fields.any?
             @updated += 1
-            log_event_update(event, tags_before)
+            Rails.logger.info "Updated #{event.url} — changed: #{fields.join(', ')}"
           else
             @unchanged += 1
           end
@@ -129,26 +132,27 @@ module Scrapers
       end
     end
 
-    # The event's genre tags, for comparing pre/post build_event. Locations are a
-    # per-venue constant so they never change and aren't worth the extra load.
+    # The event's tags, for comparing pre/post build_event. Locations are usually a
+    # per-venue constant, but they can still drift (a casing/spelling change in the
+    # venue array), so snapshot them too — same false-positive class as genres.
     def tag_snapshot(event)
-      { genres: event.genre_list.sort }
+      { genres: event.genre_list.sort, locations: event.location_list.sort }
     end
 
-    # Diagnostic for the "some scrapers report updates every sweep" problem: when an
-    # event counts as updated, name the field(s) that actually changed. A scraper
-    # whose extractor yields an unstable value (whitespace, timezone, ordering, a
-    # volatile "N tickets left" subtitle) then shows the SAME column changing on
-    # every run in the log — turning a mystery into a one-line grep — instead of
-    # us guessing offline. saved_changes covers scalar columns; the genre snapshot
-    # covers tag changes (filed under "genres", and the virtual *_list mutations are
-    # dropped so they don't double-report). Logged at info, matching the existing
-    # per-event "Processing event URL" line.
-    def log_event_update(event, tags_before)
+    # The field(s) that genuinely changed on a re-scrape — empty means "nothing
+    # really changed", even when event.changed? was true. Real DB columns come from
+    # saved_changes (what actually persisted), minus timestamps and the virtual
+    # genre_list/location_list attributes AATO marks dirty on every assignment; tag
+    # changes come from diffing the pre-build snapshot. A scraper whose extractor
+    # yields an unstable value (whitespace, timezone, a volatile "N tickets left"
+    # subtitle) then shows the SAME field on every run in the "Updated … — changed:"
+    # log — a one-line grep instead of guessing offline.
+    def changed_fields(event, tags_before)
       fields = event.saved_changes.keys - %w[created_at updated_at genre_list location_list]
-      fields << 'genres' if tags_before && tag_snapshot(event) != tags_before
-      detail = fields.join(', ').presence || 'nothing persisted (transient pre-save dirty — investigate)'
-      Rails.logger.info "Updated #{event.url} — changed: #{detail}"
+      after = tag_snapshot(event)
+      fields << 'genres'    if after[:genres]    != tags_before[:genres]
+      fields << 'locations' if after[:locations] != tags_before[:locations]
+      fields
     end
 
     # Assign every field from the event's content node. `event_content` is the row

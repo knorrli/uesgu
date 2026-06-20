@@ -142,10 +142,16 @@ ordered bugs-first, then UX, then polish.
 - **Filter chip render jumps content down** (regression after the redesign
   refactor). On the main events page, rendering the active-filter chip pushes the
   results list downward. Reserve the space / fix layout shift.
-- **Some scrapers always report event-data updates.** Per-run "updated" counts
-  are too high to be real data changes — likely a field that's compared
-  unstably (normalization, ordering, timestamp, whitespace) so events look
-  changed every sweep. Find the over-eager diff and stabilise it.
+- **Some scrapers always report event-data updates.** ✅ **FIXED** (cause found
+  via the prod-log diagnostic). The per-run "updated" counts were inflated by a
+  false-positive diff: `Event#genre_list=` runs AATO's setter with the *raw*
+  scraped tokens before canonicalising, so AATO flags the virtual
+  `genre_list`/`location_list` dirty whenever the raw spelling differs from the
+  stored canonical one (mostly cosmetic titleization, e.g. `"indie rock"` →
+  stored `"Indie Rock"`) — a no-op that persists nothing. `Scrapers::Agent` now
+  decides updated-vs-unchanged from what actually persisted (`saved_changes` real
+  columns + a genre/location tag-set snapshot), ignoring that virtual dirty flag.
+  Cosmetic normalization stays at ingest; only the miscount is gone.
 - **Deleted event referenced by a notification.** Find out what happens when a
   notification links to an event that's since been deleted; degrade gracefully
   (e.g. "no longer available") instead of a broken/blank link. **Constraint:**
@@ -211,6 +217,15 @@ ordered bugs-first, then UX, then polish.
   are **DONE** (shipped 2026-06-16) — kept here only as a pointer.
 - Session "Update the filter I just applied" soft-pointer (redesign decision 8).
 - `featured`/`main_genre` flag + subtree-count browse ranking (redesign decision 6).
+- **Genre alias: match-not-rewrite** (settled design, not built — full spec in the
+  `project-alias-match-not-rewrite` memory note). Stop the *semantic* rewrite at
+  ingest (`Genre.canonicalize_names` no longer substitutes an alias's canonical, so
+  an event keeps its raw token e.g. `Elektronik`); resolve the alias at *query
+  time* instead, so the genre filter for `Electronic` still matches + highlights it
+  via a `canonical_id` link. Keeps source data intact (the Eventfrog §17(5) win) and
+  dedupes the two subtree-expansion copies. Cosmetic fingerprint/display
+  normalization stays. NB: this does **not** affect the scrape over-count above —
+  that was the cosmetic branch, already fixed.
 
 ## Out of scope (not "incomplete")
 

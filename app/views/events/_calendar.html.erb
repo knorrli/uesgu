@@ -25,11 +25,14 @@
       <% end %>
       <% if day_events.any? && show_saved_markers %>
         <% saved_count = day_events.count { |event| event_saved?(event) } %>
-        <%# Saved-show marker, top-right: a raspberry HEART when you've bookmarked a
-            show that day (the cell's relevance signal). %>
-        <% if saved_count.positive? %>
+        <%# Cell relevance markers, top-right: a raspberry HEART when you've saved a
+            show that day, and a quieter amber DOT when a show matches one of your
+            saved filters (interest). Heart leads (strong, rare); the dot follows. %>
+        <% interest = day_events.any? { |event| interest_event?(event) } %>
+        <% if saved_count.positive? || interest %>
           <div class="day-markers" aria-hidden="true">
-            <span class="day-saved-marker"><% if saved_count > 1 %><span class="day-saved-count"><%= saved_count %></span><% end %></span>
+            <% if saved_count.positive? %><span class="day-saved-marker"><% if saved_count > 1 %><span class="day-saved-count"><%= saved_count %></span><% end %></span><% end %>
+            <% if interest %><span class="day-interest-marker"></span><% end %>
           </div>
         <% end %>
       <% end %>

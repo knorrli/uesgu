@@ -9,6 +9,10 @@ body {
   --color-accent: #0e7a4a;
   --color-warn: var(--color-red);
   --color-saved: var(--color-raspberry);
+  /* Interest = a show matches one of your saved filters. Its OWN channel (amber),
+     distinct from green (interaction) and raspberry (saved), so a passive
+     "this matches you" hint never reads as a link or a saved bookmark. */
+  --color-interest: var(--color-amber);
 
   --border-width: 2px;
   --tag-border-width: 1px;
@@ -30,6 +34,7 @@ body {
   --theme-accent-color: var(--color-accent);
   --theme-warn-color: var(--color-warn);
   --theme-saved-color: var(--color-saved);
+  --theme-interest-color: var(--color-interest);
   /* Text/glyphs painted ON the accent fill (primary buttons, badges, the today
      badge, checked-box ticks, chips). The on-accent colour matches the page
      background — the "punched out" look — and stays legible in both themes
@@ -75,6 +80,8 @@ html[data-theme="dark"] body {
   --color-accent: #38c08a;
   --color-warn: #f0837a;
   --color-saved: #ec6f98;
+  /* A lighter gold on the dark plum — #d9930a reads muddy there. */
+  --color-interest: #e6b04a;
 
   /* On the brighter dark-theme green, the dark plum ground reads far better than
      white (which glares). */

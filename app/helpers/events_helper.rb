@@ -137,6 +137,46 @@ module EventsHelper
     saved_event_ids.include?(event.id)
   end
 
+  # ── Interest highlighting (derived from saved filters) ─────────────────────
+  # "Could interest me" = matches one of my saved filters, date window ignored.
+  # Built once per request; see InterestProfile.
+  def interest_profile
+    @interest_profile ||= InterestProfile.for(current_user)
+  end
+
+  def interest_event?(event)
+    interest_profile.interesting?(event)
+  end
+
+  # A genre worth flagging as "why this interests me": it explains a match AND
+  # isn't already an applied (green) filter term — so amber never doubles green.
+  def interest_why_genre?(event, genre)
+    return false unless interest_profile.any?
+    return false if applied_filter_term?('g', genre.name)
+
+    interest_profile.why_genres(event).include?(genre)
+  end
+
+  # The location names across a venue group that explain an interest match and
+  # aren't already applied — a Set the venue header checks per token (venue + meta).
+  def interest_location_names(events)
+    return Set.new unless interest_profile.any?
+
+    Array(events)
+      .flat_map { |event| interest_profile.why_locations(event) }
+      .map(&:name)
+      .reject { |name| applied_filter_term?('l', name) }
+      .to_set
+  end
+
+  # Mirrors the "is this tag in your applied filter" test in event_filter_tag: a
+  # genre lights from a g[] subtree or a q[] CONTAINS, a location matches exactly.
+  def applied_filter_term?(param, value)
+    applied = request.query_parameters.except('page')
+    matchers = param == 'g' ? { 'g' => 'g', 'q' => 'q' } : { param => param }
+    matchers.any? { |applied_param, rule| filter_terms_matching(Array(applied[applied_param]), value, param: rule).present? }
+  end
+
   # The saved-show heart toggle on an event. Logged-in only; optimistic via the
   # `save` Stimulus controller (one self-contained controller per button, no cross-sync).
   def event_save_button(event)

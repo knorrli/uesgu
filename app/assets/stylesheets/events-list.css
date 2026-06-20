@@ -462,3 +462,56 @@
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
 }
+
+/* ── Interest highlighting (derived from saved filters; see InterestProfile) ──
+   A row matching one of your saved filters gets a quiet AMBER gutter rule (the
+   scan signal — run your eye down the left edge) plus a small flag marking WHICH
+   genre / venue matched (the "why"). Amber is its own channel — never green
+   (interaction) or raspberry (saved). The flag is suppressed on a token that's
+   already an applied filter (green), so amber and green never stack. */
+.event.is-interest {
+  position: relative;
+}
+
+/* The rule sits flush at the content column's left edge (negative the page
+   padding), so it reads as a scan column without indenting the row. Absolute ⇒
+   not a flex item, so the row's own layout is untouched. */
+.event.is-interest::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--content-padding));
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  background: var(--theme-interest-color);
+}
+
+/* The flag marker: amber, decorative. */
+.interest-flag {
+  display: inline-flex;
+  align-items: center;
+  color: var(--theme-interest-color);
+  line-height: 1;
+}
+
+.interest-flag .ph {
+  font-size: 0.85em;
+}
+
+/* On a genre pill it's a bordered segment butted onto the pill's left edge —
+   mirrors the admin edit-gear addon (shared border, no double edge). The parent
+   .event-genre is align-items:stretch, so the segment matches the pill height. */
+.event-genre .interest-flag {
+  padding: 0 5px;
+  border: var(--tag-border-width) solid var(--border-color);
+  border-right: 0;
+}
+
+/* On the venue / city-canton (text, not a chip) it's a bare leading glyph,
+   centred to the line. */
+.event-where .interest-flag,
+.event-where-meta .interest-flag {
+  margin-right: 0.3ch;
+  vertical-align: middle;
+  font-size: 0.72em;
+}

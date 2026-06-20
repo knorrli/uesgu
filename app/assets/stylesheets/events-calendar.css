@@ -183,6 +183,16 @@
     font-weight: bold;
   }
 
+  /* A show matching one of your saved filters plays this day: a small AMBER dot,
+     beside (and quieter than) the saved heart. Binary — it only says "something
+     here", no count. Amber ties it to the list's interest flags. */
+  .day-interest-marker {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--theme-interest-color);
+  }
+
   /* Inline expanding row: the day-detail frame rendered full-width beneath the
      week of the clicked day. The lighter page background (vs. the muted cells)
      plus bold accent rules top and bottom frame it as a distinct drawer lifted

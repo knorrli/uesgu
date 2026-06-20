@@ -1,6 +1,9 @@
 <% interactive = local_assigns.fetch(:interactive, true) %>
 <% rescheduled = event.rescheduled? && !event.cancelled? %>
-<article id="<%= dom_id event %>" class="<%= class_names(:event, past: event.start_date < Date.current.beginning_of_day, cancelled: event.cancelled?, rescheduled: rescheduled) %>">
+<%# Interest = this show matches one of your saved filters (date window ignored).
+    Only on the live filterable list (interactive), never the admin preview. %>
+<% interest = interactive && interest_event?(event) %>
+<article id="<%= dom_id event %>" class="<%= class_names(:event, past: event.start_date < Date.current.beginning_of_day, cancelled: event.cancelled?, rescheduled: rescheduled, 'is-interest': interest) %>">
   <div class="event-body">
 
     <h3 class="event-title">
@@ -24,7 +27,7 @@
           <%# Tag + (admin) edit gear are one unit so the gear rides flush against
               its own tag — the row's wrap-gap falls between genre units, not between
               a tag and its gear. %>
-          <span class="event-genre"><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
+          <span class="event-genre"><% if interest && interest_why_genre?(event, genre) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
         <% end %>
       </div>
     <% end %>

@@ -1103,9 +1103,12 @@
   font-weight: bold;
 }
 
+/* Fixed one-line height (not min-height) so the row reserves the exact same space
+   empty or filled — the panel never grows when a range's summary appears. */
 .range-cal__summary {
   margin-top: var(--gap-small);
-  min-height: 1.2em;
+  height: 1.25rem;
+  line-height: 1.25rem;
   text-align: center;
   font-size: var(--font-size-small);
   color: var(--theme-fg-muted);
@@ -1116,26 +1119,38 @@
    scroll fold. Mobile keeps the simple vertical stack. */
 @media (min-width: 600px) {
   /* The calendar is taller than the other sheets' content, so lift the When
-     panel's height cap (base .sheet is 26rem) to fit all 8 presets + the full
-     month without an internal scrollbar. */
-  .filter-sheets .sheet[data-field="when"] { max-height: 32rem; }
+     panel's height cap (base .sheet is 26rem) enough that the body — which only
+     gets the panel height minus the ~6rem header+footer — fits all 8 presets and
+     the full month (at the 22rem calendar width below) with no internal scrollbar. */
+  .filter-sheets .sheet[data-field="when"] { max-height: 34rem; }
 
+  /* Center the presets + calendar as one compact cluster so it reads as a
+     deliberate panel rather than two boxes stranded at the left edge of a wide
+     dropdown. align-items: stretch runs the divider the full column height. */
+  /* Presets stay pinned to the panel's left edge; the calendar is centered in the
+     space that's left, so it reads as deliberate instead of left-stranded in a
+     wide dropdown. */
   .when-body {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: stretch;
     gap: var(--gap-large);
   }
 
   .when-presets {
-    flex: 0 0 auto;
-    align-self: stretch;
+    flex: 0 0 auto;          /* size to the widest label — never wrap */
     padding-block: var(--gap-small);
+    white-space: nowrap;
     border-right: var(--border-width) solid var(--rule-color);
   }
 
-  .when-custom { flex: 0 1 auto; }
-  .when-custom .range-cal { margin-top: 0; }
+  .when-custom {
+    flex: 1 1 auto;          /* take the rest of the panel… */
+    display: flex;
+    justify-content: center; /* …and center the calendar within it */
+  }
+  /* A touch larger than the mobile 20rem so it holds the centre of the panel. */
+  .when-custom .range-cal { margin-top: 0; max-width: 22rem; }
 }
 
 /* "Save this show" toggle in the event-actions cluster — the HEART now (the rare,

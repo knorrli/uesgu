@@ -97,4 +97,29 @@ namespace :taxonomy do
            'tree is single-parent) — resolve in db/genres.yml.'
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # Phase 5 — prod taxonomy reset (run once in the Render shell after deploy).
+  #
+  # Wipe the genre MODEL rows (the tree + dispositions) and rebuild them from the
+  # cultivated seed, then re-derive every event's visibility. Event genre TAGGINGS
+  # are AATO taggings, NOT touched — events keep their genre tags; only the curated
+  # taxonomy (parents, hide/block/ignore, aliases) is reloaded. Blocked genres in
+  # the seed re-strip their junk taggings on load (GenreTreeSeed#apply_dispositions),
+  # so this also re-applies the curation cleanup. Idempotent — safe to re-run.
+  #
+  # Sequence: deploy (migrations run) → `bin/rails taxonomy:reset` in the Render
+  # shell → re-scrape (or wait for the daily cron) so any scraped genres not in the
+  # seed arrive as unplaced rows in the admin queue.
+  # ---------------------------------------------------------------------------
+  desc 'Reset the genre taxonomy: wipe the tree rows, reload db/genres.yml, and ' \
+       'recompute every event\'s visibility. Run once in prod after deploy.'
+  task reset: :environment do
+    removed = Genre.count
+    Genre.delete_all
+    Rake::Task['taxonomy:import_tree'].execute
+    Event.find_each(&:recompute_visibility!)
+    puts "taxonomy:reset — cleared #{removed} genre rows, reloaded the tree, " \
+         "recomputed visibility for #{Event.count} events."
+  end
 end

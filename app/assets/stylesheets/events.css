@@ -1012,7 +1012,9 @@
   background-color: var(--hw-active-bg-color);
 }
 
-/* ── Custom date range ── two native (OS) date pickers → one range. */
+/* ── Custom date range ── a self-contained month calendar (range_calendar
+   controller) that writes "start - end" into a hidden d[] checkbox. Identical on
+   the mobile sheet and the desktop panel; green = selection, sand pill = today. */
 .opt--custom {
   flex-direction: column;
   align-items: stretch;
@@ -1020,24 +1022,121 @@
   cursor: default;
 }
 
-.custom-range {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-medium);
+.range-cal {
+  width: 100%;
+  max-width: 20rem;
+  margin: var(--gap-small) auto 0;
 }
 
-.custom-range__input {
-  flex: 1;
-  min-width: 0;
-  padding: var(--gap-small) 0;
+.range-cal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-small);
+  margin-bottom: var(--gap-small);
+}
+
+.range-cal__month { font-weight: bold; }
+
+.range-cal__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   border: 0;
-  border-bottom: var(--border-width) solid var(--field-border-color);
+  background: none;
+  color: var(--theme-fg-color);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.range-cal__nav:hover { background: var(--theme-bg-muted); }
+
+.range-cal__weekdays,
+.range-cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.range-cal__weekday {
+  padding: var(--gap-xsmall) 0;
+  text-align: center;
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
+}
+
+.range-cal__day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: 0;
   background: none;
   color: inherit;
   font: inherit;
+  cursor: pointer;
 }
 
-.custom-range__sep { color: var(--theme-fg-muted); }
+.range-cal__day:hover { background: var(--theme-bg-muted); }
+
+.range-cal__day:focus-visible {
+  outline: var(--border-width) solid var(--theme-accent-color);
+  outline-offset: -2px;
+}
+
+.range-cal__day.is-other-month { color: var(--theme-fg-muted); opacity: 0.5; }
+
+/* today: the same sand pill the events calendar uses (green is reserved for the
+   selection below, which overrides this when today is the picked day). */
+.range-cal__day.is-today { background: var(--theme-bg-emphasis); }
+
+.range-cal__day.is-in-range {
+  background: color-mix(in srgb, var(--theme-accent-color) 16%, transparent);
+}
+
+.range-cal__day.is-start,
+.range-cal__day.is-end {
+  background: var(--theme-accent-color);
+  color: var(--theme-on-accent);
+  font-weight: bold;
+}
+
+.range-cal__summary {
+  margin-top: var(--gap-small);
+  min-height: 1.2em;
+  text-align: center;
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
+}
+
+/* Desktop: split the When body into presets (left) + calendar (right) so the
+   calendar is visible at rest, not stranded below 8 preset rows in the panel's
+   scroll fold. Mobile keeps the simple vertical stack. */
+@media (min-width: 600px) {
+  /* The calendar is taller than the other sheets' content, so lift the When
+     panel's height cap (base .sheet is 26rem) to fit all 8 presets + the full
+     month without an internal scrollbar. */
+  .filter-sheets .sheet[data-field="when"] { max-height: 32rem; }
+
+  .when-body {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: var(--gap-large);
+  }
+
+  .when-presets {
+    flex: 0 0 auto;
+    align-self: stretch;
+    padding-block: var(--gap-small);
+    border-right: var(--border-width) solid var(--rule-color);
+  }
+
+  .when-custom { flex: 0 1 auto; }
+  .when-custom .range-cal { margin-top: 0; }
+}
 
 /* "Save this show" toggle in the event-actions cluster — the HEART now (the rare,
    powerful signal). A faint outline at rest, a SOLID fill when saved (fill =

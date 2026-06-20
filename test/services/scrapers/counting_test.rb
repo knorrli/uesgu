@@ -143,6 +143,44 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     refute event.reload.discarded?
   end
 
+  test 'an identical re-scrape with overlapping discovery + consumption genres stays unchanged' do
+    # Guards a plausible over-count source: build_event assigns
+    # Array(discovery) + existing_only(consumption), which carries a DUPLICATE when
+    # the two sources share a genre ("Ggg" + "Ggg"). acts-as-taggable-on dedupes on
+    # assignment, and tag_snapshot sorts, so the freshly-built list still compares
+    # equal to the persisted one — a no-op re-scrape stays unchanged, not updated.
+    url = 'https://fixture.test/genre-overlap'
+    rows = [{ url: url, genres: ['Ggg'], consumption_genres: ['Ggg'] }]
+    CountingScraperHarness.next_rows = rows
+    CountingScraperHarness.new.call
+    assert_equal ['Ggg'], Event.find_by(url: url).genre_list
+
+    # Same data again: the dedup means nothing actually changes → unchanged, not updated.
+    CountingScraperHarness.next_rows = rows
+    again = CountingScraperHarness.new.call
+    assert_equal 0, again.updated, 'a no-op re-scrape must not count as updated'
+    assert_equal 1, again.unchanged
+  end
+
+  test 'a reschedule marker in the title sets rescheduled_at, and clears when the marker goes' do
+    url = 'https://fixture.test/moved'
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Verschoben: The Band' }]
+    CountingScraperHarness.new.call
+    event = Event.find_by(url: url)
+    assert event.rescheduled?, 'a "Verschoben" title should flag the event as rescheduled'
+    first_at = event.rescheduled_at
+
+    # Marker still present on re-scrape → flag stays, original timestamp preserved.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Verschoben: The Band' }]
+    CountingScraperHarness.new.call
+    assert_equal first_at, event.reload.rescheduled_at
+
+    # Venue fixed the title (marker gone) → flag clears, re-derived from source.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'The Band' }]
+    CountingScraperHarness.new.call
+    refute event.reload.rescheduled?
+  end
+
   test 'a re-scrape leaves an admin-pinned genre list alone' do
     url = 'https://fixture.test/pinned-genres'
     CountingScraperHarness.next_rows = [{ url: url, title: 'Show', genres: ['Aaa'] }]

@@ -30,6 +30,11 @@ class CountingScraperHarness < Scrapers::Agent
   # Discovery genres straight from the row, so a test can prove an admin-pinned
   # genre list survives a re-scrape (Event#overridden?(:genres)).
   def event_genres(content) = content[:genres]
+
+  # Consumption genres (the unstable free-text source, filtered match-only against
+  # existing rows by build_event). Lets a test exercise the discovery+consumption
+  # overlap that used to make a no-op re-scrape look "updated" every sweep.
+  def event_consumption_genres(content) = content[:consumption_genres]
 end
 
 Scrapers::All.scrapers.delete('CountingScraperHarness')

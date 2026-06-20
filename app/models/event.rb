@@ -37,6 +37,7 @@ class Event < ApplicationRecord
   scope :canonical, -> { where(canonical_event_id: nil) }
   scope :discarded, -> { kept.where.not(discarded_by_rule_id: nil) }
   scope :cancelled, -> { where.not(cancelled_at: nil) }
+  scope :rescheduled, -> { where.not(rescheduled_at: nil) }
 
   # Dismiss is a sticky, admin-driven soft-delete: a dismissed event drops out of
   # every public listing AND is never resurrected by a re-scrape (the scraper
@@ -49,6 +50,13 @@ class Event < ApplicationRecord
   # follower sees the show was called off. Derived from the source each scrape.
   def cancelled?
     cancelled_at.present?
+  end
+
+  # Rescheduled events keep their (new) date and stay listed with a marker, so a
+  # follower sees the date moved. Derived from the source each scrape, like
+  # cancellation. A cancelled show takes precedence in the UI (it's off entirely).
+  def rescheduled?
+    rescheduled_at.present?
   end
 
   def dismissed?

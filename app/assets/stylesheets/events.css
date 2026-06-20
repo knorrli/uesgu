@@ -336,6 +336,18 @@
   color: var(--theme-warn-color);
 }
 
+/* Rescheduled events stay listed at their NEW date with an informational badge —
+   no strikethrough, the show is still on. A sand emphasis pill rather than the
+   cancellation's warn-red, so "date moved" reads as a heads-up, not a call-off. */
+.event-rescheduled {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: var(--font-size-small);
+  padding: 0 0.4em;
+  background: var(--theme-bg-emphasis);
+  color: var(--theme-fg-color);
+}
+
 /* Toolbar row above the programme: the favorites/notify shortcuts and the empty
    message on the left, the view switcher on the right. Allow it to wrap so a
    visible "Meine Favoriten" shortcut (plus the view switcher) doesn't overflow on

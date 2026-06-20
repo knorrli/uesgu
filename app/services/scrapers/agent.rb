@@ -119,6 +119,7 @@ module Scrapers
             @created_ids << event.id
           elsif changed
             @updated += 1
+            log_event_update(event, tags_before)
           else
             @unchanged += 1
           end
@@ -132,6 +133,22 @@ module Scrapers
     # per-venue constant so they never change and aren't worth the extra load.
     def tag_snapshot(event)
       { genres: event.genre_list.sort }
+    end
+
+    # Diagnostic for the "some scrapers report updates every sweep" problem: when an
+    # event counts as updated, name the field(s) that actually changed. A scraper
+    # whose extractor yields an unstable value (whitespace, timezone, ordering, a
+    # volatile "N tickets left" subtitle) then shows the SAME column changing on
+    # every run in the log — turning a mystery into a one-line grep — instead of
+    # us guessing offline. saved_changes covers scalar columns; the genre snapshot
+    # covers tag changes (filed under "genres", and the virtual *_list mutations are
+    # dropped so they don't double-report). Logged at info, matching the existing
+    # per-event "Processing event URL" line.
+    def log_event_update(event, tags_before)
+      fields = event.saved_changes.keys - %w[created_at updated_at genre_list location_list]
+      fields << 'genres' if tags_before && tag_snapshot(event) != tags_before
+      detail = fields.join(', ').presence || 'nothing persisted (transient pre-save dirty — investigate)'
+      Rails.logger.info "Updated #{event.url} — changed: #{detail}"
     end
 
     # Assign every field from the event's content node. `event_content` is the row
@@ -169,6 +186,7 @@ module Scrapers
       event.data_source   = self.class.source_key
       postprocess(event)
       mark_cancellation(event, content)
+      mark_reschedule(event, content)
       mark_discarded(event)
     end
 
@@ -207,6 +225,37 @@ module Scrapers
       event.cancelled_at =
         if event_cancelled?(event, content)
           event.cancelled_at || Time.current
+        end
+    end
+
+    # Reschedule markers — a show that MOVED but keeps a (new) date, the exact
+    # counterpart to CANCELLATION_MARKER (which deliberately excludes these). The
+    # same German / French / Italian / English coverage, letter-bounded
+    # (Unicode-aware) so accents work and we don't match inside unrelated words;
+    # the "new date" phrases allow flexible whitespace. Keyword-only by design —
+    # a silent date move (no wording) is intentionally NOT flagged here, to avoid
+    # false positives from minor time tweaks / parse noise (see the redesign notes).
+    RESCHEDULE_MARKER = /
+      (?<![[:alpha:]])
+      (?:
+          verschoben | verlegt
+        | neue[rs]?\s+(?:termin|datum)
+        | report(?:ées|és|ée|é)
+        | nouvelle\s+date
+        | rinviat[oa] | posticipat[oa]
+        | postponed | rescheduled
+        | new\s+date
+      )
+      (?![[:alpha:]])
+    /xi
+
+    # Derive the reschedule flag from the source, exactly like mark_cancellation:
+    # set it while a reschedule marker is present in the title/subtitle, clear it
+    # once gone, and preserve the original timestamp across re-scrapes.
+    def mark_reschedule(event, content)
+      event.rescheduled_at =
+        if event_rescheduled?(event, content)
+          event.rescheduled_at || Time.current
         end
     end
 
@@ -263,6 +312,14 @@ module Scrapers
     # to read it precisely from `content`.
     def event_cancelled?(event, _content)
       CANCELLATION_MARKER.match?([event.title, event.subtitle].compact.join("\n"))
+    end
+
+    # Whether the event reads as rescheduled — a reschedule marker in the
+    # venue-extracted title/subtitle ("Verschoben", "neues Datum", "new date", …).
+    # Same shape as event_cancelled?; a venue with a dedicated status element can
+    # override this to read it precisely from `content`.
+    def event_rescheduled?(event, _content)
+      RESCHEDULE_MARKER.match?([event.title, event.subtitle].compact.join("\n"))
     end
 
     # Log and skip a single event that failed to parse or save, so one bad

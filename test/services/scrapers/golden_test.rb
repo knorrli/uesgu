@@ -28,8 +28,10 @@ class Scrapers::GoldenTest < Minitest::Test
   # Stand-in for an Event that records field assignments instead of persisting.
   class Capture
     FIELDS = %i[start_time start_date title subtitle genre_list location_list cancelled_at].freeze
-    # :data_source / :hidden are set by build_event but aren't part of the golden output.
-    attr_accessor(*FIELDS, :hidden, :data_source)
+    # :data_source / :hidden / :rescheduled_at are set by build_event but aren't part
+    # of the golden output (rescheduled_at is keyword-derived like cancelled_at, but
+    # left out of the golden so existing baselines don't need regenerating).
+    attr_accessor(*FIELDS, :hidden, :data_source, :rescheduled_at)
     attr_reader :url
 
     def initialize(url) = @url = url

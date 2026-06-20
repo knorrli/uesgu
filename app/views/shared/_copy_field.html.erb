@@ -6,9 +6,11 @@
 
   Locals:
     value:   — the text shown and copied (required)
-    label:   — optional field-label rendered above the field
-    actions: — optional extra buttons (captured markup) rendered in the same row
-               as Copy, so caller actions (e.g. regenerate/remove) read as one group
+    label:        — optional field-label rendered above the field
+    lead_actions: — optional buttons (captured markup) rendered BEFORE Copy, for a
+                    caller's primary action (e.g. the calendar Subscribe button)
+    actions:      — optional extra buttons (captured markup) rendered AFTER Copy, so
+                    caller actions (e.g. regenerate/remove) read as one group
 %>
 <div class="copy-field" data-controller="clipboard"
      data-clipboard-copied-value="<%= t('copy_field.copied') %>">
@@ -19,6 +21,7 @@
          data-clipboard-target="source" data-action="focus->clipboard#select"
          value="<%= value %>">
   <div class="copy-field__actions">
+    <%= local_assigns[:lead_actions] %>
     <button type="button" class="copy-field__button"
             data-clipboard-target="button" data-action="clipboard#copy">
       <%= t('copy_field.copy') %>

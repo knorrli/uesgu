@@ -325,13 +325,13 @@
       <div class="sg-specimen">
         <span class="account-form" style="display:flex; flex-direction:column; gap:var(--gap-small);">
           <span class="field-label">Field label</span>
-          <input type="text" placeholder="value / input" aria-label="Field">
           <span class="muted">A short hint — muted and smaller.</span>
+          <input type="text" placeholder="value / input" aria-label="Field">
         </span>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Field label / value / hint</span> · <code>.field-label</code> + <code>.muted</code>
-        <p class="sg-purpose">One typographic ladder per form field: a <b>bold</b> <code>.field-label</code> (a <code>&lt;span&gt;</code> over a value/select, or a fieldset <code>&lt;legend&gt;</code>), the normal-weight value/input below it, then a muted, smaller <code>.muted</code> hint. The section <code>h2</code> is larger so it stays the heading. Every label in a section uses this one style — don't let them drift into mixed weights (bold legend vs muted span vs plain span).</p>
+        <p class="sg-purpose">One typographic ladder per form field, in reading order: a <b>bold</b> <code>.field-label</code> (a <code>&lt;span&gt;</code> over a value/select, or a fieldset <code>&lt;legend&gt;</code>), then a muted, smaller <code>.muted</code> hint, then the normal-weight value/input — so the hint is read <em>before</em> you fill the field, not after. The section <code>h2</code> is larger so it stays the heading. Every label in a section uses this one style — don't let them drift into mixed weights (bold legend vs muted span vs plain span).</p>
       </div>
     </div>
 

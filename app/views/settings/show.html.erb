@@ -37,17 +37,18 @@
 
       <fieldset class="settings-field flex flex-col gap-small">
         <legend><%= t('settings.email_heading') %></legend>
-        <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
-        <%# One muted line below the field: optional + why + the third-party
-            disclosure (the address goes to resend.com). Inline at the entry point. %>
+        <%# Hint sits between the label and the field so reading order is
+            label → hint → input (the optional + why + third-party disclosure that
+            the address goes to resend.com — read before you type, not after). %>
         <p class="muted"><%= t('settings.email_hint') %></p>
+        <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
       </fieldset>
 
       <fieldset class="settings-field flex flex-col gap-small">
         <legend><%= t('settings.password_heading') %></legend>
+        <p class="muted"><%= t('settings.password_hint') %></p>
         <%= form.password_field :password, autocomplete: "new-password", placeholder: t('settings.new_password'), maxlength: 72 %>
         <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: t('settings.confirm_new_password'), maxlength: 72 %>
-        <p class="muted"><%= t('settings.password_hint') %></p>
       </fieldset>
 
       <%# Saved-show reminders moved to the saved-shows page — they're a property of
@@ -72,11 +73,12 @@
            data-push-vapid-public-key-value="<%= WebPushConfig.public_key %>"
            data-push-label-on-value="<%= t('settings.push_disable') %>"
            data-push-label-off-value="<%= t('settings.push_enable') %>"
-           data-push-status-on-value="<%= t('settings.push_status_on') %>"
-           data-push-status-off-value="<%= t('settings.push_status_off') %>"
            data-push-status-denied-value="<%= t('settings.push_status_denied') %>">
         <p class="muted"><%= t('settings.push_hint') %></p>
-        <p class="muted" data-push-target="status"><%= t('settings.push_status_off') %></p>
+        <%# On/off state is already obvious from the button label, so the status
+            line shows ONLY when permission is denied (the one state the button —
+            disabled, still reading "activate" — can't explain). Hidden otherwise. %>
+        <p class="muted" hidden data-push-target="status"></p>
         <div class="settings-actions">
           <button type="button" data-push-target="button" data-action="push#toggle">
             <%= t('settings.push_enable') %>
@@ -102,17 +104,30 @@
     <h2><%= t('settings.calendar_feed_heading') %></h2>
 
     <% if @user.calendar_feed_token.present? %>
+      <% feed_url = public_calendar_feed_url(@user.calendar_feed_token, format: :ics, **share_url_options) %>
+      <%# webcal:// hands the same feed straight to the OS default calendar app
+          (Apple Calendar, Outlook, Thunderbird …) on one tap — no copy/paste. The
+          scheme just swaps in front of the existing http(s) URL. Google Calendar on
+          the web doesn't register webcal://, so the copy field below stays as the
+          paste-the-URL fallback. %>
+      <% webcal_url = feed_url.sub(/\Ahttps?/, 'webcal') %>
       <div class="flex flex-col gap-small">
         <p class="muted"><%= t('settings.calendar_feed_hint_on') %></p>
+        <%# Subscribe (primary) leads the action row; Copy + regenerate/remove follow,
+            so all four read as one group on a single line. %>
+        <% subscribe_action = capture do %>
+          <%= link_to t('calendar_feed.subscribe'), webcal_url, class: 'button primary' %>
+        <% end %>
+        <%# Deactivate revokes the link (the feed 404s). To rotate a leaked link,
+            deactivate then create a new one — create always mints a fresh token. %>
         <% feed_actions = capture do %>
-          <%= button_to t('calendar_feed.regenerate'), calendar_feed_path, method: :post,
-                data: { turbo_confirm: t('calendar_feed.regenerate_confirm') } %>
           <%= button_to t('calendar_feed.remove'), calendar_feed_path, method: :delete, class: "delete",
                 data: { turbo_confirm: t('calendar_feed.remove_confirm') } %>
         <% end %>
         <%= render "shared/copy_field",
               label: t('settings.calendar_feed_url_label'),
-              value: public_calendar_feed_url(@user.calendar_feed_token, format: :ics, **share_url_options),
+              value: feed_url,
+              lead_actions: subscribe_action,
               actions: feed_actions %>
       </div>
     <% else %>
@@ -126,7 +141,7 @@
   <%# ── Delete account ──────────────────────────────────────────────────── %>
   <section class="settings-section">
     <h2><%= t('settings.delete_account_heading') %></h2>
-    <p><%= t('settings.delete_account_hint') %></p>
+    <p class="muted"><%= t('settings.delete_account_hint') %></p>
     <%= button_to t('settings.delete_account'), registration_path, method: :delete, class: "button delete",
           data: { turbo_confirm: t('settings.delete_account_confirm') } %>
   </section>

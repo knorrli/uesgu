@@ -14,10 +14,11 @@
     <div class="flex flex-col gap-small">
       <label class="flex flex-col gap-small">
         <span class="field-label"><%= t('auth.invite_label') %></span>
+        <%# Hint between label and input → reading order label → hint → input. %>
+        <span class="muted"><%= t('auth.invite_hint') %></span>
         <%= text_field_tag :invitation_code, @invite_code, required: true, autocomplete: "off",
               autocapitalize: "characters", spellcheck: false %>
       </label>
-      <p class="muted"><%= t('auth.invite_hint') %></p>
     </div>
 
     <label class="flex flex-col gap-small">

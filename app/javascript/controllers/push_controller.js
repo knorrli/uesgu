@@ -13,8 +13,6 @@ export default class extends Controller {
     vapidPublicKey: String,
     labelOn: String,
     labelOff: String,
-    statusOn: String,
-    statusOff: String,
     statusDenied: String
   }
 
@@ -94,8 +92,11 @@ export default class extends Controller {
     const denied = Notification.permission === "denied"
     const state = denied ? "denied" : subscription ? "on" : "off"
 
-    this.statusTarget.textContent =
-      state === "denied" ? this.statusDeniedValue : state === "on" ? this.statusOnValue : this.statusOffValue
+    // On/off is already legible in the button label, so only surface a status line
+    // for "denied" — the one state the button (disabled, still reading "activate")
+    // can't explain on its own.
+    this.statusTarget.hidden = !denied
+    if (denied) this.statusTarget.textContent = this.statusDeniedValue
     this.buttonTarget.textContent = subscription ? this.labelOnValue : this.labelOffValue
     this.buttonTarget.dataset.state = state
     this.buttonTarget.disabled = denied

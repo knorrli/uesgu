@@ -7,12 +7,12 @@
 
   <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>
     <div class="flex gap-medium wrap align-baseline">
-      <h1><%= t('.title') %></h1>
+      <h1><%= t('admin.scrape_runs.index.title') %></h1>
       <% if @presenter.in_progress? %>
-        <span class="muted"><%= t('.in_progress') %></span>
+        <span class="muted"><%= t('admin.scrape_runs.index.in_progress') %></span>
       <% else %>
-        <%= button_to t('.trigger'), admin_scrape_runs_path, class: 'button-small',
-              data: { turbo_confirm: t('.trigger_confirm') } %>
+        <%= button_to t('admin.scrape_runs.index.trigger'), admin_scrape_runs_path, class: 'button-small',
+              data: { turbo_confirm: t('admin.scrape_runs.index.trigger_confirm') } %>
       <% end %>
     </div>
   <% end %>

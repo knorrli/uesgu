@@ -1,7 +1,7 @@
 <% content_for :title, t('.title') %>
 <div class="flex flex-col gap-large">
   <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>
-    <h1><%= t('.title') %> <span class="muted"><%= @users.total_count %></span></h1>
+    <h1><%= t('admin.users.index.title') %> <span class="muted"><%= @users.total_count %></span></h1>
   <% end %>
 
   <% if @users.any? %>

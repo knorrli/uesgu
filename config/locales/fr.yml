@@ -106,12 +106,11 @@ fr:
     name: üsgu — à voir
     cancelled_prefix: "Annulé : %{title}"
     create: Créer le lien calendrier
-    regenerate: Nouveau lien
-    regenerate_confirm: Remplacer le lien ? Ton app calendrier aura besoin du nouveau.
-    remove: Supprimer le lien
-    remove_confirm: "Supprimer le lien calendrier ? Ton calendrier cessera de se mettre à jour. Pour le retirer complètement, supprime-le aussi dans ton app calendrier."
+    subscribe: S'abonner au calendrier
+    remove: Désactiver le calendrier
+    remove_confirm: "Désactiver le calendrier ? Ton app calendrier cessera de se mettre à jour. Pour le retirer complètement, supprime aussi l'abonnement là-bas."
     created: Lien calendrier prêt.
-    removed: Lien calendrier supprimé.
+    removed: Calendrier désactivé.
   event_reminder:
     title:
       one: 1 événement enregistré arrive
@@ -121,7 +120,6 @@ fr:
       other: "%{count} événements enregistrés arrivent"
   saved_filters:
     title: Filtres enregistrés
-    intro: Tes filtres enregistrés. Applique-en un pour le parcourir, ou modifie-le pour changer comment et quand tu es averti·e.
     your_rules: Tes filtres
     empty: Aucun filtre — crée ton premier ci-dessous.
     add_rule: Ajouter une règle
@@ -151,10 +149,8 @@ fr:
       duplicate: Tu as déjà un filtre enregistré pour ça.
     new:
       title: Enregistrer un filtre
-      intro: Choisis ce qui correspond, puis si et comment tu es prévenu.
     edit:
       title: Modifier le filtre enregistré
-      intro: Ce qui correspond, et si et comment tu es prévenu.
       back: ← Tous les filtres
     email_unavailable: ajoute une adresse e-mail dans les réglages
     push_unavailable: active le push dans les réglages
@@ -162,7 +158,6 @@ fr:
     section_notifications: Notifications
     section_when: Quand
     schedule_label: À quelle fréquence
-    channels_hint: Désactive l'app pour un filtre silencieux. Push et e-mail en ont besoin.
     cadences:
       daily: Quotidien
       weekly: Hebdomadaire
@@ -206,7 +201,8 @@ fr:
       cadence: Fréquence
       weekday: Jour de la semaine
       monthday: Jour du mois
-      time: Heure
+      time_hour: Heure
+      time_minute: Minute
       content_type: Type
       window: Période
       scope: Filtre
@@ -245,7 +241,7 @@ fr:
     saved: Paramètres enregistrés.
     account_heading: Compte
     push_test: Envoyer un test
-    notifications_heading: Notifications
+    notifications_heading: Notifications push
     frequency_label: À quelle fréquence veux-tu être informé des nouveaux événements ?
     language_heading: Langue
     language_auto: Automatique (navigateur)
@@ -261,18 +257,16 @@ fr:
     new_password: Nouveau mot de passe
     confirm_new_password: Confirmer le nouveau mot de passe
     save: Enregistrer
-    push_hint: On te notifie ici dès que de nouveaux événements correspondent à tes intérêts.
+    push_hint: Active le push pour cet appareil, pour que tes alertes te parviennent même quand l'app est fermée.
     push_enable: Activer sur cet appareil
     push_disable: Désactiver sur cet appareil
-    push_status_on: Activé sur cet appareil.
-    push_status_off: Désactivé sur cet appareil.
     push_status_denied: Ton navigateur bloque les notifications. Autorise-les dans les paramètres du navigateur pour les activer.
     push_unsupported: Ce navigateur ne prend pas en charge les notifications push.
     push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoute d'abord üsgu à ton écran d'accueil.
     signout_button: Se déconnecter
     calendar_feed_heading: Calendrier
     calendar_feed_hint_off: Retrouve tes événements enregistrés dans n'importe quelle app calendrier — crée un lien privé pour commencer.
-    calendar_feed_hint_on: Ajoute ce lien dans ton app calendrier (Google Agenda, Apple Calendrier…). Il se met à jour tout seul ; les événements disparaissent un jour après.
+    calendar_feed_hint_on: Se met à jour tout seul ; les événements disparaissent un jour après.
     calendar_feed_url_label: Lien calendrier
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime ton compte et toutes tes données définitivement.
@@ -285,10 +279,10 @@ fr:
       all_read: Tout est lu — les nouvelles notifications arriveront ici.
       unread_badge: Nouveau
       fallback_name: Notification
-      show_read:
-        one: Afficher 1 lue
-        other: "Afficher %{count} lues"
-      hide_read: Masquer les lues
+      view_label: Statut de lecture
+      tab_unread: Non lues
+      tab_read: Lues
+      none_read: Aucune notification lue pour l'instant.
       event_count:
         one: 1 événement
         other: "%{count} événements"

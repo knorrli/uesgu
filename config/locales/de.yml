@@ -106,12 +106,11 @@ de:
     name: üsgu — Merkliste
     cancelled_prefix: "Abgesagt: %{title}"
     create: Kalender-Link erstellen
-    regenerate: Neuer Link
-    regenerate_confirm: Link ersetzen? Deine Kalender-App braucht dann den neuen.
-    remove: Link entfernen
-    remove_confirm: "Kalender-Link entfernen? Dein Kalender hört dann auf, sich zu aktualisieren. Du musst ihn zusätzlich in deiner Kalender-App löschen, um ihn ganz zu entfernen."
+    subscribe: Im Kalender abonnieren
+    remove: Kalender deaktivieren
+    remove_confirm: "Kalender deaktivieren? Deine Kalender-App hört dann auf, sich zu aktualisieren. Um ihn ganz zu entfernen, lösche das Abo zusätzlich dort."
     created: Kalender-Link bereit.
-    removed: Kalender-Link entfernt.
+    removed: Kalender deaktiviert.
   event_reminder:
     title:
       one: 1 gespeicherte Veranstaltung steht an
@@ -121,7 +120,6 @@ de:
       other: "%{count} gespeicherte Veranstaltungen stehen an"
   saved_filters:
     title: Gespeicherte Filter
-    intro: Deine gespeicherten Filter. Wende einen an, um ihn durchzustöbern, oder bearbeite ihn, um zu ändern, wie und wann du benachrichtigt wirst.
     your_rules: Deine Filter
     empty: Noch keine Filter — leg unten deinen ersten an.
     add_rule: Regel hinzufügen
@@ -151,10 +149,8 @@ de:
       duplicate: Für diesen Filter hast du schon einen gespeicherten Filter.
     new:
       title: Filter speichern
-      intro: Wähle, worauf der Filter passt, und ob/wie du benachrichtigt wirst.
     edit:
       title: Gespeicherten Filter bearbeiten
-      intro: Worauf er passt, und ob/wie du benachrichtigt wirst.
       back: ← Alle Filter
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
     push_unavailable: Push in den Einstellungen aktivieren
@@ -162,7 +158,6 @@ de:
     section_notifications: Benachrichtigungen
     section_when: Wann
     schedule_label: Wie oft
-    channels_hint: In-App aus = stiller Filter. Push und E-Mail brauchen In-App.
     cadences:
       daily: Täglich
       weekly: Wöchentlich
@@ -206,7 +201,8 @@ de:
       cadence: Häufigkeit
       weekday: Wochentag
       monthday: Tag im Monat
-      time: Uhrzeit
+      time_hour: Stunde
+      time_minute: Minute
       content_type: Art
       window: Zeitraum
       scope: Filter
@@ -245,7 +241,7 @@ de:
     saved: Einstellungen gespeichert.
     account_heading: Konto
     push_test: Test senden
-    notifications_heading: Benachrichtigungen
+    notifications_heading: Push-Benachrichtigungen
     frequency_label: Wie oft sollen wir dich über neue Veranstaltungen informieren?
     language_heading: Sprache
     language_auto: Automatisch (Browser)
@@ -261,18 +257,16 @@ de:
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
     save: Speichern
-    push_hint: Wir sagen dir hier Bescheid, sobald neue Veranstaltungen zu deinen Interessen passen.
+    push_hint: Aktiviere Push für dieses Gerät, damit dich Benachrichtigungen auch bei geschlossener App erreichen.
     push_enable: Auf diesem Gerät aktivieren
     push_disable: Auf diesem Gerät deaktivieren
-    push_status_on: Auf diesem Gerät an.
-    push_status_off: Auf diesem Gerät aus.
     push_status_denied: Dein Browser blockiert Benachrichtigungen. Erlaube sie in den Browser-Einstellungen, um sie zu aktivieren.
     push_unsupported: Dieser Browser unterstützt keine Push-Benachrichtigungen.
     push_install_first: Um auf iPhone oder iPad Benachrichtigungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     signout_button: Abmelden
     calendar_feed_heading: Kalender
     calendar_feed_hint_off: Hol dir deine gespeicherten Veranstaltungen in jede Kalender-App — erstelle dafür einen privaten Link.
-    calendar_feed_hint_on: Füge diesen Link in deiner Kalender-App ein (Google Kalender, Apple Kalender …). Er aktualisiert sich von selbst; Veranstaltungen verschwinden einen Tag nach dem Termin.
+    calendar_feed_hint_on: Aktualisiert sich von selbst; Veranstaltungen verschwinden einen Tag nach dem Termin.
     calendar_feed_url_label: Kalender-Link
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
@@ -285,10 +279,10 @@ de:
       all_read: Alles gelesen — neue Benachrichtigungen landen hier.
       unread_badge: Neu
       fallback_name: Benachrichtigung
-      show_read:
-        one: 1 gelesene anzeigen
-        other: "%{count} gelesene anzeigen"
-      hide_read: Gelesene ausblenden
+      view_label: Lesestatus
+      tab_unread: Ungelesen
+      tab_read: Gelesen
+      none_read: Noch nichts gelesen.
       event_count:
         one: 1 Veranstaltung
         other: "%{count} Veranstaltungen"

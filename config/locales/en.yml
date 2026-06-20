@@ -106,12 +106,11 @@ en:
     name: üsgu — saved shows
     cancelled_prefix: "Cancelled: %{title}"
     create: Create calendar link
-    regenerate: New link
-    regenerate_confirm: Replace the link? Your calendar app will need the new one.
-    remove: Remove link
-    remove_confirm: "Remove the calendar link? Your calendar will stop updating. To remove it completely, also delete it in your calendar app."
+    subscribe: Subscribe in calendar
+    remove: Deactivate calendar
+    remove_confirm: "Deactivate the calendar? Your calendar app will stop updating. To remove it fully, also delete the subscription there."
     created: Calendar link ready.
-    removed: Calendar link removed.
+    removed: Calendar deactivated.
   event_reminder:
     title:
       one: 1 saved show coming up
@@ -121,7 +120,6 @@ en:
       other: "%{count} saved shows coming up"
   saved_filters:
     title: Saved filters
-    intro: Filters you've saved. Apply one to browse it, or edit it to change how and when you're notified.
     your_rules: Your filters
     empty: No filters yet — make your first one below.
     add_rule: Add a rule
@@ -151,10 +149,8 @@ en:
       duplicate: You already have a saved filter for this.
     new:
       title: Save a filter
-      intro: Pick what to match, then choose if and how you're notified.
     edit:
       title: Edit saved filter
-      intro: What it matches, and if and how you're notified.
       back: ← All saved filters
     email_unavailable: add an email address in settings
     push_unavailable: turn on push in settings
@@ -162,7 +158,6 @@ en:
     section_notifications: Notifications
     section_when: When
     schedule_label: How often
-    channels_hint: Turn off in-app for a silent saved filter. Push and email need it on.
     cadences:
       daily: Daily
       weekly: Weekly
@@ -206,7 +201,8 @@ en:
       cadence: Frequency
       weekday: Weekday
       monthday: Day of month
-      time: Time
+      time_hour: Hour
+      time_minute: Minute
       content_type: Type
       window: Window
       scope: Filter
@@ -245,7 +241,7 @@ en:
     saved: Settings saved.
     account_heading: Account
     push_test: Send a test
-    notifications_heading: Notifications
+    notifications_heading: Push notifications
     frequency_label: How often should we tell you about new events?
     language_heading: Language
     language_auto: Automatic (browser)
@@ -261,18 +257,16 @@ en:
     new_password: New password
     confirm_new_password: Confirm new password
     save: Save
-    push_hint: We'll let you know here when new events match your interests.
+    push_hint: Turn on push for this device, so your saved-filter alerts reach you even when the app is closed.
     push_enable: Enable on this device
     push_disable: Disable on this device
-    push_status_on: On for this device.
-    push_status_off: Off on this device.
     push_status_denied: Your browser is blocking notifications. Allow them in your browser settings to turn this on.
     push_unsupported: This browser doesn’t support push notifications.
     push_install_first: To get notifications on iPhone or iPad, add üsgu to your Home Screen first.
     signout_button: Sign out
     calendar_feed_heading: Calendar
     calendar_feed_hint_off: Get your saved shows in any calendar app — create a private link to get started.
-    calendar_feed_hint_on: Add this link in your calendar app (Google Calendar, Apple Calendar …). It updates on its own; shows drop off a day after they happen.
+    calendar_feed_hint_on: Updates on its own; shows drop off a day after they happen.
     calendar_feed_url_label: Calendar link
     delete_account_heading: Delete account
     delete_account_hint: Wipes your account and all your data for good.
@@ -285,10 +279,10 @@ en:
       all_read: All caught up — new notifications will land here.
       unread_badge: New
       fallback_name: Notification
-      show_read:
-        one: Show 1 read
-        other: "Show %{count} read"
-      hide_read: Hide read
+      view_label: Read status
+      tab_unread: Unread
+      tab_read: Read
+      none_read: No read notifications yet.
       event_count:
         one: 1 event
         other: "%{count} events"

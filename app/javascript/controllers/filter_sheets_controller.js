@@ -238,8 +238,11 @@ export default class extends Controller {
   // the open-time snapshot so pre-applied genres don't suppress a genuinely-typed
   // free-text term — only genres toggled in THIS session count.
   #genresToggled(sheet) {
+    // Pairs are serialized from each input's literal name attribute, i.e. "g[]=…"
+    // (NOT "g=…") — matching the wrong prefix here is what let the typed term leak
+    // through despite a genre being ticked.
     const genres = (serialized) =>
-      serialized.split("|").filter((pair) => pair.startsWith("g=")).sort().join("|")
+      serialized.split("|").filter((pair) => pair.startsWith("g[]=")).sort().join("|")
     const opened = this.snapshot === undefined ? "" : genres(this.snapshot)
     return genres(this.#serialize(sheet)) !== opened
   }

@@ -54,15 +54,15 @@ class Filter
     [queries, genres, location_list, date_ranges].any?(&:present?)
   end
 
-  # The genre names a `genres` pick expands to: each picked genre plus every
-  # genre beneath it in the tree (exact-match set; events are tagged with the
-  # canonical Genre#name, so name-matching the subtree is reliable). Picking
-  # "Rock" thus also catches "Shoegaze", "Grunge", … without any name guessing.
+  # The genre names a `genres` pick expands to: each picked genre plus every genre
+  # beneath it in the tree, plus any alias resolving into that subtree (so a filter
+  # for "Electronic" still matches an event carrying the raw alias "Elektronik").
+  # Picking "Rock" thus also catches "Shoegaze", "Grunge", … without name guessing.
+  # See Genre.filter_names_for (shared with the row highlighter).
   def expanded_genre_names
     return [] if genres.blank?
 
-    root_ids = Genre.where(fingerprint: genres.map { |name| Genre.fingerprint_for(name) }).ids
-    Genre.where(id: Genre.subtree_ids(root_ids)).pluck(:name)
+    Genre.filter_names_for(genres)
   end
 
   def ransack_query

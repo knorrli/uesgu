@@ -113,4 +113,20 @@ class FilterTest < ActiveSupport::TestCase
     assert_includes ids, hit.id, 'an ancestor pick catches a descendant-tagged event'
     refute_includes ids, miss.id
   end
+
+  test 'an aliased token is preserved on the event yet still matches its canonical filter' do
+    electronic = genre(name: 'aliaselectronic')
+    elektronik = genre(name: 'aliaselektronik'); elektronik.merge_into!(electronic)
+    event = event_with_genres(elektronik.name)
+
+    # Source-data integrity: ingest keeps the raw alias token, never rewrites it to
+    # the canonical (match-not-rewrite).
+    assert_includes event.reload.genre_list, elektronik.name
+    refute_includes event.genre_list, electronic.name
+
+    # …yet a filter on the canonical expands to, and matches, that raw token.
+    assert_includes Filter.build(genres: [electronic.name]).expanded_genre_names, elektronik.name
+    ids = Event.ransack(Filter.build(genres: [electronic.name]).ransack_query).result.ids
+    assert_includes ids, event.id, 'the canonical filter catches the raw-aliased event'
+  end
 end

@@ -117,14 +117,12 @@ module EventsHelper
     end
   end
 
-  # The set of genre names in the subtree rooted at `term` (the genre itself plus
-  # every descendant), matched by fingerprint. Memoised per request so a genre
+  # The set of genre names a picked filter term matches — the term's subtree plus
+  # any alias resolving into it (see Genre.filter_names_for, shared with the filter
+  # query so match and highlight can't drift). Memoised per request so a genre
   # repeated across many rows costs one lookup, not one per tag.
   def genre_subtree_names(term)
-    (@genre_subtree_names ||= {})[term.to_s] ||= begin
-      root_ids = Genre.where(fingerprint: Genre.fingerprint_for(term)).ids
-      Set.new(Genre.where(id: Genre.subtree_ids(root_ids)).pluck(:name))
-    end
+    (@genre_subtree_names ||= {})[term.to_s] ||= Set.new(Genre.filter_names_for(term))
   end
 
   # The current user's saved event ids, loaded once so the per-event save button

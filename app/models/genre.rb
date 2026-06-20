@@ -39,8 +39,9 @@ class Genre < ApplicationRecord
   # The catalogue: genres actually in use OR parked (given a disposition or merged
   # into a canonical). Excludes the dormant taxonomy entries (count 0, pre-mapped
   # by the seed) that have never appeared on an event — they'd swamp the curation
-  # views. Blocked/aliased genres tag 0 events yet stay listed via their mark so
-  # Restore stays reachable. Genres outside this set remain findable by name
+  # views. Blocked genres tag 0 events yet stay listed via their mark so Restore
+  # stays reachable (an aliased genre keeps its own taggings — a query-time link,
+  # not a rewrite — so it stays listed via events_count too). Genres outside this set remain findable by name
   # search (see GenresController#index), so nothing is truly hidden.
   scope :listable, lambda {
     where('events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL ' \
@@ -158,22 +159,38 @@ class Genre < ApplicationRecord
     str.to_s.strip.split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
   end
 
-  # Replace each scraped name with the canonical *display* name of the Genre it
-  # resolves to (by fingerprint): the collapsed spelling for known genres, the
-  # canonical for semantic aliases, or a titleized form for brand-new ones. This
-  # is what dedupes the publicly-shown genre tag — see Event#genre_list=.
+  # The genre names a picked-genre filter should match: every name in the picked
+  # genres' subtrees, PLUS the raw names of any alias that resolves into those
+  # subtrees. An event tagged with the raw token "Elektronik" matches a filter for
+  # "Electronic" because Elektronik#canonical is Electronic, which sits in the
+  # subtree — without the event's stored tag ever being rewritten. Defined once so
+  # the filter query (Filter#expanded_genre_names) and the row highlighter
+  # (EventsHelper#genre_subtree_names) can't drift apart.
+  def self.filter_names_for(picked_names)
+    picked_names = Array(picked_names).map(&:to_s).reject(&:blank?)
+    return [] if picked_names.empty?
+
+    root_ids = where(fingerprint: picked_names.map { |name| fingerprint_for(name) }).ids
+    subtree = subtree_ids(root_ids)
+    (where(id: subtree).pluck(:name) + where(canonical_id: subtree).pluck(:name)).uniq
+  end
+
+  # Replace each scraped name with its canonical *display* spelling, matched by
+  # fingerprint: the collapsed spelling for a known genre, or a titleized form for
+  # a brand-new one. Cosmetic normalization ONLY (e.g. "post punk" → "Post-Punk").
+  # It deliberately does NOT substitute a semantic alias's canonical — an event
+  # keeps its raw token ("Elektronik"); the filter resolves the alias at query
+  # time (see filter_names_for). Dedupes the publicly-shown tag — see
+  # Event#genre_list=.
   def self.canonicalize_names(names)
     names = Array(names).map(&:to_s)
     return names if names.empty?
 
     fingerprints = names.map { |name| fingerprint_for(name) }
-    rows = where(fingerprint: fingerprints.uniq).includes(:canonical).index_by(&:fingerprint)
+    rows = where(fingerprint: fingerprints.uniq).index_by(&:fingerprint)
     names.each_with_index.map do |name, i|
       genre = rows[fingerprints[i]]
-      if genre.nil? then display_name_for(name)
-      elsif genre.canonical then genre.canonical.name
-      else genre.name
-      end
+      genre ? genre.name : display_name_for(name)
     end
   end
 
@@ -231,33 +248,18 @@ class Genre < ApplicationRecord
     update_columns(events_count: 0)
   end
 
-  # Merge this genre into a canonical one (a semantic alias the fingerprint can't
-  # catch, e.g. "Elektronik" → "Electronic"). Operates on AATO taggings directly
-  # (never via genre_list, which would re-parse and trip the unique tag index):
-  # repoints this genre's event taggings onto the canonical tag, dropping
-  # duplicates where an event already carries the canonical. Idempotent — re-runs
-  # converge to a no-op. Future scrapes auto-resolve via Genre.canonicalize_names.
+  # Mark this genre as a semantic alias of `canonical` — a synonym the fingerprint
+  # can't catch (e.g. "Elektronik" → "Electronic"). The alias is a query-time LINK,
+  # not a data rewrite: events keep their own raw tag ("Elektronik") intact and the
+  # genre filter resolves the alias at query time (see Genre.filter_names_for), so
+  # source data stays untouched. Clearing the other marks keeps alias and
+  # disposition/placement mutually exclusive. Idempotent. reconcile! keeps
+  # events_count authoritative — the alias row retains its own taggings, so unlike
+  # a blocked/hidden genre its count stays > 0.
   def merge_into!(canonical)
     raise ArgumentError, 'a genre cannot be merged into itself' if canonical.id == id
 
-    affected = []
-    transaction do
-      alias_tag = ActsAsTaggableOn::Tag.named(name).first
-      if alias_tag
-        canonical_tag = ActsAsTaggableOn::Tag.find_or_create_all_with_like_by_name(canonical.name).first
-        taggings = ActsAsTaggableOn::Tagging.where(context: 'genres', taggable_type: Event.name, tag_id: alias_tag.id)
-        affected = taggings.pluck(:taggable_id)
-        # Events already carrying the canonical tag: drop the duplicate alias
-        # tagging instead of repointing (which would violate the unique index).
-        dup_ids = ActsAsTaggableOn::Tagging
-                  .where(context: 'genres', taggable_type: Event.name, tag_id: canonical_tag.id, taggable_id: affected)
-                  .pluck(:taggable_id)
-        taggings.where(taggable_id: dup_ids).delete_all
-        taggings.update_all(tag_id: canonical_tag.id)
-      end
-      update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil, parent_id: nil)
-    end
-    Event.where(id: affected).find_each(&:recompute_visibility!)
+    update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil, parent_id: nil)
     Genre.reconcile!
   end
 

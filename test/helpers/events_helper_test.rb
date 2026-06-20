@@ -47,4 +47,12 @@ class EventsHelperTest < ActionView::TestCase
     # An unrelated applied genre does not light it.
     assert_empty filter_terms_matching([jazz.name], shoegaze.name, param: 'g')
   end
+
+  test 'a raw aliased tag lights under its canonical filter (match and highlight stay in sync)' do
+    electronic = genre(name: 'lithelpelectronic')
+    elektronik = genre(name: 'lithelpelektronik'); elektronik.merge_into!(electronic)
+
+    # Filtering by "Electronic" lights the raw "Elektronik" tag the event carries.
+    assert_equal [electronic.name], filter_terms_matching([electronic.name], elektronik.name, param: 'g')
+  end
 end

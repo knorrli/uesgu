@@ -97,19 +97,21 @@ fr:
     empty: Rien d'enregistré — touche le cœur sur un événement.
     none_upcoming: Rien à venir — tes enregistrements passés sont dans le calendrier.
     toggle: Enregistrer l'événement
+    reminders_label: Me rappeler mes événements enregistrés
+    reminders_hint: Un rappel vers midi le jour de l'événement enregistré — dans tes notifications, et par push ou e-mail si tu les as configurés.
   copy_field:
     copy: Copier
     copied: Copié !
   calendar_feed:
     name: üsgu — à voir
     cancelled_prefix: "Annulé : %{title}"
-    create: Créer le lien d'abonnement
+    create: Créer le lien calendrier
     regenerate: Nouveau lien
     regenerate_confirm: Remplacer le lien ? Ton app calendrier aura besoin du nouveau.
     remove: Supprimer le lien
-    remove_confirm: "Supprimer le lien d'abonnement ? Ton calendrier cessera de se mettre à jour. Pour te désabonner complètement, supprime aussi l'abonnement dans ton app calendrier."
-    created: Lien d'abonnement prêt.
-    removed: Lien d'abonnement supprimé.
+    remove_confirm: "Supprimer le lien calendrier ? Ton calendrier cessera de se mettre à jour. Pour le retirer complètement, supprime-le aussi dans ton app calendrier."
+    created: Lien calendrier prêt.
+    removed: Lien calendrier supprimé.
   event_reminder:
     title:
       one: 1 événement enregistré arrive
@@ -120,8 +122,8 @@ fr:
   saved_filters:
     title: Filtres enregistrés
     intro: Tes filtres enregistrés. Applique-en un pour le parcourir, ou modifie-le pour changer comment et quand tu es averti·e.
-    your_rules: Tes règles
-    empty: Aucune règle — crée ta première ci-dessous.
+    your_rules: Tes filtres
+    empty: Aucun filtre — crée ton premier ci-dessous.
     add_rule: Ajouter une règle
     save_button: Enregistrer
     window_none: Sans période (nouveautés)
@@ -132,15 +134,15 @@ fr:
     already_exists: Tu as déjà ce filtre enregistré — tu peux l'ajuster ici.
     duplicate_edit: "Tu as aussi un autre filtre enregistré pour ça :"
     fired:
-      one: Filtre exécuté — 1 événement dans le digest.
-      other: "Filtre exécuté — %{count} événements dans le digest."
+      one: Filtre exécuté — 1 événement dans la notification.
+      other: "Filtre exécuté — %{count} événements dans la notification."
     fired_empty: Filtre exécuté — aucun événement correspondant pour le moment.
     fire_now: Tester
     delete: Supprimer
     delete_confirm: Vraiment supprimer ce filtre enregistré ?
     edit_button: Modifier
     empty_link: Filtre les événements
-    empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis touche l'entonnoir pour l'enregistrer.
+    empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis enregistre-le.
     type:
       added: Nouveautés
       happening: À l'affiche
@@ -153,7 +155,9 @@ fr:
     edit:
       title: Modifier le filtre enregistré
       intro: Ce qui correspond, et si et comment tu es prévenu.
+      back: ← Tous les filtres
     email_unavailable: ajoute une adresse e-mail dans les réglages
+    push_unavailable: active le push dans les réglages
     section_filter: Filtre
     section_notifications: Notifications
     section_when: Quand
@@ -221,8 +225,8 @@ fr:
         one: Un événement pour toi.
         other: "%{count} événements pour toi."
       cta: Voir dans l'app
-      footer_reason: Tu reçois ceci à cause d'une règle de notification que tu as créée.
-      footer_manage: Gérer les règles
+      footer_reason: Tu reçois ceci à cause d'un filtre que tu as créé.
+      footer_manage: Gérer tes filtres
   frequencies:
     daily: Quotidien
     weekly: Hebdomadaire
@@ -266,13 +270,10 @@ fr:
     push_unsupported: Ce navigateur ne prend pas en charge les notifications push.
     push_install_first: Pour recevoir des notifications sur iPhone ou iPad, ajoute d'abord üsgu à ton écran d'accueil.
     signout_button: Se déconnecter
-    calendar_feed_heading: Abonnement calendrier
-    calendar_feed_hint_off: Abonne-toi à tes événements enregistrés dans n'importe quelle app calendrier — crée un lien privé pour commencer.
+    calendar_feed_heading: Calendrier
+    calendar_feed_hint_off: Retrouve tes événements enregistrés dans n'importe quelle app calendrier — crée un lien privé pour commencer.
     calendar_feed_hint_on: Ajoute ce lien dans ton app calendrier (Google Agenda, Apple Calendrier…). Il se met à jour tout seul ; les événements disparaissent un jour après.
-    calendar_feed_url_label: Lien d'abonnement
-    reminders_heading: Rappels
-    reminders_label: Me rappeler mes événements enregistrés
-    reminders_hint: Un rappel vers midi le jour de l'événement enregistré — dans ta boîte de réception, et par push ou e-mail si tu les as configurés.
+    calendar_feed_url_label: Lien calendrier
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime ton compte et toutes tes données définitivement.
     delete_account: Supprimer mon compte
@@ -373,8 +374,8 @@ fr:
         empty: "%{count} vide(s)"
         failed: "%{count} échec(s)"
       create:
-        started: Passage des scrapers lancé — actualisez dans quelques minutes pour voir les résultats.
-        started_one: "%{scraper} lancé — actualisez dans quelques secondes pour voir le résultat."
+        started: Passage des scrapers lancé — actualise dans quelques minutes pour voir les résultats.
+        started_one: "%{scraper} lancé — actualise dans quelques secondes pour voir le résultat."
         already_running: Un passage des scrapers est déjà en cours.
         unknown_scraper: Scraper inconnu.
       index:
@@ -407,7 +408,7 @@ fr:
         no_created_events: Ce passage n'a créé aucun nouvel event.
     users:
       admin_badge: Admin
-      cant_delete_self: Vous ne pouvez pas supprimer votre propre compte ici.
+      cant_delete_self: Tu ne peux pas supprimer ton propre compte ici.
       deleted: "Le compte %{username} a été supprimé."
       index:
         title: Comptes
@@ -431,7 +432,7 @@ fr:
       revoked: Invitation révoquée.
       index:
         title: Invitations
-        intro: Codes d'invitation à usage unique. Partagez le lien avec une personne — une fois inscrite, le code est utilisé.
+        intro: Codes d'invitation à usage unique. Partage le lien avec une personne — une fois inscrite, le code est utilisé.
         new_heading: Nouvelle invitation
         note_placeholder: p. ex. pour Anna
         expires_label: Valable jusqu'au
@@ -482,12 +483,12 @@ fr:
         date_label: Date
         time_label: Heure
         genres_label: Genres
-        genres_hint: Choisis dans la taxonomie existante. La modification épingle la liste — le scraper n'y touche plus, et les styles + la visibilité en sont redérivés.
+        genres_hint: Choisis dans la liste des genres. La modification verrouille la liste — le scraper n'y touche plus, et la visibilité en est reconstruite.
         dismissed_badge: retiré
         overridden_badge: modifié manuellement
         save: Enregistrer
         overrides_heading: Remplacements manuels
-        overrides_intro: Ces champs appartiennent à l'admin et sont ignorés par le scraper. Réinitialises-en un pour que le prochain scrape le remplisse depuis la source.
+        overrides_intro: Ces champs appartiennent à l'admin et sont ignorés par le scraper. Réinitialises-en un pour que le prochain scrape le récupère à neuf depuis la source.
         revert: Réinitialiser à la source
         field_title: Titre
         field_subtitle: Sous-titre
@@ -504,7 +505,7 @@ fr:
         is_duplicate_html: Cet événement est un doublon de %{link} — masqué des listes à son profit.
         unmerge: Marquer comme autonome
         has_duplicates: "Événements fusionnés dans celui-ci :"
-        merge_intro: Fusionne cet événement dans un autre (saisis l'ID de l'événement canonique) pour supprimer un doublon manqué par le matcher.
+        merge_intro: Fusionne cet événement dans un autre (saisis l'ID de l'événement canonique) pour fusionner un doublon passé entre les mailles.
         merge_placeholder: ID de l'événement canonique
         merge: Fusionner
       update:
@@ -559,7 +560,7 @@ fr:
         active_label: Active
         save: Enregistrer la règle
         preview_heading: Aperçu
-        preview_intro: Les événements que cette règle touche en ce moment. Vérifie les faux positifs avant d'enregistrer.
+        preview_intro: Les événements que cette règle touche en ce moment. Vérifie les événements pris à tort avant d'enregistrer.
       preview:
         summary:
           zero: Ne correspond à aucun événement.
@@ -621,6 +622,7 @@ fr:
     tomorrow: Demain
   events:
     cancelled: Annulé
+    rescheduled: Nouvelle date
     delete_event: Supprimer l'événement
     edit_event: Modifier l'événement
     edit_tag: Modifier le tag

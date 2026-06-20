@@ -97,19 +97,21 @@ de:
     empty: Noch nichts gespeichert — tippe das Herz bei einer Veranstaltung.
     none_upcoming: Nichts Anstehendes — vergangene Einträge findest du im Kalender.
     toggle: Veranstaltung speichern
+    reminders_label: An gespeicherte Veranstaltungen erinnern
+    reminders_hint: Ein Hinweis um die Mittagszeit am Tag der gespeicherten Veranstaltung — in deinen Benachrichtigungen, und per Push oder E-Mail, falls eingerichtet.
   copy_field:
     copy: Kopieren
     copied: Kopiert!
   calendar_feed:
     name: üsgu — Merkliste
     cancelled_prefix: "Abgesagt: %{title}"
-    create: Abo-Link erstellen
+    create: Kalender-Link erstellen
     regenerate: Neuer Link
     regenerate_confirm: Link ersetzen? Deine Kalender-App braucht dann den neuen.
     remove: Link entfernen
-    remove_confirm: "Abo-Link entfernen? Dein Kalender-Abo hört dann auf, sich zu aktualisieren. Du musst das Abo zusätzlich in deiner Kalender-App löschen, um es ganz zu entfernen."
-    created: Abo-Link bereit.
-    removed: Abo-Link entfernt.
+    remove_confirm: "Kalender-Link entfernen? Dein Kalender hört dann auf, sich zu aktualisieren. Du musst ihn zusätzlich in deiner Kalender-App löschen, um ihn ganz zu entfernen."
+    created: Kalender-Link bereit.
+    removed: Kalender-Link entfernt.
   event_reminder:
     title:
       one: 1 gespeicherte Veranstaltung steht an
@@ -120,8 +122,8 @@ de:
   saved_filters:
     title: Gespeicherte Filter
     intro: Deine gespeicherten Filter. Wende einen an, um ihn durchzustöbern, oder bearbeite ihn, um zu ändern, wie und wann du benachrichtigt wirst.
-    your_rules: Deine Regeln
-    empty: Noch keine Regeln — erstell unten deine erste.
+    your_rules: Deine Filter
+    empty: Noch keine Filter — leg unten deinen ersten an.
     add_rule: Regel hinzufügen
     save_button: Speichern
     window_none: Kein Zeitraum (neue Events)
@@ -132,15 +134,15 @@ de:
     already_exists: Diesen gespeicherten Filter gibt es schon — hier kannst du ihn anpassen.
     duplicate_edit: "Du hast noch einen gespeicherten Filter dafür:"
     fired:
-      one: Filter ausgeführt — 1 Veranstaltung im Digest.
-      other: "Filter ausgeführt — %{count} Veranstaltungen im Digest."
+      one: Filter ausgeführt — 1 Veranstaltung in der Benachrichtigung.
+      other: "Filter ausgeführt — %{count} Veranstaltungen in der Benachrichtigung."
     fired_empty: Filter ausgeführt — derzeit keine passenden Veranstaltungen.
     fire_now: Jetzt testen
     delete: Löschen
     delete_confirm: Diesen gespeicherten Filter wirklich löschen?
     edit_button: Bearbeiten
     empty_link: Filtere die Veranstaltungen
-    empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite, dann tippe auf den Trichter.
+    empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite und speichere ihn dann.
     type:
       added: Neue Events
       happening: Was läuft
@@ -153,7 +155,9 @@ de:
     edit:
       title: Gespeicherten Filter bearbeiten
       intro: Worauf er passt, und ob/wie du benachrichtigt wirst.
+      back: ← Alle Filter
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
+    push_unavailable: Push in den Einstellungen aktivieren
     section_filter: Filter
     section_notifications: Benachrichtigungen
     section_when: Wann
@@ -221,8 +225,8 @@ de:
         one: Eine Veranstaltung für dich.
         other: "%{count} Veranstaltungen für dich."
       cta: In der App ansehen
-      footer_reason: Du bekommst das wegen einer Benachrichtigung, die du erstellt hast.
-      footer_manage: Benachrichtigungen verwalten
+      footer_reason: Du bekommst das wegen eines Filters, den du erstellt hast.
+      footer_manage: Deine Filter verwalten
   frequencies:
     daily: Täglich
     weekly: Wöchentlich
@@ -257,7 +261,7 @@ de:
     new_password: Neues Passwort
     confirm_new_password: Neues Passwort bestätigen
     save: Speichern
-    push_hint: Wir pingen dich hier an, sobald neue Veranstaltungen zu deinen Interessen passen.
+    push_hint: Wir sagen dir hier Bescheid, sobald neue Veranstaltungen zu deinen Interessen passen.
     push_enable: Auf diesem Gerät aktivieren
     push_disable: Auf diesem Gerät deaktivieren
     push_status_on: Auf diesem Gerät an.
@@ -266,13 +270,10 @@ de:
     push_unsupported: Dieser Browser unterstützt keine Push-Benachrichtigungen.
     push_install_first: Um auf iPhone oder iPad Benachrichtigungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     signout_button: Abmelden
-    calendar_feed_heading: Kalender-Abo
-    calendar_feed_hint_off: Abonniere deine gespeicherten Veranstaltungen in jeder Kalender-App — erstelle dafür einen privaten Link.
+    calendar_feed_heading: Kalender
+    calendar_feed_hint_off: Hol dir deine gespeicherten Veranstaltungen in jede Kalender-App — erstelle dafür einen privaten Link.
     calendar_feed_hint_on: Füge diesen Link in deiner Kalender-App ein (Google Kalender, Apple Kalender …). Er aktualisiert sich von selbst; Veranstaltungen verschwinden einen Tag nach dem Termin.
-    calendar_feed_url_label: Abo-Link
-    reminders_heading: Erinnerungen
-    reminders_label: An gespeicherte Veranstaltungen erinnern
-    reminders_hint: Ein Hinweis um die Mittagszeit am Tag der gespeicherten Veranstaltung — in deinem Posteingang, und per Push oder E-Mail, falls eingerichtet.
+    calendar_feed_url_label: Kalender-Link
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
     delete_account: Mein Konto löschen
@@ -482,12 +483,12 @@ de:
         date_label: Datum
         time_label: Zeit
         genres_label: Genres
-        genres_hint: Aus dem bestehenden Vokabular wählen. Beim Bearbeiten wird die Liste gepinnt – der Scraper lässt sie in Ruhe, und Styles + Sichtbarkeit werden daraus neu abgeleitet.
+        genres_hint: Aus der Genre-Liste wählen. Beim Bearbeiten wird die Liste gesperrt – der Scraper lässt sie in Ruhe, und die Sichtbarkeit wird daraus neu aufgebaut.
         dismissed_badge: entfernt
         overridden_badge: manuell bearbeitet
         save: Speichern
         overrides_heading: Manuelle Überschreibungen
-        overrides_intro: Diese Felder gehören dem Admin und werden vom Scraper übersprungen. Setze eines zurück, damit der nächste Scrape es wieder aus der Quelle füllt.
+        overrides_intro: Diese Felder gehören dem Admin und werden vom Scraper übersprungen. Setze eines zurück, damit der nächste Scrape es wieder frisch aus der Quelle holt.
         revert: Auf Quelle zurücksetzen
         field_title: Titel
         field_subtitle: Untertitel
@@ -504,7 +505,7 @@ de:
         is_duplicate_html: Diese Veranstaltung ist ein Duplikat von %{link} – zu deren Gunsten aus den Listen ausgeblendet.
         unmerge: Als eigenständig markieren
         has_duplicates: "In diese Veranstaltung zusammengeführt:"
-        merge_intro: Führe diese Veranstaltung in eine andere zusammen (ID der kanonischen Veranstaltung eingeben), um ein vom Matcher übersehenes Duplikat zu beseitigen.
+        merge_intro: Führe diese Veranstaltung in eine andere zusammen (ID der kanonischen Veranstaltung eingeben), um ein durchgerutschtes Duplikat zusammenzuführen.
         merge_placeholder: ID der kanonischen Veranstaltung
         merge: Zusammenführen
       update:
@@ -534,7 +535,7 @@ de:
     discard_rules:
       index:
         title: Filterregeln
-        intro: Filtere Junk-Veranstaltungen automatisch per Text. Eine gefilterte Veranstaltung verschwindet aus allen öffentlichen Listen und wird bei jedem Scrape neu geprüft – entferne die Regel und sie kommt zurück. Anders als das manuelle Entfernen einer einzelnen Veranstaltung.
+        intro: Filtere unerwünschte Veranstaltungen automatisch per Text. Eine gefilterte Veranstaltung verschwindet aus allen öffentlichen Listen und wird bei jedem Scrape neu geprüft – entferne die Regel und sie kommt zurück. Anders als das manuelle Entfernen einer einzelnen Veranstaltung.
         new_rule: Neue Regel
         inactive: inaktiv
         all_venues: Alle Orte
@@ -559,7 +560,7 @@ de:
         active_label: Aktiv
         save: Regel speichern
         preview_heading: Vorschau
-        preview_intro: Veranstaltungen, die diese Regel gerade trifft. Prüfe auf Fehltreffer, bevor du speicherst.
+        preview_intro: Veranstaltungen, die diese Regel gerade trifft. Prüfe auf fälschlich erfasste Veranstaltungen, bevor du speicherst.
       preview:
         summary:
           zero: Trifft keine Veranstaltungen.
@@ -621,6 +622,7 @@ de:
     tomorrow: Morgen
   events:
     cancelled: Abgesagt
+    rescheduled: Neues Datum
     delete_event: Veranstaltung löschen
     edit_event: Veranstaltung bearbeiten
     edit_tag: Tag bearbeiten

@@ -97,19 +97,21 @@ en:
     empty: Nothing saved yet — tap the heart on any show.
     none_upcoming: Nothing coming up — your past saves are on the calendar.
     toggle: Save show
+    reminders_label: Remind me about my saved shows
+    reminders_hint: A nudge around midday on the day of each saved show — in your notifications, and by push or email if you've set those up.
   copy_field:
     copy: Copy
     copied: Copied!
   calendar_feed:
     name: üsgu — saved shows
     cancelled_prefix: "Cancelled: %{title}"
-    create: Create subscription link
+    create: Create calendar link
     regenerate: New link
     regenerate_confirm: Replace the link? Your calendar app will need the new one.
     remove: Remove link
-    remove_confirm: "Remove the subscription link? Your calendar will stop updating. To unsubscribe completely, also delete the subscription in your calendar app."
-    created: Subscription link ready.
-    removed: Subscription link removed.
+    remove_confirm: "Remove the calendar link? Your calendar will stop updating. To remove it completely, also delete it in your calendar app."
+    created: Calendar link ready.
+    removed: Calendar link removed.
   event_reminder:
     title:
       one: 1 saved show coming up
@@ -120,8 +122,8 @@ en:
   saved_filters:
     title: Saved filters
     intro: Filters you've saved. Apply one to browse it, or edit it to change how and when you're notified.
-    your_rules: Your rules
-    empty: No rules yet — make your first one below.
+    your_rules: Your filters
+    empty: No filters yet — make your first one below.
     add_rule: Add a rule
     save_button: Save
     window_none: No window (new events)
@@ -132,15 +134,15 @@ en:
     already_exists: You already have this saved filter — tweak it here.
     duplicate_edit: "You also have another saved filter for this:"
     fired:
-      one: Filter run — 1 event in the digest.
-      other: "Filter run — %{count} events in the digest."
+      one: Filter run — 1 event in the notification.
+      other: "Filter run — %{count} events in the notification."
     fired_empty: Filter run — no matching events right now.
     fire_now: Test now
     delete: Delete
     delete_confirm: Really delete this saved filter?
     edit_button: Edit
     empty_link: Filter the events
-    empty_html: No saved filters yet. %{link} on the home page, then tap the funnel to save it.
+    empty_html: No saved filters yet. %{link} on the home page, then save it.
     type:
       added: New events
       happening: What's on
@@ -153,7 +155,9 @@ en:
     edit:
       title: Edit saved filter
       intro: What it matches, and if and how you're notified.
+      back: ← All saved filters
     email_unavailable: add an email address in settings
+    push_unavailable: turn on push in settings
     section_filter: Filter
     section_notifications: Notifications
     section_when: When
@@ -221,8 +225,8 @@ en:
         one: One event for you.
         other: "%{count} events for you."
       cta: View in the app
-      footer_reason: You're getting this from a notification rule you set up.
-      footer_manage: Manage rules
+      footer_reason: You're getting this from a filter you set up.
+      footer_manage: Manage your filters
   frequencies:
     daily: Daily
     weekly: Weekly
@@ -257,7 +261,7 @@ en:
     new_password: New password
     confirm_new_password: Confirm new password
     save: Save
-    push_hint: Get pinged here when new events match your interests.
+    push_hint: We'll let you know here when new events match your interests.
     push_enable: Enable on this device
     push_disable: Disable on this device
     push_status_on: On for this device.
@@ -266,13 +270,10 @@ en:
     push_unsupported: This browser doesn’t support push notifications.
     push_install_first: To get notifications on iPhone or iPad, add üsgu to your Home Screen first.
     signout_button: Sign out
-    calendar_feed_heading: Calendar subscription
-    calendar_feed_hint_off: Subscribe to your saved shows in any calendar app — create a private link to get started.
+    calendar_feed_heading: Calendar
+    calendar_feed_hint_off: Get your saved shows in any calendar app — create a private link to get started.
     calendar_feed_hint_on: Add this link in your calendar app (Google Calendar, Apple Calendar …). It updates on its own; shows drop off a day after they happen.
-    calendar_feed_url_label: Subscription link
-    reminders_heading: Reminders
-    reminders_label: Remind me about my saved shows
-    reminders_hint: A nudge around midday on the day of each saved show — in your inbox, and by push or email if you've set those up.
+    calendar_feed_url_label: Calendar link
     delete_account_heading: Delete account
     delete_account_hint: Wipes your account and all your data for good.
     delete_account: Delete my account
@@ -482,12 +483,12 @@ en:
         date_label: Date
         time_label: Time
         genres_label: Genres
-        genres_hint: Pick from the existing taxonomy. Editing pins the list — the scraper won't touch it, and styles + visibility re-derive from it.
+        genres_hint: Pick from the genre list. Editing locks the list — the scraper won't touch it, and visibility is re-built from it.
         dismissed_badge: dismissed
         overridden_badge: manually edited
         save: Save
         overrides_heading: Manual overrides
-        overrides_intro: These fields are admin-owned and skipped by the scraper. Revert one to let the next scrape refill it from source.
+        overrides_intro: These fields are admin-owned and skipped by the scraper. Revert one to let the next scrape pull it fresh from source.
         revert: Revert to source
         field_title: Title
         field_subtitle: Subtitle
@@ -504,7 +505,7 @@ en:
         is_duplicate_html: This event is a duplicate of %{link} — hidden from listings in its favour.
         unmerge: Mark standalone
         has_duplicates: "Events merged into this one:"
-        merge_intro: Merge this event into another (enter the canonical event's ID) to collapse a duplicate the matcher missed.
+        merge_intro: Merge this event into another (enter the canonical event's ID) to merge a duplicate that slipped through.
         merge_placeholder: Canonical event ID
         merge: Merge
       update:
@@ -534,7 +535,7 @@ en:
     discard_rules:
       index:
         title: Discard rules
-        intro: Auto-filter junk scraped events by text. A discarded event drops out of every public listing and is re-checked on each scrape — remove the rule and it returns. Different from dismissing a single event by hand.
+        intro: Auto-filter unwanted scraped events by text. A discarded event drops out of every public listing and is re-checked on each scrape — remove the rule and it returns. Different from dismissing a single event by hand.
         new_rule: New rule
         inactive: inactive
         all_venues: All venues
@@ -559,7 +560,7 @@ en:
         active_label: Active
         save: Save rule
         preview_heading: Preview
-        preview_intro: Events this rule matches right now. Check for false positives before saving.
+        preview_intro: Events this rule matches right now. Check for wrongly-caught events before saving.
       preview:
         summary:
           zero: Matches no events.
@@ -621,6 +622,7 @@ en:
     tomorrow: Tomorrow
   events:
     cancelled: Cancelled
+    rescheduled: New date
     delete_event: Delete event
     edit_event: Edit event
     edit_tag: Edit tag

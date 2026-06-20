@@ -1,3 +1,21 @@
+/* Saved-shows day-of reminder opt-in: a quiet block under the page header. The
+   checkbox draws itself via the global custom-checkbox; the hint aligns under the
+   label text (past the box + its gap) and stays muted/small so it supports the
+   toggle without competing with the show list below. */
+.saved-reminder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}
+
+.saved-reminder__hint {
+  /* Indent under the label text: checkbox width (1em-ish via the global box) + the
+     label's gap-small, so the hint reads as belonging to the toggle. */
+  margin: 0;
+  padding-left: calc(1.1em + var(--gap-small));
+  font-size: var(--font-size-small);
+}
+
 /* Filter fields as underlined inputs rather than full boxes — lighter, reads as
    a form line, consistent with the de-boxed list below. */
 .input-wrapper {

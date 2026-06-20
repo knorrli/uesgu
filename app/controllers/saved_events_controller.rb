@@ -39,4 +39,11 @@ class SavedEventsController < ApplicationController
     existing ? existing.destroy : current_user.event_saves.create(event: event)
     head :no_content
   end
+
+  # Toggle the day-of saved-show reminder. Optimistic, like #toggle: the reminder
+  # Stimulus controller already flipped the checkbox and just persists the choice.
+  def reminders
+    current_user.update!(event_reminders: ActiveModel::Type::Boolean.new.cast(params[:enabled]))
+    head :no_content
+  end
 end

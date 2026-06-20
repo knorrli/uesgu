@@ -22,6 +22,28 @@ class SavedEventsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'reminders endpoint toggles the day-of saved-show reminder' do
+    u = sign_in_as user
+    refute u.event_reminders?
+
+    patch reminders_saved_events_path, params: { enabled: true }
+    assert_response :no_content
+    assert u.reload.event_reminders?
+
+    patch reminders_saved_events_path, params: { enabled: false }
+    refute u.reload.event_reminders?
+  end
+
+  test 'the reminder toggle shows on the saved-shows page only once something is saved' do
+    u = sign_in_as user
+    get saved_events_path
+    assert_select '.saved-reminder', false, 'no reminder toggle before anything is saved'
+
+    u.event_saves.create!(event: event(start_date: Date.current + 3))
+    get saved_events_path
+    assert_select '.saved-reminder input[type=checkbox]'
+  end
+
   test 'index lists upcoming saved shows and hides past ones' do
     u = sign_in_as user
     upcoming = event(start_date: Date.current + 3, title: 'Upcoming Save')

@@ -24,14 +24,13 @@ class SettingsTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_session_path
   end
 
-  test 'update toggles saved-show reminders (part of the one Save form)' do
+  test 'the settings form ignores event_reminders (moved to the saved-shows page)' do
     u = sign_in_as user
     refute u.event_reminders?
 
+    # The toggle no longer lives on Settings, so a stray param must NOT flip it
+    # (it's not permitted here) — the saved-shows endpoint owns it now.
     patch settings_path, params: { user: { locale: 'de', event_reminders: '1' } }
-    assert u.reload.event_reminders?
-
-    patch settings_path, params: { user: { locale: 'de', event_reminders: '0' } }
     refute u.reload.event_reminders?
   end
 

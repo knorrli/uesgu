@@ -11,6 +11,21 @@
     <% if @any_saved %><%= render 'events/view_switcher', view: @view %><% end %>
   </div>
 
+  <%# Day-of reminder opt-in: a property of the saved-shows feature (it nudges you
+      about the shows listed here), so it lives on this page rather than Settings.
+      Only shown once there's something to be reminded about. Auto-saves in the
+      background (reminder controller); no Save button. %>
+  <% if @any_saved %>
+    <div class="saved-reminder" data-controller="reminder">
+      <label class="saved-reminder__toggle flex gap-small align-center">
+        <%= check_box_tag 'event_reminders', '1', current_user.event_reminders?,
+              data: { reminder_target: 'checkbox', action: 'reminder#toggle' } %>
+        <span><%= t('saved_events.reminders_label') %></span>
+      </label>
+      <p class="muted saved-reminder__hint"><%= t('saved_events.reminders_hint') %></p>
+    </div>
+  <% end %>
+
   <% if !@any_saved %>
     <p class="empty-state"><%= t('saved_events.empty') %></p>
   <% elsif @view == 'calendar' %>

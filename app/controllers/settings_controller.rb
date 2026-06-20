@@ -22,8 +22,10 @@ class SettingsController < ApplicationController
   end
 
   def settings_params
+    # event_reminders moved to the saved-shows page (SavedEventsController#reminders),
+    # so it's no longer part of the Settings form.
     permitted = params.expect(
-      user: [:locale, :email_address, :password, :password_confirmation, :event_reminders]
+      user: [:locale, :email_address, :password, :password_confirmation]
     )
 
     # Blank password means "leave it unchanged" rather than clearing it.

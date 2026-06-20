@@ -37,6 +37,9 @@ Rails.application.routes.draw do
   # "Save this show": the saved-shows list + an inline per-event save toggle.
   resources :saved_events, only: %i[index] do
     post :toggle, on: :collection
+    # The day-of reminder for saved shows is a property of the saved-shows feature,
+    # so its opt-in lives on this page (not Settings); a small background toggle.
+    patch :reminders, on: :collection
   end
 
   # Subscribable ICS feed of the user's saved shows. The public feed is keyed by

@@ -50,16 +50,9 @@
         <p class="muted"><%= t('settings.password_hint') %></p>
       </fieldset>
 
-      <%# Saved-show reminders: a global midday nudge. Lives in the merged Save
-          form so the page keeps a single Save (see copy-voice memory). %>
-      <fieldset class="settings-field flex flex-col gap-small">
-        <legend><%= t('settings.reminders_heading') %></legend>
-        <label class="flex gap-small align-center">
-          <%= form.check_box :event_reminders %>
-          <span><%= t('settings.reminders_label') %></span>
-        </label>
-        <p class="muted"><%= t('settings.reminders_hint') %></p>
-      </fieldset>
+      <%# Saved-show reminders moved to the saved-shows page — they're a property of
+          that feature (they nudge about the shows saved there), so the opt-in lives
+          where the shows do, not split off in Settings. %>
 
       <%= form.submit t('settings.save') %>
     <% end %>

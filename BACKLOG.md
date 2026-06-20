@@ -47,17 +47,13 @@
   (`price` / `lineup` / `description` / `image` — none exist today), so this is a
   schema decision, not just a parser tweak. Re-run the audit across the rest of
   the scrapers once that's decided.
-
-### Features / design (settled, unbuilt)
-
-- **Remove the consumption/discovery scraper split.** Now that aliasing is
-  query-time (events keep raw tokens) and the curation queue + tree + block
-  disposition absorb noise, every scraper can collect *all* the genres it sees —
-  drop the `Genre.existing_only` gating (consumption scrapers → discovery). Expect
-  the unplaced-genre queue to grow; curate it down via tree placement / aliases /
-  block. Watch the fallout via `/admin/scraper_coverage` (distinct-genre counts)
-  and the genre queue. Reframes memory
-  `project-taxonomy-hygiene-closed-vocab-scrapers` once it lands.
+- **Curate the genres minted after the gate removal.** With the
+  consumption/discovery gate gone, freetext sources now mint every token they
+  emit, so the unplaced-genre queue will fill on the next sweep — including known
+  noise like **docks** origin codes (`US`/`CH`) and Mahogany prose. Sweep the
+  queue (file / alias / block) and give the docks codes their own origin facet or
+  a block (see memory `project-docks-scraper-country-as-genre`). Watch the volume
+  via `/admin/scraper_coverage` distinct-genre counts.
 
 ### UI polish
 

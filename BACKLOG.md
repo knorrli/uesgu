@@ -50,12 +50,14 @@
 
 ### Features / design (settled, unbuilt)
 
-- **Genre alias: match-not-rewrite.** Stop the *semantic* rewrite at ingest so an
-  event keeps its raw token (e.g. `Elektronik`); resolve the alias at *query
-  time* so the `Electronic` filter still matches + highlights it via a
-  `canonical_id` link. Keeps source data intact, dedupes the two
-  subtree-expansion copies. Full spec: memory `project-alias-match-not-rewrite`.
-  (Does **not** affect the scrape over-count — that cosmetic branch is fixed.)
+- **Remove the consumption/discovery scraper split.** Now that aliasing is
+  query-time (events keep raw tokens) and the curation queue + tree + block
+  disposition absorb noise, every scraper can collect *all* the genres it sees —
+  drop the `Genre.existing_only` gating (consumption scrapers → discovery). Expect
+  the unplaced-genre queue to grow; curate it down via tree placement / aliases /
+  block. Watch the fallout via `/admin/scraper_coverage` (distinct-genre counts)
+  and the genre queue. Reframes memory
+  `project-taxonomy-hygiene-closed-vocab-scrapers` once it lands.
 
 ### UI polish
 

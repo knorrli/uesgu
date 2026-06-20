@@ -107,6 +107,7 @@ fr:
     regenerate: Nouveau lien
     regenerate_confirm: Remplacer le lien ? Ton app calendrier aura besoin du nouveau.
     remove: Supprimer le lien
+    remove_confirm: "Supprimer le lien d'abonnement ? Ton calendrier cessera de se mettre à jour. Pour te désabonner complètement, supprime aussi l'abonnement dans ton app calendrier."
     created: Lien d'abonnement prêt.
     removed: Lien d'abonnement supprimé.
   event_reminder:

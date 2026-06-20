@@ -20,6 +20,22 @@ class Notification < ApplicationRecord
     saved_filter_id.present? || event_ids.present?
   end
 
+  # Currently-visible event count for a batch of notifications without an N+1:
+  # every rule-based snapshot's event_ids is checked for visibility in ONE query,
+  # then counted in Ruby (an event hidden after the fact drops out, matching
+  # #events). Legacy window digests (no event_ids) keep their own per-record
+  # query — only the few pre-frequency-system rows take that path. Returns a hash
+  # keyed by notification id.
+  def self.visible_event_counts(notifications)
+    rule_based, legacy = notifications.partition(&:rule_based?)
+    visible_ids = Event.visible.where(id: rule_based.flat_map(&:event_ids).uniq).pluck(:id).to_set
+
+    counts = {}
+    rule_based.each { |n| counts[n.id] = n.event_ids.count { |id| visible_ids.include?(id) } }
+    legacy.each { |n| counts[n.id] = n.events.count }
+    counts
+  end
+
   # The events in this digest, narrowed to what's *currently* visible (an event
   # hidden after the fact drops out). Rule-based digests read their snapshot;
   # legacy window digests recompute from the created_at window.

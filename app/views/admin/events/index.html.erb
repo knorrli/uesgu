@@ -54,7 +54,7 @@
             </div>
           </div>
           <% if event.dismissed? %>
-            <%= button_to t('.restore'), undismiss_admin_event_path(event), method: :patch, class: 'button-small button-ghost' %>
+            <%= button_to t('.restore'), undismiss_admin_event_path(event), method: :patch, class: 'button-small' %>
           <% end %>
         </div>
       <% end %>

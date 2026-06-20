@@ -31,6 +31,19 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_select '.notification__meta', text: /2 Veranstaltungen/
   end
 
+  test 'index event count drops events hidden after the digest fired' do
+    u = user
+    sign_in_as u
+    shown = event(start_date: Date.current + 1)
+    hidden = event(start_date: Date.current + 2, hidden: true)
+    u.notifications.create!(title: 'D', event_ids: [shown.id, hidden.id],
+                            period_start: 1.week.ago, period_end: Time.current)
+
+    get notifications_path
+    assert_response :success
+    assert_select '.notification__meta', text: /1 Veranstaltung/
+  end
+
   test 'index hides read digests by default and reveals them via the toggle' do
     u = user
     sign_in_as u

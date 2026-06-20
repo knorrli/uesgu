@@ -1,7 +1,18 @@
 # Redesign: one genre tree + saved filters (drop Style + Interests)
 
-Status: **design agreed, not yet implemented.** Captures the model we settled on in
-discussion so the thread isn't the source of truth.
+Status: **✅ SHIPPED 2026-06-20** (merged to `main` in `88cbeb6`; phases 0–5
+complete). Deployed via drop-and-recreate: push → migrations run in
+`preDeployCommand` → `bin/rails taxonomy:reset` once in the Render shell →
+re-scrape. The curated tree seed is `db/genres.yml`. This doc captures the model
+and the phase plan we executed; it stays as the design record.
+
+A few things landed differently from the plan below, worth knowing when reading
+it: Interests/Favorites was **removed outright** rather than re-derived as an
+OR-union of saved filters (decision revisited 2026-06-20 — less churn; re-add a
+derived version if missed); `Style` removal moved to *last* (phase 2b), because
+rules + interests matched via styles taggings and couldn't break until phases 3–4
+migrated them; the ★/🔔 two-button save/notify model collapsed to a **single
+funnel button** (editor handles channels). The rest matches.
 
 ## Why
 

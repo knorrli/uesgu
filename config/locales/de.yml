@@ -107,6 +107,7 @@ de:
     regenerate: Neuer Link
     regenerate_confirm: Link ersetzen? Deine Kalender-App braucht dann den neuen.
     remove: Link entfernen
+    remove_confirm: "Abo-Link entfernen? Dein Kalender-Abo hört dann auf, sich zu aktualisieren. Du musst das Abo zusätzlich in deiner Kalender-App löschen, um es ganz zu entfernen."
     created: Abo-Link bereit.
     removed: Abo-Link entfernt.
   event_reminder:

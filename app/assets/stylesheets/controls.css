@@ -118,9 +118,8 @@ input[type=submit] {
 
    Per-page primary: at most one filled button per page; everything else is
    secondary (hollow) or danger, so the primary is the thing that stands out.
-   (.button-ghost is kept as a no-op alias — secondary is already hollow — so
-   existing markup needn't be swept.) Flat-text controls that aren't buttons
-   (view switcher, favorites/notify shortcuts) keep their own domain classes. */
+   Flat-text controls that aren't buttons (view switcher, save/notify shortcut)
+   keep their own domain classes. */
 .button-small {
   /* inline-flex + a fixed line-height makes every pill the same height whether
      it's an <a>, a <button> (via button_to), or an <input> — otherwise the <a>
@@ -148,13 +147,6 @@ input[type=submit] {
 .button-small[disabled] {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* No-op alias: secondary is already hollow accent. Kept so existing markup that
-   says .button-ghost still reads as secondary without a sweep. */
-.button-small.button-ghost {
-  background: transparent;
-  color: var(--theme-accent-color);
 }
 
 /* Destructive pill: hollow warn at rest, fills warn on commit — the same danger

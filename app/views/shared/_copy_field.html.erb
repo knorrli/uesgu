@@ -5,21 +5,24 @@
   the ICS subscription feed and signup invite links.
 
   Locals:
-    value: — the text shown and copied (required)
-    label: — optional field-label rendered above the field
+    value:   — the text shown and copied (required)
+    label:   — optional field-label rendered above the field
+    actions: — optional extra buttons (captured markup) rendered in the same row
+               as Copy, so caller actions (e.g. regenerate/remove) read as one group
 %>
 <div class="copy-field" data-controller="clipboard"
      data-clipboard-copied-value="<%= t('copy_field.copied') %>">
   <% if local_assigns[:label].present? %>
     <span class="field-label"><%= label %></span>
   <% end %>
-  <div class="copy-field__row">
-    <input type="text" readonly class="copy-field__input"
-           data-clipboard-target="source" data-action="focus->clipboard#select"
-           value="<%= value %>">
+  <input type="text" readonly class="copy-field__input"
+         data-clipboard-target="source" data-action="focus->clipboard#select"
+         value="<%= value %>">
+  <div class="copy-field__actions">
     <button type="button" class="copy-field__button"
             data-clipboard-target="button" data-action="clipboard#copy">
       <%= t('copy_field.copy') %>
     </button>
+    <%= local_assigns[:actions] %>
   </div>
 </div>

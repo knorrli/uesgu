@@ -42,9 +42,9 @@
 /* The .chip info-label family now lives in tags.css (shared, beside .tag), since
    it's used app-wide for read-only badges, not just here. */
 
-/* The button ladder (.button-small / .button-ghost / .danger) and .text-link
-   now live in controls.css — they're the app-wide secondary-button + link
-   vocabulary, not specific to this page. */
+/* The button ladder (.button-small / .danger) and .text-link now live in
+   controls.css — they're the app-wide secondary-button + link vocabulary, not
+   specific to this page. */
 
 /* Builder form: reuse .account-form field styling; these add the grouping. */
 .saved-filter-fieldset {

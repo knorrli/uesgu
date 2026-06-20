@@ -86,7 +86,7 @@
           <li class="admin-row">
             <span class="admin-row__main"><%= t(".field_#{field}") %></span>
             <%= button_to t('.revert'), revert_admin_event_path(@event, field: field),
-                  method: :patch, class: 'button-small button-ghost' %>
+                  method: :patch, class: 'button-small' %>
           </li>
         <% end %>
       </ul>
@@ -100,7 +100,7 @@
         <%= t('.is_duplicate_html',
               link: link_to(@event.canonical_event.title, admin_event_path(@event.canonical_event))) %>
       </p>
-      <%= button_to t('.unmerge'), unmerge_admin_event_path(@event), method: :patch, class: 'button-small button-ghost' %>
+      <%= button_to t('.unmerge'), unmerge_admin_event_path(@event), method: :patch, class: 'button-small' %>
     <% else %>
       <% if @event.duplicate_events.any? %>
         <p class="muted"><%= t('.has_duplicates') %></p>
@@ -130,7 +130,7 @@
       <%= button_to t('.restore'), undismiss_admin_event_path(@event), method: :patch, class: 'button-small' %>
     <% else %>
       <p class="muted"><%= t('.dismiss_intro') %></p>
-      <%= button_to t('.dismiss'), admin_event_path(@event), method: :delete, class: 'button-small button-ghost' %>
+      <%= button_to t('.dismiss'), admin_event_path(@event), method: :delete, class: 'button-small' %>
     <% end %>
   </section>
 </div>

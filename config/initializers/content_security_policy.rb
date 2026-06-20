@@ -11,7 +11,7 @@ Rails.application.configure do
     policy.img_src         :self, :data, :https
     policy.object_src      :none
     policy.script_src      :self                 # all JS is vendored via importmap
-    policy.style_src       :self, :unsafe_inline # some views use inline style= attrs
+    policy.style_src       :self                 # no inline styles; all CSS is external
     policy.base_uri        :self
     policy.form_action     :self
     policy.frame_ancestors :self                 # clickjacking guard
@@ -19,8 +19,9 @@ Rails.application.configure do
   end
 
   # Per-request nonce for the inline theme script and importmap's inline JSON.
-  # Only script-src is nonce-gated (style-src stays unsafe_inline). Random rather
-  # than session-based so a nonce is present for signed-out visitors too.
+  # Only script-src needs the nonce (style-src is now fully :self — no inline
+  # styles). Random rather than session-based so a nonce is present for
+  # signed-out visitors too.
   config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
   config.content_security_policy_nonce_directives = %w[script-src]
 

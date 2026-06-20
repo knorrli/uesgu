@@ -68,6 +68,9 @@
   min-height: 2.5rem;
 }
 
+/* Larger specimen text (e.g. icon-size demos). */
+.sg-specimen--lg { font-size: 1.4rem; }
+
 .sg-spec {
   font-size: var(--font-size-small);
 }

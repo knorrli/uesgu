@@ -1,5 +1,6 @@
 /* container */
 .flex { display: flex; }
+.inline-flex { display: inline-flex; }
 
 /* direction */
 .flex-col { flex-direction: column; }

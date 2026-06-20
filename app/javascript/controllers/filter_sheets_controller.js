@@ -7,13 +7,14 @@ import { searchForSuggestion } from "lib/search_for"
 // The option rows are real form inputs (name="q[]/g[]/l[]/d[]"), so committing is
 // just a GET submit — same params as the inline combobox filter. This controller
 // only handles presentation: opening/closing sheets, in-sheet search, the
-// free-text "search for X" row, the custom date range, and removing a chip.
+// free-text "search for X" row, and removing a chip. The custom date range is a
+// nested range-calendar controller; we just reset it on Clear / chip removal.
 //
 // Filters are non-destructive, so closing a sheet (× or Apply) keeps the
 // selection; we navigate only when something actually changed, so tapping × on an
 // untouched sheet closes instantly with no reload.
 export default class extends Controller {
-  static targets = ["form", "sheet", "queries", "group", "customStart", "customEnd", "customValue"]
+  static targets = ["form", "sheet", "queries", "group"]
   // submitOnApply: the events filter navigates on every apply (live listing). The
   // rule editor sets it false — picks stage into the form as checked inputs and
   // commit only on the explicit Save, so we refresh the trigger counts client-side
@@ -82,7 +83,7 @@ export default class extends Controller {
     const sheet = this.#sheetFor(event.params.field)
     if (!sheet) return
     sheet.querySelectorAll("input[type=checkbox]").forEach((input) => { input.checked = false })
-    sheet.querySelectorAll("input[type=date]").forEach((input) => { input.value = "" })
+    sheet.querySelectorAll(".range-cal").forEach((cal) => cal.dispatchEvent(new CustomEvent("range-calendar:reset")))
     sheet.querySelectorAll("[data-dynamic]").forEach((row) => row.remove())
   }
 
@@ -149,18 +150,6 @@ export default class extends Controller {
     if (!this.submitOnApplyValue) this.#refreshTrigger(input.closest(".sheet"))
   }
 
-  // Two native date inputs → the hidden "start - end" d[] input.
-  customRange() {
-    const start = this.customStartTarget.value
-    const end = this.customEndTarget.value
-    if (start && end) {
-      this.customValueTarget.value = `${start} - ${end}`
-      this.customValueTarget.checked = true
-    } else {
-      this.customValueTarget.checked = false
-    }
-  }
-
   // Remove one applied filter from the summary row, then re-submit.
   remove(event) {
     const { name, value } = event.params
@@ -169,10 +158,9 @@ export default class extends Controller {
       input.checked = false
       input.closest("[data-dynamic]")?.remove()
     })
-    // A custom-range chip also clears its date inputs so the sheet reopens empty.
-    if (name === "d" && String(value).includes(" - ") && this.hasCustomStartTarget) {
-      this.customStartTarget.value = ""
-      this.customEndTarget.value = ""
+    // A custom-range chip also resets its calendar so the sheet reopens empty.
+    if (name === "d" && String(value).includes(" - ")) {
+      this.element.querySelectorAll(".range-cal").forEach((cal) => cal.dispatchEvent(new CustomEvent("range-calendar:reset")))
     }
     this.#submit()
   }
@@ -287,12 +275,13 @@ export default class extends Controller {
   }
 
   #serialize(sheet) {
-    const checked = [...sheet.querySelectorAll("input[type=checkbox]")]
+    // The custom range rides along as a hidden d[] checkbox, so its value is
+    // captured here too — no separate date-input read needed.
+    return [...sheet.querySelectorAll("input[type=checkbox]")]
       .filter((input) => input.checked)
       .map((input) => `${input.name}=${input.value}`)
       .sort()
-    const dates = [...sheet.querySelectorAll("input[type=date]")].map((input) => input.value)
-    return [...checked, ...dates].join("|")
+      .join("|")
   }
 
   #submit() {

@@ -88,22 +88,7 @@
   margin: var(--gap-xsmall) 0 0;
 }
 
-/* Inline "this drifts from its purpose" callout, cross-referenced to the audit
- * inconsistency numbers. Amber = attention, not error. */
-.sg-flag {
-  display: block;
-  margin-top: var(--gap-xsmall);
-  padding-left: var(--gap-small);
-  border-left: var(--border-width) solid var(--color-amber);
-  color: var(--theme-fg-muted);
-  font-size: var(--font-size-small);
-}
-
-.sg-flag b {
-  color: var(--color-amber);
-}
-
-/* Resolved-on-this-branch note: green left rule, the counterpart to .sg-flag. */
+/* Resolved-on-this-branch note: green left rule for a resolved audit item. */
 .sg-ok {
   display: block;
   margin-top: var(--gap-xsmall);
@@ -155,11 +140,4 @@
 
 .sg-swatch__label code {
   color: var(--theme-fg-muted);
-}
-
-/* A small dark/light stage so we can show a specimen against the opposite
- * ground without leaving the page (the favorite heart, for instance). */
-.sg-frame {
-  padding: var(--gap-medium);
-  border: var(--tag-border-width) dashed var(--theme-bg-muted);
 }

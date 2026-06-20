@@ -43,18 +43,6 @@
   color: var(--theme-accent-color);
 }
 
-.filter-button {
-  line-height: var(--filter-input-line-height);
-}
-
-.searchbar {
-  gap: 5vw;
-}
-
-.filter-select {
-  line-height: var(--filter-input-line-height);
-}
-
 /* Date group heading: a single hairline rule instead of the old 5px double
    border — a quiet section divider, not a decorative slab. */
 .date {
@@ -357,12 +345,6 @@
   flex-wrap: wrap;
 }
 
-.events-toolbar__left {
-  flex: 1 1 auto;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
 /* Empty-result message: its own line under the toolbar so a long sentence can't
    push the view switcher around. */
 .events-empty {
@@ -642,17 +624,6 @@
    the default; the inline combobox filter (wrapped in .filter-desktop) takes over
    at the tablet breakpoint — 600px, matching the calendar breakpoint above.
    ───────────────────────────────────────────────────────────────────────── */
-
-/* Reserve one chip-row of height in the events filter so applying the FIRST
-   filter doesn't shove the toolbar + programme down (the row otherwise goes
-   0 → 1 line). Chip box = 0.75rem text + 5px×2 padding + 1px×2 border (see
-   .filter .tag / .tag). Wrapping to a second line still grows the row — an
-   accepted, rarer jump. The reservation lives on the row (chips + notify bell);
-   the bell rides this same line, so it adds no further jump. */
-.filter .chips-row {
-  align-items: center;
-  min-height: calc(0.75rem + 12px);
-}
 
 /* Chips take the row and wrap within it; the notify bell stays pinned right. */
 .filter .chips {
@@ -1036,46 +1007,6 @@
    tap target (focuses the field, opens the keyboard). */
 @media (min-width: 600px) {
   .opt--newquery { display: none; }
-}
-
-/* Desktop counterpart of .opt--newquery: the free-text "search for «X»" row at
-   the top of the What dropdown (tag_picker prepends it). Reuses the gem's
-   .hw-combobox__option base (padding + hover). It reads like the plain options —
-   neutral text, no leading icon — distinguished only by its label ("Search for
-   «X»") and the faint active ground when it's the highlighted row. No top border:
-   the row sits flush at the top of the listbox now, so a border there just drew a
-   stray grey line under the field's focus underline. */
-.filter-searchfor {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-small);
-  width: 100%;
-  border: 0;
-  background: none;
-  color: var(--theme-fg-color);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.filter-searchfor[hidden] { display: none; }
-
-.filter-searchfor__label {
-  flex-grow: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* The What field drives its OWN single highlight across the free-text row and the
-   options (tag_picker_controller#applyNav): typing lights the free-text row,
-   arrowing moves it into the list. The gem's auto-highlight of the soft-selected
-   first option is cleared in JS (not suppressed here — that also killed hover/nav
-   on that one option), so this is the only highlight, alongside the gem's :hover. */
-.filter-searchfor--active,
-.hw-combobox__option--nav-active {
-  background-color: var(--hw-active-bg-color);
 }
 
 /* ── Custom date range ── a self-contained month calendar (range_calendar

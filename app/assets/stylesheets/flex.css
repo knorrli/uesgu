@@ -11,7 +11,7 @@
 /* wrap */
 .flex.nowrap { flex-wrap: nowrap; }
 .flex.wrap { flex-wrap: wrap; }
-.flex.wrap-reverse { flex-wrap: wrap; }
+.flex.wrap-reverse { flex-wrap: wrap-reverse; }
 
 /* main axis */
 .justify-start { justify-content: flex-start; }

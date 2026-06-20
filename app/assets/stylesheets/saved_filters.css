@@ -123,11 +123,6 @@
   line-height: var(--filter-input-line-height);
 }
 
-.saved-filter-custom {
-  padding-left: var(--gap-medium);
-  border-left: var(--border-width) solid var(--theme-bg-muted);
-}
-
 .saved-filter-check {
   align-items: center;
 }

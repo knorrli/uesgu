@@ -683,6 +683,10 @@
   align-items: center;
   gap: var(--gap-small);
   margin-top: var(--gap-medium);
+  /* Reserve the row's one-line height even with no filter active, so applying a
+     filter fills space that was already held rather than pushing the toolbar +
+     results down (the chips/save control ride this same one-line height). */
+  min-height: 1.5rem;
 }
 
 .filter-sheets__summary-chips {
@@ -970,6 +974,14 @@
 .opt--newquery .opt__box {
   border-color: var(--border-color);
   color: var(--theme-fg-muted);
+}
+
+/* Desktop (inline dropdown panel): the prompt row just echoes the placeholder of
+   the search field sitting directly above it, so hide it — pressing Enter still
+   commits typed text (filter-sheets#commitTyped). On mobile the row stays as a
+   tap target (focuses the field, opens the keyboard). */
+@media (min-width: 600px) {
+  .opt--newquery { display: none; }
 }
 
 /* Desktop counterpart of .opt--newquery: the free-text "search for «X»" row at

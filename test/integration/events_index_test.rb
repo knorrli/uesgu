@@ -63,6 +63,21 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute_includes response.body, 'OtherUnique'
   end
 
+  test 'the filter summary row is always present so applying a filter never shifts the layout' do
+    event(title: 'AnyShow', start_date: Date.current + 2.days)
+
+    # No filter active: the container still renders (reserving its height), but
+    # marked --empty with no chips inside.
+    get events_path
+    assert_select '.filter-sheets__summary.filter-sheets__summary--empty'
+    assert_select '.filter-sheets__summary .filter-chip', false
+
+    # Filter active: same container, now filled with a chip and no --empty marker.
+    get events_path(q: ['AnyShow'])
+    assert_select '.filter-sheets__summary--empty', false
+    assert_select '.filter-sheets__summary .filter-chip'
+  end
+
   test 'a freetext term lights a genre tag whose name contains it, and tapping clears it' do
     # Title has no "hop"; the row shows up (and its tag lights) purely on the
     # genre-name substring — proving freetext now drives genre-tag highlighting,

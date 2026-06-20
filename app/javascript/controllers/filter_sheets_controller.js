@@ -220,10 +220,28 @@ export default class extends Controller {
     const input = sheet.querySelector(".sheet__search-input")
     if (!input || !input.value.trim()) return
 
+    // Session-scoped guard: if the user ticked/unticked a genre while this sheet
+    // was open, the leftover search text was only used to LOCATE that genre (type
+    // "ber" → tick Chamber Pop) — don't also promote it to a stray free-text term.
+    // Genres applied BEFORE opening don't count (we compare to the open snapshot),
+    // and the explicit paths (Enter, tapping the "search for X" row) still add text
+    // regardless, so this only suppresses the implicit auto-stage on commit.
+    if (this.#genresToggled(sheet)) { input.value = ""; return }
+
     const { value, blank } = searchForSuggestion(input.value, this.searchForTemplateValue, this.searchAnythingValue)
     if (blank) return
     this.#addQueryValue(value)
     input.value = ""
+  }
+
+  // Did any genre (g[]) checkbox change while this sheet was open? Compared against
+  // the open-time snapshot so pre-applied genres don't suppress a genuinely-typed
+  // free-text term — only genres toggled in THIS session count.
+  #genresToggled(sheet) {
+    const genres = (serialized) =>
+      serialized.split("|").filter((pair) => pair.startsWith("g=")).sort().join("|")
+    const opened = this.snapshot === undefined ? "" : genres(this.snapshot)
+    return genres(this.#serialize(sheet)) !== opened
   }
 
   // Update a trigger's label + count from its sheet's checked rows — the live

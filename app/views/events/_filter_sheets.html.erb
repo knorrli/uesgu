@@ -40,11 +40,13 @@
     </div>
 
     <%# ── Applied filters (removable). Server-rendered = always matches results.
-        Chips wrap inside their own growing container; the notify bell is pinned to
-        the right of the same row, so applying a filter doesn't add a separate row.
-        The whole summary only renders when a filter is active. ── %>
-    <% if @filter.active? %>
-      <div class="filter-sheets__summary">
+        Chips wrap inside their own growing container; the save control is pinned to
+        the right of the same row. The container is ALWAYS in the layout (with a
+        reserved min-height, see .filter-sheets__summary) and only its CONTENTS are
+        conditional — so activating a filter fills the space already held instead of
+        inserting a new row that shoves the toolbar + results down. ── %>
+    <div class="<%= class_names('filter-sheets__summary', 'filter-sheets__summary--empty': !@filter.active?) %>">
+      <% if @filter.active? %>
         <div class="filter-sheets__summary-chips">
           <% @filter.queries.each do |query| %>
             <%= render 'filter_chip', name: 'q', value: query, label: query, icon: 'query' %>
@@ -59,11 +61,11 @@
             <%= render 'filter_chip', name: 'd', value: range, label: date_range_label(range), icon: 'date' %>
           <% end %>
         </div>
-        <%# ★ save: a plain link to the editor (new draft, or the existing saved
+        <%# Save: a plain link to the editor (new draft, or the existing saved
             filter). Navigates away, so no turbo frame. %>
         <%= render 'save_notify' %>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
 
     <%# ── WHAT + WHERE sheets — the genre tree + the location tree, shared with
         the rule editor so both read identically (tags/_genre_sheet, _location_sheet). ── %>

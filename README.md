@@ -3,16 +3,16 @@
 **üsgu** ([uesgu.ch](https://uesgu.ch)) — Swiss-German for "Ausgang" (going out).
 
 A concert & event aggregator for Swiss music venues. It scrapes event listings
-from live-music venues across Switzerland, normalizes and tags them, and
-presents a filterable feed. Users can favorite locations and styles and receive
-periodic notifications about newly-added events.
+from live-music venues across Switzerland, normalizes and tags them onto a genre
+tree, and presents a filterable feed. Users can save filters (and get optional
+notifications when new matching events appear) and bookmark individual shows.
 
 ## Stack
 
 - Ruby on Rails 8, PostgreSQL
 - Hotwire (Turbo + Stimulus), importmap, Propshaft
-- Solid Queue for background jobs (scrapers run daily)
-- Mechanize for scraping, acts-as-taggable-on for the location/style/genre taxonomy
+- Scrapers run daily via a Render cron task (`scrapers:run_all`, `perform_now`)
+- Mechanize for scraping, acts-as-taggable-on for the location/genre taxonomy
 
 ## Development
 

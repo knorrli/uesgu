@@ -84,6 +84,17 @@
   mask: var(--heart-fill) center / contain no-repeat;
 }
 
+/* Interest (⚑) count: how many shows that day match one of your saved filters.
+   Amber, and it uses the ph-flag glyph in markup (consistent with the row flags),
+   so the base masked square is suppressed. */
+.day-summary__count--interest {
+  color: var(--theme-interest-color);
+}
+
+.day-summary__count--interest::before {
+  content: none;
+}
+
 /* Venue-led row, zero boxes. Hierarchy comes from structure + weight — the venue
    anchor (bold ink) on its own line, the underlined event title as the primary
    link, a quiet metadata line (city/canton) beneath. Colour is rationed: green
@@ -498,20 +509,27 @@
   font-size: 0.85em;
 }
 
-/* On a genre pill it's a bordered segment butted onto the pill's left edge —
-   mirrors the admin edit-gear addon (shared border, no double edge). The parent
-   .event-genre is align-items:stretch, so the segment matches the pill height. */
+/* On a genre pill it trails the label as a bordered segment butted onto the
+   pill's RIGHT edge — mirrors the admin edit-gear addon (shared border, no double
+   edge). The parent .event-genre is align-items:stretch, so it matches the pill
+   height. Placed after the content so genre labels stay left-aligned down the row. */
 .event-genre .interest-flag {
   padding: 0 5px;
   border: var(--tag-border-width) solid var(--border-color);
-  border-right: 0;
+  border-left: 0;
 }
 
-/* On the venue / city-canton (text, not a chip) it's a bare leading glyph,
-   centred to the line. */
-.event-where .interest-flag,
-.event-where-meta .interest-flag {
-  margin-right: 0.3ch;
+/* On the venue / city-canton (text, not a chip) it's a bare trailing glyph,
+   centred to the line. Sized up from the body default so it stays legible beside
+   the bold venue headline; the meta line a touch smaller, matching its text. */
+.event-where .interest-flag {
+  margin-left: 0.35ch;
   vertical-align: middle;
-  font-size: 0.72em;
+  font-size: 1.1rem;
+}
+
+.event-where-meta .interest-flag {
+  margin-left: 0.3ch;
+  vertical-align: middle;
+  font-size: 0.95rem;
 }

@@ -23,12 +23,12 @@
     <section class="venue-group flex flex-col gap-small">
       <% if anchor %>
         <div class="venue-header flex flex-col gap-xsmall">
-          <div class="event-where"><% if why_locs.include?(anchor.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><%= event_filter_tag anchor.name, field: 'l[]', value: anchor.name, interactive: interactive,
-                  modifier: 'venue' %></div>
+          <div class="event-where"><%= event_filter_tag anchor.name, field: 'l[]', value: anchor.name, interactive: interactive,
+                  modifier: 'venue' %><% if why_locs.include?(anchor.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %></div>
           <% if meta_locations.any? %>
             <div class="event-where-meta">
               <% meta_locations.each_with_index do |location, i| %>
-                <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %><% if why_locs.include?(location.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive %>
+                <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %><%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive %><% if why_locs.include?(location.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %>
               <% end %>
             </div>
           <% end %>

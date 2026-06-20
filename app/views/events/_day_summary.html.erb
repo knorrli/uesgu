@@ -1,9 +1,13 @@
-<%# Right-aligned per-day relevance summary for a date header: a saved (♥) count,
-    shown only when > 0 — so the date itself stays cleanly left-aligned with no
-    sometimes-there icon. The count is adjusted by the save toggles within the day
-    (day-summary controller, which lives on the day CONTAINER so those toggles
-    bubble to it). %>
+<%# Right-aligned per-day relevance summary for a date header: a saved (♥) count
+    and an interest (⚑) count — how many shows that day you've saved / that match a
+    saved filter — each shown only when > 0, so the date stays cleanly left-aligned
+    with no sometimes-there icon. The saved count is adjusted live by the save
+    toggles within the day (day-summary controller, on the day CONTAINER so those
+    toggles bubble to it); the interest count is static (set by your saved filters,
+    not by interaction). %>
 <% saved_count = events.count { |event| event_saved?(event) } %>
+<% interest_count = events.count { |event| interest_event?(event) } %>
 <div class="day-summary" aria-hidden="true">
   <span class="day-summary__count day-summary__count--saved" data-day-summary-target="saved" <%= 'hidden' unless saved_count.positive? %>><%= saved_count %></span>
+  <span class="day-summary__count day-summary__count--interest" <%= 'hidden' unless interest_count.positive? %>><i class="ph ph-flag"></i><%= interest_count %></span>
 </div>

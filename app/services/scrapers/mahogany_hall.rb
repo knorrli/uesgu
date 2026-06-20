@@ -33,12 +33,12 @@ module Scrapers
       content.css('.views-field-field-subtitle .field-content').text.squish
     end
 
-    # Consumption-only: Mahogany Hall exposes NO dedicated genre field (verified
+    # Freetext-mined: Mahogany Hall exposes NO dedicated genre field (verified
     # against the live markup — the event row carries only title/subtitle/teaser/
     # price). The subtitle mixes real genre lists ("dixieland, blues, gospel und
     # swing") with free-text prose ("big band goes modern grooves"). The 1–2-word
-    # filter is a damage-limiter; the closed-vocab match (Genre.existing_only) is
-    # what ultimately keeps prose/artist names from minting junk taxonomy.
+    # filter is a damage-limiter on what gets mined; leftover prose tokens now land
+    # in the curation queue (filed, aliased, or blocked) rather than being dropped.
     def event_consumption_genres(content)
       event_subtitle(content)
         .split(/,|\s\-\s|\s[au]nd\s|&|\//)

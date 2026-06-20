@@ -145,9 +145,9 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
 
   test 'an identical re-scrape with overlapping discovery + consumption genres stays unchanged' do
     # Guards a plausible over-count source: build_event assigns
-    # Array(discovery) + existing_only(consumption), which carries a DUPLICATE when
-    # the two sources share a genre ("Ggg" + "Ggg"). acts-as-taggable-on dedupes on
-    # assignment, and tag_snapshot sorts, so the freshly-built list still compares
+    # Array(event_genres) + Array(event_consumption_genres), which carries a DUPLICATE
+    # when the two sources share a genre ("Ggg" + "Ggg"). acts-as-taggable-on dedupes
+    # on assignment, and tag_snapshot sorts, so the freshly-built list still compares
     # equal to the persisted one — a no-op re-scrape stays unchanged, not updated.
     url = 'https://fixture.test/genre-overlap'
     rows = [{ url: url, genres: ['Ggg'], consumption_genres: ['Ggg'] }]

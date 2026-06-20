@@ -293,19 +293,6 @@ class Genre < ApplicationRecord
     end
   end
 
-  # The match-only counterpart to ensure!: the subset of `names` that already
-  # resolve to a Genre row by fingerprint, creating NOTHING. Used by
-  # consumption-only scrapers (unstable free-text sources — artist blurbs,
-  # subtitle prose, country codes) so they may attach only genres already in the
-  # curated vocabulary and can never mint new taxonomy from noise.
-  def self.existing_only(names)
-    names = Array(names).map(&:to_s).reject(&:blank?)
-    return [] if names.empty?
-
-    present = where(fingerprint: names.map { |name| fingerprint_for(name) }).pluck(:fingerprint).to_set
-    names.select { |name| present.include?(fingerprint_for(name)) }
-  end
-
   # Refresh the cached usage count from the current genre taggings on events,
   # creating rows for any new genres and zeroing those no longer in use. Folds
   # tag-name variants that share a fingerprint into the one Genre, so a stray

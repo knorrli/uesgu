@@ -1,10 +1,10 @@
 require_relative '../../db_test_helper'
 
-# DB-backed coverage for the discovery-vs-consumption split (see
-# Scrapers::Agent#build_event and Genre.existing_only). The golden suite runs
-# DB-free and stubs the filter, so the actual closed-vocab behaviour — trusted
-# genres mint taxonomy, consumption genres match-only and create nothing — is
-# proven here against real Genre rows. Synthetic taxonomy only (TaxonomyFixtures).
+# DB-backed coverage that a scraper now collects ALL its genres: both the
+# structured field (event_genres) and freetext-mined tokens
+# (event_consumption_genres) mint taxonomy, with no closed-vocab gate. An
+# unrecognised token lands as a fresh (unplaced) Genre row for the curation
+# queue rather than being dropped at ingest. Synthetic taxonomy only.
 class Scrapers::ConsumptionGenresTest < ActiveSupport::TestCase
   include TaxonomyFixtures
 
@@ -45,55 +45,43 @@ class Scrapers::ConsumptionGenresTest < ActiveSupport::TestCase
 
   def fingerprints(list) = list.map { |name| Genre.fingerprint_for(name) }
 
-  test 'existing_only keeps fingerprint matches, drops unknowns, and creates nothing' do
-    known = genre(name: 'techno')
+  test 'structured (event_genres) tokens are collected and mint new vocabulary' do
     before = Genre.count
 
-    kept = Genre.existing_only([known.name, known.name.upcase, 'No Such Genre', '   '])
+    event = build { |e| scraper(trusted: ['Brand New Genre'], consumption: []).send(:build_event, e, :row) }
 
-    assert_equal before, Genre.count, 'existing_only must never create a Genre'
-    assert_includes fingerprints(kept), known.fingerprint
-    refute_includes fingerprints(kept), Genre.fingerprint_for('No Such Genre')
+    assert_includes fingerprints(event.genre_list), Genre.fingerprint_for('Brand New Genre')
+    assert_equal before + 1, Genre.count
   end
 
-  test 'consumption genres attach only when already in the vocabulary' do
+  test 'freetext (event_consumption_genres) tokens are now collected and mint too — no closed-vocab gate' do
     known = genre(name: 'blues')
     before = Genre.count
 
     event = build do |e|
-      scraper(trusted: [], consumption: [known.name, 'Salsa Namá', 'Us']).send(:build_event, e, :row)
+      scraper(trusted: [], consumption: [known.name, 'Salsa Namá']).send(:build_event, e, :row)
     end
 
+    # The already-known token AND the brand-new freetext token both attach...
     assert_includes fingerprints(event.genre_list), known.fingerprint
-    refute_includes fingerprints(event.genre_list), Genre.fingerprint_for('Salsa Namá')
-    refute_includes fingerprints(event.genre_list), Genre.fingerprint_for('Us')
-    assert_equal before, Genre.count, 'a consumption-only source must not mint taxonomy'
+    assert_includes fingerprints(event.genre_list), Genre.fingerprint_for('Salsa Namá')
+    # ...and the unrecognised one mints a fresh row (lands unplaced for curation).
+    assert_equal before + 1, Genre.count, 'a new freetext token now mints a Genre'
+    assert Genre.exists?(fingerprint: Genre.fingerprint_for('Salsa Namá'))
   end
 
-  test 'trusted (discovery) genres mint new vocabulary' do
-    before = Genre.count
-
-    event = build do |e|
-      scraper(trusted: ['Brand New Genre'], consumption: []).send(:build_event, e, :row)
-    end
-
-    assert_includes fingerprints(event.genre_list), Genre.fingerprint_for('Brand New Genre')
-    assert_equal before + 1, Genre.count
-    assert Genre.exists?(fingerprint: Genre.fingerprint_for('Brand New Genre'))
-  end
-
-  test 'a mixed scraper mints its trusted genre while filtering its consumption junk' do
+  test 'both buckets are collected together and mint their new tokens' do
     known = genre(name: 'rock')
     before = Genre.count
 
     event = build do |e|
-      scraper(trusted: ['Fresh Discovery'], consumption: [known.name, 'Ch']).send(:build_event, e, :row)
+      scraper(trusted: ['Fresh Discovery'], consumption: [known.name, 'Mined Token']).send(:build_event, e, :row)
     end
 
     fps = fingerprints(event.genre_list)
-    assert_includes fps, Genre.fingerprint_for('Fresh Discovery') # trusted → minted
-    assert_includes fps, known.fingerprint                        # consumption → matched
-    refute_includes fps, Genre.fingerprint_for('Ch')              # consumption junk → dropped
-    assert_equal before + 1, Genre.count, 'only the one trusted genre is created'
+    assert_includes fps, Genre.fingerprint_for('Fresh Discovery') # structured → minted
+    assert_includes fps, known.fingerprint                        # freetext, already known → matched
+    assert_includes fps, Genre.fingerprint_for('Mined Token')     # freetext, new → minted
+    assert_equal before + 2, Genre.count, 'the two new tokens (structured + freetext) both mint'
   end
 end

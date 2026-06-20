@@ -115,12 +115,8 @@ class Scrapers::GoldenTest < Minitest::Test
       # isn't under test here (EventTest covers it), so no-op it.
       scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
 
-      # build_event filters consumption genres against existing rows; the closed-
-      # vocab behaviour is covered DB-backed elsewhere, so here echo (parse-only).
       Event.stub(:find_or_initialize_by, factory) do
-        Genre.stub(:existing_only, ->(names) { Array(names) }) do
-          scraper.send(:process_events)
-        end
+        scraper.send(:process_events)
       end
     end
     captured

@@ -143,9 +143,7 @@ class Scrapers::SchueuerTest < Minitest::Test
     scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
 
     Event.stub(:find_or_initialize_by, factory) do
-      Genre.stub(:existing_only, ->(names) { Array(names) }) do
-        scraper.send(:process_events)
-      end
+      scraper.send(:process_events)
     end
     captured
   end

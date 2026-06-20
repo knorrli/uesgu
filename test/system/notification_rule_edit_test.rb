@@ -28,6 +28,18 @@ class NotificationRuleEditTest < ApplicationSystemTestCase
     assert saved.checked?, "the saved genre is pre-checked in the What tree"
   end
 
+  test "the title updates live as the filter changes (before any save)" do
+    visit edit_notification_rule_path(@rule)
+    assert_selector "h1", text: /Zylopunk/
+
+    # Pick the root genre in the What panel — the h1 reflects it immediately, with
+    # no round-trip (the form hasn't been submitted).
+    find(".filter-trigger[data-filter-sheets-field-param='what']").click
+    find(".sheet[data-field=what] .opt--canton", text: @root.name).click
+    assert_selector "h1", text: /#{@root.name}/
+    assert_selector "h1", text: /Zylopunk/ # the original pick is still named too
+  end
+
   test "picking another genre in the What panel and saving persists it" do
     visit edit_notification_rule_path(@rule)
 

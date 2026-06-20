@@ -166,7 +166,7 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     assert_equal ['Radiohead'], r.queries
   end
 
-  test 'editing a filter to match another rule is allowed; the editor flags it' do
+  test 'editing a filter to collide with another is rejected, with a link to it' do
     u = sign_in_as user
     a = u.notification_rules.new(name: 'a', cadence: 'daily', time_of_day: 540)
     a.filter_attributes = { g: ['Rock'] }
@@ -175,13 +175,12 @@ class NotificationRulesTest < ActionDispatch::IntegrationTest
     b.filter_attributes = { g: ['Jazz'] }
     b.save!
 
-    # Editing B to match A IS applied (only the ★ dedupes); not blocked.
+    # Editing B's scope to match A is now blocked (duplicate fingerprints break the
+    # events-page "saved?" match) — not applied, re-renders the editor.
     patch notification_rule_path(b), params: { g: ['Rock'], l: [''], d: [''] }
-    assert_redirected_to notification_rules_path
-    assert_equal ['Rock'], b.reload.genres
-
-    # The editor then surfaces a non-blocking notice linking to A.
-    get edit_notification_rule_path(b)
+    assert_response :unprocessable_entity
+    assert_equal ['Jazz'], b.reload.genres # unchanged
+    # The re-rendered editor surfaces the heads-up linking to A.
     assert_select '.rule-notice a[href=?]', edit_notification_rule_path(a)
   end
 

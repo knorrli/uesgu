@@ -127,7 +127,7 @@ export default class extends Controller {
 
     const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
       .some((input) => input.value === value)
-    if (!exists) this.queriesTarget.prepend(this.#queryRow(value))
+    if (!exists) { this.queriesTarget.prepend(this.#queryRow(value)); this.#notifyChanged() }
 
     if (search) { search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true })) }
   }
@@ -146,7 +146,7 @@ export default class extends Controller {
     if (!blank) {
       const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
         .some((row) => row.value === value)
-      if (!exists) this.queriesTarget.prepend(this.#queryRow(value))
+      if (!exists) { this.queriesTarget.prepend(this.#queryRow(value)); this.#notifyChanged() }
       input.value = ""
     }
     this.#submit()
@@ -273,6 +273,13 @@ export default class extends Controller {
   #submit() {
     if (!this.submitOnApplyValue) return
     this.formTarget.requestSubmit()
+  }
+
+  // A staged free-text query row carries no native change event (it's created
+  // checked, not toggled), so emit a bubbling one — the rule editor's live title
+  // (rule-title) listens for change to recompute. No-op elsewhere.
+  #notifyChanged() {
+    this.formTarget.dispatchEvent(new Event("change", { bubbles: true }))
   }
 
   #sheetFor(field) {

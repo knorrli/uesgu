@@ -58,6 +58,9 @@ class NotificationRulesController < ApplicationController
       redirect_to notification_rules_path, notice: t("notification_rules.saved")
     else
       @filter = filter_for(@rule)
+      # Re-surface the "another rule already covers this" link alongside the error
+      # (the edit page renders it from @duplicate_of).
+      @duplicate_of = duplicate_of(@rule)
       render :edit, status: :unprocessable_entity
     end
   end

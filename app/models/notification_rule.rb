@@ -41,11 +41,13 @@ class NotificationRule < ApplicationRecord
   # the live-favorites flag. (The "Notify me" button is also hidden on an empty
   # filter; this is the backstop.)
   validate :targets_something
-  # One rule per filter set: the "Notify me" flow redirects to the existing rule
-  # instead of creating a clone (see NotificationRulesController#create), and this
-  # backstops races and direct posts. Create-only — editing an existing rule's
-  # schedule must never be blocked, and the autosave editor re-saves constantly.
-  validate :no_duplicate_filter, on: :create
+  # One saved filter per fingerprint: the save-from-events flow lands on the
+  # existing filter instead of cloning (see NotificationRulesController#create),
+  # and this enforces it on both create and edit. Duplicate fingerprints would
+  # break the events-page "saved?" derivation (matching() returns an arbitrary
+  # one), so editing a filter's scope to collide with another is rejected. It
+  # excludes self by id, so a schedule/channel-only edit never trips it.
+  validate :no_duplicate_filter, on: %i[create update]
   validates :name, presence: true
 
   # The name always mirrors the filter — there are no custom names. Re-derived on

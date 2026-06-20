@@ -181,6 +181,21 @@ class NotificationRuleTest < ActiveSupport::TestCase
     assert rule(u, filter: { s: ['Rock'] }).valid?, 'a different filter is fine'
   end
 
+  test 'editing a filter to collide with another rule is invalid; schedule-only edits are fine' do
+    u = user
+    a = rule(u, filter: { s: ['Rock'] }).tap(&:save!)
+    b = rule(u, filter: { s: ['Jazz'] }).tap(&:save!)
+
+    # Editing only the schedule never self-collides (excluded by id).
+    b.time_of_day = 600
+    assert b.valid?, 'a schedule-only edit is allowed'
+
+    # Editing B's filter to match A's is rejected.
+    b.filter_attributes = { s: ['Rock'] }
+    refute b.valid?
+    assert_includes b.errors[:base], I18n.t('notification_rules.errors.duplicate')
+  end
+
   test 'matching finds the rule for a filter, or nil' do
     u = user
     r = rule(u, filter: { s: ['Rock'] }).tap(&:save!)

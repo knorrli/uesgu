@@ -116,7 +116,7 @@ fr:
     push_body:
       one: 1 événement enregistré arrive
       other: "%{count} événements enregistrés arrivent"
-  notification_rules:
+  saved_filters:
     title: Filtres enregistrés
     intro: Tes filtres enregistrés. Applique-en un pour le parcourir, ou modifie-le pour changer comment et quand tu es averti·e.
     your_rules: Tes règles
@@ -128,41 +128,35 @@ fr:
     silent: Sans notification
     saved: Enregistré.
     deleted: Filtre enregistré supprimé.
-    already_exists: Tu as déjà cette alerte — tu peux l'ajuster ici.
-    duplicate_edit: "Tu as aussi une autre règle pour exactement ce filtre :"
+    already_exists: Tu as déjà ce filtre enregistré — tu peux l'ajuster ici.
+    duplicate_edit: "Tu as aussi un autre filtre enregistré pour ça :"
     fired:
-      one: Règle exécutée — 1 événement dans le digest.
-      other: "Règle exécutée — %{count} événements dans le digest."
-    fired_empty: Règle exécutée — aucun événement correspondant pour le moment.
+      one: Filtre exécuté — 1 événement dans le digest.
+      other: "Filtre exécuté — %{count} événements dans le digest."
+    fired_empty: Filtre exécuté — aucun événement correspondant pour le moment.
     fire_now: Tester
-    enable: Activer
-    disable: Mettre en pause
-    disabled: En pause
     delete: Supprimer
-    delete_confirm: Vraiment supprimer cette règle ?
-    default_name: Notification
+    delete_confirm: Vraiment supprimer ce filtre enregistré ?
     edit_button: Modifier
     empty_link: Filtre les événements
-    empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis touche l'étoile pour l'enregistrer.
+    empty_html: Aucun filtre enregistré. %{link} sur la page d'accueil, puis touche l'entonnoir pour l'enregistrer.
     type:
       added: Nouveautés
       happening: À l'affiche
     errors:
       empty_filter: Choisis d'abord un filtre (genre, lieu, date …).
-      duplicate: Tu as déjà une alerte pour ce filtre.
+      duplicate: Tu as déjà un filtre enregistré pour ça.
     new:
-      title: Configurer une notification
-      intro: À quelle fréquence et comment tu es prévenu.
+      title: Enregistrer un filtre
+      intro: Choisis ce qui correspond, puis si et comment tu es prévenu.
     edit:
-      title: Modifier la notification
-      intro: Ce qu'elle surveille, quand et comment tu es prévenu.
+      title: Modifier le filtre enregistré
+      intro: Ce qui correspond, et si et comment tu es prévenu.
     email_unavailable: ajoute une adresse e-mail dans les réglages
+    section_filter: Filtre
+    section_notifications: Notifications
     section_when: Quand
-    section_what: À propos de quoi
-    section_filter: Pour quoi
-    section_channels: Comment
-    content_hint: « Nouvellement ajoutés » t'alerte des événements fraîchement listés. « En cours » montre ce qui se passe sur une période (p. ex. ce week-end), peu importe quand c'était ajouté.
-    filter_hint: Sépare les valeurs par des virgules. Les noms doivent correspondre à ceux du site.
+    schedule_label: À quelle fréquence
     channels_hint: Désactive l'app pour un filtre silencieux. Push et e-mail en ont besoin.
     cadences:
       daily: Quotidien

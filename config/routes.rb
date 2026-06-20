@@ -48,11 +48,11 @@ Rails.application.routes.draw do
       constraints: { format: "ics" }, format: true
 
   # Saved filters (a saved landing-page filter, with notification delivery
-  # optional — see NotificationRule). new/create save the current events filter;
+  # optional — see SavedFilter). new/create save the current events filter;
   # edit/update tune it; fire runs it on demand ("Fire now" — test without waiting
   # for the schedule). There's no pause toggle: a filter delivers iff its in-app
   # channel is on, edited on the form like any other channel.
-  resources :notification_rules, only: %i[index new create edit update destroy] do
+  resources :saved_filters, only: %i[index new create edit update destroy] do
     member do
       post :fire
     end

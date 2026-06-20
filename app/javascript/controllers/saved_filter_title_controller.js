@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="rule-title" on the editor wrapper. Live-updates the
-// derived title (h1) as the filter is edited, mirroring NotificationRule#describe:
+// Connects to data-controller="saved-filter-title" on the editor wrapper. Live-updates the
+// derived title (h1) as the filter is edited, mirroring SavedFilter#describe:
 //   "<genres + queries | Alle Events> · [locations] · <window | new-events>".
 // Reads the picker's checked inputs (g[]/q[]/l[]) and the window select directly,
 // so it stays in sync without a round-trip. Display-only — the server re-derives

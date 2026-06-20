@@ -22,7 +22,7 @@ class EventsToolbarTest < ApplicationSystemTestCase
   test "the saved state is a solid funnel (no + badge)" do
     event(start_date: Date.current + 3, genre_list: ["Rock"])
     u = sign_in_as user
-    r = u.notification_rules.new(cadence: "daily", time_of_day: 540)
+    r = u.saved_filters.new(cadence: "daily", time_of_day: 540)
     r.filter_attributes = { g: ["Rock"] }
     r.save!
 

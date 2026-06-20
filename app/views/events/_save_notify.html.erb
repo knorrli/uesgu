@@ -14,10 +14,10 @@
     accessible name lives on aria-label. %>
 <% if current_user.present? && @filter.active? %>
   <div class="filter-actions flex flex-row align-center">
-    <% if @notify_rule %>
+    <% if @saved_filter %>
       <%# Saved: a solid (filled) funnel — opens the existing filter's editor. The
           fill vs. the not-saved outline is the at-a-glance state cue. %>
-      <%= link_to edit_notification_rule_path(@notify_rule),
+      <%= link_to edit_saved_filter_path(@saved_filter),
             class: 'save-filter-link active',
             'aria-label': t('events.index.save_filter_saved') do %>
         <span class="funnel-fill" aria-hidden="true"></span>
@@ -25,7 +25,7 @@
     <% else %>
       <%# Not saved: a funnel with a small + badge ("add this filter") — opens the
           editor with the current filter as a draft. %>
-      <%= link_to new_notification_rule_path(q: @filter.queries, g: @filter.genres,
+      <%= link_to new_saved_filter_path(q: @filter.queries, g: @filter.genres,
                     l: @filter.location_list, d: @filter.date_ranges),
             class: 'save-filter-link',
             'aria-label': t('events.index.save_filter') do %>

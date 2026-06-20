@@ -277,7 +277,7 @@ export default class extends Controller {
 
   // A staged free-text query row carries no native change event (it's created
   // checked, not toggled), so emit a bubbling one — the rule editor's live title
-  // (rule-title) listens for change to recompute. No-op elsewhere.
+  // (saved-filter-title) listens for change to recompute. No-op elsewhere.
   #notifyChanged() {
     this.formTarget.dispatchEvent(new Event("change", { bubbles: true }))
   }

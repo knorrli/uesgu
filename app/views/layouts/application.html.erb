@@ -101,7 +101,7 @@
                   <span class="ph ph-bell" aria-hidden="true"></span>
                   <span><%= t('nav.notifications') %></span><% if unread.positive? %> <span class="badge"><%= unread %></span><% end %>
                 <% end %>
-                <%= link_to notification_rules_path, class: 'nav-menu__item' do %>
+                <%= link_to saved_filters_path, class: 'nav-menu__item' do %>
                   <span class="ph ph-funnel" aria-hidden="true"></span>
                   <span><%= t('nav.filters') %></span>
                 <% end %>

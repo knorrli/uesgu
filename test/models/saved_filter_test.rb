@@ -4,7 +4,7 @@ require 'db_test_helper'
 # (date window => happening, none => added), matched_events for both, live
 # favorites, due? scheduling, fire! snapshot, and the no-empty-firehose guard.
 # Synthetic events/styles only (see taxonomy rule in db_test_helper).
-class NotificationRuleTest < ActiveSupport::TestCase
+class SavedFilterTest < ActiveSupport::TestCase
   NOON = Time.zone.local(2030, 6, 3, 12, 0, 0).freeze # a Monday
   TODAY = NOON.to_date
 
@@ -13,7 +13,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
   end
 
   def rule(user, filter:, **attrs)
-    r = user.notification_rules.new({ cadence: 'daily', time_of_day: 18 * 60,
+    r = user.saved_filters.new({ cadence: 'daily', time_of_day: 18 * 60,
                                       notify_push: false, notify_email: false }.merge(attrs))
     r.filter_attributes = filter
     r
@@ -128,9 +128,9 @@ class NotificationRuleTest < ActiveSupport::TestCase
     off.save!
     off.update_column(:last_fired_at, 1.day.ago)
 
-    created = NotificationRule.run_due!(Time.current)
+    created = SavedFilter.run_due!(Time.current)
     assert_equal 1, created.size
-    assert_equal due.id, created.first.notification_rule_id
+    assert_equal due.id, created.first.saved_filter_id
   end
 
   # --- validations -----------------------------------------------------------
@@ -176,7 +176,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
 
     dup = rule(u, filter: { l: ['Bern'], q: ['Rock'] }) # order flipped, same set
     refute dup.valid?
-    assert_includes dup.errors[:base], I18n.t('notification_rules.errors.duplicate')
+    assert_includes dup.errors[:base], I18n.t('saved_filters.errors.duplicate')
 
     assert rule(u, filter: { q: ['Rock'] }).valid?, 'a different filter is fine'
   end
@@ -193,16 +193,16 @@ class NotificationRuleTest < ActiveSupport::TestCase
     # Editing B's filter to match A's is rejected.
     b.filter_attributes = { q: ['Rock'] }
     refute b.valid?
-    assert_includes b.errors[:base], I18n.t('notification_rules.errors.duplicate')
+    assert_includes b.errors[:base], I18n.t('saved_filters.errors.duplicate')
   end
 
   test 'matching finds the rule for a filter, or nil' do
     u = user
     r = rule(u, filter: { q: ['Rock'] }).tap(&:save!)
 
-    fp = NotificationRule.fingerprint_for(Filter.build(queries: ['Rock']))
-    assert_equal r, u.notification_rules.matching(fp)
-    assert_nil u.notification_rules.matching(NotificationRule.fingerprint_for(Filter.build(queries: ['Jazz'])))
+    fp = SavedFilter.fingerprint_for(Filter.build(queries: ['Rock']))
+    assert_equal r, u.saved_filters.matching(fp)
+    assert_nil u.saved_filters.matching(SavedFilter.fingerprint_for(Filter.build(queries: ['Jazz'])))
   end
 
   # --- auto-naming -----------------------------------------------------------
@@ -215,8 +215,8 @@ class NotificationRuleTest < ActiveSupport::TestCase
   end
 
   test 'describe is <what> · [where] · <temporal>, with all-events and new-events fallbacks' do
-    all = I18n.t('notification_rules.summary.scope_all')
-    added = I18n.t('notification_rules.type.added')
+    all = I18n.t('saved_filters.summary.scope_all')
+    added = I18n.t('saved_filters.type.added')
     # no what → "Alle Events" leads; location-only still leads with it
     assert_equal "#{all} · Bern · #{added}", rule(user, filter: { l: ['Bern'] }).describe
     # added rule always ends with the new-events label
@@ -283,7 +283,7 @@ class NotificationRuleTest < ActiveSupport::TestCase
   end
 
   test 'time_string parses to minutes-since-midnight' do
-    r = NotificationRule.new
+    r = SavedFilter.new
     r.time_string = '17:30'
     assert_equal 1050, r.time_of_day
     assert_equal '17:30', r.time_string

@@ -1,17 +1,19 @@
-# A saved landing-page filter + a schedule. The user builds a filter on the main
-# page ("Rock · Bern · this weekend") and attaches a cadence/time/channel to it —
-# there's no separate builder vocabulary.
+# A saved landing-page filter, with notification delivery OPTIONAL. The user
+# builds a filter on the main page ("Rock · Bern · this weekend") and saves it; in
+# the editor they can also turn on notifications (in-app is the master channel,
+# plus push/email) and a schedule. With notifications off it's a silent saved
+# scope. There's no separate builder vocabulary — it's the same filter.
 #
-# Whether it's a "what's newly added" or a "what's happening" digest is INFERRED,
-# not chosen:
+# When notifying, whether it's a "newly added" or a "what's happening" digest is
+# INFERRED, not chosen:
 #   - filter has a relative date window (this_weekend, next_week, ...) → HAPPENING:
 #     events occurring in that window, re-resolved each time it fires.
 #   - filter has no date window → ADDED: events newly added (by created_at) since
-#     the rule last fired, future-dated only.
+#     it last fired, future-dated only.
 #
 # The filter (queries/genres/location_list/date_ranges) is frozen at save time and
 # matched exactly like the landing page (Filter#ransack_query).
-class NotificationRule < ApplicationRecord
+class SavedFilter < ApplicationRecord
   CADENCES = %w[daily weekly biweekly monthly].freeze
 
   # For a "happening" rule the firing cadence is DERIVED from the window's period
@@ -42,7 +44,7 @@ class NotificationRule < ApplicationRecord
   # filter; this is the backstop.)
   validate :targets_something
   # One saved filter per fingerprint: the save-from-events flow lands on the
-  # existing filter instead of cloning (see NotificationRulesController#create),
+  # existing filter instead of cloning (see SavedFiltersController#create),
   # and this enforces it on both create and edit. Duplicate fingerprints would
   # break the events-page "saved?" derivation (matching() returns an arbitrary
   # one), so editing a filter's scope to collide with another is rejected. It
@@ -68,14 +70,14 @@ class NotificationRule < ApplicationRecord
   def targets_something
     return if queries.any? || genres.any? || location_list.any? || date_ranges.any?
 
-    errors.add(:base, I18n.t("notification_rules.errors.empty_filter"))
+    errors.add(:base, I18n.t("saved_filters.errors.empty_filter"))
   end
 
   def no_duplicate_filter
     return unless user
-    return unless user.notification_rules.where.not(id: id).any? { |rule| rule.fingerprint == fingerprint }
+    return unless user.saved_filters.where.not(id: id).any? { |rule| rule.fingerprint == fingerprint }
 
-    errors.add(:base, I18n.t("notification_rules.errors.duplicate"))
+    errors.add(:base, I18n.t("saved_filters.errors.duplicate"))
   end
 
   before_create { self.last_fired_at ||= Time.current }
@@ -149,7 +151,7 @@ class NotificationRule < ApplicationRecord
 
   # The rule in this scope whose filter matches `fingerprint`, or nil. Set-based,
   # so it runs in Ruby — fine over a single user's handful of rules. Used as
-  # current_user.notification_rules.matching(fp).
+  # current_user.saved_filters.matching(fp).
   def self.matching(fingerprint)
     all.detect { |rule| rule.fingerprint == fingerprint }
   end
@@ -211,7 +213,7 @@ class NotificationRule < ApplicationRecord
     notification =
       if events.any?
         note = user.notifications.create!(
-          notification_rule: self,
+          saved_filter: self,
           title: display_name,
           event_ids: events.map(&:id),
           period_start: coverage_start(now),
@@ -236,7 +238,7 @@ class NotificationRule < ApplicationRecord
   # time window for a happening filter, else the new-events label.
   def describe
     what = (genres + queries).join(", ")
-    parts = [what.presence || I18n.t("notification_rules.summary.scope_all")]
+    parts = [what.presence || I18n.t("saved_filters.summary.scope_all")]
     parts << location_list.join(", ") if location_list.any?
     parts << temporal_label
     parts.join(" · ")
@@ -272,7 +274,7 @@ class NotificationRule < ApplicationRecord
   # The trailing part of the name: the window label (happening) or the new-events
   # label (added) — always present, so every name reads the same way.
   def temporal_label
-    happening? ? window_labels.join(", ") : I18n.t("notification_rules.type.added")
+    happening? ? window_labels.join(", ") : I18n.t("saved_filters.type.added")
   end
 
   def window_labels
@@ -331,6 +333,6 @@ class NotificationRule < ApplicationRecord
   def deliver_email(notification)
     NotificationMailer.digest(notification).deliver_later
   rescue StandardError => e
-    Rails.logger.error("[notification_rules] email delivery failed for rule ##{id}: #{e.class} #{e.message}")
+    Rails.logger.error("[saved_filters] email delivery failed for rule ##{id}: #{e.class} #{e.message}")
   end
 end

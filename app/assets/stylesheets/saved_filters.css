@@ -1,14 +1,14 @@
-/* Notification rules: the "list of funnels" management screen. Follows the
-   settings aesthetic — hairline separators, square-ish corners, accent green for
-   actions, raspberry only via the shared .danger role. */
+/* Saved filters: the list + editor screens. Follows the settings aesthetic —
+   hairline separators, square-ish corners, accent green for actions, raspberry
+   only via the shared .danger role. */
 
-.rule-list {
+.saved-filter-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-.rule-card {
+.saved-filter-card {
   padding: var(--gap-medium);
   border: var(--border-width) solid var(--theme-bg-muted);
 }
@@ -16,26 +16,26 @@
 /* A silent saved filter (notifications off) is a normal, valid interest — not a
    disabled alert — so it isn't dimmed. A subtle left accent marks the notifying
    ones instead, and the bell toggle carries the on/off state. */
-.rule-card--silent {
+.saved-filter-card--silent {
   border-left-color: var(--theme-bg-muted);
 }
 
-.rule-card:not(.rule-card--silent) {
+.saved-filter-card:not(.saved-filter-card--silent) {
   border-left: 3px solid var(--theme-accent-color);
 }
 
-.rule-card__name {
+.saved-filter-card__name {
   font-weight: bold;
 }
 
-.rule-card__chips,
-.rule-card__actions {
+.saved-filter-card__chips,
+.saved-filter-card__actions {
   flex-wrap: wrap;
   align-items: center;
 }
 
 /* button_to wraps each action in its own <form>; keep them inline + flush. */
-.rule-card__actions form {
+.saved-filter-card__actions form {
   margin: 0;
 }
 
@@ -47,51 +47,51 @@
    vocabulary, not specific to this page. */
 
 /* Builder form: reuse .account-form field styling; these add the grouping. */
-.rule-fieldset {
+.saved-filter-fieldset {
   border: 0;
   margin: 0;
   padding: 0;
   min-width: 0;
 }
 
-.rule-fieldset legend {
+.saved-filter-fieldset legend {
   padding: 0;
   font-weight: bold;
   margin-bottom: var(--gap-small);
 }
 
-.rule-row {
+.saved-filter-row {
   flex-wrap: wrap;
   align-items: flex-end;
 }
 
-.rule-row > label {
+.saved-filter-row > label {
   flex: 1 1 8rem;
   min-width: 0;
 }
 
-.rule-custom {
+.saved-filter-custom {
   padding-left: var(--gap-medium);
   border-left: var(--border-width) solid var(--theme-bg-muted);
 }
 
-.rule-check {
+.saved-filter-check {
   align-items: center;
 }
 
 /* Push + e-mail depend on the in-app master above them — a small indent shows the
    hierarchy (and they grey out via :disabled when in-app is off). */
-.rule-check--sub {
+.saved-filter-check--sub {
   padding-left: var(--gap-medium);
 }
 
-.rule-check--sub:has(:disabled) {
+.saved-filter-check--sub:has(:disabled) {
   opacity: 0.55;
 }
 
 /* A channel whose prerequisite is missing (e-mail with no address saved) is
    disabled; dim it so it reads as unavailable. */
-.rule-check--disabled {
+.saved-filter-check--disabled {
   opacity: 0.55;
 }
 
@@ -106,7 +106,7 @@
 /* Give the window select the same line metrics as the what/where comboboxes so
    all three filter fields are exactly the same height in every browser (some
    render a bare <select> shorter by default). */
-.rule-form select[name="d[]"] {
+.saved-filter-form select[name="d[]"] {
   line-height: var(--filter-input-line-height);
 }
 
@@ -117,10 +117,10 @@
 }
 
 /* The conditional schedule fields (weekday / monthday) carry .flex
-   (display:flex), which overrides the UA `[hidden]` rule that the rule-form
+   (display:flex), which overrides the UA `[hidden]` rule that the saved-filter-form
    Stimulus controller toggles — so without this they'd never hide. Re-assert
    [hidden] at higher specificity (same trick as events.css). */
-.rule-form [hidden] {
+.saved-filter-form [hidden] {
   display: none;
 }
 
@@ -204,7 +204,7 @@
 /* A non-blocking heads-up inside the editor (another rule already covers this
    exact filter). Accent-bordered like a flash, not warn-red like .form-errors —
    nothing's wrong, the duplicate is allowed; it's just worth knowing. */
-.rule-notice {
+.saved-filter-notice {
   border: var(--border-width) solid var(--theme-accent-color);
   padding: var(--gap-small) var(--gap-medium);
   /* Breathing room above/below so it isn't crammed between the intro and the
@@ -213,22 +213,10 @@
   line-height: 1.5;
 }
 
-/* Rule card name carries an inline type badge. */
-.rule-card__name {
+/* Saved-filter card name carries an inline type badge. */
+.saved-filter-card__name {
   display: inline-flex;
   align-items: center;
   gap: var(--gap-small);
   font-weight: bold;
-}
-
-.rule-about-label {
-  font-weight: bold;
-}
-
-/* The "keep in sync with favorites" opt-in gets a subtle neutral sand ground
-   (the shared --theme-bg-muted highlight) so it reads as a distinct optional
-   choice — without the muddy muted-green wash it used to carry. */
-.rule-sync {
-  padding: var(--gap-small) var(--gap-medium);
-  background: var(--theme-bg-muted);
 }

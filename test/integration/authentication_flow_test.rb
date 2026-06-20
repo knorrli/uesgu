@@ -16,7 +16,7 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
 
     created = User.find_by(username: 'newcomer')
-    assert_empty created.notification_rules, 'onboarding must not force a saved filter'
+    assert_empty created.saved_filters, 'onboarding must not force a saved filter'
     assert_equal created, invite.reload.redeemed_by, 'the code is spent on the new user'
 
     # The session cookie is live: a protected page now renders.

@@ -1,7 +1,7 @@
 # Email via Resend (SMTP), mirroring config/initializers/web_push.rb: supply the
 # API key through env (RESEND_API_KEY) or credentials (resend.api_key) and email
 # turns on; leave it absent and the channel is inert — MailConfig.configured? is
-# false, NotificationRule skips email, and delivery falls back to :test so
+# false, SavedFilter skips email, and delivery falls back to :test so
 # nothing leaves the app (dev/CI/first deploy all boot fine).
 #
 # SMTP, so no extra gem. The sending domain (uesgu.ch — the ASCII code/email

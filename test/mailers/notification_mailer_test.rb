@@ -26,14 +26,14 @@ class NotificationMailerTest < ActionMailer::TestCase
   test 'the heading renders in the recipient locale, not the frozen-title locale' do
     u = user(email_address: 'fan4@example.test', locale: 'en')
     # The rule's name freezes under the test's default locale (de): "… · Neue Events".
-    rule = u.notification_rules.new(cadence: 'daily', time_of_day: 600,
+    rule = u.saved_filters.new(cadence: 'daily', time_of_day: 600,
                                     notify_push: false, notify_email: false)
     rule.filter_attributes = { q: ['Rock'] }
     rule.save!
     assert_match 'Neue Events', rule.name, 'name is frozen in de here'
 
     ev = event(start_date: Date.current + 2)
-    note = u.notifications.create!(notification_rule: rule, title: rule.name,
+    note = u.notifications.create!(saved_filter: rule, title: rule.name,
                                    event_ids: [ev.id], period_start: 1.week.ago, period_end: Time.current)
 
     html = NotificationMailer.digest(note).html_part.body.to_s

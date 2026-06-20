@@ -1,4 +1,4 @@
-<% name = @notification.notification_rule&.display_name.presence || @notification.title.presence || t('notifications.show.title') %>
+<% name = @notification.saved_filter&.display_name.presence || @notification.title.presence || t('notifications.show.title') %>
 <% content_for :title, name %>
 
 <%= link_to t('notifications.show.back'), notifications_path, class: "back-link" %>

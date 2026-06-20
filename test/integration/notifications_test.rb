@@ -2,7 +2,7 @@ require 'db_test_helper'
 
 # Locks the notifications inbox: the index lists the user's digests with their
 # name + event count, and show marks a digest read. (Digests are created by
-# NotificationRule#fire!, not lazily on visit.)
+# SavedFilter#fire!, not lazily on visit.)
 class NotificationsTest < ActionDispatch::IntegrationTest
   test 'index lists the users digests by name' do
     u = user

@@ -8,12 +8,12 @@ class EventsController < ApplicationController
   # GET /events
   def index
     @filter = build_filter
-    # A logged-in user gets the ★ save control for the active filter. @notify_rule
+    # A logged-in user gets the ★ save control for the active filter. @saved_filter
     # is the saved filter matching this exact filter set, if any: present → the ★
     # is lit and links to its editor; nil → an outline ★ links to a fresh draft
-    # (see _save_notify + NotificationRule.matching).
+    # (see _save_notify + SavedFilter.matching).
     if current_user && @filter.active?
-      @notify_rule = current_user.notification_rules.matching(NotificationRule.fingerprint_for(@filter))
+      @saved_filter = current_user.saved_filters.matching(SavedFilter.fingerprint_for(@filter))
     end
     @q = Event.visible.ransack(@filter.ransack_query)
 

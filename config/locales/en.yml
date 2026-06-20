@@ -116,7 +116,7 @@ en:
     push_body:
       one: 1 saved show coming up
       other: "%{count} saved shows coming up"
-  notification_rules:
+  saved_filters:
     title: Saved filters
     intro: Filters you've saved. Apply one to browse it, or edit it to change how and when you're notified.
     your_rules: Your rules
@@ -128,41 +128,35 @@ en:
     silent: Not notifying
     saved: Saved.
     deleted: Saved filter deleted.
-    already_exists: You already have this alert — here you can tweak it.
-    duplicate_edit: "You also have another rule for this exact filter:"
+    already_exists: You already have this saved filter — tweak it here.
+    duplicate_edit: "You also have another saved filter for this:"
     fired:
-      one: Rule run — 1 event in the digest.
-      other: "Rule run — %{count} events in the digest."
-    fired_empty: Rule run — no matching events right now.
+      one: Filter run — 1 event in the digest.
+      other: "Filter run — %{count} events in the digest."
+    fired_empty: Filter run — no matching events right now.
     fire_now: Test now
-    enable: Enable
-    disable: Pause
-    disabled: Paused
     delete: Delete
-    delete_confirm: Really delete this rule?
-    default_name: Notification
+    delete_confirm: Really delete this saved filter?
     edit_button: Edit
     empty_link: Filter the events
-    empty_html: No saved filters yet. %{link} on the home page, then tap the star to save it.
+    empty_html: No saved filters yet. %{link} on the home page, then tap the funnel to save it.
     type:
       added: New events
       happening: What's on
     errors:
       empty_filter: Pick a filter first (genre, location, date …).
-      duplicate: You already have an alert for this filter.
+      duplicate: You already have a saved filter for this.
     new:
-      title: Set up a notification
-      intro: How often and how you hear about this.
+      title: Save a filter
+      intro: Pick what to match, then choose if and how you're notified.
     edit:
-      title: Edit notification
-      intro: What it watches, when, and how you're notified.
+      title: Edit saved filter
+      intro: What it matches, and if and how you're notified.
     email_unavailable: add an email address in settings
+    section_filter: Filter
+    section_notifications: Notifications
     section_when: When
-    section_what: About what
-    section_filter: For what
-    section_channels: How
-    content_hint: "“Newly added” catches freshly listed events. “Happening” shows what's on in a window (e.g. this weekend), whenever it was added."
-    filter_hint: Comma-separate values. Names must match those used on the site.
+    schedule_label: How often
     channels_hint: Turn off in-app for a silent saved filter. Push and email need it on.
     cadences:
       daily: Daily

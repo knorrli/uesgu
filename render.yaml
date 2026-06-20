@@ -95,7 +95,7 @@ projects:
             region: frankfurt
             schedule: "*/15 * * * *"
             buildCommand: "bundle install"
-            startCommand: "bin/rails notification_rules:tick"
+            startCommand: "bin/rails saved_filters:tick"
             envVars:
               - key: DATABASE_URL
                 fromDatabase:

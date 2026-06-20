@@ -10,7 +10,7 @@
     <% @notifications.each do |notification| %>
       <li class="<%= class_names('notification', unread: !notification.read?) %>">
         <%= link_to notification_path(notification) do %>
-          <% name = notification.notification_rule&.display_name.presence || notification.title.presence || t('notifications.index.fallback_name') %>
+          <% name = notification.saved_filter&.display_name.presence || notification.title.presence || t('notifications.index.fallback_name') %>
           <span class="notification__name">
             <%= name %>
             <% unless notification.read? %><span class="badge"><%= t('notifications.index.unread_badge') %></span><% end %>

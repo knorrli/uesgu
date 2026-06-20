@@ -116,7 +116,7 @@ de:
     push_body:
       one: 1 gespeicherte Veranstaltung steht an
       other: "%{count} gespeicherte Veranstaltungen stehen an"
-  notification_rules:
+  saved_filters:
     title: Gespeicherte Filter
     intro: Deine gespeicherten Filter. Wende einen an, um ihn durchzustöbern, oder bearbeite ihn, um zu ändern, wie und wann du benachrichtigt wirst.
     your_rules: Deine Regeln
@@ -128,41 +128,35 @@ de:
     silent: Keine Benachrichtigung
     saved: Gespeichert.
     deleted: Gespeicherter Filter gelöscht.
-    already_exists: Diese Benachrichtigung gibt es schon — hier kannst du sie anpassen.
-    duplicate_edit: "Du hast noch eine Regel für genau diesen Filter:"
+    already_exists: Diesen gespeicherten Filter gibt es schon — hier kannst du ihn anpassen.
+    duplicate_edit: "Du hast noch einen gespeicherten Filter dafür:"
     fired:
-      one: Regel ausgeführt — 1 Veranstaltung im Digest.
-      other: "Regel ausgeführt — %{count} Veranstaltungen im Digest."
-    fired_empty: Regel ausgeführt — derzeit keine passenden Veranstaltungen.
+      one: Filter ausgeführt — 1 Veranstaltung im Digest.
+      other: "Filter ausgeführt — %{count} Veranstaltungen im Digest."
+    fired_empty: Filter ausgeführt — derzeit keine passenden Veranstaltungen.
     fire_now: Jetzt testen
-    enable: Aktivieren
-    disable: Pausieren
-    disabled: Pausiert
     delete: Löschen
-    delete_confirm: Diese Regel wirklich löschen?
-    default_name: Benachrichtigung
+    delete_confirm: Diesen gespeicherten Filter wirklich löschen?
     edit_button: Bearbeiten
     empty_link: Filtere die Veranstaltungen
-    empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite, dann tippe auf den Stern.
+    empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite, dann tippe auf den Trichter.
     type:
       added: Neue Events
       happening: Was läuft
     errors:
       empty_filter: Wähle zuerst einen Filter (Genre, Ort, Datum …).
-      duplicate: Für diesen Filter hast du schon eine Benachrichtigung.
+      duplicate: Für diesen Filter hast du schon einen gespeicherten Filter.
     new:
-      title: Benachrichtigung einrichten
-      intro: Wie oft und wie du davon erfährst.
+      title: Filter speichern
+      intro: Wähle, worauf der Filter passt, und ob/wie du benachrichtigt wirst.
     edit:
-      title: Benachrichtigung bearbeiten
-      intro: Worüber, wann und wie du benachrichtigt wirst.
+      title: Gespeicherten Filter bearbeiten
+      intro: Worauf er passt, und ob/wie du benachrichtigt wirst.
     email_unavailable: E-Mail-Adresse in den Einstellungen hinterlegen
+    section_filter: Filter
+    section_notifications: Benachrichtigungen
     section_when: Wann
-    section_what: Worüber
-    section_filter: Wofür
-    section_channels: Wie
-    content_hint: „Neu hinzugefügt“ meldet frisch eingetragene Veranstaltungen. „Findet statt“ zeigt, was in einem Zeitraum (z. B. dieses Wochenende) läuft — egal, wann es eingetragen wurde.
-    filter_hint: Werte mit Komma trennen. Namen müssen denen auf der Seite entsprechen.
+    schedule_label: Wie oft
     channels_hint: In-App aus = stiller Filter. Push und E-Mail brauchen In-App.
     cadences:
       daily: Täglich

@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 // push + email can't ride on a digest that never fires — they're unchecked and
 // disabled. Re-enabling in-app restores them, EXCEPT a channel locked for another
 // reason (email with no address on file → data-locked), which stays disabled. The
-// server enforces the same rule (NotificationRule#silence_other_channels).
+// server enforces the same rule (SavedFilter#silence_other_channels).
 export default class extends Controller {
   static targets = ["master", "dependent"]
 

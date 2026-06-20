@@ -1,4 +1,4 @@
-# A daily nudge about the shows a user has saved. Unlike a NotificationRule
+# A daily nudge about the shows a user has saved. Unlike a SavedFilter
 # (a saved filter + schedule), this is a single global opt-in: once a day, around
 # the user's chosen time (noon by default), if any saved show falls on the target
 # day (day-of by default), send one digest.

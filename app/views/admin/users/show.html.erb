@@ -39,9 +39,9 @@
 
   <section class="flex flex-col gap-small">
     <h2><%= t('.saved_filters') %></h2>
-    <% if @user.notification_rules.any? %>
+    <% if @user.saved_filters.any? %>
       <div class="flex gap-small wrap">
-        <% @user.notification_rules.each do |rule| %><span class="chip"><%= rule.display_name %></span><% end %>
+        <% @user.saved_filters.each do |rule| %><span class="chip"><%= rule.display_name %></span><% end %>
       </div>
     <% else %>
       <p class="muted">—</p>

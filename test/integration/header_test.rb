@@ -26,7 +26,7 @@ class HeaderTest < ActionDispatch::IntegrationTest
     sign_in_as user
     get root_path
     # Saved filters are their own nav section now (no longer an inbox tab).
-    assert_select '.nav-menu__items a[href=?]', notification_rules_path, 1
+    assert_select '.nav-menu__items a[href=?]', saved_filters_path, 1
     # Logout moved to the Settings page.
     assert_select '.nav-menu__items a[href=?]', session_path, false
   end

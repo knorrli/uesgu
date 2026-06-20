@@ -3,7 +3,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :notifications, dependent: :destroy
   # User-defined notification funnels (the WHEN·WHICH·FILTER·CHANNEL rules).
-  has_many :notification_rules, dependent: :destroy
+  has_many :saved_filters, dependent: :destroy
   # Bookmarked individual events ("save this show"). class_name pinned because the
   # inflector singularizes "saves" → "safe".
   has_many :event_saves, class_name: 'EventSave', dependent: :destroy

@@ -61,6 +61,12 @@ reasons:
     explanation: >
       Feed/site exists but is unmaintained — stale or frozen data (e.g. a feed
       stuck on an old season). Worth re-checking in case it revives.
+  needs_work:
+    revisitable: true
+    explanation: >
+      Wanted, but needs significant custom integration before we can ingest it
+      cleanly — e.g. a large mixed aggregator that needs scale handling, per-event
+      keying, and music-only filtering. A build task, not a venue defect.
   feed_quality:
     revisitable: true
     explanation: >
@@ -129,6 +135,17 @@ venues:
     reason: robots
     checked: 2026-06-21
     aliases: { ole: [www.bejazz.ch] }     # OLE *aggregator* feed (per-event location), robots-blocked. Also a roving series.
+  - domain: bewegungsmelder.ch
+    name: Bewegungsmelder
+    disposition: defer
+    reason: needs_work
+    checked: 2026-06-21
+    aliases: { ole: [bewegungsmelder.ch] }
+    # Regional culture aggregator, ~7600 events / 152 pages. Has real genre tags +
+    # clean venue names + per-event <source_url>/source_id. To build: aggregator:true;
+    # key on source_id (the <url> is the venue homepage → same-date collisions);
+    # lean on the music-gate to hide the ~half that's dance/party/theater; dedup vs
+    # bee-flat (already consumed); skip the Eventfrog-sourced rows it republishes.
 
   # --- reject: evaluated, not wanted (JS-only, no scrapeable date, non-music, …).
   - domain: la-cappella.ch

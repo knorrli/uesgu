@@ -28,8 +28,9 @@ module Scrapers
   # are ignored — no image ingestion by design.
   #
   # IMPORTANT — the event URL is the venue's own <url>, never <ticket_url>.
-  # <ticket_url> is usually the Eventfrog/PETZI mirror; pointing users there is the
-  # exact mistake the PETZI scraper still has. We keep <url> (the real venue page)
+  # <ticket_url> is usually the Eventfrog/PETZI mirror; pointing users there is a
+  # mistake the PETZI scraper used to make (it now prefers the venue's official-
+  # website link, see Scrapers::Petzi#event_url). We keep <url> (the real venue page)
   # as the canonical link and only *append the show date* to it to keep one
   # event's N shows as N distinct, stable upsert keys (Event keys on url).
   #

@@ -13,6 +13,10 @@ module Scrapers
       [location, 'Zürich', 'ZH']
     end
 
+    # The feed is on the NodeHive backend (see #url), so the venue domain isn't
+    # derivable from url.host — declare it for the ledger drift test.
+    def self.venue_domains = ['dynamo.ch']
+
     # The "Konzert" category marks an event as a concert; the rest of the term ids
     # are genre facets we surface as (match-only) consumption genres.
     CONCERT_TID = 20

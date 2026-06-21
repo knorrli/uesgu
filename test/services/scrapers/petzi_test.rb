@@ -12,6 +12,21 @@ class Scrapers::PetziTest < Minitest::Test
                         File.binread(File.join(FIXTURES, name)), '200', Mechanize.new)
   end
 
+  def page_from_html(html, uri)
+    Mechanize::Page.new(URI(uri), { 'content-type' => 'text/html; charset=utf-8' },
+                        html, '200', Mechanize.new)
+  end
+
+  # Prime the per-row detail-page cache so event_url reads it without a live fetch
+  # (event_url fetches the detail page itself in production; the field-extractor
+  # tests above pass the page in directly).
+  def scraper_on(page, row: DETAIL_URL)
+    scraper(current_row: row).tap do |s|
+      s.instance_variable_set(:@detail_row, row)
+      s.instance_variable_set(:@detail_page, page)
+    end
+  end
+
   def detail = @detail ||= page_from('detail.html', DETAIL_URL, 'text/html; charset=utf-8')
 
   def scraper(current_row: DETAIL_URL)
@@ -51,7 +66,17 @@ class Scrapers::PetziTest < Minitest::Test
     assert_equal ['Kofmehl', 'Solothurn', 'SO'], scraper.event_locations(detail)
   end
 
-  def test_url_is_the_row
-    assert_equal DETAIL_URL, scraper.event_url(DETAIL_URL)
+  def test_url_is_the_venue_official_website
+    # The Kofmehl detail fixture carries an "official website" link on the venue's
+    # own domain (kofmehl.net) — event_url prefers it over the petzi.ch URL.
+    assert_equal 'https://kofmehl.net/programm/malevolence/',
+                 scraper_on(detail).event_url(DETAIL_URL)
+  end
+
+  def test_url_falls_back_to_petzi_when_no_venue_link
+    # No link on the venue's domain (only an off-domain/petzi link) → keep the
+    # petzi.ch URL. Dedup then ranks this copy last anyway.
+    bare = page_from_html('<html><body><a href="https://www.petzi.ch/x">x</a></body></html>', DETAIL_URL)
+    assert_equal DETAIL_URL, scraper_on(bare).event_url(DETAIL_URL)
   end
 end

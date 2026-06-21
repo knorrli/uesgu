@@ -103,6 +103,6 @@
 
 ## Out of scope (not "incomplete")
 
-- More scraper venues — backlog in `docs/scraper-backlog.md`.
+- More scraper venues — candidate/evaluated venues live in `config/venue_ledger.yml` (defer/reject rows); discovery via `docs/discovery-design.md`.
 - Vanished-event sweep / ratio alerting — declined as over-engineering.
 - Password reset — no recovery flow by design.

@@ -7,15 +7,17 @@ module Scrapers
   # unioned onto it. Duplicates are never deleted — bookmarks stay intact — just
   # hidden by Event.visible.
   #
-  # Source authority (most authoritative wins the canonical, see #source_rank):
-  #   OLE  — venue-published, structured, links to the venue's OWN page; this is
-  #          the source we're consolidating on, so it wins where present.
-  #   PETZI — shared aggregator; clean but scraped, and links to its ticket
-  #          mirror. Kept as a gap-filler for shows OLE doesn't (yet) cover.
-  #   bespoke HTML scrapers — fragile, last resort.
-  # So an OLE show absorbs the matching PETZI / bespoke copies and stays the lone
-  # visible listing; where there's no OLE feed, PETZI still absorbs bespoke as
-  # before. Genres always accumulate onto the canonical regardless of who won it.
+  # Source authority (most authoritative wins the canonical, see #source_rank).
+  # We rank by which copy links most DIRECTLY to the venue's own event page:
+  #   OLE  — venue-published, structured, links to the venue's OWN page; the
+  #          source we're consolidating on, so it wins where present.
+  #   bespoke HTML scrapers — also link to the venue's own event page, so they
+  #          beat PETZI; fragile, but a successfully-parsed event is venue-direct.
+  #   PETZI — shared ticketing aggregator; links to its own ticket page unless the
+  #          venue exposes an official-website link, so it's the copy of LAST resort.
+  # So an OLE show absorbs the matching bespoke / PETZI copies, and a bespoke show
+  # absorbs the matching PETZI copy, each staying the lone visible listing. Genres
+  # always accumulate onto the canonical regardless of who won it.
   #
   # Idempotent: each run re-derives every link from scratch, so a show a source
   # drops (or whose title drifts) re-surfaces. Genre accumulation self-heals
@@ -72,14 +74,15 @@ module Scrapers
       end
     end
 
-    # 0 = OLE feed (preferred), 1 = PETZI, 2 = bespoke HTML scraper. Drives which
-    # copy of an overlapping show stays visible (see class comment). data_source is
-    # the scraper's provenance stamp ("OLE:Dachstock", "Petzi", "Dachstock", …).
+    # 0 = OLE feed (preferred), 1 = bespoke HTML scraper, 2 = PETZI (last resort).
+    # Drives which copy of an overlapping show stays visible (see class comment) —
+    # we rank by which links most directly to the venue. data_source is the
+    # scraper's provenance stamp ("OLE:Dachstock", "Petzi", "Dachstock", …).
     def source_rank(event)
       case event.data_source
       when /\AOLE:/ then 0
-      when 'Petzi'  then 1
-      else 2
+      when 'Petzi'  then 2
+      else 1
       end
     end
 

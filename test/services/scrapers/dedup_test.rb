@@ -3,7 +3,8 @@ require_relative '../../db_test_helper'
 # Mechanics of cross-source dedup. Uses real tracked venues ("Kofmehl" for the
 # PETZI/bespoke cases, "Dachstock" for the OLE cases) because Dedup processes
 # Petzi::VENUES + the OLE source venues; genres are invented (taxonomy rule).
-# Source authority is read from data_source (OLE > PETZI > bespoke).
+# Source authority is read from data_source (OLE > bespoke > PETZI): we rank by
+# which copy links most directly to the venue, so PETZI is the last resort.
 class Scrapers::DedupTest < ActiveSupport::TestCase
   FUTURE = Date.current + 10
 
@@ -29,38 +30,38 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     e
   end
 
-  test 'a matching bespoke event is linked to the PETZI canonical and hidden from visible' do
-    p = petzi_event(title: 'Malevolence')
+  test 'a matching PETZI event folds onto the bespoke canonical (bespoke links direct)' do
     b = bespoke_event(title: 'Malevolence')
+    p = petzi_event(title: 'Malevolence')
 
     Scrapers::Dedup.run
 
-    assert_equal p.id, b.reload.canonical_event_id
-    assert_nil p.reload.canonical_event_id, 'PETZI event stays canonical'
-    assert_includes Event.visible, p
-    refute_includes Event.visible, b, 'duplicate is suppressed'
-    assert_equal [b], p.duplicate_events.to_a
+    assert_equal b.id, p.reload.canonical_event_id
+    assert_nil b.reload.canonical_event_id, 'bespoke event stays canonical'
+    assert_includes Event.visible, b
+    refute_includes Event.visible, p, 'PETZI duplicate is suppressed'
+    assert_equal [p], b.duplicate_events.to_a
   end
 
   test 'bookmarks on a duplicate survive (it is hidden, never deleted)' do
-    p = petzi_event(title: 'Survivor')
-    b = bespoke_event(title: 'Survivor')
+    bespoke_event(title: 'Survivor')          # the canonical
+    p = petzi_event(title: 'Survivor')        # the duplicate (PETZI ranks last)
     u = user
-    EventSave.create!(user: u, event: b)
+    EventSave.create!(user: u, event: p)
 
     Scrapers::Dedup.run
 
-    assert EventSave.exists?(user: u, event: b), 'bookmark preserved'
-    assert Event.exists?(b.id), 'duplicate not deleted'
+    assert EventSave.exists?(user: u, event: p), 'bookmark preserved'
+    assert Event.exists?(p.id), 'duplicate not deleted'
   end
 
   test "duplicate's genres are unioned onto the canonical" do
-    p = petzi_event(title: 'Union Show', genres: ['zorprock-canon'])
-    bespoke_event(title: 'Union Show', genres: ['zorpmetal-dup'])
+    b = bespoke_event(title: 'Union Show', genres: ['zorprock-canon'])  # canonical
+    petzi_event(title: 'Union Show', genres: ['zorpmetal-dup'])         # duplicate
 
     Scrapers::Dedup.run
 
-    genres = p.reload.genre_list.map(&:downcase)
+    genres = b.reload.genre_list.map(&:downcase)
     assert_includes genres, 'zorprock-canon'
     assert_includes genres, 'zorpmetal-dup'
   end
@@ -85,12 +86,12 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
   end
 
   test 'a truncated club title matches the full PETZI lineup (subset rule)' do
-    p = petzi_event(title: 'Darkside: PYTHIUS, COPPA, DAYNI, MC Resc')
     b = bespoke_event(title: 'Darkside')
+    p = petzi_event(title: 'Darkside: PYTHIUS, COPPA, DAYNI, MC Resc')
 
     Scrapers::Dedup.run
 
-    assert_equal p.id, b.reload.canonical_event_id
+    assert_equal b.id, p.reload.canonical_event_id
   end
 
   test 'a stale canonical link resets when PETZI no longer lists the show' do

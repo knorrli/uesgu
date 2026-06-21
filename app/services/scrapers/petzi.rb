@@ -8,8 +8,10 @@ module Scrapers
   # (no JS), and the venue is resolved per event from the URL slug.
   #
   # We consume only the 14 venues we already track, so PETZI can be merged against
-  # our bespoke scrapers (see Scrapers::Dedup). PETZI is the *primary* (stable)
-  # source; the bespoke scrapers fill the events PETZI omits. Genres here are
+  # our bespoke/OLE scrapers (see Scrapers::Dedup). PETZI links to the venue's OWN
+  # event page when the detail page exposes an "official website" link (see
+  # #event_url), otherwise to its own ticketing page — so Dedup ranks it LAST and
+  # it's the visible copy only for shows no other source covers. Genres here are
   # consumption (match-only): the venue tags are curated but coarse, so they enrich
   # but never mint taxonomy.
   class Petzi < Agent
@@ -32,6 +34,31 @@ module Scrapers
       'kiff'                 => ['KIFF', 'Aarau', 'AG'],
       'borom'                => ['Böröm', 'Aarau', 'AG']
     }.freeze
+
+    # slug => the venue's canonical domain (eTLD+1), so this aggregator can declare
+    # which venues it covers for the ledger drift test (Petzi adds no new venue —
+    # every slug also has a bespoke scraper, so these match those scrapers' domains
+    # and fold onto the same consume row). Kept parallel to VENUES; the drift test
+    # asserts the two key sets stay aligned.
+    DOMAINS = {
+      'dachstock'            => 'dachstock.ch',
+      'isc'                  => 'isc-club.ch',
+      'cafe-kairo'           => 'cafe-kairo.ch',
+      'gaskessel'            => 'gaskessel.ch',
+      'kulturfabrik-kofmehl' => 'kofmehl.net',
+      'fri-son'              => 'fri-son.ch',
+      'sedel'                => 'sedel.ch',
+      'nouveau-monde'        => 'nouveaumonde.ch',
+      'helsinki'             => 'helsinkiklub.ch',
+      'docks'                => 'docks.ch',
+      'treibhaus'            => 'treibhausluzern.ch',
+      'neubad'               => 'neubad.org',
+      'kiff'                 => 'kiff.ch',
+      'borom'                => 'boeroem.ch'
+    }.freeze
+
+    # Multi-venue but statically enumerable: the 14 venue domains it covers.
+    def self.venue_domains = DOMAINS.values
 
     def self.url
       URI.parse('https://www.petzi.ch/en/sitemap.xml')
@@ -59,13 +86,19 @@ module Scrapers
       xml.css('loc').map(&:text).select { |u| u.include?('/events/') && venue_for(u) }
     end
 
-    def event_url(row) = row
+    # The canonical link is the venue's OWN event page. PETZI exposes it on the
+    # detail page as the optional "official website" link (the lone external,
+    # non-social <a>); we use it only when it resolves to the venue's known domain
+    # (Petzi::DOMAINS) — never an artist/promoter site a venue may have entered
+    # there instead — and fall back to the PETZI URL when it's absent or off-domain.
+    # So a PETZI-only show still points at the venue where it can; where we also
+    # scrape the venue bespoke/OLE, Dedup ranks PETZI last and hides this copy.
+    def event_url(row) = venue_url(detail_page(row), row) || row
 
-    # Each row is an event URL; fetch its server-rendered detail page. Wrapped by
-    # build_event's `transact`, so Mechanize history returns to the sitemap after.
-    def event_content(row)
-      get(row)
-    end
+    # The field extractors read the same detail page event_url already fetched
+    # (memoized per row), so it's one request per event. Wrapped by build_event's
+    # `transact`, so Mechanize history is restored after.
+    def event_content(row) = detail_page(row)
 
     # Date from the <title> bar ("… / DD.MM.YYYY / Venue - City / PETZI"), clock
     # time from the body ("Event starts at: HH:MM", falling back to doors).
@@ -112,9 +145,30 @@ module Scrapers
       [m[1].to_i, m[2].to_i]
     end
 
-    def venue_for(url)
-      slug = VENUES.keys.find { |s| url =~ %r{/events/\d+-#{Regexp.escape(s)}-} }
-      VENUES[slug]
+    # The detail page, fetched once per row and shared by event_url + the field
+    # extractors. event_url runs first in the template, so it primes the cache.
+    def detail_page(row)
+      if @detail_row != row
+        @detail_row  = row
+        @detail_page = get(row)
+      end
+      @detail_page
     end
+
+    # The detail page's "official website" link iff it resolves to this venue's
+    # known domain; nil otherwise (absent, or an off-domain artist/promoter link).
+    def venue_url(page, row)
+      domain = Petzi::DOMAINS[slug_for(row)]
+      return if domain.blank?
+
+      page.links.filter_map(&:href)
+          .find { |href| href.start_with?('http') && Scrapers::Discovery.domain(href) == domain }
+    end
+
+    def slug_for(url)
+      VENUES.keys.find { |s| url =~ %r{/events/\d+-#{Regexp.escape(s)}-} }
+    end
+
+    def venue_for(url) = VENUES[slug_for(url)]
   end
 end

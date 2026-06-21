@@ -11,6 +11,10 @@ module Scrapers
       [location, 'Luzern', 'LU']
     end
 
+    # The feed is on Firestore (see #url), so the venue domain isn't derivable from
+    # url.host — declare it for the ledger drift test.
+    def self.venue_domains = ['bar59.ch']
+
     # Public web API key (same one the browser uses). The collection holds the full
     # history back to 2024 in document-id order, so we page through everything and
     # filter to active, upcoming events below.

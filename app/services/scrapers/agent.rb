@@ -46,6 +46,20 @@ module Scrapers
       false
     end
 
+    # The canonical venue domain(s) this scraper consumes (eTLD+1), reconciled
+    # against config/venue_ledger.yml by the ledger drift test. Single-venue
+    # default: the registrable domain of its `url`. Overridden by: a multi-venue
+    # aggregator that can enumerate its venues (Petzi), and a single-venue scraper
+    # whose feed is hosted on a SaaS/operator backend so `url.host` isn't the venue
+    # (Bar59 → firestore.googleapis.com, Dynamo → dynamo.nodehive.app). An
+    # aggregator that resolves venues only per-event returns [] (it commits to no
+    # fixed domain), exempting it from the reverse drift check.
+    def self.venue_domains
+      return [] if aggregator?
+
+      [Discovery.domain(url.host)].compact
+    end
+
     # Returns a Scrapers::Result tallying what this run saw and wrote, so the
     # orchestrator (scrapers:run_all) can persist a ScrapeResult and stamp the
     # created events — without the Agent itself knowing about those tables.

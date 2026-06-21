@@ -1,9 +1,9 @@
 <% content_for :title, t('saved_filters.title') %>
 
 <div class="saved-filters flex flex-col gap-large">
-  <header class="flex flex-col gap-small">
+  <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1><%= t('saved_filters.title') %></h1>
-  </header>
+  <% end %>
 
   <% if @rules.empty? %>
     <p class="empty-state"><%= t('saved_filters.empty_html', link: link_to(t('saved_filters.empty_link'), events_path)).html_safe %></p>

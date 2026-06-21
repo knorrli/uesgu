@@ -1,6 +1,7 @@
 ---
 en:
   nav:
+    events: Events
     admin: Admin
     notifications: Notifications
     unread_notifications: Unread notifications
@@ -139,6 +140,7 @@ en:
       duplicate: You already have a saved filter for this.
     new:
       title: Save a filter
+      back: All saved filters
     edit:
       title: Edit saved filter
       back: All saved filters
@@ -260,6 +262,8 @@ en:
       sort_by: "Sort:"
       sort_name: A–Z
       sort_count: most used
+    edit:
+      title: Edit genre
     tree:
       title: Genre tree
       summary: "%{roots} roots · %{placed} genres placed"

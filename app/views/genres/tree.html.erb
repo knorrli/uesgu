@@ -1,9 +1,6 @@
 <div class="flex flex-col gap-large">
-  <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>
-    <div class="flex justify-between align-baseline gap-medium wrap">
-      <h1><%= t('genres.tree.title') %></h1>
-      <%= link_to t('genres.index.title'), genres_path %>
-    </div>
+  <%= render layout: "shared/page_header", locals: { back_path: genres_path, back_label: t("genres.index.title") } do %>
+    <h1><%= t('genres.tree.title') %></h1>
   <% end %>
 
   <%# Read-only — each genre links to its editor (where you set the parent). %>

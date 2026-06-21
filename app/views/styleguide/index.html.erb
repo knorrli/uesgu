@@ -463,7 +463,8 @@
   <%# ======================================================= PAGE HEADER %>
   <section class="sg-section" id="page-header">
     <h2>Page header &amp; back link</h2>
-    <p class="sg-section__intro">Every interior page opens with the same block: an optional <b>back link</b> — the parent-section "up" navigation — above the title. Built from <code>shared/_page_header</code> + <code>shared/_back_link</code>; <b>reuse them</b> rather than hand-rolling a header, so admin and app pages stay identical. The ← is decorative and lives in the partial, never in the copy.</p>
+    <p class="sg-section__intro">Every page except the main events feed opens with the same block: an optional <b>back link</b> — the "up" navigation — above the title. Built from <code>shared/_page_header</code> + <code>shared/_back_link</code>; <b>reuse them</b> rather than hand-rolling a header, so admin and app pages stay identical. The ← is decorative and lives in the partial, never in the copy.</p>
+    <p class="sg-section__intro"><b>The rule:</b> the back link always points <b>up one level</b>, and the top of the tree is the events feed. A detail/edit page links to its parent list (e.g. a saved filter's editor → the filters list); a top-level page reached from the nav (Settings, Saved shows, Notifications, Admin …) links back to the feed (<code>root_path</code>, label <code>nav.events</code>). Only the feed itself and the pre-login auth pages omit the back link.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">

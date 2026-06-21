@@ -1,4 +1,7 @@
 <div class="flex flex-col gap-medium">
+  <%= render layout: "shared/page_header", locals: { back_path: genres_path, back_label: t('genres.index.title') } do %>
+    <h1><%= t('genres.edit.title') %></h1>
+  <% end %>
   <%= render 'genres/editor', genre: @genre,
         alias_suggestions: @alias_suggestions,
         sample_events: @sample_events, return_to: genres_path %>

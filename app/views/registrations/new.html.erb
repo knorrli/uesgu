@@ -1,6 +1,8 @@
 <% content_for :title, t('auth.signup_title') %>
 <div class="flex flex-col gap-medium">
-  <h1><%= t('auth.signup_title') %></h1>
+  <%= render layout: "shared/page_header" do %>
+    <h1><%= t('auth.signup_title') %></h1>
+  <% end %>
 
   <%= form_with model: @user, url: registration_path, class: 'account-form flex flex-col align-stretch gap-medium' do |form| %>
     <% if @user.errors.any? %>

@@ -1,6 +1,7 @@
 ---
 de:
   nav:
+    events: Veranstaltungen
     admin: Admin
     notifications: Benachrichtigungen
     unread_notifications: Ungelesene Benachrichtigungen
@@ -139,6 +140,7 @@ de:
       duplicate: Für diesen Filter hast du schon einen gespeicherten Filter.
     new:
       title: Filter speichern
+      back: Alle Filter
     edit:
       title: Gespeicherten Filter bearbeiten
       back: Alle Filter
@@ -260,6 +262,8 @@ de:
       sort_by: "Sortieren:"
       sort_name: A–Z
       sort_count: am häufigsten
+    edit:
+      title: Genre bearbeiten
     tree:
       title: Genre-Baum
       summary: "%{roots} Wurzeln · %{placed} Genres eingeordnet"

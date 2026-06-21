@@ -1,6 +1,7 @@
 ---
 fr:
   nav:
+    events: Événements
     admin: Admin
     notifications: Notifications
     unread_notifications: Notifications non lues
@@ -139,6 +140,7 @@ fr:
       duplicate: Tu as déjà un filtre enregistré pour ça.
     new:
       title: Enregistrer un filtre
+      back: Tous les filtres
     edit:
       title: Modifier le filtre enregistré
       back: Tous les filtres
@@ -260,6 +262,8 @@ fr:
       sort_by: "Trier:"
       sort_name: A–Z
       sort_count: plus fréquents
+    edit:
+      title: Modifier le genre
     tree:
       title: Arborescence des genres
       summary: "%{roots} racines · %{placed} genres classés"

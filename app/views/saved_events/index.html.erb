@@ -4,12 +4,14 @@
 <% content_for :head do %><meta name="turbo-cache-control" content="no-cache"><% end %>
 
 <div class="flex flex-col gap-large">
-  <%# The view switcher only appears once there's something to look at — a brand
-      new shelf just shows the empty state, nothing to toggle between. %>
-  <div class="flex justify-between align-baseline wrap gap-medium">
-    <h1><%= t('saved_events.title') %></h1>
-    <% if @any_saved %><%= render 'events/view_switcher', view: @view %><% end %>
-  </div>
+  <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
+    <%# The view switcher only appears once there's something to look at — a brand
+        new shelf just shows the empty state, nothing to toggle between. %>
+    <div class="flex justify-between align-baseline wrap gap-medium">
+      <h1><%= t('saved_events.title') %></h1>
+      <% if @any_saved %><%= render 'events/view_switcher', view: @view %><% end %>
+    </div>
+  <% end %>
 
   <%# Day-of reminder opt-in: a property of the saved-shows feature (it nudges you
       about the shows listed here), so it lives on this page rather than Settings.

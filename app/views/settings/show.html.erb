@@ -1,11 +1,13 @@
 <% content_for :title, t('settings.title') %>
 <div class="settings flex flex-col gap-large">
-  <%# Logout is a page-level action (top-right), not its own section — rare
-      account plumbing, one tap, no heading/hint needed. %>
-  <div class="flex justify-between align-center wrap gap-medium">
-    <h1><%= t('settings.title') %></h1>
-    <%= button_to t('settings.signout_button'), session_path, method: :delete, class: "button-small" %>
-  </div>
+  <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
+    <%# Logout is a page-level action (top-right), not its own section — rare
+        account plumbing, one tap, no heading/hint needed. %>
+    <div class="flex justify-between align-center wrap gap-medium">
+      <h1><%= t('settings.title') %></h1>
+      <%= button_to t('settings.signout_button'), session_path, method: :delete, class: "button-small" %>
+    </div>
+  <% end %>
 
   <% if @user.errors.any? %>
     <ul class="form-errors">

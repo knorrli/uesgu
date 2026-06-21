@@ -1,10 +1,10 @@
 <% content_for :title, t('install.title') %>
 
 <div class="install-page flex flex-col gap-large">
-  <header class="flex flex-col gap-small">
+  <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1><%= t('install.heading') %></h1>
     <p><%= t('install.intro') %></p>
-  </header>
+  <% end %>
 
   <%= render 'shared/install_block' %>
 

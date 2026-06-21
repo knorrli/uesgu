@@ -1,6 +1,8 @@
 <% content_for :title, t('.title') %>
 <div class="flex flex-col gap-large">
-  <h1><%= t('.title') %></h1>
+  <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
+    <h1><%= t('admin.index.title') %></h1>
+  <% end %>
 
   <dl class="flex flex-col gap-small">
     <div class="stat">

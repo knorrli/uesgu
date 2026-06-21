@@ -331,10 +331,8 @@
     padding: 0;
     background: none;
     color: var(--theme-fg-muted);
-    text-decoration: none;
-  }
-
-  .view-switch__item:hover {
+    /* Persistent underline (not :hover-only) so the inactive option reads as a
+       tappable link on touch, where there is no hover. */
     text-decoration: underline;
   }
 
@@ -342,6 +340,8 @@
     color: var(--theme-accent-color);
     font-weight: bold;
     background: none;
+    /* The current view is state, not a link — drop the underline. */
+    text-decoration: none;
   }
 }
 

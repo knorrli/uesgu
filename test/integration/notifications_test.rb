@@ -59,15 +59,15 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select '.notification__name', text: /Fresh/
     assert_select '.notification__name', text: /Old read/, count: 0
-    assert_select '.segmented a[href=?]', notifications_path
-    assert_select '.segmented a[href=?]', notifications_path(read: 1)
+    assert_select '.view-switcher .view-switch__item[href=?]', notifications_path
+    assert_select '.view-switcher .view-switch__item[href=?]', notifications_path(read: 1)
 
     # Gelesen (?read=1): read only — a distinct slice, not unread + read.
     get notifications_path(read: 1)
     assert_response :success
     assert_select '.notification__name', text: /Old read/
     assert_select '.notification__name', text: /Fresh/, count: 0
-    assert_select '.segmented a[href=?]', notifications_path(read: 1)
+    assert_select '.view-switcher .view-switch__item[href=?]', notifications_path(read: 1)
     assert_not_nil read && unread
   end
 
@@ -103,7 +103,7 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select '.empty-state', text: /Alles gelesen/
     # The Gelesen tab is still offered so the read digest is reachable.
-    assert_select '.segmented a[href=?]', notifications_path(read: 1)
+    assert_select '.view-switcher .view-switch__item[href=?]', notifications_path(read: 1)
   end
 
   test 'show marks the digest read' do

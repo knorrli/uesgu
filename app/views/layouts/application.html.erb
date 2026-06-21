@@ -121,8 +121,11 @@
             </details>
           <% else %>
             <%# Just "Log in" — signup is reached via the login page's "no account?
-                register" link, keeping the header light (matters on mobile). %>
-            <%= link_to t('nav.login'), new_session_path %>
+                register" link, keeping the header light (matters on mobile).
+                Hidden on the login page itself, where it's a no-op duplicate. %>
+            <% unless current_page?(new_session_path) %>
+              <%= link_to t('nav.login'), new_session_path %>
+            <% end %>
           <% end %>
         </nav>
       </div>

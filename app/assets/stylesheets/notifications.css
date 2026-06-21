@@ -41,28 +41,9 @@
   white-space: nowrap;
 }
 
-/* Flat-text toggle (Ungelesen | Gelesen on the inbox header) that matches the
-   list/calendar view switcher — plain links, active = bold accent, not a boxed
-   segmented control. Layout only; it sits inline in a flex header. */
-.segmented {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-medium);
-}
-
-.segmented a {
-  text-decoration: none;
-  color: var(--theme-fg-muted);
-}
-
-.segmented a:hover {
-  text-decoration: underline;
-}
-
-.segmented a.active {
-  color: var(--theme-accent-color);
-  font-weight: bold;
-}
+/* The inbox's Ungelesen | Gelesen toggle reuses the shared .view-switcher /
+   .view-switch__item component (see events-list.css) — one home for the
+   flat-text toggle, so a fix to one is a fix to both. No bespoke styles here. */
 
 .empty-state {
   color: var(--theme-fg-muted);

@@ -69,16 +69,14 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     assert_includes @rule.reload.queries, "Radiohead"
   end
 
-  test "an off-quarter time snaps to the nearest quarter on change (no validation block)" do
+  test "the time picker only offers quarter-hour minutes (off-quarter is impossible)" do
     visit edit_saved_filter_path(@rule)
 
-    time = find("input[type=time]")
-    page.execute_script(<<~JS)
-      const t = document.querySelector("input[type=time]")
-      t.value = "18:04"
-      t.dispatchEvent(new Event("change", { bubbles: true }))
-    JS
-    assert_equal "18:00", time.value
+    # The native time input was replaced by hour + minute selects; the minute select
+    # offers only the quarter values the scheduler honours, so nothing to snap.
+    minutes = find("select[name='saved_filter[time_minute]']")
+    assert_equal %w[00 15 30 45], minutes.all("option").map(&:value)
+    assert_equal "30", minutes.value # @rule is 17:30 (time_of_day 1050)
   end
 
   test "selecting a window hides the cadence picker (the rule becomes happening)" do
@@ -103,6 +101,14 @@ class SavedFilterEditTest < ApplicationSystemTestCase
   end
 
   test "in-app is the master: unchecking it disables and clears push" do
+    # Push is only enabled when it's actually set up (VAPID keys + a registered
+    # device); otherwise it's disabled for that reason regardless of the master.
+    # Make it ready so we isolate the in-app-master cascade.
+    ENV["VAPID_PUBLIC_KEY"] = "test-public-key"
+    ENV["VAPID_PRIVATE_KEY"] = "test-private-key"
+    @user.push_subscriptions.create!(endpoint: "https://push.example/abc",
+                                     p256dh_key: "p256", auth_key: "auth")
+
     visit edit_saved_filter_path(@rule)
     push = find("input[type=checkbox][name='saved_filter[notify_push]']", visible: :all)
     refute push.disabled?, "push starts enabled while in-app is on"
@@ -111,5 +117,8 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     find("input[type=checkbox][name='saved_filter[notify_in_app]']", visible: :all).click
     assert push.disabled?, "push disables when in-app goes off"
     refute push.checked?, "push is unchecked when in-app goes off"
+  ensure
+    ENV.delete("VAPID_PUBLIC_KEY")
+    ENV.delete("VAPID_PRIVATE_KEY")
   end
 end

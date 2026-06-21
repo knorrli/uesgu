@@ -64,7 +64,9 @@ class EventFilterTest < ApplicationSystemTestCase
     field = find(".sheet[data-field=what] .sheet__search-input")
     field.click # settle focus before typing (open() parks focus elsewhere)
     field.send_keys("zzqx")
-    assert_selector ".sheet[data-field=what] .opt--newquery", text: /zzqx/
+    # The "search for X" row is intentionally display:none on desktop (Enter/Apply
+    # commit the typed text instead), so assert its text updated, not its visibility.
+    assert_selector ".sheet[data-field=what] .opt--newquery", text: /zzqx/, visible: :all
     field.send_keys(:enter)
 
     assert_current_path(/q%5B%5D=zzqx/)
@@ -79,7 +81,8 @@ class EventFilterTest < ApplicationSystemTestCase
     field = find(".sheet[data-field=what] .sheet__search-input")
     field.click # settle focus before typing (open() parks focus elsewhere)
     field.send_keys("wubz")
-    assert_selector ".sheet[data-field=what] .opt--newquery", text: /wubz/
+    # Row is display:none on desktop (see above) — assert text, not visibility.
+    assert_selector ".sheet[data-field=what] .opt--newquery", text: /wubz/, visible: :all
     # Apply (not Enter, not the "search for X" row) still keeps the typed text.
     find(".sheet[data-field=what] .sheet__apply").click
 
@@ -98,9 +101,12 @@ class EventFilterTest < ApplicationSystemTestCase
     find(".sheet[data-field=what] .sheet__close").click
     assert_no_selector ".sheet[data-field=what].sheet--open"
 
-    # Clicking outside the open panel dismisses it.
+    # Clicking outside the open panel dismisses it. The panel floats over the
+    # content below it, so a normal .click on the covered toolbar is refused by
+    # Cuprite (overlap guard); .trigger fires the document click the controller
+    # listens for, with the target genuinely outside the sheet.
     open_sheet("what")
-    find(".events-toolbar").click
+    find("body").trigger("click")
     assert_no_selector ".sheet[data-field=what].sheet--open"
   end
 

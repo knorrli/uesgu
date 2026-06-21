@@ -1,7 +1,7 @@
 # üsgu — Backlog
 
 > Single source of truth for **what's left**. If an open item isn't here, it
-> isn't tracked. Reconciled against code on 2026-06-20 (the old punch list and
+> isn't tracked. Reconciled against code on 2026-06-21 (the old punch list and
 > session backlog were ~20 items already shipped — all removed).
 >
 > üsgu is a **personal tool** — built until it feels useful, not an MVP to
@@ -43,14 +43,6 @@
   (`price` / `lineup` / `description` / `image` — none exist today), so this is a
   schema decision, not just a parser tweak. Re-run the audit across the rest of
   the scrapers once that's decided.
-- **Curate the genres minted after the gate removal.** With the
-  consumption/discovery gate gone, freetext sources now mint every token they
-  emit, so the unplaced-genre queue will fill on the next sweep — including known
-  noise like **docks** origin codes (`US`/`CH`) and Mahogany prose. Sweep the
-  queue (file / alias / block) and give the docks codes their own origin facet or
-  a block (see memory `project-docks-scraper-country-as-genre`). Watch the volume
-  via `/admin/scraper_coverage` distinct-genre counts.
-
 - **Consume OLE feeds as a generic source (Open Linked Event Data).** *Core
   shipped on branch `ole-ingestion` (2026-06-21), pending merge + deploy.*
   `Scrapers::Ole` is a generic, config-driven `Agent` subclass: a `SOURCES` list
@@ -69,15 +61,6 @@
     opt-out call (cf. `Scrapers::BadBonn`). BeJazz was the intended aggregator
     proof; aggregator support is implemented + tested regardless. Listed in
     `Scrapers::Ole::DEFERRED`.
-  - **Bewegungsmelder aggregator — BUILT, pending review + deploy** (branch
-    `ole-bewegungsmelder`, 2026-06-21). `Scrapers::OleBewegungsmelder`
-    (`aggregator: true`, `link_via: :source` — keys on per-event `<source_url>`,
-    prefers a real venue deep link when the feed gives one). Lean-permissive
-    non-music filtering curated in `db/genres.yml`. Ledger flipped to `consume`.
-    Review `FINDINGS-bewegungsmelder.md`, then merge + run `taxonomy:import_tree`
-    in prod. **Open verify item:** `Tanz`-only dance-class series shows under the
-    permissive policy (flip `Tanz`→hidden to drop it); Heitere Fahne files under
-    VS due to an upstream PLZ typo (3984) — admin location fix if wanted.
   - **Messy aggregates.** Konzerte Bern (0 genres + address jammed into `<name>` →
     needs address-in-name cleanup) and Hinto ALL (46 venues) deferred.
   - **Retire fragile scrapers where OLE overlaps** (e.g. the bespoke Dachstock
@@ -94,14 +77,12 @@
   saved shows). See memory `project-screenshot-design-review`.
 - **Slow PWA start / splash screen** — cold start is sluggish; no splash handling
   yet. (See memory `project-pwa-install-affordance`.)
-
-### Discuss / experiment
-
-- **Filter menu floats over content instead of pushing it down.** Currently
-  opening the filter shifts the results list downward. Experiment with an
-  overlay/floating panel that sits *above* the content (no layout push). Decide
-  the interaction (anchored popover vs. sheet, desktop vs. mobile) before
-  committing — relates to the existing reserved-summary-row layout work.
+- **Filter-sheet scrim dims the saved-filter editor.** On the saved-filter
+  editor (which reuses the filter sheets), opening a Where/What sheet drops the
+  global `body.filter-sheet-open` scrim over the *whole* editor form — title,
+  schedule, Speichern — not just the content behind a feed panel. The scrim/float
+  UX only makes sense on the events feed; the editor shouldn't dim. (Regression
+  surfaced from the desktop float+scrim work, commit `5448624`.)
 
 ### Maybe-later (explicitly deferred)
 

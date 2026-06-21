@@ -48,6 +48,12 @@
   .simple-calendar .day-markers { top: var(--gap-small); bottom: auto; }
 }
 
+/* Positioning context for the desktop dropdown panel: on desktop the open sheet
+   floats (position: absolute) anchored to the bottom of this block rather than
+   dropping into flow, so it overlays the results below instead of shoving them
+   down. No-op on mobile, where the sheet is position: fixed. */
+.filter-sheets { position: relative; }
+
 /* ── Trigger bar ── three underlined rows echoing the inline filter, but each
    whole row is a tap target opening its sheet. */
 .filter-sheets__bar {
@@ -166,12 +172,17 @@
   .filter-sheets__bar { flex-direction: row; gap: var(--gap-medium); }
   .filter-trigger { flex: 1 1 0; min-width: 0; }
 
-  /* A sheet becomes an inline panel in normal flow: since the closed sheets are
-     display:none, the open one drops in right under the bar (and the summary
-     chips). Full filter width, bordered, its body scrolls. No slide transform. */
+  /* A sheet becomes a floating dropdown panel: anchored to the bottom of the
+     filter block (top: 100%) and lifted out of flow, so the open one overlays the
+     results below instead of pushing them down. Full filter width, bordered, its
+     body scrolls. No slide transform. */
   .filter-sheets .sheet {
-    position: static;
-    inset: auto;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    z-index: 100;
     max-height: 26rem;
     margin-top: var(--gap-small);
     transform: none;
@@ -182,6 +193,30 @@
   }
 
   .filter-sheets .sheet--open { display: flex; }
+
+  /* Scrim — a translucent layer between the floating panel and the page, so the
+     open panel reads as the active layer and the results below it as inactive.
+     Always present but invisible (opacity 0) so it can fade in when a sheet opens;
+     pointer-events stay off, so a click on the dimmed area still bubbles to the
+     document's click-outside handler and closes the panel. Desktop only — on
+     mobile the full-screen sheet covers the page itself. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.18s ease, visibility 0.18s;
+  }
+
+  body.filter-sheet-open::before { opacity: 1; visibility: visible; }
+
+  /* Lift the whole filter block (bar + chips + panel) above the scrim so the
+     control you're using stays bright; only the content below it dims. */
+  body.filter-sheet-open .filter-sheets { z-index: 100; }
 
   /* Keep the × close on desktop too (alongside Apply, click-outside and Esc) — an
      explicit, familiar way to dismiss the panel. The header keeps its base

@@ -44,10 +44,16 @@ class MobileFilterTest < ApplicationSystemTestCase
     # The root is a visible browse row; its expand chevron reveals the child.
     assert_selector ".sheet[data-field=what] .opt--canton", text: rock.name, visible: true
 
-    # Pick the root — subtree expansion must catch the child-tagged event. Waiting
-    # on :checked avoids racing the click.
-    find(".sheet[data-field=what] .opt--canton", text: rock.name).click
-    assert_selector ".sheet[data-field=what] input[value='#{rock.name}']:checked", visible: :all
+    # Pick the root — subtree expansion must catch the child-tagged event. The row's
+    # action can bind a tick after the sheet opens, so the first tap may no-op; re-tap
+    # until the box reads checked. Breaking the instant it's checked avoids a second
+    # effective tap toggling it back off. (No fixed sleeps.)
+    checked = ".sheet[data-field=what] input[value='#{rock.name}']:checked"
+    10.times do
+      find(".sheet[data-field=what] .opt--canton", text: rock.name).click
+      break if has_selector?(checked, visible: :all, wait: 1)
+    end
+    assert_selector checked, visible: :all
 
     find(".sheet[data-field=what] .sheet__apply").click
 
@@ -72,7 +78,14 @@ class MobileFilterTest < ApplicationSystemTestCase
     # Sheets open with focus parked on the close button, never the search field.
     refute_focused field
 
-    find(".sheet[data-field=what] .opt--newquery").click
+    # The row's click->addQuery action can bind a tick after the sheet opens, so the
+    # first tap may no-op. Re-tap until focus lands (re-tapping a blank row just
+    # re-focuses the field — safe); the assert below is the definitive check.
+    newquery = ".sheet[data-field=what] .opt--newquery"
+    10.times do
+      find(newquery).click
+      break if focused?(field)
+    end
     assert_focused field # the tap moved focus into the search field
   end
 

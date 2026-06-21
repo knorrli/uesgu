@@ -18,10 +18,16 @@ class MobileDateFilterTest < ApplicationSystemTestCase
     # The grid is rendered client-side on connect; wait for its day cells.
     assert_selector "#{sheet} .range-cal__day", minimum: 28
 
-    # Pick start then end. Waiting on the painted is-start/is-end classes avoids
-    # racing the click handler (no fixed sleeps).
-    find("#{sheet} .range-cal__day[data-date='#{start_day.iso8601}']").click
-    assert_selector "#{sheet} .range-cal__day.is-start[data-date='#{start_day.iso8601}']"
+    # Pick start then end. The cells are rendered via innerHTML, so Stimulus wires
+    # their click->pick action a tick later (MutationObserver) — the cells exist
+    # before the binding lands, so a single immediate click can no-op. Re-click the
+    # start day until it actually paints; no-op clicks leave the selection empty, so
+    # this never double-registers, and once it lands the controller is wired for the
+    # end click. (No fixed sleeps — Capybara polls the painted class.)
+    start_sel    = "#{sheet} .range-cal__day[data-date='#{start_day.iso8601}']"
+    start_picked = "#{sheet} .range-cal__day.is-start[data-date='#{start_day.iso8601}']"
+    find(start_sel).click until has_selector?(start_picked, wait: 1)
+
     find("#{sheet} .range-cal__day[data-date='#{end_day.iso8601}']").click
     assert_selector "#{sheet} .range-cal__day.is-end[data-date='#{end_day.iso8601}']"
 

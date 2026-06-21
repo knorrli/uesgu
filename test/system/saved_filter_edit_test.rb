@@ -19,11 +19,12 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     sign_in_as @user
   end
 
-  test "the editor shows the saved genre checked, the derived name, and a window select" do
+  test "the editor shows the saved genre checked, the derived name, and a window trigger" do
     visit edit_saved_filter_path(@rule)
 
-    assert_selector "h1", text: /Zylopunk/                 # name derived from the filter
-    assert_selector "select[name='d[]']"                   # window select present
+    assert_selector "h1", text: /Zylopunk/                                   # name derived from the filter
+    assert_selector ".filter-trigger[data-filter-sheets-field-param='when']" # window trigger present (panel, not a select)
+    assert_selector ".sheet[data-field=when] input[name='d[]']", visible: :all, minimum: 1
     saved = find("input[name='g[]'][value='#{@genre.name}']", visible: :all)
     assert saved.checked?, "the saved genre is pre-checked in the What tree"
   end
@@ -84,11 +85,15 @@ class SavedFilterEditTest < ApplicationSystemTestCase
 
     # added rule → cadence picker visible to start
     assert_selector "[data-saved-filter-form-target='cadenceField']"
-    # pick a window by value (locale-independent); the schedule reacts client-side
-    find("select[name='d[]'] option[value='this_weekend']").select_option
+    # Open the When panel and pick a window by value (locale-independent). The
+    # native box is visually hidden (.opt), so click its label; the schedule reacts
+    # client-side as the change bubbles to the form.
+    find(".filter-trigger[data-filter-sheets-field-param='when']").click
+    find(".sheet[data-field=when] input[name='d[]'][value='this_weekend']", visible: :all).ancestor("label").click
     assert_no_selector "[data-saved-filter-form-target='cadenceField']", visible: true
 
     # …and Save persists the flip to happening.
+    find(".sheet[data-field=when] .sheet__apply").click
     find(".saved-filter-form input[type=submit]").click
     assert_current_path saved_filters_path
     assert @rule.reload.happening?

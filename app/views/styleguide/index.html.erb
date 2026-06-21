@@ -379,6 +379,21 @@
         <span class="sg-ok"><b>Audit #4 — resolved.</b> All standalone checkboxes now share one custom box (<code>appearance:none</code>, matching the sheet's <code>.opt__box</code>) — no more native-vs-custom split. The chip (<code>label.tag</code>) stays a distinct, deliberate selectable-chip pattern.</span>
       </div>
     </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <div style="min-width: 12rem; border: var(--border-width) solid var(--rule-color);">
+          <label class="opt"><input type="checkbox"><span class="opt__box"></span><span class="opt__label">Multi (checkbox)</span></label>
+          <label class="opt opt--single"><input type="checkbox" checked><span class="opt__box"></span><span class="opt__label">Single (radio)</span></label>
+          <label class="opt opt--single"><input type="checkbox"><span class="opt__box"></span><span class="opt__label">Single, unpicked</span></label>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Sheet option rows</span> · <code>.opt</code> &nbsp;/&nbsp; <code>.opt--single</code>
+        <p class="sg-purpose">The checkable rows inside a filter sheet (What / Where / When). Default is multi-select (square box). <code>.opt--single</code> rounds the box to a radio dot for single-select sheets — the rule editor's <b>When</b>, where a recurring filter takes exactly one relative window.</p>
+        <span class="sg-ok">One row component, two semantics — the box shape (square vs round) is the only signal, so multi- and single-select read consistently across every sheet.</span>
+      </div>
+    </div>
   </section>
 
   <%# ============================================================ ICONS %>

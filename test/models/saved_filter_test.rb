@@ -28,6 +28,12 @@ class SavedFilterTest < ActiveSupport::TestCase
     assert rule(u, filter: { l: ['Some Venue'] }).added?
   end
 
+  test 'multiple windows are narrowed to the first on save (a rule takes one window)' do
+    r = rule(user, filter: { d: %w[tomorrow this_weekend next_week] })
+    assert_equal ['tomorrow'], r.date_ranges, 'only the first window is kept'
+    assert_equal ['tomorrow'], r.active_windows
+  end
+
   test 'a custom absolute date range is dropped on save (falls back to new events)' do
     r = rule(user, filter: { q: ['some-style'], d: ['2030-06-20 - 2030-06-25'] })
     assert_empty r.date_ranges, 'the absolute range is not stored as a window'

@@ -57,7 +57,7 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get new_saved_filter_path(g: [leaf.name]) # no date → added rule
 
     assert_response :success
-    # The picked genre is pre-checked in the What tree; window is a select.
+    # The picked genre is pre-checked in the What tree; the window is the When panel.
     assert_select "input[name='g[]'][value='#{leaf.name}'][checked]"
     assert_select 'form[data-controller~="saved-filter-form"]'
     assert_select 'select[name="saved_filter[cadence]"][data-saved-filter-form-target="cadence"]'
@@ -72,10 +72,23 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get new_saved_filter_path(l: ['Bern'], d: ['this_weekend']) # weekly window
 
     assert_response :success
-    assert_select "select[name='d[]'] option[value='this_weekend'][selected='selected']"
+    assert_select "section.sheet[data-field='when'] input[name='d[]'][value='this_weekend'][checked]"
     # The cadence picker is always in the DOM (hidden client-side when windowed);
     # the firing-day picker is present for the weekly rhythm.
     assert_select 'select[name="saved_filter[weekday]"]'
+  end
+
+  test 'new with a multi-window filter (carried from the feed) narrows to one window' do
+    sign_in_as user
+    get new_saved_filter_path(d: %w[tomorrow this_weekend next_week])
+
+    assert_response :success
+    # Single-select: only the first window is pre-checked, the others are not.
+    assert_select "section.sheet[data-field='when'] input[name='d[]'][value='tomorrow'][checked]"
+    assert_select "section.sheet[data-field='when'] input[name='d[]'][value='this_weekend'][checked]", false
+    assert_select "section.sheet[data-field='when'] input[name='d[]'][value='next_week'][checked]", false
+    # The trigger badge reflects one window, not three.
+    assert_select ".filter-trigger[data-filter-sheets-field-param='when'] .badge", text: '1'
   end
 
   # --- create ----------------------------------------------------------------
@@ -169,9 +182,9 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
 
     get edit_saved_filter_path(r)
     assert_response :success
-    # The saved genre is pre-checked in the What tree; the window is a <select>.
+    # The saved genre is pre-checked in the What tree; the window is the When panel.
     assert_select "input[name='g[]'][value='#{leaf.name}'][checked]"
-    assert_select 'select[name="d[]"]'
+    assert_select "section.sheet[data-field='when'] input[name='d[]']"
     # No name field; the derived name is the (server-rendered) page title.
     assert_select 'input[name="saved_filter[name]"]', false
     assert_select 'h1', text: /Zyloedit/

@@ -17,9 +17,12 @@
      data-filter-sheets-search-for-template-value="<%= t('events.filter.search_for', query: '%{query}') %>"
      data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>">
   <%# `filter` is the rule's saved filter (SavedFiltersController#filter_for). %>
+  <%# action: the schedule (cadence/weekday/monthday visibility) reacts to the
+      window picked in the When sheet below — a checkbox toggle, not a select — so
+      saved-filter-form recomputes on any change bubbling up from the picker. %>
   <%= form_with model: rule, class: 'saved-filter-form account-form flex flex-col gap-medium',
         data: { controller: 'saved-filter-form', 'saved-filter-form-rhythms-value': SavedFilter::WINDOW_RHYTHM.to_json,
-                'filter-sheets-target': 'form' } do |form| %>
+                'filter-sheets-target': 'form', action: 'change->saved-filter-form#update' } do |form| %>
     <% if rule.errors.any? %>
       <ul class="form-errors">
         <% rule.errors.full_messages.each { |m| %><li><%= m %></li><% } %>
@@ -27,40 +30,31 @@
     <% end %>
 
     <%# ── FILTER ── what this saved filter matches: the same trigger bar + tree
-        sheets as the events page, so the two read identically, plus the date
-        window. (The window is a preset select — a recurring filter takes no custom
-        range — and it also drives the notification cadence below.) %>
+        sheets as the events page, so the two read identically — What / Where /
+        When all on one row. The When sheet is single-select with no calendar (a
+        recurring filter takes ONE relative window, never a custom range); the
+        chosen window also drives the notification cadence below. %>
     <fieldset class="saved-filter-fieldset flex flex-col gap-medium">
       <legend><%= t('saved_filters.section_filter') %></legend>
 
       <% what_terms  = filter.queries + filter.genres %>
       <% where_terms = filter.location_list.map { |loc| location_display(loc) } %>
-      <%# Bar + sheets share a position:relative wrapper so the desktop floating
-          panel anchors directly under the trigger bar (top: 100% of this box —
-          the sheets are absolute, so the box is just the bar's height). Without it
-          the panel would resolve against the whole-form .filter-sheets and drop
-          past the Wann select below. The feed anchors to .filter-sheets instead, on
-          purpose: there the buffer reveals the applied-filter chips; here there are
-          none, so the panel sits flush under the bar. %>
+      <%# One window only (single-select) — show just the first, matching the panel. %>
+      <% when_terms  = Array(filter.date_ranges.find { |r| Datepicker.preset.key?(r) }).map { |w| t("datepicker.#{w}") } %>
+      <%# Bar + sheets grouped together: on desktop a sheet opens in-flow right
+          below this bar (pushing the rest of the form down), so keeping them in one
+          wrapper places the panel directly under its triggers. %>
       <div class="filter-sheets__fields">
         <div class="filter-sheets__bar">
           <%= render 'tags/filter_trigger', field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') %>
           <%= render 'tags/filter_trigger', field: 'where', icon: 'locations', terms: where_terms, empty: t('events.filter.where') %>
+          <%= render 'tags/filter_trigger', field: 'when',  icon: 'date',      terms: when_terms,  empty: t('events.filter.when') %>
         </div>
 
         <%= render 'tags/genre_sheet', filter: filter %>
         <%= render 'tags/location_sheet', filter: filter %>
+        <%= render 'tags/when_sheet', filter: filter, custom_range: false, single: true %>
       </div>
-
-      <%# .field-label sits on the text span (not the wrapping label) so the bold
-          stays on the label and the select's value renders at normal weight, like
-          every other input — matches the app-wide label→input pattern. %>
-      <label class="flex flex-col gap-xsmall">
-        <span class="field-label"><%= t('saved_filters.section_when') %></span>
-        <%= select_tag 'd[]', options_for_select(rule_window_options, filter.date_ranges.first),
-              include_blank: t('saved_filters.window_none'),
-              data: { 'saved-filter-form-target': 'window', action: 'saved-filter-form#update' } %>
-      </label>
     </fieldset>
 
     <%# ── NOTIFICATIONS ── delivery is OPTIONAL: in-app is the MASTER channel, and

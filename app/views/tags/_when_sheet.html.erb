@@ -1,0 +1,93 @@
+<%# The "When" filter sheet behind the bar's "Wann?" trigger — shared so the feed
+    and the rule editor read identically (same chrome as the genre/location sheets).
+
+    Two modes, both plain d[] checkbox rows the filter-sheets controller already
+    understands (no separate date input to read):
+      • feed     — multi-select presets + a custom-range month calendar.
+      • editor   — single: true, custom_range: false. A recurring rule takes ONE
+                   relative window and never an absolute range, so the presets are
+                   radio-style (filter-sheets#enforceSingle keeps one checked) and
+                   the calendar is dropped.
+
+    Locals: filter (responds to #date_ranges), custom_range (default true),
+            single (default false). %>
+<% custom_range = local_assigns.fetch(:custom_range, true) %>
+<% single       = local_assigns.fetch(:single, false) %>
+<%# Single-select takes exactly one window, so pre-check only the first preset even
+    if the filter carries several (e.g. a multi-window filter saved from the feed —
+    the model also narrows it to one on save). %>
+<% selected_window = filter.date_ranges.find { |r| Datepicker.preset.key?(r) } if single %>
+<% if custom_range %>
+  <% custom = filter.date_ranges.find { |r| r.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) } %>
+  <% custom_start, custom_end = custom&.split(' - ') %>
+<% end %>
+<section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
+         aria-label="<%= t('events.filter.sheet.when') %>"
+         data-filter-sheets-target="sheet" data-field="when"
+         <%= 'data-action="change->filter-sheets#enforceSingle"'.html_safe if single %>>
+  <header class="sheet__header">
+    <button type="button" class="sheet__close ph ph-x" data-action="filter-sheets#close" aria-label="<%= t('events.filter.close') %>"></button>
+    <h2 class="sheet__title"><%= t('events.filter.sheet.when') %></h2>
+    <button type="button" class="sheet__clear" data-action="filter-sheets#clear" data-filter-sheets-field-param="when"><%= t('events.filter.clear') %></button>
+  </header>
+  <%# When body: a single vertical column on mobile (presets, then calendar);
+      on desktop (≥600px) the two split into side-by-side columns so the
+      calendar is visible at rest instead of below the panel's scroll fold.
+      Editor (presets only) keeps the simple single column at every width. %>
+  <div class="sheet__body when-body">
+    <div class="when-presets">
+      <% Datepicker.preset.each do |key, preset| %>
+        <% checked = single ? key.to_s == selected_window : filter.date_ranges.include?(key.to_s) %>
+        <label class="opt <%= 'opt--single' if single %>">
+          <input type="checkbox" name="d[]" value="<%= key %>" <%= 'checked' if checked %>>
+          <span class="opt__box"></span>
+          <span class="opt__label"><%= preset[:label] %></span>
+        </label>
+      <% end %>
+    </div>
+
+    <% if custom_range %>
+      <%# Custom range — a self-contained month calendar (range_calendar_controller)
+          in place of two native date inputs, so the picker matches the app theme
+          and reads identically on the mobile sheet and the desktop panel. The
+          static chrome + localised strings are here; the controller fills the day
+          grid and writes "start - end" into the hidden d[] checkbox below. %>
+      <div class="opt opt--custom when-custom">
+        <span class="opt__type"><%= t('events.filter.custom_range') %></span>
+        <div class="range-cal"
+             data-controller="range-calendar"
+             data-action="range-calendar:reset->range-calendar#reset"
+             data-range-calendar-today-value="<%= Date.current.iso8601 %>"
+             data-range-calendar-start-value="<%= custom_start %>"
+             data-range-calendar-end-value="<%= custom_end %>"
+             data-range-calendar-month-names-value="<%= t('date.month_names').to_json %>">
+          <div class="range-cal__head">
+            <button type="button" class="range-cal__nav ph ph-caret-left"
+                    data-action="range-calendar#prevMonth"
+                    aria-label="<%= t('simple_calendar.previous') %>"></button>
+            <span class="range-cal__month" data-range-calendar-target="label" aria-live="polite"></span>
+            <button type="button" class="range-cal__nav ph ph-caret-right"
+                    data-action="range-calendar#nextMonth"
+                    aria-label="<%= t('simple_calendar.next') %>"></button>
+          </div>
+          <div class="range-cal__weekdays" aria-hidden="true">
+            <% 7.times do |i| %>
+              <span class="range-cal__weekday"><%= t('date.abbr_day_names')[(i + 1) % 7] %></span>
+            <% end %>
+          </div>
+          <div class="range-cal__grid" role="grid"
+               data-range-calendar-target="grid"
+               data-action="keydown->range-calendar#navigate"></div>
+          <div class="range-cal__summary" data-range-calendar-target="summary" aria-live="polite"></div>
+          <%# Hidden input that actually submits the custom range as "start - end". %>
+          <input type="checkbox" name="d[]" hidden
+                 value="<%= custom %>" <%= 'checked' if custom.present? %>
+                 data-range-calendar-target="value">
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <footer class="sheet__footer">
+    <button type="button" class="sheet__apply" data-action="filter-sheets#apply"><%= t('events.filter.apply') %></button>
+  </footer>
+</section>

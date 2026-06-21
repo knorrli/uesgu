@@ -15,12 +15,6 @@ module SavedFiltersHelper
     (1..28).map { |day| [t("saved_filters.monthday_option", day: day), day] }
   end
 
-  # The relative windows offerable on a rule (blank = none → "new events"). Only
-  # presets — a rule never takes an absolute range (see SavedFilter).
-  def rule_window_options
-    SavedFilter::WINDOW_RHYTHM.keys.map { |key| [t("datepicker.#{key}"), key] }
-  end
-
   # The notification time, split into two selects (see SavedFilter#time_hour). The
   # minute list is only the quarter hours the scheduler can honour, so the time can
   # never be set to a value that would silently snap.

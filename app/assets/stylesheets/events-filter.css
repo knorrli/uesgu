@@ -112,18 +112,6 @@
   border-top: var(--border-width) solid var(--rule-color);
 }
 
-/* Positioning context for the desktop dropdown panel: on desktop the open sheet
-   floats (position: absolute) anchored to the bottom of this block rather than
-   dropping into flow, so it overlays the results below instead of shoving them
-   down. No-op on mobile, where the sheet is position: fixed. */
-.filter-sheets { position: relative; }
-
-/* The saved-filter editor wraps bar + sheets in this tighter box (it's the closer
-   positioned ancestor, so the panel anchors under the BAR rather than the whole
-   form — see saved_filters/_form). Sheets are absolute, so the box is the bar's
-   height and top:100% lands right beneath it. The feed has no such wrapper: its
-   panel anchors to .filter-sheets, below the chips row, on purpose. */
-.filter-sheets__fields { position: relative; }
 
 /* ── Trigger bar ── three underlined rows echoing the inline filter, but each
    whole row is a tap target opening its sheet. */
@@ -243,38 +231,24 @@
   .filter-sheets__bar { flex-direction: row; gap: var(--gap-medium); }
   .filter-trigger { flex: 1 1 0; min-width: 0; }
 
-  /* A sheet becomes a floating dropdown panel: anchored to the bottom of the
-     filter block (top: 100%) and lifted out of flow, so the open one overlays the
-     results below instead of pushing them down. Full filter width, bordered, its
-     body scrolls. No slide transform. */
+  /* A sheet becomes an IN-FLOW panel: it opens below the bar and pushes the
+     content under it down, rather than floating over it. Floating (position:
+     absolute) was removed on purpose — an out-of-flow panel still counts toward
+     the document's scroll height, so it ballooned the page on short layouts (the
+     rule editor) and let focus-on-check jump the page; in-flow has neither problem
+     and reads identically in the feed and the editor. Full filter width, bordered,
+     its body scrolls past 26rem. No slide transform (that's the mobile sheet). */
   .filter-sheets .sheet {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    bottom: auto;
-    z-index: 100;
+    position: static;
     max-height: 26rem;
     margin-top: var(--gap-small);
     transform: none;
     visibility: visible;
     display: none;
     border: var(--border-width) solid var(--rule-color);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   }
 
-  /* Editor: the panel sits flush under the bar. The feed keeps the gap so the
-     applied-filter chips stay visible between the bar and the panel; the editor
-     has no chips there, so the buffer just looks like a stray gap. */
-  .filter-sheets__fields .sheet { margin-top: 0; }
-
   .filter-sheets .sheet--open { display: flex; }
-
-  /* While a sheet is open, lift the filter block into its own stacking context so
-     its floating dropdown panel renders ABOVE the content below it. No page dimming
-     (the panel's border + shadow are the "this floats above" cue) — same model as
-     the saved-filters menu, so the filter UI reads identically everywhere. */
-  body.filter-sheet-open .filter-sheets { z-index: 100; }
 
   /* Keep the × close on desktop too (alongside Apply, click-outside and Esc) — an
      explicit, familiar way to dismiss the panel. The header keeps its base
@@ -386,6 +360,7 @@
 
 /* ── Option rows ── a checkable row; native box hidden, custom box drawn. */
 .opt {
+  position: relative;       /* anchor the visually-hidden input that fills the row */
   display: flex;
   align-items: center;
   gap: var(--gap-medium);
@@ -401,11 +376,17 @@
    the JS-toggled `hidden` (the free-text row) actually hide. */
 .opt[hidden] { display: none; }
 
+/* The native box is visually hidden but FILLS the row (not collapsed to a 0×0
+   point at the row's origin): when a label-click focuses it, it's already fully
+   on-screen, so the browser never scroll-jumps the page to bring it into view.
+   pointer-events:none keeps it from intercepting the row's disclosure toggle; the
+   wrapping label still toggles it natively on click. */
 .opt input[type="checkbox"] {
   position: absolute;
-  width: 0;
-  height: 0;
+  inset: 0;
+  margin: 0;
   opacity: 0;
+  pointer-events: none;
 }
 
 .opt__box {
@@ -436,6 +417,16 @@
   flex-grow: 1;
   min-width: 0;
 }
+
+/* Single-select presets (the rule editor's When): a recurring filter takes ONE
+   relative window, so the box is round — a radio, not a checkbox. (Behaviour:
+   filter-sheets #enforceSingle keeps one ticked.) */
+.opt--single .opt__box { border-radius: 50%; }
+
+/* Selected = a SOLID accent disc, not a ring. The box already fills accent when
+   checked (base rule); drop the inner tick/dot so it reads as filled-and-chosen
+   rather than focused-but-empty. Unselected stays a bordered empty circle. */
+.opt--single input:checked ~ .opt__box::before { display: none; }
 
 .opt__type {
   flex-shrink: 0;
@@ -618,22 +609,32 @@
      panel's height cap (base .sheet is 26rem) enough that the body — which only
      gets the panel height minus the ~6rem header+footer — fits all 8 presets and
      the full month (at the 22rem calendar width below) with no internal scrollbar. */
-  .filter-sheets .sheet[data-field="when"] { max-height: 34rem; }
+  .filter-sheets .sheet[data-field="when"]:has(.when-custom) { max-height: 34rem; }
 
+  /* Presets-only When (the rule editor): no calendar, just 8 short rows — lift the
+     base 26rem cap enough that all of them show at rest, so the single-select list
+     reads as a complete menu rather than a scrolling one. */
+  .filter-sheets .sheet[data-field="when"]:not(:has(.when-custom)) { max-height: 30rem; }
+
+  /* Two-column layout only when there's a calendar to sit beside the presets (the
+     feed). The editor's When sheet is presets-only — it stays the plain single
+     column (a full-width list like the genre/location panels), so these rules are
+     scoped to :has(.when-custom) and the border below to a preset block actually
+     followed by a calendar. */
   /* Center the presets + calendar as one compact cluster so it reads as a
      deliberate panel rather than two boxes stranded at the left edge of a wide
      dropdown. align-items: stretch runs the divider the full column height. */
   /* Presets stay pinned to the panel's left edge; the calendar is centered in the
      space that's left, so it reads as deliberate instead of left-stranded in a
      wide dropdown. */
-  .when-body {
+  .when-body:has(.when-custom) {
     display: flex;
     flex-direction: row;
     align-items: stretch;
     gap: var(--gap-large);
   }
 
-  .when-presets {
+  .when-presets:has(+ .when-custom) {
     flex: 0 0 auto;          /* size to the widest label — never wrap */
     padding-block: var(--gap-small);
     white-space: nowrap;

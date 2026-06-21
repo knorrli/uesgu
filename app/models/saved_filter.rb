@@ -102,8 +102,11 @@ class SavedFilter < ApplicationRecord
       "location_list" => clean(params[:l]),
       # Rules only do relative windows (re-resolved each fire); a fixed absolute
       # range makes no sense for a recurring alert (and would silently die once
-      # past), so drop non-presets — the rule falls back to "new events".
-      "date_ranges" => clean(params[:d]).select { |range| Datepicker.preset.key?(range) }
+      # past), so drop non-presets — the rule falls back to "new events". And a
+      # rule takes exactly ONE window (the cadence derives from it, and the
+      # editor's When picker is single-select), so keep only the first — a filter
+      # carried over from the feed (where When is multi-select) is narrowed here.
+      "date_ranges" => clean(params[:d]).select { |range| Datepicker.preset.key?(range) }.first(1)
     }
   end
 

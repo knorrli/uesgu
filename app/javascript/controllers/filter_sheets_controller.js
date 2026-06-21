@@ -91,6 +91,20 @@ export default class extends Controller {
     event.currentTarget.closest(".loc-group")?.classList.toggle("collapsed")
   }
 
+  // Single-select sheets (the rule editor's When): a recurring filter takes ONE
+  // relative window, so ticking a preset clears the rest — radio behaviour over
+  // plain checkboxes, which keeps #serialize / #refreshTrigger / clear unchanged.
+  // Clicking the active preset off leaves none checked = "new events". Wired only
+  // where the sheet opts in (data-action on a single sheet); the feed's When is
+  // multi-select and never calls this.
+  enforceSingle(event) {
+    const input = event.target
+    if (!input.checked) return
+    input.closest(".sheet").querySelectorAll('input[type="checkbox"]').forEach((other) => {
+      if (other !== input) other.checked = false
+    })
+  }
+
   // In-sheet search: hide non-matching rows. While searching, expand groups and
   // drop those with no surviving rows; clearing the box re-collapses them.
   filter(event) {

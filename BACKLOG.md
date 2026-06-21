@@ -59,8 +59,6 @@
   saved shows). See memory `project-screenshot-design-review`.
 - **Slow PWA start / splash screen** — cold start is sluggish; no splash handling
   yet. (See memory `project-pwa-install-affordance`.)
-- **Dark PWA icon not wired into the manifest** — `icon-192-dark.png` exists but
-  `manifest.json.erb` references only the single-theme icons. Minor.
 
 ### Discuss / experiment
 

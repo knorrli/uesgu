@@ -578,6 +578,7 @@ de:
     delete_event: Veranstaltung löschen
     edit_event: Veranstaltung bearbeiten
     edit_tag: Tag bearbeiten
+    offsite_link: Öffnet auf %{source}, nicht der Website des Veranstaltungsorts
     index:
       empty: Keine Veranstaltungen für die aktuellen Filter.
       view:

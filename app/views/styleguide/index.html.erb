@@ -212,6 +212,20 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <span><span style="text-decoration: line-through underline;">Called-off show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--cancelled">Cancelled</span></span>
+          <span><span style="text-decoration: underline;">Moved show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--moved">New date</span></span>
+          <span><span style="text-decoration: underline;">Off-site show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--source">Bewegungsmelder</span></span>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Event markers</span> · <code>.chip--cancelled</code>, <code>.chip--moved</code>, <code>.chip--source</code>
+        <p class="sg-purpose">A quiet <code>.chip</code> sub-family that trails an event title with secondary info, sized down so it never competes with the title. One shape, <b>colour = severity</b>: cancelled (warn-red, + struck title) → rescheduled (sand heads-up) → off-site source (neutral grey). The source one names where the link leaves you and shows <b>only</b> on links that aren't the venue's own page (detected by host — most Petzi / deep-linked OLE carry none).</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
         <span class="badge">3</span>
         <span class="badge">+2 more</span>
       </div>

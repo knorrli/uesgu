@@ -16,6 +16,29 @@ module EventsHelper
     request.query_parameters.except('day', 'page').merge('view' => 'calendar')
   end
 
+  # Listing/aggregator hosts (eTLD+1 → friendly name) we link OUT to when an event
+  # has no page on the venue's own site. Keyed on the link HOST, not data_source:
+  # an aggregator scraper (Petzi, OLE:Bewegungsmelder) links to the venue's own
+  # page when one exists, so only the genuinely off-site links get badged. Add a
+  # row when a new source can land users somewhere other than the venue.
+  OFFSITE_SOURCES = {
+    'bewegungsmelder.ch' => 'Bewegungsmelder',
+    'eventfrog.ch'       => 'Eventfrog',
+    'petzi.ch'           => 'PETZI'
+  }.freeze
+
+  # The friendly name of the listing site an event's link points at, or nil when
+  # it points at the venue's own site (the common case → no badge). Lets the event
+  # card flag "this link leaves you at Bewegungsmelder, not the venue".
+  def event_offsite_source(event)
+    host = URI.parse(event.url.to_s).host&.downcase&.delete_prefix('www.')
+    return nil if host.blank?
+
+    OFFSITE_SOURCES[host] || OFFSITE_SOURCES.find { |domain, _| host.end_with?(".#{domain}") }&.last
+  rescue URI::InvalidURIError
+    nil
+  end
+
   # Build a path to the *current* listing (events_path or saved_events_path) from
   # a query hash — url_for fills the controller/action from the live request.
   def calendar_listing_path(query)

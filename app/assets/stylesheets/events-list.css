@@ -296,28 +296,13 @@
   opacity: 0.5;
 }
 
-/* Cancelled events stay listed (so a follower sees the show was called off) but
-   the title is struck through and prefixed with a warning-coloured badge. */
+/* Cancelled events stay listed (so a follower sees the show was called off) with
+   the title struck through; the trailing warn-red `.chip--cancelled` marker
+   (tags.css) names the status. Rescheduled events keep their title intact and
+   carry the sand `.chip--moved` marker instead — "date moved" is a heads-up, not
+   a call-off, so no strikethrough. */
 .event.cancelled .event-title a {
   text-decoration: line-through;
-}
-
-.event-cancelled {
-  font-weight: bold;
-  text-transform: uppercase;
-  color: var(--theme-warn-color);
-}
-
-/* Rescheduled events stay listed at their NEW date with an informational badge —
-   no strikethrough, the show is still on. A sand emphasis pill rather than the
-   cancellation's warn-red, so "date moved" reads as a heads-up, not a call-off. */
-.event-rescheduled {
-  font-weight: bold;
-  text-transform: uppercase;
-  font-size: var(--font-size-small);
-  padding: 0 0.4em;
-  background: var(--theme-bg-emphasis);
-  color: var(--theme-fg-color);
 }
 
 /* Toolbar row above the programme: the favorites/notify shortcuts and the empty

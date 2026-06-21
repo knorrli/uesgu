@@ -113,3 +113,27 @@ label.tag:has(input:checked) {
   background: color-mix(in srgb, var(--theme-fg-color) 8%, transparent);
   color: var(--theme-fg-muted);
 }
+
+/* Event markers — a quiet chip sub-family appended AFTER an event title to add
+   status/source info WITHOUT competing with it. Smaller than a base .chip and
+   still borderless (read-only info); colour = severity: cancelled (warn-red) →
+   rescheduled (sand heads-up) → source (the neutral base-.chip grey). They trail
+   the title link, so each takes a small leading gap. Used on the events list. */
+.chip--cancelled,
+.chip--moved,
+.chip--source {
+  margin-left: 0.5ch;
+  vertical-align: middle;
+  font-size: 0.7rem;
+  padding: 1px var(--gap-small);
+}
+
+.chip--cancelled {
+  background: color-mix(in srgb, var(--theme-warn-color) 14%, transparent);
+  color: var(--theme-warn-color);
+}
+
+.chip--moved {
+  background: var(--theme-bg-emphasis);
+  color: var(--theme-fg-color);
+}

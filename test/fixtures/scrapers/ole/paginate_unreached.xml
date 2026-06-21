@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic OLE page with an UPCOMING event but NO <next_url>. In the early-exit
+  test it sits behind STOP_AFTER_EMPTY_PAGES past-only pages, so the loop must
+  bail before fetching it — its event proving absent is the assertion.
+-->
+<export>
+  <meta>
+    <max_pages>99</max_pages>
+  </meta>
+  <events>
+    <event source_id="unreachable">
+      <name>Unreachable Act</name>
+      <url>https://venue.example/events/unreachable</url>
+      <shows>
+        <show source_id="u-1"><date_start>2026-10-10T20:00:00+02:00</date_start></show>
+      </shows>
+    </event>
+  </events>
+</export>

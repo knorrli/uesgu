@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic OLE page with only a PAST event (→ zero upcoming rows) plus a
+  <next_url>. Queued several times to simulate the history tail of a newest-first
+  feed (early-exit) or the leading past pages of an oldest-first feed (safety).
+-->
+<export>
+  <meta>
+    <max_pages>99</max_pages>
+    <next_url>https://venue.example/oleexport?page=next</next_url>
+  </meta>
+  <events>
+    <event source_id="past">
+      <name>Past Act</name>
+      <url>https://venue.example/events/past</url>
+      <shows>
+        <show source_id="p-1"><date_start>2020-02-02T20:00:00+01:00</date_start></show>
+      </shows>
+    </event>
+  </events>
+</export>

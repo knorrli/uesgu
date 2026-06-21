@@ -88,6 +88,13 @@ module Scrapers
     # the venue-pointing url, the [venue, city, canton] tags).
     Row = Struct.new(:event, :show, :start_time, :url, :locations, keyword_init: true)
 
+    # Pagination early-exit margin. Feeds dump full history (back to ~2012) over
+    # dozens of slow pages; the shipping ones are ordered newest-first, so once
+    # this many CONSECUTIVE pages yield no upcoming show, the rest is past-only and
+    # we stop. The margin tolerates the feeds' not-quite-monotonic date order (a
+    # later page can briefly poke back above today). See #event_rows.
+    STOP_AFTER_EMPTY_PAGES = 3
+
     # Sources are generated subclasses (see bottom of file). They're created
     # anonymously via Class.new, so they have no name when Ruby fires `inherited`
     # — suppress Registerable's auto-registration here (no super) and register each
@@ -131,15 +138,27 @@ module Scrapers
     # --- Template-method hooks -------------------------------------------------
 
     # process_events fetched page 1 (get(self.class.url)); we parse it, follow
-    # <meta><next_url> pagination to the end, and expand every <event> into one
-    # Row per upcoming <show>. Returning the fully-resolved Rows keeps the field
-    # extractors trivial (they just read the Row).
+    # <meta><next_url> pagination, and expand every <event> into one Row per
+    # upcoming <show>. Returning the fully-resolved Rows keeps the field extractors
+    # trivial (they just read the Row).
+    #
+    # Stops early once STOP_AFTER_EMPTY_PAGES consecutive pages produce no upcoming
+    # row — the past-only history tail of a newest-first feed. The `rows.any?`
+    # guard keeps an oldest-first feed (whose upcoming events trail at the end)
+    # paging until it reaches them, so the early-exit only ever skips real history,
+    # never real events. `max_pages` remains the hard ceiling.
     def event_rows
       rows = []
       doc = current_doc
       pages = 1
+      empty_streak = 0
       loop do
-        rows.concat(rows_from(doc))
+        page_rows = rows_from(doc)
+        rows.concat(page_rows)
+
+        empty_streak = page_rows.empty? ? empty_streak + 1 : 0
+        break if rows.any? && empty_streak >= STOP_AFTER_EMPTY_PAGES
+
         nxt = next_url(doc)
         break if nxt.blank?
 

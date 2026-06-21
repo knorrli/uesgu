@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic OLE page: one UPCOMING event plus a <next_url>, so pagination
+  continues. Used by the early-exit test as the page that seeds rows before the
+  past-only tail (see Scrapers::Ole#event_rows / STOP_AFTER_EMPTY_PAGES).
+-->
+<export>
+  <meta>
+    <max_pages>99</max_pages>
+    <next_url>https://venue.example/oleexport?page=2</next_url>
+  </meta>
+  <events>
+    <event source_id="reachable">
+      <name>Reachable Act</name>
+      <url>https://venue.example/events/reachable</url>
+      <shows>
+        <show source_id="r-1"><date_start>2026-09-09T20:00:00+02:00</date_start></show>
+      </shows>
+    </event>
+  </events>
+</export>

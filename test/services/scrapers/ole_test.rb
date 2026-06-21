@@ -39,6 +39,31 @@ class Scrapers::OleTest < Minitest::Test
     refute(events.any? { |e| e.title == 'Has Been Trio' }, 'an all-past event must be dropped entirely')
   end
 
+  # Newest-first feeds dump full history behind the upcoming events; stop once
+  # STOP_AFTER_EMPTY_PAGES consecutive pages yield no upcoming row so we don't
+  # page through years of past-only events. (Real feeds: 25 pages → ~8.)
+  def test_pagination_stops_after_consecutive_past_only_pages
+    events = run_offline(single_venue,
+                         'paginate_future.xml',
+                         'paginate_empty.xml', 'paginate_empty.xml', 'paginate_empty.xml',
+                         'paginate_unreached.xml')
+    titles = events.map(&:title)
+    assert_includes titles, 'Reachable Act'
+    refute_includes titles, 'Unreachable Act',
+                     'must bail after the past-only tail, never reaching the 5th page'
+  end
+
+  # Safety for oldest-first feeds: leading past-only pages must NOT trip the
+  # early-exit — we've collected nothing yet, so the rows.any? guard keeps paging
+  # until the upcoming events at the tail.
+  def test_pagination_keeps_going_through_leading_past_pages
+    events = run_offline(single_venue,
+                         'paginate_empty.xml', 'paginate_empty.xml', 'paginate_empty.xml',
+                         'paginate_tail.xml')
+    assert_includes events.map(&:title), 'Tail Act',
+                    'oldest-first feeds must page through to their upcoming events'
+  end
+
   def test_trailing_colon_stripped_and_lead_becomes_subtitle_when_described
     events = run_offline(single_venue, 'single_page1.xml', 'single_page2.xml')
     by_title = events.index_by(&:title)

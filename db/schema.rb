@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_20_180000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -236,6 +236,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_20_180000) do
     t.index ["calendar_feed_token"], name: "index_users_on_calendar_feed_token", unique: true
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
+  end
+
+  create_table "venue_places", force: :cascade do |t|
+    t.string "venue", null: false
+    t.string "city"
+    t.string "canton"
+    t.string "source", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["venue", "city", "canton"], name: "index_venue_places_on_venue_and_city_and_canton", unique: true
   end
 
   add_foreign_key "event_saves", "events"

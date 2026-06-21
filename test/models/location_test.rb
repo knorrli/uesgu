@@ -50,6 +50,23 @@ class LocationTest < ActiveSupport::TestCase
     assert_includes tree[canton][city], @scraper.location
   end
 
+  # A per-event aggregator can't declare its venues in code, so it persists the
+  # places it resolves (VenuePlace). Those must fold into the taxonomy exactly
+  # like a declared scraper place — classified as a venue and nested in the tree —
+  # otherwise the aggregator's venues are unfilterable (the gap Bewegungsmelder
+  # first exposed). Synthetic names (project-test-synthetic-taxonomy).
+  test 'an aggregator-resolved VenuePlace folds into venue_names, type and tree' do
+    VenuePlace.create!(venue: 'Glorphalle', city: 'Snarftown', canton: 'BE',
+                       source: 'OLE:Test')
+
+    assert_includes Location.venue_names, 'Glorphalle'
+    assert_equal :venue, Location.type_for('Glorphalle')
+
+    tree = Location.hierarchy
+    assert_includes tree['BE'].keys, 'Snarftown'
+    assert_includes tree['BE']['Snarftown'], 'Glorphalle'
+  end
+
   # Regression: a multi-venue aggregator (Petzi) declares only a placeholder
   # [location] (size 1), so it has no city. It must be excluded from the tree —
   # otherwise the favorites location picker calls parameterize on a nil city and

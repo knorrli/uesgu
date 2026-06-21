@@ -184,6 +184,18 @@ module Scrapers
       def source_key = provenance
     end
 
+    # Real sweep entry point. After the base run (fetch → build → save events),
+    # persist the venue places this aggregator resolved so they enter the location
+    # taxonomy. Only #call does this — the golden/OLE offline tests drive
+    # #process_events directly and the dry parse calls #event_rows, so neither
+    # writes VenuePlace rows. A no-op for single-venue sources (which declare their
+    # place in code and so are already in the taxonomy — see #note_place).
+    def call
+      result = super
+      persist_discovered_places
+      result
+    end
+
     # --- Template-method hooks -------------------------------------------------
 
     # process_events fetched page 1 (get(self.class.url)); we parse it, follow
@@ -270,13 +282,19 @@ module Scrapers
         next [] if base_url.blank?
 
         locations = locations_for(event_node)
-        event_node.css('shows show').filter_map do |show_node|
+        rows = event_node.css('shows show').filter_map do |show_node|
           start = parse_start(show_node)
           next if start.nil? || start.to_date < Date.current # drop past shows
 
           Row.new(event: event_node, show: show_node, start_time: start,
                   url: occurrence_url(base_url, start), locations: locations)
         end
+        # Remember an aggregator's resolved place once we know it has an upcoming
+        # show, so Location can fold the venue into the WHERE tree (see #call →
+        # #persist_discovered_places). In-memory only — never writes here, so the
+        # read-only dry parse (which calls #event_rows, not #call) stays read-only.
+        note_place(locations) if rows.any?
+        rows
       end
     end
 
@@ -359,6 +377,23 @@ module Scrapers
       city   = squish(text(loc, 'locality'))
       canton = CITY_CANTON_FIXES[city.downcase] || SwissPostcode.canton(text(loc, 'code'))
       [venue, city, canton].compact_blank.presence || self.class.locations
+    end
+
+    # Accumulate an aggregator's distinct resolved [venue, city, canton] tuples in
+    # memory during the run; persisted later by #persist_discovered_places. Only
+    # aggregators need this — single-venue sources are already in the taxonomy via
+    # their declared place. Skip a tuple too thin to place (no city).
+    def note_place(locations)
+      return unless self.class.aggregator? && locations.size >= 2
+
+      (@discovered_places ||= Set.new) << locations
+    end
+
+    # Upsert the run's resolved venue places (idempotent — see VenuePlace.record!).
+    def persist_discovered_places
+      @discovered_places&.each do |venue, city, canton|
+        VenuePlace.record!(venue: venue, city: city, canton: canton, source: self.class.source_key)
+      end
     end
 
     def text(node, css)

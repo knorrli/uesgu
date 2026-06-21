@@ -177,3 +177,4 @@ venues:
   - { domain: stattland.ch,        name: Stattland,                 disposition: reject, reason: non_music, checked: 2026-06-21 }
   - { domain: mobilservice.ch,     name: Mobilservice,              disposition: reject, reason: non_music, checked: 2026-06-21 }
   - { domain: konzerte-bern.ch,    name: Konzerte Bern,             disposition: reject, reason: feed_quality, checked: 2026-06-21 }  # classical, but homepage-only URLs (collisions) + no genres + address-jammed aggregator venues
+  - { domain: kulturdietikon.ch,   name: Kultur Dietikon,           disposition: reject, reason: non_music,   checked: 2026-06-21 }  # civic agenda (markets/demos/Bundesfeier) + a few choir concerts; no genres, most events have no venue

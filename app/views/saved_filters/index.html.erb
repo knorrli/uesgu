@@ -2,7 +2,13 @@
 
 <div class="saved-filters flex flex-col gap-large">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
-    <h1><%= t('saved_filters.title') %></h1>
+    <div class="flex justify-between align-center wrap gap-medium">
+      <h1><%= t('saved_filters.title') %></h1>
+      <%# Compose a filter from scratch — navigation to the editor (a link, not a
+          commit), so the secondary button style, matching the cards' Apply.
+          Right-aligned across the header, like the settings page's sign-out. %>
+      <%= link_to t('saved_filters.new_button'), new_saved_filter_path, class: 'button-small' %>
+    </div>
   <% end %>
 
   <% if @rules.empty? %>

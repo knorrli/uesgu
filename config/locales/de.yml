@@ -116,6 +116,7 @@ de:
       other: "%{count} gespeicherte Veranstaltungen stehen an"
   saved_filters:
     title: Gespeicherte Filter
+    new_button: Neuer Filter
     save_button: Speichern
     window_none: Kein Zeitraum (neue Events)
     apply: Anwenden
@@ -132,7 +133,7 @@ de:
     delete: Löschen
     delete_confirm: Diesen gespeicherten Filter wirklich löschen?
     empty_link: Filtere die Veranstaltungen
-    empty_html: Noch keine gespeicherten Filter. %{link} auf der Startseite und speichere ihn dann.
+    empty_html: Noch keine Filter. „Neuer Filter“ oben, oder %{link} auf der Startseite.
     type:
       added: Neue Events
     errors:

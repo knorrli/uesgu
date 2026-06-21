@@ -58,11 +58,6 @@
   saved shows). See memory `project-screenshot-design-review`.
 - **Slow PWA start / splash screen** — cold start is sluggish; no splash handling
   yet. (See memory `project-pwa-install-affordance`.)
-- **Create filters directly on the saved-filters index.** Today the only way to
-  make a filter is to build one on the feed and save it from there; the
-  `/saved_filters` page just points back ("Filter the events on the home page,
-  then save it"). Let users compose + save a filter straight from the index.
-  (User feedback, 2026-06-20.)
 
 ### Maybe-later (explicitly deferred)
 

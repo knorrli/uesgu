@@ -116,6 +116,7 @@ en:
       other: "%{count} saved shows coming up"
   saved_filters:
     title: Saved filters
+    new_button: New filter
     save_button: Save
     window_none: No window (new events)
     apply: Apply
@@ -132,7 +133,7 @@ en:
     delete: Delete
     delete_confirm: Really delete this saved filter?
     empty_link: Filter the events
-    empty_html: No saved filters yet. %{link} on the home page, then save it.
+    empty_html: No filters yet. Hit “New filter” above, or %{link} on the home page.
     type:
       added: New events
     errors:

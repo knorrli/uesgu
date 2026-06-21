@@ -63,6 +63,10 @@ gem 'mechanize'
 # Calendar View
 gem 'simple_calendar'
 
+# Rate limiting / abuse throttling at the Rack layer (sheds scraper floods
+# before they reach the controller — see config/initializers/rack_attack.rb)
+gem 'rack-attack'
+
 group :development, :test do
   # See https://guides.rubyonrails.org/ndebugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

@@ -57,8 +57,15 @@ module Scrapers
       # Net-new, non-PETZI single-venue Bern feeds.
       # { key: 'Klangkeller', feed_url: 'https://www.klangkeller-bern.ch/app/klangkeller/action/oleexport',
       #   location: ['Klangkeller', 'Bern', 'BE'] },
-      { key: 'LaCappella',  feed_url: 'https://www.la-cappella.ch/app/lacappella/action/oleexport',
-        location: ['La Cappella', 'Bern', 'BE'] }
+      # La Cappella dropped: it's a Kleinkunst/cabaret house, not a music venue —
+      # its feed is ~80% Kabarett & Comedy / Theater / Mundart / Worte / Zauberkunst,
+      # which clashes with our music focus and would flood the taxonomy. (Also an
+      # oldest-first feed, so it walks its full history every sweep, and it acts as
+      # an organiser — events it promotes at other venues we scrape would duplicate
+      # under a "La Cappella" tag that dedup can't merge.)
+      # { key: 'LaCappella',  feed_url: 'https://www.la-cappella.ch/app/lacappella/action/oleexport',
+      #   location: ['La Cappella', 'Bern', 'BE'] },
+      # CasinoBern dropped: only ever exposed a 2019 dataset, never updated since.
       # { key: 'CasinoBern',  feed_url: 'https://www.casinobern.ch/wp-content/themes/casinobern/views/component/event/ole/',
       #   location: ['Casino Bern', 'Bern', 'BE'] }
       # { key: 'Lichtspiel',  feed_url: 'https://www.lichtspiel.ch/oleexport/',

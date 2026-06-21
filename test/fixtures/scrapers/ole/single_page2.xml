@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic single-venue OLE feed, PAGE 2 of 2. No <next_url> → pagination stops.
+  Event D is entirely in the past → contributes ZERO events (proves the filter
+  drops whole events, not just individual shows). Event C is the only survivor
+  on this page, so seeing it in the output proves page 2 was actually fetched.
+-->
+<export>
+  <meta>
+    <max_pages>2</max_pages>
+  </meta>
+  <events>
+    <event source_id="evt-c">
+      <name>Wibble Trio</name>
+      <url>https://venue.example/events/c</url>
+      <shows>
+        <show source_id="evt-c-1"><date_start>2026-09-05T19:00:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Zorpjazz</category>
+      </categories>
+    </event>
+
+    <event source_id="evt-d">
+      <name>Has Been Trio</name>
+      <url>https://venue.example/events/d</url>
+      <shows>
+        <show source_id="evt-d-1"><date_start>2019-03-03T20:00:00+01:00</date_start></show>
+        <show source_id="evt-d-2"><date_start>2021-04-04T20:00:00+02:00</date_start></show>
+      </shows>
+    </event>
+  </events>
+</export>

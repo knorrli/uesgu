@@ -131,6 +131,24 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes Event.visible, b
   end
 
+  # OLE overlaps PETZI heavily (Dachstock is in both). An OLE event is just a
+  # non-PETZI-host row, so existing venue+date+title dedup absorbs it: it points at
+  # the PETZI canonical and is hidden, never shown as a second listing. (The OLE
+  # adapter keeps the venue <url>, not the <ticket_url> PETZI mirror, so its host
+  # reads as bespoke here — exactly what we want.) Genres ∪ onto the canonical.
+  test 'an OLE event overlapping a PETZI show merges onto the canonical, not duplicated' do
+    p   = make(title: 'Shared Headliner', date: FUTURE, genres: [], venue: 'Dachstock', host: 'www.petzi.ch')
+    ole = make(title: 'Shared Headliner', date: FUTURE, genres: ['ole-only-genre'],
+               venue: 'Dachstock', host: 'api.dachstock.ch')
+
+    Scrapers::Dedup.run
+
+    assert_equal p.id, ole.reload.canonical_event_id, 'OLE duplicate points at the PETZI canonical'
+    refute_includes Event.visible, ole, 'OLE duplicate is hidden, not a second listing'
+    assert_includes Event.visible, p
+    assert_includes p.reload.genre_list.map(&:downcase), 'ole-only-genre', 'OLE genres union onto canonical'
+  end
+
   test 'past events are left untouched' do
     past = Date.current - 5
     p = petzi_event(title: 'Past Show', date: past)

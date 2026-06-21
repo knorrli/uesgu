@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic aggregator (multi-venue) OLE feed, single page. Each event resolves
+  its OWN venue from <location>, and canton is derived from the PLZ <code> (OLE
+  gives no canton). Event 1 → Bern (3011 → BE); Event 2 → Zermatt (3920 → VS, a
+  deliberate non-Bern code to prove the derivation isn't hard-wired to BE).
+  Invented venue/artist/taxonomy names (project-test-synthetic-taxonomy).
+-->
+<export>
+  <meta>
+    <max_pages>1</max_pages>
+  </meta>
+  <events>
+    <event source_id="agg-1">
+      <name>Snarftet plays Florp</name>
+      <url>https://bejazz.example/events/snarftet</url>
+      <ticket_url>https://eventfrog.ch/de/p/ticket-snarftet</ticket_url>
+      <lead>Quartet</lead>
+      <shows>
+        <show source_id="agg-1-1"><date_start>2026-07-20T20:30:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Zorpjazz</category>
+      </categories>
+      <location>
+        <name>Marians Jazzroom</name>
+        <street>Engestrasse 54</street>
+        <code>3011</code>
+        <locality>Bern</locality>
+      </location>
+    </event>
+
+    <event source_id="agg-2">
+      <name>Bergglorp Ensemble</name>
+      <url>https://bejazz.example/events/bergglorp</url>
+      <shows>
+        <show source_id="agg-2-1"><date_start>2026-08-02T19:30:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Alpentron</category>
+      </categories>
+      <location>
+        <name>Vernissage Halle</name>
+        <street>Bahnhofstrasse 9</street>
+        <code>3920</code>
+        <locality>Zermatt</locality>
+      </location>
+    </event>
+  </events>
+</export>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic single-venue OLE feed, PAGE 1 of 2. Invented taxonomy + names
+  (project-test-synthetic-taxonomy). Exercises: pagination (next_url → page 2),
+  date filtering (Event A has a 2020 show that must be dropped), multi-show
+  expansion (Event B → 2 occurrences), trailing-colon title cleanup (Event A),
+  and the URL rule (the venue <url> is canonical, <ticket_url> = eventfrog mirror
+  must NOT be used).
+-->
+<export>
+  <meta>
+    <max_pages>2</max_pages>
+    <next_url>https://venue.example/oleexport?page=2</next_url>
+  </meta>
+  <events>
+    <event source_id="evt-a">
+      <name>Zorptron Quartet:</name>
+      <url>https://venue.example/events/a</url>
+      <ticket_url>https://eventfrog.ch/de/p/ticket-a</ticket_url>
+      <lead>with Blip Collective</lead>
+      <description>A long blurb we deliberately ignore (no description column).</description>
+      <shows>
+        <show source_id="evt-a-2020"><date_start>2020-01-15T20:00:00+01:00</date_start></show>
+        <show source_id="evt-a-future"><date_start>2026-07-01T20:30:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Zorpjazz</category>
+        <category>Bliptronica</category>
+      </categories>
+      <location>
+        <name>Klangkeller Saal</name>
+        <street>Beispielgasse 1</street>
+        <code>3011</code>
+        <locality>Bern</locality>
+      </location>
+    </event>
+
+    <event source_id="evt-b">
+      <name>Glorptet</name>
+      <url>https://venue.example/events/b</url>
+      <ticket_url>https://eventfrog.ch/de/p/ticket-b</ticket_url>
+      <lead></lead>
+      <shows>
+        <show source_id="evt-b-1"><date_start>2026-08-10T21:00:00+02:00</date_start></show>
+        <show source_id="evt-b-2"><date_start>2026-08-11T21:00:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Wibblecore</category>
+      </categories>
+      <location>
+        <name>Klangkeller Saal</name>
+        <code>3011</code>
+        <locality>Bern</locality>
+      </location>
+    </event>
+  </events>
+</export>

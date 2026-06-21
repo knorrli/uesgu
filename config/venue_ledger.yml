@@ -144,3 +144,11 @@ venues:
   - { domain: onobern.ch,         name: ONO,              disposition: reject, reason: no_date,  checked: 2026-06-14 }  # EventON WP REST exposes publish date, not event date
   - { domain: mariansjazzroom.ch, name: Marians Jazzroom, disposition: reject, reason: js_only,  checked: 2026-06-14 }  # Squarespace; events render client-side
   - { domain: prozess.be,         name: PROZESS,          disposition: reject, reason: js_only,  checked: 2026-06-14 }  # pure SPA; empty static shell
+
+  # OLE-registry feeds surfaced by discovery:report, rejected — no musical / fitting events.
+  - { domain: breitsch-traeff.ch,  name: Breitsch-Träff,            disposition: reject, reason: non_music, checked: 2026-06-21 }
+  - { domain: futurina.ch,         name: Futurina,                  disposition: reject, reason: non_music, checked: 2026-06-21 }
+  - { domain: klangkeller-bern.ch, name: Klangkeller Bern,          disposition: reject, reason: non_music, checked: 2026-06-21 }
+  - { domain: lichtspiel.ch,       name: Lichtspiel,                disposition: reject, reason: non_music, checked: 2026-06-21 }
+  - { domain: refbern.ch,          name: Reformierte Kirchen Bern,  disposition: reject, reason: non_music, checked: 2026-06-21 }
+  - { domain: stattland.ch,        name: Stattland,                 disposition: reject, reason: non_music, checked: 2026-06-21 }

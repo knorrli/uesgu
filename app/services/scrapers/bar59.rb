@@ -37,6 +37,12 @@ module Scrapers
       "https://www.bar59.ch/#event-#{row['id']}" if row['id'].present?
     end
 
+    # The feed lives on a Firestore backend, so the public event host isn't the
+    # feed host — pin it explicitly for the golden-suite URL assertion.
+    def self.event_url_pattern
+      %r{\Ahttps://www\.bar59\.ch/#event-}
+    end
+
     # `date` is an ISO timestamp at midnight UTC (year present); the actual start is
     # the separate `startTime` string (e.g. "20:00").
     def event_start_time(row)

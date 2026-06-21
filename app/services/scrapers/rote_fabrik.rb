@@ -22,11 +22,21 @@ module Scrapers
       body.is_a?(Hash) ? body.values : Array(body)
     end
 
-    # No scrapable per-event page (the SPA route 404s to a plain GET), so key the
-    # event on the calendar's canonical event URL.
+    # The public event page is a Vue hash-route on the main site's programme — the
+    # SPA's own JSON-LD declares it as `…/de/programm.html#/events/<id>`, keyed on
+    # the OCCURRENCE id (top-level `id`), NOT `r_f_event_id`. The `kalender.` feed
+    # host is a login-gated backend whose `/events/<id>` pages 404 to a visitor, and
+    # `r_f_event_id` collides with an unrelated occurrence in the public route — so
+    # both halves of the old URL were wrong (see event_url_pattern + the golden suite).
     def event_url(row)
-      id = row['r_f_event_id'] || row['id']
-      "https://kalender.rotefabrik.ch/events/#{id}" if id.present?
+      id = row['id']
+      "https://rotefabrik.ch/de/programm.html#/events/#{id}" if id.present?
+    end
+
+    # The feed host (kalender.) ≠ the public event host, so pin the full public
+    # shape rather than inheriting the host-from-feed default.
+    def self.event_url_pattern
+      %r{\Ahttps://rotefabrik\.ch/de/programm\.html#/events/\d+\z}
     end
 
     # Top-level `date` is "YYYY-MM-DD HH:MM:SS" (year present); the real start is

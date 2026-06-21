@@ -60,6 +60,21 @@ module Scrapers
       [Discovery.domain(url.host)].compact
     end
 
+    # The shape every event URL this scraper emits MUST match, asserted by the
+    # golden suite against every captured URL. A wrong host or path-base here ships
+    # dead links into the app (the Rote Fabrik failure: the public pages live on
+    # rotefabrik.ch, but the feed host is the login-gated kalender.rotefabrik.ch).
+    # Default: scheme + the listing host, which covers single-venue scrapers whose
+    # event pages live on the same host as their feed. Override when the event host
+    # differs from the feed host (a SaaS/operator backend, an admin calendar), and
+    # pin the full path shape when the URL is built from an id so an id/path
+    # regression can't slip through. Aggregators resolve a per-event host, so they
+    # commit to no single shape and opt out with nil.
+    def self.event_url_pattern
+      return nil if aggregator?
+      %r{\Ahttps?://#{Regexp.escape(url.host)}/}
+    end
+
     # Returns a Scrapers::Result tallying what this run saw and wrote, so the
     # orchestrator (scrapers:run_all) can persist a ScrapeResult and stamp the
     # created events — without the Agent itself knowing about those tables.

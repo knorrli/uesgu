@@ -37,6 +37,12 @@ module Scrapers
       row['link'].presence
     end
 
+    # The feed is served from the cms. host, but `link` points at the public www.
+    # host — pin it explicitly for the golden-suite URL assertion.
+    def self.event_url_pattern
+      %r{\Ahttps://www\.sudpol\.ch/}
+    end
+
     # ACF `event_date_info` is an array of date rows (multi-date runs); take the
     # first. `event_date` is a UNIX timestamp that already carries the start time.
     def event_start_time(row)

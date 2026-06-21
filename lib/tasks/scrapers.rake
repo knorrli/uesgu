@@ -95,6 +95,66 @@ namespace :scrapers do
     end
   end
 
+  # One-off backfill: rewrite the stored Rote Fabrik event URLs that the old
+  # event_url built wrongly — they pointed at the login-gated `kalender.` backend
+  # using `r_f_event_id`, which 404s to a visitor (a dead link in the app). The
+  # fixed scraper now emits the public SPA route keyed on the occurrence id. Since
+  # events are matched on `url`, the next scrape would otherwise CREATE fresh rows
+  # and orphan the old ones — so run this BEFORE the next sweep to heal in place.
+  #
+  # Fetches the live feed and reuses the scraper's own event_url so the rewritten
+  # URL is byte-identical to what re-scraping produces. Idempotent: only touches
+  # rows still on the old `kalender.` host; an event whose id has dropped from the
+  # feed (can't be remapped) is reported and left untouched. Run on prod via the
+  # Render shell after deploy.
+  #
+  #   bin/rails scrapers:rote_fabrik:fix_urls          # apply
+  #   DRY_RUN=1 bin/rails scrapers:rote_fabrik:fix_urls # preview only
+  namespace :rote_fabrik do
+    desc 'Backfill Rote Fabrik event URLs from the dead kalender. backend to the public SPA route'
+    task fix_urls: :environment do
+      dry = ENV['DRY_RUN'].present?
+      old = Event.where(data_source: Scrapers::RoteFabrik.source_key)
+                 .where('url LIKE ?', '%kalender.rotefabrik.ch%')
+      if old.none?
+        puts 'rote_fabrik:fix_urls: nothing to do (no events on the old kalender. host)'
+        next
+      end
+
+      agent = Scrapers::RoteFabrik.new
+      agent.get(Scrapers::RoteFabrik.url)
+      # r_f_event_id (the id baked into the OLD url) → the live row, so we can rebuild
+      # the new url via the scraper's own event_url.
+      rows_by_rf = agent.send(:event_rows).index_by { |r| r['r_f_event_id'].to_s }
+
+      fixed = skipped = collided = 0
+      old.find_each do |event|
+        rf_id = event.url[%r{events/(\d+)}, 1]
+        row = rows_by_rf[rf_id]
+        unless row
+          skipped += 1
+          puts "  SKIP ##{event.id} #{event.title} — r_f_event_id #{rf_id} no longer in feed (#{event.url})"
+          next
+        end
+
+        new_url = agent.send(:event_url, row)
+        clash = Event.where(url: new_url).where.not(id: event.id).exists?
+        if clash
+          collided += 1
+          puts "  SKIP ##{event.id} #{event.title} — target URL already exists (#{new_url}); needs manual merge"
+          next
+        end
+
+        puts "  ##{event.id} #{event.title}: #{event.url} → #{new_url}"
+        event.update!(url: new_url) unless dry
+        fixed += 1
+      end
+
+      verb = dry ? 'would fix' : 'fixed'
+      puts "rote_fabrik:fix_urls: #{verb} #{fixed}, skipped #{skipped} (not in feed), #{collided} collision(s)#{' [DRY RUN]' if dry}"
+    end
+  end
+
   # REVIEW-ONLY dry run for vetting a draft scraper before it's wired in. Runs the
   # scraper LIVE (real get/page/click) but mirrors build_event into a plain hash
   # instead of an Event — so it never touches the DB, never mints genres, and never

@@ -50,6 +50,12 @@ module Scrapers
       "https://www.dynamo.ch#{alias_path}" if alias_path.present?
     end
 
+    # The feed is a NodeHive backend, so the public event host isn't the feed host
+    # — pin it explicitly for the golden-suite URL assertion.
+    def self.event_url_pattern
+      %r{\Ahttps://www\.dynamo\.ch/}
+    end
+
     # `field_event_date.value` is full ISO 8601 with offset and year — clean.
     def event_start_time(row)
       value = row.dig('attributes', 'field_event_date', 'value')

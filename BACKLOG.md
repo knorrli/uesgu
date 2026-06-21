@@ -50,6 +50,13 @@
   by the mobile sweep as a broken-looking title; root cause is the Nouveau Monde
   scraper's title extraction, not the view.
 
+- **Run the Rote Fabrik URL backfill on prod.** The scraper fix + the
+  `scrapers:rote_fabrik:fix_urls` backfill have shipped; the 15 local rows are
+  healed. Prod still has the dead `kalender.rotefabrik.ch` URLs — run
+  `bin/rails scrapers:rote_fabrik:fix_urls` on the Render shell **before the next
+  nightly sweep** so the events heal in place instead of the sweep creating fresh
+  rows and orphaning the old ones. (`DRY_RUN=1` to preview first.)
+
 ### UI polish
 
 - **General mobile-first sweep** of the app — ongoing direction, not a discrete

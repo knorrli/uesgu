@@ -86,6 +86,7 @@ class Scrapers::GoldenTest < Minitest::Test
     skip "no fixture captured for #{slug}" unless File.exist?(list_path)
 
     captured = capture_events(klass, slug, dir)
+    assert_url_shape(klass, slug, captured)
     actual = captured.map(&:to_h)
     golden_path = File.join(dir, 'golden.json')
 
@@ -96,6 +97,26 @@ class Scrapers::GoldenTest < Minitest::Test
       assert File.exist?(golden_path), "missing golden for #{slug} — run CAPTURE_GOLDEN=1"
       expected = JSON.parse(File.read(golden_path), symbolize_names: true)
       assert_equal expected, actual, "#{slug}: parse output drifted from the golden baseline"
+    end
+  end
+
+  # Guard every scraper's event URLs against the Rote Fabrik failure class: a wrong
+  # host or path-base that ships dead links into the app. Each scraper declares the
+  # shape its URLs must match (Scrapers::Agent.event_url_pattern — default: scheme +
+  # the listing host); we assert every captured URL is present and matches it. This
+  # can't catch a valid-host-but-wrong-id link (undetectable offline), but it does
+  # catch the whole-host/path regressions that broke Rote Fabrik. Aggregators return
+  # nil (per-event host, no single shape) and are skipped.
+  def assert_url_shape(klass, slug, captured)
+    pattern = klass.event_url_pattern
+    return if pattern.nil?
+
+    captured.each do |c|
+      assert c.url.present?, "#{slug}: captured an event with a blank URL"
+      assert_match pattern, c.url,
+                   "#{slug}: event URL #{c.url.inspect} doesn't match expected shape " \
+                   "#{pattern.inspect} — a wrong host/path here ships dead links " \
+                   '(see Rote Fabrik). Fix event_url, or update event_url_pattern.'
     end
   end
 

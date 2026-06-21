@@ -20,7 +20,7 @@
     <%= render 'view_switcher', view: @view %>
   </div>
 
-  <% if @events.empty? %>
+  <% unless @has_results %>
     <p class="muted events-empty"><%= t('events.index.empty') %></p>
   <% end %>
 

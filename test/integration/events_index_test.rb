@@ -42,6 +42,36 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_select '.day-saved-marker', count: 0
   end
 
+  # The calendar's month nav reloads only the turbo frame, so the empty-state
+  # message (which sits outside it) must key off "does the filter match anything
+  # at all", not the currently-focused month's slice — otherwise it goes stale
+  # and falsely claims "keine Veranstaltungen" on a month that does have results.
+  test 'the calendar empty-state reflects whole-filter matches, not the focused month' do
+    event(title: 'DarksideShow', start_date: Date.current + 2.months)
+
+    # Focus a month with no matching events while the filter still matches an
+    # event two months out: no empty-state message.
+    get events_path(view: 'calendar', q: ['DarksideShow'], start_date: Date.current.iso8601)
+    assert_response :success
+    assert_select 'p.events-empty', false
+
+    # A filter that genuinely matches nothing still shows the message.
+    get events_path(view: 'calendar', q: ['NoSuchEventAnywhere'])
+    assert_select 'p.events-empty'
+  end
+
+  # With no explicit month nav and no date filter, the calendar opens on the
+  # month holding the first matching event — so a search lands on its results
+  # rather than a (possibly empty) current month the user must page past.
+  test 'the calendar focuses the first matching event when no month is requested' do
+    event(title: 'DarksideShow', start_date: Date.current + 2.months)
+
+    get events_path(view: 'calendar', q: ['DarksideShow'])
+
+    assert_response :success
+    assert_select 'time.calendar-title[datetime=?]', (Date.current + 2.months).strftime('%Y-%m')
+  end
+
   test 'a location filter narrows the listing' do
     event(title: 'AlphaShow', location_list: ['VenueAlpha'], start_date: Date.current + 2.days)
     event(title: 'BetaShow', location_list: ['VenueBeta'], start_date: Date.current + 2.days)

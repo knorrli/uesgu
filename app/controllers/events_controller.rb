@@ -24,11 +24,18 @@ class EventsController < ApplicationController
     @view = resolve_view(session_key: :events_view, account_attr: :events_view)
 
     events = @q.result(distinct: true).order(start_date: :asc)
+    # Whether the filter matches anything at all — a filter-level fact, not the
+    # current month's slice. The calendar's month nav reloads only the turbo
+    # frame, so an empty-state keyed off the month-scoped @events would go stale
+    # when you page to a month that does have results; this stays correct.
+    @has_results = events.exists?
     if @view == 'calendar'
       @calendar_interactive = true
       # Focus order: explicit month nav (start_date) > the month of an active
-      # date filter (e.g. "next weekend" may fall in another month) > today.
-      @calendar_start = (Date.parse(params[:start_date]) rescue nil) || @filter.earliest_date || Date.current
+      # date filter (e.g. "next weekend" may fall in another month) > the month
+      # of the first matching event (so a search lands on its results instead of
+      # an empty current month) > today.
+      @calendar_start = (Date.parse(params[:start_date]) rescue nil) || @filter.earliest_date || events.minimum(:start_date) || Date.current
       # simple_calendar navigates via params[:start_date]; load the focused
       # month plus a week of padding so adjacent-month grid cells are covered.
       @events = events.includes(:locations, :genres).where(start_date: (@calendar_start.beginning_of_month - 7)..(@calendar_start.end_of_month + 7))

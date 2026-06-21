@@ -77,12 +77,6 @@
   saved shows). See memory `project-screenshot-design-review`.
 - **Slow PWA start / splash screen** — cold start is sluggish; no splash handling
   yet. (See memory `project-pwa-install-affordance`.)
-- **Filter-sheet scrim dims the saved-filter editor.** On the saved-filter
-  editor (which reuses the filter sheets), opening a Where/What sheet drops the
-  global `body.filter-sheet-open` scrim over the *whole* editor form — title,
-  schedule, Speichern — not just the content behind a feed panel. The scrim/float
-  UX only makes sense on the events feed; the editor shouldn't dim. (Regression
-  surfaced from the desktop float+scrim work, commit `5448624`.)
 
 ### Maybe-later (explicitly deferred)
 

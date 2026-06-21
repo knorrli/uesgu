@@ -118,6 +118,13 @@
    down. No-op on mobile, where the sheet is position: fixed. */
 .filter-sheets { position: relative; }
 
+/* The saved-filter editor wraps bar + sheets in this tighter box (it's the closer
+   positioned ancestor, so the panel anchors under the BAR rather than the whole
+   form — see saved_filters/_form). Sheets are absolute, so the box is the bar's
+   height and top:100% lands right beneath it. The feed has no such wrapper: its
+   panel anchors to .filter-sheets, below the chips row, on purpose. */
+.filter-sheets__fields { position: relative; }
+
 /* ── Trigger bar ── three underlined rows echoing the inline filter, but each
    whole row is a tap target opening its sheet. */
 .filter-sheets__bar {
@@ -256,30 +263,17 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   }
 
+  /* Editor: the panel sits flush under the bar. The feed keeps the gap so the
+     applied-filter chips stay visible between the bar and the panel; the editor
+     has no chips there, so the buffer just looks like a stray gap. */
+  .filter-sheets__fields .sheet { margin-top: 0; }
+
   .filter-sheets .sheet--open { display: flex; }
 
-  /* Scrim — a translucent layer between the floating panel and the page, so the
-     open panel reads as the active layer and the results below it as inactive.
-     Always present but invisible (opacity 0) so it can fade in when a sheet opens;
-     pointer-events stay off, so a click on the dimmed area still bubbles to the
-     document's click-outside handler and closes the panel. Desktop only — on
-     mobile the full-screen sheet covers the page itself. */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 90;
-    background: rgba(0, 0, 0, 0.35);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.18s ease, visibility 0.18s;
-  }
-
-  body.filter-sheet-open::before { opacity: 1; visibility: visible; }
-
-  /* Lift the whole filter block (bar + chips + panel) above the scrim so the
-     control you're using stays bright; only the content below it dims. */
+  /* While a sheet is open, lift the filter block into its own stacking context so
+     its floating dropdown panel renders ABOVE the content below it. No page dimming
+     (the panel's border + shadow are the "this floats above" cue) — same model as
+     the saved-filters menu, so the filter UI reads identically everywhere. */
   body.filter-sheet-open .filter-sheets { z-index: 100; }
 
   /* Keep the × close on desktop too (alongside Apply, click-outside and Esc) — an

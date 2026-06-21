@@ -35,15 +35,22 @@
 
       <% what_terms  = filter.queries + filter.genres %>
       <% where_terms = filter.location_list.map { |loc| location_display(loc) } %>
-      <div class="filter-sheets__bar">
-        <%= render 'tags/filter_trigger', field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') %>
-        <%= render 'tags/filter_trigger', field: 'where', icon: 'locations', terms: where_terms, empty: t('events.filter.where') %>
-      </div>
+      <%# Bar + sheets share a position:relative wrapper so the desktop floating
+          panel anchors directly under the trigger bar (top: 100% of this box —
+          the sheets are absolute, so the box is just the bar's height). Without it
+          the panel would resolve against the whole-form .filter-sheets and drop
+          past the Wann select below. The feed anchors to .filter-sheets instead, on
+          purpose: there the buffer reveals the applied-filter chips; here there are
+          none, so the panel sits flush under the bar. %>
+      <div class="filter-sheets__fields">
+        <div class="filter-sheets__bar">
+          <%= render 'tags/filter_trigger', field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') %>
+          <%= render 'tags/filter_trigger', field: 'where', icon: 'locations', terms: where_terms, empty: t('events.filter.where') %>
+        </div>
 
-      <%# The sheets sit right under the bar so the desktop dropdown panel lands
-          beneath its trigger. (Mobile sheets are fixed full-screen — order is moot.) %>
-      <%= render 'tags/genre_sheet', filter: filter %>
-      <%= render 'tags/location_sheet', filter: filter %>
+        <%= render 'tags/genre_sheet', filter: filter %>
+        <%= render 'tags/location_sheet', filter: filter %>
+      </div>
 
       <%# .field-label sits on the text span (not the wrapping label) so the bold
           stays on the label and the select's value renders at normal weight, like

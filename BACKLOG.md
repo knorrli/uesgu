@@ -43,31 +43,12 @@
   (`price` / `lineup` / `description` / `image` — none exist today), so this is a
   schema decision, not just a parser tweak. Re-run the audit across the rest of
   the scrapers once that's decided.
-- **Consume OLE feeds as a generic source (Open Linked Event Data).** *Core
-  shipped on branch `ole-ingestion` (2026-06-21), pending merge + deploy.*
-  `Scrapers::Ole` is a generic, config-driven `Agent` subclass: a `SOURCES` list
-  generates one registered scraper per feed — **new source = a URL, not code**.
-  Handles all the POC's skipped gotchas: `date_start >= today` filter,
-  `<meta><next_url>` pagination, multi-show → N events (venue `<url>` + show-date
-  key), per-event aggregator location with PLZ→canton (`Scrapers::SwissPostcode`),
-  trailing-colon title cleanup. Event URL is the venue's own `<url>`, never the
-  `<ticket_url>` mirror. Six robots-OK single-venue Bern feeds ship and were
-  live-verified (Dachstock, Klangkeller, La Cappella, Casino Bern, Lichtspiel,
-  Stattland); Dachstock proves `Scrapers::Dedup` absorbs PETZI overlap. Golden
-  tests + `script/ole_dry_parse.rb` (read-only) included. Remaining follow-ups:
-
-  - **Robots decision for robots-disallowed feeds.** Birdseye + BeJazz expose OLE
-    exports but `robots.txt` disallows our UA. Held pending a deliberate per-venue
-    opt-out call (cf. `Scrapers::BadBonn`). BeJazz was the intended aggregator
-    proof; aggregator support is implemented + tested regardless. Listed in
-    `Scrapers::Ole::DEFERRED`.
-  - **Messy aggregates.** Konzerte Bern (0 genres + address jammed into `<name>` →
-    needs address-in-name cleanup) and Hinto ALL (46 venues) deferred.
-  - **Retire fragile scrapers where OLE overlaps** (e.g. the bespoke Dachstock
-    HTML scraper) — evaluate once OLE has run a few sweeps.
-
-  Full schema + source list + gotchas in memory `project-open-event-data-avenues`.
-  (Out of scope: admin-UI toggle, images, Eventfrog.)
+- **Nouveau Monde: lineup jammed onto the title.** Event #285 title is stored as
+  `Fête de la Musique : Brunch musical, La Gustav + Cold TouchLa GustavCold Touch`
+  — the parser appends the artist names to the title with no separator (the
+  subtitle already carries `La Gustav (ch), Cold Touch (ch)` correctly). Surfaced
+  by the mobile sweep as a broken-looking title; root cause is the Nouveau Monde
+  scraper's title extraction, not the view.
 
 ### UI polish
 
@@ -77,11 +58,14 @@
   saved shows). See memory `project-screenshot-design-review`.
 - **Slow PWA start / splash screen** — cold start is sluggish; no splash handling
   yet. (See memory `project-pwa-install-affordance`.)
+- **Create filters directly on the saved-filters index.** Today the only way to
+  make a filter is to build one on the feed and save it from there; the
+  `/saved_filters` page just points back ("Filter the events on the home page,
+  then save it"). Let users compose + save a filter straight from the index.
+  (User feedback, 2026-06-20.)
 
 ### Maybe-later (explicitly deferred)
 
-- Reschedule **state-change-back** detection — core reschedule marking ships;
-  detecting "was rescheduled, now back to the original date" doesn't.
 - Session "Update the filter I just applied" soft-pointer.
 - `featured`/`main_genre` flag + subtree-count browse ranking.
 

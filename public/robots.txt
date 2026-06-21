@@ -1,1 +1,22 @@
 # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+#
+# robots.txt is read only by automated crawlers that choose to obey it — real
+# users' browsers never fetch it, so nothing here can affect a human visitor.
+#
+# Goal: stop polite crawlers from walking the combinatorial long tail of
+# query-string filter/pagination URLs (/?g=…&l=…&d=…&page=…). Every novel
+# permutation expands the web process's working set (resident memory ratchets
+# up and never returns to the OS), which is the bulk of the crawl-driven RAM
+# growth. The canonical pages stay crawlable; only the faceted variants don't.
+
+User-agent: *
+# Block every URL carrying a query string — all filter + pagination permutations.
+Disallow: /*?
+# Auth-gated / non-content areas (bots only get a login redirect here anyway).
+Disallow: /admin
+Disallow: /saved_events
+Disallow: /saved_filters
+Disallow: /notifications
+# Be gentle for the crawlers that honour it (Bing, Yandex, … — Googlebot ignores
+# Crawl-delay; set its rate in Search Console if it ever becomes a problem).
+Crawl-delay: 10

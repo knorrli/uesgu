@@ -137,15 +137,17 @@ venues:
     aliases: { ole: [www.bejazz.ch] }     # OLE *aggregator* feed (per-event location), robots-blocked. Also a roving series.
   - domain: bewegungsmelder.ch
     name: Bewegungsmelder
-    disposition: defer
-    reason: needs_work
+    disposition: consume
     checked: 2026-06-21
     aliases: { ole: [bewegungsmelder.ch] }
-    # Regional culture aggregator, ~7600 events / 152 pages. Has real genre tags +
-    # clean venue names + per-event <source_url>/source_id. To build: aggregator:true;
-    # key on source_id (the <url> is the venue homepage → same-date collisions);
-    # lean on the music-gate to hide the ~half that's dance/party/theater; dedup vs
-    # bee-flat (already consumed); skip the Eventfrog-sourced rows it republishes.
+    # Regional culture aggregator (Scrapers::OleBewegungsmelder, aggregator+
+    # link_via: :source). ~7600 events / 152 pages, but mostly historical — ~28
+    # upcoming at a time. Built 2026-06-21: keys on the per-event <source_url>
+    # (the <url> is only a venue homepage → same-venue/same-date collisions),
+    # prefers a real venue deep link for the link when the feed gives one; ~half
+    # the programme is non-music, hidden via db/genres.yml dispositions (lean-
+    # permissive). The <ticket_url> eventfrog mirror is never used, so eventfrog-
+    # republished rows need no special handling. See FINDINGS-bewegungsmelder.md.
 
   # --- reject: evaluated, not wanted (JS-only, no scrapeable date, non-music, …).
   - domain: la-cappella.ch

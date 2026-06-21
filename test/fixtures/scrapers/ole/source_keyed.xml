@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic editorial-aggregator feed for the link_via: :source path
+  (Bewegungsmelder-shaped). Both events share ONE venue homepage in <url>
+  (https://kulturhof.example) and BOTH play on the SAME night — so keying on
+  <url>+date would collide them into one. Each carries a distinct per-event
+  <source_url>, with an HTML char-ref (&#038; = "&") baked inside the CDATA the
+  way the real feed ships it, to prove CGI.unescapeHTML decodes it. Event 2 has
+  two shows to prove the show-date is still appended for distinct upsert keys.
+  Event 3's <url> IS a real per-event deep link (digit-bearing path), so it must
+  be PREFERRED over <source_url> (link users to the venue, not the aggregator).
+  Invented venue/artist/taxonomy names (project-test-synthetic-taxonomy).
+-->
+<export>
+  <meta>
+    <max_pages>1</max_pages>
+  </meta>
+  <events>
+    <event source_id="posts-300">
+      <name>Florpcore Festival</name>
+      <url><![CDATA[https://dieheiterefahne.example/events/1257/15]]></url>
+      <source_url><![CDATA[https://bm.example/?post_type=event&#038;p=300]]></source_url>
+      <shows>
+        <show source_id="ev-300"><date_start>2026-07-25T19:00:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Snarfpunk</category>
+        <category><![CDATA[Speis &amp; Trank]]></category>
+      </categories>
+      <location>
+        <name>Heitere Fahne</name>
+        <street>Kirchstrasse 24</street>
+        <code>3084</code>
+        <locality>Wabern</locality>
+      </location>
+    </event>
+
+    <event source_id="posts-100">
+      <name>Glorptron Live</name>
+      <url><![CDATA[https://kulturhof.example]]></url>
+      <source_url><![CDATA[https://bm.example/?post_type=event&#038;p=100]]></source_url>
+      <ticket_url><![CDATA[https://eventfrog.ch/de/p/glorptron]]></ticket_url>
+      <lead>Quartet</lead>
+      <shows>
+        <show source_id="ev-100"><date_start>2026-07-20T20:30:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Zorpjazz</category>
+      </categories>
+      <location>
+        <name>Kulturhof</name>
+        <street>Muhlernstrasse 11</street>
+        <code>3011</code>
+        <locality>Bern</locality>
+      </location>
+    </event>
+
+    <event source_id="posts-200">
+      <name>Snarfwave</name>
+      <url><![CDATA[https://kulturhof.example]]></url>
+      <source_url><![CDATA[https://bm.example/?post_type=event&#038;p=200]]></source_url>
+      <shows>
+        <show source_id="ev-200a"><date_start>2026-07-20T22:00:00+02:00</date_start></show>
+        <show source_id="ev-200b"><date_start>2026-07-21T22:00:00+02:00</date_start></show>
+      </shows>
+      <categories>
+        <category>Bliptronica</category>
+      </categories>
+      <location>
+        <name>Kulturhof</name>
+        <street>Muhlernstrasse 11</street>
+        <code>3011</code>
+        <locality>Bern</locality>
+      </location>
+    </event>
+  </events>
+</export>

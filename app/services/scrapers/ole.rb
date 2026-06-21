@@ -1,4 +1,5 @@
 require 'nokogiri'
+require 'cgi'
 
 module Scrapers
   # OLE (Open Linked Event Data) — a single standardized XML schema that many
@@ -73,6 +74,27 @@ module Scrapers
       #   location: ['Lichtspiel', 'Bern', 'BE'] },
       # { key: 'Stattland',   feed_url: 'https://stattland.ch/feed/ole',
       #   location: ['Stattland', 'Bern', 'BE'] }
+
+      # Bewegungsmelder — a Bern-region editorial culture AGGREGATOR (robots-OK;
+      # ~7600 events / 152 pages, newest-first). Two things make it different from
+      # the single-venue feeds above and drive the two non-default flags:
+      #   aggregator: true  — venue is resolved per event from <location> (+PLZ→
+      #                       canton), and it stays OUT of the location taxonomy.
+      #   link_via: :source — its <url> is unreliable: a real per-event deep link
+      #                       for some venues, but a bare homepage (identical per
+      #                       event, can't be a key) for most. We PREFER the venue
+      #                       deep link when present, else fall back to the stable
+      #                       per-event <source_url> — never the homepage (see
+      #                       #event_base_url / #venue_event_link?). (The
+      #                       <ticket_url> eventfrog mirror is never used, so
+      #                       eventfrog-republished rows need no special handling
+      #                       — see FINDINGS-bewegungsmelder.md.)
+      # Heavy overlap with venues we already consume (Bee-Flat, Dachstock,
+      # Dampfzentrale, Dynamo, Turnhalle, Rote Fabrik, …) is folded by Scrapers::
+      # Dedup. ~Half the programme is non-music (Theater/Party/Tanz/…); the music
+      # gate hides it via db/genres.yml dispositions (curated, not gated at ingest).
+      { key: 'Bewegungsmelder', feed_url: 'https://bewegungsmelder.ch/oleexport/',
+        aggregator: true, link_via: :source }
     ].freeze
 
     # Configured + parseable but DEFERRED, for reference (NOT swept). Both return
@@ -112,19 +134,28 @@ module Scrapers
     end
 
     class << self
-      attr_accessor :feed_url, :place, :is_aggregator, :label, :provenance
+      attr_accessor :feed_url, :place, :is_aggregator, :label, :provenance, :link_via
 
       # Build (but do NOT register) a configured source subclass. The shipping
       # loop at the bottom of this file names + registers each; tests call this to
       # get an isolated single-venue / aggregator class without touching the live
       # registry, so coverage doesn't depend on which feeds are currently enabled.
-      def build(key:, feed_url:, place: nil, aggregator: false)
+      #
+      # link_via selects which feed field is the event's canonical link + upsert
+      # key (see #event_base_url): the default :venue uses the venue's own <url>;
+      # :source uses the per-event <source_url>. Editorial AGGREGATORS (e.g.
+      # Bewegungsmelder) expose only a venue *homepage* in <url> — same for every
+      # event there, so <url>+date collides for two same-night shows at one venue —
+      # while <source_url> is a stable, rich, per-event page on the aggregator. For
+      # those, :source is both the only safe key AND the better user link.
+      def build(key:, feed_url:, place: nil, aggregator: false, link_via: :venue)
         Class.new(self) do
           self.feed_url      = feed_url
           self.place         = place
           self.is_aggregator = aggregator
           self.label         = key
           self.provenance    = "OLE:#{key}"
+          self.link_via      = link_via
         end
       end
 
@@ -138,6 +169,16 @@ module Scrapers
       def locations = place || [location]
 
       def aggregator? = !!is_aggregator
+
+      # The domain reconciled against the ledger's `consume` row (see the drift
+      # test). Agent returns [] for any aggregator, because a member-enumerating
+      # one (Petzi) commits to no single host. An OLE aggregator is different: it's
+      # ONE fixed feed endpoint, so the domain we commit to scraping IS that feed
+      # host — it takes a single `consume` row, even though it still resolves the
+      # actual VENUE per event (#aggregator? keeps it out of the location taxonomy).
+      # Single-venue OLE sources already got this from Agent; we just opt
+      # aggregators back in so the ledger can record the decision.
+      def venue_domains = [Discovery.domain(url.host)].compact
 
       # Provenance stamped on every event (Event#data_source), e.g. "OLE:Klangkeller".
       def source_key = provenance
@@ -205,7 +246,7 @@ module Scrapers
     # land UNPLACED in the curation queue), so we keep every token and curate
     # downstream rather than gate at ingest.
     def event_consumption_genres(row)
-      row.event.css('categories category').map { |c| squish(c.text) }.reject(&:blank?).uniq
+      row.event.css('categories category').map { |c| squish(decode(c.text)) }.reject(&:blank?).uniq
     end
 
     def event_locations(row) = row.locations
@@ -225,7 +266,7 @@ module Scrapers
     # date so the upsert keys stay distinct.
     def rows_from(doc)
       doc.css('event').flat_map do |event_node|
-        base_url = text(event_node, 'url')
+        base_url = event_base_url(event_node)
         next [] if base_url.blank?
 
         locations = locations_for(event_node)
@@ -237,6 +278,47 @@ module Scrapers
                   url: occurrence_url(base_url, start), locations: locations)
         end
       end
+    end
+
+    # This event's canonical link + upsert key (occurrence_url then appends the
+    # show date to keep N shows distinct). CGI.unescapeHTML undoes the HTML
+    # char-refs these feeds bake into a URL inside CDATA (e.g. "&#038;" → "&");
+    # it's a no-op on the already-clean URLs of the single-venue sources.
+    #
+    # Default (link_via: :venue): the venue's own <url> — NEVER the <ticket_url>
+    # mirror (see the class comment).
+    #
+    # Editorial aggregator (link_via: :source, e.g. Bewegungsmelder): its <url> is
+    # unreliable — for some venues it's a real per-event deep link, for most it's
+    # just a bare homepage (identical for every event there, so it can't be a key).
+    # We PREFER the venue's own page when <url> is a genuine event-specific deep
+    # link (see #venue_event_link?), since linking users to the venue beats the
+    # aggregator; otherwise we fall back to the per-event <source_url> (the
+    # aggregator's own event page) — never the useless, collision-prone homepage.
+    def event_base_url(event_node)
+      venue = decode(text(event_node, 'url'))
+      return venue unless self.class.link_via == :source
+
+      venue_event_link?(venue) ? venue : decode(text(event_node, 'source_url')).presence
+    end
+
+    def decode(raw) = raw.blank? ? raw : CGI.unescapeHTML(raw)
+
+    # A venue <url> worth linking to over the aggregator: a real per-event deep
+    # link, not a bare homepage or a generic section page. Conservative on purpose
+    # — the feed's <url> is junky (homepages, a "/menu" page) and a wrong guess
+    # would collide two events onto one key. We trust it only when the path carries
+    # a digit/id segment or there's a query string; bare domains and word-only
+    # section pages (/menu) fall through to the stable per-event <source_url>.
+    def venue_event_link?(url)
+      return false if url.blank?
+
+      uri = URI.parse(url)
+      return true if uri.query.present?
+
+      uri.path.to_s.split('/').any? { |seg| seg.match?(/\d/) }
+    rescue URI::InvalidURIError
+      false
     end
 
     # ISO-8601 so no fuzzy parsing; a blank/garbled date is skipped with a warn
@@ -258,15 +340,24 @@ module Scrapers
       "#{base_url}#show-#{start.to_date.iso8601}"
     end
 
+    # Manual canton corrections for cities an aggregator mis-tags via a wrong PLZ.
+    # The only canton signal OLE gives is the PLZ, so a typo'd code resolves to the
+    # wrong canton (Bewegungsmelder lists Wabern bei Köniz under 3984 = Fiesch/VS;
+    # its real PLZ is 3084/BE). Keyed on the downcased locality, so it corrects the
+    # specific place without remapping a PLZ that's legitimately VS for elsewhere.
+    # Add a row when a venue lands in the wrong canton in the WHERE tree.
+    CITY_CANTON_FIXES = { 'wabern' => 'BE' }.freeze
+
     # Single-venue: the configured place. Aggregator: resolve per event from
-    # <location>, deriving canton from the PLZ (the only canton signal OLE gives).
+    # <location>, deriving canton from the PLZ (the only canton signal OLE gives),
+    # with CITY_CANTON_FIXES overriding known upstream PLZ typos.
     def locations_for(event_node)
       return self.class.locations unless self.class.aggregator?
 
       loc    = event_node.at_css('location')
       venue  = clean_title(text(loc, 'name'))
       city   = squish(text(loc, 'locality'))
-      canton = SwissPostcode.canton(text(loc, 'code'))
+      canton = CITY_CANTON_FIXES[city.downcase] || SwissPostcode.canton(text(loc, 'code'))
       [venue, city, canton].compact_blank.presence || self.class.locations
     end
 
@@ -292,8 +383,11 @@ module Scrapers
 
     def squish(str) = str.to_s.gsub(/\s+/, ' ').strip
 
-    # Squish + drop a trailing colon ("Mardi Gras:" → "Mardi Gras").
-    def clean_title(str) = squish(str).sub(/\s*:\z/, '')
+    # Decode HTML char-refs + squish + drop a trailing colon ("Mardi Gras:" →
+    # "Mardi Gras"). The decode handles feeds that ship "&amp;" literally inside a
+    # CDATA title or venue name ("Speis &amp; Trank" → "Speis & Trank"), matching
+    # how <lead> is already entity-decoded in #plain_text.
+    def clean_title(str) = squish(decode(str)).sub(/\s*:\z/, '')
 
     def next_url(doc) = squish(text(doc, 'meta next_url'))
 
@@ -309,7 +403,8 @@ module Scrapers
   Ole::SOURCES.each do |src|
     const = "Ole#{src[:key]}"
     klass = Ole.build(key: src[:key], feed_url: src[:feed_url],
-                      place: src[:location], aggregator: src.fetch(:aggregator, false))
+                      place: src[:location], aggregator: src.fetch(:aggregator, false),
+                      link_via: src.fetch(:link_via, :venue))
     Scrapers.const_set(const, klass)
     All.scrapers[const] = klass
   end

@@ -25,6 +25,13 @@ class Scrapers::OleTest < Minitest::Test
     Scrapers::Ole.build(key: 'TestAgg', feed_url: 'https://agg.example/oleexport', aggregator: true)
   end
 
+  # An editorial aggregator that keys + links on the per-event <source_url>
+  # instead of the venue homepage <url> (Bewegungsmelder-shaped).
+  def source_aggregator
+    Scrapers::Ole.build(key: 'TestSrc', feed_url: 'https://bm.example/oleexport',
+                        aggregator: true, link_via: :source)
+  end
+
   # --- single-venue: pagination + date filter + multi-show + URL rule ---------
 
   def test_single_venue_paginates_filters_and_expands
@@ -124,6 +131,63 @@ class Scrapers::OleTest < Minitest::Test
     # 3011 → BE, 3920 → VS (deliberately non-Bern, proving it isn't hard-wired).
     assert_equal ['Marians Jazzroom', 'Bern', 'BE'], by_title['Snarftet plays Florp'].location_list
     assert_equal ['Vernissage Halle', 'Zermatt', 'VS'], by_title['Bergglorp Ensemble'].location_list
+  end
+
+  # --- link_via: :source — key + link on <source_url>, not the venue homepage --
+
+  # Two different events at the SAME venue homepage on the SAME night: keying on
+  # <url>+date would collide them into one, so the per-event <source_url> is the
+  # only safe upsert key. Also proves the HTML char-ref in the URL is decoded.
+  def test_source_linked_aggregator_keys_on_decoded_source_url
+    events = run_offline(source_aggregator, 'source_keyed.xml')
+
+    glorptron = events.find { |e| e.title == 'Glorptron Live' }
+    assert_equal 'https://bm.example/?post_type=event&p=100#show-2026-07-20', glorptron.url,
+                 '&#038; must be decoded to & and the show date appended'
+    refute(events.any? { |e| e.url.start_with?('https://kulturhof.example') },
+           'the venue homepage <url> must not be the key when link_via: :source')
+    assert_equal events.size, events.map(&:url).uniq.size,
+                 'same-venue/same-night events must get distinct keys via <source_url>'
+  end
+
+  # A multi-show event still gets one distinct key per show (source_url + date).
+  def test_source_linked_multi_show_keys_stay_distinct
+    events = run_offline(source_aggregator, 'source_keyed.xml')
+    snarf = events.select { |e| e.title == 'Snarfwave' }
+    assert_equal %w[https://bm.example/?post_type=event&p=200#show-2026-07-20
+                    https://bm.example/?post_type=event&p=200#show-2026-07-21].sort,
+                 snarf.map(&:url).sort
+  end
+
+  # When the aggregator's <url> IS a genuine per-event deep link, link there
+  # (the venue) rather than the aggregator's own <source_url>.
+  def test_source_linked_prefers_a_real_venue_deep_link_over_source_url
+    events = run_offline(source_aggregator, 'source_keyed.xml')
+    florp = events.find { |e| e.title == 'Florpcore Festival' }
+    assert_equal 'https://dieheiterefahne.example/events/1257/15#show-2026-07-25', florp.url,
+                 'a digit-bearing venue deep link is preferred over <source_url>'
+  end
+
+  # A category shipping "&amp;" literally inside its CDATA must be entity-decoded,
+  # not minted as the junk genre "Speis &Amp; Trank".
+  def test_category_html_entities_are_decoded
+    events = run_offline(source_aggregator, 'source_keyed.xml')
+    florp = events.find { |e| e.title == 'Florpcore Festival' }
+    assert_includes florp.genre_list, 'Speis & Trank'
+    refute(florp.genre_list.any? { |g| g.include?('amp;') }, 'no raw HTML entity may leak into a genre')
+  end
+
+  # A city the feed mis-tags via a wrong PLZ is corrected to its real canton
+  # (Wabern → BE, not VS as PLZ 3984/Fiesch would resolve).
+  def test_city_canton_fix_overrides_a_wrong_plz
+    s = aggregator.new
+    node = Nokogiri::XML(<<~XML).remove_namespaces!.at_css('event')
+      <event><url>https://x.example/e</url>
+        <shows><show><date_start>2026-07-01T20:00:00+02:00</date_start></show></shows>
+        <location><name>Heitere Fahne</name><code>3984</code><locality>Wabern</locality></location>
+      </event>
+    XML
+    assert_equal ['Heitere Fahne', 'Wabern', 'BE'], s.send(:locations_for, node)
   end
 
   # --- unit-level guards on the cleanup helpers ------------------------------

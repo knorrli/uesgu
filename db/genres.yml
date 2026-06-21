@@ -345,12 +345,42 @@ hidden:
 - Meditation
 - Guided Meditation
 - World Meditation
+# Non-music categories minted by the Bewegungsmelder OLE aggregator (a regional
+# culture feed — ~half its programme is non-music). Lean-permissive curation:
+# hide the clearly non-music event types so a listing carrying ONLY these drops
+# out, while anything also tagged with a real music genre stays. Borderline
+# music-adjacent tags (All Styles / Party / Tanz) are kept visible via `ignored`
+# below, not hidden. See FINDINGS-bewegungsmelder.md.
+- Theater
+- Ausstellung
+- Film
+- Kunst
+- Talk / Forum
+- Spoken Word
+- Kurse / Workshops
+- Spiel & Spass
+- Speis & Trank
+- Sport
+- Flohmi
+- Messe
+- Mundart
 blocked:
 - Konzert
 - Music
+# Meaningless catch-all categories from Bewegungsmelder — never a real genre, so
+# strip on sight (like Konzert). An event left with no other tag then reads as
+# non-music and is hidden.
+- Andere
+- Sonstiges
 ignored:
 - Festival
 - Mini-Festival
+# Music-adjacent Bewegungsmelder tags we deliberately SHOW but don't file in the
+# tree (they're event types, not genres). Kept per the permissive policy: a gig
+# tagged only "All Styles"/"Party"/"Tanz" stays visible rather than being hidden.
+- All Styles
+- Party
+- Tanz
 
 # semantic merges the fingerprint can't catch
 aliases:

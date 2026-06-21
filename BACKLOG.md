@@ -69,6 +69,15 @@
     opt-out call (cf. `Scrapers::BadBonn`). BeJazz was the intended aggregator
     proof; aggregator support is implemented + tested regardless. Listed in
     `Scrapers::Ole::DEFERRED`.
+  - **Bewegungsmelder aggregator — BUILT, pending review + deploy** (branch
+    `ole-bewegungsmelder`, 2026-06-21). `Scrapers::OleBewegungsmelder`
+    (`aggregator: true`, `link_via: :source` — keys on per-event `<source_url>`,
+    prefers a real venue deep link when the feed gives one). Lean-permissive
+    non-music filtering curated in `db/genres.yml`. Ledger flipped to `consume`.
+    Review `FINDINGS-bewegungsmelder.md`, then merge + run `taxonomy:import_tree`
+    in prod. **Open verify item:** `Tanz`-only dance-class series shows under the
+    permissive policy (flip `Tanz`→hidden to drop it); Heitere Fahne files under
+    VS due to an upstream PLZ typo (3984) — admin location fix if wanted.
   - **Messy aggregates.** Konzerte Bern (0 genres + address jammed into `<name>` →
     needs address-in-name cleanup) and Hinto ALL (46 venues) deferred.
   - **Retire fragile scrapers where OLE overlaps** (e.g. the bespoke Dachstock

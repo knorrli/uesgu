@@ -59,9 +59,9 @@ module EventsHelper
   # FILTERS the programme by that term ("tap rock → rock events"), the behaviour
   # cold users expect. One action per tag: the whole tag is the filter link, so a
   # tag means exactly one thing (no tiny secondary follow target crammed onto a
-  # finger-sized chip). Following was removed entirely (the ★ saves a whole filter
-  # instead — see _save_notify), which frees colour to mean the app's usual "this
-  # is interactive" again.
+  # finger-sized chip). Following was removed entirely (the saved-filters menu
+  # saves a whole filter instead — see _saved_filters_menu), which frees colour to
+  # mean the app's usual "this is interactive" again.
   #
   # The tap TOGGLES the filter by this term, and the highlight follows MATCHING,
   # not exact equality. A tag lights green when an applied filter matches it — for

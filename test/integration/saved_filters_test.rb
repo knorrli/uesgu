@@ -11,10 +11,37 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     sign_in_as user
 
     get events_path
-    assert_select 'a.save-filter-link', false, 'no save on an empty filter'
+    assert_select 'a.filter-menu__save', false, 'no save on an empty filter'
 
     get events_path(g: ['Rock'])
-    assert_select 'a.save-filter-link'
+    assert_select 'a.filter-menu__save'
+  end
+
+  # --- saved-filters menu (events feed chip row) -----------------------------
+
+  test 'the saved-filters menu lets you apply a saved filter via its full URL' do
+    u = sign_in_as user
+    r = u.saved_filters.new(cadence: 'daily', time_of_day: 540)
+    r.filter_attributes = { g: ['Rock'], l: ['Bern'] }
+    r.save!
+
+    get events_path
+    assert_response :success
+    assert_select 'details.filter-menu'
+    # The apply item links to the full events URL for that filter (shareable; the
+    # same target as the /saved_filters "Apply" link).
+    assert_select 'a.filter-menu__apply[href=?]',
+                  events_path(q: [], g: ['Rock'], l: ['Bern'], d: [])
+  end
+
+  test 'no saved-filters menu without saved filters (empty filter) or when signed out' do
+    sign_in_as user
+    get events_path
+    assert_select 'details.filter-menu', false, 'no menu with no active filter and none saved'
+
+    reset! # drop the session → signed out
+    get events_path
+    assert_select 'details.filter-menu', false, 'no menu for anonymous visitors'
   end
 
   # --- new -------------------------------------------------------------------
@@ -111,20 +138,22 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_saved_filter_path(existing)
   end
 
-  test 'the save star is a single button: draft link when unsaved, edit link when saved' do
+  test 'the save control is a single menu item: draft link when unsaved, edit link when saved' do
     u = sign_in_as user
 
-    # Unsaved: outline star linking to the editor with this filter as a draft.
+    # Unsaved: the menu's save item drafts a new saved filter from this filter.
     get events_path(g: ['Rock'])
-    assert_select "a.save-filter-link[href=?]", new_saved_filter_path(g: ['Rock'])
-    assert_select 'a.save-filter-link.active', false
+    assert_select "a.filter-menu__save[href=?]", new_saved_filter_path(g: ['Rock'])
+    assert_select 'a.filter-menu__save.is-saved', false
 
-    # Saved (any kind): the star is lit and links straight to that filter's editor.
+    # Saved (any kind): the active filter is now a saved one — the item links to its
+    # editor and the menu toggle shows the filled-funnel saved cue.
     r = u.saved_filters.new(name: 'x', cadence: 'daily', time_of_day: 540)
     r.filter_attributes = { g: ['Rock'] }
     r.save!
     get events_path(g: ['Rock'])
-    assert_select "a.save-filter-link.active[href=?]", edit_saved_filter_path(r)
+    assert_select "a.filter-menu__save.is-saved[href=?]", edit_saved_filter_path(r)
+    assert_select '.filter-menu__toggle .funnel-fill'
     # No separate notify control on the events page.
     assert_select 'a.notify-bell-link', false
   end

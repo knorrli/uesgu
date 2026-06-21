@@ -603,6 +603,8 @@ fr:
         where: Où
         when: Quand
       search_where: "Rechercher salles, villes, cantons…"
+      saved:
+        menu: Filtres enregistrés
       apply: Appliquer
       clear: Effacer
       close: Fermer

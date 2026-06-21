@@ -1,0 +1,54 @@
+<%# Saved-filters menu — the single merged control pinned to the right of the
+    chip row, for everything saved-filter:
+      • SAVE the active filter (top item) — funnel+ when unsaved (new draft),
+        "Gespeichert — bearbeiten" when the active filter is itself a saved one.
+      • APPLY any of the user's other saved filters (the list) — each links to the
+        full events URL for that filter (shareable; the feed stays ephemeral).
+    A native <details> dropdown (menu_controller closes it on outside-click / Esc),
+    reusing the nav's .nav-menu dropdown pattern. The caller renders this only when
+    there's something to do here (active filter to save, or saved filters to
+    apply); reads @filter, @saved_filter, @saved_filters. %>
+<% applyable = Array(@saved_filters).reject { |sf| sf == @saved_filter } %>
+<details class="nav-menu filter-menu" data-controller="menu" data-action="toggle->menu#toggle">
+  <summary class="filter-menu__toggle" aria-label="<%= t('events.filter.saved.menu') %>">
+    <% if @saved_filter %>
+      <%# Active filter is saved → filled funnel (the at-a-glance saved cue). %>
+      <span class="funnel-fill" aria-hidden="true"></span>
+    <% else %>
+      <span class="ph ph-funnel" aria-hidden="true"></span>
+    <% end %>
+  </summary>
+
+  <div class="nav-menu__items filter-menu__panel">
+    <% if @filter.active? %>
+      <% if @saved_filter %>
+        <%= link_to edit_saved_filter_path(@saved_filter),
+              class: 'nav-menu__item filter-menu__save is-saved' do %>
+          <span class="ph ph-funnel" aria-hidden="true"></span>
+          <span><%= t('events.index.save_filter_saved') %></span>
+        <% end %>
+      <% else %>
+        <%= link_to new_saved_filter_path(q: @filter.queries, g: @filter.genres,
+                      l: @filter.location_list, d: @filter.date_ranges),
+              class: 'nav-menu__item filter-menu__save' do %>
+          <span class="save-filter-icon" aria-hidden="true">
+            <span class="ph ph-funnel"></span>
+            <span class="save-filter-plus">+</span>
+          </span>
+          <span><%= t('events.index.save_filter') %></span>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% if applyable.any? %>
+      <% if @filter.active? %><hr class="filter-menu__divider"><% end %>
+      <% applyable.each do |sf| %>
+        <%= link_to events_path(q: sf.queries, g: sf.genres, l: sf.location_list, d: sf.date_ranges),
+              class: 'nav-menu__item filter-menu__apply' do %>
+          <span class="ph ph-funnel" aria-hidden="true"></span>
+          <span><%= sf.display_name %></span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</details>

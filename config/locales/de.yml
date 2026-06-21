@@ -603,6 +603,8 @@ de:
         where: Wo
         when: Wann
       search_where: "Lokale, Städte, Kantone suchen…"
+      saved:
+        menu: Gespeicherte Filter
       apply: Anwenden
       clear: Zurücksetzen
       close: Schliessen

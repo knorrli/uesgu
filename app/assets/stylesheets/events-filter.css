@@ -48,6 +48,70 @@
   .simple-calendar .day-markers { top: var(--gap-small); bottom: auto; }
 }
 
+/* ── Saved-filters menu (_saved_filters_menu) ── the single merged saved-filter
+   control pinned to the right of the chip row: a <details> dropdown (reusing the
+   nav's .nav-menu pattern) that saves the active filter and/or applies a saved
+   one. margin-left:auto keeps it right-aligned even when no chips precede it (the
+   empty-filter state). When open, lift it into its own stacking context above the
+   results so the floating panel paints over them (cf. .filter-sheets does the same
+   for the desktop What/Where/When panel). */
+.filter-menu { flex: 0 0 auto; margin-left: auto; }
+
+.filter-menu[open] { z-index: 100; }
+
+/* Icon trigger. Square (the app's --border-radius is none — sharp corners
+   everywhere), and padded WITHOUT a negative top margin so the hover/open
+   highlight never reaches up to touch the trigger bar's underline above. */
+.filter-menu__toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--gap-small);
+  border-radius: var(--border-radius);
+  color: var(--theme-accent-color);
+}
+
+.filter-menu__toggle:hover,
+.filter-menu[open] .filter-menu__toggle {
+  background: var(--theme-bg-emphasis);
+}
+
+.filter-menu__toggle .ph { font-size: 1.35rem; line-height: 1; }
+
+/* Saved: a solid (filled) funnel (masked SVG, accent-painted) — the strong
+   filled-vs-outline state cue, matching the size of the outline funnel. */
+.filter-menu__toggle .funnel-fill {
+  display: inline-block;
+  width: 1.35rem;
+  height: 1.35rem;
+  background-color: var(--theme-accent-color);
+  -webkit-mask: var(--funnel-fill) center / contain no-repeat;
+  mask: var(--funnel-fill) center / contain no-repeat;
+}
+
+/* The floating panel. Reuses .nav-menu__items (bordered, position:absolute, solid
+   bg); here we add a shadow + high z so it sits over the results as a clear layer. */
+.filter-menu__panel {
+  z-index: 110;
+  background: var(--theme-bg-color);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Width follows the content: the panel sizes to its widest item (a short filter
+   gets a narrow panel, a long one a wider panel), capped to the viewport so it
+   never overflows — only then do long names wrap. Scoped under .filter-menu so it
+   beats .nav-menu__items' nowrap regardless of stylesheet order. */
+.filter-menu .nav-menu__items {
+  width: max-content;
+  max-width: calc(100vw - 2 * var(--content-padding));
+  white-space: normal;
+}
+
+.filter-menu__divider {
+  margin: var(--gap-small) 0;
+  border: 0;
+  border-top: var(--border-width) solid var(--rule-color);
+}
+
 /* Positioning context for the desktop dropdown panel: on desktop the open sheet
    floats (position: absolute) anchored to the bottom of this block rather than
    dropping into flow, so it overlays the results below instead of shoving them

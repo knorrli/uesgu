@@ -1,22 +1,25 @@
 require "application_system_test_case"
 
-# The events toolbar (just the list/calendar view switcher now) and the save-filter
-# control. It's an icon-only funnel (outline + "+" when not saved) that sits by the
-# applied-filter chips, only when a filter is active. Verified at desktop and phone.
+# The events toolbar (the list/calendar view switcher) and the chip-row
+# saved-filters menu — a funnel <details> dropdown that SAVES the active filter and
+# APPLIES a saved one. The toggle sits by the applied-filter chips whenever there's
+# something to do here; its items live in the dropdown panel. Desktop + phone.
 class EventsToolbarTest < ApplicationSystemTestCase
-  test "the save funnel shows by the chips at all widths when a filter is active" do
+  test "the saved-filters menu shows by the chips at all widths when a filter is active" do
     event(start_date: Date.current + 3, genre_list: ["Rock"])
     sign_in_as user
 
-    visit events_path("g[]": ["Rock"]) # an active filter → the save funnel shows
+    visit events_path("g[]": ["Rock"]) # an active filter → the menu toggle shows
 
-    # Desktop (default 1300px window): outline funnel + the "+" add badge.
-    assert_selector ".save-filter-link .ph-funnel", visible: true
-    assert_selector ".save-filter-link .save-filter-plus", visible: true
+    # Desktop (default 1300px window): the funnel toggle is visible; opening it
+    # reveals the "save this filter" item with its + add badge.
+    assert_selector ".filter-menu__toggle .ph-funnel", visible: true
+    find(".filter-menu__toggle").click
+    assert_selector ".filter-menu__save .save-filter-plus", visible: true
 
-    # Mobile: still present by the chips.
+    # Mobile: the toggle is still present by the chips.
     page.current_window.resize_to(390, 800)
-    assert_selector ".save-filter-link .ph-funnel", visible: true
+    assert_selector ".filter-menu__toggle .ph-funnel", visible: true
   end
 
   test "the saved state is a solid funnel (no + badge)" do
@@ -27,16 +30,16 @@ class EventsToolbarTest < ApplicationSystemTestCase
     r.save!
 
     visit events_path("g[]": ["Rock"]) # this exact filter is saved → lit, solid funnel
-    assert_selector ".save-filter-link.active .funnel-fill", visible: true
+    assert_selector ".filter-menu__toggle .funnel-fill", visible: true
     assert_no_selector ".save-filter-plus"
   end
 
-  test "no save funnel when the filter is empty" do
+  test "no saved-filters menu when the filter is empty and none are saved" do
     event(start_date: Date.current + 3)
     sign_in_as user
 
-    visit events_path # no filter
+    visit events_path # no filter, no saved filters
 
-    assert_no_selector ".save-filter-link"
+    assert_no_selector ".filter-menu"
   end
 end

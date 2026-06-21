@@ -8,13 +8,17 @@ class EventsController < ApplicationController
   # GET /events
   def index
     @filter = build_filter
-    # A logged-in user gets the ★ save control for the active filter. @saved_filter
-    # is the saved filter matching this exact filter set, if any: present → the ★
-    # is lit and links to its editor; nil → an outline ★ links to a fresh draft
-    # (see _save_notify + SavedFilter.matching).
+    # @saved_filter is the saved filter matching this exact filter set, if any:
+    # present → the saved-filters menu's funnel is lit (filled) and its top item
+    # edits that filter; nil → the menu offers to save the active filter as a new
+    # draft (see _saved_filters_menu + SavedFilter.matching).
     if current_user && @filter.active?
       @saved_filter = current_user.saved_filters.matching(SavedFilter.fingerprint_for(@filter))
     end
+    # The chip-row saved-filters menu (signed-in only) lists these to apply: each
+    # option carries the full events URL for that saved filter, so picking one
+    # navigates straight there (shareable). See _saved_filters_menu.
+    @saved_filters = current_user.saved_filters.order(:created_at) if current_user
     @q = Event.visible.ransack(@filter.ransack_query)
 
     @view = resolve_view(session_key: :events_view, account_attr: :events_view)

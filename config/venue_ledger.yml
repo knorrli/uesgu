@@ -152,3 +152,4 @@ venues:
   - { domain: lichtspiel.ch,       name: Lichtspiel,                disposition: reject, reason: non_music, checked: 2026-06-21 }
   - { domain: refbern.ch,          name: Reformierte Kirchen Bern,  disposition: reject, reason: non_music, checked: 2026-06-21 }
   - { domain: stattland.ch,        name: Stattland,                 disposition: reject, reason: non_music, checked: 2026-06-21 }
+  - { domain: mobilservice.ch,     name: Mobilservice,              disposition: reject, reason: non_music, checked: 2026-06-21 }

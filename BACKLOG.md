@@ -53,14 +53,6 @@
 
 ### UI polish
 
-- **Typographic hierarchy pass.** Every page *except the main events page* should
-  use a correct, consistent heading hierarchy (`h1`–`h6`, no level skips, one
-  `h1` per page). Audit + fix across the app, then **document the scale and rules
-  in `/styleguide`** so it stays enforced.
-- **Uniform spacing pass.** Establish and apply consistent vertical/section
-  spacing across all pages and their sections (page padding, section gaps,
-  field/stack rhythm). Codify the spacing scale + rules in `/styleguide` and
-  apply via shared utilities/tokens (not per-page one-offs).
 - **General mobile-first sweep** of the app — ongoing direction, not a discrete
   ticket. Enforce the visual invariants: what's clickable is unambiguous; one
   visual representation per element; green only ever means "interested" (heart =

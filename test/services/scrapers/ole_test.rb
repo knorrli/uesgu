@@ -39,10 +39,22 @@ class Scrapers::OleTest < Minitest::Test
     refute(events.any? { |e| e.title == 'Has Been Trio' }, 'an all-past event must be dropped entirely')
   end
 
-  def test_trailing_colon_stripped_and_lead_becomes_subtitle
-    a = run_offline(single_venue, 'single_page1.xml', 'single_page2.xml').first
-    assert_equal 'Zorptron Quartet', a.title        # source had "Zorptron Quartet:"
-    assert_equal 'with Blip Collective', a.subtitle # source <lead>
+  def test_trailing_colon_stripped_and_lead_becomes_subtitle_when_described
+    events = run_offline(single_venue, 'single_page1.xml', 'single_page2.xml')
+    by_title = events.index_by(&:title)
+
+    a = by_title['Zorptron Quartet']
+    assert_equal 'Zorptron Quartet', a.title           # source had "Zorptron Quartet:"
+    # <lead>, kept because the event has a <description>; HTML entity decoded.
+    assert_equal 'with Blip & Collective', a.subtitle
+  end
+
+  # The subtitle gate: an event whose <description> is just a stray <br/> is a
+  # bare listing, so its <lead> is the generic venue blurb and must be dropped.
+  def test_lead_dropped_when_description_is_empty
+    events = run_offline(single_venue, 'single_page1.xml', 'single_page2.xml')
+    wibble = events.find { |e| e.title == 'Wibble Trio' }
+    assert_nil wibble.subtitle, 'no real <description> → venue-blurb <lead> is gated out'
   end
 
   def test_past_shows_are_dropped_but_future_kept

@@ -1,50 +1,91 @@
 module Scrapers
   # Non-destructive event dedup, run once at the end of a sweep (after every
-  # scraper). PETZI is the primary/canonical source; where one of our bespoke
-  # scrapers lists the same show (same venue + date + fuzzy title), that bespoke
-  # event is pointed at the PETZI canonical (canonical_event_id) and its genres
-  # are unioned onto the canonical. Duplicates are never deleted — bookmarks stay
-  # intact — they're just hidden by Event.visible.
+  # scraper). Several sources can list the same show — a venue's OLE feed, PETZI
+  # (the shared ticketing backend), and/or a bespoke HTML scraper. Where they
+  # overlap (same venue + date + fuzzy title) the less-authoritative copies are
+  # pointed at a single canonical (canonical_event_id) and their genres are
+  # unioned onto it. Duplicates are never deleted — bookmarks stay intact — just
+  # hidden by Event.visible.
   #
-  # Idempotent: each run resets every tracked bespoke event's link from scratch,
-  # so a show PETZI no longer lists (or whose title drifted) re-surfaces. Genre
-  # accumulation self-heals because the PETZI scrape resets the canonical's own
-  # genres each sweep before this re-unions the duplicates.
+  # Source authority (most authoritative wins the canonical, see #source_rank):
+  #   OLE  — venue-published, structured, links to the venue's OWN page; this is
+  #          the source we're consolidating on, so it wins where present.
+  #   PETZI — shared aggregator; clean but scraped, and links to its ticket
+  #          mirror. Kept as a gap-filler for shows OLE doesn't (yet) cover.
+  #   bespoke HTML scrapers — fragile, last resort.
+  # So an OLE show absorbs the matching PETZI / bespoke copies and stays the lone
+  # visible listing; where there's no OLE feed, PETZI still absorbs bespoke as
+  # before. Genres always accumulate onto the canonical regardless of who won it.
+  #
+  # Idempotent: each run re-derives every link from scratch, so a show a source
+  # drops (or whose title drifts) re-surfaces. Genre accumulation self-heals
+  # because each scraper resets its own event's genres each sweep before this
+  # re-unions the duplicates.
   class Dedup
-    PETZI_HOST = 'petzi.ch'
     MATCH_THRESHOLD = 0.4
 
     def self.run = new.run
 
     def run
-      Petzi::VENUES.each_value { |loc| dedup_venue(loc.first) }
+      dedup_venues.each { |venue| dedup_venue(venue) }
     end
 
     private
 
-    # Only future, non-dismissed events for this venue are in play.
+    # Every venue where more than one source can land an event: the PETZI member
+    # venues plus the single-venue OLE feeds. Config-driven — adding an OLE venue
+    # or a PETZI member is enough, there's no separate list to maintain here.
+    def dedup_venues
+      ole = Ole::SOURCES.reject { |s| s[:aggregator] }.filter_map { |s| s[:location]&.first }
+      (Petzi::VENUES.values.map(&:first) + ole).uniq
+    end
+
+    # All future, non-dismissed events for this venue, processed in descending
+    # source authority. Each event links to the best already-seen (i.e. more-or-
+    # equally authoritative) match; an event with no match becomes a canonical
+    # itself and can in turn absorb the lower-authority copies that follow.
     def dedup_venue(venue)
-      scope = Event.kept.where(start_date: Date.current..).tagged_with(venue, on: :locations)
-      petzi   = scope.where('events.url LIKE ?', "%#{PETZI_HOST}%").to_a
-      bespoke = scope.where.not('events.url LIKE ?', "%#{PETZI_HOST}%").to_a
-      return if petzi.empty?
+      events = Event.kept.where(start_date: Date.current..).tagged_with(venue, on: :locations).to_a
+      return if events.size < 2
 
-      bespoke.each do |b|
-        next if b.overridden?('canonical_event') # admin-pinned merge/un-merge: leave it
+      ranked     = events.sort_by { |e| [source_rank(e), e.id] }
+      canonicals = []
 
-        canonical = best_match(b, petzi)
-        b.update_column(:canonical_event_id, canonical&.id) # nil resets a stale link
+      ranked.each do |e|
+        # Admin-pinned merge/un-merge: leave the link as the admin set it. A
+        # pinned standalone (link nil) still counts as a canonical others can fold
+        # onto; a pinned merge keeps pointing where it was pinned.
+        if e.overridden?('canonical_event')
+          canonicals << e if e.canonical_event_id.nil?
+          next
+        end
+
+        canonical = best_match(e, canonicals)
+        e.update_column(:canonical_event_id, canonical&.id) # nil resets a stale link
+        canonicals << e if canonical.nil?
       end
 
       # Re-derive each canonical's genres as its own ∪ its duplicates' (auto-matched
       # AND admin-pinned), so a manual merge still enriches the canonical's genres.
-      petzi.each do |p|
-        merge_genres(p, bespoke.select { |b| b.canonical_event_id == p.id })
+      canonicals.each do |c|
+        merge_genres(c, ranked.select { |e| e.canonical_event_id == c.id })
       end
     end
 
-    # Union the duplicates' genres onto the canonical (PETZI re-set its own genres
-    # this sweep, so the result is PETZI ∪ duplicates), then re-derive visibility.
+    # 0 = OLE feed (preferred), 1 = PETZI, 2 = bespoke HTML scraper. Drives which
+    # copy of an overlapping show stays visible (see class comment). data_source is
+    # the scraper's provenance stamp ("OLE:Dachstock", "Petzi", "Dachstock", …).
+    def source_rank(event)
+      case event.data_source
+      when /\AOLE:/ then 0
+      when 'Petzi'  then 1
+      else 2
+      end
+    end
+
+    # Union the duplicates' genres onto the canonical (the canonical's own scraper
+    # re-set its genres this sweep, so the result is canonical ∪ duplicates), then
+    # re-derive visibility.
     def merge_genres(canonical, dups)
       return if dups.empty?
 
@@ -56,17 +97,17 @@ module Scrapers
       canonical.recompute_visibility!
     end
 
-    # Best PETZI event for a bespoke event: same date, highest title similarity,
-    # accepting a subset relationship (our club scrapers truncate "Darkside" where
-    # PETZI lists the full DJ lineup) or Jaccard >= threshold.
-    def best_match(bespoke, petzi_events)
-      bt = tokens(bespoke.title)
-      scored = petzi_events
-               .select { |p| p.start_date == bespoke.start_date }
-               .map do |p|
-                 pt = tokens(p.title)
-                 subset = !bt.empty? && !pt.empty? && (bt.subset?(pt) || pt.subset?(bt))
-                 { event: p, jaccard: jaccard(bt, pt), subset: subset }
+    # Best canonical for an event: same date, highest title similarity, accepting a
+    # subset relationship (our club scrapers truncate "Darkside" where the feed
+    # lists the full DJ lineup) or Jaccard >= threshold.
+    def best_match(event, candidates)
+      bt = tokens(event.title)
+      scored = candidates
+               .select { |c| c.start_date == event.start_date }
+               .map do |c|
+                 ct = tokens(c.title)
+                 subset = !bt.empty? && !ct.empty? && (bt.subset?(ct) || ct.subset?(bt))
+                 { event: c, jaccard: jaccard(bt, ct), subset: subset }
                end
       best = scored.max_by { |s| [s[:subset] ? 1 : 0, s[:jaccard]] }
       return nil unless best

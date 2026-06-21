@@ -18,12 +18,14 @@ module Scrapers
   #     <location><name><street><code>(PLZ)<locality></location>
   #   </event>
   #
-  # Field mapping: name→title (squished, trailing ":" stripped), lead→subtitle,
+  # Field mapping: name→title (squished, trailing ":" stripped), lead→subtitle
+  # (only for events that have their own content — see #event_subtitle),
   # date_start→start_time, categories→consumption genres (they MINT taxonomy and
   # land in the curation queue — we collect everything and curate downstream, per
-  # the taxonomy-hygiene model), location→event_locations. <description>, <image>
-  # and <files> are deliberately ignored (no description column; no image
-  # ingestion by design).
+  # the taxonomy-hygiene model), location→event_locations. <description> is read
+  # only as the "has own content" signal that gates the subtitle (it's full HTML
+  # prose and there's no description column to store it in); <image> and <files>
+  # are ignored — no image ingestion by design.
   #
   # IMPORTANT — the event URL is the venue's own <url>, never <ticket_url>.
   # <ticket_url> is usually the Eventfrog/PETZI mirror; pointing users there is the
@@ -31,10 +33,11 @@ module Scrapers
   # as the canonical link and only *append the show date* to it to keep one
   # event's N shows as N distinct, stable upsert keys (Event keys on url).
   #
-  # Overlap with PETZI/bespoke scrapers is expected (Dachstock is in PETZI) and is
-  # absorbed by Scrapers::Dedup unchanged — it matches on venue + date + fuzzy
-  # title, so an OLE Dachstock show is merged onto its PETZI canonical rather than
-  # duplicated. (See ole_test.rb for the proof.)
+  # Overlap with PETZI/bespoke scrapers is expected (Dachstock is in all three)
+  # and is resolved by Scrapers::Dedup, which matches on venue + date + fuzzy
+  # title. OLE is the PREFERRED source there (venue-published, links to the real
+  # venue page), so an overlapping PETZI/bespoke copy folds onto the OLE event,
+  # not the other way round. (See dedup_test.rb for the proof.)
   class Ole < Agent
     # --- Source registry. A single-venue source declares its [venue, city,
     # canton] place and seeds the location taxonomy like a normal scraper. An
@@ -55,9 +58,9 @@ module Scrapers
       # { key: 'Klangkeller', feed_url: 'https://www.klangkeller-bern.ch/app/klangkeller/action/oleexport',
       #   location: ['Klangkeller', 'Bern', 'BE'] },
       { key: 'LaCappella',  feed_url: 'https://www.la-cappella.ch/app/lacappella/action/oleexport',
-        location: ['La Cappella', 'Bern', 'BE'] },
-      { key: 'CasinoBern',  feed_url: 'https://www.casinobern.ch/wp-content/themes/casinobern/views/component/event/ole/',
-        location: ['Casino Bern', 'Bern', 'BE'] }
+        location: ['La Cappella', 'Bern', 'BE'] }
+      # { key: 'CasinoBern',  feed_url: 'https://www.casinobern.ch/wp-content/themes/casinobern/views/component/event/ole/',
+      #   location: ['Casino Bern', 'Bern', 'BE'] }
       # { key: 'Lichtspiel',  feed_url: 'https://www.lichtspiel.ch/oleexport/',
       #   location: ['Lichtspiel', 'Bern', 'BE'] },
       # { key: 'Stattland',   feed_url: 'https://stattland.ch/feed/ole',
@@ -155,10 +158,21 @@ module Scrapers
     def event_start_time(row) = row.start_time
 
     # name → title, squished with any trailing ":" removed (OLE titles often read
-    # "Artist:" with the support act in <lead>).
+    # "Artist:" with the lineup appended after the colon).
     def event_title(row) = clean_title(text(row.event, 'name'))
 
-    def event_subtitle(row) = squish(text(row.event, 'lead')).presence
+    # <lead> is the event's teaser line and makes a good subtitle — EXCEPT the
+    # feed injects the generic VENUE blurb into <lead> for bare listings (club
+    # nights etc.) that have no content of their own, which would then repeat the
+    # same paragraph across most of a venue's events. Those content-less events
+    # have an empty <description> (just a stray <br/>) while real events carry a
+    # populated one, so we gate on it: keep <lead> only when the event actually
+    # has a description. Drops the repeated venue blurb without losing real subtitles.
+    def event_subtitle(row)
+      return nil unless description_present?(row.event)
+
+      plain_text(text(row.event, 'lead')).presence
+    end
 
     # <categories> are consumption genres: they mint taxonomy (unrecognised tokens
     # land UNPLACED in the curation queue), so we keep every token and curate
@@ -232,6 +246,22 @@ module Scrapers
     def text(node, css)
       node&.at_css(css)&.text
     end
+
+    # True when <description> holds real text — i.e. anything survives once the
+    # HTML scaffolding (<br/>, other tags, entities, whitespace) is stripped. A
+    # bare listing's description is just "<br/>", which reads as blank here, so it
+    # gates the venue-blurb <lead> out of the subtitle (see #event_subtitle).
+    def description_present?(event_node)
+      text(event_node, 'description').to_s
+        .gsub(/<[^>]+>/, ' ')
+        .gsub(/&[^;\s]+;/, ' ')
+        .strip.present?
+    end
+
+    # <lead> is HTML-ish prose (entities like &amp;, the odd inline tag). Render it
+    # to clean single-line plain text so it doesn't double-escape through the view's
+    # simple_format (which would otherwise show a literal "&amp;").
+    def plain_text(html) = squish(Nokogiri::HTML.fragment(html.to_s).text)
 
     def squish(str) = str.to_s.gsub(/\s+/, ' ').strip
 

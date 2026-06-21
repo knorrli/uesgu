@@ -4,6 +4,8 @@
   Event D is entirely in the past → contributes ZERO events (proves the filter
   drops whole events, not just individual shows). Event C is the only survivor
   on this page, so seeing it in the output proves page 2 was actually fetched.
+  Event C also has a (venue-blurb) <lead> but a <br/>-only <description>, so it
+  exercises the subtitle gate: no real description → the lead is dropped.
 -->
 <export>
   <meta>
@@ -13,6 +15,8 @@
     <event source_id="evt-c">
       <name>Wibble Trio</name>
       <url>https://venue.example/events/c</url>
+      <lead>Generic venue blurb the feed repeats across every bare listing.</lead>
+      <description><br/></description>
       <shows>
         <show source_id="evt-c-1"><date_start>2026-09-05T19:00:00+02:00</date_start></show>
       </shows>

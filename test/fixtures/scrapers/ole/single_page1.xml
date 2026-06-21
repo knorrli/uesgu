@@ -17,8 +17,8 @@
       <name>Zorptron Quartet:</name>
       <url>https://venue.example/events/a</url>
       <ticket_url>https://eventfrog.ch/de/p/ticket-a</ticket_url>
-      <lead>with Blip Collective</lead>
-      <description>A long blurb we deliberately ignore (no description column).</description>
+      <lead>with Blip &amp; Collective</lead>
+      <description>A populated description — its presence is the subtitle gate.</description>
       <shows>
         <show source_id="evt-a-2020"><date_start>2020-01-15T20:00:00+01:00</date_start></show>
         <show source_id="evt-a-future"><date_start>2026-07-01T20:30:00+02:00</date_start></show>

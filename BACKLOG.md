@@ -51,6 +51,32 @@
   a block (see memory `project-docks-scraper-country-as-genre`). Watch the volume
   via `/admin/scraper_coverage` distinct-genre counts.
 
+- **Consume OLE feeds as a generic source (Open Linked Event Data).** *Core
+  shipped on branch `ole-ingestion` (2026-06-21), pending merge + deploy.*
+  `Scrapers::Ole` is a generic, config-driven `Agent` subclass: a `SOURCES` list
+  generates one registered scraper per feed — **new source = a URL, not code**.
+  Handles all the POC's skipped gotchas: `date_start >= today` filter,
+  `<meta><next_url>` pagination, multi-show → N events (venue `<url>` + show-date
+  key), per-event aggregator location with PLZ→canton (`Scrapers::SwissPostcode`),
+  trailing-colon title cleanup. Event URL is the venue's own `<url>`, never the
+  `<ticket_url>` mirror. Six robots-OK single-venue Bern feeds ship and were
+  live-verified (Dachstock, Klangkeller, La Cappella, Casino Bern, Lichtspiel,
+  Stattland); Dachstock proves `Scrapers::Dedup` absorbs PETZI overlap. Golden
+  tests + `script/ole_dry_parse.rb` (read-only) included. Remaining follow-ups:
+
+  - **Robots decision for robots-disallowed feeds.** Birdseye + BeJazz expose OLE
+    exports but `robots.txt` disallows our UA. Held pending a deliberate per-venue
+    opt-out call (cf. `Scrapers::BadBonn`). BeJazz was the intended aggregator
+    proof; aggregator support is implemented + tested regardless. Listed in
+    `Scrapers::Ole::DEFERRED`.
+  - **Messy aggregates.** Konzerte Bern (0 genres + address jammed into `<name>` →
+    needs address-in-name cleanup) and Hinto ALL (46 venues) deferred.
+  - **Retire fragile scrapers where OLE overlaps** (e.g. the bespoke Dachstock
+    HTML scraper) — evaluate once OLE has run a few sweeps.
+
+  Full schema + source list + gotchas in memory `project-open-event-data-avenues`.
+  (Out of scope: admin-UI toggle, images, Eventfrog.)
+
 ### UI polish
 
 - **General mobile-first sweep** of the app — ongoing direction, not a discrete

@@ -76,8 +76,23 @@ headless-browser fetch path we don't have yet. Recorded so we don't re-investiga
 
 ## Skipped — robots.txt disallows
 
-_(none yet — record any venue whose `User-agent: *` group blocks its listing
-pages here, with the date checked, so we don't re-evaluate it.)_
+Record any venue whose `User-agent: *` group blocks its listing pages here, with
+the date checked, so we don't re-evaluate it. These are **wanted but blocked** —
+we'd ingest them if the policy changed; opting out of robots is a deliberate
+per-venue call (cf. `Scrapers::BadBonn`), not something we do unattended.
+
+- [ ] **Birdseye** — Basel (BS) — https://www.birdseye.ch/HintoEventlist.php —
+      *OLE feed, robots-disallowed* (checked 2026-06-21). Exposes a clean OLE
+      export but `robots.txt` blocks the path for our UA. A jazz club we'd want.
+- [ ] **BeJazz** — Bern (BE) — http://www.bejazz.ch/app/bejazz/action/oleexport/ —
+      *OLE **aggregator** feed, robots-disallowed* (checked 2026-06-21). Would be
+      our first multi-venue OLE aggregator (per-event location + PLZ→canton); the
+      adapter supports it, the feed is just blocked. NB: distinct from the "roving
+      series" BeJazz note under *Skipped — promoters* above — this is the OLE
+      export, which covers BeJazz's guest-venue programme as structured data.
+
+Both are mirrored in code as `Scrapers::Ole::DEFERRED` (`reason: :robots`) so the
+shipping `SOURCES` list stays clean.
 
 ## Notes
 

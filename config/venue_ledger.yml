@@ -61,6 +61,12 @@ reasons:
     explanation: >
       Feed/site exists but is unmaintained — stale or frozen data (e.g. a feed
       stuck on an old season). Worth re-checking in case it revives.
+  feed_quality:
+    revisitable: true
+    explanation: >
+      Feed parses but is too poor to ingest cleanly — e.g. no per-event URLs
+      (broken links + same-date upsert collisions), no structured genres, or
+      addresses jammed into the venue name. Revisit if the publisher improves it.
   non_music:
     revisitable: false
     explanation: >
@@ -153,3 +159,4 @@ venues:
   - { domain: refbern.ch,          name: Reformierte Kirchen Bern,  disposition: reject, reason: non_music, checked: 2026-06-21 }
   - { domain: stattland.ch,        name: Stattland,                 disposition: reject, reason: non_music, checked: 2026-06-21 }
   - { domain: mobilservice.ch,     name: Mobilservice,              disposition: reject, reason: non_music, checked: 2026-06-21 }
+  - { domain: konzerte-bern.ch,    name: Konzerte Bern,             disposition: reject, reason: feed_quality, checked: 2026-06-21 }  # classical, but homepage-only URLs (collisions) + no genres + address-jammed aggregator venues

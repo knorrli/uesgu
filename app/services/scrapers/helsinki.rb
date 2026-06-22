@@ -20,6 +20,12 @@ module Scrapers
       @scrape_date = Date.current
     end
 
+    # The homepage carries no genre/style/tag field (title + support line only),
+    # so the scraper collects none. Any genre coverage on these events is
+    # incidental — PETZI ships the same shows with tags and a dedup merge / admin
+    # pin can leave a few behind. Record a no_field gap.
+    field_gaps genres: :no_field
+
     def event_rows
       page.css('div.event')
     end

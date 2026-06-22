@@ -45,10 +45,6 @@ module Scrapers
       content.at_css('.groupHeading h2')&.text&.squish
     end
 
-    # Each `.groupIntro` section is one act (name + origin plate). This line is real
-    # secondary text only for a multi-act bill: when the single act already sits in
-    # the title ("Jeudi-Midi : Oze" + "Oze (ch)") it merely echoes it, so surface the
-    # line only when it names an act the title doesn't — a genuine support bill.
     def event_description(content)
       content.css('.groupIntro').map do |node|
         country_code = node.css('.plateMedium').text.squish

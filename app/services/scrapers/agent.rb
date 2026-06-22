@@ -84,7 +84,13 @@ module Scrapers
     # coverage page can explain every gap consistently and a settled "does this
     # source even expose X?" call isn't re-litigated. The symbol is the stable
     # key; the human text lives in i18n (admin.scraper_coverage.index.gap_reason.*).
-    FIELD_GAP_REASONS = %i[no_field].freeze
+    #
+    #   no_field — the source carries no such field at all (structural).
+    #   dormant  — the field exists in the feed but the source never populates it
+    #              (e.g. an always-empty `tags` array). Distinct from no_field
+    #              because it may "wake up": the page's reality-wins rule then
+    #              surfaces the live % the moment real values arrive.
+    FIELD_GAP_REASONS = %i[no_field dormant].freeze
 
     # Declare (and read) the coverage fields this source structurally cannot
     # fill. A *capability* fact, kept on the scraper because the scraper is the

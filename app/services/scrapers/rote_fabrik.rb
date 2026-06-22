@@ -58,8 +58,14 @@ module Scrapers
     end
 
     # Fine genre facet (`tags`, a structured {id,name,slug} field) — clean by
-    # construction, so allowed to mint taxonomy (discovery). Empty for current
-    # concerts, so this is dormant until they populate it.
+    # construction, so allowed to mint taxonomy (discovery). The feed ships `tags`
+    # on every event but leaves it empty (the other taxonomy, `categories`, only
+    # ever holds the type tags Konzert/Party — not genres), so genre coverage sits
+    # at 0%. Declared a `dormant` gap below: the extractor stays wired, and the
+    # coverage page's reality-wins rule surfaces the live % the day they populate
+    # it — so this self-heals without anyone re-checking.
+    field_gaps genres: :dormant
+
     def event_genres(row)
       Array(row.dig('rf_event', 'tags')).map { |t| (t.is_a?(Hash) ? t['name'] : t).to_s.squish }.compact_blank
     end

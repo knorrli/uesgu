@@ -356,6 +356,7 @@ en:
         gap: n/a
         gap_reason:
           no_field: This source doesn't expose this field at all.
+          dormant: This source has the field but never fills it.
         col:
           scraper: Scraper
           events: Events

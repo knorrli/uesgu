@@ -56,10 +56,12 @@
   scraper, never a hand-kept doc.
 - **Real extractor defects to chase (group B — source HAS the data, we drop it).**
   Surfaced by the 2026-06-22 fixture audit; these are NOT gaps, they're fixes:
-  - **muehle_hunziken subtitle (0%).** Detail page carries a subtitle line
-    (e.g. "by Al McKay") the scraper isn't pulling — extractable.
-  - **rote_fabrik genres (0%).** Has a genre extractor (`rf_event.tags`) but
-    ships nothing → likely broken; verify the feed still carries tags.
+  - ~~**muehle_hunziken subtitle (0%).**~~ DONE (2026-06-22) — pulls the list-row
+    `text-sm md:text-xl` line (support act / tour note); fixture 0% → 41%.
+  - ~~**rote_fabrik genres (0%).**~~ RESOLVED (2026-06-22) — not a defect: the feed
+    ships `tags` but leaves it empty, and `categories` is only Konzert/Party type
+    tags. Declared a `dormant` field gap (extractor stays wired; reality-wins
+    surfaces the % if they ever populate `tags`).
   - **docks (subtitle 32% / genres 41%).** Both attempted; genres mis-tag artist
     origin codes (see taxonomy notes) — needs a cleaner extraction.
   - **suedpol subtitle (0%).** ACF `subtitle` extractor present but always empty —

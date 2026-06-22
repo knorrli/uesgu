@@ -17,6 +17,10 @@ module Scrapers
       URI.parse('https://www.cafe-kairo.ch/programm')
     end
 
+    # Café Kairo's listing is title + date only — no subtitle line and no
+    # genre/style/tag field anywhere.
+    field_gaps subtitle: :no_field, genres: :no_field
+
     def event_rows
       page.css('article[id^="kultur_"]')
     end

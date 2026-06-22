@@ -351,8 +351,11 @@ de:
     scraper_coverage:
       index:
         title: Datenabdeckung
-        intro: "Wie viel jeder Scraper pro Event liefert — live aus den Events berechnet, nie von Hand gepflegt. Niedrige Werte heissen: der Scraper könnte mehr sammeln, oder er ist kaputt."
+        intro: "Wie viel jeder Scraper pro Event liefert — live aus den Events berechnet, nie von Hand gepflegt. Niedrige Werte heissen: der Scraper könnte mehr sammeln, oder er ist kaputt. „n/a“ heisst: die Quelle stellt das Feld gar nicht bereit."
         empty: Noch keine Events zum Auswerten.
+        gap: n/a
+        gap_reason:
+          no_field: Diese Quelle stellt dieses Feld gar nicht bereit.
         col:
           scraper: Scraper
           events: Events

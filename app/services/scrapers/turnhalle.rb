@@ -21,6 +21,10 @@ module Scrapers
       @scrape_date = Date.current
     end
 
+    # Turnhalle (bee-flat) lists a title + date only — no subtitle line and no
+    # genre/style/tag field.
+    field_gaps subtitle: :no_field, genres: :no_field
+
     def event_rows
       page.css('article.event.tile')
     end

@@ -43,6 +43,32 @@
   (`price` / `lineup` / `description` / `image` — none exist today), so this is a
   schema decision, not just a parser tweak. Re-run the audit across the rest of
   the scrapers once that's decided.
+- **Genuine field gaps are now declared in-code (2026-06-22).** Sources that
+  structurally don't expose a coverage field are recorded with
+  `field_gaps subtitle: :no_field` / `genres: :no_field` on the scraper class
+  (`Scrapers::Agent.field_gaps`); the coverage matrix renders those cells as a
+  muted **n/a** (reason on hover) instead of red, so a settled "does this source
+  expose X?" question isn't re-asked. Honesty guard: if a declared-absent field
+  ever ships real coverage, the live % wins over the declaration. Declared so
+  far — genres: bad_bonn, boeroem, dampfzentrale, kairo, kaserne, nouveau_monde,
+  saegegasse, sous_soul, turnhalle, volkshaus; subtitle: bar59, dynamo, kairo,
+  kaserne, roessli, turnhalle, volkshaus. To extend: add `field_gaps …` to the
+  scraper, never a hand-kept doc.
+- **Real extractor defects to chase (group B — source HAS the data, we drop it).**
+  Surfaced by the 2026-06-22 fixture audit; these are NOT gaps, they're fixes:
+  - **muehle_hunziken subtitle (0%).** Detail page carries a subtitle line
+    (e.g. "by Al McKay") the scraper isn't pulling — extractable.
+  - **rote_fabrik genres (0%).** Has a genre extractor (`rf_event.tags`) but
+    ships nothing → likely broken; verify the feed still carries tags.
+  - **docks (subtitle 32% / genres 41%).** Both attempted; genres mis-tag artist
+    origin codes (see taxonomy notes) — needs a cleaner extraction.
+  - **suedpol subtitle (0%).** ACF `subtitle` extractor present but always empty —
+    confirm whether the field is genuinely unused (→ declare a gap) or mis-read.
+  - **kofmehl genres (29%)**, **neubad (genres 33%, 1 distinct)** — both need a look.
+  - **petzi subtitle (0%)** — not yet verified whether the detail pages expose a
+    support/secondary line; check before declaring a gap.
+  - **helsinki genres (19%) with no genre extractor** — genres are leaking in,
+    likely via dedup merges with PETZI; confirm that's intended.
 - **Nouveau Monde: lineup jammed onto the title.** Event #285 title is stored as
   `Fête de la Musique : Brunch musical, La Gustav + Cold TouchLa GustavCold Touch`
   — the parser appends the artist names to the title with no separator (the

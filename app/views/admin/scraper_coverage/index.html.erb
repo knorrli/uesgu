@@ -26,9 +26,9 @@
             <tr class="<%= 'is-empty' unless row.present? %>">
               <td><%= row.source.underscore %></td>
               <td class="num"><%= row.events %></td>
-              <td class="num"><%= coverage_cell(row, row.time_pct) %></td>
-              <td class="num"><%= coverage_cell(row, row.subtitle_pct) %></td>
-              <td class="num"><%= coverage_cell(row, row.genre_pct) %></td>
+              <td class="num"><%= coverage_cell(row, :time) %></td>
+              <td class="num"><%= coverage_cell(row, :subtitle) %></td>
+              <td class="num"><%= coverage_cell(row, :genres) %></td>
               <td class="num"><%= row.distinct_genres.positive? ? row.distinct_genres : '—' %></td>
             </tr>
           <% end %>

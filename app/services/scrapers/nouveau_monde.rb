@@ -12,6 +12,10 @@ module Scrapers
       URI.parse('https://www.nouveaumonde.ch/agenda/')
     end
 
+    # Nouveau Monde's only taxonomy is activity-type filters (concert / expo /
+    # atelier / …), not music genres — there is no genre/style field to extract.
+    field_gaps genres: :no_field
+
     def event_rows
       page.css('.poster[data-tofilter*=concert]')
     end

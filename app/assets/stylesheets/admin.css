@@ -293,6 +293,15 @@
 .coverage--low {
   color: var(--theme-warn-color);
 }
+/* A field the source structurally can't provide (declared via Scrapers::Agent
+   .field_gaps): shown muted as "n/a", never red — a settled absence, not a
+   broken extractor. The dotted underline hints at the hover title (the reason). */
+.coverage--gap {
+  color: var(--theme-fg-muted);
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  cursor: help;
+}
 .scrape-table tr.is-empty td {
   color: var(--theme-fg-muted);
 }

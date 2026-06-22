@@ -12,6 +12,10 @@ module Scrapers
       URI.parse('https://volkshaus-basel.ch/programm/')
     end
 
+    # Volkshaus Basel lists a title + date only — no subtitle line and no
+    # genre/style/tag field.
+    field_gaps subtitle: :no_field, genres: :no_field
+
     # One server-rendered row per event; the body is an inline collapse panel, so
     # there is no detail page to fetch.
     def event_rows

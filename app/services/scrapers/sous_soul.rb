@@ -17,6 +17,9 @@ module Scrapers
       URI.parse('https://www.sous-soul.love/')
     end
 
+    # Sous Soul lists a title + Untertitel only; there is no genre/style/tag field.
+    field_gaps genres: :no_field
+
     # Each event renders twice in the list (a default + a hover variant); dedupe by
     # detail href so we don't fetch every detail page twice.
     def event_rows

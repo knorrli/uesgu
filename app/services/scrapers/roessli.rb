@@ -12,6 +12,9 @@ module Scrapers
       URI.parse('https://www.souslepont-roessli.ch/')
     end
 
+    # Rössli lists a title + categories (extracted as genres) but no subtitle line.
+    field_gaps subtitle: :no_field
+
     def event_rows
       page.css('.rossli-events .event')
     end

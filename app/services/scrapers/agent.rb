@@ -21,6 +21,10 @@ module Scrapers
     # robots unless it sets `self.respect_robots = false`.
     class_attribute :respect_robots, instance_writer: false, default: true
 
+    # Backing store for the `field_gaps` macro below. A frozen default so the
+    # unset case shares one empty hash; each declaring scraper gets its own.
+    class_attribute :_field_gaps, instance_accessor: false, default: {}.freeze
+
     def initialize
       super
       self.user_agent = USER_AGENT
@@ -73,6 +77,42 @@ module Scrapers
     def self.event_url_pattern
       return nil if aggregator?
       %r{\Ahttps?://#{Regexp.escape(url.host)}/}
+    end
+
+    # The controlled vocabulary of *why* a coverage field is absent at a source,
+    # mirroring venue_ledger.yml's `reasons:` map — a small fixed set so the
+    # coverage page can explain every gap consistently and a settled "does this
+    # source even expose X?" call isn't re-litigated. The symbol is the stable
+    # key; the human text lives in i18n (admin.scraper_coverage.index.gap_reason.*).
+    FIELD_GAP_REASONS = %i[no_field].freeze
+
+    # Declare (and read) the coverage fields this source structurally cannot
+    # fill. A *capability* fact, kept on the scraper because the scraper is the
+    # code that actually knows what the upstream exposes — it can't rot the way a
+    # separate capability doc would. The coverage page (ScraperCoveragePresenter)
+    # reads this to report a genuinely-absent field as "n/a (reason)" instead of
+    # flagging an impossible-to-fill cell red, so the same gap isn't
+    # re-investigated on every glance. Honesty is preserved by the page itself:
+    # if a field declared absent ever ships real coverage, the live percentage
+    # wins over the declaration, so a stale gap self-corrects rather than masking
+    # newly collected data.
+    #
+    # Macro form declares (`field_gaps genres: :no_field, subtitle: :no_field`);
+    # the bare form reads. Merges down the class hierarchy so an OLE subclass can
+    # add its own. Keys are coverage fields (:subtitle, :genres); values come from
+    # FIELD_GAP_REASONS. Declare ONLY a field that is absent at the SOURCE — never
+    # one that's merely unbuilt (that's a defect to fix, not a gap to record).
+    def self.field_gaps(**gaps)
+      return _field_gaps if gaps.empty?
+
+      gaps.each do |field, reason|
+        next if FIELD_GAP_REASONS.include?(reason)
+
+        raise ArgumentError,
+              "unknown field-gap reason #{reason.inspect} for #{field.inspect} " \
+              "(one of: #{FIELD_GAP_REASONS.join(', ')})"
+      end
+      self._field_gaps = _field_gaps.merge(gaps).freeze
     end
 
     # Returns a Scrapers::Result tallying what this run saw and wrote, so the

@@ -12,6 +12,9 @@ module Scrapers
       URI.parse('https://boeroem.ch/')
     end
 
+    # Böröm lists a title + Untertitel only; there is no genre/style/tag field.
+    field_gaps genres: :no_field
+
     def event_rows
       page.css('.ast-article-single .veranstaltung')
     end

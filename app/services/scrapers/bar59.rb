@@ -25,6 +25,10 @@ module Scrapers
       URI.parse(BASE)
     end
 
+    # Bar 59's Firestore feed carries a genre field (extracted below) but no
+    # subtitle / secondary-title field.
+    field_gaps subtitle: :no_field
+
     def event_rows
       docs = all_documents
       docs.map { |doc| flatten(doc) }

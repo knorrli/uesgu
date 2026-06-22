@@ -36,6 +36,10 @@ module Scrapers
       URI.parse("https://dynamo.nodehive.app/jsonapi/node/event?#{query}")
     end
 
+    # Dynamo's feed carries a genre taxonomy (extracted below) but no subtitle
+    # field.
+    field_gaps subtitle: :no_field
+
     def event_rows
       Array(parse_json(page.body, default: {})['data'])
     end

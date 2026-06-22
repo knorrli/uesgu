@@ -351,8 +351,11 @@ en:
     scraper_coverage:
       index:
         title: Data coverage
-        intro: How much each scraper collects per event — computed live from the events, never hand-maintained. Low values mean the scraper could collect more, or broke.
+        intro: How much each scraper collects per event — computed live from the events, never hand-maintained. Low values mean the scraper could collect more, or broke. "n/a" means the source doesn't expose the field at all.
         empty: No events to measure yet.
+        gap: n/a
+        gap_reason:
+          no_field: This source doesn't expose this field at all.
         col:
           scraper: Scraper
           events: Events

@@ -20,6 +20,10 @@ module Scrapers
       URI.parse('https://club.badbonn.ch/program')
     end
 
+    # Bad Bonn's pages carry only a title + a free-text blurb (the subtitle) —
+    # there is no genre/style/tag field anywhere to extract.
+    field_gaps genres: :no_field
+
     def event_rows
       page.css('.program-row')
     end

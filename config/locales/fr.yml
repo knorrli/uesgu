@@ -351,8 +351,11 @@ fr:
     scraper_coverage:
       index:
         title: Couverture des données
-        intro: Ce que chaque scraper récupère par event — calculé en direct depuis les events, jamais à la main. Une valeur basse veut dire qu'il pourrait en récupérer plus, ou qu'il est cassé.
+        intro: Ce que chaque scraper récupère par event — calculé en direct depuis les events, jamais à la main. Une valeur basse veut dire qu'il pourrait en récupérer plus, ou qu'il est cassé. « n/a » veut dire que la source n'expose pas du tout ce champ.
         empty: Pas encore d'events à analyser.
+        gap: n/a
+        gap_reason:
+          no_field: Cette source n'expose pas du tout ce champ.
         col:
           scraper: Scraper
           events: Events

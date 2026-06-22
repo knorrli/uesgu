@@ -13,6 +13,10 @@ module Scrapers
       URI.parse('https://kaserne-basel.ch/de')
     end
 
+    # Kaserne's SvelteKit listing exposes a title + date only — no subtitle line
+    # and no genre/style/tag field.
+    field_gaps subtitle: :no_field, genres: :no_field
+
     # Each event is a <details> whose class encodes the category; `concert-type`
     # is the music filter (the venue also programmes dance/discourse).
     def event_rows

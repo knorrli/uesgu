@@ -79,7 +79,7 @@ module EventsHelper
     param = field.delete_suffix('[]')
 
     unless interactive
-      return link_to label, events_path(param.to_sym => Array(value)),
+      return link_to label, events_path(param.to_sym => Array(value), filtered: 1),
                      class: class_names('filter-link', modifier)
     end
 
@@ -114,7 +114,10 @@ module EventsHelper
       query[param] = Array(applied[param]) + [value.to_s]
     end
 
-    link_to label, events_path(query),
+    # `filtered: 1` marks this as a deliberate filter action (see EventsController),
+    # so toggling the LAST term off lands on a /events?filtered=1 that clears the
+    # persistence cookie instead of replaying it (the marker is stripped on redirect).
+    link_to label, events_path(query.merge('filtered' => 1)),
             class: class_names('filter-link', modifier, active: active),
             data: { turbo_frame: '_top' }
   end

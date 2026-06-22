@@ -13,7 +13,7 @@ fr:
     install: Installer l'app
   cookie_notice:
     label: Note sur les cookies
-    body: "Petit mot sur les cookies : deux, pas plus — un pour te garder connecté, un pour retenir ton thème. Pas de pistage, pas de pub, personne qui te regarde."
+    body: "Petit mot sur les cookies : trois, pas plus — un pour te garder connecté, un pour retenir ton thème, un pour ton filtre. Pas de pistage, pas de pub, personne qui te regarde."
     dismiss: Compris
   install:
     title: Installer l'app
@@ -588,6 +588,7 @@ fr:
     offsite_link: S'ouvre sur %{source}, pas sur le site du lieu
     index:
       empty: Aucun événement ne correspond aux filtres actuels.
+      clear_filter: Réinitialiser le filtre
       view:
         label: Vue
         list: Liste

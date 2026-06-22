@@ -119,7 +119,58 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes response.body, 'NoMatchTitle' # in the list via genres_name_cont
     # The genre tag is lit, and tapping it drops the freetext term (back to no q).
-    assert_select "a.filter-link.active[href=?]", events_path, text: 'Quophop'
+    # The href carries filtered=1 so clearing the last term wipes the persistence
+    # cookie instead of replaying it (EventsController#redirect_to_canonical_filter).
+    assert_select "a.filter-link.active[href=?]", events_path(filtered: 1), text: 'Quophop'
+  end
+
+  # ── Filter persistence ──────────────────────────────────────────────────────
+  # The active filter is remembered in a per-device cookie, but the URL stays the
+  # single source of truth: a plain visit with a remembered filter redirects to that
+  # filter's URL rather than rendering a bare /events that's secretly filtered.
+
+  test 'an applied filter is remembered and replayed on a later plain visit' do
+    event(title: 'JazzNightShow', genre_list: ['Jazzy'], start_date: Date.current + 2.days)
+
+    # Apply via the form: it carries the `filtered` marker, which is stripped to a
+    # clean URL while the filter itself is stored.
+    get events_path(filtered: 1, g: ['Jazzy'])
+    assert_redirected_to events_path(g: ['Jazzy'])
+    follow_redirect!
+    assert_response :success
+
+    # A later plain visit reflects the remembered filter in the URL.
+    get events_path
+    assert_redirected_to events_path(g: ['Jazzy'])
+  end
+
+  test 'a shared filter link renders directly and is then remembered' do
+    event(title: 'JazzNightShow', genre_list: ['Jazzy'], start_date: Date.current + 2.days)
+
+    # No marker, URL already clean → render straight away (no redirect)…
+    get events_path(g: ['Jazzy'])
+    assert_response :success
+    # …and it becomes the remembered filter.
+    get events_path
+    assert_redirected_to events_path(g: ['Jazzy'])
+  end
+
+  test 'clearing the filter wipes the remembered one so it is not replayed' do
+    event(title: 'JazzNightShow', genre_list: ['Jazzy'], start_date: Date.current + 2.days)
+
+    get events_path(filtered: 1, g: ['Jazzy']) # remember Jazzy
+    follow_redirect!
+
+    # Clear via the form: the marker with no filter params deletes the cookie and
+    # lands on a clean bare URL.
+    get events_path(filtered: 1)
+    assert_redirected_to events_path
+    follow_redirect!
+    assert_response :success
+
+    # A later plain visit stays unfiltered — nothing is replayed.
+    get events_path
+    assert_response :success
   end
 
   test 'the default date floor hides past events' do

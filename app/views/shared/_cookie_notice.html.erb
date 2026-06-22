@@ -1,11 +1,12 @@
 <%# A one-time, non-blocking courtesy notice. We only set strictly-necessary
-    cookies (login session, CSRF) plus one theme-preference cookie — none for
-    tracking — so no consent is required; an Accept/Reject wall would be theater.
-    Hence a plain notice with a single dismiss, not a consent gate.
+    cookies (login session, CSRF) plus two preference cookies — theme and the
+    remembered feed filter — none for tracking — so no consent is required; an
+    Accept/Reject wall would be theater. Hence a plain notice with a single
+    dismiss, not a consent gate.
 
     Hidden by default; the controller reveals it on first visit and remembers the
     dismissal in localStorage — deliberately NOT a cookie, so the copy's "exactly
-    two cookies" stays literally true. %>
+    three cookies" stays literally true. %>
 <aside class="cookie-notice" data-controller="cookie-notice" aria-label="<%= t('cookie_notice.label') %>" hidden>
   <p class="cookie-notice__text">
     <span class="ph ph-cookie cookie-notice__icon" aria-hidden="true"></span> <%= t('cookie_notice.body') %>

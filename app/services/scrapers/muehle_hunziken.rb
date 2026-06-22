@@ -51,6 +51,20 @@ module Scrapers
       current_row.at_css('h2')&.text&.squish
     end
 
+    # A secondary line under the title in the list row — a support act
+    # ("& Annika Strand"), an afterparty/festival note, or a "next shows"
+    # pointer. Optional: only some events carry one. It's the row's small
+    # heading-slot <div> (the only `text-sm md:text-xl` block), styled apart from
+    # the <h2> title — read from the list row like the title (the detail click is
+    # only ever for the start time).
+    def event_subtitle(_content)
+      div = current_row.css('div').find do |node|
+        classes = node['class'].to_s
+        classes.include?('text-sm') && classes.include?('md:text-xl')
+      end
+      div&.text&.squish.presence
+    end
+
     # The detail page carries a venue-typed genre bar (beside a language badge and
     # Spotify link) with no usable wrapper class — just bare text nodes joined by
     # `<span class="last-of-type:hidden">, </span>` comma separators, which are the

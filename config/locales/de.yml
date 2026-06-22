@@ -13,7 +13,7 @@ de:
     install: App installieren
   cookie_notice:
     label: Cookie-Hinweis
-    body: "Kurz zu Cookies: genau zwei — einer hält dich eingeloggt, einer merkt sich dein Theme. Kein Tracking, keine Werbung, niemand schaut zu."
+    body: "Kurz zu Cookies: genau drei — einer hält dich eingeloggt, einer merkt sich dein Theme, einer deinen Filter. Kein Tracking, keine Werbung, niemand schaut zu."
     dismiss: Alles klar
   install:
     title: App installieren
@@ -588,6 +588,7 @@ de:
     offsite_link: Öffnet auf %{source}, nicht der Website des Veranstaltungsorts
     index:
       empty: Keine Veranstaltungen für die aktuellen Filter.
+      clear_filter: Filter zurücksetzen
       view:
         label: Ansicht
         list: Liste

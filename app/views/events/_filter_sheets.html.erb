@@ -27,6 +27,12 @@
         html: { autocomplete: 'off' },
         data: { filter_sheets_target: 'form', turbo_frame: '_top' } do %>
 
+    <%# Marks every submission of THIS form (apply, chip ×, Clear-then-commit — all
+        go through requestSubmit) as a deliberate filter action, so the controller
+        treats even a cleared-to-empty submit as "no filter" instead of replaying the
+        persisted cookie. Plain visits to /events omit it and so replay the cookie. %>
+    <%= hidden_field_tag :filtered, 1 %>
+
     <%# ── Trigger bar — each row opens its sheet ── %>
     <div class="filter-sheets__bar">
       <% [

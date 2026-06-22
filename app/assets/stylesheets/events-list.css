@@ -320,6 +320,14 @@
   margin: 0;
 }
 
+/* The "clear filter" escape hatch in the empty state — an inline accent link, set
+   apart from the muted message so the way out reads as actionable. */
+.events-empty__reset {
+  color: var(--theme-accent-color);
+  text-decoration: underline;
+  white-space: nowrap;
+}
+
 /* List / Calendar as a plain text toggle, not filled buttons: the active view
    is bold accent, the other a muted link. Its own class (was the generic
    .button, which now means a real boxed button). */

@@ -13,7 +13,7 @@ en:
     install: Install app
   cookie_notice:
     label: Cookie notice
-    body: "Quick word on cookies: just two — one keeps you logged in, one remembers your theme. No tracking, no ads, nobody watching."
+    body: "Quick word on cookies: just three — one keeps you logged in, one remembers your theme, one remembers your filter. No tracking, no ads, nobody watching."
     dismiss: Got it
   install:
     title: Install app
@@ -588,6 +588,7 @@ en:
     offsite_link: Opens on %{source}, not the venue's own site
     index:
       empty: No events match your current filters.
+      clear_filter: Clear filter
       view:
         label: View
         list: List

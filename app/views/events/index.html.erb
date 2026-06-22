@@ -21,7 +21,15 @@
   </div>
 
   <% unless @has_results %>
-    <p class="muted events-empty"><%= t('events.index.empty') %></p>
+    <p class="muted events-empty">
+      <%= t('events.index.empty') %>
+      <%# With a persisted filter, a sparse return can look empty — offer the way out.
+          `filtered: 1` makes it an explicit empty submit so the cookie is cleared too
+          (a bare /events would just replay the stored filter). %>
+      <% if @filter.active? %>
+        <%= link_to t('events.index.clear_filter'), events_path(filtered: 1), class: 'events-empty__reset' %>
+      <% end %>
+    </p>
   <% end %>
 
   <% if @view == 'calendar' %>

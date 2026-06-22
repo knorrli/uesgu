@@ -16,6 +16,14 @@ module Scrapers
     # talks, yoga…). The category sits on the list row as `span.kategorie`.
     MUSIC_CATEGORIES = %w[Konzert Klubnacht].freeze
 
+    # Neubad exposes no music-genre field — its only taxonomy is the event TYPE
+    # (`span.kategorie`, mirrored in the detail "Was" row: Konzert, Klubnacht,
+    # Kunst, Film…), which we use to filter to music, not to tag a genre. Any
+    # genre coverage on these events is incidental (PETZI carries the same shows
+    # with tags; a dedup merge or admin pin can leave a few). Record a no_field
+    # gap so the low number isn't re-investigated.
+    field_gaps genres: :no_field
+
     def event_rows
       page.css('ul.liste li.zeile')
     end

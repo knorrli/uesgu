@@ -12,6 +12,13 @@ module Scrapers
       URI.parse('https://kofmehl.net/')
     end
 
+    # Kofmehl's site exposes no genre/style/tag field — its detail pages carry a
+    # title + support/subtitle only. Any genre coverage that shows up on these
+    # events is incidental (PETZI ships the same shows with tags; a dedup merge or
+    # an admin pin can leave a few behind), never collected here. Declared a gap
+    # to record that the source itself can't deliver genres.
+    field_gaps genres: :no_field
+
     def event_rows
       page.css('.events .events__element')
     end

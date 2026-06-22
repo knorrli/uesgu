@@ -28,10 +28,6 @@
   only way to get genuinely dynamic motion, since the iOS splash is a static
   pre-boot image and cannot animate. Pick the direction first; they're separate
   efforts.
-- Trim `phosphor.css` to only the used icon classes (~78 KB → tiny). The font is
-  already subset; this is the matching CSS cut. Deferred as low-value and a
-  maintenance burden (must re-trim when adding an icon). See
-  `docs/pwa-cold-start-proposal.md`.
 - Session "Update the filter I just applied" soft-pointer.
 - `featured`/`main_genre` flag + subtree-count browse ranking.
 

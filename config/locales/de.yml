@@ -463,8 +463,8 @@ de:
         is_duplicate_html: Diese Veranstaltung ist ein Duplikat von %{link} – zu deren Gunsten aus den Listen ausgeblendet.
         unmerge: Als eigenständig markieren
         has_duplicates: "In diese Veranstaltung zusammengeführt:"
-        merge_intro: Führe diese Veranstaltung in eine andere zusammen (ID der kanonischen Veranstaltung eingeben), um ein durchgerutschtes Duplikat zusammenzuführen.
-        merge_placeholder: ID der kanonischen Veranstaltung
+        merge_intro: Führe diese Veranstaltung in eine andere zusammen (nach Titel suchen), um ein durchgerutschtes Duplikat zusammenzuführen.
+        merge_placeholder: Kanonische Veranstaltung suchen…
         merge: Zusammenführen
       update:
         saved: Veranstaltung aktualisiert.
@@ -476,6 +476,7 @@ de:
         restored: Veranstaltung wiederhergestellt.
       merge:
         merged: Veranstaltungen zusammengeführt.
+        merge_missing: Wähle zuerst eine Veranstaltung aus.
       unmerge:
         unmerged: Veranstaltung als eigenständig getrennt.
     locations:
@@ -632,8 +633,7 @@ de:
       time: "%H:%M"
   views:
     pagination:
-      first: "&laquo; Start"
-      last: Ende &raquo;
-      next: Weiter &rsaquo;
-      previous: "&lsaquo; Zurück"
-      truncate: "&hellip;"
+      aria_label: Seitennavigation
+      previous: "‹ Zurück"
+      next: "Weiter ›"
+      page_of: "Seite %{current} / %{total}"

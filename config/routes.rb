@@ -127,6 +127,9 @@ Rails.application.routes.draw do
     # field back to the scraper; destroy dismisses (soft-deletes) it and undismiss
     # restores it.
     resources :events, only: %i[index show update destroy] do
+      collection do
+        get :search       # title autocomplete source for the merge (dedup) picker
+      end
       member do
         patch :revert
         patch :undismiss

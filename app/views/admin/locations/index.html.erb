@@ -40,7 +40,7 @@
       <% end %>
     </div>
 
-    <div class="flex justify-center"><%= paginate @locations %></div>
+    <%= render 'shared/pagination', collection: @locations %>
   <% else %>
     <p class="muted"><%= t('.empty') %></p>
   <% end %>

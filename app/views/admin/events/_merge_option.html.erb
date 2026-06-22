@@ -1,0 +1,7 @@
+<%# One option in the merge (dedup) autocomplete: the event's title over a muted
+    meta line (date · venue · #id) so near-duplicates are easy to tell apart. %>
+<% meta = [l(merge_option.start_date), merge_option.venue&.name, "##{merge_option.id}"].compact %>
+<span class="merge-option flex flex-col gap-small">
+  <span class="merge-option__title"><%= merge_option.title %></span>
+  <span class="merge-option__meta muted"><%= meta.join(' · ') %></span>
+</span>

@@ -171,6 +171,25 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     refute e.reload.dismissed?
   end
 
+  test 'the events list pages with the shared prev/next readout' do
+    51.times { |i| event(title: "Show #{format('%02d', i)}") }
+    sign_in_as user(admin: true)
+
+    # Page 1 of 2: a readout and a working "next" link, no "prev" link.
+    get admin_events_path(sort: 'title')
+    assert_response :success
+    assert_select '.pagination__status', text: /1 .* 2/
+    assert_select '.pagination a[rel=next][href*="page=2"]'
+    assert_select '.pagination a[rel=prev]', count: 0
+    # Filter params survive into the page links.
+    assert_select '.pagination a[rel=next][href*="sort=title"]'
+
+    # Page 2: a working "prev" link, no "next" link.
+    get admin_events_path(sort: 'title', page: 2)
+    assert_select '.pagination a[rel=prev][href*="page=1"]'
+    assert_select '.pagination a[rel=next]', count: 0
+  end
+
   test 'an admin can merge an event into a canonical and split it back out' do
     canonical = event(title: 'PETZI Version')
     dup = event(title: 'Venue Version')
@@ -197,6 +216,28 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     patch merge_admin_event_path(e), params: { canonical_id: e.id }
     assert_redirected_to admin_event_path(e)
     assert_nil e.reload.canonical_event_id
+  end
+
+  test 'merging without picking a canonical is rejected gracefully' do
+    e = event(title: 'Unpicked')
+    sign_in_as user(admin: true)
+
+    patch merge_admin_event_path(e), params: { canonical_id: '' }
+    assert_redirected_to admin_event_path(e)
+    assert_nil e.reload.canonical_event_id
+  end
+
+  test 'the merge picker searches canonical events by title, excluding self' do
+    current = event(title: 'Editing This One')
+    match = event(title: 'Matching Canonical')
+    event(title: 'Unrelated')
+    sign_in_as user(admin: true)
+
+    get search_admin_events_path(exclude: current.id, q: 'Matching'), as: :turbo_stream
+    assert_response :success
+    assert_match 'Matching Canonical', response.body
+    assert_no_match 'Unrelated', response.body
+    assert_no_match 'Editing This One', response.body
   end
 
   test 'the show page surfaces the merge form and the duplicate relationship' do

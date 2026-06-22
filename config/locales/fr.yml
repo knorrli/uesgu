@@ -463,8 +463,8 @@ fr:
         is_duplicate_html: Cet événement est un doublon de %{link} — masqué des listes à son profit.
         unmerge: Marquer comme autonome
         has_duplicates: "Événements fusionnés dans celui-ci :"
-        merge_intro: Fusionne cet événement dans un autre (saisis l'ID de l'événement canonique) pour fusionner un doublon passé entre les mailles.
-        merge_placeholder: ID de l'événement canonique
+        merge_intro: Fusionne cet événement dans un autre (cherche-le par titre) pour fusionner un doublon passé entre les mailles.
+        merge_placeholder: Chercher l'événement canonique…
         merge: Fusionner
       update:
         saved: Événement mis à jour.
@@ -476,6 +476,7 @@ fr:
         restored: Événement restauré.
       merge:
         merged: Événements fusionnés.
+        merge_missing: Choisis d'abord un événement.
       unmerge:
         unmerged: Événement séparé comme autonome.
     locations:
@@ -632,8 +633,7 @@ fr:
       time: "%H:%M"
   views:
     pagination:
-      first: "&laquo; Début"
-      last: Fin &raquo;
-      next: Suivant &rsaquo;
-      previous: "&lsaquo; Précédent"
-      truncate: "&hellip;"
+      aria_label: Pagination
+      previous: "‹ Précédent"
+      next: "Suivant ›"
+      page_of: "Page %{current} / %{total}"

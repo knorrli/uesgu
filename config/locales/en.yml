@@ -463,8 +463,8 @@ en:
         is_duplicate_html: This event is a duplicate of %{link} — hidden from listings in its favour.
         unmerge: Mark standalone
         has_duplicates: "Events merged into this one:"
-        merge_intro: Merge this event into another (enter the canonical event's ID) to merge a duplicate that slipped through.
-        merge_placeholder: Canonical event ID
+        merge_intro: Merge this event into another (search for it by title) to merge a duplicate that slipped through.
+        merge_placeholder: Search for the canonical event…
         merge: Merge
       update:
         saved: Event updated.
@@ -476,6 +476,7 @@ en:
         restored: Event restored.
       merge:
         merged: Events merged.
+        merge_missing: Pick an event first.
       unmerge:
         unmerged: Event split out as standalone.
     locations:
@@ -632,8 +633,7 @@ en:
       time: "%H:%M"
   views:
     pagination:
-      first: "&laquo; First"
-      last: Last &raquo;
-      next: Next &rsaquo;
-      previous: "&lsaquo; Prev"
-      truncate: "&hellip;"
+      aria_label: Pagination
+      previous: "‹ Prev"
+      next: "Next ›"
+      page_of: "Page %{current} / %{total}"

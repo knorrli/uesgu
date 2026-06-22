@@ -32,6 +32,7 @@
     <a href="#inputs">Form inputs</a>
     <a href="#icons">Icons</a>
     <a href="#nav">Navigation</a>
+    <a href="#pagination">Pagination</a>
     <a href="#page-header">Page header</a>
   </nav>
 
@@ -486,6 +487,24 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Unread signal</span> · <code>.unread-dot</code> + <code>.badge</code>
         <p class="sg-purpose">A dot on the menu trigger flags unread at a glance; the count badge sits beside the Notifications item inside the menu.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# ======================================================= PAGINATION %>
+  <section class="sg-section" id="pagination">
+    <h2>Pagination</h2>
+    <p class="sg-section__intro">Every long list (admin events/locations/users, genres, the public feed) closes with the same quiet pager: prev/next plus a <code>Seite X / Y</code> readout, <b>never</b> a number grid — so it stays one calm line at any width. Built from <code>shared/_pagination</code>; pass the Kaminari <code>collection</code>. It renders nothing for a single page, and the end you can't move past (first/last) shows as muted, inert text so the readout never shifts as you page.</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <%# A throwaway 3-page array so the specimen shows a live middle page with
+            both steps active — the real partial, the real CSS. %>
+        <%= render 'shared/pagination', collection: Kaminari.paginate_array((1..150).to_a).page(2).per(50) %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Pager</span> · <code>render 'shared/pagination', collection: @events</code>
+        <p class="sg-purpose">Replaces the old Kaminari number grid (which wrapped to a second row on narrow screens). Use it everywhere a <code>.page(params[:page])</code> collection is listed — one home, so the pager reads identically across admin and app.</p>
       </div>
     </div>
   </section>

@@ -45,6 +45,16 @@ module Admin
       @event = Event.find(params.expect(:id))
     end
 
+    # Async autocomplete source for the merge (dedup) picker on #show — find a
+    # canonical event to fold this one into by title instead of by raw id. Scoped
+    # to kept canonical events (the only valid merge targets), minus the event
+    # being edited (passed as `exclude`). Renders combobox options (turbo_stream).
+    def search
+      scope = Event.kept.canonical.where.not(id: params[:exclude])
+      scope = scope.where('title ILIKE ?', "%#{params[:q]}%") if params[:q].present?
+      @events = scope.includes(:locations).order(start_date: :asc).limit(20)
+    end
+
     # Manual correction of an event's fields. Locking is implicit on edit: any
     # overridable field whose value the admin actually changed is added to
     # overridden_fields, so the next re-scrape leaves it alone. Date + time are
@@ -94,7 +104,9 @@ module Admin
     # PETZI and venue titles drifted apart. The duplicate drops out of listings.
     def merge
       event = Event.find(params.expect(:id))
-      canonical = Event.find(params.expect(:canonical_id))
+      canonical = Event.find_by(id: params[:canonical_id])
+      return redirect_to admin_event_path(event), alert: t('.merge_missing') if canonical.nil?
+
       event.merge_into!(canonical)
       redirect_to admin_event_path(canonical), notice: t('.merged')
     rescue ArgumentError => e

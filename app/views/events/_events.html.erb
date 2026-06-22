@@ -13,7 +13,5 @@
     </div>
   <% end %>
 
-  <div class="flex justify-center">
-    <%= paginate @events %>
-  </div>
+  <%= render 'shared/pagination', collection: @events %>
 </section>

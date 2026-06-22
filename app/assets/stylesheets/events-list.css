@@ -345,48 +345,39 @@
   }
 }
 
-/* ── Pagination ── Kaminari's default markup, styled as a compact centered row
-   of square tap targets. On phones it collapses to ‹ prev · current · next ›
-   (numbered links, gap, first/last hidden) so the nav never wraps to a 2nd line. */
+/* ── Pagination ── A quiet readout (shared/_pagination), never a number grid:
+   ‹ Zurück · Seite X / Y · Weiter ›. The status sits centred, the steps anchor
+   to each edge, so it stays one line at every width. Steps are 2.75rem tall so
+   they remain comfortable tap targets even without a box around them. */
 .pagination {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   align-items: center;
-  gap: var(--gap-small);
+  justify-content: space-between;
+  gap: var(--gap-medium);
+  margin-top: var(--gap-large);
 }
 
-.pagination a,
-.pagination .current {
+.pagination__step {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 2.75rem;
-  height: 2.75rem;
-  padding: 0 var(--gap-small);
-  border: var(--tag-border-width) solid var(--border-color);
-  color: var(--theme-fg-color);
+  min-height: 2.75rem;
+  color: var(--theme-accent-color);
   text-decoration: none;
 }
 
-.pagination a:hover { background: var(--theme-bg-muted); }
+.pagination__step:hover { text-decoration: underline; }
 
-.pagination .current {
-  background: var(--theme-accent-color);
-  border-color: var(--theme-accent-color);
-  color: var(--theme-on-accent);
-}
-
-.pagination .gap {
-  min-width: 0;
-  border: 0;
+/* First/last page: the step that has nowhere to go is muted, present, inert —
+   so the readout never shifts as you page through. */
+.pagination__step.is-disabled {
   color: var(--theme-fg-muted);
+  cursor: default;
 }
 
-@media (max-width: 600px) {
-  .pagination .page:not(.current),
-  .pagination .first,
-  .pagination .last { display: none; }
+.pagination__status {
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+  text-align: center;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

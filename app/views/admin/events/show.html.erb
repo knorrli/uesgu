@@ -55,10 +55,12 @@
         <%= t('.genres_label') %>
         <% if @event.overridden?(:genres) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
-      <div class="input-wrapper flex">
+      <div class="input-wrapper flex genre-combobox">
         <%# Multiselect over the assignable taxonomy; submits comma-joined Genre
-            ids the controller maps back to names. %>
-        <%= f.combobox :override_genre_ids, Genre.listable.by_name,
+            ids the controller maps back to names. Options come from the shared
+            genre_combobox_options helper, so the umbrella genres sort to the top
+            and carry their descendant count — same surfacing as the genre editor. %>
+        <%= f.combobox :override_genre_ids, genre_combobox_options(Genre.listable),
               value: @event.override_genre_ids.join(','),
               multiselect_chip_src: chips_genres_path,
               placeholder: t('.genres_label') do |combobox| %>
@@ -115,7 +117,16 @@
       <% end %>
       <p class="muted"><%= t('.merge_intro') %></p>
       <%= form_with url: merge_admin_event_path(@event), method: :patch, class: 'flex gap-small align-baseline wrap' do %>
-        <%= number_field_tag :canonical_id, nil, placeholder: t('.merge_placeholder'), required: true, min: 1 %>
+        <%# Title autocomplete over kept canonical events (admin/events#search),
+            emitting the chosen event's id into canonical_id — no more hunting for
+            a raw database id. %>
+        <div class="input-wrapper flex flex-grow merge-combobox">
+          <%= combobox_tag :canonical_id, search_admin_events_path(exclude: @event.id),
+                placeholder: t('.merge_placeholder'), autocomplete: 'off' do |combobox| %>
+            <% combobox.customize_fieldset class: 'flex-grow' %>
+            <% combobox.customize_input class: 'flex-grow' %>
+          <% end %>
+        </div>
         <%= submit_tag t('.merge'), class: 'button-small' %>
       <% end %>
     <% end %>
@@ -128,7 +139,7 @@
       <%= button_to t('.restore'), undismiss_admin_event_path(@event), method: :patch, class: 'button-small' %>
     <% else %>
       <p class="muted"><%= t('.dismiss_intro') %></p>
-      <%= button_to t('.dismiss'), admin_event_path(@event), method: :delete, class: 'button-small' %>
+      <%= button_to t('.dismiss'), admin_event_path(@event), method: :delete, class: 'button-small danger' %>
     <% end %>
   </section>
 </div>

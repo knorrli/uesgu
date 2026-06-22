@@ -70,7 +70,5 @@
     <% end %>
   </div>
 
-  <div class="flex justify-center">
-    <%= paginate @genres %>
-  </div>
+  <%= render 'shared/pagination', collection: @genres %>
 </div>

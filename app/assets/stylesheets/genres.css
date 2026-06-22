@@ -69,10 +69,12 @@
   font-weight: bold;
 }
 
-/* "Set parent" picker — lay each option out as name (left) + descendant count
-   (right), so the umbrella genres (which also sort to the top) read at a glance.
-   Scoped to this form so the merge picker and other comboboxes are untouched. */
-.genre-set-parent .hw-combobox__option {
+/* Genre pickers that surface umbrellas — the editor's "set parent" picker and the
+   admin event editor's genre assignment — lay each option out as name (left) +
+   descendant count (right), so the umbrella genres (which also sort to the top)
+   read at a glance. Scoped to these two so other comboboxes are untouched. */
+.genre-set-parent .hw-combobox__option,
+.genre-combobox .hw-combobox__option {
   display: flex;
   justify-content: space-between;
   gap: var(--gap-medium);

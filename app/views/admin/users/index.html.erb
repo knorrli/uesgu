@@ -18,7 +18,7 @@
       <% end %>
     </ul>
 
-    <%= paginate @users %>
+    <%= render 'shared/pagination', collection: @users %>
   <% else %>
     <p class="muted"><%= t('.empty') %></p>
   <% end %>

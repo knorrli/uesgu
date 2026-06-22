@@ -34,21 +34,14 @@
         Crustpunk → Punk). Blank = a top-level (root) genre. Parents exclude this
         genre and its own descendants (which would form a cycle) and any
         hidden/blocked/aliased genre. The parent-based successor to "Assign".
-        Ordered by each candidate's descendant count (also shown right-aligned in
-        the dropdown), so the broad umbrella genres you reach for most (Rock,
-        Electronic …) — the ones that already have sub-genres — sit at the top
-        instead of being scattered alphabetically. The count is render-only, so
-        typing still filters on the name. %>
-    <% descendant_counts = Genre.descendant_counts %>
-    <% parent_options = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
-                             .where.not(id: [genre.id, *genre.descendant_ids])
-                             .to_a.sort_by { |g| [-descendant_counts[g.id], g.name.downcase] }
-                             .map { |g|
-                               name = tag.span(g.name)
-                               count = descendant_counts[g.id]
-                               content = count.positive? ? safe_join([name, tag.span(count, class: 'genre-option-count')]) : name
-                               { display: g.name, value: g.id, content: content }
-                             } %>
+        Ordered (via genre_combobox_options) by each candidate's descendant count,
+        also shown right-aligned in the dropdown, so the broad umbrella genres you
+        reach for most (Rock, Electronic …) — the ones that already have sub-genres
+        — sit at the top instead of being scattered alphabetically. The count is
+        render-only, so typing still filters on the name. %>
+    <% parent_candidates = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
+                                .where.not(id: [genre.id, *genre.descendant_ids]) %>
+    <% parent_options = genre_combobox_options(parent_candidates) %>
     <%= form_with url: set_parent_genre_path(genre), method: :post, scope: :genre,
           class: 'flex justify-between gap-medium wrap align-end genre-set-parent' do |f| %>
       <%= hidden_field_tag :return_to, return_to %>

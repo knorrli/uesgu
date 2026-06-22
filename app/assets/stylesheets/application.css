@@ -69,6 +69,7 @@ a {
 .account-form input[type="email"],
 .account-form input[type="password"],
 .account-form input[type="time"],
+.account-form input[type="date"],
 .account-form select {
   padding: var(--gap-small) 0;
   border: 0;
@@ -79,11 +80,12 @@ a {
   max-width: 100%;
 }
 
-/* The native time picker ships as a bordered, opaque-white box that ignored the
-   underline treatment entirely (a stark white rectangle beside the underline
-   selects on the rule form). Strip the box to match, and let its picker glyph
-   follow the theme. */
-.account-form input[type="time"] {
+/* The native time/date pickers ship as bordered, opaque-white boxes that ignored
+   the underline treatment entirely (a stark white rectangle beside the underline
+   inputs — see the admin event editor's Datum next to its Zeit). Strip the box to
+   match, and let the picker glyph follow the theme. */
+.account-form input[type="time"],
+.account-form input[type="date"] {
   background: none;
   color-scheme: light dark;
 }

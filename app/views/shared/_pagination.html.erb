@@ -1,0 +1,30 @@
+<%# Shared pager: a quiet "‹ Zurück · Seite X / Y · Weiter ›" readout — prev/next
+    plus a page count, no number grid. One home for every paginated list (admin
+    events/locations/users, genres, the public feed). Renders nothing for a single
+    page; a disabled end (first/last page) is muted text, not a link. Links keep
+    the current query params (status/sort/q) and only swap :page. %>
+<% if collection.total_pages > 1 %>
+  <%# Stay on the current path and only swap :page — built straight off the request
+      so it works under any controller (and inside the feed's turbo frame) without
+      a route lookup. %>
+  <% page_url = ->(n) { "#{request.path}?#{request.query_parameters.merge(page: n).to_query}" } %>
+  <nav class="pagination" aria-label="<%= t('views.pagination.aria_label') %>">
+    <% if collection.first_page? %>
+      <span class="pagination__step is-disabled"><%= t('views.pagination.previous') %></span>
+    <% else %>
+      <%= link_to t('views.pagination.previous'), page_url.call(collection.prev_page),
+            rel: 'prev', class: 'pagination__step' %>
+    <% end %>
+
+    <span class="pagination__status">
+      <%= t('views.pagination.page_of', current: collection.current_page, total: collection.total_pages) %>
+    </span>
+
+    <% if collection.last_page? %>
+      <span class="pagination__step is-disabled"><%= t('views.pagination.next') %></span>
+    <% else %>
+      <%= link_to t('views.pagination.next'), page_url.call(collection.next_page),
+            rel: 'next', class: 'pagination__step' %>
+    <% end %>
+  </nav>
+<% end %>

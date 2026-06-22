@@ -25,7 +25,7 @@ class CountingScraperHarness < Scrapers::Agent
 
   # A second, independently-varying field — lets a test change one field while
   # holding another, e.g. to prove an admin-locked field survives a re-scrape.
-  def event_subtitle(content) = content[:subtitle]
+  def event_description(content) = content[:description]
 
   # Genres straight from the row, so a test can prove an admin-pinned genre list
   # survives a re-scrape (Event#overridden?(:genres)) or that a duplicate-carrying

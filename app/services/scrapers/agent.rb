@@ -103,9 +103,9 @@ module Scrapers
     # wins over the declaration, so a stale gap self-corrects rather than masking
     # newly collected data.
     #
-    # Macro form declares (`field_gaps genres: :no_field, subtitle: :no_field`);
+    # Macro form declares (`field_gaps genres: :no_field, description: :no_field`);
     # the bare form reads. Merges down the class hierarchy so an OLE subclass can
-    # add its own. Keys are coverage fields (:subtitle, :genres); values come from
+    # add its own. Keys are coverage fields (:description, :genres); values come from
     # FIELD_GAP_REASONS. Declare ONLY a field that is absent at the SOURCE — never
     # one that's merely unbuilt (that's a defect to fix, not a gap to record).
     def self.field_gaps(**gaps)
@@ -220,7 +220,7 @@ module Scrapers
     # genre_list/location_list attributes AATO marks dirty on every assignment; tag
     # changes come from diffing the pre-build snapshot. A scraper whose extractor
     # yields an unstable value (whitespace, timezone, a volatile "N tickets left"
-    # subtitle) then shows the SAME field on every run in the "Updated … — changed:"
+    # description) then shows the SAME field on every run in the "Updated … — changed:"
     # log — a one-line grep instead of guessing offline.
     def changed_fields(event, tags_before)
       fields = event.saved_changes.keys - %w[created_at updated_at genre_list location_list]
@@ -244,9 +244,9 @@ module Scrapers
       event.start_time    = event_start_time(content) unless event.overridden?(:start_time)
       event.start_date    = event.start_time.to_date  unless event.overridden?(:start_date)
       event.title         = event_title(content)      unless event.overridden?(:title)
-      event.subtitle      = event_subtitle(content)   unless event.overridden?(:subtitle)
+      event.description   = event_description(content)   unless event.overridden?(:description)
       # Every genre a scraper extracts — whether from a clean structured field or
-      # mined from unstable free text (artist blurbs, subtitles, origin codes) —
+      # mined from unstable free text (artist blurbs, descriptions, origin codes) —
       # mints taxonomy: an unrecognised token arrives UNPLACED in the admin
       # curation queue (to be filed into the tree, aliased, or blocked) rather than
       # being dropped at ingest. We collect everything and clean downstream — the
@@ -254,8 +254,13 @@ module Scrapers
       # Skip when an admin has pinned the list (Event#overridden?(:genres)) so the
       # re-scrape can't overwrite the correction — the field-level genre sibling
       # of the scalar skips above.
+      # The genre set is the scraper's own extraction PLUS any known genre names
+      # mined from a dropped description blob (mined_genres — off unless a scraper
+      # opts into event_genre_prose). Mining is match-only over the existing
+      # taxonomy, so it can't mint, only attach; event_genres is what mints. Both
+      # are skipped together when an admin has pinned the list.
       unless event.overridden?(:genres)
-        event.genre_list = Array(event_genres(content))
+        event.genre_list = Array(event_genres(content)) + mined_genres(content)
       end
       # Visibility (the music gate) is a derived projection of whatever genres now
       # stand — scraped or admin-pinned — so a pinned genre list still derives the
@@ -278,7 +283,7 @@ module Scrapers
     # mirrors DiscardRule#matching_events (its single source of truth).
     def mark_discarded(event)
       rule = discard_rules.detect do |r|
-        r.matches?(title: event.title, subtitle: event.subtitle, location: self.class.location)
+        r.matches?(title: event.title, description: event.description, location: self.class.location)
       end
       event.discarded_by_rule_id = rule&.id
       @discarded += 1 if rule
@@ -331,7 +336,7 @@ module Scrapers
     /xi
 
     # Derive the reschedule flag from the source, exactly like mark_cancellation:
-    # set it while a reschedule marker is present in the title/subtitle, clear it
+    # set it while a reschedule marker is present in the title/description, clear it
     # once gone, and preserve the original timestamp across re-scrapes.
     def mark_reschedule(event, content)
       event.rescheduled_at =
@@ -370,35 +375,43 @@ module Scrapers
     # Run before field extraction (e.g. stateful year-rollover detection).
     def preprocess(_content) = nil
 
-    # Many venues expose no subtitle / no genres; default to none.
-    def event_subtitle(_content) = nil
+    # Many venues expose no description / no genres; default to none.
+    def event_description(_content) = nil
 
     # Every genre a scraper extracts for an event, from whatever source — a clean
     # structured genre/style field the venue curates, or tokens mined from unstable
-    # free text (artist blurbs, subtitle prose, parsed titles, origin codes). All
+    # free text (artist blurbs, description prose, parsed titles, origin codes). All
     # of it mints taxonomy: an unrecognised token lands UNPLACED in the curation
     # queue to be filed, aliased, or blocked, rather than dropped at ingest.
     # Default: none.
     def event_genres(_content) = nil
 
+    # Opt-in seam for ingest-time genre mining. Several venues expose NO genre
+    # field, yet the description prose they fetch (and otherwise drop) names real,
+    # matchable styles. A scraper for such a venue overrides this to return that
+    # blob as plain text; the base then attaches any genre names it contains that
+    # ALREADY EXIST in the taxonomy (see mined_genres). Default: none (no mining),
+    # so this is inert for every scraper that doesn't opt in.
+    def event_genre_prose(_content) = nil
+
     # Adjust the built event before saving (e.g. promote a blank title).
     def postprocess(_event) = nil
 
     # Whether the event reads as cancelled. Default: a cancellation marker in the
-    # venue-extracted title/subtitle (the common "ABGESAGT: …" / "Annulé" prefix)
+    # venue-extracted title/description (the common "ABGESAGT: …" / "Annulé" prefix)
     # — NOT a full-HTML scan, which false-matches boilerplate, JS and other
     # events. A venue that exposes a dedicated status element should override this
     # to read it precisely from `content`.
     def event_cancelled?(event, _content)
-      CANCELLATION_MARKER.match?([event.title, event.subtitle].compact.join("\n"))
+      CANCELLATION_MARKER.match?([event.title, event.description].compact.join("\n"))
     end
 
     # Whether the event reads as rescheduled — a reschedule marker in the
-    # venue-extracted title/subtitle ("Verschoben", "neues Datum", "new date", …).
+    # venue-extracted title/description ("Verschoben", "neues Datum", "new date", …).
     # Same shape as event_cancelled?; a venue with a dedicated status element can
     # override this to read it precisely from `content`.
     def event_rescheduled?(event, _content)
-      RESCHEDULE_MARKER.match?([event.title, event.subtitle].compact.join("\n"))
+      RESCHEDULE_MARKER.match?([event.title, event.description].compact.join("\n"))
     end
 
     # Log and skip a single event that failed to parse or save, so one bad
@@ -423,6 +436,21 @@ module Scrapers
     rescue JSON::ParserError => e
       Rails.logger.error("[#{self.class.location}] feed returned unparseable JSON: #{e.message}")
       default
+    end
+
+    # The known genre names found in this event's dropped description prose —
+    # match-only against the existing taxonomy (mints nothing). Empty unless the
+    # scraper opts in via event_genre_prose. The mineable vocabulary is loaded
+    # once per run (genres don't change mid-scrape) and reused across every event.
+    def mined_genres(content)
+      text = event_genre_prose(content)
+      return [] if text.blank?
+
+      Genre.names_in_prose(text, genre_mining_index)
+    end
+
+    def genre_mining_index
+      @genre_mining_index ||= Genre.prose_mining_index
     end
 
     # Ensure a Genre row exists for each tagged genre (so brand-new ones surface in

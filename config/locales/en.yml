@@ -362,7 +362,7 @@ en:
           scraper: Scraper
           events: Events
           time: Time
-          subtitle: Subtitle
+          description: Description
           genres: Genres
           distinct_genres: distinct genres
     users:
@@ -437,7 +437,7 @@ en:
         source_link: View source
         intro: Correct bad source data below. A field you change is locked and won't be overwritten on the next scrape.
         title_label: Title
-        subtitle_label: Subtitle
+        description_label: Description
         date_label: Date
         time_label: Time
         genres_label: Genres
@@ -449,7 +449,7 @@ en:
         overrides_intro: These fields are admin-owned and skipped by the scraper. Revert one to let the next scrape pull it fresh from source.
         revert: Revert to source
         field_title: Title
-        field_subtitle: Subtitle
+        field_description: Description
         field_start_date: Date & time
         field_genres: Genres
         dismiss_heading: Visibility
@@ -511,7 +511,7 @@ en:
         title: Edit discard rule
       form:
         pattern_label: Text pattern
-        pattern_hint: Case-insensitive. Matches if it appears anywhere in the title or subtitle (e.g. “Tschütte”, “Grossleinwand”).
+        pattern_hint: Case-insensitive. Matches if it appears anywhere in the title or description (e.g. “Tschütte”, “Grossleinwand”).
         scraper_label: Venue
         all_venues: All venues
         note_label: Note (optional)

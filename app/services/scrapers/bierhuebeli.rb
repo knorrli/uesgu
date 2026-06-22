@@ -54,7 +54,7 @@ module Scrapers
     # the support act (and some samples have no spaces around them), so promote
     # those to a middot first or strip_tags would merge the words; then strip every
     # remaining tag and decode entities (&amp; → &), matching event_title.
-    def event_subtitle(row)
+    def event_description(row)
       html = event_field(row, 'billboard-byline').to_s.gsub(%r{<br\s*/?>}i, ' · ')
       CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(html)).squish.presence
     end

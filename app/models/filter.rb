@@ -69,7 +69,7 @@ class Filter
     {
       g: [
         {
-          title_or_subtitle_or_genres_name_cont_any: queries,
+          title_or_description_or_genres_name_cont_any: queries,
           genres_name_in: expanded_genre_names.presence,
           m: Ransack::Constants::OR
         },

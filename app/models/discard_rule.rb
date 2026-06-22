@@ -18,27 +18,27 @@ class DiscardRule < ApplicationRecord
   # The kept events this rule currently targets — the SINGLE source of truth
   # shared by the editor preview, the "catches N" count, and .reapply_all!. A
   # case-insensitive substring (sanitized so %/_ in the pattern stay literal,
-  # matching #matches?'s plain include) on title OR subtitle, optionally scoped
+  # matching #matches?'s plain include) on title OR description, optionally scoped
   # to one venue's location tag. Independent of `active` on purpose: the preview
   # shows what a rule WOULD catch while you're still toggling it.
   def matching_events
     needle = "%#{ActiveRecord::Base.sanitize_sql_like(pattern.to_s)}%"
-    scope = Event.kept.where('events.title ILIKE :n OR events.subtitle ILIKE :n', n: needle)
+    scope = Event.kept.where('events.title ILIKE :n OR events.description ILIKE :n', n: needle)
     scope = scope.tagged_with(scraper, on: :locations) if scraper.present?
     scope
   end
 
   # Per-event predicate for the scrape path (Scrapers::Agent#build_event), where
   # the event isn't queryable yet. Kept behaviorally identical to
-  # matching_events: same case-insensitive substring on title/subtitle, same
+  # matching_events: same case-insensitive substring on title/description, same
   # venue gate (the scraper's own location, which is one of the event's location
   # tags). `location` is the scraping venue's name.
-  def matches?(title:, subtitle:, location:)
+  def matches?(title:, description:, location:)
     return false if pattern.blank?
     return false if scraper.present? && scraper != location
 
     needle = pattern.downcase
-    title.to_s.downcase.include?(needle) || subtitle.to_s.downcase.include?(needle)
+    title.to_s.downcase.include?(needle) || description.to_s.downcase.include?(needle)
   end
 
   # Re-derive discarded_by_rule_id across every kept event from the current

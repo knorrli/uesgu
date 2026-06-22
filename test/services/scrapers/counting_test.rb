@@ -59,21 +59,21 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
 
   test 'a locked field survives a re-scrape while other fields still update' do
     url = 'https://fixture.test/locked'
-    CountingScraperHarness.next_rows = [{ url: url, title: 'Real Title', subtitle: 'First Sub' }]
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Real Title', description: 'First Sub' }]
     CountingScraperHarness.new.call
     event = Event.find_by(url: url)
     event.lock_field!(:title) # admin corrected the title
 
     # Source changes both fields; the locked title must be preserved, the
-    # unlocked subtitle must track the source → a real change → updated.
-    CountingScraperHarness.next_rows = [{ url: url, title: 'Source Title', subtitle: 'Second Sub' }]
+    # unlocked description must track the source → a real change → updated.
+    CountingScraperHarness.next_rows = [{ url: url, title: 'Source Title', description: 'Second Sub' }]
     result = CountingScraperHarness.new.call
 
     assert_equal 1, result.updated
     assert_equal 0, result.unchanged
     event.reload
     assert_equal 'Real Title', event.title
-    assert_equal 'Second Sub', event.subtitle
+    assert_equal 'Second Sub', event.description
   end
 
   test 'a re-scrape that only touches a locked field counts as unchanged' do

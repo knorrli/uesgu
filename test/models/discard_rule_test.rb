@@ -10,20 +10,20 @@ class DiscardRuleTest < ActiveSupport::TestCase
     refute DiscardRule.new(pattern: '').valid?
   end
 
-  test 'matches? is a case-insensitive substring of title or subtitle' do
+  test 'matches? is a case-insensitive substring of title or description' do
     rule = DiscardRule.new(pattern: 'zorp')
-    assert rule.matches?(title: 'A ZORPball night', subtitle: nil, location: 'X')
-    assert rule.matches?(title: 'Nothing', subtitle: 'late zorp show', location: 'X')
-    refute rule.matches?(title: 'Nothing', subtitle: 'here', location: 'X')
+    assert rule.matches?(title: 'A ZORPball night', description: nil, location: 'X')
+    assert rule.matches?(title: 'Nothing', description: 'late zorp show', location: 'X')
+    refute rule.matches?(title: 'Nothing', description: 'here', location: 'X')
   end
 
   test 'matches? respects the venue gate' do
     rule = DiscardRule.new(pattern: 'zorp', scraper: 'Venue A')
-    assert rule.matches?(title: 'zorp', subtitle: nil, location: 'Venue A')
-    refute rule.matches?(title: 'zorp', subtitle: nil, location: 'Venue B')
+    assert rule.matches?(title: 'zorp', description: nil, location: 'Venue A')
+    refute rule.matches?(title: 'zorp', description: nil, location: 'Venue B')
   end
 
-  test 'matching_events finds kept events by title/subtitle, scoped to the venue' do
+  test 'matching_events finds kept events by title/description, scoped to the venue' do
     here = event(title: 'zorp fest', location_list: ['Venue A', 'Town', 'XX'])
     elsewhere = event(title: 'zorp fest', location_list: ['Venue B', 'Town', 'XX'])
     event(title: 'real concert', location_list: ['Venue A', 'Town', 'XX'])

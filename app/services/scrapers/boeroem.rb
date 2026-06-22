@@ -43,7 +43,7 @@ module Scrapers
       content.at_css('.elementor-top-section .elementor-widget-theme-post-title').text.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.elementor-top-section .event-single-untertitel').text.squish
     end
 

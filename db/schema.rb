@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_21_120000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_22_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -36,7 +36,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_21_120000) do
 
   create_table "events", force: :cascade do |t|
     t.string "title", null: false
-    t.string "subtitle"
+    t.string "description"
     t.date "start_date", null: false
     t.datetime "start_time"
     t.string "url", null: false

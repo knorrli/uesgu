@@ -5,7 +5,7 @@ require 'test_helper'
 # "new date" phrases, and the fact that cancellation markers are NOT reschedules
 # (and vice versa) — the two are deliberately disjoint.
 class Scrapers::RescheduleTest < Minitest::Test
-  Event = Struct.new(:title, :subtitle)
+  Event = Struct.new(:title, :description)
 
   RESCHEDULED = [
     'Konzert verschoben',
@@ -45,7 +45,7 @@ class Scrapers::RescheduleTest < Minitest::Test
     end
   end
 
-  def test_detects_marker_in_subtitle
+  def test_detects_marker_in_description
     event = Event.new('Some Band', 'Achtung: dieses Konzert wurde verschoben')
     assert scraper.send(:event_rescheduled?, event, nil)
   end

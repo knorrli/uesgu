@@ -96,18 +96,18 @@ class EventTest < ActiveSupport::TestCase
 
   test 'release_field! clears a locked field, idempotently' do
     e = event
-    e.lock_field!(:subtitle)
-    assert e.overridden?(:subtitle)
+    e.lock_field!(:description)
+    assert e.overridden?(:description)
 
-    e.release_field!(:subtitle)
-    refute e.reload.overridden?(:subtitle)
+    e.release_field!(:description)
+    refute e.reload.overridden?(:description)
 
-    e.release_field!(:subtitle) # no-op, no error
+    e.release_field!(:description) # no-op, no error
     assert_empty e.reload.overridden_fields
   end
 
   test 'ransackable allowlists expose only the intended fields' do
-    assert_equal %w[title subtitle start_date].sort, Event.ransackable_attributes.sort
+    assert_equal %w[title description start_date].sort, Event.ransackable_attributes.sort
     assert_includes Event.ransackable_associations, 'locations'
     assert_includes Event.ransackable_associations, 'genres'
     refute_includes Event.ransackable_associations, 'styles'

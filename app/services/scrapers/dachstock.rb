@@ -34,7 +34,7 @@ module Scrapers
       content.css('.event-teaser-info .event-title').text.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.artist-list .artist-teaser').map do |node|
         artist_name = node.at_css('.artist-name').text.squish
         artist_info = node.at_css('.artist-info').text.squish
@@ -49,13 +49,13 @@ module Scrapers
       content.css('.event-teaser-info .event-teaser-tags .tag').map { |node| node.text.squish }
     end
 
-    # The teaser sometimes carries only the support-act subtitle and no title;
+    # The teaser sometimes carries only the support-act description and no title;
     # promote it so the event isn't left titleless.
     def postprocess(event)
       return if event.title.present?
 
-      event.title = event.subtitle
-      event.subtitle = nil
+      event.title = event.description
+      event.description = nil
     end
   end
 end

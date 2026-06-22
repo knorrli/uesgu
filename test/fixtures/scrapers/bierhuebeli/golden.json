@@ -4,7 +4,7 @@
     "start_time": "2027-03-05T20:00:00+01:00",
     "start_date": "2027-03-05",
     "title": "CREEDENCE CLEARWATER REVIVED",
-    "subtitle": "FEATURING JOHNNIE GUITAR WILLIAMSON · Double Anniversary World Tour 2027",
+    "description": "FEATURING JOHNNIE GUITAR WILLIAMSON · Double Anniversary World Tour 2027",
     "genre_list": [
       "Externer Anlass",
       "Southern Rock",
@@ -23,7 +23,7 @@
     "start_time": "2026-12-05T18:00:00+01:00",
     "start_date": "2026-12-05",
     "title": "FEMMEtastique",
-    "subtitle": "Berns einzigartigste Night Out für Frauen · DJs Nina Powlee & Curly Lisa",
+    "description": "Berns einzigartigste Night Out für Frauen · DJs Nina Powlee & Curly Lisa",
     "genre_list": [
       "Girlhood",
       "Party für Frauen"
@@ -40,7 +40,7 @@
     "start_time": "2026-10-31T18:00:00+01:00",
     "start_date": "2026-10-31",
     "title": "FEMMEtastique",
-    "subtitle": "Berns einzigartigste Night Out für Frauen · DJs Nina Powlee & Curly Lisa",
+    "description": "Berns einzigartigste Night Out für Frauen · DJs Nina Powlee & Curly Lisa",
     "genre_list": [
       "Girlhood",
       "Party für Frauen"
@@ -57,7 +57,7 @@
     "start_time": "2026-09-19T23:00:00+02:00",
     "start_date": "2026-09-19",
     "title": "BEST OF 2000ER PARTY",
-    "subtitle": "DJs Skoob & Flink",
+    "description": "DJs Skoob & Flink",
     "genre_list": [
       "2000er",
       "Mashup",
@@ -81,7 +81,7 @@
     "start_time": "2026-09-11T23:00:00+02:00",
     "start_date": "2026-09-11",
     "title": "Pearls of the 80ies",
-    "subtitle": "DJ Franctone",
+    "description": "DJ Franctone",
     "genre_list": [
       "80s Disco",
       "80er Hits",
@@ -102,7 +102,7 @@
     "start_time": "2026-09-12T18:00:00+02:00",
     "start_date": "2026-09-12",
     "title": "FEMMEtastique",
-    "subtitle": "Berns einzigartigste Night Out für Frauen · DJs Nina Powlee & Curly Lisa",
+    "description": "Berns einzigartigste Night Out für Frauen · DJs Nina Powlee & Curly Lisa",
     "genre_list": [
       "Girlhood",
       "Party für Frauen"
@@ -119,7 +119,7 @@
     "start_time": "2027-04-25T19:00:00+02:00",
     "start_date": "2027-04-25",
     "title": "AUF DER COUCH MIT FELIZITAS AMBAUEN",
-    "subtitle": "Mit der Psychotherapeutin im Gespräch - Talk mit Barbara Bleisch",
+    "description": "Mit der Psychotherapeutin im Gespräch - Talk mit Barbara Bleisch",
     "genre_list": [
       "Externer Anlass",
       "PsychologieLive",
@@ -139,7 +139,7 @@
     "start_time": "2026-09-26T19:30:00+02:00",
     "start_date": "2026-09-26",
     "title": "STREUSEL ON TOP",
-    "subtitle": "LIVE COMEDY",
+    "description": "LIVE COMEDY",
     "genre_list": [
       "Comedy",
       "Backen",
@@ -157,7 +157,7 @@
     "start_time": "2026-07-19T21:00:00+02:00",
     "start_date": "2026-07-19",
     "title": "FINALE",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -173,7 +173,7 @@
     "start_time": "2026-07-15T21:00:00+02:00",
     "start_date": "2026-07-15",
     "title": "Halbfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -189,7 +189,7 @@
     "start_time": "2026-07-14T21:00:00+02:00",
     "start_date": "2026-07-14",
     "title": "Halbfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -205,7 +205,7 @@
     "start_time": "2026-07-11T23:00:00+02:00",
     "start_date": "2026-07-11",
     "title": "Viertelfinale",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -221,7 +221,7 @@
     "start_time": "2026-07-10T21:00:00+02:00",
     "start_date": "2026-07-10",
     "title": "Viertelfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -237,7 +237,7 @@
     "start_time": "2026-07-09T22:00:00+02:00",
     "start_date": "2026-07-09",
     "title": "Viertelfinale",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -253,7 +253,7 @@
     "start_time": "2026-07-07T18:00:00+02:00",
     "start_date": "2026-07-07",
     "title": "Achtelfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -269,7 +269,7 @@
     "start_time": "2026-07-06T21:00:00+02:00",
     "start_date": "2026-07-06",
     "title": "Achtelfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -285,7 +285,7 @@
     "start_time": "2026-07-03T20:00:00+02:00",
     "start_date": "2026-07-03",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
@@ -302,7 +302,7 @@
     "start_time": "2026-07-02T21:00:00+02:00",
     "start_date": "2026-07-02",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
@@ -319,7 +319,7 @@
     "start_time": "2026-07-01T22:00:00+02:00",
     "start_date": "2026-07-01",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -335,7 +335,7 @@
     "start_time": "2026-07-01T18:00:00+02:00",
     "start_date": "2026-07-01",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -351,7 +351,7 @@
     "start_time": "2026-06-30T23:00:00+02:00",
     "start_date": "2026-06-30",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
@@ -368,7 +368,7 @@
     "start_time": "2026-09-22T18:30:00+02:00",
     "start_date": "2026-09-22",
     "title": "«DER BUND» IM GESPRÄCH",
-    "subtitle": "Thema und Talk-Gast folgt ...",
+    "description": "Thema und Talk-Gast folgt ...",
     "genre_list": [
       "Podium",
       "Polit-Talk",
@@ -388,7 +388,7 @@
     "start_time": "2026-09-30T20:00:00+02:00",
     "start_date": "2026-09-30",
     "title": "MASSIMO ROCCHI",
-    "subtitle": "LIVE - 50 JAHRE BÜHNENPRÄSENZ",
+    "description": "LIVE - 50 JAHRE BÜHNENPRÄSENZ",
     "genre_list": [
       "Comedy",
       "Pantomime",
@@ -407,7 +407,7 @@
     "start_time": "2027-05-05T19:00:00+02:00",
     "start_date": "2027-05-05",
     "title": "PUB QUIZ",
-    "subtitle": "mit The Great Quizbies · History-Special",
+    "description": "mit The Great Quizbies · History-Special",
     "genre_list": [
       "Quiz",
       "Pub Quiz",
@@ -426,7 +426,7 @@
     "start_time": "2027-02-09T19:00:00+01:00",
     "start_date": "2027-02-09",
     "title": "PUB QUIZ",
-    "subtitle": "mit The Great Quizbies · Nerd-Special",
+    "description": "mit The Great Quizbies · Nerd-Special",
     "genre_list": [
       "Quiz",
       "Pub Quiz",
@@ -445,7 +445,7 @@
     "start_time": "2027-02-02T19:00:00+01:00",
     "start_date": "2027-02-02",
     "title": "PUB QUIZ",
-    "subtitle": "mit The Great Quizbies · Nerd-Special",
+    "description": "mit The Great Quizbies · Nerd-Special",
     "genre_list": [
       "Quiz",
       "Pub Quiz",
@@ -464,7 +464,7 @@
     "start_time": "2026-07-25T23:00:00+02:00",
     "start_date": "2026-07-25",
     "title": "Offizielle BernPride Afterparty",
-    "subtitle": "Rainbow Heartbeat · DJs Taylor Cruz und Nina Powlee",
+    "description": "Rainbow Heartbeat · DJs Taylor Cruz und Nina Powlee",
     "genre_list": [
       "Bernpride",
       "Afterparty",
@@ -486,7 +486,7 @@
     "start_time": "2027-04-04T14:00:00+02:00",
     "start_date": "2027-04-04",
     "title": "HAZEL BRUGGER",
-    "subtitle": "Good Evening Europe · Nachmittagsvorstellung",
+    "description": "Good Evening Europe · Nachmittagsvorstellung",
     "genre_list": [
       "Externer Anlass",
       "Comedy",
@@ -508,7 +508,7 @@
     "start_time": "2027-04-04T19:00:00+02:00",
     "start_date": "2027-04-04",
     "title": "HAZEL BRUGGER",
-    "subtitle": "Good Evening Europe · Abendvorstellung",
+    "description": "Good Evening Europe · Abendvorstellung",
     "genre_list": [
       "Externer Anlass",
       "Comedy",
@@ -530,7 +530,7 @@
     "start_time": "2026-08-11T19:00:00+02:00",
     "start_date": "2026-08-11",
     "title": "PUB QUIZ",
-    "subtitle": "mit The Great Quizbies · Musik-Special",
+    "description": "mit The Great Quizbies · Musik-Special",
     "genre_list": [
       "Quiz",
       "Pub Quiz",
@@ -549,7 +549,7 @@
     "start_time": "2026-06-20T23:00:00+02:00",
     "start_date": "2026-06-20",
     "title": "BEST OF 2000ER PARTY",
-    "subtitle": "DJs Nina Powlee & Pow",
+    "description": "DJs Nina Powlee & Pow",
     "genre_list": [
       "2000er",
       "Mashup",
@@ -573,7 +573,7 @@
     "start_time": "2026-06-30T19:00:00+02:00",
     "start_date": "2026-06-30",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
@@ -590,7 +590,7 @@
     "start_time": "2026-06-23T22:00:00+02:00",
     "start_date": "2026-06-23",
     "title": "ENGLAND – GHANA",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
@@ -607,7 +607,7 @@
     "start_time": "2026-06-11T21:00:00+02:00",
     "start_date": "2026-06-11",
     "title": "MEXICO – SÜDAFRIKA",
-    "subtitle": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
+    "description": "PUBLIC VIEWING IM GUSTAVS (INNENBEREICH)",
     "genre_list": [
       "FIFA FUSSBALL WM",
       "IM GUSTAV"
@@ -624,7 +624,7 @@
     "start_time": "2026-06-29T19:00:00+02:00",
     "start_date": "2026-06-29",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -640,7 +640,7 @@
     "start_time": "2026-06-28T21:00:00+02:00",
     "start_date": "2026-06-28",
     "title": "Sechzehntelfinale",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -656,7 +656,7 @@
     "start_time": "2026-06-24T21:00:00+02:00",
     "start_date": "2026-06-24",
     "title": "SCHWEIZ – KANADA",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -672,7 +672,7 @@
     "start_time": "2026-06-23T19:00:00+02:00",
     "start_date": "2026-06-23",
     "title": "PORTUGAL – USBEKISTAN",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -688,7 +688,7 @@
     "start_time": "2026-06-22T19:00:00+02:00",
     "start_date": "2026-06-22",
     "title": "ARGENTINIEN – ÖSTERREICH",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -704,7 +704,7 @@
     "start_time": "2026-06-20T22:00:00+02:00",
     "start_date": "2026-06-20",
     "title": "DEUTSCHLAND – ELFENBEINKÜSTE",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -720,7 +720,7 @@
     "start_time": "2026-06-20T19:00:00+02:00",
     "start_date": "2026-06-20",
     "title": "NIEDERLANDE – SCHWEDEN",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -736,7 +736,7 @@
     "start_time": "2026-06-19T21:00:00+02:00",
     "start_date": "2026-06-19",
     "title": "USA – AUSTRALIEN",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -752,7 +752,7 @@
     "start_time": "2026-06-18T21:00:00+02:00",
     "start_date": "2026-06-18",
     "title": "SCHWEIZ – BOSNIEN UND HERZEGOWINA",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -768,7 +768,7 @@
     "start_time": "2026-06-18T18:00:00+02:00",
     "start_date": "2026-06-18",
     "title": "TSCHECHIEN – SÜDAFRIKA",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -784,7 +784,7 @@
     "start_time": "2026-06-17T22:00:00+02:00",
     "start_date": "2026-06-17",
     "title": "ENGLAND – KROATIEN",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -800,7 +800,7 @@
     "start_time": "2026-06-17T19:00:00+02:00",
     "start_date": "2026-06-17",
     "title": "PORTUGAL – DR KONGO",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -816,7 +816,7 @@
     "start_time": "2026-06-16T21:00:00+02:00",
     "start_date": "2026-06-16",
     "title": "FRANKREICH – SENEGAL",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -832,7 +832,7 @@
     "start_time": "2026-06-15T21:00:00+02:00",
     "start_date": "2026-06-15",
     "title": "BELGIEN – ÄGYPTEN",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -848,7 +848,7 @@
     "start_time": "2026-06-15T18:00:00+02:00",
     "start_date": "2026-06-15",
     "title": "SPANIEN – KAP VERDE",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -864,7 +864,7 @@
     "start_time": "2026-06-14T19:00:00+02:00",
     "start_date": "2026-06-14",
     "title": "DEUTSCHLAND – CURAÇAO",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -880,7 +880,7 @@
     "start_time": "2026-06-13T21:00:00+02:00",
     "start_date": "2026-06-13",
     "title": "KATAR – SCHWEIZ",
-    "subtitle": "PUBLIC VIEWING IM SOMMERZELT",
+    "description": "PUBLIC VIEWING IM SOMMERZELT",
     "genre_list": [
       "FIFA FUSSBALL WM"
     ],
@@ -896,7 +896,7 @@
     "start_time": "2026-11-16T20:00:00+01:00",
     "start_date": "2026-11-16",
     "title": "JON CLEARY",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Blues",
       "Soul",
@@ -915,7 +915,7 @@
     "start_time": "2026-10-25T20:00:00+01:00",
     "start_date": "2026-10-25",
     "title": "MATT HANSEN",
-    "subtitle": "The Orchid Tour",
+    "description": "The Orchid Tour",
     "genre_list": [
       "Singer-Songwriter",
       "Pop",
@@ -933,7 +933,7 @@
     "start_time": "2026-10-13T21:00:00+02:00",
     "start_date": "2026-10-13",
     "title": "Generations",
-    "subtitle": "DJs Pow & ZMi",
+    "description": "DJs Pow & ZMi",
     "genre_list": [
       "Ü-30 Party",
       "All-Style",
@@ -956,7 +956,7 @@
     "start_time": "2026-10-10T23:00:00+02:00",
     "start_date": "2026-10-10",
     "title": "STRICTLY 90IES",
-    "subtitle": "DJs Danny da Vingee & Tom Larson",
+    "description": "DJs Danny da Vingee & Tom Larson",
     "genre_list": [
       "90s",
       "90er-Jahre Pop",
@@ -977,7 +977,7 @@
     "start_time": "2026-12-12T21:00:00+01:00",
     "start_date": "2026-12-12",
     "title": "Generations",
-    "subtitle": "DJs Pow & ZMi",
+    "description": "DJs Pow & ZMi",
     "genre_list": [
       "Ü-30 Party",
       "All-Style",
@@ -1000,7 +1000,7 @@
     "start_time": "2026-07-11T23:00:00+02:00",
     "start_date": "2026-07-11",
     "title": "BRAVO HITS PARTY",
-    "subtitle": "DJs Kai und ZMi",
+    "description": "DJs Kai und ZMi",
     "genre_list": [
       "Allstyle",
       "Bravohits only",
@@ -1021,7 +1021,7 @@
     "start_time": "2026-06-27T23:00:00+02:00",
     "start_date": "2026-06-27",
     "title": "Made in 2010",
-    "subtitle": "DJs Vest & Yoyo",
+    "description": "DJs Vest & Yoyo",
     "genre_list": [
       "Hits von 2010 bis heute",
       "Ab 16 Jahren"
@@ -1038,7 +1038,7 @@
     "start_time": "2026-07-08T20:00:00+02:00",
     "start_date": "2026-07-08",
     "title": "CAVALERA",
-    "subtitle": "CHAOS A.D. · Support: Anger in Defeat",
+    "description": "CHAOS A.D. · Support: Anger in Defeat",
     "genre_list": [
       "Metal",
       "Thrash Metal",
@@ -1057,7 +1057,7 @@
     "start_time": "2026-06-06T23:00:00+02:00",
     "start_date": "2026-06-06",
     "title": "Viva la Vida",
-    "subtitle": "Latin & Partytunes",
+    "description": "Latin & Partytunes",
     "genre_list": [
       "Latin",
       "Salsa",
@@ -1075,7 +1075,7 @@
     "start_time": "2026-10-17T16:30:00+02:00",
     "start_date": "2026-10-17",
     "title": "Berner Gourmet Gala 2026",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Gourmet"
     ],
@@ -1091,7 +1091,7 @@
     "start_time": "2026-11-25T20:00:00+01:00",
     "start_date": "2026-11-25",
     "title": "CHARLES NGUELA",
-    "subtitle": "TIMING",
+    "description": "TIMING",
     "genre_list": [
       "Comedy",
       "Spoken Word",
@@ -1112,7 +1112,7 @@
     "start_time": "2027-03-08T20:00:00+01:00",
     "start_date": "2027-03-08",
     "title": "BLANCO WHITE",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Singer-Songwriter",
       "Indie-Folk",
@@ -1132,7 +1132,7 @@
     "start_time": "2027-03-13T20:00:00+01:00",
     "start_date": "2027-03-13",
     "title": "EIVØR",
-    "subtitle": "Support: Rabbitology",
+    "description": "Support: Rabbitology",
     "genre_list": [
       "Nordic Folk",
       "Electronica",
@@ -1152,7 +1152,7 @@
     "start_time": "2027-02-03T20:00:00+01:00",
     "start_date": "2027-02-03",
     "title": "SVEN IVANIĆ",
-    "subtitle": "«LUEGEMER SPONTI»",
+    "description": "«LUEGEMER SPONTI»",
     "genre_list": [
       "Comedy",
       "Stand-up",
@@ -1171,7 +1171,7 @@
     "start_time": "2026-12-12T19:00:00+01:00",
     "start_date": "2026-12-12",
     "title": "MATTIU",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Mundart",
       "Indie",
@@ -1193,7 +1193,7 @@
     "start_time": "2026-12-01T20:00:00+01:00",
     "start_date": "2026-12-01",
     "title": "KWAM.E",
-    "subtitle": "DA IZZA WIEDER LIVE",
+    "description": "DA IZZA WIEDER LIVE",
     "genre_list": [
       "Hip-Hop",
       "Rap"
@@ -1210,7 +1210,7 @@
     "start_time": "2026-05-12T19:30:00+02:00",
     "start_date": "2026-05-12",
     "title": "RAMON CLAU",
-    "subtitle": "Show im Gustav",
+    "description": "Show im Gustav",
     "genre_list": [
       "Soul",
       "Pop",
@@ -1229,7 +1229,7 @@
     "start_time": "2027-03-13T20:00:00+01:00",
     "start_date": "2027-03-13",
     "title": "THE BEATLES FACTORY",
-    "subtitle": "Days in a life. · Kursaal Bern",
+    "description": "Days in a life. · Kursaal Bern",
     "genre_list": [
       "Externer Anlass"
     ],
@@ -1245,7 +1245,7 @@
     "start_time": "2026-05-30T23:00:00+02:00",
     "start_date": "2026-05-30",
     "title": "Bad Taste Party",
-    "subtitle": "DJs Kai & Vest",
+    "description": "DJs Kai & Vest",
     "genre_list": [
       "Hits ohne Geschmacksgrenze",
       "Gratis wenn dein Outfit stimmt"
@@ -1262,7 +1262,7 @@
     "start_time": "2026-05-22T23:00:00+02:00",
     "start_date": "2026-05-22",
     "title": "FUSE PARTY",
-    "subtitle": "DJ Layla",
+    "description": "DJ Layla",
     "genre_list": [
       "Afrobeats",
       "Dancehall",
@@ -1285,7 +1285,7 @@
     "start_time": "2026-11-08T20:00:00+01:00",
     "start_date": "2026-11-08",
     "title": "JOJO MAYER",
-    "subtitle": "ME/MACHINE 2.0",
+    "description": "ME/MACHINE 2.0",
     "genre_list": [
       "Electronic",
       "Jazz",
@@ -1306,7 +1306,7 @@
     "start_time": "2026-05-14T23:00:00+02:00",
     "start_date": "2026-05-14",
     "title": "Made in 2010",
-    "subtitle": "DJs Nina Powlee & Curly Lisa",
+    "description": "DJs Nina Powlee & Curly Lisa",
     "genre_list": [
       "Hits von 2010 bis heute",
       "Ab 16 Jahren"
@@ -1323,7 +1323,7 @@
     "start_time": "2026-05-24T23:00:00+02:00",
     "start_date": "2026-05-24",
     "title": "BIERHÜBELI PFINGST PARTY",
-    "subtitle": "DJs Nina Powlee & Layla & Kobragypsy",
+    "description": "DJs Nina Powlee & Layla & Kobragypsy",
     "genre_list": [
       "Feiertagsmodus",
       "Pfingstvergnügen",
@@ -1345,7 +1345,7 @@
     "start_time": "2026-05-13T18:00:00+02:00",
     "start_date": "2026-05-13",
     "title": "Queer Tea Dance",
-    "subtitle": "Benefiz Party queerAlternBern",
+    "description": "Benefiz Party queerAlternBern",
     "genre_list": [
       "Queer Dance",
       "Pop Classics",
@@ -1365,7 +1365,7 @@
     "start_time": "2026-05-20T18:30:00+02:00",
     "start_date": "2026-05-20",
     "title": "NYNA DUBOIS & JONAS ZAHND",
-    "subtitle": "Show im Gustav",
+    "description": "Show im Gustav",
     "genre_list": [
       "Pop",
       "Soul"
@@ -1382,7 +1382,7 @@
     "start_time": "2027-03-18T20:00:00+01:00",
     "start_date": "2027-03-18",
     "title": "DUB INC",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Reggae",
       "Hip-Hop",
@@ -1403,7 +1403,7 @@
     "start_time": "2026-05-13T23:00:00+02:00",
     "start_date": "2026-05-13",
     "title": "VERSUS PARTY",
-    "subtitle": "Girl Power VS Boyband Edition",
+    "description": "Girl Power VS Boyband Edition",
     "genre_list": [
       "Girl Power",
       "Boyband"
@@ -1420,7 +1420,7 @@
     "start_time": "2026-08-12T19:00:00+02:00",
     "start_date": "2026-08-12",
     "title": "PUB QUIZ",
-    "subtitle": "mit The Great Quizbies · Musik-Special",
+    "description": "mit The Great Quizbies · Musik-Special",
     "genre_list": [
       "Quiz",
       "Pub Quiz",
@@ -1439,7 +1439,7 @@
     "start_time": "2026-11-03T19:00:00+01:00",
     "start_date": "2026-11-03",
     "title": "PUB QUIZ",
-    "subtitle": "mit The Great Quizbies · 80s-Special",
+    "description": "mit The Great Quizbies · 80s-Special",
     "genre_list": [
       "Quiz",
       "Pub Quiz",
@@ -1458,7 +1458,7 @@
     "start_time": "2027-04-10T20:00:00+02:00",
     "start_date": "2027-04-10",
     "title": "STEFF LA CHEFFE",
-    "subtitle": "Verschobene Show vom 20.11.2026 · STOFF",
+    "description": "Verschobene Show vom 20.11.2026 · STOFF",
     "genre_list": [
       "Rap",
       "Mundart"
@@ -1475,7 +1475,7 @@
     "start_time": "2026-11-13T23:00:00+01:00",
     "start_date": "2026-11-13",
     "title": "QUEERHÜBELI",
-    "subtitle": "THE POP EDITION",
+    "description": "THE POP EDITION",
     "genre_list": [
       "Queerhübeli"
     ],
@@ -1491,7 +1491,7 @@
     "start_time": "2026-04-16T18:00:00+02:00",
     "start_date": "2026-04-16",
     "title": "Gustav x Matte",
-    "subtitle": "5 Gänge für 5 Jahre · Im Gustavs Biergarten (Innenbereich)",
+    "description": "5 Gänge für 5 Jahre · Im Gustavs Biergarten (Innenbereich)",
     "genre_list": [
       "5 Gang Menü",
       "Gustav"
@@ -1508,7 +1508,7 @@
     "start_time": "2026-05-15T23:00:00+02:00",
     "start_date": "2026-05-15",
     "title": "BRAVO HITS PARTY",
-    "subtitle": "DJs Kai und ZMi",
+    "description": "DJs Kai und ZMi",
     "genre_list": [
       "Allstyle",
       "Bravohits only",
@@ -1529,7 +1529,7 @@
     "start_time": "2026-05-16T21:00:00+02:00",
     "start_date": "2026-05-16",
     "title": "EuroVision Public Viewing Party",
-    "subtitle": "DJ Vest & Simon Miles",
+    "description": "DJ Vest & Simon Miles",
     "genre_list": [
       "Eurovision-Hits",
       "Pop",
@@ -1550,7 +1550,7 @@
     "start_time": "2026-05-30T16:00:00+02:00",
     "start_date": "2026-05-30",
     "title": "BIERHÜBELI MERCHANDISING DAY 2026",
-    "subtitle": "Merch von: Patent Ochsner, Stephan Eicher, Züri West, Chlyklass u.v.m.",
+    "description": "Merch von: Patent Ochsner, Stephan Eicher, Züri West, Chlyklass u.v.m.",
     "genre_list": [
       "Merchandising"
     ],
@@ -1566,7 +1566,7 @@
     "start_time": "2026-10-16T20:00:00+02:00",
     "start_date": "2026-10-16",
     "title": "GAVIN DEGRAW",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Pop",
       "Rock",
@@ -1587,7 +1587,7 @@
     "start_time": "2026-10-28T20:00:00+01:00",
     "start_date": "2026-10-28",
     "title": "MARC SWAY",
-    "subtitle": "UNPLUGGED 2026",
+    "description": "UNPLUGGED 2026",
     "genre_list": [
       "Pop",
       "Soul",
@@ -1607,7 +1607,7 @@
     "start_time": "2027-03-02T20:00:00+01:00",
     "start_date": "2027-03-02",
     "title": "TRENTEMØLLER",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Electronic",
       "Dream-Pop",
@@ -1630,7 +1630,7 @@
     "start_time": "2026-04-02T23:00:00+02:00",
     "start_date": "2026-04-02",
     "title": "SUPER BOWL – 32nd Edition",
-    "subtitle": "Die legendäre Sportstudiparty",
+    "description": "Die legendäre Sportstudiparty",
     "genre_list": [
       "Sportstudi Party",
       "Party",
@@ -1648,7 +1648,7 @@
     "start_time": "2026-05-15T18:30:00+02:00",
     "start_date": "2026-05-15",
     "title": "KLANGFARBENRAUSCH",
-    "subtitle": "Show im Gustav",
+    "description": "Show im Gustav",
     "genre_list": [
       "Drum & Bass",
       "Live Electronic",
@@ -1669,7 +1669,7 @@
     "start_time": "2026-12-16T20:00:00+01:00",
     "start_date": "2026-12-16",
     "title": "VERONICA FUSARO",
-    "subtitle": "Support: Sanaë",
+    "description": "Support: Sanaë",
     "genre_list": [
       "Alternative-Pop",
       "Soul",
@@ -1688,7 +1688,7 @@
     "start_time": "2026-10-12T20:00:00+02:00",
     "start_date": "2026-10-12",
     "title": "STARSAILOR",
-    "subtitle": "with strings Love Is Here 25th Anniversary Tour",
+    "description": "with strings Love Is Here 25th Anniversary Tour",
     "genre_list": [
       "Post-Britpop",
       "Alternative Rock",
@@ -1706,7 +1706,7 @@
     "start_time": "2026-09-21T20:00:00+02:00",
     "start_date": "2026-09-21",
     "title": "ANGÉLIQUE KIDJO",
-    "subtitle": "HOPE TOUR",
+    "description": "HOPE TOUR",
     "genre_list": [
       "Afropop",
       "Afrobeat",
@@ -1729,7 +1729,7 @@
     "start_time": "2026-09-04T20:30:00+02:00",
     "start_date": "2026-09-04",
     "title": "KRUDER & DORFMEISTER",
-    "subtitle": "DJ SET",
+    "description": "DJ SET",
     "genre_list": [
       "Electronic",
       "Downtempo",
@@ -1749,7 +1749,7 @@
     "start_time": "2026-10-18T20:00:00+02:00",
     "start_date": "2026-10-18",
     "title": "SEAN KOCH",
-    "subtitle": "Europe 2026 – Support: Current Swell AcousticTrio",
+    "description": "Europe 2026 – Support: Current Swell AcousticTrio",
     "genre_list": [
       "Surf Folk",
       "Indie-Folk",
@@ -1772,7 +1772,7 @@
     "start_time": "2026-10-13T20:00:00+02:00",
     "start_date": "2026-10-13",
     "title": "KAIZERS ORCHESTRA",
-    "subtitle": "Europe 2026 · Support: Victory Kid",
+    "description": "Europe 2026 · Support: Victory Kid",
     "genre_list": [
       "Rock",
       "Alternative",
@@ -1794,7 +1794,7 @@
     "start_time": "2026-05-06T19:30:00+02:00",
     "start_date": "2026-05-06",
     "title": "READY TO ROLL",
-    "subtitle": "Show im Gustav",
+    "description": "Show im Gustav",
     "genre_list": [
       "Blues",
       "Rock"
@@ -1811,7 +1811,7 @@
     "start_time": "2026-05-09T23:00:00+02:00",
     "start_date": "2026-05-09",
     "title": "NOTTE ITALIANA",
-    "subtitle": "Negroni DJ Team",
+    "description": "Negroni DJ Team",
     "genre_list": [
       "Italiana",
       "Würdigung der italienischen Musiker:innen",
@@ -1829,7 +1829,7 @@
     "start_time": "2026-09-19T20:00:00+02:00",
     "start_date": "2026-09-19",
     "title": "SCHILLER",
-    "subtitle": "Voyage",
+    "description": "Voyage",
     "genre_list": [
       "Elektronische Musik",
       "Ambient",

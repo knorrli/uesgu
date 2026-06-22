@@ -45,7 +45,7 @@ module Scrapers
       content.at_css('.groupHeading h2')&.text&.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.groupIntro').map do |node|
         country_code = node.css('.plateMedium').text.squish
         act_name = StringIO.new

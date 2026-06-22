@@ -12,8 +12,8 @@
           title so they stay secondary to it. %><% if event.cancelled? %> <span class="chip chip--cancelled"><%= t('events.cancelled') %></span><% end %><% if rescheduled %> <span class="chip chip--moved"><%= t('events.rescheduled') %></span><% end %><% if (source = event_offsite_source(event)) %> <span class="chip chip--source" title="<%= t('events.offsite_link', source: source) %>"><%= source %></span><% end %>
     </h3>
 
-    <% if event.subtitle.present? %>
-      <div class="event-subtitle"><%= simple_format(event.subtitle) %></div>
+    <% if event.description.present? %>
+      <div class="event-subtitle"><%= simple_format(event.description) %></div>
     <% end %>
 
     <%# One descriptor row: the event's OWN genres, each a filter tag. Tapping a

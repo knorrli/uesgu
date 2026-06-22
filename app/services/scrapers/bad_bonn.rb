@@ -20,7 +20,7 @@ module Scrapers
       URI.parse('https://club.badbonn.ch/program')
     end
 
-    # Bad Bonn's pages carry only a title + a free-text blurb (the subtitle) —
+    # Bad Bonn's pages carry only a title + a free-text blurb (the description) —
     # there is no genre/style/tag field anywhere to extract.
     field_gaps genres: :no_field
 
@@ -51,8 +51,15 @@ module Scrapers
       content.at_css('article[data-date]').attr('data-title').to_s
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('article p').map { |node| node.text.squish }.find(&:present?).to_s
+    end
+
+    # No genre field, but the detail-page blurb (the `<article>` prose, here the
+    # same `<p>` nodes the description samples from) names real styles — mine the
+    # known ones (Scrapers::Agent match-only mining).
+    def event_genre_prose(content)
+      content.css('article p').map(&:text).join("\n")
     end
 
     private

@@ -55,7 +55,7 @@ module Scrapers
       content.at_css('h2.event_title')&.text&.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.at_css('h2.event_title.untertitel')&.text&.squish
     end
 

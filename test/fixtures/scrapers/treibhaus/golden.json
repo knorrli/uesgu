@@ -4,7 +4,7 @@
     "start_time": "2026-06-13T18:00:00+02:00",
     "start_date": "2026-06-13",
     "title": "Bandnight Musikschule Luzern",
-    "subtitle": "Showcase",
+    "description": "Showcase",
     "genre_list": [],
     "location_list": [
       "Treibhaus",
@@ -18,7 +18,7 @@
     "start_time": "2026-06-26T19:30:00+02:00",
     "start_date": "2026-06-26",
     "title": "Aeon Kay | set the skies aflame - Release Concert | Support: Varidian",
-    "subtitle": "Release Concert",
+    "description": "Release Concert",
     "genre_list": [],
     "location_list": [
       "Treibhaus",
@@ -32,7 +32,7 @@
     "start_time": "2026-09-25T19:30:00+02:00",
     "start_date": "2026-09-25",
     "title": "Binary Sunset Albumtaufe + Manic Pixxies",
-    "subtitle": "Gemeinsamer Konzertabend im Südpol",
+    "description": "Gemeinsamer Konzertabend im Südpol",
     "genre_list": [],
     "location_list": [
       "Treibhaus",

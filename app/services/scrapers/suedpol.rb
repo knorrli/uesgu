@@ -56,7 +56,7 @@ module Scrapers
       CGI.unescapeHTML(row.dig('title', 'rendered').to_s).squish
     end
 
-    def event_subtitle(row)
+    def event_description(row)
       CGI.unescapeHTML(row.dig('acf', 'subtitle').to_s).squish.presence
     end
 

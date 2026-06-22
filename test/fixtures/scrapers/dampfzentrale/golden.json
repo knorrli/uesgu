@@ -4,7 +4,7 @@
     "start_time": "2026-06-12T00:00:00+02:00",
     "start_date": "2026-06-12",
     "title": "Entre Nous",
-    "subtitle": "Das Schlachthaus Theater und die Dampfzentrale Bern spannen zusammen",
+    "description": "Das Schlachthaus Theater und die Dampfzentrale Bern spannen zusammen",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -18,7 +18,7 @@
     "start_time": "2026-06-12T19:00:00+02:00",
     "start_date": "2026-06-12",
     "title": "Tänzerische Einführung",
-    "subtitle": "mit Cosima Grand",
+    "description": "mit Cosima Grand",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -32,7 +32,7 @@
     "start_time": "2026-06-12T20:00:00+02:00",
     "start_date": "2026-06-12",
     "title": "Nina Richard feat. demi Jakob",
-    "subtitle": "arms (not weapons)",
+    "description": "arms (not weapons)",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -46,7 +46,7 @@
     "start_time": "2026-06-13T19:00:00+02:00",
     "start_date": "2026-06-13",
     "title": "Die Zentrale",
-    "subtitle": "Für alle von 10 bis 14 Jahren",
+    "description": "Für alle von 10 bis 14 Jahren",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -60,7 +60,7 @@
     "start_time": "2026-06-13T20:00:00+02:00",
     "start_date": "2026-06-13",
     "title": "Nina Richard feat. demi Jakob",
-    "subtitle": "arms (not weapons)",
+    "description": "arms (not weapons)",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -74,7 +74,7 @@
     "start_time": "2026-06-14T11:00:00+02:00",
     "start_date": "2026-06-14",
     "title": "Streik-Foyer",
-    "subtitle": "Vom Streik-Foyer der Dampfzentrale Bern zum Bundesplatz!",
+    "description": "Vom Streik-Foyer der Dampfzentrale Bern zum Bundesplatz!",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -88,7 +88,7 @@
     "start_time": "2026-06-14T13:30:00+02:00",
     "start_date": "2026-06-14",
     "title": "Wild Card",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -102,7 +102,7 @@
     "start_time": "2026-06-18T19:00:00+02:00",
     "start_date": "2026-06-18",
     "title": "maximum tilt",
-    "subtitle": "Contemporary Arts Practice HKB",
+    "description": "Contemporary Arts Practice HKB",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -116,7 +116,7 @@
     "start_time": "2026-06-23T19:30:00+02:00",
     "start_date": "2026-06-23",
     "title": "Ensemble Proton Bern",
-    "subtitle": "Versinken",
+    "description": "Versinken",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -130,7 +130,7 @@
     "start_time": "2026-06-26T20:00:00+02:00",
     "start_date": "2026-06-26",
     "title": "Variaton",
-    "subtitle": "Fallende Horizonte",
+    "description": "Fallende Horizonte",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -144,7 +144,7 @@
     "start_time": "2026-06-27T20:00:00+02:00",
     "start_date": "2026-06-27",
     "title": "Variaton",
-    "subtitle": "Fallende Horizonte",
+    "description": "Fallende Horizonte",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -158,7 +158,7 @@
     "start_time": "2026-06-28T10:00:00+02:00",
     "start_date": "2026-06-28",
     "title": "Zentralmarkt",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -172,7 +172,7 @@
     "start_time": "2026-06-28T18:00:00+02:00",
     "start_date": "2026-06-28",
     "title": "Variaton",
-    "subtitle": "Fallende Horizonte",
+    "description": "Fallende Horizonte",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -186,7 +186,7 @@
     "start_time": "2026-07-04T18:00:00+02:00",
     "start_date": "2026-07-04",
     "title": "AETHER – a transcendental waveform market",
-    "subtitle": "Lauren Duffus / DJ Haram / Vica Pacheco / LA Timpa / Ciro Vitiello & Junge Eko / Loto Retina (DJ) / STREIKTHROUGH / Nina Emge (DJ) / Leef (DJ)",
+    "description": "Lauren Duffus / DJ Haram / Vica Pacheco / LA Timpa / Ciro Vitiello & Junge Eko / Loto Retina (DJ) / STREIKTHROUGH / Nina Emge (DJ) / Leef (DJ)",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -200,7 +200,7 @@
     "start_time": "2026-07-26T10:00:00+02:00",
     "start_date": "2026-07-26",
     "title": "Zentralmarkt",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -214,7 +214,7 @@
     "start_time": "2026-08-30T10:00:00+02:00",
     "start_date": "2026-08-30",
     "title": "Zentralmarkt",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -228,7 +228,7 @@
     "start_time": "2026-09-27T10:00:00+02:00",
     "start_date": "2026-09-27",
     "title": "Zentralmarkt",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -242,7 +242,7 @@
     "start_time": "2026-09-29T19:30:00+02:00",
     "start_date": "2026-09-29",
     "title": "Ensemble Proton Bern",
-    "subtitle": "Brodel-Tage",
+    "description": "Brodel-Tage",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -256,7 +256,7 @@
     "start_time": "2026-10-01T20:00:00+02:00",
     "start_date": "2026-10-01",
     "title": "Barbara Bleisch trifft",
-    "subtitle": "Raúl Krauthausen",
+    "description": "Raúl Krauthausen",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -270,7 +270,7 @@
     "start_time": "2026-10-02T19:30:00+02:00",
     "start_date": "2026-10-02",
     "title": "Milena Patagônia & Band",
-    "subtitle": "Dijaspora Baby-Tourstart & Plattentaufe",
+    "description": "Dijaspora Baby-Tourstart & Plattentaufe",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -284,7 +284,7 @@
     "start_time": "2026-10-06T20:00:00+02:00",
     "start_date": "2026-10-06",
     "title": "Stanislas Pili, Andrea Zamengo, João Calado",
-    "subtitle": "Spielplan - Instrumentalmusik in Aktion (1970). Komposition: Mauricio Kagel",
+    "description": "Spielplan - Instrumentalmusik in Aktion (1970). Komposition: Mauricio Kagel",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -298,7 +298,7 @@
     "start_time": "2026-12-10T20:00:00+01:00",
     "start_date": "2026-12-10",
     "title": "Barbara Bleisch trifft",
-    "subtitle": "Mirjana Spoljaric Egger",
+    "description": "Mirjana Spoljaric Egger",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",
@@ -312,7 +312,7 @@
     "start_time": "2026-12-15T19:30:00+01:00",
     "start_date": "2026-12-15",
     "title": "Ensemble Proton Bern",
-    "subtitle": "Ausschweifen",
+    "description": "Ausschweifen",
     "genre_list": [],
     "location_list": [
       "Dampfzentrale",

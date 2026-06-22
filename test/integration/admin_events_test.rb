@@ -66,11 +66,11 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
   end
 
   test 'editing an event locks only the fields the admin changed' do
-    e = event(title: 'Wrong Title', subtitle: 'Keep Me')
+    e = event(title: 'Wrong Title', description: 'Keep Me')
     sign_in_as user(admin: true)
 
     patch admin_event_path(e), params: { event: {
-      title: 'Fixed Title', subtitle: 'Keep Me',
+      title: 'Fixed Title', description: 'Keep Me',
       date: e.start_date.iso8601, time: '20:30'
     } }
     assert_redirected_to admin_event_path(e)
@@ -78,7 +78,7 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     e.reload
     assert_equal 'Fixed Title', e.title
     assert e.overridden?(:title)
-    refute e.overridden?(:subtitle) # resubmitted unchanged → not locked
+    refute e.overridden?(:description) # resubmitted unchanged → not locked
     # The time went from none → 20:30, so the date/time pair locks together.
     assert e.overridden?(:start_time)
     assert e.overridden?(:start_date)
@@ -90,7 +90,7 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     sign_in_as user(admin: true)
 
     patch admin_event_path(e), params: { event: {
-      title: 'T', subtitle: '', date: e.start_date.iso8601, time: '',
+      title: 'T', description: '', date: e.start_date.iso8601, time: '',
       url: 'https://evil.test/changed', hidden: true
     } }
 
@@ -130,7 +130,7 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     sign_in_as user(admin: true)
 
     patch admin_event_path(e), params: { event: {
-      title: 'Genre Show', subtitle: '', date: e.start_date.iso8601, time: '',
+      title: 'Genre Show', description: '', date: e.start_date.iso8601, time: '',
       override_genre_ids: "#{g1.id},#{g2.id}"
     } }
     assert_redirected_to admin_event_path(e)

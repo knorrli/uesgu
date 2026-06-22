@@ -41,14 +41,14 @@ module Scrapers
       end.compact_blank.join(' ')
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.subtitle').text.split(',').map { |part| part.squish }.compact_blank.join(', ')
     end
 
     def event_genres(content)
       # The venue packs several genres into one comma-separated `.eventgenre` span
       # ("City Pop, Funk, Soul"), so split on commas into atomic genres rather than
-      # storing the whole string as a single junk tag. Mirrors event_subtitle.
+      # storing the whole string as a single junk tag. Mirrors event_description.
       content.css('.eventgenre').flat_map { |node| node.text.split(',') }.map(&:squish).compact_blank
     end
   end

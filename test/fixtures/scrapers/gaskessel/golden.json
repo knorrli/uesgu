@@ -4,7 +4,7 @@
     "start_time": "2026-06-12T21:00:00+02:00",
     "start_date": "2026-06-12",
     "title": "Solax",
-    "subtitle": "EP-Taufe „The Willow gets over it“ Support: Barcode Zebra",
+    "description": "EP-Taufe „The Willow gets over it“ Support: Barcode Zebra",
     "genre_list": [
       "City Pop",
       "Funk",
@@ -22,7 +22,7 @@
     "start_time": "2026-06-13T21:00:00+02:00",
     "start_date": "2026-06-13",
     "title": "Evolution",
-    "subtitle": "Gymerfete Kirchenfeld",
+    "description": "Gymerfete Kirchenfeld",
     "genre_list": [
       "Hits",
       "Trance",
@@ -40,7 +40,7 @@
     "start_time": "2026-06-14T12:00:00+02:00",
     "start_date": "2026-06-14",
     "title": "Manifest für dini Mueter",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Picnic",
       "Politik"
@@ -57,7 +57,7 @@
     "start_time": "2026-06-26T21:00:00+02:00",
     "start_date": "2026-06-26",
     "title": "Free Quenzy Bash",
-    "subtitle": "Leany, Binnay, Mabuyu, Pluto32, JK, Ozyen",
+    "description": "Leany, Binnay, Mabuyu, Pluto32, JK, Ozyen",
     "genre_list": [
       "Rap",
       "Hip-Hop",
@@ -75,7 +75,7 @@
     "start_time": "2026-06-27T23:00:00+02:00",
     "start_date": "2026-06-27",
     "title": "Zero Zero",
-    "subtitle": "Nina Powlee, Curly Lisa",
+    "description": "Nina Powlee, Curly Lisa",
     "genre_list": [
       "2000er Smash Hits"
     ],
@@ -91,7 +91,7 @@
     "start_time": "2026-07-03T21:00:00+02:00",
     "start_date": "2026-07-03",
     "title": "Back to the Roots",
-    "subtitle": "DJ Tarcis",
+    "description": "DJ Tarcis",
     "genre_list": [
       "Oldiesdiscobeats"
     ],
@@ -107,7 +107,7 @@
     "start_time": "2026-07-04T23:00:00+02:00",
     "start_date": "2026-07-04",
     "title": "Saisonschluss",
-    "subtitle": "1luu, *ginga*linda*, Tymn G, Cobuq, pasq, Adelminho",
+    "description": "1luu, *ginga*linda*, Tymn G, Cobuq, pasq, Adelminho",
     "genre_list": [
       "Techno",
       "Trance"
@@ -124,7 +124,7 @@
     "start_time": "2026-09-05T17:00:00+02:00",
     "start_date": "2026-09-05",
     "title": "Musikfestival Bern",
-    "subtitle": "Blitz of ConnectionOCTA Duo (Zoi Argyriou und Núria Carbó)",
+    "description": "Blitz of ConnectionOCTA Duo (Zoi Argyriou und Núria Carbó)",
     "genre_list": [
       "Percussion",
       "Electronica"
@@ -141,7 +141,7 @@
     "start_time": "2026-09-05T23:00:00+02:00",
     "start_date": "2026-09-05",
     "title": "Outro",
-    "subtitle": "deejayhuut, kettenmayer, haessiggurke, dibbasey, nici van jürgen, dj aanori",
+    "description": "deejayhuut, kettenmayer, haessiggurke, dibbasey, nici van jürgen, dj aanori",
     "genre_list": [
       "Open Format",
       "Techno"
@@ -158,7 +158,7 @@
     "start_time": "2026-09-09T19:00:00+02:00",
     "start_date": "2026-09-09",
     "title": "lovehead",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Indie Rock"
     ],
@@ -174,7 +174,7 @@
     "start_time": "2026-09-10T19:00:00+02:00",
     "start_date": "2026-09-10",
     "title": "The Young Gods",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Rock",
       "Industrial"
@@ -191,7 +191,7 @@
     "start_time": "2026-09-11T20:00:00+02:00",
     "start_date": "2026-09-11",
     "title": "Crimer (Special Solo Show) & Valentino Vivace",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Italo-Disco",
       "French Touch",
@@ -209,7 +209,7 @@
     "start_time": "2026-09-18T20:00:00+02:00",
     "start_date": "2026-09-18",
     "title": "futurebae (DE)",
-    "subtitle": "The Hot Ex-Effekt Tour",
+    "description": "The Hot Ex-Effekt Tour",
     "genre_list": [
       "Pop",
       "Rap",
@@ -227,7 +227,7 @@
     "start_time": "2026-09-24T20:00:00+02:00",
     "start_date": "2026-09-24",
     "title": "Jack Botts (AUS)",
-    "subtitle": "Jordy Maxwell",
+    "description": "Jordy Maxwell",
     "genre_list": [
       "Surf-Folk"
     ],
@@ -243,7 +243,7 @@
     "start_time": "2026-10-15T19:00:00+02:00",
     "start_date": "2026-10-15",
     "title": "Club Quiz",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Pup Quiz"
     ],
@@ -259,7 +259,7 @@
     "start_time": "2026-10-22T20:00:00+02:00",
     "start_date": "2026-10-22",
     "title": "Finojet (AUS)",
-    "subtitle": "Tom River AUS",
+    "description": "Tom River AUS",
     "genre_list": [
       "Indie",
       "Folk"
@@ -276,7 +276,7 @@
     "start_time": "2026-10-25T19:00:00+01:00",
     "start_date": "2026-10-25",
     "title": "Luvre47 (DE)",
-    "subtitle": "Motorsport Tour 2026",
+    "description": "Motorsport Tour 2026",
     "genre_list": [
       "Rap",
       "Hip-Hop"
@@ -293,7 +293,7 @@
     "start_time": "2026-11-06T20:00:00+01:00",
     "start_date": "2026-11-06",
     "title": "Manic Pixxies & Batbait",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Dream Punk",
       "Rock"
@@ -310,7 +310,7 @@
     "start_time": "2026-11-13T20:00:00+01:00",
     "start_date": "2026-11-13",
     "title": "SENTO",
-    "subtitle": "Nelia Masengu",
+    "description": "Nelia Masengu",
     "genre_list": [
       "Neo-Soul",
       "R&B",
@@ -328,7 +328,7 @@
     "start_time": "2026-11-26T19:00:00+01:00",
     "start_date": "2026-11-26",
     "title": "Club Quiz",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Pup Quiz"
     ],
@@ -344,7 +344,7 @@
     "start_time": "2026-11-27T20:00:00+01:00",
     "start_date": "2026-11-27",
     "title": "Kids With Buns (BEL)",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Indie-Pop"
     ],
@@ -360,7 +360,7 @@
     "start_time": "2026-12-10T19:00:00+01:00",
     "start_date": "2026-12-10",
     "title": "Florian Paul & die Kapelle der letzten Hoffnung (DE)",
-    "subtitle": "Kein Zurück Tour",
+    "description": "Kein Zurück Tour",
     "genre_list": [
       "Tanzbare Melancholie"
     ],
@@ -376,7 +376,7 @@
     "start_time": "2026-12-17T19:00:00+01:00",
     "start_date": "2026-12-17",
     "title": "Club Quiz",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Pup Quiz"
     ],

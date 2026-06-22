@@ -13,7 +13,7 @@ module Scrapers
     end
 
     # Kofmehl's site exposes no genre/style/tag field — its detail pages carry a
-    # title + support/subtitle only. Any genre coverage that shows up on these
+    # title + support/description only. Any genre coverage that shows up on these
     # events is incidental (PETZI ships the same shows with tags; a dedup merge or
     # an admin pin can leave a few behind), never collected here. Declared a gap
     # to record that the source itself can't deliver genres.
@@ -42,7 +42,7 @@ module Scrapers
       content.css('.event__title-artist').text.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       support = content.css('.event__support').text.squish
       subtitle = content.css('.event__subtitle').text.squish
       [support, subtitle].compact_blank.join(', ')

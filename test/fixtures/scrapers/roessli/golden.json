@@ -4,7 +4,7 @@
     "start_time": "2026-06-11T21:00:00+02:00",
     "start_date": "2026-06-11",
     "title": "RATC, Holiday Wasteland, Restless",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Konzert",
       "Punk"
@@ -21,7 +21,7 @@
     "start_time": "2026-06-14T20:00:00+02:00",
     "start_date": "2026-06-14",
     "title": "SILUETT & Nightwatchers",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Konzert",
       "Post Punk",
@@ -39,7 +39,7 @@
     "start_time": "2026-06-18T21:00:00+02:00",
     "start_date": "2026-06-18",
     "title": "«Out Of Scale» – Annie Taylor, support by The Attycs",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Alternative",
       "Grunge",
@@ -59,7 +59,7 @@
     "start_time": "2026-06-21T15:00:00+02:00",
     "start_date": "2026-06-21",
     "title": "Fescht drü a Gring",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "1-A-Grind",
       "Grind",
@@ -79,7 +79,7 @@
     "start_time": "2026-06-24T21:00:00+02:00",
     "start_date": "2026-06-24",
     "title": "Offene Bühne, Karaoke",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Acoustic"
     ],
@@ -95,7 +95,7 @@
     "start_time": "2026-06-25T21:00:00+02:00",
     "start_date": "2026-06-25",
     "title": "A Dream of Drag",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Drag Show",
       "Performance"
@@ -112,7 +112,7 @@
     "start_time": "2026-06-26T20:30:00+02:00",
     "start_date": "2026-06-26",
     "title": "Softness, Resistance and the In-Between",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Afterparty",
       "Performance",
@@ -131,7 +131,7 @@
     "start_time": "2026-06-27T22:00:00+02:00",
     "start_date": "2026-06-27",
     "title": "Patchwork Night – Maurice Fulton, Sassy J",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Disco",
       "Garage",
@@ -151,7 +151,7 @@
     "start_time": "2026-07-02T23:00:00+02:00",
     "start_date": "2026-07-02",
     "title": "TS Kalashni, DJ kk — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Afrohouse",
       "Breakbeat",
@@ -172,7 +172,7 @@
     "start_time": "2026-07-09T23:00:00+02:00",
     "start_date": "2026-07-09",
     "title": "Bölz No Eis Team — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Party",
       "Synthwave"
@@ -189,7 +189,7 @@
     "start_time": "2026-07-23T23:00:00+02:00",
     "start_date": "2026-07-23",
     "title": "Benny Blanco, Libero — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Deep Tech",
       "House",
@@ -207,7 +207,7 @@
     "start_time": "2026-07-30T23:00:00+02:00",
     "start_date": "2026-07-30",
     "title": "Sommerkaraoke — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Acoustic",
       "Karaoke"
@@ -224,7 +224,7 @@
     "start_time": "2026-08-06T23:00:00+02:00",
     "start_date": "2026-08-06",
     "title": "Trancesistor 950.780 — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Trance"
     ],
@@ -240,7 +240,7 @@
     "start_time": "2026-08-13T23:00:00+02:00",
     "start_date": "2026-08-13",
     "title": "Löie Fest — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "80s",
       "90s",
@@ -258,7 +258,7 @@
     "start_time": "2026-08-20T23:00:00+02:00",
     "start_date": "2026-08-20",
     "title": "Pogologie DJ Team — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Hardcore",
       "Punk"
@@ -275,7 +275,7 @@
     "start_time": "2026-08-27T23:00:00+02:00",
     "start_date": "2026-08-27",
     "title": "Rössli Nighter — Rössli Sommerserie",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "60s",
       "Early Reggae",
@@ -296,7 +296,7 @@
     "start_time": "2026-09-06T20:00:00+02:00",
     "start_date": "2026-09-06",
     "title": "Wolfer & WAR",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Doomgaze",
       "Konzert",
@@ -316,7 +316,7 @@
     "start_time": "2026-11-22T20:00:00+01:00",
     "start_date": "2026-11-22",
     "title": "GVLLOW",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "House of the Dead",
       "Konzert",
@@ -336,7 +336,7 @@
     "start_time": "2026-11-26T20:00:00+01:00",
     "start_date": "2026-11-26",
     "title": "Tight Finks – Rockin‘ Rössli – Vol. 5 Support; The Melmacs",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "'77",
       "Legende",
@@ -355,7 +355,7 @@
     "start_time": "2026-12-23T20:00:00+01:00",
     "start_date": "2026-12-23",
     "title": "SKAme ja nomau machen",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Hard Swing",
       "Konzert",
@@ -376,7 +376,7 @@
     "start_time": "2027-04-08T20:30:00+02:00",
     "start_date": "2027-04-08",
     "title": "Ami Warning «Wellen Tour 2027»",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Indie",
       "Pop",

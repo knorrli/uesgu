@@ -27,7 +27,7 @@ class Scrapers::GoldenTest < Minitest::Test
 
   # Stand-in for an Event that records field assignments instead of persisting.
   class Capture
-    FIELDS = %i[start_time start_date title subtitle genre_list location_list cancelled_at].freeze
+    FIELDS = %i[start_time start_date title description genre_list location_list cancelled_at].freeze
     # :data_source / :hidden / :rescheduled_at are set by build_event but aren't part
     # of the golden output (rescheduled_at is keyword-derived like cancelled_at, but
     # left out of the golden so existing baselines don't need regenerating).
@@ -135,6 +135,11 @@ class Scrapers::GoldenTest < Minitest::Test
       # Keep the run DB-free: the genre-row/visibility derivation hits the DB and
       # isn't under test here (EventTest covers it), so no-op it.
       scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
+      # Likewise prose genre-mining reads the taxonomy from the DB; its matching is
+      # covered by GenreTest and its composition by GenreMintingTest. No-op'ing it
+      # keeps golden output the pure parse result (event_genres only), so the
+      # baseline stays deterministic and independent of taxonomy state.
+      scraper.define_singleton_method(:mined_genres) { |content| [] }
 
       Event.stub(:find_or_initialize_by, factory) do
         scraper.send(:process_events)

@@ -23,7 +23,7 @@ module Scrapers
 
     # bee-flat exposes no genre/style/tag field — the `.style` div is a venue
     # tagline ("a perfect celebration of Joni Mitchell", a tour/album name), not
-    # a genre, so it feeds the subtitle below rather than genres.
+    # a genre, so it feeds the description below rather than genres.
     field_gaps genres: :no_field
 
     def event_rows
@@ -63,8 +63,8 @@ module Scrapers
 
     # bee-flat's `.style` div is the event's tagline (tour/album name or a short
     # descriptor) — venue-authored "valuable additional info", so use it as the
-    # subtitle. Absent on the odd row, hence nil-safe.
-    def event_subtitle(content)
+    # description. Absent on the odd row, hence nil-safe.
+    def event_description(content)
       content.at_css('.style')&.text&.squish.presence
     end
 

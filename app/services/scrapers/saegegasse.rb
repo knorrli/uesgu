@@ -12,7 +12,7 @@ module Scrapers
       URI.parse('https://www.saegegasse.ch/programm')
     end
 
-    # Sägegasse lists a title + a free-text description (the subtitle); there is
+    # Sägegasse lists a title + a free-text description (the description); there is
     # no genre/style/tag field.
     field_gaps genres: :no_field
 
@@ -37,7 +37,7 @@ module Scrapers
       content.css('.rsepro-title-block').text.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.rsepro-small-description-block').text.squish
     end
   end

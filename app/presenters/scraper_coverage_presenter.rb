@@ -1,6 +1,6 @@
 # Backs /admin/scraper_coverage: a per-scraper matrix of how *complete* the data
 # each scraper collects is — what share of its events carry a start time, a
-# subtitle, and at least one genre, plus how many distinct genres it surfaces.
+# description, and at least one genre, plus how many distinct genres it surfaces.
 #
 # Computed live from the events table (grouped by Event#data_source, which every
 # scraper stamps via source_key), so it can never drift the way a hand-written
@@ -8,17 +8,17 @@
 # its genre% fall the next time the page is opened. Every known scraper is listed
 # even with zero events, so a venue that's gone silent stands out too.
 class ScraperCoveragePresenter
-  Row = Data.define(:source, :events, :with_time, :with_subtitle, :with_genre, :distinct_genres, :gaps) do
+  Row = Data.define(:source, :events, :with_time, :with_description, :with_genre, :distinct_genres, :gaps) do
     def present? = events.positive?
     def time_pct = ratio(with_time)
-    def subtitle_pct = ratio(with_subtitle)
+    def description_pct = ratio(with_description)
     def genre_pct = ratio(with_genre)
 
-    # The fill-rate for one coverage field, by its gap key (:time/:subtitle/:genres).
+    # The fill-rate for one coverage field, by its gap key (:time/:description/:genres).
     def pct(field)
       case field
       when :time     then time_pct
-      when :subtitle then subtitle_pct
+      when :description then description_pct
       when :genres   then genre_pct
       end
     end
@@ -60,9 +60,9 @@ class ScraperCoveragePresenter
     sources = (Scrapers::All.scrapers.keys + base.keys).uniq.sort_by(&:downcase)
 
     sources.map do |source|
-      total, with_time, with_subtitle = base.fetch(source, [0, 0, 0])
+      total, with_time, with_description = base.fetch(source, [0, 0, 0])
       with_genre, distinct = genres.fetch(source, [0, 0])
-      Row.new(source:, events: total, with_time:, with_subtitle:,
+      Row.new(source:, events: total, with_time:, with_description:,
               with_genre:, distinct_genres: distinct,
               gaps: gaps.fetch(source, {}))
     end
@@ -81,14 +81,14 @@ class ScraperCoveragePresenter
     end
   end
 
-  # [total, with_time, with_subtitle] per data_source in one grouped pass. A NULL
-  # or empty subtitle / a date-only event (no start_time) simply doesn't count.
+  # [total, with_time, with_description] per data_source in one grouped pass. A NULL
+  # or empty description / a date-only event (no start_time) simply doesn't count.
   def base_counts
     Event.where.not(data_source: nil).group(:data_source).pluck(
       :data_source,
       Arel.sql('COUNT(*)'),
       Arel.sql('COUNT(start_time)'),
-      Arel.sql("COUNT(NULLIF(subtitle, ''))")
+      Arel.sql("COUNT(NULLIF(description, ''))")
     ).to_h { |source, total, time, sub| [source, [total, time, sub]] }
   end
 

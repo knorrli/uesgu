@@ -42,7 +42,7 @@ module Scrapers
       content.css('.viz-event-name').text.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.viz-event-headline').text.squish
     end
 

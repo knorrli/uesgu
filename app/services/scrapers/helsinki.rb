@@ -56,8 +56,14 @@ module Scrapers
       title.presence || content.at_css('.agenda .support')&.text&.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.agenda .support').map { |node| node.text.squish }.compact_blank.join(', ').presence
+    end
+
+    # No genre field, but the `.description` blurb names real styles — mine the
+    # known ones (Scrapers::Agent match-only mining).
+    def event_genre_prose(content)
+      content.css('.description p').map(&:text).join("\n")
     end
 
     private

@@ -175,6 +175,67 @@ class Genre < ApplicationRecord
     (where(id: subtree).pluck(:name) + where(canonical_id: subtree).pluck(:name)).uniq
   end
 
+  # Genre names that are also ordinary words — too ambiguous to mine out of free
+  # prose, where "the house was packed" / "from every country" / "good for the
+  # soul" would false-match. Prose mining (names_in_prose) skips these; they still
+  # tag normally from a venue's own curated genre field, where the context is
+  # unambiguous. Compared by fingerprint, so spelling variants are caught too.
+  # Tunable — widen it if a homograph keeps surfacing junk taggings.
+  PROSE_MINING_STOPWORDS = %w[
+    house pop soul folk country garage industrial drum band world wave experimental
+  ].freeze
+
+  # The vocabulary prose mining matches against: fingerprint => stored display
+  # name for every known genre EXCEPT blocked noise (never a real genre) and the
+  # everyday-word stoplist above. Built from the same Genre name-space the filter
+  # matcher draws on, so a mined token lights up genre filters exactly like a
+  # hand-tagged one — including alias raw names (e.g. "Elektronik"), which keep
+  # their own fingerprint and resolve to their canonical at query time. The caller
+  # builds this ONCE per scrape run (it's a full-table read).
+  def self.prose_mining_index
+    stop = PROSE_MINING_STOPWORDS.to_set { |word| fingerprint_for(word) }
+    where(blocked_at: nil).pluck(:fingerprint, :name)
+                          .reject { |fingerprint, _| fingerprint.blank? || stop.include?(fingerprint) }
+                          .to_h
+  end
+
+  # The known genre names that appear, on word boundaries, in a free-text blob —
+  # MATCH-ONLY mining over `index` (fingerprint => name, from prose_mining_index):
+  # it attaches existing taxonomy, minting NOTHING new (unlike a scraper's
+  # event_genres). Tokenises on whitespace and tests 1..3-word windows by
+  # fingerprint, so spelling variants fold the way the genre filter matches
+  # ("post punk" → "Post-Punk", "drum and bass" → "Drum & Bass") with no sub-word
+  # hits ("Jazzgeschichte" never matches "jazz"). Greedy + non-overlapping:
+  # "indie rock" yields the single "Indie Rock", not also "Indie" + "Rock".
+  #
+  # Known limitation: negation/comparison in prose still matches ("not your
+  # typical techno" attaches Techno). Known-vocab-only bounds the blast radius, and
+  # a wrong tag is a normal tagging an admin can dismiss/block — but it is NOT
+  # zero, so this stays an ingest-only dataset-quality aid, surfaced nowhere new.
+  def self.names_in_prose(text, index)
+    return [] if text.blank? || index.empty?
+
+    words = text.to_s.split
+    found = []
+    i = 0
+    while i < words.size
+      name = nil
+      span = 1
+      3.downto(1) do |n|
+        next if i + n > words.size
+
+        if (hit = index[fingerprint_for(words[i, n].join(' '))])
+          name = hit
+          span = n
+          break
+        end
+      end
+      found << name if name
+      i += span
+    end
+    found.uniq
+  end
+
   # Replace each scraped name with its canonical *display* spelling, matched by
   # fingerprint: the collapsed spelling for a known genre, or a titleized form for
   # a brand-new one. Cosmetic normalization ONLY (e.g. "post punk" → "Post-Punk").

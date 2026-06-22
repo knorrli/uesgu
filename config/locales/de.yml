@@ -362,7 +362,7 @@ de:
           scraper: Scraper
           events: Events
           time: Uhrzeit
-          subtitle: Untertitel
+          description: Beschreibung
           genres: Genres
           distinct_genres: versch. Genres
     users:
@@ -437,7 +437,7 @@ de:
         source_link: Quelle ansehen
         intro: Korrigiere fehlerhafte Quelldaten unten. Ein geändertes Feld wird gesperrt und beim nächsten Scrape nicht überschrieben.
         title_label: Titel
-        subtitle_label: Untertitel
+        description_label: Beschreibung
         date_label: Datum
         time_label: Zeit
         genres_label: Genres
@@ -449,7 +449,7 @@ de:
         overrides_intro: Diese Felder gehören dem Admin und werden vom Scraper übersprungen. Setze eines zurück, damit der nächste Scrape es wieder frisch aus der Quelle holt.
         revert: Auf Quelle zurücksetzen
         field_title: Titel
-        field_subtitle: Untertitel
+        field_description: Beschreibung
         field_start_date: Datum & Zeit
         field_genres: Genres
         dismiss_heading: Sichtbarkeit

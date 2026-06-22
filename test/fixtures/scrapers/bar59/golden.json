@@ -4,7 +4,7 @@
     "start_time": "2026-07-10T20:00:00+02:00",
     "start_date": "2026-07-10",
     "title": "Sommerpause",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bar 59",
@@ -18,7 +18,7 @@
     "start_time": "2026-07-04T20:00:00+02:00",
     "start_date": "2026-07-04",
     "title": "Sommerpause",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bar 59",
@@ -32,7 +32,7 @@
     "start_time": "2026-06-18T21:00:00+02:00",
     "start_date": "2026-06-18",
     "title": "Baraoke 59 - Karaoke",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Karaoke"
     ],
@@ -48,7 +48,7 @@
     "start_time": "2026-07-03T20:00:00+02:00",
     "start_date": "2026-07-03",
     "title": "Sommerpause",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bar 59",
@@ -62,7 +62,7 @@
     "start_time": "2026-06-26T20:00:00+02:00",
     "start_date": "2026-06-26",
     "title": "B59 Tanznacht",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Open Format"
     ],
@@ -78,7 +78,7 @@
     "start_time": "2026-06-27T20:00:00+02:00",
     "start_date": "2026-06-27",
     "title": "B59 Royal Night",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Hip-Hop & Classics"
     ],
@@ -94,7 +94,7 @@
     "start_time": "2026-08-01T22:00:00+02:00",
     "start_date": "2026-08-01",
     "title": "B59 Party Tunes",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Open Format"
     ],
@@ -110,7 +110,7 @@
     "start_time": "2026-08-22T22:00:00+02:00",
     "start_date": "2026-08-22",
     "title": "B59 Latin Groove",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Salsa",
       "Bachata",
@@ -128,7 +128,7 @@
     "start_time": "2026-08-21T22:00:00+02:00",
     "start_date": "2026-08-21",
     "title": "B59 Party Tunes",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Open Format"
     ],
@@ -144,7 +144,7 @@
     "start_time": "2026-06-25T21:00:00+02:00",
     "start_date": "2026-06-25",
     "title": "Baraoke 59 - Karaoke",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Karaoke"
     ],

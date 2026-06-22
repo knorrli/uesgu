@@ -90,7 +90,7 @@ class SavedEventsCalendar
   end
 
   def description_for(event)
-    [event.subtitle.presence, event.genres.map(&:name).presence&.join(', '), event.url]
+    [event.description.presence, event.genres.map(&:name).presence&.join(', '), event.url]
       .compact.join("\n")
   end
 end

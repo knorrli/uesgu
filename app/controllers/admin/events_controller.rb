@@ -53,7 +53,7 @@ module Admin
     # that hang off the genres.
     def update
       @event = Event.find(params.expect(:id))
-      attrs = params.expect(event: %i[title subtitle date time override_genre_ids])
+      attrs = params.expect(event: %i[title description date time override_genre_ids])
       assign_scalars(@event, attrs)
       locked = @event.changed & Event::OVERRIDABLE_FIELDS
       locked |= SCHEDULE_FIELDS if locked.intersect?(SCHEDULE_FIELDS)
@@ -117,7 +117,7 @@ module Admin
 
     def assign_scalars(event, attrs)
       event.title = attrs[:title]
-      event.subtitle = attrs[:subtitle].presence
+      event.description = attrs[:description].presence
       date = attrs[:date].present? ? Date.parse(attrs[:date]) : event.start_date
       event.start_date = date
       event.start_time =

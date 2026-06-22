@@ -4,7 +4,7 @@
     "start_time": "2026-09-25T22:30:00+02:00",
     "start_date": "2026-09-25",
     "title": "Binary Sunset Albumtaufe + Manic Pixxies",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -18,7 +18,7 @@
     "start_time": "2026-07-02T22:30:00+02:00",
     "start_date": "2026-07-02",
     "title": "Sommer im Südpol: High on the Sound",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Electronic",
       "Dub",
@@ -36,7 +36,7 @@
     "start_time": "2026-07-23T21:00:00+02:00",
     "start_date": "2026-07-23",
     "title": "Sommer im Südpol: Adrian Würsch x Elias Menzi",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -50,7 +50,7 @@
     "start_time": "2026-06-28T19:00:00+02:00",
     "start_date": "2026-06-28",
     "title": "Sommer im Südpol: Rami Thawi",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -64,7 +64,7 @@
     "start_time": "2026-06-26T21:00:00+02:00",
     "start_date": "2026-06-26",
     "title": "Sommer im Südpol: Gemischter Chor Obernau",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -78,7 +78,7 @@
     "start_time": "2026-06-13T19:00:00+02:00",
     "start_date": "2026-06-13",
     "title": "Sommer im Südpol: Local Lineup Sommerfest",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -92,7 +92,7 @@
     "start_time": "2026-08-13T22:30:00+02:00",
     "start_date": "2026-08-13",
     "title": "Sommer im Südpol: Sleeper Spies",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -106,7 +106,7 @@
     "start_time": "2026-08-06T22:30:00+02:00",
     "start_date": "2026-08-06",
     "title": "Sommer im Südpol: Cocon Javel",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Electronic Pop"
     ],
@@ -122,7 +122,7 @@
     "start_time": "2026-07-31T22:30:00+02:00",
     "start_date": "2026-07-31",
     "title": "Sommer im Südpol: Gina Été",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Pop",
       "Alternative"
@@ -139,7 +139,7 @@
     "start_time": "2026-11-20T22:00:00+01:00",
     "start_date": "2026-11-20",
     "title": "Nicky B Fly – Wo chumi her Tour",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Urban",
       "Pop"
@@ -156,7 +156,7 @@
     "start_time": "2026-11-07T21:00:00+01:00",
     "start_date": "2026-11-07",
     "title": "jan SEVEN dettwyler",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -170,7 +170,7 @@
     "start_time": "2026-06-11T22:15:00+02:00",
     "start_date": "2026-06-11",
     "title": "Groove Extravaganza – Intercity Jazz Orchestra feat. Anatole Muster",
-    "subtitle": "big band goes modern grooves",
+    "description": "big band goes modern grooves",
     "genre_list": [],
     "location_list": [
       "Südpol",
@@ -184,7 +184,7 @@
     "start_time": "2026-06-20T22:00:00+02:00",
     "start_date": "2026-06-20",
     "title": "Hells Metal Army",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Death Metal",
       "Metal"
@@ -201,7 +201,7 @@
     "start_time": "2026-06-12T23:00:00+02:00",
     "start_date": "2026-06-12",
     "title": "PLH | Support: SGB",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Rap",
       "Hip-Hop"
@@ -218,7 +218,7 @@
     "start_time": "2026-08-29T17:00:00+02:00",
     "start_date": "2026-08-29",
     "title": "Les Digitales Festival 2026",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Electronic",
       "IDM"
@@ -235,7 +235,7 @@
     "start_time": "2026-12-10T21:30:00+01:00",
     "start_date": "2026-12-10",
     "title": "IKAN HYU: <em>SWIM WITH SHARKS TOUR 2026</em>",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Indie",
       "Alternative"
@@ -252,7 +252,7 @@
     "start_time": "2027-04-30T23:00:00+02:00",
     "start_date": "2027-04-30",
     "title": "Steff la Cheffe: Stoff Tour 2027",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Südpol",

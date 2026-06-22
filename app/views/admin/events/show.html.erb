@@ -28,10 +28,10 @@
 
     <label class="flex flex-col gap-small">
       <span class="flex gap-small align-baseline">
-        <%= t('.subtitle_label') %>
-        <% if @event.overridden?(:subtitle) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
+        <%= t('.description_label') %>
+        <% if @event.overridden?(:description) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
-      <%= text_field_tag 'event[subtitle]', @event.subtitle, autocomplete: 'off' %>
+      <%= text_field_tag 'event[description]', @event.description, autocomplete: 'off' %>
     </label>
 
     <div class="flex gap-medium wrap">

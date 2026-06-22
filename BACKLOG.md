@@ -7,15 +7,43 @@
 
 ## Scrapers
 
-- **Capture richer fields some sources expose but we drop.** Blocked on a schema
-  decision — these need **new event columns first** (`price` / `lineup` /
-  `description` / `image`, none exist today). **Audit done + schema proposal
-  drafted: `docs/richer-fields-proposal.md`** — confirmed dropped fields per
-  scraper (bar59 is richest: artists/htmlText/picture; plus Bad Bonn price, OLE
-  + PETZI description, Mahogany Hall price), recommended migration, and the one
-  real open decision (image hotlink vs proxy vs skip, a privacy call). Answer the
-  4 open decisions in that doc and the wiring is mechanical. (Genuinely-absent
-  coverage fields are declared in-code via `field_gaps` — don't re-audit those.)
+- **Capture richer fields some sources expose but we drop.** Two slices already
+  shipped (genre-mining + the subtitle→description rename, below). What remains is
+  the **price** and **image** capture — `price` and `image_url` columns don't exist
+  yet, blocked on a schema decision. **Audit + proposal: `docs/richer-fields-proposal.md`**
+  (note: the proposal's separate `description`/`lineup` columns are SUPERSEDED — see
+  the rename below; only price + image remain). Bad Bonn / Mahogany Hall expose a
+  price; the one real open decision is **image hotlink vs proxy vs skip** (a privacy
+  call — see the doc). Until then, the per-source **curate** follow-up (next bullet)
+  is the live work. (Genuinely-absent coverage fields are declared in-code via
+  `field_gaps` — don't re-audit those.)
+    - **Shipped — ingest-time genre-mining from dropped prose.** The description
+      text at five genre-less venues (kairo, helsinki, bad_bonn, volkshaus,
+      rote_fabrik) is now scanned at ingest for genre names that ALREADY exist in
+      the taxonomy and attached as taggings — match-only, mints nothing
+      (`Genre.names_in_prose` + the `event_genre_prose` opt-in hook; everyday-word
+      homographs excluded via `PROSE_MINING_STOPWORDS`). Mined genres attach at
+      scrape time and `build_event` re-derives the music gate (`hidden`) in the same
+      pass, so existing events pick them up on their next scrape with no separate
+      backfill — a console `Event.find_each(&:recompute_visibility!)` forces it sooner.
+    - **Shipped — renamed `subtitle` → `description`.** The single secondary-text
+      column had drifted into a general "best text we have" field (tagline / support
+      line / lineup / first blurb paragraph / title-dup). Renamed it instead of
+      adding a 2nd column, so `description` + `lineup` from the proposal collapse
+      into one curated-per-source field. The B1 mining hook is `event_genre_prose`
+      (distinct from the displayed `event_description`).
+    - **Open — rename the `.event-subtitle` CSS class to match.** The data field is
+      now `description`, but the presentational class (`app/assets/stylesheets/events-list.css`,
+      used in `events/_event.html.erb`, plus the "muted subtitle" styleguide copy)
+      was left as `.event-subtitle` to keep the rename diff data-only. Rename it to
+      `.event-description` for clean code — mind the propshaft global/alphabetical
+      cascade (one pattern, one home) and check no scraper's venue CSS selector
+      collides (`.event-subtitle` is also a venue class in isc/docks — those stay).
+    - **Open — curate what fills `description` per source.** Now that the field is
+      general, improve its content per scraper: kill nouveau_monde's title-dup,
+      fill the empties (kairo/volkshaus have prose we currently only mine), prefer a
+      real blurb over a restated title where the source offers one. Pure scraper-hook
+      work, no schema.
 
 ## Maybe-later (explicitly deferred)
 

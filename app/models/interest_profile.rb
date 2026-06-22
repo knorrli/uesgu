@@ -84,7 +84,7 @@ class InterestProfile
     @matches[event.id] ||= begin
       genre_names    = Set.new(event.genres.map { |genre| genre.name.to_s.downcase })
       location_names = Set.new(event.locations.map { |location| location.name.to_s.downcase })
-      haystack       = [event.title, event.subtitle, *event.genres.map(&:name)].compact.join(" ").downcase
+      haystack       = [event.title, event.description, *event.genres.map(&:name)].compact.join(' ').downcase
       @criteria.select { |criteria| criteria.match?(genre_names, location_names, haystack) }
     end
   end

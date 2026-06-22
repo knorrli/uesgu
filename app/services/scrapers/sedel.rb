@@ -33,7 +33,7 @@ module Scrapers
       content.css('.field-name-node-title').text.split(' | ').compact_blank.map(&:squish).join(', ')
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.field-name-field-veranstalter').text.squish
     end
 

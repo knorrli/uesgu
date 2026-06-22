@@ -115,7 +115,7 @@
         <h3><%= t('genres.editor.appears_on') %></h3>
         <span class="muted"><%= t('genres.editor.usage', count: genre.events_count) %></span>
       </div>
-      <%# Reuse the real event card so the full extracted context (subtitle,
+      <%# Reuse the real event card so the full extracted context (description,
           styles, sibling genres) is visible. interactive:false renders it
           read-only; the date + venue (which the card omits, the list shows them
           via grouping) sit in a muted header above each. %>

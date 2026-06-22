@@ -43,7 +43,7 @@ module Scrapers
       content.at_css('h3')&.text&.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.at_css('p.font-medium')&.text&.squish
     end
   end

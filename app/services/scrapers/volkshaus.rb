@@ -12,9 +12,9 @@ module Scrapers
       URI.parse('https://volkshaus-basel.ch/programm/')
     end
 
-    # Volkshaus Basel lists a title + date only — no subtitle line and no
+    # Volkshaus Basel lists a title + date only — no description line and no
     # genre/style/tag field.
-    field_gaps subtitle: :no_field, genres: :no_field
+    field_gaps description: :no_field, genres: :no_field
 
     # One server-rendered row per event; the body is an inline collapse panel, so
     # there is no detail page to fetch.
@@ -48,6 +48,13 @@ module Scrapers
 
     def event_title(content)
       content.at_css('a.toggle-link h4')&.text&.squish
+    end
+
+    # No genre field, but the inline collapse-panel blurb names real styles — mine
+    # the known ones (Scrapers::Agent match-only mining). The panel mixes the prose
+    # with date/organiser lines; match-only over the known vocabulary filters those.
+    def event_genre_prose(content)
+      content.css('.panel-collapse .col-sm-8 p').map(&:text).join("\n")
     end
   end
 end

@@ -127,4 +127,82 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_includes names, used.name
     refute_includes names, 'truly-dormant'
   end
+
+  # --- Prose mining (names_in_prose / prose_mining_index) ---------------------
+  # The ingest-time match-only miner: find KNOWN genre names in dropped
+  # description prose, mint nothing. Synthetic taxonomy only.
+
+  test 'names_in_prose matches a known genre named in prose' do
+    Genre.create!(name: 'Zorptronic')
+    index = Genre.prose_mining_index
+
+    assert_equal ['Zorptronic'], Genre.names_in_prose('a night of pure zorptronic energy', index)
+  end
+
+  test 'names_in_prose returns the stored display spelling, not the prose casing' do
+    Genre.create!(name: 'Zorptronic')
+
+    assert_equal ['Zorptronic'], Genre.names_in_prose('ZORPTRONIC all night', Genre.prose_mining_index)
+  end
+
+  test 'names_in_prose folds spelling variants like the genre filter' do
+    Genre.create!(name: 'Wub Core') # fingerprint "wubcore"
+    index = Genre.prose_mining_index
+
+    # multi-word window and hyphen variant both collapse to the stored spelling
+    assert_equal ['Wub Core'], Genre.names_in_prose('expect some wub core tonight', index)
+    assert_equal ['Wub Core'], Genre.names_in_prose('expect some wub-core tonight', index)
+  end
+
+  test 'names_in_prose is greedy: the longest window wins, no redundant sub-tags' do
+    Genre.create!(name: 'Wub')
+    Genre.create!(name: 'Wub Core')
+
+    assert_equal ['Wub Core'], Genre.names_in_prose('heavy wub core set', Genre.prose_mining_index)
+  end
+
+  test 'names_in_prose respects word boundaries (no sub-word hits)' do
+    Genre.create!(name: 'Zorp')
+    index = Genre.prose_mining_index
+
+    assert_empty Genre.names_in_prose('zorptronic and zorps and bezorp', index)
+    assert_equal ['Zorp'], Genre.names_in_prose('a zorp night', index)
+  end
+
+  test 'names_in_prose mints nothing and matches only the known vocabulary' do
+    Genre.create!(name: 'Zorptronic')
+    index = Genre.prose_mining_index
+
+    assert_no_difference -> { Genre.count } do
+      result = Genre.names_in_prose('zorptronic meets some flarejazz', index)
+      assert_equal ['Zorptronic'], result # flarejazz is unknown → not mined
+    end
+  end
+
+  test 'prose_mining_index excludes blocked genres' do
+    blocked = Genre.create!(name: 'Wubnoise')
+    blocked.block!
+
+    refute_includes Genre.prose_mining_index.keys, blocked.fingerprint
+  end
+
+  test 'prose_mining_index excludes the everyday-word stoplist' do
+    word = Genre::PROSE_MINING_STOPWORDS.first
+    Genre.create!(name: word) # a real genre, but too ambiguous to mine from prose
+    index = Genre.prose_mining_index
+
+    refute_includes index.keys, Genre.fingerprint_for(word)
+    assert_empty Genre.names_in_prose("the #{word} was packed", index)
+  end
+
+  test 'prose_mining_index includes alias raw names so they resolve at filter time' do
+    canonical = Genre.create!(name: 'Zorptronic')
+    aliased = Genre.create!(name: 'Zorptronik')
+    aliased.merge_into!(canonical)
+    index = Genre.prose_mining_index
+
+    # the alias keeps its own fingerprint/name; mining "zorptronik" attaches the
+    # raw token, which the filter resolves to Zorptronic at query time.
+    assert_equal ['Zorptronik'], Genre.names_in_prose('pure zorptronik vibes', index)
+  end
 end

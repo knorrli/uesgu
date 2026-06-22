@@ -4,7 +4,7 @@
     "start_time": "2026-06-21T09:00:00+02:00",
     "start_date": "2026-06-21",
     "title": "FÊTE DE LA MUSIQUE : MOVIMENTO",
-    "subtitle": "Orchestre intergénérationnel – Répétition générale",
+    "description": "Orchestre intergénérationnel – Répétition générale",
     "genre_list": [
       "Orchestre",
       "Classique"
@@ -21,7 +21,7 @@
     "start_time": "2026-09-16T19:30:00+02:00",
     "start_date": "2026-09-16",
     "title": "PREWN (US)",
-    "subtitle": "Only Show en Suisse Romande",
+    "description": "Only Show en Suisse Romande",
     "genre_list": [
       "Indie-Folk",
       "Experimental Indie Rock"
@@ -38,7 +38,7 @@
     "start_time": "2026-09-17T19:30:00+02:00",
     "start_date": "2026-09-17",
     "title": "YASMINE HAMDAN (LBN)",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Avant-Pop",
       "Electronic",
@@ -56,7 +56,7 @@
     "start_time": "2026-09-25T20:00:00+02:00",
     "start_date": "2026-09-25",
     "title": "HUBRIS. (CH)",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Post-Rock"
     ],
@@ -72,7 +72,7 @@
     "start_time": "2026-10-10T20:30:00+02:00",
     "start_date": "2026-10-10",
     "title": "SESSA (BRA)",
-    "subtitle": "Only Show en Suisse Romande",
+    "description": "Only Show en Suisse Romande",
     "genre_list": [
       "Música Popular Brasileira",
       "Folk",
@@ -90,7 +90,7 @@
     "start_time": "2026-10-17T20:30:00+02:00",
     "start_date": "2026-10-17",
     "title": "MITSUNE (JP/DE)",
-    "subtitle": "Support : KONOMONO (CH), Only Swiss Show",
+    "description": "Support : KONOMONO (CH), Only Swiss Show",
     "genre_list": [
       "Japanese Neo-Folk meets Psych & cinematic soundscapes"
     ],
@@ -106,7 +106,7 @@
     "start_time": "2026-10-29T19:30:00+01:00",
     "start_date": "2026-10-29",
     "title": "Daudi Matsiko (UK) + Momoko Gill (UK)",
-    "subtitle": "Co-plateau / Doppelkonzert",
+    "description": "Co-plateau / Doppelkonzert",
     "genre_list": [
       "Modern Folk",
       "Jazz",
@@ -124,7 +124,7 @@
     "start_time": "2026-11-01T18:30:00+01:00",
     "start_date": "2026-11-01",
     "title": "THE SISTERS OF MERCY (UK)",
-    "subtitle": "Only Show en Suisse Romande",
+    "description": "Only Show en Suisse Romande",
     "genre_list": [
       "Goth Rock",
       "Post-Punk",
@@ -142,7 +142,7 @@
     "start_time": "2026-11-07T20:00:00+01:00",
     "start_date": "2026-11-07",
     "title": "SNIPER (FR)",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Hip-Hop",
       "Rap"
@@ -159,7 +159,7 @@
     "start_time": "2026-11-15T19:00:00+01:00",
     "start_date": "2026-11-15",
     "title": "WATER DAMAGE (US)",
-    "subtitle": "Only Swiss Show",
+    "description": "Only Swiss Show",
     "genre_list": [
       "Experimental Rock",
       "Drone",
@@ -177,7 +177,7 @@
     "start_time": "2026-11-21T20:00:00+01:00",
     "start_date": "2026-11-21",
     "title": "MARIA BC (US)",
-    "subtitle": "Only Show en Suisse Romande",
+    "description": "Only Show en Suisse Romande",
     "genre_list": [
       "Ambient Folk",
       "Dream Pop",

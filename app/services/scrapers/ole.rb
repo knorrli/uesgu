@@ -19,12 +19,12 @@ module Scrapers
   #     <location><name><street><code>(PLZ)<locality></location>
   #   </event>
   #
-  # Field mapping: name→title (squished, trailing ":" stripped), lead→subtitle
-  # (only for events that have their own content — see #event_subtitle),
+  # Field mapping: name→title (squished, trailing ":" stripped), lead→description
+  # (only for events that have their own content — see #event_description),
   # date_start→start_time, categories→genres (they MINT taxonomy and
   # land in the curation queue — we collect everything and curate downstream, per
   # the taxonomy-hygiene model), location→event_locations. <description> is read
-  # only as the "has own content" signal that gates the subtitle (it's full HTML
+  # only as the "has own content" signal that gates the description (it's full HTML
   # prose and there's no description column to store it in); <image> and <files>
   # are ignored — no image ingestion by design.
   #
@@ -241,14 +241,14 @@ module Scrapers
     # "Artist:" with the lineup appended after the colon).
     def event_title(row) = clean_title(text(row.event, 'name'))
 
-    # <lead> is the event's teaser line and makes a good subtitle — EXCEPT the
+    # <lead> is the event's teaser line and makes a good description — EXCEPT the
     # feed injects the generic VENUE blurb into <lead> for bare listings (club
     # nights etc.) that have no content of their own, which would then repeat the
     # same paragraph across most of a venue's events. Those content-less events
     # have an empty <description> (just a stray <br/>) while real events carry a
     # populated one, so we gate on it: keep <lead> only when the event actually
-    # has a description. Drops the repeated venue blurb without losing real subtitles.
-    def event_subtitle(row)
+    # has a description. Drops the repeated venue blurb without losing real descriptions.
+    def event_description(row)
       return nil unless description_present?(row.event)
 
       plain_text(text(row.event, 'lead')).presence
@@ -402,7 +402,7 @@ module Scrapers
     # True when <description> holds real text — i.e. anything survives once the
     # HTML scaffolding (<br/>, other tags, entities, whitespace) is stripped. A
     # bare listing's description is just "<br/>", which reads as blank here, so it
-    # gates the venue-blurb <lead> out of the subtitle (see #event_subtitle).
+    # gates the venue-blurb <lead> out of the description (see #event_description).
     def description_present?(event_node)
       text(event_node, 'description').to_s
         .gsub(/<[^>]+>/, ' ')

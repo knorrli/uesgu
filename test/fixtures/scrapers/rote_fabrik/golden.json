@@ -4,7 +4,7 @@
     "start_time": "2026-06-19T22:00:00+02:00",
     "start_date": "2026-06-19",
     "title": "undrgrndst",
-    "subtitle": "the summer starts here",
+    "description": "the summer starts here",
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -18,7 +18,7 @@
     "start_time": "2026-06-23T19:00:00+02:00",
     "start_date": "2026-06-23",
     "title": "SUNN O)))",
-    "subtitle": "Support: Natasha Grujović & Steve Moore",
+    "description": "Support: Natasha Grujović & Steve Moore",
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -32,7 +32,7 @@
     "start_time": "2026-06-28T19:00:00+02:00",
     "start_date": "2026-06-28",
     "title": "Agriculture",
-    "subtitle": "Support: wolfer",
+    "description": "Support: wolfer",
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -46,7 +46,7 @@
     "start_time": "2026-07-03T19:30:00+02:00",
     "start_date": "2026-07-03",
     "title": "Lila Iké",
-    "subtitle": "with WURL BAND",
+    "description": "with WURL BAND",
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -60,7 +60,7 @@
     "start_time": "2026-07-14T19:00:00+02:00",
     "start_date": "2026-07-14",
     "title": "Kevin Morby",
-    "subtitle": "Support: Liam Kazar",
+    "description": "Support: Liam Kazar",
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -74,7 +74,7 @@
     "start_time": "2026-07-17T21:00:00+02:00",
     "start_date": "2026-07-17",
     "title": "Stadtsommer",
-    "subtitle": "Verbrennung 3. Grades und Radon",
+    "description": "Verbrennung 3. Grades und Radon",
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -88,7 +88,7 @@
     "start_time": "2026-07-25T16:30:00+02:00",
     "start_date": "2026-07-25",
     "title": "Jazzhane Festival",
-    "subtitle": "Aynur Doğan, Islandman, Saliah, Sami Galbi, and more...",
+    "description": "Aynur Doğan, Islandman, Saliah, Sami Galbi, and more...",
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -102,7 +102,7 @@
     "start_time": "2026-07-26T19:00:00+02:00",
     "start_date": "2026-07-26",
     "title": "ECHT!",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -116,7 +116,7 @@
     "start_time": "2026-09-25T20:00:00+02:00",
     "start_date": "2026-09-25",
     "title": "Autechre",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -130,7 +130,7 @@
     "start_time": "2026-10-24T19:30:00+02:00",
     "start_date": "2026-10-24",
     "title": "Kabaka Pyramid",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -144,7 +144,7 @@
     "start_time": "2026-10-31T20:00:00+01:00",
     "start_date": "2026-10-31",
     "title": "Deafkids",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -158,7 +158,7 @@
     "start_time": "2026-11-20T19:30:00+01:00",
     "start_date": "2026-11-20",
     "title": "Fatoumata Diawara",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",
@@ -172,7 +172,7 @@
     "start_time": "2026-11-22T20:00:00+01:00",
     "start_date": "2026-11-22",
     "title": "Maria BC",
-    "subtitle": null,
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Rote Fabrik",

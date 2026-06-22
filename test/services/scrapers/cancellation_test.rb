@@ -2,9 +2,9 @@ require 'test_helper'
 
 # Locks the cancellation-marker behaviour independent of fixtures: the multilingual
 # keyword set, the letter-boundary guards against false positives, and the fact that
-# the default reads the extracted title/subtitle (not full HTML).
+# the default reads the extracted title/description (not full HTML).
 class Scrapers::CancellationTest < Minitest::Test
-  Event = Struct.new(:title, :subtitle)
+  Event = Struct.new(:title, :description)
 
   CANCELLED = [
     'ABGESAGT',
@@ -42,7 +42,7 @@ class Scrapers::CancellationTest < Minitest::Test
     end
   end
 
-  def test_detects_marker_in_subtitle
+  def test_detects_marker_in_description
     event = Event.new('Some Band', 'Dieses Konzert wurde leider abgesagt')
     assert scraper.send(:event_cancelled?, event, nil)
   end

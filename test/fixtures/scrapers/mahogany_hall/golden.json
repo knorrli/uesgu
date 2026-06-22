@@ -4,7 +4,7 @@
     "start_time": "2026-06-10T20:00:00+02:00",
     "start_date": "2026-06-10",
     "title": "Open Mic - Eintritt frei",
-    "subtitle": "any stile",
+    "description": "any stile",
     "genre_list": [
       "Any Stile"
     ],
@@ -20,7 +20,7 @@
     "start_time": "2026-06-11T20:00:00+02:00",
     "start_date": "2026-06-11",
     "title": "Jazzorchester der Universität Bern feat. Stewy von Wattenwyl (Piano)",
-    "subtitle": "big band jazz - move and groove",
+    "description": "big band jazz - move and groove",
     "genre_list": [
       "Move",
       "Groove"
@@ -37,7 +37,7 @@
     "start_time": "2026-06-12T19:00:00+02:00",
     "start_date": "2026-06-12",
     "title": "DJ Andy (BluesBar)",
-    "subtitle": "blues'n'roll back to the roots, bluesrock, southernrock, funk, soul und blues",
+    "description": "blues'n'roll back to the roots, bluesrock, southernrock, funk, soul und blues",
     "genre_list": [
       "Bluesrock",
       "Southernrock",
@@ -57,7 +57,7 @@
     "start_time": "2026-06-14T19:00:00+02:00",
     "start_date": "2026-06-14",
     "title": "GROOVE EXTRAVAGANZA – Intercity Jazz Orchestra feat. Anatole Muster",
-    "subtitle": "big band goes modern grooves",
+    "description": "big band goes modern grooves",
     "genre_list": [],
     "location_list": [
       "Mahogany Hall",
@@ -71,7 +71,7 @@
     "start_time": "2026-06-28T19:30:00+02:00",
     "start_date": "2026-06-28",
     "title": "PETER “PESCHE” FRIEDLI (1965–2026) MEMORIAL CONCERT",
-    "subtitle": "four decades of music by peter “pesche” friedli — jazz, blues, soul & funk",
+    "description": "four decades of music by peter “pesche” friedli — jazz, blues, soul & funk",
     "genre_list": [
       "Blues",
       "Soul",
@@ -89,7 +89,7 @@
     "start_time": "2026-08-21T21:00:00+02:00",
     "start_date": "2026-08-21",
     "title": "Dar Vida",
-    "subtitle": "latin",
+    "description": "latin",
     "genre_list": [
       "Latin"
     ],
@@ -105,7 +105,7 @@
     "start_time": "2026-09-02T19:30:00+02:00",
     "start_date": "2026-09-02",
     "title": "Wolverines Jazz Band",
-    "subtitle": "dixieland, blues, boogie-woogie, gospel und swing",
+    "description": "dixieland, blues, boogie-woogie, gospel und swing",
     "genre_list": [
       "Dixieland",
       "Blues",
@@ -125,7 +125,7 @@
     "start_time": "2026-09-04T20:00:00+02:00",
     "start_date": "2026-09-04",
     "title": "David Darkow",
-    "subtitle": "blues rock /dark country",
+    "description": "blues rock /dark country",
     "genre_list": [
       "Blues Rock",
       "Dark Country"
@@ -142,7 +142,7 @@
     "start_time": "2026-09-05T21:00:00+02:00",
     "start_date": "2026-09-05",
     "title": "Fränk & Bänd",
-    "subtitle": "berner mundartrock",
+    "description": "berner mundartrock",
     "genre_list": [
       "Berner Mundartrock"
     ],
@@ -158,7 +158,7 @@
     "start_time": "2026-09-09T20:00:00+02:00",
     "start_date": "2026-09-09",
     "title": "Open Mic - Eintritt frei",
-    "subtitle": "any stile",
+    "description": "any stile",
     "genre_list": [
       "Any Stile"
     ],
@@ -174,7 +174,7 @@
     "start_time": "2026-09-10T20:00:00+02:00",
     "start_date": "2026-09-10",
     "title": "Matthias Kirchner & Band – Fleisch und Blut",
-    "subtitle": "liedermacher",
+    "description": "liedermacher",
     "genre_list": [
       "Liedermacher"
     ],
@@ -190,7 +190,7 @@
     "start_time": "2026-09-11T21:00:00+02:00",
     "start_date": "2026-09-11",
     "title": "BeBluesed Festival",
-    "subtitle": "blues",
+    "description": "blues",
     "genre_list": [
       "Blues"
     ],
@@ -206,7 +206,7 @@
     "start_time": "2026-09-12T21:00:00+02:00",
     "start_date": "2026-09-12",
     "title": "The Neighbours",
-    "subtitle": "covers von funk, soul, blues, rock bis latin",
+    "description": "covers von funk, soul, blues, rock bis latin",
     "genre_list": [
       "Soul",
       "Blues"
@@ -223,7 +223,7 @@
     "start_time": "2026-09-14T19:00:00+02:00",
     "start_date": "2026-09-14",
     "title": "Mondayblues",
-    "subtitle": "blues",
+    "description": "blues",
     "genre_list": [
       "Blues"
     ],
@@ -239,7 +239,7 @@
     "start_time": "2026-09-16T20:00:00+02:00",
     "start_date": "2026-09-16",
     "title": "Poetry Slam",
-    "subtitle": "spoken word",
+    "description": "spoken word",
     "genre_list": [
       "Spoken Word"
     ],
@@ -255,7 +255,7 @@
     "start_time": "2026-09-18T21:00:00+02:00",
     "start_date": "2026-09-18",
     "title": "Taxibrousse",
-    "subtitle": "world",
+    "description": "world",
     "genre_list": [
       "World"
     ],
@@ -271,7 +271,7 @@
     "start_time": "2026-09-20T17:30:00+02:00",
     "start_date": "2026-09-20",
     "title": "Salsa-Tanz & Bar",
-    "subtitle": "salsa namá",
+    "description": "salsa namá",
     "genre_list": [
       "Salsa Namá"
     ],
@@ -287,7 +287,7 @@
     "start_time": "2026-09-25T21:00:00+02:00",
     "start_date": "2026-09-25",
     "title": "Ronny Rast",
-    "subtitle": "blues, rock",
+    "description": "blues, rock",
     "genre_list": [
       "Blues",
       "Rock"
@@ -304,7 +304,7 @@
     "start_time": "2026-10-02T21:00:00+02:00",
     "start_date": "2026-10-02",
     "title": "The Order",
-    "subtitle": "hardrock/metal",
+    "description": "hardrock/metal",
     "genre_list": [
       "Hardrock",
       "Metal"
@@ -321,7 +321,7 @@
     "start_time": "2026-10-04T17:30:00+02:00",
     "start_date": "2026-10-04",
     "title": "Salsa-Tanz & Bar",
-    "subtitle": "salsa namá",
+    "description": "salsa namá",
     "genre_list": [
       "Salsa Namá"
     ],
@@ -337,7 +337,7 @@
     "start_time": "2026-10-07T19:30:00+02:00",
     "start_date": "2026-10-07",
     "title": "Wolverines Jazz Band",
-    "subtitle": "dixieland, blues, boogie-woogie, gospel und swing",
+    "description": "dixieland, blues, boogie-woogie, gospel und swing",
     "genre_list": [
       "Dixieland",
       "Blues",
@@ -357,7 +357,7 @@
     "start_time": "2026-10-08T20:30:00+02:00",
     "start_date": "2026-10-08",
     "title": "Phil Dankner \"Phil um d'Ohre\"",
-    "subtitle": "entertainment, music & comedy",
+    "description": "entertainment, music & comedy",
     "genre_list": [
       "Entertainment",
       "Music",
@@ -375,7 +375,7 @@
     "start_time": "2026-10-09T20:30:00+02:00",
     "start_date": "2026-10-09",
     "title": "FASTLANE ROCK-NIGHT support by R-A-C",
-    "subtitle": "rock / hard rock / acoustic cover",
+    "description": "rock / hard rock / acoustic cover",
     "genre_list": [
       "Rock",
       "Hard Rock",
@@ -393,7 +393,7 @@
     "start_time": "2026-10-11T17:30:00+02:00",
     "start_date": "2026-10-11",
     "title": "Salsa-Tanz & Bar",
-    "subtitle": "salsa namá",
+    "description": "salsa namá",
     "genre_list": [
       "Salsa Namá"
     ],
@@ -409,7 +409,7 @@
     "start_time": "2026-10-14T20:00:00+02:00",
     "start_date": "2026-10-14",
     "title": "Open Mic - Eintritt frei",
-    "subtitle": "any stile",
+    "description": "any stile",
     "genre_list": [
       "Any Stile"
     ],
@@ -425,7 +425,7 @@
     "start_time": "2026-10-15T20:00:00+02:00",
     "start_date": "2026-10-15",
     "title": "Woodlands Bäckafall",
-    "subtitle": "nordic celtic folk",
+    "description": "nordic celtic folk",
     "genre_list": [],
     "location_list": [
       "Mahogany Hall",
@@ -439,7 +439,7 @@
     "start_time": "2026-10-16T21:00:00+02:00",
     "start_date": "2026-10-16",
     "title": "RICCARDO GROSSO BAND",
-    "subtitle": "harmonica-driven electric blues band with an unapologetically raw sound",
+    "description": "harmonica-driven electric blues band with an unapologetically raw sound",
     "genre_list": [],
     "location_list": [
       "Mahogany Hall",
@@ -453,7 +453,7 @@
     "start_time": "2026-10-18T12:00:00+02:00",
     "start_date": "2026-10-18",
     "title": "Philipp Moll Sunday 12PM Jazz",
-    "subtitle": "mainstream jazz",
+    "description": "mainstream jazz",
     "genre_list": [
       "Mainstream Jazz"
     ],
@@ -469,7 +469,7 @@
     "start_time": "2026-10-21T20:00:00+02:00",
     "start_date": "2026-10-21",
     "title": "Poetry Slam",
-    "subtitle": "spoken word",
+    "description": "spoken word",
     "genre_list": [
       "Spoken Word"
     ],
@@ -485,7 +485,7 @@
     "start_time": "2026-10-23T21:00:00+02:00",
     "start_date": "2026-10-23",
     "title": "Painted Blue",
-    "subtitle": "blues",
+    "description": "blues",
     "genre_list": [
       "Blues"
     ],

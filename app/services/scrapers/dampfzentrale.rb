@@ -14,7 +14,7 @@ module Scrapers
       URI.parse('https://www.dampfzentrale.ch/')
     end
 
-    # Dampfzentrale lists a title + subtitle only; no genre/style/tag field.
+    # Dampfzentrale lists a title + description only; no genre/style/tag field.
     field_gaps genres: :no_field
 
     def event_rows
@@ -45,7 +45,7 @@ module Scrapers
       content.at_css('.event-information h2')&.text&.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.at_css('.event-information h3')&.text&.squish
     end
 

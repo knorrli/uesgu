@@ -34,7 +34,7 @@ module Scrapers
       content.css('.top-event-container h1').text.squish
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.event-subtitle').text.split('+').map { |part| part.squish }.compact_blank.join(', ')
     end
 

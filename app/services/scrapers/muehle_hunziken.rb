@@ -57,7 +57,7 @@ module Scrapers
     # heading-slot <div> (the only `text-sm md:text-xl` block), styled apart from
     # the <h2> title — read from the list row like the title (the detail click is
     # only ever for the start time).
-    def event_subtitle(_content)
+    def event_description(_content)
       div = current_row.css('div').find do |node|
         classes = node['class'].to_s
         classes.include?('text-sm') && classes.include?('md:text-xl')

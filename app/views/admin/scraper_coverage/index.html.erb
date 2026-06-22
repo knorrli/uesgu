@@ -16,7 +16,7 @@
             <th><%= t('.col.scraper') %></th>
             <th class="num"><%= t('.col.events') %></th>
             <th class="num"><%= t('.col.time') %></th>
-            <th class="num"><%= t('.col.subtitle') %></th>
+            <th class="num"><%= t('.col.description') %></th>
             <th class="num"><%= t('.col.genres') %></th>
             <th class="num"><%= t('.col.distinct_genres') %></th>
           </tr>
@@ -27,7 +27,7 @@
               <td><%= row.source.underscore %></td>
               <td class="num"><%= row.events %></td>
               <td class="num"><%= coverage_cell(row, :time) %></td>
-              <td class="num"><%= coverage_cell(row, :subtitle) %></td>
+              <td class="num"><%= coverage_cell(row, :description) %></td>
               <td class="num"><%= coverage_cell(row, :genres) %></td>
               <td class="num"><%= row.distinct_genres.positive? ? row.distinct_genres : '—' %></td>
             </tr>

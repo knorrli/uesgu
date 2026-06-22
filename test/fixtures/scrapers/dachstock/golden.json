@@ -4,7 +4,7 @@
     "start_time": "2026-06-09T18:00:00+02:00",
     "start_date": "2026-06-09",
     "title": "DACHSTOCK & SOUS LE PONT PRESENT: SCHACHTURNIER IM SOULI",
-    "subtitle": "",
+    "description": "",
     "genre_list": [],
     "location_list": [
       "Dachstock",
@@ -18,7 +18,7 @@
     "start_time": "2026-06-12T23:00:00+02:00",
     "start_date": "2026-06-12",
     "title": "NEOPERREO",
-    "subtitle": "LIZZ (Santiago), TOMASA DEL REAL (LIVE) (Mexico City), Orfigyal (Madrid), PAPI SCORPIO (Mexico City), Mafia Princess, Crybbys (Bern)",
+    "description": "LIZZ (Santiago), TOMASA DEL REAL (LIVE) (Mexico City), Orfigyal (Madrid), PAPI SCORPIO (Mexico City), Mafia Princess, Crybbys (Bern)",
     "genre_list": [
       "Party",
       "Neoperreo",
@@ -38,7 +38,7 @@
     "start_time": "2026-06-13T21:00:00+02:00",
     "start_date": "2026-06-13",
     "title": "PLH (Bremen), Débikatesse (Zürich)",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Konzert",
       "Hip Hop",
@@ -56,7 +56,7 @@
     "start_time": "2026-06-16T18:30:00+02:00",
     "start_date": "2026-06-16",
     "title": "Dachstock and Grosse Halle present: Edwin Rosen Live 2026",
-    "subtitle": "Edwin Rosen (Stuttgart), Farce (Wien)",
+    "description": "Edwin Rosen (Stuttgart), Farce (Wien)",
     "genre_list": [
       "Konzert",
       "Post-Punk",
@@ -75,7 +75,7 @@
     "start_time": "2026-06-19T23:00:00+02:00",
     "start_date": "2026-06-19",
     "title": "Sonare",
-    "subtitle": "Caiva (München), Galopp (Basel), Canelos (Bern), Delevn (Bern), Semtek (Bern), Zeitgeist (Bern)",
+    "description": "Caiva (München), Galopp (Basel), Canelos (Bern), Delevn (Bern), Semtek (Bern), Zeitgeist (Bern)",
     "genre_list": [
       "Party",
       "HardBounce",
@@ -97,7 +97,7 @@
     "start_time": "2026-06-20T23:00:00+02:00",
     "start_date": "2026-06-20",
     "title": "Darkside",
-    "subtitle": "PYTHIUS (Utrecht), COPPA (UK), Deejay MF (Bern), Konfront.Audio (Bern), DAYNI (Luzern), MC Resc (Freiburg)",
+    "description": "PYTHIUS (Utrecht), COPPA (UK), Deejay MF (Bern), Konfront.Audio (Bern), DAYNI (Luzern), MC Resc (Freiburg)",
     "genre_list": [
       "Party",
       "Drum and Bass"
@@ -114,7 +114,7 @@
     "start_time": "2026-07-11T23:00:00+02:00",
     "start_date": "2026-07-11",
     "title": "DACHSTOCK X SOUS LE PONT: WANNA BE SUMMER SPECIAL EDITION - VAMOS A LA PLAYA",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Party",
       "90ties",
@@ -133,7 +133,7 @@
     "start_time": "2026-08-11T18:00:00+02:00",
     "start_date": "2026-08-11",
     "title": "Dachstock & Sous le Pont present: Schachturnier im Souli",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Schachturnier",
       "Spieleabend"
@@ -150,7 +150,7 @@
     "start_time": "2026-08-20T18:00:00+02:00",
     "start_date": "2026-08-20",
     "title": "No Borders No Nations",
-    "subtitle": "",
+    "description": "",
     "genre_list": [
       "Festival"
     ],
@@ -166,7 +166,7 @@
     "start_time": "2026-08-28T21:00:00+02:00",
     "start_date": "2026-08-28",
     "title": "Six Sex (Buenos Aires)",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Konzert",
       "Electronica",
@@ -187,7 +187,7 @@
     "start_time": "2026-08-29T23:00:00+02:00",
     "start_date": "2026-08-29",
     "title": "Darkside",
-    "subtitle": "DLR (Bristol), LTJ BUKEM (London), Lockee b2b ryck (Bern)",
+    "description": "DLR (Bristol), LTJ BUKEM (London), Lockee b2b ryck (Bern)",
     "genre_list": [
       "Party",
       "Drum and Bass"
@@ -204,7 +204,7 @@
     "start_time": "2026-09-11T22:00:00+02:00",
     "start_date": "2026-09-11",
     "title": "BaileSystem & Dachstock present",
-    "subtitle": "Victor Cena (Brasil), Cleiton Rasta, Bimba (Zürich), Gusto (Rio de Janeiro), SLB (Zürich)",
+    "description": "Victor Cena (Brasil), Cleiton Rasta, Bimba (Zürich), Gusto (Rio de Janeiro), SLB (Zürich)",
     "genre_list": [
       "Party",
       "Konzert",
@@ -223,7 +223,7 @@
     "start_time": "2026-09-12T23:00:00+02:00",
     "start_date": "2026-09-12",
     "title": "Bermuda Dreieck",
-    "subtitle": "",
+    "description": "",
     "genre_list": [],
     "location_list": [
       "Dachstock",
@@ -237,7 +237,7 @@
     "start_time": "2026-09-18T21:00:00+02:00",
     "start_date": "2026-09-18",
     "title": "Kumbia Queers (Buenos Aires)",
-    "subtitle": null,
+    "description": null,
     "genre_list": [
       "Konzert",
       "Cumbia",
@@ -255,7 +255,7 @@
     "start_time": "2026-09-25T21:00:00+02:00",
     "start_date": "2026-09-25",
     "title": "SIBCITY TOUR",
-    "subtitle": "ETO (Bern), Nik* (Zürich)",
+    "description": "ETO (Bern), Nik* (Zürich)",
     "genre_list": [
       "Konzert",
       "Electro",

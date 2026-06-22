@@ -101,7 +101,7 @@ class Event < ApplicationRecord
   # Scalar fields an admin may edit and lock against the scraper. Tracked by
   # ActiveRecord dirty-checking, so the controller locks exactly what changed.
   # `url` is the immutable upsert key, so it's deliberately absent.
-  OVERRIDABLE_FIELDS = %w[title subtitle start_date start_time].freeze
+  OVERRIDABLE_FIELDS = %w[title description start_date start_time].freeze
 
   # Tag lists an admin may pin against the scraper. Not real columns (so they
   # never show up in `changed`), but they sit in overridden_fields alongside the
@@ -154,7 +154,7 @@ class Event < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ['title', 'subtitle', 'start_date']
+    ['title', 'description', 'start_date']
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -171,7 +171,7 @@ class Event < ApplicationRecord
     [
       start_date.strftime('%y-%m-%d'),
       title.truncate(40),
-      subtitle&.truncate(20),
+      description&.truncate(20),
       locations.map(&:name).join(', ')
     ].compact_blank.join(' || ')
   end

@@ -17,9 +17,9 @@ module Scrapers
       URI.parse('https://www.cafe-kairo.ch/programm')
     end
 
-    # Café Kairo's listing is title + date only — no subtitle line and no
+    # Café Kairo's listing is title + date only — no description line and no
     # genre/style/tag field anywhere.
-    field_gaps subtitle: :no_field, genres: :no_field
+    field_gaps description: :no_field, genres: :no_field
 
     def event_rows
       page.css('article[id^="kultur_"]')
@@ -45,6 +45,13 @@ module Scrapers
 
     def event_title(content)
       content.at_css('.text h2')&.text&.squish
+    end
+
+    # No genre field, but the inline blurb (the `.text` prose paragraphs after the
+    # `h2.h1` title) names real styles — mine the known ones (Scrapers::Agent
+    # match-only mining). The h2 title is excluded; only the `<p>` prose is scanned.
+    def event_genre_prose(content)
+      content.css('.text p').map(&:text).join("\n")
     end
   end
 end

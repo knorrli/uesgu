@@ -39,7 +39,7 @@ module Scrapers
       end.compact_blank.join(' ')
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.EventPage__SupportActs').children.map do |node|
         next if node.text.squish.blank?
 

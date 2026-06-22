@@ -193,7 +193,7 @@ namespace :scrapers do
           start_time: start_time&.iso8601,
           start_date: start_time&.to_date&.iso8601,
           title: agent.send(:event_title, content),
-          subtitle: agent.send(:event_subtitle, content),
+          description: agent.send(:event_description, content),
           genres: genres
         }
       end

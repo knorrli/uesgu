@@ -36,7 +36,7 @@ module Scrapers
       end.compact_blank.join(' ')
     end
 
-    def event_subtitle(content)
+    def event_description(content)
       content.css('.performers.standard .performer').map do |node|
         node.children.map  do |child|
           next "(#{child.text.squish})" if child.name == 'sup' && child.text.squish.present?

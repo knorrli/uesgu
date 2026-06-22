@@ -53,7 +53,7 @@ module Scrapers
       row.dig('rf_event', 'title').to_s.squish
     end
 
-    def event_subtitle(row)
+    def event_description(row)
       row.dig('rf_event', 'subtitle').to_s.squish.presence
     end
 
@@ -68,6 +68,15 @@ module Scrapers
 
     def event_genres(row)
       Array(row.dig('rf_event', 'tags')).map { |t| (t.is_a?(Hash) ? t['name'] : t).to_s.squish }.compact_blank
+    end
+
+    # `tags` is dormant (above), but `rf_event.description` is populated HTML prose
+    # that names real styles — strip the markup and mine the known ones
+    # (Scrapers::Agent match-only mining), so these events aren't genre-blind while
+    # the structured facet stays empty.
+    def event_genre_prose(row)
+      html = row.dig('rf_event', 'description').to_s
+      Nokogiri::HTML(html).text if html.present?
     end
   end
 end

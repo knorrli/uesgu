@@ -362,7 +362,7 @@ fr:
           scraper: Scraper
           events: Events
           time: Heure
-          subtitle: Sous-titre
+          description: Description
           genres: Genres
           distinct_genres: genres distincts
     users:
@@ -437,7 +437,7 @@ fr:
         source_link: Voir la source
         intro: Corrige les données source erronées ci-dessous. Un champ modifié est verrouillé et ne sera pas écrasé au prochain scrape.
         title_label: Titre
-        subtitle_label: Sous-titre
+        description_label: Description
         date_label: Date
         time_label: Heure
         genres_label: Genres
@@ -449,7 +449,7 @@ fr:
         overrides_intro: Ces champs appartiennent à l'admin et sont ignorés par le scraper. Réinitialises-en un pour que le prochain scrape le récupère à neuf depuis la source.
         revert: Réinitialiser à la source
         field_title: Titre
-        field_subtitle: Sous-titre
+        field_description: Description
         field_start_date: Date et heure
         field_genres: Genres
         dismiss_heading: Visibilité

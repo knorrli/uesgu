@@ -56,7 +56,7 @@ module Scrapers
       row['nameBand'].presence || row['title']
     end
 
-    def event_subtitle(row)
+    def event_description(row)
       row['subTitle'].presence
     end
 

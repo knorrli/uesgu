@@ -21,37 +21,34 @@
     <%# PWA manifest makes the app installable; routes enabled in config/routes.rb. %>
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <%# Canonical set: the theme-aware SVG is what modern browsers use; the .ico
-        (sizes="any") is the legacy fallback they skip when an SVG is present. The
-        512px PNG is intentionally NOT a <link rel=icon> — it's a raster Chrome
-        would prefer from cache over the theme-aware SVG. The PWA manifest still
+    <%# One canonical mark (script/generate_icons.rb). The SVG is what modern
+        browsers use; the .ico (sizes="any") is the legacy fallback they skip when
+        an SVG is present. The 512px PNG is intentionally NOT a <link rel=icon> —
+        it's a raster Chrome would prefer from cache over the SVG; the PWA manifest
         references it for the installed app.
-        ?v= busts the icon cache on change — iOS especially caches the home-screen
-        (apple-touch) icon hard, keyed by URL, so a reused filename keeps serving
-        a stale icon across reinstalls. Bump ICON_VERSION (helper) when the art
-        changes; a fresh "Add to Home Screen" then refetches. %>
+        ?v=ICON_VERSION busts the icon cache on change — iOS especially caches the
+        home-screen (apple-touch) icon hard, keyed by URL, so a reused filename
+        keeps serving a stale icon across reinstalls. ICON_VERSION is a content
+        hash of the art, so it bumps itself; a fresh "Add to Home Screen" refetches. %>
     <link rel="icon" href="/favicon.ico?v=<%= ICON_VERSION %>" sizes="any">
-    <link id="favicon-svg" rel="icon" href="<%= theme == 'light' ? '/icon-light.svg' : '/icon.svg' %>?v=<%= ICON_VERSION %>" type="image/svg+xml">
+    <link rel="icon" href="/icon.svg?v=<%= ICON_VERSION %>" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=<%= ICON_VERSION %>">
 
     <%# iOS PWA launch images (apple-touch-startup-image) — generated, see
-        script/generate_ios_splash.rb. Android derives its splash from the
+        script/generate_icons.rb. Android derives its splash from the
         manifest; iOS needs these per-device or it launches blank. %>
     <%= render "layouts/ios_splash_screens" %>
 
-    <%# The server set <html data-theme> and the favicon above from the `theme`
-        cookie. On the very first visit there's no cookie yet, so it's unset:
-        resolve from the OS, set the favicon, and persist a cookie so every later
-        request renders the right theme + icon with no flash. Pre-paint (still in
-        <head>), so no visible theme flash. %>
+    <%# The server set <html data-theme> from the `theme` cookie. On the very
+        first visit there's no cookie yet, so it's unset: resolve from the OS and
+        persist a cookie so every later request renders the right theme with no
+        flash. Pre-paint (still in <head>), so no visible theme flash. %>
     <script nonce="<%= content_security_policy_nonce %>">
       (function () {
         if (document.documentElement.dataset.theme) return
         var t = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
         document.documentElement.dataset.theme = t
         document.cookie = "theme=" + t + ";path=/;max-age=31536000;samesite=lax"
-        var el = document.getElementById("favicon-svg")
-        if (el) el.href = (t === "light" ? "/icon-light.svg" : "/icon.svg") + "?v=<%= ICON_VERSION %>"
       })()
     </script>
 

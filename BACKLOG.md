@@ -19,15 +19,13 @@
 
 ## Maybe-later (explicitly deferred)
 
-- **"Party spotlight" cones — asymmetric / dynamic light mark.** Make the mark's
-  light-cones feel like live coloured spotlights rather than the static symmetric
-  splay. Two distinct directions: (a) an **asymmetric static logo redesign** —
-  brand change touching every icon surface (`icon.svg`, `icon-light.svg`, the PWA
-  PNGs, and the generated splash via `script/generate_ios_splash.rb`); or (b) an
-  **in-app animated loader** (HTML/CSS/SVG, rendered after the PWA boots) — the
-  only way to get genuinely dynamic motion, since the iOS splash is a static
-  pre-boot image and cannot animate. Pick the direction first; they're separate
-  efforts.
+- **"Party spotlight" animated loader (deferred half of the cone idea).** The
+  asymmetric static redesign **shipped** — the mark now has asymmetric,
+  rounded-pool "party spotlight" cones, and every icon artifact regenerates from
+  one source via `script/generate_icons.rb`. What remains deferred is an **in-app
+  animated loader** (HTML/CSS/SVG rendered after the PWA boots) for genuinely
+  dynamic motion — the iOS splash is a static pre-boot image and cannot animate.
+  Separate effort.
 - Session "Update the filter I just applied" soft-pointer.
 - `featured`/`main_genre` flag + subtree-count browse ranking.
 

@@ -3,8 +3,8 @@ import { Controller } from "@hotwired/stimulus"
 // Connects to data-controller="theme" on the header toggle button.
 //
 // Binary light ↔ dark, stored in a `theme` cookie (per-device) so the SERVER can
-// render <html data-theme> and the matching favicon up-front — no flash. The
-// first-visit default (no cookie yet) is resolved from the OS inline in <head>.
+// render <html data-theme> up-front — no flash. The first-visit default (no
+// cookie yet) is resolved from the OS inline in <head>.
 // This controller only handles the click and keeps the button icon/label in
 // sync; it no longer follows the OS live (that was the old "system" preference,
 // now dropped).
@@ -35,8 +35,6 @@ export default class extends Controller {
     const next = this.theme === "dark" ? "light" : "dark"
     this.theme = next
     document.documentElement.dataset.theme = next
-    const favicon = document.getElementById("favicon-svg")
-    if (favicon) favicon.href = next === "light" ? "/icon-light.svg" : "/icon.svg"
     this.render()
   }
 

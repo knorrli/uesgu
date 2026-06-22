@@ -1,2 +1,6 @@
+<%# formats: [:html] pins the option partial to its .html.erb template — without
+    it Rails inherits this request's :turbo_stream format and can't find the
+    partial, 500ing the whole search (the sync genre combobox renders in an HTML
+    request, so it never hit this). %>
 <%= async_combobox_options @events, value: :id, display: :title,
-      render_in: { partial: 'admin/events/merge_option' } %>
+      render_in: { partial: 'admin/events/merge_option', formats: [:html] } %>

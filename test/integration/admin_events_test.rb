@@ -233,7 +233,11 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     event(title: 'Unrelated')
     sign_in_as user(admin: true)
 
-    get search_admin_events_path(exclude: current.id, q: 'Matching'), as: :turbo_stream
+    # Request format as a URL param (format: :turbo_stream), exactly as the
+    # combobox's async fetch does — not `as: :turbo_stream` (an Accept header),
+    # which leaves :html in the format list and lets the option partial resolve
+    # via fallback, masking the missing-template 500 the real request hits.
+    get search_admin_events_path(exclude: current.id, q: 'Matching', format: :turbo_stream)
     assert_response :success
     assert_match 'Matching Canonical', response.body
     assert_no_match 'Unrelated', response.body

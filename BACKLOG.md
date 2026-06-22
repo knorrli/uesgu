@@ -49,11 +49,18 @@
   (`Scrapers::Agent.field_gaps`); the coverage matrix renders those cells as a
   muted **n/a** (reason on hover) instead of red, so a settled "does this source
   expose X?" question isn't re-asked. Honesty guard: if a declared-absent field
-  ever ships real coverage, the live % wins over the declaration. Declared so
-  far — genres: bad_bonn, boeroem, dampfzentrale, kairo, kaserne, nouveau_monde,
-  saegegasse, sous_soul, turnhalle, volkshaus; subtitle: bar59, dynamo, kairo,
-  kaserne, roessli, turnhalle, volkshaus. To extend: add `field_gaps …` to the
-  scraper, never a hand-kept doc.
+  ever ships real coverage, the live % wins over the declaration. Reasons:
+  `no_field` (no such field at the source) and `dormant` (field exists in the
+  feed but the source never fills it — e.g. Rote Fabrik's always-empty `tags`).
+  Declared so far — genres (no_field): bad_bonn, boeroem, dampfzentrale,
+  helsinki, kairo, kaserne, kofmehl, neubad, nouveau_monde, saegegasse,
+  sous_soul, turnhalle, volkshaus; genres (dormant): rote_fabrik; subtitle
+  (no_field): bar59, dynamo, kairo, kaserne, petzi, roessli, turnhalle,
+  volkshaus. To extend: add `field_gaps …` to the scraper, never a hand-kept
+  doc. NB: a source with no genre field but incidental coverage from PETZI
+  merges / admin pins (kofmehl, neubad, helsinki) still shows that live % per
+  the reality-wins rule — the declaration is the in-code capability record, it
+  doesn't blank the cell.
 - **Real extractor defects to chase (group B — source HAS the data, we drop it).**
   Surfaced by the 2026-06-22 fixture audit; these are NOT gaps, they're fixes:
   - ~~**muehle_hunziken subtitle (0%).**~~ DONE (2026-06-22) — pulls the list-row
@@ -62,15 +69,27 @@
     ships `tags` but leaves it empty, and `categories` is only Konzert/Party type
     tags. Declared a `dormant` field gap (extractor stays wired; reality-wins
     surfaces the % if they ever populate `tags`).
-  - **docks (subtitle 32% / genres 41%).** Both attempted; genres mis-tag artist
-    origin codes (see taxonomy notes) — needs a cleaner extraction.
-  - **suedpol subtitle (0%).** ACF `subtitle` extractor present but always empty —
-    confirm whether the field is genuinely unused (→ declare a gap) or mis-read.
-  - **kofmehl genres (29%)**, **neubad (genres 33%, 1 distinct)** — both need a look.
-  - **petzi subtitle (0%)** — not yet verified whether the detail pages expose a
-    support/secondary line; check before declaring a gap.
-  - **helsinki genres (19%) with no genre extractor** — genres are leaking in,
-    likely via dedup merges with PETZI; confirm that's intended.
+  - ~~**docks (genres 41%).**~~ DONE (2026-06-22) — the `.artist-info` spans mixed
+    a 2-letter ISO origin code (US/CH/AU) with the genre word under one class;
+    now drop the bare codes so they stop minting bogus `Us`/`Ch`/`Au` genres.
+    (Subtitle 32% left as-is: the `.event-subtitle` support-act extractor works;
+    most concerts just list no support — honest-low, not a defect.)
+  - ~~**suedpol subtitle (0%).**~~ NO ACTION (2026-06-22) — not a bug: the ACF
+    `subtitle` AND `support` fields are both genuinely almost always empty
+    (2/21 in the fixture) and the extractor works. Genres ~50% is likewise just
+    sparse source tagging (no other genre source). Honest-low, nothing to fix.
+  - ~~**kofmehl genres (29%)**, **neubad (33%, 1 distinct)**, **helsinki (19%)**.~~
+    DONE (2026-06-22) — all three sites expose no music-genre field (only event
+    *types* where any: Konzert/Klubnacht); the coverage is incidental PETZI-merge
+    leakage. Declared `genres: :no_field` on each.
+  - ~~**petzi subtitle (0%).**~~ DONE (2026-06-22) — no structured subtitle/support
+    field (title + a free-text description blurb only). Declared `subtitle:
+    :no_field`.
+- **Curation follow-up (not a scraper task): retire the bogus Docks genres.** The
+  Docks fix stops *minting* origin codes, and a re-scrape drops them from live
+  events, but the already-minted `Us` / `Ch` / `Au` (and any other 2-letter)
+  Genre rows linger in the taxonomy until blocked/merged in the admin genre
+  curation queue.
 - **Nouveau Monde: lineup jammed onto the title.** Event #285 title is stored as
   `Fête de la Musique : Brunch musical, La Gustav + Cold TouchLa GustavCold Touch`
   — the parser appends the artist names to the title with no separator (the

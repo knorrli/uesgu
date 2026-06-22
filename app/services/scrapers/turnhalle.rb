@@ -21,9 +21,10 @@ module Scrapers
       @scrape_date = Date.current
     end
 
-    # Turnhalle (bee-flat) lists a title + date only — no subtitle line and no
-    # genre/style/tag field.
-    field_gaps subtitle: :no_field, genres: :no_field
+    # bee-flat exposes no genre/style/tag field — the `.style` div is a venue
+    # tagline ("a perfect celebration of Joni Mitchell", a tour/album name), not
+    # a genre, so it feeds the subtitle below rather than genres.
+    field_gaps genres: :no_field
 
     def event_rows
       page.css('article.event.tile')
@@ -58,6 +59,13 @@ module Scrapers
     # and an album-release span — keep only the text nodes.
     def event_title(content)
       content.at_css('h2')&.children&.select(&:text?)&.map { |n| n.text.squish }&.compact_blank&.join(' ')
+    end
+
+    # bee-flat's `.style` div is the event's tagline (tour/album name or a short
+    # descriptor) — venue-authored "valuable additional info", so use it as the
+    # subtitle. Absent on the odd row, hence nil-safe.
+    def event_subtitle(content)
+      content.at_css('.style')&.text&.squish.presence
     end
 
     private

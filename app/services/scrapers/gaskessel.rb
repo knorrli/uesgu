@@ -42,7 +42,7 @@ module Scrapers
     end
 
     def event_description(content)
-      content.css('.subtitle').text.split(',').map { |part| part.squish }.compact_blank.join(', ')
+      content.css('.subtitle').text.split(',').map { |part| part.squish }.compact_blank.join(', ').presence
     end
 
     def event_genres(content)

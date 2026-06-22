@@ -56,8 +56,12 @@ module Scrapers
       title.presence || content.at_css('.agenda .support')&.text&.squish
     end
 
+    # The support line(s) below the headline. Skip it when the headline itself fell
+    # back to the support line (header-only nights — see event_title), otherwise the
+    # description would just echo the title.
     def event_description(content)
-      content.css('.agenda .support').map { |node| node.text.squish }.compact_blank.join(', ').presence
+      support = content.css('.agenda .support').map { |node| node.text.squish }.compact_blank.join(', ').presence
+      support unless support == event_title(content)
     end
 
     # No genre field, but the `.description` blurb names real styles — mine the

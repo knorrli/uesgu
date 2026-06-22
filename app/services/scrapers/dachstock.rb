@@ -42,7 +42,7 @@ module Scrapers
         artist << artist_name
         artist << " (#{artist_info})" if artist_info.present?
         artist.string
-      end.compact_blank.join(', ')
+      end.compact_blank.join(', ').presence
     end
 
     def event_genres(content)

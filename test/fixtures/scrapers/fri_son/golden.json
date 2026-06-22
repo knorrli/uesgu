@@ -38,7 +38,7 @@
     "start_time": "2026-09-17T19:30:00+02:00",
     "start_date": "2026-09-17",
     "title": "YASMINE HAMDAN (LBN)",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Avant-Pop",
       "Electronic",
@@ -56,7 +56,7 @@
     "start_time": "2026-09-25T20:00:00+02:00",
     "start_date": "2026-09-25",
     "title": "HUBRIS. (CH)",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Post-Rock"
     ],
@@ -142,7 +142,7 @@
     "start_time": "2026-11-07T20:00:00+01:00",
     "start_date": "2026-11-07",
     "title": "SNIPER (FR)",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Hip-Hop",
       "Rap"

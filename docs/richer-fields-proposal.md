@@ -1,9 +1,22 @@
 # Richer event fields — coverage audit + schema proposal
 
-> Status: **decision-ready proposal**. No migration has been run and no scraper
-> changed. This unblocks the `BACKLOG.md` item *"Capture richer fields some
-> sources expose but we drop"*, which is blocked on a schema decision. Pick the
-> column set (and the image-privacy stance), and the wiring is mechanical.
+> Status: **CLOSED.** The decision came back split:
+>
+> - **`description` + `lineup` → shipped, but not as new columns.** Instead of a
+>   second column, the existing `subtitle` column was renamed to `description` and
+>   made the single "best secondary text we have" field, curated per source (kills
+>   title-dups, fills empties from blurb prose, prefers a real support/blurb line).
+>   So the proposal's separate `description`/`lineup` columns are **superseded** —
+>   one field does both.
+> - **Genre-mining → shipped.** The dropped blurb prose at genre-less venues is
+>   scanned at ingest for already-known genre names (the `event_genre_prose` hook).
+> - **`price` + `image` → rejected.** Image hotlinking leaks the viewer's IP to
+>   every venue (against the privacy-first ethos) and proxying isn't worth the cost
+>   for a personal tool; price adds little. No `price`/`image_url` column will be
+>   added.
+>
+> The audit below is retained for reference only — the recommendations in §4–§6
+> are NOT the final decision (see this banner).
 
 ## TL;DR
 

@@ -42,7 +42,7 @@ module Scrapers
           next "(#{child.text.squish})" if child.name == 'sup' && child.text.squish.present?
           child.text.squish
         end.compact_blank.join(' ')
-      end.compact_blank.join(', ')
+      end.compact_blank.join(', ').presence
     end
 
     def event_genres(content)

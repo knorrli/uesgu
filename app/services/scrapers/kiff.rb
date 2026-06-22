@@ -52,7 +52,7 @@ module Scrapers
         end.compact_blank.join(', ')
 
         "#{node.css('dt').text.squish}: #{act_list}".presence || node.text
-      end.compact_blank.join("\n")
+      end.compact_blank.join("\n").presence
     end
 
     def event_genres(content)

@@ -40,7 +40,7 @@
     "start_time": "2026-06-14T12:00:00+02:00",
     "start_date": "2026-06-14",
     "title": "Manifest für dini Mueter",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Picnic",
       "Politik"
@@ -158,7 +158,7 @@
     "start_time": "2026-09-09T19:00:00+02:00",
     "start_date": "2026-09-09",
     "title": "lovehead",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Indie Rock"
     ],
@@ -174,7 +174,7 @@
     "start_time": "2026-09-10T19:00:00+02:00",
     "start_date": "2026-09-10",
     "title": "The Young Gods",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Rock",
       "Industrial"
@@ -191,7 +191,7 @@
     "start_time": "2026-09-11T20:00:00+02:00",
     "start_date": "2026-09-11",
     "title": "Crimer (Special Solo Show) & Valentino Vivace",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Italo-Disco",
       "French Touch",
@@ -243,7 +243,7 @@
     "start_time": "2026-10-15T19:00:00+02:00",
     "start_date": "2026-10-15",
     "title": "Club Quiz",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Pup Quiz"
     ],
@@ -293,7 +293,7 @@
     "start_time": "2026-11-06T20:00:00+01:00",
     "start_date": "2026-11-06",
     "title": "Manic Pixxies & Batbait",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Dream Punk",
       "Rock"
@@ -328,7 +328,7 @@
     "start_time": "2026-11-26T19:00:00+01:00",
     "start_date": "2026-11-26",
     "title": "Club Quiz",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Pup Quiz"
     ],
@@ -344,7 +344,7 @@
     "start_time": "2026-11-27T20:00:00+01:00",
     "start_date": "2026-11-27",
     "title": "Kids With Buns (BEL)",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Indie-Pop"
     ],
@@ -376,7 +376,7 @@
     "start_time": "2026-12-17T19:00:00+01:00",
     "start_date": "2026-12-17",
     "title": "Club Quiz",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Pup Quiz"
     ],

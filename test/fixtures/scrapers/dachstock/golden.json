@@ -4,7 +4,7 @@
     "start_time": "2026-06-09T18:00:00+02:00",
     "start_date": "2026-06-09",
     "title": "DACHSTOCK & SOUS LE PONT PRESENT: SCHACHTURNIER IM SOULI",
-    "description": "",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Dachstock",
@@ -114,7 +114,7 @@
     "start_time": "2026-07-11T23:00:00+02:00",
     "start_date": "2026-07-11",
     "title": "DACHSTOCK X SOUS LE PONT: WANNA BE SUMMER SPECIAL EDITION - VAMOS A LA PLAYA",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Party",
       "90ties",
@@ -133,7 +133,7 @@
     "start_time": "2026-08-11T18:00:00+02:00",
     "start_date": "2026-08-11",
     "title": "Dachstock & Sous le Pont present: Schachturnier im Souli",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Schachturnier",
       "Spieleabend"
@@ -150,7 +150,7 @@
     "start_time": "2026-08-20T18:00:00+02:00",
     "start_date": "2026-08-20",
     "title": "No Borders No Nations",
-    "description": "",
+    "description": null,
     "genre_list": [
       "Festival"
     ],
@@ -223,7 +223,7 @@
     "start_time": "2026-09-12T23:00:00+02:00",
     "start_date": "2026-09-12",
     "title": "Bermuda Dreieck",
-    "description": "",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Dachstock",

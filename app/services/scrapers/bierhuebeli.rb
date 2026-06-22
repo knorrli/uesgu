@@ -60,11 +60,11 @@ module Scrapers
     end
 
 
-    # Free-text genre fields the venue types per event — match-only against the
-    # existing vocabulary so typos/marketing terms can't mint taxonomy.
+    # Free-text genre fields the venue types per event; tokens mint and are curated
+    # downstream (typos/marketing terms land UNPLACED for filing/aliasing/blocking).
     # `musicradar` is a rich HTML blurb (Wer:/Stil:/Aktuell:/…); only its "Stil:"
     # line is genre data, so parse that segment out rather than the whole prose.
-    def event_consumption_genres(row)
+    def event_genres(row)
       extract_tag_genres(row) | extract_musicradar_genres(row)
     end
 

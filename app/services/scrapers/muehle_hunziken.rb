@@ -69,10 +69,10 @@ module Scrapers
     # Spotify link) with no usable wrapper class — just bare text nodes joined by
     # `<span class="last-of-type:hidden">, </span>` comma separators, which are the
     # page's only such inline comma-list. So anchor on those separators, read their
-    # parent, and split on the commas they carry. Match-only (consumption): the
-    # field is third-party free-text that sometimes holds a non-genre category
-    # ("Podcast"), so it must never mint taxonomy.
-    def event_consumption_genres(content)
+    # parent, and split on the commas they carry. Third-party free-text that
+    # sometimes holds a non-genre category ("Podcast"); those tokens mint and are
+    # blocked downstream rather than gated at ingest.
+    def event_genres(content)
       list = content.css('span').find { |s| s['class'].to_s.include?('last-of-type:hidden') }&.parent
       return [] unless list
 

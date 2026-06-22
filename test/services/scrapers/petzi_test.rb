@@ -59,7 +59,7 @@ class Scrapers::PetziTest < Minitest::Test
   end
 
   def test_extracts_curated_genre_tags
-    assert_equal %w[Concert Rock], scraper.event_consumption_genres(detail)
+    assert_equal %w[Concert Rock], scraper.event_genres(detail)
   end
 
   def test_resolves_venue_location_from_url_slug

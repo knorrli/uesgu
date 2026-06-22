@@ -18,7 +18,7 @@ module Scrapers
     def self.venue_domains = ['dynamo.ch']
 
     # The "Konzert" category marks an event as a concert; the rest of the term ids
-    # are genre facets we surface as (match-only) consumption genres.
+    # are genre facets we surface as genres (they mint and are curated downstream).
     CONCERT_TID = 20
     GENRE_BY_TID = {
       14 => 'Metal', 15 => 'Hip-Hop', 16 => 'Elektro',

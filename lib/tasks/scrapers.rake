@@ -187,8 +187,7 @@ namespace :scrapers do
         content = agent.send(:event_content, row)
         agent.send(:preprocess, content)
         start_time = agent.send(:event_start_time, content)
-        genres = Array(agent.send(:event_genres, content)) +
-                 Array(agent.send(:event_consumption_genres, content))
+        genres = Array(agent.send(:event_genres, content))
         events << {
           url: url,
           start_time: start_time&.iso8601,

@@ -61,9 +61,9 @@ module Scrapers
       row['title'].to_s.squish
     end
 
-    # `genre` is a free-text, comma-separated string ("Salsa, Bachata, Reggaeton")
-    # — an unstable consumption source, so match-only against the vocabulary.
-    def event_consumption_genres(row)
+    # `genre` is a free-text, comma-separated string ("Salsa, Bachata, Reggaeton").
+    # Unstable, but every token mints and is curated downstream.
+    def event_genres(row)
       row['genre'].to_s.split(',').map(&:squish).compact_blank
     end
 

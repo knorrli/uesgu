@@ -245,10 +245,9 @@ module Scrapers
       event.start_date    = event.start_time.to_date  unless event.overridden?(:start_date)
       event.title         = event_title(content)      unless event.overridden?(:title)
       event.subtitle      = event_subtitle(content)   unless event.overridden?(:subtitle)
-      # Genres come from two extraction sources: a clean structured field
-      # (event_genres) and tokens mined from unstable free text
-      # (event_consumption_genres — artist blurbs, subtitles, origin codes). Both
-      # now mint taxonomy: an unrecognised token arrives UNPLACED in the admin
+      # Every genre a scraper extracts — whether from a clean structured field or
+      # mined from unstable free text (artist blurbs, subtitles, origin codes) —
+      # mints taxonomy: an unrecognised token arrives UNPLACED in the admin
       # curation queue (to be filed into the tree, aliased, or blocked) rather than
       # being dropped at ingest. We collect everything and clean downstream — the
       # query-time alias link means raw tokens are safe to keep (see Genre).
@@ -256,7 +255,7 @@ module Scrapers
       # re-scrape can't overwrite the correction — the field-level genre sibling
       # of the scalar skips above.
       unless event.overridden?(:genres)
-        event.genre_list = Array(event_genres(content)) + Array(event_consumption_genres(content))
+        event.genre_list = Array(event_genres(content))
       end
       # Visibility (the music gate) is a derived projection of whatever genres now
       # stand — scraped or admin-pinned — so a pinned genre list still derives the
@@ -374,16 +373,13 @@ module Scrapers
     # Many venues expose no subtitle / no genres; default to none.
     def event_subtitle(_content) = nil
 
-    # Genres from a clean, structured genre/style field the venue curates.
+    # Every genre a scraper extracts for an event, from whatever source — a clean
+    # structured genre/style field the venue curates, or tokens mined from unstable
+    # free text (artist blurbs, subtitle prose, parsed titles, origin codes). All
+    # of it mints taxonomy: an unrecognised token lands UNPLACED in the curation
+    # queue to be filed, aliased, or blocked, rather than dropped at ingest.
     # Default: none.
     def event_genres(_content) = nil
-
-    # Genres mined from an UNSTABLE free-text source (artist blurbs, subtitle
-    # prose, parsed titles, origin codes) — lower confidence than event_genres.
-    # Like event_genres these mint taxonomy; an unrecognised token lands UNPLACED
-    # in the curation queue to be filed, aliased, or blocked. A scraper with both a
-    # clean field and a messy one overrides both. Default: none.
-    def event_consumption_genres(_content) = nil
 
     # Adjust the built event before saving (e.g. promote a blank title).
     def postprocess(_event) = nil

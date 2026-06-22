@@ -12,8 +12,8 @@ module Scrapers
   # event page when the detail page exposes an "official website" link (see
   # #event_url), otherwise to its own ticketing page — so Dedup ranks it LAST and
   # it's the visible copy only for shows no other source covers. Genres here are
-  # consumption (match-only): the venue tags are curated but coarse, so they enrich
-  # but never mint taxonomy.
+  # the venue's curated-but-coarse tags; like every source they mint taxonomy and
+  # are curated downstream.
   class Petzi < Agent
     # slug (the leading venue segment of /events/{id}-{slug}-{title}) => the exact
     # [venue, city, canton] our bespoke scrapers already declare, so a merged event
@@ -121,9 +121,10 @@ module Scrapers
       squish(content.parser.at_css('h1')&.text)
     end
 
-    # Curated venue tags ("Concert", "Rock", "Hip-Hop"). Consumption (match-only):
-    # type tags like "Concert"/"Festival" simply find no genre match and drop out.
-    def event_consumption_genres(content)
+    # Curated venue tags ("Concert", "Rock", "Hip-Hop"). Free-text, so type tags
+    # like "Concert"/"Festival" mint too and are curated (filed/aliased/blocked)
+    # downstream rather than dropped at ingest.
+    def event_genres(content)
       content.parser.css('a.tag').map { |a| squish(a.text) }.reject(&:blank?).uniq
     end
 

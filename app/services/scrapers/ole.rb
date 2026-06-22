@@ -21,7 +21,7 @@ module Scrapers
   #
   # Field mapping: name→title (squished, trailing ":" stripped), lead→subtitle
   # (only for events that have their own content — see #event_subtitle),
-  # date_start→start_time, categories→consumption genres (they MINT taxonomy and
+  # date_start→start_time, categories→genres (they MINT taxonomy and
   # land in the curation queue — we collect everything and curate downstream, per
   # the taxonomy-hygiene model), location→event_locations. <description> is read
   # only as the "has own content" signal that gates the subtitle (it's full HTML
@@ -254,10 +254,9 @@ module Scrapers
       plain_text(text(row.event, 'lead')).presence
     end
 
-    # <categories> are consumption genres: they mint taxonomy (unrecognised tokens
-    # land UNPLACED in the curation queue), so we keep every token and curate
-    # downstream rather than gate at ingest.
-    def event_consumption_genres(row)
+    # <categories> mint taxonomy (unrecognised tokens land UNPLACED in the curation
+    # queue), so we keep every token and curate downstream rather than gate at ingest.
+    def event_genres(row)
       row.event.css('categories category').map { |c| squish(decode(c.text)) }.reject(&:blank?).uniq
     end
 

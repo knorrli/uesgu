@@ -60,8 +60,9 @@ module Scrapers
       CGI.unescapeHTML(row.dig('acf', 'subtitle').to_s).squish.presence
     end
 
-    # ACF `tags` is an optional, free-text genre field — consumption (match-only).
-    def event_consumption_genres(row)
+    # ACF `tags` is an optional, free-text genre field; tokens mint and are
+    # curated downstream.
+    def event_genres(row)
       tags = row.dig('acf', 'tags')
       list = tags.is_a?(Array) ? tags : tags.to_s.split(',')
       list.map { |t| t.to_s.squish }.compact_blank

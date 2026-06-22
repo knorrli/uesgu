@@ -143,14 +143,13 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     refute event.reload.discarded?
   end
 
-  test 'an identical re-scrape with overlapping discovery + consumption genres stays unchanged' do
-    # Guards a plausible over-count source: build_event assigns
-    # Array(event_genres) + Array(event_consumption_genres), which carries a DUPLICATE
-    # when the two sources share a genre ("Ggg" + "Ggg"). acts-as-taggable-on dedupes
-    # on assignment, and tag_snapshot sorts, so the freshly-built list still compares
+  test 'an identical re-scrape with a duplicate-carrying genre list stays unchanged' do
+    # Guards a plausible over-count source: an extractor can hand build_event a list
+    # that already carries a DUPLICATE ("Ggg" twice). acts-as-taggable-on dedupes on
+    # assignment, and tag_snapshot sorts, so the freshly-built list still compares
     # equal to the persisted one — a no-op re-scrape stays unchanged, not updated.
     url = 'https://fixture.test/genre-overlap'
-    rows = [{ url: url, genres: ['Ggg'], consumption_genres: ['Ggg'] }]
+    rows = [{ url: url, genres: %w[Ggg Ggg] }]
     CountingScraperHarness.next_rows = rows
     CountingScraperHarness.new.call
     assert_equal ['Ggg'], Event.find_by(url: url).genre_list

@@ -19,6 +19,15 @@
 
 ## Maybe-later (explicitly deferred)
 
+- **"Party spotlight" cones — asymmetric / dynamic light mark.** Make the mark's
+  light-cones feel like live coloured spotlights rather than the static symmetric
+  splay. Two distinct directions: (a) an **asymmetric static logo redesign** —
+  brand change touching every icon surface (`icon.svg`, `icon-light.svg`, the PWA
+  PNGs, and the generated splash via `script/generate_ios_splash.rb`); or (b) an
+  **in-app animated loader** (HTML/CSS/SVG, rendered after the PWA boots) — the
+  only way to get genuinely dynamic motion, since the iOS splash is a static
+  pre-boot image and cannot animate. Pick the direction first; they're separate
+  efforts.
 - Trim `phosphor.css` to only the used icon classes (~78 KB → tiny). The font is
   already subset; this is the matching CSS cut. Deferred as low-value and a
   maintenance burden (must re-trim when adding an icon). See

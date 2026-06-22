@@ -13,7 +13,7 @@
     </h3>
 
     <% if event.description.present? %>
-      <div class="event-subtitle"><%= simple_format(event.description) %></div>
+      <div class="event-description"><%= simple_format(event.description) %></div>
     <% end %>
 
     <%# One descriptor row: the event's OWN genres, each a filter tag. Tapping a

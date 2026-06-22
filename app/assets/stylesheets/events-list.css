@@ -202,12 +202,12 @@
   font-weight: normal;
 }
 
-.event-subtitle {
+.event-description {
   color: var(--theme-fg-muted);
   font-size: var(--font-size-small);
 }
 
-.event-subtitle p {
+.event-description p {
   margin: 0;
 }
 
@@ -217,7 +217,7 @@
 }
 
 /* Styles are the primary, followable descriptor — bold AND full foreground colour
-   so they assert a clear tier above the muted, regular-weight subtitle and genres
+   so they assert a clear tier above the muted, regular-weight description and genres
    they sit between, without adding another font size to the row. The fg colour
    lives on the tags themselves (not the container) so it beats the base .event-tag
    muted. */
@@ -404,7 +404,7 @@
      cramped against the line above — and downright tight when that line is itself
      a box (a "Neues Datum" reschedule pill in the title). A small margin on top of
      the flex gap gives the pill row consistent breathing room whether or not a
-     subtitle sits between it and the title. */
+     description sits between it and the title. */
   margin-top: var(--gap-xsmall);
 }
 

@@ -31,14 +31,9 @@
       line / lineup / first blurb paragraph / title-dup). Renamed it instead of
       adding a 2nd column, so `description` + `lineup` from the proposal collapse
       into one curated-per-source field. The B1 mining hook is `event_genre_prose`
-      (distinct from the displayed `event_description`).
-    - **Open — rename the `.event-subtitle` CSS class to match.** The data field is
-      now `description`, but the presentational class (`app/assets/stylesheets/events-list.css`,
-      used in `events/_event.html.erb`, plus the "muted subtitle" styleguide copy)
-      was left as `.event-subtitle` to keep the rename diff data-only. Rename it to
-      `.event-description` for clean code — mind the propshaft global/alphabetical
-      cascade (one pattern, one home) and check no scraper's venue CSS selector
-      collides (`.event-subtitle` is also a venue class in isc/docks — those stay).
+      (distinct from the displayed `event_description`). The card's presentational
+      class is now `.event-description` too (the isc/docks `.event-subtitle` venue
+      selectors are unrelated and stay).
     - **Open — curate what fills `description` per source.** Now that the field is
       general, improve its content per scraper: kill nouveau_monde's title-dup,
       fill the empties (kairo/volkshaus have prose we currently only mine), prefer a

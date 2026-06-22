@@ -9,21 +9,22 @@
 
 - **Capture richer fields some sources expose but we drop.** Blocked on a schema
   decision — these need **new event columns first** (`price` / `lineup` /
-  `description` / `image`, none exist today): **Bad Bonn** has `data-price`;
-  **bar59** (Firestore) has `artists` (lineup/support), `htmlText` (description),
-  and `picture` (image). Once the columns are decided, re-run the
-  `/admin/scraper_coverage` audit across the rest of the scrapers for similar
-  droppable fields. (Genuinely-absent fields are already declared in-code via
-  `field_gaps` and render as n/a in the matrix — don't re-audit those.)
+  `description` / `image`, none exist today). **Audit done + schema proposal
+  drafted: `docs/richer-fields-proposal.md`** — confirmed dropped fields per
+  scraper (bar59 is richest: artists/htmlText/picture; plus Bad Bonn price, OLE
+  + PETZI description, Mahogany Hall price), recommended migration, and the one
+  real open decision (image hotlink vs proxy vs skip, a privacy call). Answer the
+  4 open decisions in that doc and the wiring is mechanical. (Genuinely-absent
+  coverage fields are declared in-code via `field_gaps` — don't re-audit those.)
 
 ## UI polish
 
-- **General mobile-first sweep** of the app — ongoing direction, not a discrete
-  ticket. Enforce the visual invariants: what's clickable is unambiguous; one
-  visual representation per element; green only ever means "interested" (heart =
-  saved shows). See memory `project-screenshot-design-review`.
 - **Slow PWA start / splash screen** — cold start is sluggish; no splash handling
-  yet. (See memory `project-pwa-install-affordance`.)
+  yet. **Investigation done: `docs/pwa-cold-start-proposal.md`** — two distinct
+  problems (no iOS splash; serial no-cache cold-start waterfall), ranked fixes.
+  Safe quick wins ready to ship (font preload + theme-color meta); structural
+  fixes (SW app-shell cache, font subset) need a product call. (See memory
+  `project-pwa-install-affordance`.)
 
 ## Maybe-later (explicitly deferred)
 

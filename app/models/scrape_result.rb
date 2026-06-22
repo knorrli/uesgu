@@ -11,4 +11,14 @@ class ScrapeResult < ApplicationRecord
   def attention?
     empty? || failed?
   end
+
+  def errored?
+    errored_count.to_i.positive?
+  end
+
+  # Headline status for display. An "ok" run that nevertheless errored on some
+  # rows is downgraded to a warning so it never reads as a clean success.
+  def display_status
+    ok? && errored? ? "errors" : status
+  end
 end

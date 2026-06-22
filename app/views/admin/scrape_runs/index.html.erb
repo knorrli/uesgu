@@ -58,15 +58,15 @@
                 <td class="num"><%= result&.created_count %></td>
                 <td class="num"><%= result&.updated_count %></td>
                 <td class="num"><%= result&.unchanged_count %></td>
-                <td class="num"><%= result&.errored_count %></td>
+                <td class="num <%= 'scrape-num--errors' if result&.errored? %>"><%= result&.errored_count %></td>
                 <td class="num"><%= result&.discarded_count %></td>
                 <td>
                   <span class="scrape-history">
                     <% @presenter.history(slug).each do |entry| %>
                       <% if entry %>
                         <%= link_to '', admin_scrape_run_path(entry.scrape_run),
-                              class: "scrape-dot scrape-dot--#{entry.status}",
-                              title: "#{l(entry.scrape_run.started_at)} · #{t("admin.scrape_runs.status.#{entry.status}")}" %>
+                              class: "scrape-dot scrape-dot--#{entry.display_status}",
+                              title: "#{l(entry.scrape_run.started_at)} · #{t("admin.scrape_runs.status.#{entry.display_status}")}" %>
                       <% else %>
                         <span class="scrape-dot scrape-dot--none"></span>
                       <% end %>

@@ -48,7 +48,7 @@
             <td class="num"><%= result.created_count %></td>
             <td class="num"><%= result.updated_count %></td>
             <td class="num"><%= result.unchanged_count %></td>
-            <td class="num"><%= result.errored_count %></td>
+            <td class="num <%= 'scrape-num--errors' if result.errored? %>"><%= result.errored_count %></td>
             <td class="num"><%= result.discarded_count %></td>
             <td class="num"><%= number_with_precision(result.duration_ms.to_i / 1000.0, precision: 1) %>s</td>
             <td><% unless @in_progress %><%= render 'admin/scrape_runs/run_button', scraper: result.scraper %><% end %></td>

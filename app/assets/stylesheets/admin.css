@@ -242,6 +242,12 @@
   background: var(--color-amber);
 }
 
+/* Ran and wrote events, but errored on some rows: amber like empty, so it never
+   reads as a clean success — distinct from a fully failed run (red). */
+.scrape-badge--errors {
+  background: var(--color-amber);
+}
+
 .scrape-badge--failed {
   background: var(--color-red);
 }
@@ -272,6 +278,10 @@
   background: var(--color-amber);
 }
 
+.scrape-dot--errors {
+  background: var(--color-amber);
+}
+
 .scrape-dot--failed {
   background: var(--color-red);
 }
@@ -285,6 +295,12 @@
 .scrape-error {
   white-space: normal;
   font-size: var(--font-size-small);
+  color: var(--theme-warn-color);
+}
+
+/* A non-zero per-run error count: warn colour so it stands out in the table,
+   mirroring the coverage matrix's low-fill highlight. */
+.scrape-num--errors {
   color: var(--theme-warn-color);
 }
 

@@ -308,6 +308,7 @@ en:
     scrape_runs:
       status:
         ok: ok
+        errors: "ok, with errors"
         empty: empty
         failed: failed
       run_status:

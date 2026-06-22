@@ -39,7 +39,10 @@ module Scrapers
     end
 
     def event_title(content)
-      content.css('.groupHeading h2').text.squish
+      # Some events render multiple `.groupHeading` sections (the lineup acts
+      # each get one, doubling as `.groupIntro`); only the first carries the
+      # event title — taking all of them jams the artist names onto the title.
+      content.at_css('.groupHeading h2')&.text&.squish
     end
 
     def event_subtitle(content)

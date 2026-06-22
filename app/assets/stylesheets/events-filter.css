@@ -40,7 +40,7 @@
 @media (min-width: 600px) {
   /* Wider columns can carry the taller cell without looking squashed; restore the
      roomier desktop calendar height (mobile keeps the compact 4.25rem above). */
-  .simple-calendar .day { height: 7rem; }
+  .simple-calendar .day { height: 6.5rem; }
   /* Room for the venue headline only at desktop width. */
   .simple-calendar .day-headline,
   .simple-calendar .day-headline-more { display: block; }

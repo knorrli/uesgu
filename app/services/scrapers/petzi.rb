@@ -79,6 +79,12 @@ module Scrapers
       true
     end
 
+    # PETZI exposes no subtitle/support field: the detail page is a title (<h1>)
+    # plus a free-text description blurb (<p class="text_block">), with any
+    # support acts buried in the prose ("Mit Drain, Gridiron…") and no clean
+    # delimiter. Nothing structured to pull, so subtitle stays empty by design.
+    field_gaps subtitle: :no_field
+
     # The sitemap lists every member event; keep only the URLs for venues we track.
     def event_rows
       xml = Nokogiri::XML(page.body)

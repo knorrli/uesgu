@@ -17,18 +17,12 @@
   4 open decisions in that doc and the wiring is mechanical. (Genuinely-absent
   coverage fields are declared in-code via `field_gaps` — don't re-audit those.)
 
-## UI polish
-
-- **iOS PWA splash screen** — still missing. Android derives its splash from the
-  manifest; iOS needs explicit `apple-touch-startup-image` link tags (per device
-  size) or it launches to a blank screen. Needs artwork generation. The rest of
-  the cold-start work is done: font preload, `theme-color` meta, service-worker
-  app-shell cache, and Phosphor font subsetting (147 KB → 3.5 KB, regenerate via
-  `script/subset_phosphor.py`) all shipped — see `docs/pwa-cold-start-proposal.md`.
-  (See memory `project-pwa-install-affordance`.)
-
 ## Maybe-later (explicitly deferred)
 
+- Trim `phosphor.css` to only the used icon classes (~78 KB → tiny). The font is
+  already subset; this is the matching CSS cut. Deferred as low-value and a
+  maintenance burden (must re-trim when adding an icon). See
+  `docs/pwa-cold-start-proposal.md`.
 - Session "Update the filter I just applied" soft-pointer.
 - `featured`/`main_genre` flag + subtree-count browse ranking.
 

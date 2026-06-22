@@ -34,6 +34,11 @@
     <link id="favicon-svg" rel="icon" href="<%= theme == 'light' ? '/icon-light.svg' : '/icon.svg' %>?v=<%= ICON_VERSION %>" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=<%= ICON_VERSION %>">
 
+    <%# iOS PWA launch images (apple-touch-startup-image) — generated, see
+        script/generate_ios_splash.rb. Android derives its splash from the
+        manifest; iOS needs these per-device or it launches blank. %>
+    <%= render "layouts/ios_splash_screens" %>
+
     <%# The server set <html data-theme> and the favicon above from the `theme`
         cookie. On the very first visit there's no cookie yet, so it's unset:
         resolve from the OS, set the favicon, and persist a cookie so every later

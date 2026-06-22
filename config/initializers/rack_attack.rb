@@ -22,6 +22,25 @@ class Rack::Attack
     req.ip == "127.0.0.1" || req.ip == "::1"
   end
 
+  ### Blocklists — dropped outright, before routing #####################
+
+  # Vulnerability scanners and script-kiddie bots constantly probe for software we
+  # don't run (WordPress, phpMyAdmin, exposed .env/.git, …). None of these paths can
+  # ever be legitimate on this Rails app — there is no PHP and we never serve dotfiles
+  # — so we drop them at the Rack layer. This kills the ActionController::RoutingError
+  # noise they'd otherwise generate (see the /wp-admin/install.php floods) and costs
+  # next to nothing. Anchored/substring branches each match independently; req.path
+  # excludes the query string, so ".../install.php?step=1" still matches \.php$.
+  PROBE_PATHS = %r{
+    \.php$                              |   # any PHP endpoint — install.php, xmlrpc.php, …
+    /wp-(admin|login|content|includes)  |   # WordPress probes
+    /(\.env|\.git|\.aws|\.ssh)\b        |   # leaked-secret probes
+    /(phpmyadmin|pma|myadmin|adminer)\b |   # DB-admin panels
+    /vendor/(phpunit|laravel)               # framework RCE probes
+  }xi
+
+  blocklist("block/known-probes") { |req| PROBE_PATHS.match?(req.path) }
+
   ### Throttles #########################################################
 
   # Per-IP request cap. Strict by design: 60 dynamic requests/minute is far above a

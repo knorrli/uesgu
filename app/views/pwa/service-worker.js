@@ -39,8 +39,57 @@ self.addEventListener("notificationclick", (event) => {
   )
 })
 
-// A no-op fetch handler. We don't cache anything (the app is online-first), but
-// registering a fetch listener satisfies some browsers' PWA installability
-// criteria. Not calling respondWith() lets every request hit the network as
-// normal.
-self.addEventListener("fetch", () => {})
+// App-shell caching. The app is online-first for *content* — HTML, API calls and
+// everything cross-origin always hit the network — but the fingerprinted static
+// assets (CSS / JS / fonts under /assets/) are immutable and worth serving from
+// cache, which is the bulk of cold-start latency. We cache them lazily on first
+// fetch; there's no precache list to keep in sync because propshaft digests the
+// URLs (a byte change yields a new URL, so a cached entry can never be stale).
+//
+// Bump CACHE_VERSION to wipe the asset cache (e.g. if it ever grows unwieldy from
+// accumulated old digests). Within a version, superseded digests are harmless.
+const CACHE_VERSION = "v1"
+const ASSET_CACHE = `usgu-assets-${CACHE_VERSION}`
+
+self.addEventListener("install", () => {
+  // Take over without waiting for existing tabs to close. Nothing to precache.
+  self.skipWaiting()
+})
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    (async () => {
+      // Drop caches from older versions of this worker.
+      const names = await caches.keys()
+      await Promise.all(
+        names.filter((name) => name !== ASSET_CACHE).map((name) => caches.delete(name))
+      )
+      await self.clients.claim()
+    })()
+  )
+})
+
+self.addEventListener("fetch", (event) => {
+  const { request } = event
+  const url = new URL(request.url)
+
+  // Only intercept our own fingerprinted assets. Everything else stays
+  // online-first: we don't call respondWith(), so it hits the network as normal.
+  const isAsset =
+    request.method === "GET" &&
+    url.origin === self.location.origin &&
+    url.pathname.startsWith("/assets/")
+  if (!isAsset) return
+
+  // Cache-first — safe because the URL carries a content digest.
+  event.respondWith(
+    caches.open(ASSET_CACHE).then(async (cache) => {
+      const hit = await cache.match(request)
+      if (hit) return hit
+
+      const response = await fetch(request)
+      if (response.ok) cache.put(request, response.clone())
+      return response
+    })
+  )
+})

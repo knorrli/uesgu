@@ -1,8 +1,15 @@
 # PWA cold-start & splash screen — investigation + proposal
 
-> Status: **investigation + proposal**. No code changed. Addresses the
-> `BACKLOG.md` item *"Slow PWA start / splash screen — cold start is sluggish;
-> no splash handling yet."* See memory `project-pwa-install-affordance`.
+> Status: **investigation + proposal**. Addresses the `BACKLOG.md` item *"Slow
+> PWA start / splash screen — cold start is sluggish; no splash handling yet."*
+> See memory `project-pwa-install-affordance`.
+>
+> **Implemented (2026-06-22):** A (font preload), B (`theme-color` meta), C
+> (service-worker app-shell cache), E (font subset: Phosphor.woff2 147 KB → 3.5
+> KB via `script/subset_phosphor.py`). D (CSS minify) **declined** — it needs a
+> build step we don't want. **Still open:** iOS `apple-touch-startup-image`
+> splash images (the headline "no splash on iOS" fix — needs artwork generation),
+> and the optional CSS-class trim for `phosphor.css`.
 
 ## TL;DR — two separate problems
 

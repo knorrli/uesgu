@@ -9,6 +9,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <%# iOS reads the meta tag (not the manifest) to tint the status bar / launch
+        chrome; matched to the manifest's theme/background colour so the installed
+        PWA launches as ours rather than a blank white frame. %>
+    <meta name="theme-color" content="#17131a">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -45,6 +49,12 @@
         if (el) el.href = (t === "light" ? "/icon-light.svg" : "/icon.svg") + "?v=<%= ICON_VERSION %>"
       })()
     </script>
+
+    <%# Preload the icon font: it's needed for the header glyphs at first paint
+        but is otherwise only discovered after the (large) CSS parses, costing a
+        serial round-trip + an icon flash on cold start. crossorigin is required
+        on font preloads even same-origin. %>
+    <%= tag.link rel: "preload", href: asset_path("Phosphor.woff2"), as: "font", type: "font/woff2", crossorigin: "anonymous" %>
 
     <%= combobox_style_tag %>
     <%# Includes all stylesheet files in app/assets/stylesheets %>

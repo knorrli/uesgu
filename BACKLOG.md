@@ -15,12 +15,6 @@
   `/admin/scraper_coverage` audit across the rest of the scrapers for similar
   droppable fields. (Genuinely-absent fields are already declared in-code via
   `field_gaps` and render as n/a in the matrix — don't re-audit those.)
-- **Run the Rote Fabrik URL backfill on prod.** The scraper fix + the
-  `scrapers:rote_fabrik:fix_urls` backfill have shipped and healed the local
-  rows. Prod still has the dead `kalender.rotefabrik.ch` URLs — run
-  `bin/rails scrapers:rote_fabrik:fix_urls` on the Render shell **before the next
-  nightly sweep** so events heal in place instead of the sweep orphaning them.
-  (`DRY_RUN=1` to preview first.)
 
 ## UI polish
 

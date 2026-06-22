@@ -6,4 +6,6 @@
 #
 # History: v2 = cream light mark + stronger dark spotlight cones (2026-06-17).
 #          v3 = PWA/light icon gains splayed light cones on cream (2026-06-17).
-ICON_VERSION = "3".freeze
+#          v4 = dark mark cones splayed outward to match light (no overlap);
+#               also rebusts the iOS splash images (2026-06-22).
+ICON_VERSION = "4".freeze

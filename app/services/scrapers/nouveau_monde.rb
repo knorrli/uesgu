@@ -50,20 +50,13 @@ module Scrapers
     # the title ("Jeudi-Midi : Oze" + "Oze (ch)") it merely echoes it, so surface the
     # line only when it names an act the title doesn't — a genuine support bill.
     def event_description(content)
-      acts = content.css('.groupIntro').filter_map do |node|
-        name = node.children.find { |child| child.name == 'h2' }&.text&.squish
-        next if name.blank?
-
+      content.css('.groupIntro').map do |node|
         country_code = node.css('.plateMedium').text.squish
-        country_code.present? ? "#{name} (#{country_code})" : name
-      end
-      return if acts.empty?
-
-      title = event_title(content).to_s
-      bare_names = acts.map { |act| act.sub(/\s*\([^)]*\)\z/, '') }
-      return if bare_names.all? { |name| title.include?(name) }
-
-      acts.join(', ')
+        act_name = StringIO.new
+        act_name << node.children.find { |child| child.name == 'h2' }.text
+        act_name << " (#{country_code})" if country_code.present?
+        act_name.string
+      end.compact_blank.join(', ')
     end
 
     # No genre extraction: the live ProcessWire template exposes no genre/style

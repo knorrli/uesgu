@@ -56,8 +56,18 @@ module Scrapers
       content.css('.event_detail_header .event_title_title').text.squish
     end
 
+    # ISC dropped the old header subtitle; every detail page now carries a "FFO"
+    # ("for fans of") facts row instead — a curated list of kindred/inspiration
+    # acts (e.g. "Slowdive, Mazzy Star, My Bloody Valentine"). That's the best
+    # secondary-text we get, so surface it as the description. The live label is
+    # just "FFO" (older pages spelled it "FFO (for fans of)"), hence the prefix
+    # match.
     def event_description(content)
-      content.css('.event_detail_header .event-subtitle').text.split('+').map { |part| part.squish }.compact_blank.join(', ').presence
+      row = content.css('.event_detail .facts_listing .facts_listing_row').find do |node|
+        node.at_css('.column_left')&.text&.squish&.start_with?('FFO')
+      end
+      bands = row&.at_css('.column_right')&.text&.squish
+      "For fans of: #{bands}" if bands.present?
     end
 
     def event_genres(content)

@@ -45,6 +45,12 @@
   genuinely dynamic motion the static iOS splash can't do (it's a pre-boot image).
   The static asymmetric mark already ships via `script/generate_icons.rb`; this is
   the separate motion follow-up.
+- **User-contributed event capture** — demand-side coverage: let a user
+  voluntarily hand üsgu an unstructured event (snap a street poster; paste a
+  WhatsApp concert tip) → extract → dedup → provisional event. One funnel, two
+  input adapters; poster-photo path goes first. Ethos-critical: capture the
+  *event*, never *monitor* the WhatsApp group. Idea note + rough poster pipeline
+  in [`docs/user-event-capture.md`](docs/user-event-capture.md).
 - Session "Update the filter I just applied" soft-pointer.
 - `featured`/`main_genre` flag + subtree-count browse ranking.
 

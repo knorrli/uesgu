@@ -49,6 +49,27 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
   exit 1
 fi
 
+# Refuse to release unless CI is green on this exact commit. Branch protection
+# already requires it to merge, but this guards the gap between "merged" and
+# "main's post-merge CI finished" — and against tagging a commit whose checks are
+# still running. Needs gh authenticated locally.
+echo "Checking CI on $(git rev-parse --short HEAD)..."
+checks="$(gh api "repos/knorrli/uesgu/commits/$(git rev-parse HEAD)/check-runs" \
+  --jq '.check_runs[] | "\(.name)=\(.conclusion // "pending")"' 2>/dev/null || true)"
+if [ -z "$checks" ]; then
+  echo "Error: couldn't read CI status from GitHub (is gh authenticated?)." >&2
+  exit 1
+fi
+for check in lint security test; do
+  result="$(printf '%s\n' "$checks" | awk -F= -v c="$check" '$1 == c { print $2; exit }')"
+  if [ "$result" != "success" ]; then
+    echo "Error: required check '$check' is '${result:-missing}', not 'success'." >&2
+    echo "  https://github.com/knorrli/uesgu/actions" >&2
+    exit 1
+  fi
+done
+echo "CI is green (lint, security, test)."
+
 echo "Tagging $tag..."
 git tag -a "$tag" -m "Release $tag"
 git push origin "$tag"

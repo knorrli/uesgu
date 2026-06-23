@@ -110,14 +110,18 @@
       </div>
       <%# Reuse the real event card so the full extracted context (description,
           styles, sibling genres) is visible. interactive:false renders it
-          read-only; the date + venue (which the card omits, the list shows them
-          via grouping) sit in a muted header above each. %>
+          read-only (no interest highlighting), but the admin edit/delete tooling
+          stays — curating a genre often means it doesn't belong on a listed event
+          (mis-extracted from a blurb), so the card's edit gear jumps straight to
+          that event and its delete returns here (return_to). The date + venue
+          (which the card omits, the list shows them via grouping) sit in a muted
+          header above each. %>
       <% sample_events.each do |event| %>
         <div class="genre-sample-event flex flex-col gap-small">
           <span class="muted">
             <%= event.start_date.strftime('%d.%m.%y') %><% if event.venue %> &middot; <%= event.venue.name %><% end %>
           </span>
-          <%= render event, interactive: false %>
+          <%= render event, interactive: false, return_to: return_to %>
         </div>
       <% end %>
     </div>

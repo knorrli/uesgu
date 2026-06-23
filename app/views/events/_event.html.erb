@@ -1,3 +1,10 @@
+<%# `interactive` = this is the live end-user programme list. It governs only the
+    end-user affordances: interest highlighting (below) and the filter-tag toggle /
+    green semantics (event_filter_tag). It does NOT gate admin tooling — the edit
+    gears and delete are orthogonal and follow admin? alone, so they're available in
+    the read-only preview too (e.g. the genre-curation queue, which renders this
+    card with interactive:false but where the admin still wants to jump in and fix
+    a mis-tagged event). %>
 <% interactive = local_assigns.fetch(:interactive, true) %>
 <% rescheduled = event.rescheduled? && !event.cancelled? %>
 <%# Interest = this show matches one of your saved filters (date window ignored).
@@ -29,7 +36,7 @@
           <%# Tag + (admin) edit gear are one unit so the gear rides flush against
               its own tag — the row's wrap-gap falls between genre units, not between
               a tag and its gear. %>
-          <span class="event-genre"><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if interest && interest_why_genre?(event, genre) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><% if current_user&.admin? && interactive %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
+          <span class="event-genre"><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if interest && interest_why_genre?(event, genre) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><% if current_user&.admin? %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
         <% end %>
       </div>
     <% end %>
@@ -39,11 +46,13 @@
   <% if current_user %>
     <div class="event-actions">
       <%= event_save_button(event) %>
-      <% if current_user.admin? && interactive %>
+      <% if current_user.admin? %>
         <%= link_to admin_event_path(event), class: 'icon-button', data: { turbo_frame: '_top' }, 'aria-label': t('events.edit_event') do %>
           <span class="ph ph-gear"></span>
         <% end %>
-        <%= button_to event, method: :delete, class: 'icon-button danger', 'aria-label': t('events.delete_event') do %>
+        <%# return_to (when the card carries one, e.g. the genre-curation queue) lands
+            the delete back on that page instead of the public feed. %>
+        <%= button_to event, method: :delete, params: { return_to: local_assigns[:return_to] }.compact, class: 'icon-button danger', 'aria-label': t('events.delete_event') do %>
           <span class="ph ph-trash"></span>
         <% end %>
       <% end %>

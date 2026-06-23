@@ -65,10 +65,20 @@ class EventsController < ApplicationController
   # deleted and recreated by the next scrape of a source that still lists it.
   def destroy
     @event.dismiss!
-    redirect_to events_path, status: :see_other
+    redirect_to delete_return_path, status: :see_other
   end
 
   private
+
+  # Where a delete lands. A delete fired from the genre-curation queue passes its
+  # own path as return_to so the admin stays in the curation flow instead of being
+  # bounced to the public feed; the feed's own delete passes nothing and falls back
+  # here. Only same-origin relative paths are honoured (a leading single slash, not
+  # "//host") — never redirect off-site from a param.
+  def delete_return_path
+    target = params[:return_to].to_s
+    target.match?(%r{\A/(?!/)}) ? target : events_path
+  end
 
   # Events on a single day, honouring the active filter (queries/locations/
   # styles) but overriding its date floor so past days in the visible month

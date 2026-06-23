@@ -29,6 +29,32 @@ fr:
     benefit_quick: Ouvert d'un tap, sans navigateur
     benefit_notify: Notifications pour les nouveaux événements de tes filtres enregistrés
     benefit_home: Sa propre icône sur ton écran d'accueil
+  footer:
+    label: Pied de page
+    about: À propos
+    privacy: Confidentialité
+  about:
+    title: À propos de üsgu
+    heading: À propos de üsgu
+    intro: üsgu.ch rassemble les concerts et événements de la région au même endroit, directement depuis les pages des organisateurs et les agendas. Fini de fouiller dix sites pour savoir qui joue où et quand.
+    why: Je l'ai créé parce que je perdais le fil moi-même, et que je ratais des concerts que j'aurais adoré voir. C'est un projet privé entre amis, pas une startup et pas un business. Pas de pub, rien à vendre.
+    privacy: Plus d'infos sur la confidentialité →
+  privacy:
+    title: Confidentialité
+    heading: Confidentialité
+    intro: üsgu.ch est un projet privé et non commercial, et collecte le moins de données possible. Voici ce qui est enregistré, et pourquoi.
+    collect_heading: Ce que nous enregistrons
+    collect_account: Ton nom d'utilisateur et ton mot de passe (chiffré), pour que tu aies un compte.
+    collect_email: Ton adresse e-mail, seulement si tu en donnes une, et uniquement pour t'envoyer les notifications que tu as configurées.
+    collect_content: 'Ce que tu crées toi-même : filtres enregistrés et événements gardés.'
+    collect_cookies: 'Trois cookies : l''un te garde connecté, un autre retient ton thème (clair/sombre), le dernier retient le filtre que tu as appliqué en dernier. Rien d''autre.'
+    nothing_heading: Ce que nous ne faisons pas
+    nothing_body: Aucun pistage, aucun outil de statistique, aucune pub. Nous ne vendons pas tes données et ne les partageons pas.
+    delete_heading: Suppression
+    delete_body: Tu peux supprimer ton compte à tout moment dans les réglages, et tout ce qui te concerne disparaît avec.
+    contact_heading: Contact
+    contact_body: Des questions sur la confidentialité ? Écris à %{email}.
+    contact_email: kontakt@uesgu.ch
   languages:
     de: Allemand
     fr: Français

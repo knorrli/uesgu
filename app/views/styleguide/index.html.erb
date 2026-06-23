@@ -34,6 +34,7 @@
     <a href="#nav">Navigation</a>
     <a href="#pagination">Pagination</a>
     <a href="#page-header">Page header</a>
+    <a href="#footer">Footer</a>
   </nav>
 
   <%# ============================================================ COLOURS %>
@@ -525,6 +526,22 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Page header</span> · <code>render layout: "shared/page_header"</code>
         <p class="sg-purpose">Put the <code>&lt;h1&gt;</code> (plus any kicker, count, meta or inline action) in the block; pass <code>back_path</code> / <code>back_label</code> for the up-link, or omit them on a top-level page. Renders as the first child of the page's <code>flex flex-col gap-large</code> column.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# ============================================================== FOOTER %>
+  <section class="sg-section" id="footer">
+    <h2>Footer</h2>
+    <p class="sg-section__intro">A quiet, in-flow row of secondary links (about + the privacy notice), rendered once at the bottom of every page by the layout. Deliberately <b>recessive</b> — small, foreground-muted text — so it never competes with the feed; it sits below <code>&lt;main&gt;</code> and pins to the bottom on short pages. The real partial, the real CSS:</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <%= render 'shared/footer' %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Site footer</span> · <code>render 'shared/footer'</code>
+        <p class="sg-purpose">Already in the application layout — pages don't render it themselves. Add a link here (and a route) only when there's a genuinely new low-priority/legal destination; keep it short so the row stays scannable.</p>
       </div>
     </div>
   </section>

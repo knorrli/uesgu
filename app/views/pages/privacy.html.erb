@@ -1,0 +1,38 @@
+<% content_for :title, t('privacy.title') %>
+
+<div class="text-page flex flex-col gap-large">
+  <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
+    <h1><%= t('privacy.heading') %></h1>
+  <% end %>
+
+  <div class="prose flex flex-col gap-medium">
+    <p><%= t('privacy.intro') %></p>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('privacy.collect_heading') %></h2>
+      <ul>
+        <li><%= t('privacy.collect_account') %></li>
+        <li><%= t('privacy.collect_email') %></li>
+        <li><%= t('privacy.collect_content') %></li>
+        <li><%= t('privacy.collect_cookies') %></li>
+      </ul>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('privacy.nothing_heading') %></h2>
+      <p><%= t('privacy.nothing_body') %></p>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('privacy.delete_heading') %></h2>
+      <p><%= t('privacy.delete_body') %></p>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('privacy.contact_heading') %></h2>
+      <%# Plain text, not a mailto: kontakt@uesgu.ch has no inbox yet (inbound
+          forwarding is the open blocker in BACKLOG.md). Swap to mail_to once it's live. %>
+      <p><%= t('privacy.contact_body', email: t('privacy.contact_email')) %></p>
+    </section>
+  </div>
+</div>

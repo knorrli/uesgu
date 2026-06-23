@@ -1,0 +1,10 @@
+<%# Site footer: a quiet, in-flow row of secondary links (about + legal). Kept
+    recessive on purpose so it never competes with the feed. Sibling of <main>;
+    the body's flex column + main's `flex: 1 0 auto` pin it to the bottom on
+    short pages. Specimen lives in the styleguide (/styleguide #footer). %>
+<footer class="site-footer">
+  <nav class="site-footer__nav" aria-label="<%= t('footer.label') %>">
+    <%= link_to t('footer.about'), about_path %>
+    <%= link_to t('footer.privacy'), privacy_path %>
+  </nav>
+</footer>

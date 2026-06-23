@@ -29,6 +29,32 @@ en:
     benefit_quick: Opens with one tap, no browser
     benefit_notify: Notifications for new events from your saved filters
     benefit_home: Its own icon on your home screen
+  footer:
+    label: Footer
+    about: About
+    privacy: Privacy
+  about:
+    title: About üsgu
+    heading: About üsgu
+    intro: üsgu.ch gathers concerts and events from around the region into one place, straight from venue pages and event listings. No more checking ten websites to find out who's playing where and when.
+    why: I built it because I kept losing track myself, and missing shows I'd have loved to see. It's a private project for friends, not a startup and not a business. No ads, nothing to sell.
+    privacy: More info about data privacy →
+  privacy:
+    title: Privacy
+    heading: Privacy
+    intro: üsgu.ch is a private, non-commercial project and collects as little data as possible. Here's what's stored, and why.
+    collect_heading: What we store
+    collect_account: Your username and password (encrypted), so you can have an account.
+    collect_email: Your email address, only if you give one, and only to send you the notifications you set up.
+    collect_content: 'Whatever you create yourself: saved filters and saved events.'
+    collect_cookies: 'Three cookies: one keeps you logged in, one remembers your theme (light/dark), one remembers the filter you last applied. Nothing else.'
+    nothing_heading: What we don't do
+    nothing_body: No tracking, no analytics tools, no ads. We don't sell your data and we don't share it.
+    delete_heading: Deleting
+    delete_body: You can delete your account any time in settings, and everything that belongs to you goes with it.
+    contact_heading: Contact
+    contact_body: Questions about privacy? Write to %{email}.
+    contact_email: kontakt@uesgu.ch
   languages:
     de: German
     fr: French

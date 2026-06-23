@@ -29,6 +29,32 @@ de:
     benefit_quick: Mit einem Tipp geöffnet, ohne den Browser
     benefit_notify: Benachrichtigungen zu neuen Veranstaltungen aus deinen gespeicherten Filtern
     benefit_home: Eigenes Symbol auf deinem Startbildschirm
+  footer:
+    label: Fusszeile
+    about: Über üsgu
+    privacy: Datenschutz
+  about:
+    title: Über üsgu
+    heading: Über üsgu
+    intro: üsgu.ch sammelt Konzerte und Veranstaltungen aus der Region an einem Ort, direkt von den Seiten der Veranstalter und aus Veranstaltungslisten. Kein Abklappern von zehn Websites mehr, um zu sehen, wer wann wo spielt.
+    why: Ich hab üsgu gebaut, weil ich selber dauernd den Überblick verlor und Konzerte verpasste, die ich gern gesehen hätte. Es ist ein privates Projekt für Freunde, kein Startup und kein Geschäft. Keine Werbung, nichts zu verkaufen.
+    privacy: Hier gibts mehr zum Datenschutz →
+  privacy:
+    title: Datenschutz
+    heading: Datenschutz
+    intro: üsgu.ch ist ein privates, nicht-kommerzielles Projekt und sammelt so wenig Daten wie möglich. Hier steht, was gespeichert wird und warum.
+    collect_heading: Was wir speichern
+    collect_account: Deinen Benutzernamen und dein Passwort (verschlüsselt), damit du ein Konto hast.
+    collect_email: Deine E-Mail-Adresse, nur wenn du eine angibst, und nur um dir die Benachrichtigungen zu schicken, die du eingestellt hast.
+    collect_content: 'Was du selber anlegst: gespeicherte Filter und gemerkte Veranstaltungen.'
+    collect_cookies: 'Drei Cookies: einer hält dich eingeloggt, einer merkt sich dein Theme (hell/dunkel), einer den zuletzt angewendeten Filter. Sonst keine.'
+    nothing_heading: Was wir nicht tun
+    nothing_body: Kein Tracking, keine Statistik-Tools, keine Werbung. Wir verkaufen deine Daten nicht und geben sie nicht weiter.
+    delete_heading: Löschen
+    delete_body: Du kannst dein Konto jederzeit in den Einstellungen löschen, damit verschwindet alles, was zu dir gehört.
+    contact_heading: Kontakt
+    contact_body: Fragen zum Datenschutz? Schreib an %{email}.
+    contact_email: kontakt@uesgu.ch
   languages:
     de: Deutsch
     fr: Französisch

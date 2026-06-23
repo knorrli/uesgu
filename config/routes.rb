@@ -28,6 +28,11 @@ Rails.application.routes.draw do
   # most important first step for users). Linked from the header.
   get 'install', to: 'install#show', as: :install
 
+  # Footer pages — public, no account: "what is this / why" and the privacy
+  # notice. Linked from shared/_footer.
+  get 'about', to: 'pages#about', as: :about
+  get 'privacy', to: 'pages#privacy', as: :privacy
+
   resource :session
   resource :registration, only: %i[new create destroy]
   get 'signup', to: 'registrations#new'

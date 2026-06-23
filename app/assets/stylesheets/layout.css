@@ -157,6 +157,35 @@
   max-width: 64ch;
 }
 
+/* Site footer: a quiet, in-flow row of secondary links (about + legal). Held
+   recessive — small, foreground-muted text — so it never competes with the feed.
+   Same centered max-width column as the header/content; the body flex column
+   (+ main's `flex: 1 0 auto`) keeps it pinned to the bottom on short pages. */
+.site-footer {
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+  padding: var(--gap-large) var(--content-padding);
+  border-top: var(--border-width) solid var(--border-color);
+  font-size: var(--font-size-small);
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small) var(--gap-large);
+}
+
+.site-footer__nav a {
+  color: var(--theme-fg-muted);
+  text-decoration: none;
+}
+
+.site-footer__nav a:hover {
+  color: var(--theme-accent-color);
+  text-decoration: underline;
+}
+
 /* The count pill: a small accent-filled number attached to something else —
    unread notifications in the menu, the applied-filter count on a mobile filter
    trigger. One definition for both (was duplicated as .filter-trigger__badge).

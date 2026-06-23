@@ -5,23 +5,10 @@
 > **personal tool**: functional completeness is met; remaining work is polish
 > plus a few open items.
 
-## Planned
+## In progress
 
-- **Footer + "Über üsgu" / Datenschutz pages.**
-  - New `shared/_footer` partial in the app layout + a styleguide specimen.
-    Recessive (muted, small), in-flow (not sticky).
-  - Two links: **Über üsgu** (name chosen for the alliteration) and **Datenschutz**.
-  - *Über üsgu* — first-person, in voice: what üsgu is, why it was made, the
-    privacy-first stance. Static page, own route/controller in the vein of `install`.
-  - *Datenschutz* — short revDSG notice (username, optional email, theme cookie;
-    not shared/sold; how to delete the account), ending with a contact line
-    `kontakt@uesgu.ch`. **No Impressum, no real name** — non-commercial hobby site,
-    so the UWG e-commerce imprint duty doesn't apply.
-  - i18n in de/fr/en (French stays informal `tu`).
-  - ✅ Inbound `kontakt@uesgu.ch` is live (Infomaniak free mail service, forwards to
-    personal inbox; inbound delivery tested 2026-06-23). Ship the contact as a working
-    `mailto:` link.
-  - ⚠️ Datenschutz wording is **not lawyer-reviewed** — sanity-check before relying on it.
+- **Datenschutz wording is not lawyer-reviewed.** The `/privacy` (Datenschutz) copy
+  in de/fr/en is a best-effort revDSG notice — sanity-check before relying on it.
 
 ## Maybe-later (explicitly deferred)
 

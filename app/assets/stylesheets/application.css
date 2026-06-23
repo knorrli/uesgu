@@ -23,12 +23,13 @@ main.content {
   flex: 1 0 auto;
 }
 
-/* The cookie notice is fixed to the bottom; on a tall page (the calendar) the
-   last content row scrolled under it. Reserve clearance ONLY while the notice is
-   actually visible — the controller drops the `hidden` attr to show it and
-   removes the element entirely on dismiss / for returning visitors, so the space
-   is reclaimed the moment it's gone. */
-body:has(.cookie-notice:not([hidden])) main.content {
+/* The cookie notice is fixed to the bottom; without clearance the last row on a
+   tall page scrolls under it. The footer is now the bottom-most element, so the
+   clearance lives there (its links would otherwise hide behind the notice).
+   Reserve it ONLY while the notice is visible — the controller drops the `hidden`
+   attr to show it and removes the element entirely on dismiss / for returning
+   visitors, so the space is reclaimed the moment it's gone. */
+body:has(.cookie-notice:not([hidden])) .site-footer {
   padding-bottom: calc(var(--gap-large) + 3.5rem);
 }
 

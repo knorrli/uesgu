@@ -1,0 +1,27 @@
+/* Static text pages (Über üsgu, Datenschutz) — prose, not chrome. Mirrors the
+   install page's narrow single column, but tuned for reading rather than a hero
+   action. The .prose block owns the few raw HTML elements these pages use
+   (paragraphs, headings, lists, inline links) so the copy stays plain ERB. */
+
+.text-page {
+  max-width: 40rem;
+}
+
+/* Comfortable measure + a touch more line height than chrome text. */
+.prose {
+  line-height: 1.5;
+}
+
+.prose ul {
+  list-style: disc;
+  padding-left: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+}
+
+/* In-prose links get an underline (chrome links rely on position/colour for
+   affordance; a sentence link needs the underline to read as a link). */
+.prose a {
+  text-decoration: underline;
+}

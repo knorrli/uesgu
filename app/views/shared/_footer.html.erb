@@ -7,4 +7,10 @@
     <%= link_to t('footer.about'), about_path %>
     <%= link_to t('footer.privacy'), privacy_path %>
   </nav>
+  <%# Deployed version (git tag), right-aligned and recessive. Links to the
+      matching GitHub release; see lib/app_version.rb for the source string. %>
+  <%= link_to AppVersion.current, AppVersion.url,
+              class: "site-footer__version",
+              title: t("footer.version"),
+              rel: "noopener" %>
 </footer>

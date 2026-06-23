@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# Cut a release. Tags the current main commit `vX.Y.Z` and pushes the tag, which
+# triggers .github/workflows/release.yml → deploys to Render + publishes a GitHub
+# Release. Nothing reaches production except through this path.
+#
+#   bin/release 0.1.0        # tag v0.1.0 and ship it
+#
+# Before running: land your changes on main via PR and move the relevant notes
+# from the "Unreleased" section of CHANGELOG.md into a new version section.
+
+set -euo pipefail
+
+version="${1:-}"
+if [ -z "$version" ]; then
+  echo "Usage: bin/release X.Y.Z" >&2
+  exit 1
+fi
+
+# Accept both "0.1.0" and "v0.1.0"; normalise to a "v"-prefixed tag.
+version="${version#v}"
+if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Error: '$version' is not a semantic version (expected X.Y.Z)." >&2
+  exit 1
+fi
+tag="v${version}"
+
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [ "$branch" != "main" ]; then
+  echo "Error: release from main, not '$branch'." >&2
+  exit 1
+fi
+
+if [ -n "$(git status --porcelain)" ]; then
+  echo "Error: working tree is dirty. Commit or stash first." >&2
+  exit 1
+fi
+
+if git rev-parse "$tag" >/dev/null 2>&1; then
+  echo "Error: tag $tag already exists." >&2
+  exit 1
+fi
+
+echo "Fetching latest main…"
+git fetch origin main --tags --quiet
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
+  echo "Error: local main is not in sync with origin/main. Pull/push first." >&2
+  exit 1
+fi
+
+if ! grep -q "$tag" CHANGELOG.md 2>/dev/null; then
+  echo "Warning: $tag has no section in CHANGELOG.md." >&2
+  read -r -p "Continue anyway? [y/N] " reply
+  [ "$reply" = "y" ] || [ "$reply" = "Y" ] || { echo "Aborted."; exit 1; }
+fi
+
+echo "Tagging $tag…"
+git tag -a "$tag" -m "Release $tag"
+git push origin "$tag"
+
+echo
+echo "Pushed $tag. Watch the deploy:"
+echo "  https://github.com/knorrli/uesgu/actions/workflows/release.yml"

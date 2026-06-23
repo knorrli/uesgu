@@ -27,4 +27,12 @@ class FooterPagesTest < ActionDispatch::IntegrationTest
       assert_select "a[href=?]", privacy_path
     end
   end
+
+  test "footer shows the deployed version, linked to GitHub" do
+    get root_path
+    assert_response :success
+    assert_select "footer.site-footer a.site-footer__version", text: AppVersion.current do |links|
+      assert_match %r{\Ahttps://github\.com/knorrli/uesgu/}, links.first["href"]
+    end
+  end
 end

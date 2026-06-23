@@ -33,5 +33,8 @@
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 
+# Build-time version stamp, written by bin/render-build.sh (see lib/app_version.rb).
+/REVISION
+
 # Claude Code local files (per-project settings, session worktrees, scratch)
 .claude/

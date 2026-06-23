@@ -27,4 +27,19 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/service-worker", { scope: "/" })
     .catch((error) => console.error("Service worker registration failed:", error))
+
+  // Deep-link from a tapped push notification while this window is already open. The
+  // service worker (app/views/pwa/service-worker.js, navigateLiveClient) can't safely
+  // navigate us itself on iOS, so it asks us to do it: we ACK on the message port so
+  // it knows we're alive (and won't also openWindow), then visit the target. ACK
+  // first — the visit may tear this page down before a later postMessage would land.
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data?.type !== "navigate") return
+    event.ports[0]?.postMessage("ok")
+    if (window.Turbo) {
+      window.Turbo.visit(event.data.url)
+    } else {
+      window.location.href = event.data.url
+    }
+  })
 }

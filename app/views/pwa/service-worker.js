@@ -20,24 +20,61 @@ self.addEventListener("notificationclick", (event) => {
   const path = event.notification.data?.path || "/"
   const url = new URL(path, self.location.origin).href
 
-  event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      // Prefer focusing a tab already sitting on the target path.
-      for (const client of clientList) {
-        if (new URL(client.url).pathname === path && "focus" in client) {
-          return client.focus()
-        }
-      }
-      // Otherwise open the target. We deliberately do NOT use WindowClient.navigate():
-      // on iOS, a standalone PWA has a single window whose web-content process iOS
-      // suspends/evicts when backgrounded. The service worker still holds a stale
-      // WindowClient for it, and navigate() resurrects the window chrome without
-      // reloading the dead process — the blank white screen. openWindow() forces a
-      // real load (and on iOS standalone reuses the one window rather than spawning).
-      if (clients.openWindow) return clients.openWindow(url)
-    })
-  )
+  event.waitUntil(openNotificationPath(path, url))
 })
+
+// Bring the PWA to `path` when a push notification is tapped. Three cases, and iOS
+// standalone makes them subtle:
+//
+//  1. A live window is already sitting on `path` — just focus it.
+//  2. A live window is on some OTHER path (e.g. the app was backgrounded on the feed)
+//     — we must navigate it. iOS won't do this for us: clients.openWindow() on an
+//     already-running standalone PWA only FOCUSES the single window, it does not load
+//     the new URL — that's the deep-link bug this handler exists to fix. And
+//     WindowClient.navigate() is unsafe: if iOS had evicted the window's web-content
+//     process, navigate() resurrects the dead chrome to a blank white screen. So
+//     instead we postMessage the live page and let it navigate ITSELF (location-level
+//     visit), which is reliable precisely because the page is running to receive the
+//     message and ACK it.
+//  3. No live window — cold start, or the process was evicted and can't answer our
+//     message. clients.openWindow() forces a real load (reusing the one window on iOS).
+//
+// We can't tell a live window from an evicted-but-still-listed one synchronously, so
+// case 2 probes with a short ACK timeout and falls through to case 3 on silence.
+async function openNotificationPath(path, url) {
+  const clientList = await clients.matchAll({ type: "window", includeUncontrolled: true })
+
+  for (const client of clientList) {
+    if (new URL(client.url).pathname === path && "focus" in client) {
+      return client.focus()
+    }
+  }
+
+  for (const client of clientList) {
+    if (await navigateLiveClient(client, path, url)) return
+  }
+
+  if (clients.openWindow) return clients.openWindow(url)
+}
+
+// Focus a window and ask its page to navigate itself to `url`. Resolves true only if
+// the page answers within the timeout — i.e. it's genuinely alive and has taken over
+// the navigation. false means "treat it as dead; let the caller fall back to
+// openWindow()". The page-side listener lives in app/javascript/application.js.
+function navigateLiveClient(client, path, url) {
+  if (!("focus" in client) || !("postMessage" in client)) return Promise.resolve(false)
+
+  return new Promise((resolve) => {
+    const channel = new MessageChannel()
+    const timer = setTimeout(() => resolve(false), 600)
+    channel.port1.onmessage = () => {
+      clearTimeout(timer)
+      resolve(true)
+    }
+    client.focus()
+    client.postMessage({ type: "navigate", path, url }, [channel.port2])
+  })
+}
 
 // App-shell caching. The app is online-first for *content* — HTML, API calls and
 // everything cross-origin always hit the network — but the fingerprinted static

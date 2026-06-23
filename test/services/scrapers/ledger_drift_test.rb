@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 # Drift detection for the venue ledger (config/venue_ledger.yml). The ledger is
 # the authoritative "have we decided on this source?" record; these rules keep it
@@ -88,6 +88,6 @@ class Scrapers::LedgerDriftTest < Minitest::Test
   # must cover the same slugs, so neither can gain/lose a venue without the other.
   def test_petzi_venues_and_domains_stay_aligned
     assert_equal Scrapers::Petzi::VENUES.keys.sort, Scrapers::Petzi::DOMAINS.keys.sort,
-                 'Petzi::VENUES and Petzi::DOMAINS have diverged — every slug needs both a place and a domain'
+                 "Petzi::VENUES and Petzi::DOMAINS have diverged — every slug needs both a place and a domain"
   end
 end

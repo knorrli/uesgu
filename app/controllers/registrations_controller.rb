@@ -1,6 +1,6 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access only: %i[ new create ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_registration_url, alert: t('auth.rate_limited') }
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_registration_url, alert: t("auth.rate_limited") }
 
   def new
     @user = User.new
@@ -16,7 +16,7 @@ class RegistrationsController < ApplicationController
     invitation = Invitation.available_by_code(@invite_code)
 
     if invitation.nil?
-      @user.errors.add(:base, t('registrations.invalid_invite'))
+      @user.errors.add(:base, t("registrations.invalid_invite"))
       return render :new, status: :unprocessable_entity
     end
 
@@ -26,11 +26,11 @@ class RegistrationsController < ApplicationController
     end
 
     start_new_session_for @user
-    redirect_to root_path, notice: t('registrations.welcome')
+    redirect_to root_path, notice: t("registrations.welcome")
   rescue ActiveRecord::RecordInvalid
     render :new, status: :unprocessable_entity
   rescue Invitation::Unavailable
-    @user.errors.add(:base, t('registrations.invalid_invite'))
+    @user.errors.add(:base, t("registrations.invalid_invite"))
     render :new, status: :unprocessable_entity
   end
 
@@ -39,7 +39,7 @@ class RegistrationsController < ApplicationController
     user = Current.user
     terminate_session
     user.destroy
-    redirect_to root_path, notice: t('registrations.account_deleted'), status: :see_other
+    redirect_to root_path, notice: t("registrations.account_deleted"), status: :see_other
   end
 
   private

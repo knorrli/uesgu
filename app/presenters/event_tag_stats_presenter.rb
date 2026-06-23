@@ -2,7 +2,7 @@ class EventTagStatsPresenter
   def location_tags
     ActsAsTaggableOn::Tag
       .includes(:taggings)
-      .where(taggings: { context: 'locations', taggable_type: Event.name })
+      .where(taggings: { context: "locations", taggable_type: Event.name })
   end
 
   # Genres are now first-class; "in use" means present on at least one event.

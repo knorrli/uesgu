@@ -1,4 +1,4 @@
-require 'nokogiri'
+require "nokogiri"
 
 module Scrapers
   # PETZI (petzi.ch) is the Swiss federation of music venues; its agenda is the
@@ -19,20 +19,20 @@ module Scrapers
     # [venue, city, canton] our bespoke scrapers already declare, so a merged event
     # keeps one consistent location and dedup matches by venue.
     VENUES = {
-      'dachstock'            => ['Dachstock', 'Bern', 'BE'],
-      'isc'                  => ['ISC', 'Bern', 'BE'],
-      'cafe-kairo'           => ['Café Kairo', 'Bern', 'BE'],
-      'gaskessel'            => ['Gaskessel', 'Bern', 'BE'],
-      'kulturfabrik-kofmehl' => ['Kofmehl', 'Solothurn', 'SO'],
-      'fri-son'              => ['FriSon', 'Fribourg', 'FR'],
-      'sedel'                => ['Sedel', 'Luzern', 'LU'],
-      'nouveau-monde'        => ['Nouveau Monde', 'Fribourg', 'FR'],
-      'helsinki'             => ['Helsinki Klub', 'Zürich', 'ZH'],
-      'docks'                => ['Docks', 'Lausanne', 'VD'],
-      'treibhaus'            => ['Treibhaus', 'Luzern', 'LU'],
-      'neubad'               => ['Neubad', 'Luzern', 'LU'],
-      'kiff'                 => ['KIFF', 'Aarau', 'AG'],
-      'borom'                => ['Böröm', 'Aarau', 'AG']
+      "dachstock"            => ["Dachstock", "Bern", "BE"],
+      "isc"                  => ["ISC", "Bern", "BE"],
+      "cafe-kairo"           => ["Café Kairo", "Bern", "BE"],
+      "gaskessel"            => ["Gaskessel", "Bern", "BE"],
+      "kulturfabrik-kofmehl" => ["Kofmehl", "Solothurn", "SO"],
+      "fri-son"              => ["FriSon", "Fribourg", "FR"],
+      "sedel"                => ["Sedel", "Luzern", "LU"],
+      "nouveau-monde"        => ["Nouveau Monde", "Fribourg", "FR"],
+      "helsinki"             => ["Helsinki Klub", "Zürich", "ZH"],
+      "docks"                => ["Docks", "Lausanne", "VD"],
+      "treibhaus"            => ["Treibhaus", "Luzern", "LU"],
+      "neubad"               => ["Neubad", "Luzern", "LU"],
+      "kiff"                 => ["KIFF", "Aarau", "AG"],
+      "borom"                => ["Böröm", "Aarau", "AG"]
     }.freeze
 
     # slug => the venue's canonical domain (eTLD+1), so this aggregator can declare
@@ -41,31 +41,31 @@ module Scrapers
     # and fold onto the same consume row). Kept parallel to VENUES; the drift test
     # asserts the two key sets stay aligned.
     DOMAINS = {
-      'dachstock'            => 'dachstock.ch',
-      'isc'                  => 'isc-club.ch',
-      'cafe-kairo'           => 'cafe-kairo.ch',
-      'gaskessel'            => 'gaskessel.ch',
-      'kulturfabrik-kofmehl' => 'kofmehl.net',
-      'fri-son'              => 'fri-son.ch',
-      'sedel'                => 'sedel.ch',
-      'nouveau-monde'        => 'nouveaumonde.ch',
-      'helsinki'             => 'helsinkiklub.ch',
-      'docks'                => 'docks.ch',
-      'treibhaus'            => 'treibhausluzern.ch',
-      'neubad'               => 'neubad.org',
-      'kiff'                 => 'kiff.ch',
-      'borom'                => 'boeroem.ch'
+      "dachstock"            => "dachstock.ch",
+      "isc"                  => "isc-club.ch",
+      "cafe-kairo"           => "cafe-kairo.ch",
+      "gaskessel"            => "gaskessel.ch",
+      "kulturfabrik-kofmehl" => "kofmehl.net",
+      "fri-son"              => "fri-son.ch",
+      "sedel"                => "sedel.ch",
+      "nouveau-monde"        => "nouveaumonde.ch",
+      "helsinki"             => "helsinkiklub.ch",
+      "docks"                => "docks.ch",
+      "treibhaus"            => "treibhausluzern.ch",
+      "neubad"               => "neubad.org",
+      "kiff"                 => "kiff.ch",
+      "borom"                => "boeroem.ch"
     }.freeze
 
     # Multi-venue but statically enumerable: the 14 venue domains it covers.
     def self.venue_domains = DOMAINS.values
 
     def self.url
-      URI.parse('https://www.petzi.ch/en/sitemap.xml')
+      URI.parse("https://www.petzi.ch/en/sitemap.xml")
     end
 
     def self.location
-      'PETZI'
+      "PETZI"
     end
 
     def self.locations
@@ -89,7 +89,7 @@ module Scrapers
     def event_rows
       xml = Nokogiri::XML(page.body)
       xml.remove_namespaces!
-      xml.css('loc').map(&:text).select { |u| u.include?('/events/') && venue_for(u) }
+      xml.css("loc").map(&:text).select { |u| u.include?("/events/") && venue_for(u) }
     end
 
     # The canonical link is the venue's OWN event page. PETZI exposes it on the
@@ -112,20 +112,20 @@ module Scrapers
       date = title_parts(content).find { |p| p =~ %r{\A\d{2}\.\d{2}\.\d{4}\z} }
       raise "Unparseable PETZI date for #{current_row}" if date.blank?
 
-      d, m, y = date.split('.').map(&:to_i)
+      d, m, y = date.split(".").map(&:to_i)
       hour, minute = show_or_doors(content)
       Time.zone.local(y, m, d, hour, minute)
     end
 
     def event_title(content)
-      squish(content.parser.at_css('h1')&.text)
+      squish(content.parser.at_css("h1")&.text)
     end
 
     # Curated venue tags ("Concert", "Rock", "Hip-Hop"). Free-text, so type tags
     # like "Concert"/"Festival" mint too and are curated (filed/aliased/blocked)
     # downstream rather than dropped at ingest.
     def event_genres(content)
-      content.parser.css('a.tag').map { |a| squish(a.text) }.reject(&:blank?).uniq
+      content.parser.css("a.tag").map { |a| squish(a.text) }.reject(&:blank?).uniq
     end
 
     # Multi-venue: resolve from the row (URL) currently being processed.
@@ -135,10 +135,10 @@ module Scrapers
 
     private
 
-    def squish(str) = str.to_s.gsub(/\s+/, ' ').strip
+    def squish(str) = str.to_s.gsub(/\s+/, " ").strip
 
     def title_parts(content)
-      squish(content.parser.at_css('title')&.text).split(' / ')
+      squish(content.parser.at_css("title")&.text).split(" / ")
     end
 
     # Prefer the show time; fall back to doors; then midnight if neither is shown.
@@ -169,7 +169,7 @@ module Scrapers
       return if domain.blank?
 
       page.links.filter_map(&:href)
-          .find { |href| href.start_with?('http') && Scrapers::Discovery.domain(href) == domain }
+          .find { |href| href.start_with?("http") && Scrapers::Discovery.domain(href) == domain }
     end
 
     def slug_for(url)

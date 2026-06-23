@@ -57,7 +57,7 @@ module Scrapers
         # Admin-pinned merge/un-merge: leave the link as the admin set it. A
         # pinned standalone (link nil) still counts as a canonical others can fold
         # onto; a pinned merge keeps pointing where it was pinned.
-        if e.overridden?('canonical_event')
+        if e.overridden?("canonical_event")
           canonicals << e if e.canonical_event_id.nil?
           next
         end
@@ -81,7 +81,7 @@ module Scrapers
     def source_rank(event)
       case event.data_source
       when /\AOLE:/ then 0
-      when 'Petzi'  then 2
+      when "Petzi"  then 2
       else 1
       end
     end
@@ -129,9 +129,9 @@ module Scrapers
 
     def tokens(title)
       title.to_s.downcase
-           .tr('äöüàâéèêëïîçáí', 'aouaaeeeeiicai')
-           .gsub(/\(.*?\)/, ' ')
-           .gsub(/[^a-z0-9 ]/, ' ')
+           .tr("äöüàâéèêëïîçáí", "aouaaeeeeiicai")
+           .gsub(/\(.*?\)/, " ")
+           .gsub(/[^a-z0-9 ]/, " ")
            .split
            .reject { |t| STOP.include?(t) || t.length < 2 }
            .to_set

@@ -162,6 +162,11 @@
    Same centered max-width column as the header/content; the body flex column
    (+ main's `flex: 1 0 auto`) keeps it pinned to the bottom on short pages. */
 .site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-small) var(--gap-large);
   width: 100%;
   max-width: var(--content-max-width);
   margin-inline: auto;
@@ -182,6 +187,19 @@
 }
 
 .site-footer__nav a:hover {
+  color: var(--theme-accent-color);
+  text-decoration: underline;
+}
+
+/* Deployed version (git tag): recessive, tabular, pushed to the right by the
+   footer's space-between. Quieter than the nav links so it reads as a label. */
+.site-footer__version {
+  color: var(--theme-fg-muted);
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
+.site-footer__version:hover {
   color: var(--theme-accent-color);
   text-decoration: underline;
 }

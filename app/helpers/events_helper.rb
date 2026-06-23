@@ -5,7 +5,7 @@ module EventsHelper
   # Route-agnostic (via url_for) so the same calendar partials drive both the
   # main programme and the saved-shows list.
   def calendar_day_path(date)
-    calendar_listing_path(calendar_state_params.merge('day' => date.iso8601))
+    calendar_listing_path(calendar_state_params.merge("day" => date.iso8601))
   end
 
   def calendar_collapse_path
@@ -13,7 +13,7 @@ module EventsHelper
   end
 
   def calendar_state_params
-    request.query_parameters.except('day', 'page').merge('view' => 'calendar')
+    request.query_parameters.except("day", "page").merge("view" => "calendar")
   end
 
   # Listing/aggregator hosts (eTLD+1 → friendly name) we link OUT to when an event
@@ -22,16 +22,16 @@ module EventsHelper
   # page when one exists, so only the genuinely off-site links get badged. Add a
   # row when a new source can land users somewhere other than the venue.
   OFFSITE_SOURCES = {
-    'bewegungsmelder.ch' => 'Bewegungsmelder',
-    'eventfrog.ch'       => 'Eventfrog',
-    'petzi.ch'           => 'PETZI'
+    "bewegungsmelder.ch" => "Bewegungsmelder",
+    "eventfrog.ch"       => "Eventfrog",
+    "petzi.ch"           => "PETZI"
   }.freeze
 
   # The friendly name of the listing site an event's link points at, or nil when
   # it points at the venue's own site (the common case → no badge). Lets the event
   # card flag "this link leaves you at Bewegungsmelder, not the venue".
   def event_offsite_source(event)
-    host = URI.parse(event.url.to_s).host&.downcase&.delete_prefix('www.')
+    host = URI.parse(event.url.to_s).host&.downcase&.delete_prefix("www.")
     return nil if host.blank?
 
     OFFSITE_SOURCES[host] || OFFSITE_SOURCES.find { |domain, _| host.end_with?(".#{domain}") }&.last
@@ -50,7 +50,7 @@ module EventsHelper
   # changing months collapses any open day. Other state (filter) is preserved.
   def calendar_nav_path(url)
     uri = URI.parse(url)
-    query = Rack::Utils.parse_nested_query(uri.query).except('day')
+    query = Rack::Utils.parse_nested_query(uri.query).except("day")
     uri.query = query.presence && query.to_query
     uri.to_s
   end
@@ -76,14 +76,14 @@ module EventsHelper
   # notification digest passing interactive: false) it stays a plain single-value
   # link into the listing — a way back into the site.
   def event_filter_tag(label, field:, value:, interactive: true, modifier: nil)
-    param = field.delete_suffix('[]')
+    param = field.delete_suffix("[]")
 
     unless interactive
       return link_to label, events_path(param.to_sym => Array(value), filtered: 1),
-                     class: class_names('filter-link', modifier)
+                     class: class_names("filter-link", modifier)
     end
 
-    applied = request.query_parameters.except('page')
+    applied = request.query_parameters.except("page")
 
     # Which applied filter params light this tag, and the match RULE for each (the
     # rule is keyed to the APPLIED param, not the tag, so one tag can answer to two
@@ -93,7 +93,7 @@ module EventsHelper
     # own param exactly (locations).
     matchers =
       case param
-      when 'g' then { 'g' => 'g', 'q' => 'q' }
+      when "g" then { "g" => "g", "q" => "q" }
       else { param => param }
       end
     matched = matchers.to_h { |p, rule| [p, filter_terms_matching(Array(applied[p]), value, param: rule)] }
@@ -117,9 +117,9 @@ module EventsHelper
     # `filtered: 1` marks this as a deliberate filter action (see EventsController),
     # so toggling the LAST term off lands on a /events?filtered=1 that clears the
     # persistence cookie instead of replaying it (the marker is stripped on redirect).
-    link_to label, events_path(query.merge('filtered' => 1)),
-            class: class_names('filter-link', modifier, active: active),
-            data: { turbo_frame: '_top' }
+    link_to label, events_path(query.merge("filtered" => 1)),
+            class: class_names("filter-link", modifier, active: active),
+            data: { turbo_frame: "_top" }
   end
 
   # The applied terms that "match" a tag — the ones that light it green and that
@@ -129,10 +129,10 @@ module EventsHelper
   # Case-insensitive.
   def filter_terms_matching(applied_terms, value, param:)
     case param
-    when 'q'
+    when "q"
       haystack = value.to_s.downcase
       applied_terms.select { |term| haystack.include?(term.to_s.downcase) }
-    when 'g'
+    when "g"
       # A genre tag lights when an applied genre filter's SUBTREE contains it —
       # descendant-set membership, reusing the same tree expansion Filter matches
       # with (so filtering "Rock" lights a row's "Shoegaze"). Tapping it removes
@@ -176,7 +176,7 @@ module EventsHelper
   # isn't already an applied (green) filter term — so amber never doubles green.
   def interest_why_genre?(event, genre)
     return false unless interest_profile.any?
-    return false if applied_filter_term?('g', genre.name)
+    return false if applied_filter_term?("g", genre.name)
 
     interest_profile.why_genres(event).include?(genre)
   end
@@ -189,15 +189,15 @@ module EventsHelper
     Array(events)
       .flat_map { |event| interest_profile.why_locations(event) }
       .map(&:name)
-      .reject { |name| applied_filter_term?('l', name) }
+      .reject { |name| applied_filter_term?("l", name) }
       .to_set
   end
 
   # Mirrors the "is this tag in your applied filter" test in event_filter_tag: a
   # genre lights from a g[] subtree or a q[] CONTAINS, a location matches exactly.
   def applied_filter_term?(param, value)
-    applied = request.query_parameters.except('page')
-    matchers = param == 'g' ? { 'g' => 'g', 'q' => 'q' } : { param => param }
+    applied = request.query_parameters.except("page")
+    matchers = param == "g" ? { "g" => "g", "q" => "q" } : { param => param }
     matchers.any? { |applied_param, rule| filter_terms_matching(Array(applied[applied_param]), value, param: rule).present? }
   end
 
@@ -208,14 +208,14 @@ module EventsHelper
 
     saved = event_saved?(event)
     button_tag type: :button,
-               class: class_names('event-save', 'icon-button', saved: saved),
+               class: class_names("event-save", "icon-button", saved: saved),
                'aria-pressed': saved.to_s,
-               'aria-label': t('saved_events.toggle'),
-               data: { controller: 'save', action: 'save#toggle',
+               'aria-label': t("saved_events.toggle"),
+               data: { controller: "save", action: "save#toggle",
                        save_event_id_value: event.id, save_saved_value: saved } do
       # A masked heart (not the ph font glyph) so the saved state can fill solid,
       # outline→fill — see .save-heart.
-      content_tag(:span, '', class: 'save-heart', 'aria-hidden': true)
+      content_tag(:span, "", class: "save-heart", 'aria-hidden': true)
     end
   end
 end

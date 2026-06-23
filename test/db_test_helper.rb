@@ -10,8 +10,8 @@
 # genre names only — never real taxonomy content — so taxonomy edits in the
 # parallel refactor can't break these tests. The TaxonomyFixtures helper below
 # makes the synthetic data obvious at every call site.
-require_relative 'test_helper'
-require 'rails/test_help'
+require_relative "test_helper"
+require "rails/test_help"
 
 module TaxonomyFixtures
   # Monotonic suffix so repeated calls in one test never collide on the unique
@@ -73,7 +73,7 @@ module TaxonomyFixtures
     Invitation.create!(attrs)
   end
 
-  PASSWORD = 'secret123'
+  PASSWORD = "secret123"
 
   # Integration-test sign-in: drive the real session-create flow so the signed
   # cookie is set in the test's cookie jar. Only meaningful inside an

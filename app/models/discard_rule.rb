@@ -5,7 +5,7 @@
 # .reapply_all!), never sticky — editing or deleting a rule reverses it. That's
 # the key difference from Event#dismiss! (manual, per-event, permanent).
 class DiscardRule < ApplicationRecord
-  has_many :discarded_events, class_name: 'Event', foreign_key: :discarded_by_rule_id,
+  has_many :discarded_events, class_name: "Event", foreign_key: :discarded_by_rule_id,
                               inverse_of: :discarded_by_rule, dependent: :nullify
 
   # Length floor so a stray one-character rule can't sweep the whole table.
@@ -23,7 +23,7 @@ class DiscardRule < ApplicationRecord
   # shows what a rule WOULD catch while you're still toggling it.
   def matching_events
     needle = "%#{ActiveRecord::Base.sanitize_sql_like(pattern.to_s)}%"
-    scope = Event.kept.where('events.title ILIKE :n OR events.description ILIKE :n', n: needle)
+    scope = Event.kept.where("events.title ILIKE :n OR events.description ILIKE :n", n: needle)
     scope = scope.tagged_with(scraper, on: :locations) if scraper.present?
     scope
   end
@@ -49,7 +49,7 @@ class DiscardRule < ApplicationRecord
   def self.reapply_all!
     Event.kept.where.not(discarded_by_rule_id: nil).update_all(discarded_by_rule_id: nil)
     active.by_recency.each do |rule|
-      ids = rule.matching_events.where(discarded_by_rule_id: nil).pluck('events.id')
+      ids = rule.matching_events.where(discarded_by_rule_id: nil).pluck("events.id")
       Event.where(id: ids).update_all(discarded_by_rule_id: rule.id)
     end
   end

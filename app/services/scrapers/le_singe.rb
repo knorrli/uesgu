@@ -5,12 +5,12 @@ module Scrapers
   # plain Hashes — the field extractors read keys instead of CSS.
   class LeSinge < Agent
     def self.location
-      'Le Singe'
+      "Le Singe"
     end
 
     # Biel/Bienne is in canton Bern.
     def self.locations
-      [location, 'Biel', 'BE']
+      [location, "Biel", "BE"]
     end
 
     # location=1 is Le Singe. The endpoint pages by `offset` in steps of 10.
@@ -39,42 +39,42 @@ module Scrapers
     end
 
     def event_url(row)
-      row['detailUrl'].presence
+      row["detailUrl"].presence
     end
 
     # startDate is a clean "YYYY-MM-DD HH:MM:SS" (year present); startTime is the
     # real door/show time in "HHhMM" form (e.g. "17h00").
     def event_start_time(row)
-      date = row['startDate'].to_s[/\d{4}-\d{2}-\d{2}/]
+      date = row["startDate"].to_s[/\d{4}-\d{2}-\d{2}/]
       raise "Unparseable Le Singe date: #{row['startDate'].inspect}" if date.blank?
 
-      time = row['startTime'].to_s.tr('h', ':')[/\d{1,2}:\d{2}/]
+      time = row["startTime"].to_s.tr("h", ":")[/\d{1,2}:\d{2}/]
       Time.zone.parse("#{date} #{time}")
     end
 
     def event_title(row)
-      row['nameBand'].presence || row['title']
+      row["nameBand"].presence || row["title"]
     end
 
     def event_description(row)
-      row['subTitle'].presence
+      row["subTitle"].presence
     end
 
     # The endpoint's `genres` is a curated, closed vocabulary maintained by the
     # collective (with stable numeric genreIds) — a clean structured field, so it
     # is allowed to mint taxonomy (discovery).
     def event_genres(row)
-      Array(row['genres']).map { |g| g.to_s.squish }.compact_blank
+      Array(row["genres"]).map { |g| g.to_s.squish }.compact_blank
     end
 
     def event_cancelled?(_event, row)
-      row['isCancelled'] == true
+      row["isCancelled"] == true
     end
 
     private
 
     def data_from(body)
-      parse_json(body, default: {}).fetch('data', [])
+      parse_json(body, default: {}).fetch("data", [])
     end
   end
 end

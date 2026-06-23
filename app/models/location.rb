@@ -65,9 +65,9 @@ class Location
     venues = venue_names
     cantons = canton_codes
     ActsAsTaggableOn::Tagging
-      .where(context: 'locations', taggable_type: Event.name)
+      .where(context: "locations", taggable_type: Event.name)
       .joins(:tag)
-      .group('tags.name')
+      .group("tags.name")
       .count
       .map do |name, count|
         type = venues.include?(name) ? :venue : (cantons.include?(name) ? :canton : :city)

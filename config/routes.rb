@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get 'up' => 'rails/health#show', as: :rails_health_check
+  get "up" => "rails/health#show", as: :rails_health_check
 
   # Render dynamic PWA files from app/views/pwa/* (manifest is linked in the
   # layout head; the service worker is registered in application.js).
@@ -22,20 +22,20 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  root 'events#index'
+  root "events#index"
 
   # Public "add üsgu to your phone" page — no account required (installing is the
   # most important first step for users). Linked from the header.
-  get 'install', to: 'install#show', as: :install
+  get "install", to: "install#show", as: :install
 
   # Footer pages — public, no account: "what is this / why" and the privacy
   # notice. Linked from shared/_footer.
-  get 'about', to: 'pages#about', as: :about
-  get 'privacy', to: 'pages#privacy', as: :privacy
+  get "about", to: "pages#about", as: :about
+  get "privacy", to: "pages#privacy", as: :privacy
 
   resource :session
   resource :registration, only: %i[new create destroy]
-  get 'signup', to: 'registrations#new'
+  get "signup", to: "registrations#new"
   resource :settings, only: %i[show update]
   resources :notifications, only: %i[index show]
 
@@ -69,10 +69,10 @@ Rails.application.routes.draw do
   # Web Push opt-in/out for the current device. Keyed by endpoint (in the body),
   # not an id, so a singular-style pair of bare routes fits better than a
   # resource collection.
-  post 'push_subscriptions' => 'push_subscriptions#create'
-  delete 'push_subscriptions' => 'push_subscriptions#destroy'
+  post "push_subscriptions" => "push_subscriptions#create"
+  delete "push_subscriptions" => "push_subscriptions#destroy"
   # Send a test push to the current device, so a user can verify it arrives.
-  post 'push_subscriptions/test' => 'push_subscriptions#test'
+  post "push_subscriptions/test" => "push_subscriptions#test"
 
   # Living styleguide: a single admin-only page that renders every shared UI
   # element with the real bundled CSS, so it stays in sync as the styles change
@@ -87,7 +87,7 @@ Rails.application.routes.draw do
   end
 
   scope :admin do
-    get '', to: 'admin#index', as: :admin
+    get "", to: "admin#index", as: :admin
 
     # Genre curation. index/edit browse + open the per-genre editor; queue is the
     # "tinder" flow serving the next genre not yet filed into the tree; set_parent
@@ -145,7 +145,7 @@ Rails.application.routes.draw do
     resources :locations, only: %i[index]
 
     # Per-scraper data-coverage matrix (fill-rates computed live from events).
-    get 'scraper_coverage', to: 'scraper_coverage#index', as: :scraper_coverage
+    get "scraper_coverage", to: "scraper_coverage#index", as: :scraper_coverage
 
     # Admin-authored rules that auto-discard junk scraped events by text match.
     # preview is a live, save-less lookup of the events a (possibly unsaved) rule

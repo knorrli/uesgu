@@ -1,26 +1,26 @@
 module TagsHelper
   # Phosphor weight applied to every icon (the base class the glyph sits on).
-  ICON_BASE = 'ph'
+  ICON_BASE = "ph"
 
   # The Phosphor glyph class for a tag context, without the ICON_BASE weight,
   # e.g. 'ph-house'. Kept separate so JS can swap a single glyph class on an
   # element that already carries ICON_BASE.
   def tag_icon_glyph(context:)
     case context.to_s
-    when 'query'
-      'ph-magnifying-glass'
-    when 'date'
-      'ph-calendar-dots'
-    when 'genres'
-      'ph-tag'
-    when 'locations', 'venue'
-      'ph-house'
-    when 'city'
-      'ph-map-pin'
-    when 'canton'
-      'ph-map-trifold'
+    when "query"
+      "ph-magnifying-glass"
+    when "date"
+      "ph-calendar-dots"
+    when "genres"
+      "ph-tag"
+    when "locations", "venue"
+      "ph-house"
+    when "city"
+      "ph-map-pin"
+    when "canton"
+      "ph-map-trifold"
     else
-      'ph-lightning'
+      "ph-lightning"
     end
   end
 
@@ -35,12 +35,12 @@ module TagsHelper
   # PER-TYPE from the value (canton/city/venue), so a location chip's icon tells
   # you which kind of place.
   FILTER_CHIP_GLYPH = {
-    'q[]' => 'ph-magnifying-glass',
-    'd[]' => 'ph-calendar-dots'
+    "q[]" => "ph-magnifying-glass",
+    "d[]" => "ph-calendar-dots"
   }.freeze
 
   def filter_chip_icon(param, value = nil)
-    return tag_icon_class(context: Location.type_for(value)) if param == 'l[]' && value.present?
+    return tag_icon_class(context: Location.type_for(value)) if param == "l[]" && value.present?
 
     "#{ICON_BASE} #{FILTER_CHIP_GLYPH.fetch(param, 'ph-lightning')}"
   end
@@ -84,7 +84,7 @@ module TagsHelper
     return nil if count.zero?
 
     { name: genre.name, value: genre.name, count: count,
-      search: ([genre.name] + child_nodes.map { |node| node[:search] }).join(' '),
+      search: ([genre.name] + child_nodes.map { |node| node[:search] }).join(" "),
       children: child_nodes }
   end
 
@@ -121,14 +121,14 @@ module TagsHelper
 
         { name: city, value: city, type: :city,
           count: counts[city] || venue_nodes.sum { |v| v[:count] },
-          search: ([city] + venue_nodes.map { |v| v[:name] }).join(' '), children: venue_nodes }
+          search: ([city] + venue_nodes.map { |v| v[:name] }).join(" "), children: venue_nodes }
       end
       next if city_nodes.empty? && counts[canton].to_i.zero?
 
       name = canton_name(canton)
       { name: name, value: canton, type: :canton,
         count: counts[canton] || city_nodes.sum { |c| c[:count] },
-        search: ([name, canton] + city_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(' '),
+        search: ([name, canton] + city_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(" "),
         children: city_nodes }
     end
   end

@@ -4,15 +4,15 @@ module Scrapers
   # keyed by event id. Rows are Hashes.
   class RoteFabrik < Agent
     def self.location
-      'Rote Fabrik'
+      "Rote Fabrik"
     end
 
     def self.locations
-      [location, 'Zürich', 'ZH']
+      [location, "Zürich", "ZH"]
     end
 
     def self.url
-      URI.parse('https://kalender.rotefabrik.ch/api/events?categories=konzert')
+      URI.parse("https://kalender.rotefabrik.ch/api/events?categories=konzert")
     end
 
     # The feed is a dict keyed by event id; each value is one occurrence carrying a
@@ -29,7 +29,7 @@ module Scrapers
     # `r_f_event_id` collides with an unrelated occurrence in the public route — so
     # both halves of the old URL were wrong (see event_url_pattern + the golden suite).
     def event_url(row)
-      id = row['id']
+      id = row["id"]
       "https://rotefabrik.ch/de/programm.html#/events/#{id}" if id.present?
     end
 
@@ -42,19 +42,19 @@ module Scrapers
     # Top-level `date` is "YYYY-MM-DD HH:MM:SS" (year present); the real start is
     # the `from` (or door) "HH:MM:SS" time.
     def event_start_time(row)
-      date = row['date'].to_s[/\d{4}-\d{2}-\d{2}/]
+      date = row["date"].to_s[/\d{4}-\d{2}-\d{2}/]
       raise "Unparseable Rote Fabrik date: #{row['date'].inspect}" if date.blank?
 
-      time = (row['from'].presence || row['door']).to_s[/\d{1,2}:\d{2}/]
+      time = (row["from"].presence || row["door"]).to_s[/\d{1,2}:\d{2}/]
       Time.zone.parse("#{date} #{time}")
     end
 
     def event_title(row)
-      row.dig('rf_event', 'title').to_s.squish
+      row.dig("rf_event", "title").to_s.squish
     end
 
     def event_description(row)
-      row.dig('rf_event', 'subtitle').to_s.squish.presence
+      row.dig("rf_event", "subtitle").to_s.squish.presence
     end
 
     # Fine genre facet (`tags`, a structured {id,name,slug} field) — clean by
@@ -67,7 +67,7 @@ module Scrapers
     field_gaps genres: :dormant
 
     def event_genres(row)
-      Array(row.dig('rf_event', 'tags')).map { |t| (t.is_a?(Hash) ? t['name'] : t).to_s.squish }.compact_blank
+      Array(row.dig("rf_event", "tags")).map { |t| (t.is_a?(Hash) ? t["name"] : t).to_s.squish }.compact_blank
     end
 
     # `tags` is dormant (above), but `rf_event.description` is populated HTML prose
@@ -75,7 +75,7 @@ module Scrapers
     # (Scrapers::Agent match-only mining), so these events aren't genre-blind while
     # the structured facet stays empty.
     def event_genre_prose(row)
-      html = row.dig('rf_event', 'description').to_s
+      html = row.dig("rf_event", "description").to_s
       Nokogiri::HTML(html).text if html.present?
     end
   end

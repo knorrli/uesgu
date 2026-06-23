@@ -86,8 +86,8 @@ class ScraperCoveragePresenter
   def base_counts
     Event.where.not(data_source: nil).group(:data_source).pluck(
       :data_source,
-      Arel.sql('COUNT(*)'),
-      Arel.sql('COUNT(start_time)'),
+      Arel.sql("COUNT(*)"),
+      Arel.sql("COUNT(start_time)"),
       Arel.sql("COUNT(NULLIF(description, ''))")
     ).to_h { |source, total, time, sub| [source, [total, time, sub]] }
   end
@@ -102,8 +102,8 @@ class ScraperCoveragePresenter
          .group(:data_source)
          .pluck(
            :data_source,
-           Arel.sql('COUNT(DISTINCT CASE WHEN taggings.id IS NOT NULL THEN events.id END)'),
-           Arel.sql('COUNT(DISTINCT taggings.tag_id)')
+           Arel.sql("COUNT(DISTINCT CASE WHEN taggings.id IS NOT NULL THEN events.id END)"),
+           Arel.sql("COUNT(DISTINCT taggings.tag_id)")
          ).to_h { |source, with_genre, distinct| [source, [with_genre, distinct]] }
   end
 end

@@ -1,40 +1,40 @@
-require 'db_test_helper'
+require "db_test_helper"
 
 # Locks the settings update: persists preferences, and treats a blank password
 # as "leave unchanged" rather than clearing it.
 class SettingsTest < ActionDispatch::IntegrationTest
-  test 'update persists the locale' do
+  test "update persists the locale" do
     u = sign_in_as user
-    patch settings_path, params: { user: { locale: 'en' } }
+    patch settings_path, params: { user: { locale: "en" } }
     assert_redirected_to settings_path
 
-    assert_equal 'en', u.reload.locale
+    assert_equal "en", u.reload.locale
   end
 
-  test 'a blank password leaves the existing password intact' do
+  test "a blank password leaves the existing password intact" do
     u = sign_in_as user
-    patch settings_path, params: { user: { locale: 'de', password: '' } }
+    patch settings_path, params: { user: { locale: "de", password: "" } }
     assert_redirected_to settings_path
 
-    assert u.reload.authenticate(PASSWORD), 'old password still works'
+    assert u.reload.authenticate(PASSWORD), "old password still works"
   end
 
-  test 'settings require authentication' do
+  test "settings require authentication" do
     get settings_path
     assert_redirected_to new_session_path
   end
 
-  test 'the settings form ignores event_reminders (moved to the saved-shows page)' do
+  test "the settings form ignores event_reminders (moved to the saved-shows page)" do
     u = sign_in_as user
     refute u.event_reminders?
 
     # The toggle no longer lives on Settings, so a stray param must NOT flip it
     # (it's not permitted here) — the saved-shows endpoint owns it now.
-    patch settings_path, params: { user: { locale: 'de', event_reminders: '1' } }
+    patch settings_path, params: { user: { locale: "de", event_reminders: "1" } }
     refute u.reload.event_reminders?
   end
 
-  test 'settings page renders the account and delete sections, logout in the header' do
+  test "settings page renders the account and delete sections, logout in the header" do
     sign_in_as user
     get settings_path
 
@@ -42,12 +42,12 @@ class SettingsTest < ActionDispatch::IntegrationTest
     # Account section + its single save form (language/email/password share one
     # form), and the delete-account section. The per-device notifications section
     # only renders when web push is configured, so it's absent here.
-    assert_select 'h2', text: I18n.t('settings.account_heading')
-    assert_select 'input[type=submit]', 1
-    assert_select 'h2', text: I18n.t('settings.delete_account_heading')
+    assert_select "h2", text: I18n.t("settings.account_heading")
+    assert_select "input[type=submit]", 1
+    assert_select "h2", text: I18n.t("settings.delete_account_heading")
     # Logout is a page-level action in the header (no longer its own section).
-    assert_select 'form[action=?][method=post] button', session_path
+    assert_select "form[action=?][method=post] button", session_path
     # Install moved to the top nav — it's not on the settings page anymore.
-    assert_select '.install-block', false
+    assert_select ".install-block", false
   end
 end

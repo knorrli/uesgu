@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 # Locks the Schüür date parser independent of the big captured fixture.
 #
@@ -21,29 +21,29 @@ require 'test_helper'
 class Scrapers::SchueuerTest < Minitest::Test
   # day-shaped string => expected "YYYY-MM-DD HH:MM" (nil = should not parse)
   PARSEABLE = {
-    'Do. 11. Juni 2026 – 21:00'             => '2026-06-11 21:00', # full month
-    'Mi. 01. Juli 2026 – 17:00'             => '2026-07-01 17:00',
-    'Do. 06. Aug. 2026 – 21:00'             => '2026-08-06 21:00', # abbrev + dot
-    'Do. 08. Okt. 2026 – 19:00'             => '2026-10-08 19:00', # abbrev that old code raised on
-    'Mo. 29. Dez. 2026 – 19:00'             => '2026-12-29 19:00',
-    'Do. 5. März 2026 – 20:00'              => '2026-03-05 20:00', # single-digit day + umlaut month
-    'Fr. 11. – So. 13. Juni 2026 – 20:00'   => '2026-06-11 20:00', # day range → start day
-    '11.–13. Juli 2026'                     => '2026-07-11 00:00'  # compact range, no time
+    "Do. 11. Juni 2026 – 21:00"             => "2026-06-11 21:00", # full month
+    "Mi. 01. Juli 2026 – 17:00"             => "2026-07-01 17:00",
+    "Do. 06. Aug. 2026 – 21:00"             => "2026-08-06 21:00", # abbrev + dot
+    "Do. 08. Okt. 2026 – 19:00"             => "2026-10-08 19:00", # abbrev that old code raised on
+    "Mo. 29. Dez. 2026 – 19:00"             => "2026-12-29 19:00",
+    "Do. 5. März 2026 – 20:00"              => "2026-03-05 20:00", # single-digit day + umlaut month
+    "Fr. 11. – So. 13. Juni 2026 – 20:00"   => "2026-06-11 20:00", # day range → start day
+    "11.–13. Juli 2026"                     => "2026-07-11 00:00"  # compact range, no time
   }.freeze
 
   UNPARSEABLE = [
-    'Diverse Daten',          # no day/month/year at all
-    'Demnächst',              # placeholder
-    '32. Juni 2026 – 20:00',  # day out of range — old code raised "argument out of range"
-    'Sa. 11. Foobar 2026',    # unknown month word
-    ''
+    "Diverse Daten",          # no day/month/year at all
+    "Demnächst",              # placeholder
+    "32. Juni 2026 – 20:00",  # day out of range — old code raised "argument out of range"
+    "Sa. 11. Foobar 2026",    # unknown month word
+    ""
   ].freeze
 
   def test_parses_every_real_date_shape
     PARSEABLE.each do |raw, expected|
       time = scraper.send(:parse_start_time, raw)
       refute_nil time, "expected #{raw.inspect} to parse"
-      assert_equal expected, time.strftime('%Y-%m-%d %H:%M'),
+      assert_equal expected, time.strftime("%Y-%m-%d %H:%M"),
                    "wrong start time for #{raw.inspect}"
     end
   end
@@ -64,17 +64,17 @@ class Scrapers::SchueuerTest < Minitest::Test
     fake_logger.define_singleton_method(:warn) { |msg| logged = msg }
 
     Rails.stub(:logger, fake_logger) do
-      assert scraper.send(:skip_row?, row_with_date('Diverse Daten')),
-             'expected an unparseable-date row to be skipped'
+      assert scraper.send(:skip_row?, row_with_date("Diverse Daten")),
+             "expected an unparseable-date row to be skipped"
     end
 
     assert_match(/Schüür/, logged)
-    assert_match(/Diverse Daten/, logged, 'warn message should include the offending value')
+    assert_match(/Diverse Daten/, logged, "warn message should include the offending value")
   end
 
   def test_skip_row_keeps_good_rows
-    refute scraper.send(:skip_row?, row_with_date('Do. 11. Juni 2026 – 21:00')),
-           'a normally-dated row must not be skipped'
+    refute scraper.send(:skip_row?, row_with_date("Do. 11. Juni 2026 – 21:00")),
+           "a normally-dated row must not be skipped"
   end
 
   # End-to-end through the template method: a programme with one bad row between
@@ -88,8 +88,8 @@ class Scrapers::SchueuerTest < Minitest::Test
 
     titles = captured.map(&:title)
     assert_equal %w[Good\ A Good\ B], titles
-    assert_equal '2026-06-11 21:00', captured.first.start_time.strftime('%Y-%m-%d %H:%M')
-    assert_equal '2026-10-08 19:00', captured.last.start_time.strftime('%Y-%m-%d %H:%M')
+    assert_equal "2026-06-11 21:00", captured.first.start_time.strftime("%Y-%m-%d %H:%M")
+    assert_equal "2026-10-08 19:00", captured.last.start_time.strftime("%Y-%m-%d %H:%M")
   end
 
   private
@@ -99,7 +99,7 @@ class Scrapers::SchueuerTest < Minitest::Test
   end
 
   def row_with_date(date_text)
-    page_from(event_box('Synthetic', date_text, '/events/x')).at_css('.viz-event-list-box')
+    page_from(event_box("Synthetic", date_text, "/events/x")).at_css(".viz-event-list-box")
   end
 
   def event_box(name, date_text, href)
@@ -114,9 +114,9 @@ class Scrapers::SchueuerTest < Minitest::Test
 
   def page_from(html)
     Mechanize::Page.new(
-      URI('https://www.schuur.ch/programm'),
-      { 'content-type' => 'text/html; charset=utf-8' },
-      "<html><body>#{html}</body></html>", '200', Mechanize.new
+      URI("https://www.schuur.ch/programm"),
+      { "content-type" => "text/html; charset=utf-8" },
+      "<html><body>#{html}</body></html>", "200", Mechanize.new
     )
   end
 

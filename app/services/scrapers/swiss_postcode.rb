@@ -20,27 +20,27 @@ module Scrapers
     # FR/VD-mixed 1500s, the SO/BL/AG-mixed 4300–4499) are intentionally absent →
     # nil. The Bern block (3000–3899) is the one that matters most here.
     RANGES = [
-      [1200..1299, 'GE'], # Genève
-      [1700..1799, 'FR'], # Fribourg city region
-      [1900..1999, 'VS'], # Valais (Sion / Martigny)
-      [2000..2099, 'NE'], # Neuchâtel
-      [2300..2399, 'NE'], # La Chaux-de-Fonds
-      [2500..2549, 'BE'], # Biel/Bienne
-      [2800..2899, 'JU'], # Delémont / Jura
-      [3000..3899, 'BE'], # Bern region (Bern, Thun, Interlaken …)
-      [3900..3999, 'VS'], # Upper Valais (Brig, Zermatt) — NOT Bern
-      [4000..4099, 'BS'], # Basel-Stadt
-      [4100..4199, 'BL'], # Basel-Landschaft
-      [4500..4599, 'SO'], # Solothurn
-      [4600..4699, 'SO'], # Olten
-      [5000..5999, 'AG'], # Aargau
-      [6000..6199, 'LU'], # Luzern
-      [6300..6399, 'ZG'], # Zug
-      [6500..6999, 'TI'], # Ticino
-      [7000..7999, 'GR'], # Graubünden
-      [8000..8099, 'ZH'], # Zürich city
-      [8400..8499, 'ZH'], # Winterthur
-      [9000..9099, 'SG']  # St. Gallen
+      [1200..1299, "GE"], # Genève
+      [1700..1799, "FR"], # Fribourg city region
+      [1900..1999, "VS"], # Valais (Sion / Martigny)
+      [2000..2099, "NE"], # Neuchâtel
+      [2300..2399, "NE"], # La Chaux-de-Fonds
+      [2500..2549, "BE"], # Biel/Bienne
+      [2800..2899, "JU"], # Delémont / Jura
+      [3000..3899, "BE"], # Bern region (Bern, Thun, Interlaken …)
+      [3900..3999, "VS"], # Upper Valais (Brig, Zermatt) — NOT Bern
+      [4000..4099, "BS"], # Basel-Stadt
+      [4100..4199, "BL"], # Basel-Landschaft
+      [4500..4599, "SO"], # Solothurn
+      [4600..4699, "SO"], # Olten
+      [5000..5999, "AG"], # Aargau
+      [6000..6199, "LU"], # Luzern
+      [6300..6399, "ZG"], # Zug
+      [6500..6999, "TI"], # Ticino
+      [7000..7999, "GR"], # Graubünden
+      [8000..8099, "ZH"], # Zürich city
+      [8400..8499, "ZH"], # Winterthur
+      [9000..9099, "SG"]  # St. Gallen
     ].freeze
 
     module_function

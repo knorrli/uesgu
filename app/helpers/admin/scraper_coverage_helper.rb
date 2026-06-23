@@ -11,18 +11,18 @@ module Admin
     # gap, not a failure, so never red; otherwise the percentage, flagged --low
     # when too many events lack the field.
     def coverage_cell(row, field)
-      return tag.span('—', class: 'muted') unless row.present?
+      return tag.span("—", class: "muted") unless row.present?
 
       if (reason = row.gap_for(field))
         return tag.span(
-          t('admin.scraper_coverage.index.gap'),
-          class: 'coverage coverage--gap',
+          t("admin.scraper_coverage.index.gap"),
+          class: "coverage coverage--gap",
           title: t("admin.scraper_coverage.index.gap_reason.#{reason}")
         )
       end
 
       pct = row.pct(field)
-      tag.span("#{pct}%", class: class_names('coverage', 'coverage--low' => pct < COVERAGE_LOW))
+      tag.span("#{pct}%", class: class_names("coverage", "coverage--low" => pct < COVERAGE_LOW))
     end
   end
 end

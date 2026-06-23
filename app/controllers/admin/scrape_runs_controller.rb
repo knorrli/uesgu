@@ -22,12 +22,12 @@ module Admin
     # (A thread, not a job, because there's no background worker — see render.yaml.)
     def create
       if ScrapeRun.in_progress.exists?
-        return redirect_to admin_scrape_runs_path, alert: t('.already_running'), status: :see_other
+        return redirect_to admin_scrape_runs_path, alert: t(".already_running"), status: :see_other
       end
 
       scrapers = selected_scrapers
       if scrapers.empty?
-        return redirect_to admin_scrape_runs_path, alert: t('.unknown_scraper'), status: :see_other
+        return redirect_to admin_scrape_runs_path, alert: t(".unknown_scraper"), status: :see_other
       end
 
       Scrapers::Sweep.enqueue(ScrapeRun.create!(started_at: Time.current), scrapers: scrapers)
@@ -51,9 +51,9 @@ module Admin
     # Spell them out so the scanner and runtime agree.
     def trigger_notice(scrapers)
       if params[:scraper].present?
-        t('admin.scrape_runs.create.started_one', scraper: scrapers.keys.first.underscore)
+        t("admin.scrape_runs.create.started_one", scraper: scrapers.keys.first.underscore)
       else
-        t('admin.scrape_runs.create.started')
+        t("admin.scrape_runs.create.started")
       end
     end
   end

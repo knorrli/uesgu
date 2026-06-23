@@ -17,7 +17,7 @@ require "active_support/core_ext/integer/time"
 class RenderLogFormatter < ActiveSupport::Logger::SimpleFormatter
   # Rails severities → the level names Render's filter understands. The rest
   # (DEBUG/INFO/ERROR) already match once downcased.
-  LEVELS = { 'WARN' => 'warning', 'FATAL' => 'critical', 'UNKNOWN' => 'info' }.freeze
+  LEVELS = { "WARN" => "warning", "FATAL" => "critical", "UNKNOWN" => "info" }.freeze
 
   def call(severity, _timestamp, _progname, msg)
     message = msg.is_a?(String) ? msg : msg.inspect

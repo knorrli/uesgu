@@ -3,12 +3,12 @@
 # admin oversight page can answer "did last night work?" at a glance.
 class ScrapeRun < ApplicationRecord
   has_many :scrape_results, dependent: :destroy
-  has_many :created_events, class_name: 'Event',
+  has_many :created_events, class_name: "Event",
                             foreign_key: :created_in_scrape_run_id,
                             dependent: :nullify,
                             inverse_of: :created_in_scrape_run
 
-  enum :status, { running: 'running', finished: 'finished' }, default: 'running'
+  enum :status, { running: "running", finished: "finished" }, default: "running"
 
   scope :recent, -> { order(started_at: :desc) }
   # A run that's still going. Time-bounded so a crashed run (left "running"

@@ -1,19 +1,19 @@
 module Scrapers
   class Docks < Agent
     def self.location
-      'Docks'
+      "Docks"
     end
 
     def self.locations
-      [location, 'Lausanne', 'VD']
+      [location, "Lausanne", "VD"]
     end
 
     def self.url
-      URI.parse('https://www.docks.ch/programme')
+      URI.parse("https://www.docks.ch/programme")
     end
 
     def event_rows
-      page.css('.programme-container .mix.concerts')
+      page.css(".programme-container .mix.concerts")
     end
 
     def event_url(row)
@@ -25,17 +25,17 @@ module Scrapers
     end
 
     def event_start_time(content)
-      date_string = content.css('.event-infos .event-info-date').text.squish[/\d{1,2}\.\d{1,2}\.\d{4}/]
-      time_string = content.css('.event-infos .event-info-door').last.text.squish[/\d{2}:\d{2}/]
+      date_string = content.css(".event-infos .event-info-date").text.squish[/\d{1,2}\.\d{1,2}\.\d{4}/]
+      time_string = content.css(".event-infos .event-info-door").last.text.squish[/\d{2}:\d{2}/]
       Time.zone.parse("#{date_string}, #{time_string}")
     end
 
     def event_title(content)
-      content.css('.top-event-container h1').text.squish
+      content.css(".top-event-container h1").text.squish
     end
 
     def event_description(content)
-      content.css('.event-subtitle').text.split('+').map { |part| part.squish }.compact_blank.join(', ')
+      content.css(".event-subtitle").text.split("+").map { |part| part.squish }.compact_blank.join(", ")
     end
 
     # Docks has no dedicated genre field (the former `.event-info-style` selector
@@ -48,7 +48,7 @@ module Scrapers
     # genre (a real origin facet is future work). Everything else titleizes into a
     # genre.
     def event_genres(content)
-      content.css('.artist-item .artist-info')
+      content.css(".artist-item .artist-info")
              .map { |node| node.text.squish }
              .compact_blank
              .reject { |tag| origin_code?(tag) }
@@ -66,7 +66,7 @@ module Scrapers
     end
 
     def link_for(row)
-      Page::Link.new(row.at_css('a'), @mech, page)
+      Page::Link.new(row.at_css("a"), @mech, page)
     end
   end
 end

@@ -6,7 +6,7 @@ namespace :discovery do
   # See docs/discovery-design.md. Suitable for a periodic (weekly) cron.
   #
   #   bin/rails discovery:report
-  desc 'Report upstream venues/feeds we do not yet consume (read-only triage)'
+  desc "Report upstream venues/feeds we do not yet consume (read-only triage)"
   task report: :environment do
     ledger = Scrapers::Discovery::Ledger.load
     agent  = Scrapers::Agent.new # honest UA + robots.txt, like every scraper
@@ -21,14 +21,14 @@ namespace :discovery do
     end
 
     # --- OLE registry: an XML list of per-venue feed URLs (hinto.ch/oleexport) ---
-    ole_doc = fetch.call('OLE registry', 'https://www.hinto.ch/oleexport')
-    ole_sources = ole_doc ? ole_doc.css('sources source').map(&:text) : []
+    ole_doc = fetch.call("OLE registry", "https://www.hinto.ch/oleexport")
+    ole_sources = ole_doc ? ole_doc.css("sources source").map(&:text) : []
     ole_new = Scrapers::Discovery.ole_unknown_domains(ole_sources, ledger)
 
     # --- PETZI sitemap: event URLs whose venue slug we don't track ---
-    petzi_doc  = fetch.call('PETZI sitemap', Scrapers::Petzi.url.to_s)
-    petzi_urls = petzi_doc ? petzi_doc.css('loc').map(&:text).select { |u| u.include?('/events/') } : []
-    known_slugs = ledger.alias_keys('petzi') | Scrapers::Petzi::VENUES.keys.to_set
+    petzi_doc  = fetch.call("PETZI sitemap", Scrapers::Petzi.url.to_s)
+    petzi_urls = petzi_doc ? petzi_doc.css("loc").map(&:text).select { |u| u.include?("/events/") } : []
+    known_slugs = ledger.alias_keys("petzi") | Scrapers::Petzi::VENUES.keys.to_set
     petzi_new = Scrapers::Discovery.petzi_unknown_clusters(petzi_urls, known_slugs)
 
     # --- Re-check: blocked venues whose revisitable reason may have gone stale ---
@@ -41,26 +41,26 @@ namespace :discovery do
     missing = (covered - consume).to_a.sort
 
     puts "\nDISCOVERY REPORT — #{Date.current}"
-    puts '=' * 60
+    puts "=" * 60
 
     puts "\nOLE registry — #{ole_new.size} feed domain(s) not in the ledger:"
     ole_new.each { |d| puts "  #{d}" }
-    puts '  (none)' if ole_new.empty?
+    puts "  (none)" if ole_new.empty?
 
     puts "\nPETZI — #{petzi_new.size} untracked venue slug(s) " \
-         '(best-effort cluster; identify the venue, then add slug→domain):'
+         "(best-effort cluster; identify the venue, then add slug→domain):"
     petzi_new.each do |c|
-      puts format('  %-28s %2d event(s)   e.g. %s', c[:slug], c[:count], c[:samples].first)
+      puts format("  %-28s %2d event(s)   e.g. %s", c[:slug], c[:count], c[:samples].first)
     end
-    puts '  (none)' if petzi_new.empty?
+    puts "  (none)" if petzi_new.empty?
 
     puts "\nRe-check — #{recheck.size} blocked venue(s) past the staleness window:"
     recheck.each { |e| puts "  #{e.domain}  (#{e.reason}, last checked #{e.checked})" }
-    puts '  (none)' if recheck.empty?
+    puts "  (none)" if recheck.empty?
 
     puts "\nDrift — ledger vs live scrapers:"
     if orphans.empty? && missing.empty?
-      puts '  OK — ledger and registry reconcile'
+      puts "  OK — ledger and registry reconcile"
     else
       orphans.each { |d| puts "  orphan consume row (no scraper): #{d}" }
       missing.each { |d| puts "  scraped but unrecorded: #{d}" }

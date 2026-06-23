@@ -6,9 +6,9 @@ class CountingScraperHarness < Scrapers::Agent
   class << self
     attr_accessor :next_rows
 
-    def location = 'Test Venue'
-    def locations = ['Test Venue']
-    def url = 'https://fixture.test/list'
+    def location = "Test Venue"
+    def locations = ["Test Venue"]
+    def url = "https://fixture.test/list"
   end
 
   # No network: the list page is irrelevant because #event_rows is supplied.
@@ -21,7 +21,7 @@ class CountingScraperHarness < Scrapers::Agent
 
   # A row flagged :bad yields a blank title so save! trips the presence
   # validation — the per-event skip path. A :title lets a re-scrape change data.
-  def event_title(content) = content[:bad] ? nil : (content[:title] || 'Synthetic Show')
+  def event_title(content) = content[:bad] ? nil : (content[:title] || "Synthetic Show")
 
   # A second, independently-varying field — lets a test change one field while
   # holding another, e.g. to prove an admin-locked field survives a re-scrape.
@@ -33,4 +33,4 @@ class CountingScraperHarness < Scrapers::Agent
   def event_genres(content) = content[:genres]
 end
 
-Scrapers::All.scrapers.delete('CountingScraperHarness')
+Scrapers::All.scrapers.delete("CountingScraperHarness")

@@ -9,15 +9,15 @@ module Scrapers
     self.respect_robots = false
 
     def self.location
-      'Bad Bonn'
+      "Bad Bonn"
     end
 
     def self.locations
-      [location, 'Düdingen', 'FR']
+      [location, "Düdingen", "FR"]
     end
 
     def self.url
-      URI.parse('https://club.badbonn.ch/program')
+      URI.parse("https://club.badbonn.ch/program")
     end
 
     # Bad Bonn's pages carry only a title + a free-text blurb (the description) —
@@ -25,7 +25,7 @@ module Scrapers
     field_gaps genres: :no_field
 
     def event_rows
-      page.css('.program-row')
+      page.css(".program-row")
     end
 
     def event_url(row)
@@ -40,32 +40,32 @@ module Scrapers
     # (The element used to be `article.show`; the site dropped that class in a
     # Tailwind redesign, but the data attributes are stable.)
     def event_start_time(content)
-      article = content.at_css('article[data-date]')
-      date_string = article&.attr('data-date').to_s
-      time_string = article&.attr('data-time').to_s
+      article = content.at_css("article[data-date]")
+      date_string = article&.attr("data-date").to_s
+      time_string = article&.attr("data-time").to_s
       raise "Missing date (article[data-date]) on #{content.uri}" if date_string.blank?
       Time.zone.parse("#{date_string}, #{time_string}")
     end
 
     def event_title(content)
-      content.at_css('article[data-date]').attr('data-title').to_s
+      content.at_css("article[data-date]").attr("data-title").to_s
     end
 
     def event_description(content)
-      content.css('article p').map { |node| node.text.squish }.find(&:present?).to_s
+      content.css("article p").map { |node| node.text.squish }.find(&:present?).to_s
     end
 
     # No genre field, but the detail-page blurb (the `<article>` prose, here the
     # same `<p>` nodes the description samples from) names real styles — mine the
     # known ones (Scrapers::Agent match-only mining).
     def event_genre_prose(content)
-      content.css('article p').map(&:text).join("\n")
+      content.css("article p").map(&:text).join("\n")
     end
 
     private
 
     def link_for(row)
-      Page::Link.new(row.at_css('.program-bands a'), @mech, page)
+      Page::Link.new(row.at_css(".program-bands a"), @mech, page)
     end
   end
 end

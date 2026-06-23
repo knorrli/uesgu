@@ -4,15 +4,15 @@ module Scrapers
   # split across weekday/day/month divs with NO year — infer it.
   class Helsinki < Agent
     def self.location
-      'Helsinki Klub'
+      "Helsinki Klub"
     end
 
     def self.locations
-      [location, 'Zürich', 'ZH']
+      [location, "Zürich", "ZH"]
     end
 
     def self.url
-      URI.parse('https://www.helsinkiklub.ch/')
+      URI.parse("https://www.helsinkiklub.ch/")
     end
 
     def initialize
@@ -27,12 +27,12 @@ module Scrapers
     field_gaps genres: :no_field
 
     def event_rows
-      page.css('div.event')
+      page.css("div.event")
     end
 
     # No per-event URL exists; the block id ("event_1871") is the stable key.
     def event_url(row)
-      id = row.attr('id')
+      id = row.attr("id")
       "#{self.class.url}##{id}" if id.present?
     end
 
@@ -40,34 +40,34 @@ module Scrapers
     # occurrence (the page wraps across the year boundary). Start time is free text
     # in `.showtime` ("Bar 19:30 Uhr / Show 20:30 Uhr"); prefer the show time.
     def event_start_time(content)
-      day = content.at_css('.date .day')&.text&.squish
-      month = month_number(month: content.at_css('.date .month')&.text&.squish)
+      day = content.at_css(".date .day")&.text&.squish
+      month = month_number(month: content.at_css(".date .month")&.text&.squish)
       raise "Unparseable Helsinki date: #{content.at_css('.date')&.text&.squish.inspect}" if day.blank? || !month.is_a?(Integer)
 
-      hour, minute = show_time(content.at_css('.showtime')&.text.to_s)
+      hour, minute = show_time(content.at_css(".showtime")&.text.to_s)
       Time.zone.local(year_for(month, day.to_i), month, day.to_i, hour, minute)
     end
 
     # The headline is the bare text of `.top` (its `.addition` child is a sub-line);
     # header-only nights carry just a `.support` line — fall back to that.
     def event_title(content)
-      top = content.at_css('.agenda .top')
-      title = top&.children&.select(&:text?)&.map { |n| n.text.squish }&.compact_blank&.join(' ')
-      title.presence || content.at_css('.agenda .support')&.text&.squish
+      top = content.at_css(".agenda .top")
+      title = top&.children&.select(&:text?)&.map { |n| n.text.squish }&.compact_blank&.join(" ")
+      title.presence || content.at_css(".agenda .support")&.text&.squish
     end
 
     # The support line(s) below the headline. Skip it when the headline itself fell
     # back to the support line (header-only nights — see event_title), otherwise the
     # description would just echo the title.
     def event_description(content)
-      support = content.css('.agenda .support').map { |node| node.text.squish }.compact_blank.join(', ').presence
+      support = content.css(".agenda .support").map { |node| node.text.squish }.compact_blank.join(", ").presence
       support unless support == event_title(content)
     end
 
     # No genre field, but the `.description` blurb names real styles — mine the
     # known ones (Scrapers::Agent match-only mining).
     def event_genre_prose(content)
-      content.css('.description p').map(&:text).join("\n")
+      content.css(".description p").map(&:text).join("\n")
     end
 
     private

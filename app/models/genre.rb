@@ -6,8 +6,8 @@ class Genre < ApplicationRecord
 
   # An alias points at the canonical genre it should be treated as (e.g.
   # "Elektronik" → "Electronic"): semantic merges the fingerprint can't catch.
-  belongs_to :canonical, class_name: 'Genre', optional: true
-  has_many :aliases, class_name: 'Genre', foreign_key: :canonical_id,
+  belongs_to :canonical, class_name: "Genre", optional: true
+  has_many :aliases, class_name: "Genre", foreign_key: :canonical_id,
                      inverse_of: :canonical, dependent: :nullify
 
   # The genre tree: a genre sits under one parent (e.g. Crustpunk → Punk → Rock),
@@ -16,11 +16,11 @@ class Genre < ApplicationRecord
   # descendant (see subtree_ids). A root genre (no parent) is a top-level browse
   # bucket. Orphan, don't cascade, on delete — losing a parent shouldn't delete
   # the subtree. See docs/taxonomy-and-saved-filters-redesign.md.
-  belongs_to :parent, class_name: 'Genre', optional: true
-  has_many :children, class_name: 'Genre', foreign_key: :parent_id,
+  belongs_to :parent, class_name: "Genre", optional: true
+  has_many :children, class_name: "Genre", foreign_key: :parent_id,
                       inverse_of: :parent, dependent: :nullify
 
-  scope :in_use, -> { where('events_count > 0') }
+  scope :in_use, -> { where("events_count > 0") }
   # Tree curation queue: in active use, sitting under no parent, carrying no
   # disposition or alias, AND not itself a parent of other genres — the genres
   # still waiting to be filed into the tree. Excluding parents is what separates
@@ -47,31 +47,31 @@ class Genre < ApplicationRecord
   # doesn't vanish from the catalogue right after a merge. Genres outside this set
   # remain findable by name search (see GenresController#index), so nothing is hidden.
   scope :listable, lambda {
-    where('events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL ' \
-          'OR blocked_at IS NOT NULL OR canonical_id IS NOT NULL ' \
-          'OR EXISTS (SELECT 1 FROM genres aliases WHERE aliases.canonical_id = genres.id)')
+    where("events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL " \
+          "OR blocked_at IS NOT NULL OR canonical_id IS NOT NULL " \
+          "OR EXISTS (SELECT 1 FROM genres aliases WHERE aliases.canonical_id = genres.id)")
   }
   scope :by_usage, -> { order(events_count: :desc, name: :asc) }
   scope :by_name, -> { order(name: :asc) }
 
   # Folded accented Latin letters used by both the SQL `fingerprint` generated
   # column (see AddFingerprintToGenres) and fingerprint_for below. Keep in sync.
-  FINGERPRINT_ACCENTS_FROM = 'äöüàâéèêëïîôûç'.freeze
-  FINGERPRINT_ACCENTS_TO   = 'aouaaeeeeiiouc'.freeze
+  FINGERPRINT_ACCENTS_FROM = "äöüàâéèêëïîôûç".freeze
+  FINGERPRINT_ACCENTS_TO   = "aouaaeeeeiiouc".freeze
 
   # Curated display spellings, keyed by fingerprint. Reuses the alias-map
   # canonicals so collapsed variants surface with a nice name (the lowercase
   # taxonomy seed and raw scrapes both store a pretty `name`; `fingerprint` stays
   # the matching key). Anything not listed falls back to titleize_genre.
   DISPLAY_OVERRIDES = {
-    'hiphop' => 'Hip Hop', 'postpunk' => 'Post-Punk', 'blackmetal' => 'Black Metal',
-    'indiepop' => 'Indie Pop', 'randb' => 'R&B', 'dreampop' => 'Dream Pop',
-    'indiefolk' => 'Indie Folk', 'postrock' => 'Post-Rock', 'progrock' => 'Prog Rock',
-    'garagerock' => 'Garage Rock', 'punkrock' => 'Punk Rock', 'bluesrock' => 'Blues Rock',
-    'globalperreo' => 'Global Perreo', 'hardrock' => 'Hard Rock', 'indiepunk' => 'Indie Punk',
-    'italodisco' => 'Italo Disco', 'noiserock' => 'Noise Rock', 'numetal' => 'Nu-Metal',
-    'synthpop' => 'Synth Pop', 'drumandbass' => 'Drum & Bass', 'nyhc' => 'NYHC',
-    'psychrock' => 'Psych Rock'
+    "hiphop" => "Hip Hop", "postpunk" => "Post-Punk", "blackmetal" => "Black Metal",
+    "indiepop" => "Indie Pop", "randb" => "R&B", "dreampop" => "Dream Pop",
+    "indiefolk" => "Indie Folk", "postrock" => "Post-Rock", "progrock" => "Prog Rock",
+    "garagerock" => "Garage Rock", "punkrock" => "Punk Rock", "bluesrock" => "Blues Rock",
+    "globalperreo" => "Global Perreo", "hardrock" => "Hard Rock", "indiepunk" => "Indie Punk",
+    "italodisco" => "Italo Disco", "noiserock" => "Noise Rock", "numetal" => "Nu-Metal",
+    "synthpop" => "Synth Pop", "drumandbass" => "Drum & Bass", "nyhc" => "NYHC",
+    "psychrock" => "Psych Rock"
   }.freeze
 
   def to_s
@@ -147,9 +147,9 @@ class Genre < ApplicationRecord
   # raw scraped strings that have no row to read the stored column off.
   def self.fingerprint_for(str)
     str.to_s.downcase
-       .gsub('&', 'and').gsub("'n'", 'and')
+       .gsub("&", "and").gsub("'n'", "and")
        .tr(FINGERPRINT_ACCENTS_FROM, FINGERPRINT_ACCENTS_TO)
-       .gsub(/[^a-z0-9]/, '')
+       .gsub(/[^a-z0-9]/, "")
   end
 
   # The display spelling for a (possibly messy) scraped/seeded name: a curated
@@ -228,7 +228,7 @@ class Genre < ApplicationRecord
       3.downto(1) do |n|
         next if i + n > words.size
 
-        if (hit = index[fingerprint_for(words[i, n].join(' '))])
+        if (hit = index[fingerprint_for(words[i, n].join(" "))])
           name = hit
           span = n
           break
@@ -267,7 +267,7 @@ class Genre < ApplicationRecord
   def set_parent!(parent)
     new_parent_id = parent.is_a?(Genre) ? parent.id : parent.presence&.to_i
     if new_parent_id && self.class.subtree_ids([id]).include?(new_parent_id)
-      raise ArgumentError, 'a genre cannot be parented under itself or its own descendant'
+      raise ArgumentError, "a genre cannot be parented under itself or its own descendant"
     end
 
     transaction do
@@ -322,7 +322,7 @@ class Genre < ApplicationRecord
   # events_count authoritative — the alias row retains its own taggings, so unlike
   # a blocked/hidden genre its count stays > 0.
   def merge_into!(canonical)
-    raise ArgumentError, 'a genre cannot be merged into itself' if canonical.id == id
+    raise ArgumentError, "a genre cannot be merged into itself" if canonical.id == id
 
     update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil, parent_id: nil)
     Genre.reconcile!
@@ -364,8 +364,8 @@ class Genre < ApplicationRecord
   # case/spacing variant never re-splits what fingerprinting merged.
   def self.reconcile!
     counts = ActsAsTaggableOn::Tagging
-             .where(context: 'genres', taggable_type: Event.name)
-             .joins(:tag).group('tags.name').count
+             .where(context: "genres", taggable_type: Event.name)
+             .joins(:tag).group("tags.name").count
 
     by_fingerprint = Hash.new(0)
     representative = {}
@@ -376,12 +376,12 @@ class Genre < ApplicationRecord
     end
 
     ensure!(representative.values)
-    rows = where(fingerprint: by_fingerprint.keys.presence || ['']).index_by(&:fingerprint)
+    rows = where(fingerprint: by_fingerprint.keys.presence || [""]).index_by(&:fingerprint)
     by_fingerprint.each { |fingerprint, count| rows[fingerprint]&.update_columns(events_count: count) }
     # Zero every genre outside the current tag set. The `|| ['']` matters: when the
     # set is empty it's *all* genres, and no fingerprint is '', so NOT IN ('')
     # matches every row — whereas NOT IN (NULL) would be SQL-unknown and zero none.
-    where.not(fingerprint: by_fingerprint.keys.presence || ['']).update_all(events_count: 0)
+    where.not(fingerprint: by_fingerprint.keys.presence || [""]).update_all(events_count: 0)
   end
 
   private

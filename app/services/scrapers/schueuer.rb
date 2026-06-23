@@ -1,23 +1,23 @@
 module Scrapers
   class Schueuer < Agent
     def self.location
-      'Schüür'
+      "Schüür"
     end
 
     def self.locations
-      [location, 'Luzern', 'LU']
+      [location, "Luzern", "LU"]
     end
 
     def self.url
-      URI.parse('https://www.schuur.ch/programm')
+      URI.parse("https://www.schuur.ch/programm")
     end
 
     def event_rows
-      page.css('.viz-event-list-box')
+      page.css(".viz-event-list-box")
     end
 
     def event_url(row)
-      URI.parse(row.at_css('a.viz-event-box-details-link').attr('href').to_s).to_s
+      URI.parse(row.at_css("a.viz-event-box-details-link").attr("href").to_s).to_s
     end
 
     # Skip (and warn about) any row whose date we can't parse into a real time,
@@ -39,21 +39,21 @@ module Scrapers
     end
 
     def event_title(content)
-      content.css('.viz-event-name').text.squish
+      content.css(".viz-event-name").text.squish
     end
 
     def event_description(content)
-      content.css('.viz-event-headline').text.squish
+      content.css(".viz-event-headline").text.squish
     end
 
     def event_genres(content)
-      content.css('.viz-event-genre').map { |node| node.text.squish }
+      content.css(".viz-event-genre").map { |node| node.text.squish }
     end
 
     private
 
     def date_text(node)
-      node.css('.viz-event-date').text.squish
+      node.css(".viz-event-date").text.squish
     end
 
     # Parse Schüür's date string into a Time, or return nil when it can't be
@@ -82,8 +82,8 @@ module Scrapers
       return nil if day.blank? || month.blank? || year.blank?
 
       text =~ /(?<hour>\d{1,2}):(?<minute>\d{1,2})/
-      hour   = Regexp.last_match&.named_captures&.dig('hour')
-      minute = Regexp.last_match&.named_captures&.dig('minute')
+      hour   = Regexp.last_match&.named_captures&.dig("hour")
+      minute = Regexp.last_match&.named_captures&.dig("minute")
 
       Time.zone.parse("#{year}-#{month_number(month: month)}-#{day}, #{hour}:#{minute}")
     rescue ArgumentError => e

@@ -13,8 +13,8 @@ module ListingViewMode
   # Only an explicit ?view= switch writes to the account — a plain GET render
   # (the hot path) never writes.
   def resolve_view(session_key:, account_attr:)
-    view = params[:view].presence || session[session_key] || current_user&.public_send(account_attr) || 'list'
-    view = 'list' unless view == 'calendar'
+    view = params[:view].presence || session[session_key] || current_user&.public_send(account_attr) || "list"
+    view = "list" unless view == "calendar"
     session[session_key] = view
     if params[:view].present? && current_user && current_user.public_send(account_attr) != view
       current_user.update_column(account_attr, view)

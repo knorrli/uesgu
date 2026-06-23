@@ -1,4 +1,4 @@
-require 'cgi'
+require "cgi"
 
 module Scrapers
   # Südpol (Luzern/Kriens) serves its events from a headless-WordPress REST API;
@@ -7,11 +7,11 @@ module Scrapers
   # theatre/dance). Rows are WP post Hashes.
   class Suedpol < Agent
     def self.location
-      'Südpol'
+      "Südpol"
     end
 
     def self.locations
-      [location, 'Kriens', 'LU']
+      [location, "Kriens", "LU"]
     end
 
     # Music category term ids: Konzert=4, Club=13, Sound=63.
@@ -28,13 +28,13 @@ module Scrapers
     # ones (filtered on the ACF timestamp). The base already fetched page 1.
     def event_rows
       events = data_from(page.body)
-      total = page.response['x-wp-totalpages'].to_i
+      total = page.response["x-wp-totalpages"].to_i
       (2..total).each { |p| events.concat(data_from(get(self.class.endpoint(p)).body)) }
       events.select { |row| upcoming?(row) }
     end
 
     def event_url(row)
-      row['link'].presence
+      row["link"].presence
     end
 
     # The feed is served from the cms. host, but `link` points at the public www.
@@ -53,18 +53,18 @@ module Scrapers
     end
 
     def event_title(row)
-      CGI.unescapeHTML(row.dig('title', 'rendered').to_s).squish
+      CGI.unescapeHTML(row.dig("title", "rendered").to_s).squish
     end
 
     def event_description(row)
-      CGI.unescapeHTML(row.dig('acf', 'subtitle').to_s).squish.presence
+      CGI.unescapeHTML(row.dig("acf", "subtitle").to_s).squish.presence
     end
 
     # ACF `tags` is an optional, free-text genre field; tokens mint and are
     # curated downstream.
     def event_genres(row)
-      tags = row.dig('acf', 'tags')
-      list = tags.is_a?(Array) ? tags : tags.to_s.split(',')
+      tags = row.dig("acf", "tags")
+      list = tags.is_a?(Array) ? tags : tags.to_s.split(",")
       list.map { |t| t.to_s.squish }.compact_blank
     end
 
@@ -75,7 +75,7 @@ module Scrapers
     end
 
     def event_stamp(row)
-      Array(row.dig('acf', 'event_date_info')).first&.dig('event_date')
+      Array(row.dig("acf", "event_date_info")).first&.dig("event_date")
     end
 
     def upcoming?(row)

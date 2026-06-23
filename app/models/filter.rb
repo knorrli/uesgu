@@ -98,7 +98,7 @@ class Filter
     mapped = map_date_ranges(date_ranges).compact
     return nil if mapped.blank?
 
-    mapped.map { |range| Date.iso8601(range.split(' - ').first) }.min
+    mapped.map { |range| Date.iso8601(range.split(" - ").first) }.min
   end
 
   private

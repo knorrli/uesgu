@@ -11,16 +11,16 @@ namespace :taxonomy do
   # and folds names with Genre.fingerprint_for (the single matching key, so the
   # draft dedupes exactly as the loader will). See docs/taxonomy-and-saved-filters-redesign.md.
   # ---------------------------------------------------------------------------
-  desc 'Generate a draft genre tree (db/genres.yml) from the current flat ' \
-       'Style→Genre seed. A starting point to cultivate by hand, not a finished seed.'
+  desc "Generate a draft genre tree (db/genres.yml) from the current flat " \
+       "Style→Genre seed. A starting point to cultivate by hand, not a finished seed."
   task draft_tree: :environment do
-    require 'json'
-    require 'yaml'
+    require "json"
+    require "yaml"
 
-    root = File.expand_path('../..', __dir__)
-    taxonomy     = JSON.parse(File.read(File.join(root, 'lib/genres.json')))
-    aliases      = JSON.parse(File.read(File.join(root, 'lib/genre_aliases.json')))
-    dispositions = JSON.parse(File.read(File.join(root, 'lib/genre_dispositions.json')))
+    root = File.expand_path("../..", __dir__)
+    taxonomy     = JSON.parse(File.read(File.join(root, "lib/genres.json")))
+    aliases      = JSON.parse(File.read(File.join(root, "lib/genre_aliases.json")))
+    dispositions = JSON.parse(File.read(File.join(root, "lib/genre_dispositions.json")))
 
     # Names already spoken for as a disposition or an alias must not also appear
     # as tree children — a placed genre carries no disposition (see Genre#set_parent!).
@@ -36,18 +36,18 @@ namespace :taxonomy do
                  .reject { |n| excluded.include?(Genre.fingerprint_for(n)) || Genre.fingerprint_for(n) == style_fp }
                  .uniq { |n| Genre.fingerprint_for(n) }
                  .sort
-      { 'name' => style_name, 'children' => children }
+      { "name" => style_name, "children" => children }
     end
 
     tree = {
-      'genres'  => roots,
-      'hidden'  => Array(dispositions['hidden']).sort,
-      'blocked' => Array(dispositions['blocked']).sort,
-      'ignored' => Array(dispositions['ignored']).sort,
-      'aliases' => aliases
+      "genres"  => roots,
+      "hidden"  => Array(dispositions["hidden"]).sort,
+      "blocked" => Array(dispositions["blocked"]).sort,
+      "ignored" => Array(dispositions["ignored"]).sort,
+      "aliases" => aliases
     }
 
-    out = File.join(root, 'db/genres.yml')
+    out = File.join(root, "db/genres.yml")
     header = <<~YAML
       # Curated genre tree — the backbone seed loaded by `rake taxonomy:import_tree`.
       #
@@ -62,9 +62,9 @@ namespace :taxonomy do
       #   ignored: real, publicly-shown genres deliberately left unplaced
       #   aliases: canonical => [spelling variants] the fingerprint can't catch
     YAML
-    File.write(out, header + tree.to_yaml.sub(/\A---\n/, ''))
+    File.write(out, header + tree.to_yaml.sub(/\A---\n/, ""))
 
-    child_count = roots.sum { |r| r['children'].size }
+    child_count = roots.sum { |r| r["children"].size }
     puts "Wrote #{out}"
     puts "  #{roots.size} roots, #{child_count} children, " \
          "#{tree['hidden'].size} hidden, #{tree['blocked'].size} blocked, " \
@@ -82,11 +82,11 @@ namespace :taxonomy do
   # untouched, so they stay unplaced in the admin curation queue. The seed is the
   # curated backbone; scrapers add leaves you then file.
   # ---------------------------------------------------------------------------
-  desc 'Load the curated genre tree (db/genres.yml): upsert genres, set parents ' \
-       'from the nesting, apply dispositions + aliases. Idempotent.'
+  desc "Load the curated genre tree (db/genres.yml): upsert genres, set parents " \
+       "from the nesting, apply dispositions + aliases. Idempotent."
   task import_tree: :environment do
-    require 'yaml'
-    path = ENV['GENRES_TREE'].presence || Rails.root.join('db/genres.yml')
+    require "yaml"
+    path = ENV["GENRES_TREE"].presence || Rails.root.join("db/genres.yml")
     result = GenreTreeSeed.import(YAML.load_file(path))
 
     puts "Loaded genre tree from #{path}: #{result.placed} placed under a parent, " \
@@ -94,7 +94,7 @@ namespace :taxonomy do
          "#{result.blocked} blocked, #{result.ignored} ignored, #{result.alias_groups} alias groups"
     if result.multi_home.any?
       warn "  ⚠ #{result.multi_home.size} genre(s) listed under multiple parents (last wins, " \
-           'tree is single-parent) — resolve in db/genres.yml.'
+           "tree is single-parent) — resolve in db/genres.yml."
     end
   end
 
@@ -112,12 +112,12 @@ namespace :taxonomy do
   # shell → re-scrape (or wait for the daily cron) so any scraped genres not in the
   # seed arrive as unplaced rows in the admin queue.
   # ---------------------------------------------------------------------------
-  desc 'Reset the genre taxonomy: wipe the tree rows, reload db/genres.yml, and ' \
-       'recompute every event\'s visibility. Run once in prod after deploy.'
+  desc "Reset the genre taxonomy: wipe the tree rows, reload db/genres.yml, and " \
+       "recompute every event's visibility. Run once in prod after deploy."
   task reset: :environment do
     removed = Genre.count
     Genre.delete_all
-    Rake::Task['taxonomy:import_tree'].execute
+    Rake::Task["taxonomy:import_tree"].execute
     Event.find_each(&:recompute_visibility!)
     puts "taxonomy:reset — cleared #{removed} genre rows, reloaded the tree, " \
          "recomputed visibility for #{Event.count} events."

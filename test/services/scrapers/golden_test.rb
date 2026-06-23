@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 # Behavior-preservation harness for the scraper template-method refactor.
 #
@@ -15,10 +15,10 @@ require 'test_helper'
 #   CAPTURE_GOLDEN=1 bin/rails test test/services/scrapers/golden_test.rb   # write goldens
 #   bin/rails test test/services/scrapers/golden_test.rb                    # assert vs goldens
 class Scrapers::GoldenTest < Minitest::Test
-  FIXTURE_ROOT = File.expand_path('../../fixtures/scrapers', __dir__)
+  FIXTURE_ROOT = File.expand_path("../../fixtures/scrapers", __dir__)
   # Click-into-detail scrapers: a stubbed `click` returns the saved detail page.
   SHAPE_B = %w[bad_bonn kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken].freeze
-  CAPTURING = ENV['CAPTURE_GOLDEN'] == '1'
+  CAPTURING = ENV["CAPTURE_GOLDEN"] == "1"
   # Pin the clock to when the fixtures were captured so year-inferring scrapers
   # stay deterministic regardless of when the suite runs (ISC reads Date.current
   # to resolve the year its detail pages omit; left live, its golden rots a year
@@ -82,13 +82,13 @@ class Scrapers::GoldenTest < Minitest::Test
 
   def run_golden(klass, slug)
     dir = File.join(FIXTURE_ROOT, slug)
-    list_path = File.join(dir, 'list.html')
+    list_path = File.join(dir, "list.html")
     skip "no fixture captured for #{slug}" unless File.exist?(list_path)
 
     captured = capture_events(klass, slug, dir)
     assert_url_shape(klass, slug, captured)
     actual = captured.map(&:to_h)
-    golden_path = File.join(dir, 'golden.json')
+    golden_path = File.join(dir, "golden.json")
 
     if CAPTURING
       File.write(golden_path, "#{JSON.pretty_generate(actual)}\n")
@@ -116,13 +116,13 @@ class Scrapers::GoldenTest < Minitest::Test
       assert_match pattern, c.url,
                    "#{slug}: event URL #{c.url.inspect} doesn't match expected shape " \
                    "#{pattern.inspect} — a wrong host/path here ships dead links " \
-                   '(see Rote Fabrik). Fix event_url, or update event_url_pattern.'
+                   "(see Rote Fabrik). Fix event_url, or update event_url_pattern."
     end
   end
 
   def capture_events(klass, slug, dir)
-    list_page = page_from(File.join(dir, 'list.html'), klass.url.to_s)
-    detail_page = (page_from(File.join(dir, 'detail.html'), 'https://fixture.test/detail') if SHAPE_B.include?(slug))
+    list_page = page_from(File.join(dir, "list.html"), klass.url.to_s)
+    detail_page = (page_from(File.join(dir, "detail.html"), "https://fixture.test/detail") if SHAPE_B.include?(slug))
 
     captured = []
     factory = ->(*, **kwargs) { Capture.new(kwargs[:url]).tap { |c| captured << c } }
@@ -149,6 +149,6 @@ class Scrapers::GoldenTest < Minitest::Test
   end
 
   def page_from(path, uri)
-    Mechanize::Page.new(URI(uri), { 'content-type' => 'text/html; charset=utf-8' }, File.binread(path), '200', Mechanize.new)
+    Mechanize::Page.new(URI(uri), { "content-type" => "text/html; charset=utf-8" }, File.binread(path), "200", Mechanize.new)
   end
 end

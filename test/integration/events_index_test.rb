@@ -1,127 +1,127 @@
-require 'db_test_helper'
+require "db_test_helper"
 
 # Locks the public events listing: it's reachable without auth and only renders
 # visible (non-hidden) events.
 class EventsIndexTest < ActionDispatch::IntegrationTest
-  test 'index is public and shows visible events but not hidden ones' do
-    event(title: 'VisibleMarkerShow', start_date: Date.current + 3.days)
-    event(title: 'HiddenMarkerShow', start_date: Date.current + 3.days, hidden: true)
+  test "index is public and shows visible events but not hidden ones" do
+    event(title: "VisibleMarkerShow", start_date: Date.current + 3.days)
+    event(title: "HiddenMarkerShow", start_date: Date.current + 3.days, hidden: true)
 
     get events_path
 
     assert_response :success
-    assert_includes response.body, 'VisibleMarkerShow'
-    refute_includes response.body, 'HiddenMarkerShow'
+    assert_includes response.body, "VisibleMarkerShow"
+    refute_includes response.body, "HiddenMarkerShow"
   end
 
-  test 'calendar view renders' do
+  test "calendar view renders" do
     sign_in_as user
-    get events_path(view: 'calendar')
+    get events_path(view: "calendar")
     assert_response :success
   end
 
-  test 'the calendar flags days holding a saved show with a bookmark marker' do
+  test "the calendar flags days holding a saved show with a bookmark marker" do
     u = sign_in_as user
-    saved = event(start_date: Date.current + 3, title: 'SavedShow')
-    event(start_date: Date.current + 5, title: 'UnsavedShow') # different day, not saved
+    saved = event(start_date: Date.current + 3, title: "SavedShow")
+    event(start_date: Date.current + 5, title: "UnsavedShow") # different day, not saved
     u.event_saves.create!(event: saved)
 
-    get events_path(view: 'calendar')
+    get events_path(view: "calendar")
 
     assert_response :success
     # Only the day with the saved show is flagged — not every day with events.
-    assert_select 'section.event-calendar .day-saved-marker', count: 1
+    assert_select "section.event-calendar .day-saved-marker", count: 1
   end
 
-  test 'guests never see the calendar bookmark marker' do
+  test "guests never see the calendar bookmark marker" do
     event(start_date: Date.current + 3)
 
-    get events_path(view: 'calendar')
+    get events_path(view: "calendar")
 
     assert_response :success
-    assert_select '.day-saved-marker', count: 0
+    assert_select ".day-saved-marker", count: 0
   end
 
   # The calendar's month nav reloads only the turbo frame, so the empty-state
   # message (which sits outside it) must key off "does the filter match anything
   # at all", not the currently-focused month's slice — otherwise it goes stale
   # and falsely claims "keine Veranstaltungen" on a month that does have results.
-  test 'the calendar empty-state reflects whole-filter matches, not the focused month' do
-    event(title: 'DarksideShow', start_date: Date.current + 2.months)
+  test "the calendar empty-state reflects whole-filter matches, not the focused month" do
+    event(title: "DarksideShow", start_date: Date.current + 2.months)
 
     # Focus a month with no matching events while the filter still matches an
     # event two months out: no empty-state message.
-    get events_path(view: 'calendar', q: ['DarksideShow'], start_date: Date.current.iso8601)
+    get events_path(view: "calendar", q: ["DarksideShow"], start_date: Date.current.iso8601)
     assert_response :success
-    assert_select 'p.events-empty', false
+    assert_select "p.events-empty", false
 
     # A filter that genuinely matches nothing still shows the message.
-    get events_path(view: 'calendar', q: ['NoSuchEventAnywhere'])
-    assert_select 'p.events-empty'
+    get events_path(view: "calendar", q: ["NoSuchEventAnywhere"])
+    assert_select "p.events-empty"
   end
 
   # With no explicit month nav and no date filter, the calendar opens on the
   # month holding the first matching event — so a search lands on its results
   # rather than a (possibly empty) current month the user must page past.
-  test 'the calendar focuses the first matching event when no month is requested' do
-    event(title: 'DarksideShow', start_date: Date.current + 2.months)
+  test "the calendar focuses the first matching event when no month is requested" do
+    event(title: "DarksideShow", start_date: Date.current + 2.months)
 
-    get events_path(view: 'calendar', q: ['DarksideShow'])
-
-    assert_response :success
-    assert_select 'time.calendar-title[datetime=?]', (Date.current + 2.months).strftime('%Y-%m')
-  end
-
-  test 'a location filter narrows the listing' do
-    event(title: 'AlphaShow', location_list: ['VenueAlpha'], start_date: Date.current + 2.days)
-    event(title: 'BetaShow', location_list: ['VenueBeta'], start_date: Date.current + 2.days)
-
-    get events_path(l: 'VenueAlpha')
+    get events_path(view: "calendar", q: ["DarksideShow"])
 
     assert_response :success
-    assert_includes response.body, 'AlphaShow'
-    refute_includes response.body, 'BetaShow'
+    assert_select "time.calendar-title[datetime=?]", (Date.current + 2.months).strftime("%Y-%m")
   end
 
-  test 'a text query filters by title' do
-    event(title: 'FindMeUnique', start_date: Date.current + 2.days)
-    event(title: 'OtherUnique', start_date: Date.current + 2.days)
+  test "a location filter narrows the listing" do
+    event(title: "AlphaShow", location_list: ["VenueAlpha"], start_date: Date.current + 2.days)
+    event(title: "BetaShow", location_list: ["VenueBeta"], start_date: Date.current + 2.days)
 
-    get events_path(q: ['FindMeUnique'])
+    get events_path(l: "VenueAlpha")
 
-    assert_includes response.body, 'FindMeUnique'
-    refute_includes response.body, 'OtherUnique'
+    assert_response :success
+    assert_includes response.body, "AlphaShow"
+    refute_includes response.body, "BetaShow"
   end
 
-  test 'the filter summary row is always present so applying a filter never shifts the layout' do
-    event(title: 'AnyShow', start_date: Date.current + 2.days)
+  test "a text query filters by title" do
+    event(title: "FindMeUnique", start_date: Date.current + 2.days)
+    event(title: "OtherUnique", start_date: Date.current + 2.days)
+
+    get events_path(q: ["FindMeUnique"])
+
+    assert_includes response.body, "FindMeUnique"
+    refute_includes response.body, "OtherUnique"
+  end
+
+  test "the filter summary row is always present so applying a filter never shifts the layout" do
+    event(title: "AnyShow", start_date: Date.current + 2.days)
 
     # No filter active: the container still renders (reserving its height), but
     # marked --empty with no chips inside.
     get events_path
-    assert_select '.filter-sheets__summary.filter-sheets__summary--empty'
-    assert_select '.filter-sheets__summary .filter-chip', false
+    assert_select ".filter-sheets__summary.filter-sheets__summary--empty"
+    assert_select ".filter-sheets__summary .filter-chip", false
 
     # Filter active: same container, now filled with a chip and no --empty marker.
-    get events_path(q: ['AnyShow'])
-    assert_select '.filter-sheets__summary--empty', false
-    assert_select '.filter-sheets__summary .filter-chip'
+    get events_path(q: ["AnyShow"])
+    assert_select ".filter-sheets__summary--empty", false
+    assert_select ".filter-sheets__summary .filter-chip"
   end
 
-  test 'a freetext term lights a genre tag whose name contains it, and tapping clears it' do
+  test "a freetext term lights a genre tag whose name contains it, and tapping clears it" do
     # Title has no "hop"; the row shows up (and its tag lights) purely on the
     # genre-name substring — proving freetext now drives genre-tag highlighting,
     # not just the genre-tree filter.
-    event(title: 'NoMatchTitle', genre_list: ['Quophop'], start_date: Date.current + 2.days)
+    event(title: "NoMatchTitle", genre_list: ["Quophop"], start_date: Date.current + 2.days)
 
-    get events_path(q: ['hop'])
+    get events_path(q: ["hop"])
 
     assert_response :success
-    assert_includes response.body, 'NoMatchTitle' # in the list via genres_name_cont
+    assert_includes response.body, "NoMatchTitle" # in the list via genres_name_cont
     # The genre tag is lit, and tapping it drops the freetext term (back to no q).
     # The href carries filtered=1 so clearing the last term wipes the persistence
     # cookie instead of replaying it (EventsController#redirect_to_canonical_filter).
-    assert_select "a.filter-link.active[href=?]", events_path(filtered: 1), text: 'Quophop'
+    assert_select "a.filter-link.active[href=?]", events_path(filtered: 1), text: "Quophop"
   end
 
   # ── Filter persistence ──────────────────────────────────────────────────────
@@ -129,36 +129,36 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
   # single source of truth: a plain visit with a remembered filter redirects to that
   # filter's URL rather than rendering a bare /events that's secretly filtered.
 
-  test 'an applied filter is remembered and replayed on a later plain visit' do
-    event(title: 'JazzNightShow', genre_list: ['Jazzy'], start_date: Date.current + 2.days)
+  test "an applied filter is remembered and replayed on a later plain visit" do
+    event(title: "JazzNightShow", genre_list: ["Jazzy"], start_date: Date.current + 2.days)
 
     # Apply via the form: it carries the `filtered` marker, which is stripped to a
     # clean URL while the filter itself is stored.
-    get events_path(filtered: 1, g: ['Jazzy'])
-    assert_redirected_to events_path(g: ['Jazzy'])
+    get events_path(filtered: 1, g: ["Jazzy"])
+    assert_redirected_to events_path(g: ["Jazzy"])
     follow_redirect!
     assert_response :success
 
     # A later plain visit reflects the remembered filter in the URL.
     get events_path
-    assert_redirected_to events_path(g: ['Jazzy'])
+    assert_redirected_to events_path(g: ["Jazzy"])
   end
 
-  test 'a shared filter link renders directly and is then remembered' do
-    event(title: 'JazzNightShow', genre_list: ['Jazzy'], start_date: Date.current + 2.days)
+  test "a shared filter link renders directly and is then remembered" do
+    event(title: "JazzNightShow", genre_list: ["Jazzy"], start_date: Date.current + 2.days)
 
     # No marker, URL already clean → render straight away (no redirect)…
-    get events_path(g: ['Jazzy'])
+    get events_path(g: ["Jazzy"])
     assert_response :success
     # …and it becomes the remembered filter.
     get events_path
-    assert_redirected_to events_path(g: ['Jazzy'])
+    assert_redirected_to events_path(g: ["Jazzy"])
   end
 
-  test 'clearing the filter wipes the remembered one so it is not replayed' do
-    event(title: 'JazzNightShow', genre_list: ['Jazzy'], start_date: Date.current + 2.days)
+  test "clearing the filter wipes the remembered one so it is not replayed" do
+    event(title: "JazzNightShow", genre_list: ["Jazzy"], start_date: Date.current + 2.days)
 
-    get events_path(filtered: 1, g: ['Jazzy']) # remember Jazzy
+    get events_path(filtered: 1, g: ["Jazzy"]) # remember Jazzy
     follow_redirect!
 
     # Clear via the form: the marker with no filter params deletes the cookie and
@@ -173,44 +173,44 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test 'the default date floor hides past events' do
-    event(title: 'PastShow', start_date: Date.current - 10.days)
-    event(title: 'FutureShow', start_date: Date.current + 10.days)
+  test "the default date floor hides past events" do
+    event(title: "PastShow", start_date: Date.current - 10.days)
+    event(title: "FutureShow", start_date: Date.current + 10.days)
 
     get events_path
 
-    assert_includes response.body, 'FutureShow'
-    refute_includes response.body, 'PastShow'
+    assert_includes response.body, "FutureShow"
+    refute_includes response.body, "PastShow"
   end
 
   # The favorites shortcut is rendered for any logged-in user but hidden until
   # they follow something, so the favorite Stimulus controller can reveal it on
   # the first favorite without a reload (it can only toggle a node that exists).
-  test 'the chosen view is mirrored onto the logged-in users account' do
+  test "the chosen view is mirrored onto the logged-in users account" do
     u = sign_in_as user
-    get events_path(view: 'calendar')
-    assert_equal 'calendar', u.reload.events_view
+    get events_path(view: "calendar")
+    assert_equal "calendar", u.reload.events_view
 
-    get events_path(view: 'nonsense') # invalid falls back to list
-    assert_equal 'list', u.reload.events_view
+    get events_path(view: "nonsense") # invalid falls back to list
+    assert_equal "list", u.reload.events_view
   end
 
-  test 'the admin delete button dismisses (soft-delete): gone from public, kept in DB' do
-    e = event(title: 'DismissMeShow', start_date: Date.current + 3.days)
+  test "the admin delete button dismisses (soft-delete): gone from public, kept in DB" do
+    e = event(title: "DismissMeShow", start_date: Date.current + 3.days)
     sign_in_as user(admin: true)
 
     delete event_path(e)
     assert_redirected_to events_path
 
-    assert e.reload.dismissed?, 'event should be soft-deleted, not destroyed'
-    assert Event.exists?(e.id), 'row should remain in the DB'
+    assert e.reload.dismissed?, "event should be soft-deleted, not destroyed"
+    assert Event.exists?(e.id), "row should remain in the DB"
 
     get events_path
-    assert_not_includes @response.body, 'DismissMeShow'
+    assert_not_includes @response.body, "DismissMeShow"
   end
 
-  test 'non-admins cannot dismiss events' do
-    e = event(title: 'KeepMeShow', start_date: Date.current + 3.days)
+  test "non-admins cannot dismiss events" do
+    e = event(title: "KeepMeShow", start_date: Date.current + 3.days)
     sign_in_as user(admin: false)
 
     delete event_path(e)
@@ -218,7 +218,7 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute e.reload.dismissed?
   end
 
-  test 'the edit gear links to the admin event page, only for admins' do
+  test "the edit gear links to the admin event page, only for admins" do
     e = event(start_date: Date.current + 3.days)
 
     sign_in_as user(admin: true)
@@ -227,10 +227,10 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
 
     sign_in_as user(admin: false)
     get events_path
-    assert_select 'a.icon-button', count: 0
+    assert_select "a.icon-button", count: 0
   end
 
-  test 'the delete button submits a real DELETE (method override present)' do
+  test "the delete button submits a real DELETE (method override present)" do
     e = event(start_date: Date.current + 3.days)
     sign_in_as user(admin: true)
 

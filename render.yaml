@@ -54,7 +54,12 @@ projects:
               # under the 512MB starter limit.
               - key: MALLOC_ARENA_MAX
                 value: 2
-            autoDeployTrigger: commit
+            # Release-only deploys. We do NOT auto-deploy on every commit to main;
+            # production moves only when a `vX.Y.Z` tag is pushed, which fires
+            # .github/workflows/release.yml → hits this service's deploy hook with
+            # ?ref=<tag>. Blueprint auto-sync (render.yaml changes) is a separate
+            # dashboard setting and is unaffected by this.
+            autoDeployTrigger: "off"
 
           # Daily scrape of every venue — replaces the in-Puma Solid Queue scheduler.
           # Runs on its own ephemeral instance (billed per second), so scraping no longer
@@ -80,7 +85,9 @@ projects:
               - fromGroup: uesgu-env
               - key: RAILS_ENV
                 value: production
-            autoDeployTrigger: commit
+            # Release-only: deploys on a pushed tag via the cron's deploy hook
+            # (see the web service above + .github/workflows/release.yml).
+            autoDeployTrigger: "off"
 
           # Per-user-due notification sweep. Runs every 15 min so each alert fires
           # within a quarter-hour of its chosen time; the rake task is idempotent
@@ -104,7 +111,9 @@ projects:
               - fromGroup: uesgu-env
               - key: RAILS_ENV
                 value: production
-            autoDeployTrigger: commit
+            # Release-only: deploys on a pushed tag via the cron's deploy hook
+            # (see the web service above + .github/workflows/release.yml).
+            autoDeployTrigger: "off"
 
         databases:
           - name: uesgu-db

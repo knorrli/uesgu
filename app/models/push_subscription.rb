@@ -16,10 +16,19 @@ class PushSubscription < ApplicationRecord
   def deliver(title:, body:, path: "/")
     return false unless WebPushConfig.configured?
 
+    # Declarative Web Push (https://webkit.org/blog/16535/): the payload itself carries
+    # the notification and a `navigate` URL, so iOS 18.4+ shows it and deep-links on tap
+    # NATIVELY. This is essential — iOS does not fire the service worker's
+    # notificationclick for an already-running standalone PWA, so it's the only way to
+    # open the right page there. Browsers that don't recognise the `web_push: 8030`
+    # magic key (Chrome/Android, desktop) ignore it and fall back to the service worker
+    # push event, which reads the same payload and deep-links from notificationclick
+    # (see app/views/pwa/service-worker.js). `navigate` must be absolute and on the
+    # PUBLIC punycode origin the installed PWA runs on, or iOS opens it outside the app.
     WebPush.payload_send(
       message: JSON.generate(
-        title: title,
-        options: { body: body, icon: "/icon.png", badge: "/icon.png", data: { path: path } }
+        web_push: 8030,
+        notification: { title: title, body: body, navigate: "https://#{AppHost::PUBLIC}#{path}" }
       ),
       endpoint: endpoint,
       p256dh: p256dh_key,

@@ -1,24 +1,31 @@
 // Service worker for üsgu's installable PWA.
 //
-// Two jobs:
-//  1. Receive Web Push messages and show them as OS notifications.
-//  2. On notification click, focus an existing tab on the target path or open one.
-//
-// The push payload is the JSON our backend sends (PushSubscription#deliver):
-//   { title, options: { body, icon, badge, data: { path } } }
-
-// ⚠️ TEMPORARY DIAGNOSTIC. Bump on every deploy so we can see — ON THE DEVICE —
-// which service worker is actually active: it's stamped into every notification we
-// show (push) and into the DEBUG report (notificationclick). Remove with the rest of
-// the diagnostic scaffolding.
-const SW_BUILD = "D3"
+// Push is split by platform:
+//  • iOS 18.4+ uses Declarative Web Push — the push PAYLOAD (PushSubscription#deliver)
+//    carries the notification and a `navigate` URL, and the OS shows it and deep-links
+//    on tap with no JavaScript. This is essential: iOS does NOT fire notificationclick
+//    for an already-running standalone PWA, so nothing in this file can deep-link there.
+//  • Browsers that don't understand the declarative payload (Chrome/Android, desktop)
+//    ignore its `web_push: 8030` key and fire the push event below instead; we read the
+//    same payload, show the notification, and deep-link from notificationclick — which
+//    DOES fire on those platforms.
 
 self.addEventListener("push", (event) => {
   if (!event.data) return
 
-  const { title, options } = event.data.json()
-  options.body = `${options.body || ""} · build ${SW_BUILD}`
-  event.waitUntil(self.registration.showNotification(title, options))
+  // Declarative shape: { web_push: 8030, notification: { title, body, navigate } }.
+  const notification = event.data.json().notification || {}
+  let path = "/"
+  try { path = new URL(notification.navigate, self.location.origin).pathname } catch (e) {}
+
+  event.waitUntil(
+    self.registration.showNotification(notification.title || "üsgu", {
+      body: notification.body,
+      icon: "/icon.png",
+      badge: "/icon.png",
+      data: { path }
+    })
+  )
 })
 
 self.addEventListener("notificationclick", (event) => {
@@ -27,71 +34,17 @@ self.addEventListener("notificationclick", (event) => {
   const path = event.notification.data?.path || "/"
   const url = new URL(path, self.location.origin).href
 
-  event.waitUntil(onClick(path, url))
-})
-
-// ⚠️ TEMPORARY DIAGNOSTIC BUILD. Two-part probe of how iOS runs notificationclick:
-//
-//  • "CLICK D3" notification — fired FIRST, before any other async work. If you see
-//    it, the handler fires. If you DON'T, iOS isn't dispatching notificationclick at
-//    all (or kills the SW before even this runs).
-//  • "DEBUG D3" notification — fired LAST, after matchAll + navigation attempts. If
-//    CLICK shows but DEBUG doesn't, the SW is being killed mid-async as the app
-//    foregrounds (so we can't rely on async work inside the handler).
-//
-// Candidate fix folded in: we postMessage every client a {type:"navigate"} the moment
-// the handler runs. That message QUEUES on a suspended page and is delivered when iOS
-// resumes it on foreground, so the page navigates ITSELF (Turbo.visit in
-// application.js) without the SW having to stay alive. This survives the kill above.
-async function onClick(path, url) {
-  // (1) Prove the handler fired, before anything else can be cut short.
-  await self.registration.showNotification(`CLICK ${SW_BUILD}`, {
-    body: "notificationclick fired",
-    tag: "usgu-click",
-    data: { path: "/" }
-  }).catch(() => {})
-
-  // (2) Attempt the deep-link and gather diagnostics.
-  const log = []
-  try {
-    const clientList = await clients.matchAll({ type: "window", includeUncontrolled: true })
-    log.push(`clients=${clientList.length}`)
-    clientList.forEach((c, i) => log.push(`#${i} ${pathOf(c)} foc=${c.focused} vis=${c.visibilityState}`))
-
-    // Queue a self-navigate on every page (delivered when iOS resumes it).
-    for (const client of clientList) {
-      client.postMessage({ type: "navigate", path, url })
-    }
-
-    // Belt-and-suspenders: focus + WindowClient.navigate() too.
-    for (const client of clientList) {
-      if ("focus" in client) { try { await client.focus() } catch (e) {} }
-      if ("navigate" in client) {
-        try { await client.navigate(url); log.push("nav=ok") } catch (e) { log.push("nav=ERR:" + (e && e.message)) }
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      // Focus a tab already on the target path, else open one. (Not reached on iOS —
+      // see the header note — but correct for Chrome/Android/desktop.)
+      for (const client of clientList) {
+        if (new URL(client.url).pathname === path && "focus" in client) return client.focus()
       }
-    }
-
-    if (!clientList.length && clients.openWindow) {
-      log.push("openWindow")
-      await clients.openWindow(url)
-    }
-  } catch (e) {
-    log.push("FATAL:" + (e && e.message))
-  }
-  await report(log)
-}
-
-function pathOf(client) {
-  try { return new URL(client.url).pathname } catch (e) { return "?" }
-}
-
-function report(log) {
-  return self.registration.showNotification(`DEBUG ${SW_BUILD}`, {
-    body: log.join(" | "),
-    tag: "usgu-debug",
-    data: { path: "/" }
-  }).catch(() => {})
-}
+      if (clients.openWindow) return clients.openWindow(url)
+    })
+  )
+})
 
 // App-shell caching. The app is online-first for *content* — HTML, API calls and
 // everything cross-origin always hit the network — but the fingerprinted static

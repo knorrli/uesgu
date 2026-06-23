@@ -18,9 +18,9 @@
     `kontakt@uesgu.ch`. **No Impressum, no real name** — non-commercial hobby site,
     so the UWG e-commerce imprint duty doesn't apply.
   - i18n in de/fr/en (French stays informal `tu`).
-  - 🚫 **BLOCKER:** set up inbound email forwarding `kontakt@uesgu.ch` → personal
-    inbox (Cloudflare Email Routing or registrar forwarding; Resend is outbound-only,
-    can't receive). Until live, the contact ships as plain text, not a working link.
+  - ✅ Inbound `kontakt@uesgu.ch` is live (Infomaniak free mail service, forwards to
+    personal inbox; inbound delivery tested 2026-06-23). Ship the contact as a working
+    `mailto:` link.
   - ⚠️ Datenschutz wording is **not lawyer-reviewed** — sanity-check before relying on it.
 
 ## Maybe-later (explicitly deferred)

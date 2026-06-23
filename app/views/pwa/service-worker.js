@@ -7,10 +7,17 @@
 // The push payload is the JSON our backend sends (PushSubscription#deliver):
 //   { title, options: { body, icon, badge, data: { path } } }
 
+// ⚠️ TEMPORARY DIAGNOSTIC. Bump on every deploy so we can see — ON THE DEVICE —
+// which service worker is actually active: it's stamped into every notification we
+// show (push) and into the DEBUG report (notificationclick). Remove with the rest of
+// the diagnostic scaffolding.
+const SW_BUILD = "D2"
+
 self.addEventListener("push", (event) => {
   if (!event.data) return
 
   const { title, options } = event.data.json()
+  options.body = `${options.body || ""} · build ${SW_BUILD}`
   event.waitUntil(self.registration.showNotification(title, options))
 })
 
@@ -78,7 +85,7 @@ function pathOf(client) {
 }
 
 function report(log) {
-  return self.registration.showNotification("DEBUG", {
+  return self.registration.showNotification(`DEBUG ${SW_BUILD}`, {
     body: log.join(" | "),
     tag: "usgu-debug",
     data: { path: "/" }

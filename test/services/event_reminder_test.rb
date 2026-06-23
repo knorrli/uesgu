@@ -65,6 +65,20 @@ class EventReminderTest < ActiveSupport::TestCase
     assert_equal [live.id], note.event_ids
   end
 
+  # A saved show merged into a canonical (canonical_event_id set), or one since
+  # hidden/discarded, must not be counted: it's dropped by Notification#events
+  # downstream, so counting it here would split the frozen header count from the
+  # body/list count (the "3 stehen an" / "2 für dich" mismatch).
+  test 'skips events excluded from Event.visible (merged duplicate, hidden, discarded)' do
+    u = reminder_user
+    canonical = save_for(u, title: 'Canonical', start_date: TODAY)
+    save_for(u, title: 'Duplicate', start_date: TODAY, canonical_event_id: canonical.id)
+    save_for(u, title: 'Hidden', start_date: TODAY, hidden: true)
+
+    note = EventReminder.new(u, at(12, 30)).fire_if_due!
+    assert_equal [canonical.id], note.event_ids
+  end
+
   test 'with nothing on the day it sends no digest but still marks the day done' do
     u = reminder_user
     save_for(u, title: 'Later', start_date: TODAY + 3)

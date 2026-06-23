@@ -46,11 +46,19 @@ class EventReminder
     notification
   end
 
-  # Saved shows on the target day, excluding cancelled/dismissed ones (no point
-  # reminding about a show that's off). Public for the controller's "preview".
+  # Saved shows on the target day. Narrowed to Event.visible so the firing set
+  # matches what every consumer later recomputes (Notification#events, the
+  # mailer, the inbox) — otherwise a saved duplicate merged into a canonical
+  # (canonical_event_id set), or an event since hidden/discarded, would be
+  # counted in the frozen title + event_ids but dropped downstream, so the
+  # header ("3 ... stehen an") would disagree with the body/list ("2 für dich").
+  # Also drops cancelled shows (no point reminding about a show that's off);
+  # visible keeps cancelled events, so that filter stays explicit. Public for
+  # the controller's "preview".
   def target_events
     @user.saved_events
-         .where(start_date: target_date, cancelled_at: nil, dismissed_at: nil)
+         .merge(Event.visible)
+         .where(start_date: target_date, cancelled_at: nil)
          .includes(:locations, :genres)
          .order(:start_time, :title)
   end

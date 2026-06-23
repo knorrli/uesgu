@@ -25,6 +25,21 @@
 
 ## Maybe-later (explicitly deferred)
 
+- **Upstream Turbo scroll bug — workaround shipped, PR optional.** A
+  `data-turbo-action="advance"` turbo-frame navigation (our calendar's open-day
+  URL) permanently sets Turbo's internal `view.forceReloaded`, which then silently
+  disables scroll-to-top for **every** later Drive visit — the intermittent "feed
+  pagination doesn't scroll to the top" bug. Worked around in
+  `app/javascript/application.js` (reset the flag on `turbo:before-render`); guarded
+  by `test/system/feed_pagination_scroll_test.rb`. Root cause is **upstream and
+  unfixed in the latest Turbo** (8.0.13 here; still broken on 8.0.23 / `main` —
+  `forceReloaded` is only ever initialised, never reset). Tracked upstream as
+  [hotwired/turbo#1344](https://github.com/hotwired/turbo/issues/1344) (original,
+  2024-12) and [#1526](https://github.com/hotwired/turbo/issues/1526) (root-cause
+  writeup); both open, maintainer interest but no PR. Follow-ups: (a) optionally
+  submit the trivial fix as a PR (reset `forceReloaded` at `Visit#start` + a
+  functional test); (b) once upstream ships a fix, delete our workaround + its test.
+
 - **"Party spotlight" animated loader.** An in-app animated loader (HTML/CSS/SVG,
   rendered after the PWA boots) that brings the mark's spotlight cones to life —
   genuinely dynamic motion the static iOS splash can't do (it's a pre-boot image).

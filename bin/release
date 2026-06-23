@@ -6,8 +6,9 @@
 #
 #   bin/release 0.1.0        # tag v0.1.0 and ship it
 #
-# Before running: land your changes on main via PR and move the relevant notes
-# from the "Unreleased" section of CHANGELOG.md into a new version section.
+# Before running: land your changes on main via PR. The release notes are
+# generated automatically from the merged PRs (see .github/release.yml) — there
+# is no changelog to update.
 
 set -euo pipefail
 
@@ -48,11 +49,26 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
   exit 1
 fi
 
-if ! grep -q "$tag" CHANGELOG.md 2>/dev/null; then
-  echo "Warning: $tag has no section in CHANGELOG.md." >&2
-  read -r -p "Continue anyway? [y/N] " reply
-  [ "$reply" = "y" ] || [ "$reply" = "Y" ] || { echo "Aborted."; exit 1; }
+# Refuse to release unless CI is green on this exact commit. Branch protection
+# already requires it to merge, but this guards the gap between "merged" and
+# "main's post-merge CI finished" — and against tagging a commit whose checks are
+# still running. Needs gh authenticated locally.
+echo "Checking CI on $(git rev-parse --short HEAD)..."
+checks="$(gh api "repos/knorrli/uesgu/commits/$(git rev-parse HEAD)/check-runs" \
+  --jq '.check_runs[] | "\(.name)=\(.conclusion // "pending")"' 2>/dev/null || true)"
+if [ -z "$checks" ]; then
+  echo "Error: couldn't read CI status from GitHub (is gh authenticated?)." >&2
+  exit 1
 fi
+for check in lint security test; do
+  result="$(printf '%s\n' "$checks" | awk -F= -v c="$check" '$1 == c { print $2; exit }')"
+  if [ "$result" != "success" ]; then
+    echo "Error: required check '$check' is '${result:-missing}', not 'success'." >&2
+    echo "  https://github.com/knorrli/uesgu/actions" >&2
+    exit 1
+  fi
+done
+echo "CI is green (lint, security, test)."
 
 echo "Tagging $tag..."
 git tag -a "$tag" -m "Release $tag"

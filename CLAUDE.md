@@ -1,5 +1,21 @@
 # Project instructions — üsgu
 
+## Branches & PRs
+
+`main` is protected — land everything via PR (CI must be green). Branch names are
+load-bearing: the prefix drives the release-notes category via
+`.github/workflows/label-pr.yml`.
+
+- **Prefix every branch** `feat/…`, `fix/…`, or `chore/…`, chosen from the
+  change's primary intent *before* creating it. `feat/`→ Features, `fix/`→ Fixes,
+  anything else → Maintenance.
+- **One branch = one coherent change.** Never pile unrelated work onto an
+  existing branch. If scope drifts (a `fix/` sprouts a feature, or a branch turns
+  into a grab-bag), split it — or at minimum re-label the PR so the auto-generated
+  release notes stay honest.
+- Keep PRs small and reviewable. Releases are cut with `bin/release X.Y.Z`, which
+  refuses to tag unless CI is green on the commit.
+
 ## UI changes must conform to the styleguide
 
 There is a living styleguide at `/styleguide` (source: `app/views/styleguide/index.html.erb`). Every specimen renders the **real** shared element/partial with the app's CSS, so it stays truthful.

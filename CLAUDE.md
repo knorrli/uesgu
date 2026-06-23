@@ -16,7 +16,17 @@ load-bearing: the prefix drives the release-notes category via
 - Keep PRs small and reviewable. Releases are cut with `bin/release X.Y.Z`, which
   refuses to tag unless CI is green on the commit.
 
-## UI changes must conform to the styleguide
+## Tracking open work
+
+Open work lives in **GitHub issues**, not in the repo (there is no `BACKLOG.md`).
+With `main` PR-gated, an in-repo backlog meant a PR + CI round-trip for every note;
+issues sidestep that and self-close from PRs (`Closes #N`). Conventions:
+
+- **Anything that could become actionable → an issue.** Use `feature` / `chore` /
+  `bug` / `documentation`; tag not-yet-active ideas `maybe-later`.
+- **Durable decisions and "we rejected X because Y" rationale do _not_ go in
+  issues** — they never close. Those belong in design docs under `docs/` (or the
+  assistant memory). Don't reopen a settled decision as an issue.
 
 There is a living styleguide at `/styleguide` (source: `app/views/styleguide/index.html.erb`). Every specimen renders the **real** shared element/partial with the app's CSS, so it stays truthful.
 

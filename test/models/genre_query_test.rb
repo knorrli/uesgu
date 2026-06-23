@@ -128,6 +128,21 @@ class GenreQueryTest < ActiveSupport::TestCase
     refute_includes names, 'truly-dormant'
   end
 
+  test 'listable includes a zero-usage canonical that an alias points at' do
+    # The clean-spelled genre can sit at events_count 0 because the live event
+    # carries the messy variant's raw token (e.g. "Death Metal Melodic" → "Melodic
+    # Death Metal"). It only earns its place via the alias, so it must stay listed
+    # so it doesn't vanish from the catalogue right after the merge.
+    canonical = genre(name: 'melodic-death-metal', events_count: 0)
+    aliased = genre(name: 'death-metal-melodic', events_count: 1)
+    aliased.merge_into!(canonical)
+
+    names = Genre.listable.pluck(:name)
+
+    assert_includes names, canonical.name, 'a zero-usage canonical with an alias stays listed'
+    assert_includes names, aliased.name, 'the alias stays listed via its own taggings'
+  end
+
   # --- Prose mining (names_in_prose / prose_mining_index) ---------------------
   # The ingest-time match-only miner: find KNOWN genre names in dropped
   # description prose, mint nothing. Synthetic taxonomy only.

@@ -85,14 +85,20 @@
     <% end %>
 
     <%# Merge into a canonical genre — a semantic alias the fingerprint can't catch
-        (e.g. "Elektronik" → "Electronic"). Folds this genre's events onto the
-        canonical and auto-resolves it on every future scrape. Ordered most-used
-        first, since you merge variants into the popular real genre. %>
+        (e.g. "Elektronik" → "Electronic"). A query-time link: this genre keeps its
+        own taggings, and a filter on the canonical resolves the alias (see
+        Genre.filter_names_for), so future scrapes auto-match too. Candidates mirror
+        the parent picker — any genre that isn't hidden, blocked, or itself an alias,
+        minus this one — so a correctly-spelled but dormant (0-event) genre stays a
+        valid target (the live event often carries the messy variant, leaving the
+        clean canonical at count 0). Ordered most-used first. %>
+    <% merge_candidates = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
+                               .where.not(id: genre.id).by_usage %>
     <%= form_with url: merge_genre_path(genre), method: :post, scope: :genre,
           class: 'flex justify-between gap-medium wrap align-end genre-merge' do |f| %>
       <%= hidden_field_tag :return_to, return_to %>
       <div class="input-wrapper flex flex-grow">
-        <%= f.combobox :canonical_genre_id, Genre.listable.where.not(id: genre.id).by_usage,
+        <%= f.combobox :canonical_genre_id, merge_candidates,
               placeholder: t('genres.editor.merge_into') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>

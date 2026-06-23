@@ -36,16 +36,20 @@ class Genre < ApplicationRecord
   scope :hidden, -> { where.not(hidden_at: nil) }
   scope :blocked, -> { where.not(blocked_at: nil) }
   scope :aliased, -> { where.not(canonical_id: nil) }
-  # The catalogue: genres actually in use OR parked (given a disposition or merged
-  # into a canonical). Excludes the dormant taxonomy entries (count 0, pre-mapped
-  # by the seed) that have never appeared on an event — they'd swamp the curation
-  # views. Blocked genres tag 0 events yet stay listed via their mark so Restore
-  # stays reachable (an aliased genre keeps its own taggings — a query-time link,
-  # not a rewrite — so it stays listed via events_count too). Genres outside this set remain findable by name
-  # search (see GenresController#index), so nothing is truly hidden.
+  # The catalogue: genres actually in use OR parked (given a disposition, merged
+  # into a canonical, or serving as a canonical for >=1 alias). Excludes the dormant
+  # taxonomy entries (count 0, pre-mapped by the seed) that have never appeared on an
+  # event — they'd swamp the curation views. Blocked genres tag 0 events yet stay
+  # listed via their mark so Restore stays reachable (an aliased genre keeps its own
+  # taggings — a query-time link, not a rewrite — so it stays listed via events_count
+  # too). A canonical hub can itself sit at count 0 (the live event carries the
+  # alias's raw token, not the canonical's) — the EXISTS clause keeps it listed so it
+  # doesn't vanish from the catalogue right after a merge. Genres outside this set
+  # remain findable by name search (see GenresController#index), so nothing is hidden.
   scope :listable, lambda {
     where('events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL ' \
-          'OR blocked_at IS NOT NULL OR canonical_id IS NOT NULL')
+          'OR blocked_at IS NOT NULL OR canonical_id IS NOT NULL ' \
+          'OR EXISTS (SELECT 1 FROM genres aliases WHERE aliases.canonical_id = genres.id)')
   }
   scope :by_usage, -> { order(events_count: :desc, name: :asc) }
   scope :by_name, -> { order(name: :asc) }

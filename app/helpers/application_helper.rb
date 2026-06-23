@@ -13,4 +13,12 @@ module ApplicationHelper
   def share_url_options
     request.host == AppHost::PUBLIC ? { host: AppHost::CODE } : {}
   end
+
+  # A URL safe to use as an href. Event source URLs come from scrapers (so they
+  # are attacker-influenceable); only emit them when they're plainly http(s),
+  # otherwise fall back to "#" so a crafted `javascript:`/`data:` URL can't ride
+  # an admin's click. Use wherever we link out to a scraped/user-supplied URL.
+  def external_url(url)
+    url.to_s.match?(%r{\Ahttps?://}i) ? url : "#"
+  end
 end

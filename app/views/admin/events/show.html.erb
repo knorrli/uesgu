@@ -5,7 +5,7 @@
     <div class="flex gap-small wrap align-baseline muted">
       <span><%= l(@event.start_date) %></span>
       <% if @event.venue %><span><%= @event.venue.name %></span><% end %>
-      <%= link_to t('admin.events.show.source_link'), @event.url, target: '_blank', rel: 'noopener' %>
+      <%= link_to t("admin.events.show.source_link"), external_url(@event.url), target: "_blank", rel: "noopener" %>
       <% if @event.data_source.present? %><span><%= t('admin.events.show.source_label', source: @event.data_source) %></span><% end %>
       <% if @event.cancelled? %><span class="chip"><%= t('admin.events.index.cancelled_badge') %></span><% end %>
       <% if @event.hidden? %><span><%= t('admin.events.index.hidden_badge') %></span><% end %>

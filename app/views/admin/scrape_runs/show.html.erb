@@ -70,7 +70,7 @@
         <% @created_events.each do |event| %>
           <li class="admin-row">
             <span class="admin-row__main">
-              <%= link_to event.title, event.url, target: '_blank', rel: 'noopener' %>
+              <%= link_to event.title, external_url(event.url), target: "_blank", rel: "noopener" %>
             </span>
             <span class="stat__leader"></span>
             <span class="admin-row__meta muted">

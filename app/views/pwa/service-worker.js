@@ -11,7 +11,7 @@
 // which service worker is actually active: it's stamped into every notification we
 // show (push) and into the DEBUG report (notificationclick). Remove with the rest of
 // the diagnostic scaffolding.
-const SW_BUILD = "D2"
+const SW_BUILD = "D3"
 
 self.addEventListener("push", (event) => {
   if (!event.data) return
@@ -27,57 +27,58 @@ self.addEventListener("notificationclick", (event) => {
   const path = event.notification.data?.path || "/"
   const url = new URL(path, self.location.origin).href
 
-  event.waitUntil(diagnoseAndOpen(path, url))
+  event.waitUntil(onClick(path, url))
 })
 
-// ⚠️ TEMPORARY DIAGNOSTIC BUILD. Reports what notificationclick decides via a "DEBUG"
-// notification, and tries WindowClient.navigate() as the candidate deep-link fix.
-// Once we know how iOS actually behaves, revert this to the clean handler.
+// ⚠️ TEMPORARY DIAGNOSTIC BUILD. Two-part probe of how iOS runs notificationclick:
 //
-// Reading the DEBUG body: it lists how many window clients matchAll() saw (and each
-// one's path / focused / visibility), then which branch ran (act=focus-exact /
-// navigate / openWindow) and whether navigate() succeeded. If you see NO debug
-// notification at all when you tap, notificationclick never fired (or the new SW
-// isn't active) — that's the most important signal.
-async function diagnoseAndOpen(path, url) {
+//  • "CLICK D3" notification — fired FIRST, before any other async work. If you see
+//    it, the handler fires. If you DON'T, iOS isn't dispatching notificationclick at
+//    all (or kills the SW before even this runs).
+//  • "DEBUG D3" notification — fired LAST, after matchAll + navigation attempts. If
+//    CLICK shows but DEBUG doesn't, the SW is being killed mid-async as the app
+//    foregrounds (so we can't rely on async work inside the handler).
+//
+// Candidate fix folded in: we postMessage every client a {type:"navigate"} the moment
+// the handler runs. That message QUEUES on a suspended page and is delivered when iOS
+// resumes it on foreground, so the page navigates ITSELF (Turbo.visit in
+// application.js) without the SW having to stay alive. This survives the kill above.
+async function onClick(path, url) {
+  // (1) Prove the handler fired, before anything else can be cut short.
+  await self.registration.showNotification(`CLICK ${SW_BUILD}`, {
+    body: "notificationclick fired",
+    tag: "usgu-click",
+    data: { path: "/" }
+  }).catch(() => {})
+
+  // (2) Attempt the deep-link and gather diagnostics.
   const log = []
   try {
     const clientList = await clients.matchAll({ type: "window", includeUncontrolled: true })
     log.push(`clients=${clientList.length}`)
     clientList.forEach((c, i) => log.push(`#${i} ${pathOf(c)} foc=${c.focused} vis=${c.visibilityState}`))
 
-    // 1) A window is already on the target path — just focus it.
+    // Queue a self-navigate on every page (delivered when iOS resumes it).
     for (const client of clientList) {
-      if (pathOf(client) === path && "focus" in client) {
-        log.push("act=focus-exact")
-        await report(log)
-        return client.focus()
-      }
+      client.postMessage({ type: "navigate", path, url })
     }
 
-    // 2) A window exists on another path — try to navigate IT (the candidate fix).
+    // Belt-and-suspenders: focus + WindowClient.navigate() too.
     for (const client of clientList) {
+      if ("focus" in client) { try { await client.focus() } catch (e) {} }
       if ("navigate" in client) {
-        log.push("act=navigate")
-        try {
-          const navigated = await client.navigate(url)
-          log.push("navigate=ok")
-          await report(log)
-          return navigated && "focus" in navigated ? navigated.focus() : undefined
-        } catch (e) {
-          log.push("navigate=ERR:" + (e && e.message))
-        }
+        try { await client.navigate(url); log.push("nav=ok") } catch (e) { log.push("nav=ERR:" + (e && e.message)) }
       }
     }
 
-    // 3) Nothing to navigate — open fresh.
-    log.push("act=openWindow")
-    await report(log)
-    if (clients.openWindow) return clients.openWindow(url)
+    if (!clientList.length && clients.openWindow) {
+      log.push("openWindow")
+      await clients.openWindow(url)
+    }
   } catch (e) {
     log.push("FATAL:" + (e && e.message))
-    await report(log)
   }
+  await report(log)
 }
 
 function pathOf(client) {

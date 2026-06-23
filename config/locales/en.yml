@@ -48,6 +48,14 @@ en:
     collect_email: Your email address, only if you give one, and only to send you the notifications you set up.
     collect_content: 'Whatever you create yourself: saved filters and saved events.'
     collect_cookies: 'Three cookies: one keeps you logged in, one remembers your theme (light/dark), one remembers the filter you last applied. Nothing else.'
+    services_heading: Outside services
+    services_hosting: 'Hosting: Render (render.com). Everything runs in their Frankfurt region, so your data stays in the EU.'
+    services_email: 'Email: Resend (resend.com) delivers the optional notification emails. No email, no Resend.'
+    services_push: 'Push: if you turn on push notifications, they travel through your browser or phone''s push service (Google, Mozilla, or Apple).'
+    calendar_heading: Calendar link
+    calendar_body: If you create a calendar subscription, its link holds a secret token. Anyone you share that link with can see your saved shows, so keep it to yourself. You can deactivate it any time in settings.
+    logs_heading: Server logs
+    logs_body: The server keeps short-lived logs that include your IP address, like any website does. They help with errors and abuse, and we don't use them to track or profile you.
     nothing_heading: What we don't do
     nothing_body: No tracking, no analytics tools, no ads. We don't sell your data and we don't share it.
     delete_heading: Deleting

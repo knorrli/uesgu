@@ -48,6 +48,14 @@ fr:
     collect_email: Ton adresse e-mail, seulement si tu en donnes une, et uniquement pour t'envoyer les notifications que tu as configurées.
     collect_content: 'Ce que tu crées toi-même : filtres enregistrés et événements gardés.'
     collect_cookies: 'Trois cookies : l''un te garde connecté, un autre retient ton thème (clair/sombre), le dernier retient le filtre que tu as appliqué en dernier. Rien d''autre.'
+    services_heading: Services externes
+    services_hosting: 'Hébergement : Render (render.com). Tout tourne dans leur région de Francfort, tes données restent donc dans l''UE.'
+    services_email: 'E-mail : Resend (resend.com) envoie les e-mails de notification optionnels. Pas d''e-mail, pas de Resend.'
+    services_push: 'Push : si tu actives les notifications push, elles passent par le service push de ton navigateur ou de ton téléphone (Google, Mozilla ou Apple).'
+    calendar_heading: Lien calendrier
+    calendar_body: Si tu crées un abonnement calendrier, son lien contient un jeton secret. Toute personne à qui tu donnes ce lien peut voir tes événements enregistrés, alors garde-le pour toi. Tu peux le désactiver à tout moment dans les réglages.
+    logs_heading: Journaux serveur
+    logs_body: Le serveur garde des journaux de courte durée qui contiennent ton adresse IP, comme tout site web. Ils servent en cas d'erreur ou d'abus, et on ne s'en sert pas pour te pister ou te profiler.
     nothing_heading: Ce que nous ne faisons pas
     nothing_body: Aucun pistage, aucun outil de statistique, aucune pub. Nous ne vendons pas tes données et ne les partageons pas.
     delete_heading: Suppression

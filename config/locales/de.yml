@@ -48,6 +48,14 @@ de:
     collect_email: Deine E-Mail-Adresse, nur wenn du eine angibst, und nur um dir die Benachrichtigungen zu schicken, die du eingestellt hast.
     collect_content: 'Was du selber anlegst: gespeicherte Filter und gemerkte Veranstaltungen.'
     collect_cookies: 'Drei Cookies: einer hält dich eingeloggt, einer merkt sich dein Theme (hell/dunkel), einer den zuletzt angewendeten Filter. Sonst keine.'
+    services_heading: Externe Dienste
+    services_hosting: 'Hosting: Render (render.com). Alles läuft in deren Frankfurt-Region, deine Daten bleiben also in der EU.'
+    services_email: 'E-Mail: Resend (resend.com) verschickt die optionalen Benachrichtigungs-Mails. Keine E-Mail, kein Resend.'
+    services_push: 'Push: Wenn du Push-Benachrichtigungen einschaltest, laufen sie über den Push-Dienst deines Browsers oder Handys (Google, Mozilla oder Apple).'
+    calendar_heading: Kalender-Link
+    calendar_body: Wenn du ein Kalender-Abo erstellst, enthält der Link einen geheimen Token. Jeder, dem du den Link gibst, sieht deine gemerkten Veranstaltungen, also behalt ihn für dich. Du kannst ihn jederzeit in den Einstellungen deaktivieren.
+    logs_heading: Server-Logs
+    logs_body: Der Server führt kurzlebige Logs, die deine IP-Adresse enthalten, wie jede Website. Sie helfen bei Fehlern und Missbrauch, und wir nutzen sie nicht, um dich zu verfolgen oder zu profilieren.
     nothing_heading: Was wir nicht tun
     nothing_body: Kein Tracking, keine Statistik-Tools, keine Werbung. Wir verkaufen deine Daten nicht und geben sie nicht weiter.
     delete_heading: Löschen

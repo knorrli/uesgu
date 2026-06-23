@@ -6,15 +6,15 @@ module Scrapers
   # local date/time portion and treat it as Swiss wall-clock.
   class Kairo < Agent
     def self.location
-      'Café Kairo'
+      "Café Kairo"
     end
 
     def self.locations
-      [location, 'Bern', 'BE']
+      [location, "Bern", "BE"]
     end
 
     def self.url
-      URI.parse('https://www.cafe-kairo.ch/programm')
+      URI.parse("https://www.cafe-kairo.ch/programm")
     end
 
     # Café Kairo's listing carries an inline blurb but no genre/style/tag field.
@@ -26,7 +26,7 @@ module Scrapers
 
     # Non-concert culture posts (exhibitions, info) carry no date block — skip them.
     def skip_row?(row)
-      row.at_css('.concerts_date time')&.attr('datetime').blank?
+      row.at_css(".concerts_date time")&.attr("datetime").blank?
     end
 
     # No detail page exists; the article id ("kultur_17431") is the stable key.
@@ -35,7 +35,7 @@ module Scrapers
     end
 
     def event_start_time(content)
-      stamp = content.at_css('.concerts_date time')&.attr('datetime').to_s
+      stamp = content.at_css(".concerts_date time")&.attr("datetime").to_s
       /(?<y>\d{4})-(?<mo>\d{2})-(?<d>\d{2})T(?<h>\d{2}):(?<mi>\d{2})/ =~ stamp
       raise "Unparseable Kairo date: #{stamp.inspect}" if y.blank?
 
@@ -43,21 +43,21 @@ module Scrapers
     end
 
     def event_title(content)
-      content.at_css('.text h2')&.text&.squish
+      content.at_css(".text h2")&.text&.squish
     end
 
     # The blurb's lead paragraph is the venue's concise secondary line — for concerts
     # an origin+style tagline ("Bern – Cold Wave/Gothic"), elsewhere a short category
     # word. Surface it; the full prose still feeds genre mining via event_genre_prose.
     def event_description(content)
-      content.css('.text p').map { |node| node.text.squish }.find(&:present?)
+      content.css(".text p").map { |node| node.text.squish }.find(&:present?)
     end
 
     # No genre field, but the inline blurb (the `.text` prose paragraphs after the
     # `h2.h1` title) names real styles — mine the known ones (Scrapers::Agent
     # match-only mining). The h2 title is excluded; only the `<p>` prose is scanned.
     def event_genre_prose(content)
-      content.css('.text p').map(&:text).join("\n")
+      content.css(".text p").map(&:text).join("\n")
     end
   end
 end

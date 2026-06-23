@@ -20,5 +20,4 @@ class NotificationsController < ApplicationController
     # Eager-load what the venue_groups/_event partials render, to avoid an N+1.
     @events = @notification.events.includes(:locations, :genres)
   end
-
 end

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 # Locks the cancellation-marker behaviour independent of fixtures: the multilingual
 # keyword set, the letter-boundary guards against false positives, and the fact that
@@ -7,25 +7,25 @@ class Scrapers::CancellationTest < Minitest::Test
   Event = Struct.new(:title, :description)
 
   CANCELLED = [
-    'ABGESAGT',
-    'Noche Cubana - ABGESAGT',
-    'Konzert abgesagt',
-    'Concert annulé',
-    'Soirée annulée',
-    'Annulation',
-    'Concerto annullato',
-    'Show cancelled',
-    'Tour canceled'
+    "ABGESAGT",
+    "Noche Cubana - ABGESAGT",
+    "Konzert abgesagt",
+    "Concert annulé",
+    "Soirée annulée",
+    "Annulation",
+    "Concerto annullato",
+    "Show cancelled",
+    "Tour canceled"
   ].freeze
 
   NOT_CANCELLED = [
-    'Fabian Cancellara Tribute', # contains "cancell" but not "cancelled"
-    'Annie Lennox',              # "ann…" but not a marker
-    'Annual Festival',           # "annu…al", not "annul…"
-    'Konzert verschoben',        # postponed is NOT cancelled
-    'Spectacle reporté',         # postponed (FR) is NOT cancelled
-    'Ausverkauft',               # sold out is NOT cancelled
-    'Uncancellable Party'        # marker embedded in a longer word
+    "Fabian Cancellara Tribute", # contains "cancell" but not "cancelled"
+    "Annie Lennox",              # "ann…" but not a marker
+    "Annual Festival",           # "annu…al", not "annul…"
+    "Konzert verschoben",        # postponed is NOT cancelled
+    "Spectacle reporté",         # postponed (FR) is NOT cancelled
+    "Ausverkauft",               # sold out is NOT cancelled
+    "Uncancellable Party"        # marker embedded in a longer word
   ].freeze
 
   def test_matches_cancellation_markers
@@ -43,7 +43,7 @@ class Scrapers::CancellationTest < Minitest::Test
   end
 
   def test_detects_marker_in_description
-    event = Event.new('Some Band', 'Dieses Konzert wurde leider abgesagt')
+    event = Event.new("Some Band", "Dieses Konzert wurde leider abgesagt")
     assert scraper.send(:event_cancelled?, event, nil)
   end
 

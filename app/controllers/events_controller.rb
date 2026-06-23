@@ -40,7 +40,7 @@ class EventsController < ApplicationController
     # frame, so an empty-state keyed off the month-scoped @events would go stale
     # when you page to a month that does have results; this stays correct.
     @has_results = events.exists?
-    if @view == 'calendar'
+    if @view == "calendar"
       @calendar_interactive = true
       # Focus order: explicit month nav (start_date) > the month of an active
       # date filter (e.g. "next weekend" may fall in another month) > the month

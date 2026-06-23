@@ -1,5 +1,5 @@
-require 'rubygems'
-require 'mechanize'
+require "rubygems"
+require "mechanize"
 
 module Scrapers
   class Agent < Mechanize
@@ -11,7 +11,7 @@ module Scrapers
     # reader, not ClaudeBot/GPTBot, so AI-crawler blocks don't apply to us.
     # A disallowed listing page raises Mechanize::RobotsDisallowedError out of
     # `get`, surfacing the venue as a failed run rather than silently scraping.
-    USER_AGENT = 'uesgu/1.0 (+https://uesgu.ch; personal event aggregator)'.freeze
+    USER_AGENT = "uesgu/1.0 (+https://uesgu.ch; personal event aggregator)".freeze
 
     # Per-venue escape hatch. Mechanize's single `robots` flag gates BOTH the
     # robots.txt check and the page-level `noindex, nofollow` meta tag. Some
@@ -225,8 +225,8 @@ module Scrapers
     def changed_fields(event, tags_before)
       fields = event.saved_changes.keys - %w[created_at updated_at genre_list location_list]
       after = tag_snapshot(event)
-      fields << 'genres'    if after[:genres]    != tags_before[:genres]
-      fields << 'locations' if after[:locations] != tags_before[:locations]
+      fields << "genres"    if after[:genres]    != tags_before[:genres]
+      fields << "locations" if after[:locations] != tags_before[:locations]
       fields
     end
 
@@ -466,18 +466,18 @@ module Scrapers
 
     def month_numbers
       @month_numbers ||= {
-        'Jan' => 1, 'Januar' => 1,
-        'Feb' => 2, 'Februar' => 2,
-        'Mär' => 3, 'Mrz' => 3, 'März' => 3,
-        'Apr' => 4, 'April' => 4,
-        'Mai' => 5,
-        'Jun' => 6, 'Juni' => 6,
-        'Jul' => 7, 'Juli' => 7,
-        'Aug' => 8, 'August' => 8,
-        'Sep' => 9, 'Sept' => 9, 'September' => 9,
-        'Okt' => 10, 'Oktober' => 10,
-        'Nov' => 11, 'November' => 11,
-        'Dez' => 12, 'Dezember' => 12
+        "Jan" => 1, "Januar" => 1,
+        "Feb" => 2, "Februar" => 2,
+        "Mär" => 3, "Mrz" => 3, "März" => 3,
+        "Apr" => 4, "April" => 4,
+        "Mai" => 5,
+        "Jun" => 6, "Juni" => 6,
+        "Jul" => 7, "Juli" => 7,
+        "Aug" => 8, "August" => 8,
+        "Sep" => 9, "Sept" => 9, "September" => 9,
+        "Okt" => 10, "Oktober" => 10,
+        "Nov" => 11, "November" => 11,
+        "Dez" => 12, "Dezember" => 12
       }
     end
   end

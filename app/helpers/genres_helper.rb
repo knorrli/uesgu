@@ -12,7 +12,7 @@ module GenresHelper
           .map do |genre|
             count = counts[genre.id]
             name = tag.span(genre.name)
-            content = count.positive? ? safe_join([name, tag.span(count, class: 'genre-option-count')]) : name
+            content = count.positive? ? safe_join([name, tag.span(count, class: "genre-option-count")]) : name
             { display: genre.name, value: genre.id, content: content }
           end
   end

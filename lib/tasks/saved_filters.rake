@@ -7,7 +7,7 @@ namespace :saved_filters do
   # Wired into render.yaml as the `notify-due` cron (schedule "*/15 * * * *").
   # Also runs the saved-show reminder sweep (EventReminder) — both share this one
   # cron since both are idempotent via their own per-fire guards.
-  desc 'Fire all due saved filters + saved-show reminders (run frequently from cron)'
+  desc "Fire all due saved filters + saved-show reminders (run frequently from cron)"
   task tick: :environment do
     now = Time.current
     sent = SavedFilter.run_due!(now)

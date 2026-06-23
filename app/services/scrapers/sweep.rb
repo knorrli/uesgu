@@ -72,7 +72,7 @@ module Scrapers
       if result.created_ids.any?
         Event.where(id: result.created_ids).update_all(created_in_scrape_run_id: run.id)
       end
-      @out.puts format('[%s] %s in %.1fs (%d seen, +%d new, ~%d updated, %d errored, %d filtered)',
+      @out.puts format("[%s] %s in %.1fs (%d seen, +%d new, ~%d updated, %d errored, %d filtered)",
                        slug, status.to_s.upcase, ms_since(started) / 1000.0,
                        result.seen, result.created, result.updated, result.errored, result.discarded)
     rescue StandardError => e
@@ -86,7 +86,7 @@ module Scrapers
         error_class: e.class.name, error_message: e.message&.truncate(1000)
       )
       Rails.logger.error("[#{slug}] scrape failed: #{e.class}: #{e.message}")
-      @out.puts format('[%s] FAILED in %.1fs — %s: %s', slug, ms_since(started) / 1000.0, e.class, e.message)
+      @out.puts format("[%s] FAILED in %.1fs — %s: %s", slug, ms_since(started) / 1000.0, e.class, e.message)
     end
 
     def finalize(run)

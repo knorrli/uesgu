@@ -7,19 +7,19 @@ module Scrapers
     DATE_SLUG = /-(?<y>\d{4})-(?<mo>\d{2})-(?<d>\d{2})\z/
 
     def self.location
-      'Mühle Hunziken'
+      "Mühle Hunziken"
     end
 
     def self.locations
-      [location, 'Rubigen', 'BE']
+      [location, "Rubigen", "BE"]
     end
 
     def self.url
-      URI.parse('https://muehlehunziken.ch/programm')
+      URI.parse("https://muehlehunziken.ch/programm")
     end
 
     def event_rows
-      page.css('li.wavy-bottom')
+      page.css("li.wavy-bottom")
     end
 
     # Undated rows are category/section links (festivals, info), not datable
@@ -48,7 +48,7 @@ module Scrapers
     end
 
     def event_title(content)
-      current_row.at_css('h2')&.text&.squish
+      current_row.at_css("h2")&.text&.squish
     end
 
     # A secondary line under the title in the list row — a support act
@@ -58,9 +58,9 @@ module Scrapers
     # the <h2> title — read from the list row like the title (the detail click is
     # only ever for the start time).
     def event_description(_content)
-      div = current_row.css('div').find do |node|
-        classes = node['class'].to_s
-        classes.include?('text-sm') && classes.include?('md:text-xl')
+      div = current_row.css("div").find do |node|
+        classes = node["class"].to_s
+        classes.include?("text-sm") && classes.include?("md:text-xl")
       end
       div&.text&.squish.presence
     end
@@ -73,28 +73,28 @@ module Scrapers
     # sometimes holds a non-genre category ("Podcast"); those tokens mint and are
     # blocked downstream rather than gated at ingest.
     def event_genres(content)
-      list = content.css('span').find { |s| s['class'].to_s.include?('last-of-type:hidden') }&.parent
+      list = content.css("span").find { |s| s["class"].to_s.include?("last-of-type:hidden") }&.parent
       return [] unless list
 
-      list.text.split(',').map(&:squish).reject(&:blank?)
+      list.text.split(",").map(&:squish).reject(&:blank?)
     end
 
     private
 
     def row_href(row)
-      row&.at_css('a')&.attr('href').to_s
+      row&.at_css("a")&.attr("href").to_s
     end
 
     def link_for(row)
-      Page::Link.new(row.at_css('a'), @mech, page)
+      Page::Link.new(row.at_css("a"), @mech, page)
     end
 
     # Definition list: <dt>Showbeginn</dt><dd>20.00</dd>. Prefer the show start,
     # fall back to door time, then to midnight if neither is published.
     def show_time(content)
       %w[Showbeginn Beginn Türöffnung Einlass].each do |label|
-        dt = content.css('dt').find { |n| n.text.squish.start_with?(label) }
-        time = dt&.at_xpath('following-sibling::dd[1]')&.text.to_s[/\d{1,2}[.:]\d{2}/]
+        dt = content.css("dt").find { |n| n.text.squish.start_with?(label) }
+        time = dt&.at_xpath("following-sibling::dd[1]")&.text.to_s[/\d{1,2}[.:]\d{2}/]
         return time.split(/[.:]/).map(&:to_i) if time
       end
       [0, 0]

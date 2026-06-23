@@ -4,26 +4,26 @@ class Event < ApplicationRecord
   # The scrape run that first created this event (nil for events predating run
   # tracking, or whose run has since been pruned). Set once, on insert, by the
   # orchestrator — re-scrapes that only update the event leave it untouched.
-  belongs_to :created_in_scrape_run, class_name: 'ScrapeRun', optional: true,
+  belongs_to :created_in_scrape_run, class_name: "ScrapeRun", optional: true,
                                      inverse_of: :created_events
 
   # Users who bookmarked this event ("save this show"). class_name pinned because
   # the inflector singularizes "saves" → "safe".
-  has_many :event_saves, class_name: 'EventSave', dependent: :destroy
+  has_many :event_saves, class_name: "EventSave", dependent: :destroy
 
   # The admin discard rule (if any) currently filtering this event from public
   # listings. Re-derived each scrape + on rule changes; nullified if the rule is
   # deleted (see DiscardRule). nil = not discarded.
-  belongs_to :discarded_by_rule, class_name: 'DiscardRule', optional: true,
+  belongs_to :discarded_by_rule, class_name: "DiscardRule", optional: true,
                                  inverse_of: :discarded_events
 
   # Event dedup (non-destructive): a duplicate points at its canonical (the
   # preferred source, PETZI). nil = this event IS canonical / standalone.
   # Re-derived each scrape by Scrapers::Dedup; bookmarks on a duplicate are
   # preserved (never deleted), the duplicate is just hidden from listings.
-  belongs_to :canonical_event, class_name: 'Event', optional: true,
+  belongs_to :canonical_event, class_name: "Event", optional: true,
                                inverse_of: :duplicate_events
-  has_many :duplicate_events, class_name: 'Event', foreign_key: :canonical_event_id,
+  has_many :duplicate_events, class_name: "Event", foreign_key: :canonical_event_id,
                               dependent: :nullify, inverse_of: :canonical_event
 
   validates :title, :start_date, :url, presence: true
@@ -85,17 +85,17 @@ class Event < ApplicationRecord
   # link so the next sweep's dedup leaves it alone. Used to collapse a pair the
   # fuzzy matcher missed (titles drifted between PETZI and the venue source).
   def merge_into!(canonical)
-    raise ArgumentError, 'cannot merge an event into itself' if canonical.id == id
+    raise ArgumentError, "cannot merge an event into itself" if canonical.id == id
 
     update!(canonical_event_id: canonical.id)
-    lock_field!('canonical_event')
+    lock_field!("canonical_event")
   end
 
   # Admin manual un-merge: declare this event standalone and PIN that decision, so
   # dedup won't re-merge it. Used to split a pair the fuzzy matcher wrongly joined.
   def mark_standalone!
     update!(canonical_event_id: nil)
-    lock_field!('canonical_event')
+    lock_field!("canonical_event")
   end
 
   # Scalar fields an admin may edit and lock against the scraper. Tracked by
@@ -154,11 +154,11 @@ class Event < ApplicationRecord
   end
 
   def self.ransackable_attributes(auth_object = nil)
-    ['title', 'description', 'start_date']
+    ["title", "description", "start_date"]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ['taggings', 'locations', 'genres']
+    ["taggings", "locations", "genres"]
   end
 
   # The venue location among this event's flat location tags (the rest are
@@ -169,11 +169,11 @@ class Event < ApplicationRecord
 
   def to_s
     [
-      start_date.strftime('%y-%m-%d'),
+      start_date.strftime("%y-%m-%d"),
       title.truncate(40),
       description&.truncate(20),
-      locations.map(&:name).join(', ')
-    ].compact_blank.join(' || ')
+      locations.map(&:name).join(", ")
+    ].compact_blank.join(" || ")
   end
 
   # Normalize scraped genres at the source — the central choke point for every

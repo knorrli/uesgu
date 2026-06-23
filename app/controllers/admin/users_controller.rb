@@ -16,11 +16,11 @@ module Admin
       # always refused, at least one admin (you) always remains — there's no way
       # to lock the site out of its admin via this screen.
       if @user == current_user
-        redirect_to admin_users_path, alert: t('admin.users.cant_delete_self'), status: :see_other
+        redirect_to admin_users_path, alert: t("admin.users.cant_delete_self"), status: :see_other
       else
         username = @user.username
         @user.destroy
-        redirect_to admin_users_path, notice: t('admin.users.deleted', username: username), status: :see_other
+        redirect_to admin_users_path, notice: t("admin.users.deleted", username: username), status: :see_other
       end
     end
   end

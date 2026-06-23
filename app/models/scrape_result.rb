@@ -4,7 +4,7 @@
 class ScrapeResult < ApplicationRecord
   belongs_to :scrape_run
 
-  enum :status, { ok: 'ok', empty: 'empty', failed: 'failed' }
+  enum :status, { ok: "ok", empty: "empty", failed: "failed" }
 
   scope :attention, -> { where(status: %w[empty failed]) }
 

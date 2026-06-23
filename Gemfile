@@ -34,19 +34,19 @@ gem "kamal", require: false
 gem "thruster", require: false
 
 # I18n
-gem 'rails-i18n', '~> 8.0.0'
+gem "rails-i18n", "~> 8.0.0"
 
 # Genres and Tags for Events
-gem 'acts-as-taggable-on'
+gem "acts-as-taggable-on"
 
 # Searching and sorting
-gem 'ransack'
+gem "ransack"
 
 # Pagination
-gem 'kaminari'
+gem "kaminari"
 
 # Support for iCalendar exports
-gem 'icalendar'
+gem "icalendar"
 
 # Combobox UI element for filters. Pinned: we lean on internal markup/behaviour
 # (a custom free-text row in the listbox, two prototype overrides in
@@ -55,17 +55,17 @@ gem 'icalendar'
 gem "hotwire_combobox", "~> 0.4.0"
 
 # Soft delete
-gem 'discard'
+gem "discard"
 
 # Web Scraping
-gem 'mechanize'
+gem "mechanize"
 
 # Calendar View
-gem 'simple_calendar'
+gem "simple_calendar"
 
 # Rate limiting / abuse throttling at the Rack layer (sheds scraper floods
 # before they reach the controller — see config/initializers/rack_attack.rb)
-gem 'rack-attack'
+gem "rack-attack"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/ndebugging_rails_applications.html#debugging-with-the-debug-gem

@@ -1,4 +1,4 @@
-require 'cgi'
+require "cgi"
 
 module Scrapers
   # Jugendkulturhaus Dynamo (Zürich) runs a Next.js front-end over a headless
@@ -6,33 +6,33 @@ module Scrapers
   # tagged as concerts, and map the finer category tags to genres. Rows are Hashes.
   class Dynamo < Agent
     def self.location
-      'Dynamo'
+      "Dynamo"
     end
 
     def self.locations
-      [location, 'Zürich', 'ZH']
+      [location, "Zürich", "ZH"]
     end
 
     # The feed is on the NodeHive backend (see #url), so the venue domain isn't
     # derivable from url.host — declare it for the ledger drift test.
-    def self.venue_domains = ['dynamo.ch']
+    def self.venue_domains = ["dynamo.ch"]
 
     # The "Konzert" category marks an event as a concert; the rest of the term ids
     # are genre facets we surface as genres (they mint and are curated downstream).
     CONCERT_TID = 20
     GENRE_BY_TID = {
-      14 => 'Metal', 15 => 'Hip-Hop', 16 => 'Elektro',
-      17 => 'Hardcore/Punk', 18 => 'Pop', 32 => 'Rock/Indie'
+      14 => "Metal", 15 => "Hip-Hop", 16 => "Elektro",
+      17 => "Hardcore/Punk", 18 => "Pop", 32 => "Rock/Indie"
     }.freeze
 
     def self.url
       params = {
-        'filter[field_event_date.value][operator]' => '>',
-        'filter[field_event_date.value][value]' => Date.current.iso8601,
-        'sort' => 'field_event_date.value',
-        'page[limit]' => '50'
+        "filter[field_event_date.value][operator]" => ">",
+        "filter[field_event_date.value][value]" => Date.current.iso8601,
+        "sort" => "field_event_date.value",
+        "page[limit]" => "50"
       }
-      query = params.map { |k, v| "#{CGI.escape(k)}=#{CGI.escape(v)}" }.join('&')
+      query = params.map { |k, v| "#{CGI.escape(k)}=#{CGI.escape(v)}" }.join("&")
       URI.parse("https://dynamo.nodehive.app/jsonapi/node/event?#{query}")
     end
 
@@ -41,7 +41,7 @@ module Scrapers
     field_gaps description: :no_field
 
     def event_rows
-      Array(parse_json(page.body, default: {})['data'])
+      Array(parse_json(page.body, default: {})["data"])
     end
 
     # Drop courses/markets/workshops; keep only concert-tagged events.
@@ -50,7 +50,7 @@ module Scrapers
     end
 
     def event_url(row)
-      alias_path = row.dig('attributes', 'path', 'alias')
+      alias_path = row.dig("attributes", "path", "alias")
       "https://www.dynamo.ch#{alias_path}" if alias_path.present?
     end
 
@@ -62,7 +62,7 @@ module Scrapers
 
     # `field_event_date.value` is full ISO 8601 with offset and year — clean.
     def event_start_time(row)
-      value = row.dig('attributes', 'field_event_date', 'value')
+      value = row.dig("attributes", "field_event_date", "value")
       raise "Missing Dynamo date for #{event_url(row)}" if value.blank?
 
       Time.zone.parse(value)
@@ -70,7 +70,7 @@ module Scrapers
 
     # `attributes.title` appends a "- DD.MM.YYYY" suffix; `field_title` is clean.
     def event_title(row)
-      row.dig('attributes', 'field_title').to_s.squish
+      row.dig("attributes", "field_title").to_s.squish
     end
 
     # Genres come from a fixed Drupal taxonomy (stable term ids → known names) — a
@@ -82,8 +82,8 @@ module Scrapers
     private
 
     def category_tids(row)
-      Array(row.dig('relationships', 'field_categories', 'data'))
-        .filter_map { |term| term.dig('meta', 'drupal_internal__target_id') }
+      Array(row.dig("relationships", "field_categories", "data"))
+        .filter_map { |term| term.dig("meta", "drupal_internal__target_id") }
     end
   end
 end

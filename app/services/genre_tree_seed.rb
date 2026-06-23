@@ -16,14 +16,14 @@ class GenreTreeSeed
 
   def initialize(data)
     @data    = data || {}
-    @hidden  = Array(@data['hidden'])
-    @blocked = Array(@data['blocked'])
-    @ignored = Array(@data['ignored'])
-    @aliases = @data['aliases'] || {}
+    @hidden  = Array(@data["hidden"])
+    @blocked = Array(@data["blocked"])
+    @ignored = Array(@data["ignored"])
+    @aliases = @data["aliases"] || {}
   end
 
   def import
-    @parent_of = flatten_tree(@data['genres'])
+    @parent_of = flatten_tree(@data["genres"])
 
     Genre.ensure!(@parent_of.keys + @hidden + @blocked + @ignored + @aliases.keys + @aliases.values.flatten)
     @lookup = Genre.all.index_by(&:fingerprint)
@@ -46,7 +46,7 @@ class GenreTreeSeed
   # node is either a bare string leaf or a { 'name' =>, 'children' => [...] } hash.
   def flatten_tree(nodes, parent_name = nil, acc = {})
     Array(nodes).each do |node|
-      name, children = node.is_a?(Hash) ? [node['name'], node['children']] : [node, nil]
+      name, children = node.is_a?(Hash) ? [node["name"], node["children"]] : [node, nil]
       next if name.to_s.strip.empty?
 
       acc[name] = parent_name
@@ -74,7 +74,7 @@ class GenreTreeSeed
       # "Pop") IS that genre — leave it put rather than tripping the not-self check.
       next if parent && parent.id == child.id
 
-      seen[child.id] << (parent_name || '(root)')
+      seen[child.id] << (parent_name || "(root)")
       child.update_columns(parent_id: parent&.id, ignored_at: nil, hidden_at: nil,
                            blocked_at: nil, canonical_id: nil)
     end

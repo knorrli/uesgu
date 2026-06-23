@@ -2,16 +2,16 @@ class GenresController < ApplicationController
   before_action :require_admin
 
   STATUS_SCOPES = {
-    'unplaced' => :unplaced,
-    'placed' => :placed,
-    'ignored' => :ignored,
-    'hidden' => :hidden,
-    'blocked' => :blocked
+    "unplaced" => :unplaced,
+    "placed" => :placed,
+    "ignored" => :ignored,
+    "hidden" => :hidden,
+    "blocked" => :blocked
   }.freeze
 
   # Browse default is alphabetical (finding a known genre); 'count' surfaces the
   # heaviest hitters (the queue's order).
-  SORT_SCOPES = { 'name' => :by_name, 'count' => :by_usage }.freeze
+  SORT_SCOPES = { "name" => :by_name, "count" => :by_usage }.freeze
 
   # Standard CRUD entry, filterable by status and sortable. Browsing shows the
   # curation catalogue (`Genre.listable` = in use + parked); a name search instead
@@ -19,10 +19,10 @@ class GenresController < ApplicationController
   # touched that currently tag 0 events — so nothing is ever truly hidden, it's
   # just one search away.
   def index
-    @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : 'all'
-    @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : 'name'
-    scope = @status == 'all' ? Genre.all : Genre.public_send(STATUS_SCOPES[@status])
-    scope = params[:q].present? ? scope.where('name ILIKE ?', "%#{params[:q]}%") : scope.listable
+    @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : "all"
+    @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : "name"
+    scope = @status == "all" ? Genre.all : Genre.public_send(STATUS_SCOPES[@status])
+    scope = params[:q].present? ? scope.where("name ILIKE ?", "%#{params[:q]}%") : scope.listable
     @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:parent).page(params[:page]).per(50)
   end
 
@@ -74,7 +74,7 @@ class GenresController < ApplicationController
   # Selection chips for the per-event genre-override combobox (admin/events#show).
   # Mirrors StylesController#chips but admin-gated (require_admin above).
   def chips
-    @genres = Genre.where(id: params[:combobox_values].to_s.split(',')).distinct.by_name
+    @genres = Genre.where(id: params[:combobox_values].to_s.split(",")).distinct.by_name
     render turbo_stream: helpers.combobox_selection_chips_for(@genres)
   end
 
@@ -116,7 +116,7 @@ class GenresController < ApplicationController
   # round-tripped value can't be turned into an open redirect.
   def return_to
     to = params[:return_to].to_s
-    to.start_with?('/') ? to : genres_path
+    to.start_with?("/") ? to : genres_path
   end
 
   def sample_events_for(genre)

@@ -1,4 +1,4 @@
-require 'public_suffix'
+require "public_suffix"
 
 module Scrapers
   # Source/venue discoverability. Finds venues/feeds we don't yet consume by
@@ -8,7 +8,7 @@ module Scrapers
   # This module holds the two pieces the rest of the system reconciles against:
   # the canonical-domain normalizer (#domain) and the ledger loader (Ledger).
   module Discovery
-    LEDGER_PATH = Rails.root.join('config/venue_ledger.yml')
+    LEDGER_PATH = Rails.root.join("config/venue_ledger.yml")
 
     # The canonical venue key: the registrable domain (eTLD+1), lowercased, with
     # scheme / userinfo / port / path and any subdomain ("www.", "api.", …)
@@ -31,7 +31,7 @@ module Scrapers
       str = value.to_s.strip
       return nil if str.empty?
 
-      str = "//#{str}" unless str.include?('//')
+      str = "//#{str}" unless str.include?("//")
       URI.parse(str).host&.downcase
     rescue URI::InvalidURIError
       nil
@@ -69,10 +69,10 @@ module Scrapers
     def self.petzi_unknown_clusters(event_urls, known_slugs)
       known = known_slugs.to_a
       tails = event_urls.filter_map { |u| u[PETZI_EVENT_SLUG, 1] }
-                        .reject { |t| t.include?('donation') }
+                        .reject { |t| t.include?("donation") }
                         .reject { |t| known.any? { |s| t == s || t.start_with?("#{s}-") } }
 
-      tails.group_by { |t| t.split('-').first(PETZI_STEM_TOKENS).join('-') }
+      tails.group_by { |t| t.split("-").first(PETZI_STEM_TOKENS).join("-") }
            .map { |stem, members| { slug: stem, count: members.size, samples: members.first(2) } }
            .sort_by { |c| [-c[:count], c[:slug]] }
     end
@@ -81,7 +81,7 @@ module Scrapers
     # upstream ("petzi"/"ole"/"hinto") to the raw keys that resolve to this domain.
     Entry = Struct.new(:domain, :name, :disposition, :reason, :checked, :aliases,
                        keyword_init: true) do
-      def consume? = disposition == 'consume'
+      def consume? = disposition == "consume"
 
       def blocked? = !consume?
     end
@@ -101,8 +101,8 @@ module Scrapers
       attr_reader :reasons, :entries
 
       def initialize(data)
-        @reasons = data.fetch('reasons')
-        @entries = Array(data.fetch('venues')).map { |row| build_entry(row) }
+        @reasons = data.fetch("reasons")
+        @entries = Array(data.fetch("venues")).map { |row| build_entry(row) }
       end
 
       def consume_domains = entries.select(&:consume?).map(&:domain).to_set
@@ -113,7 +113,7 @@ module Scrapers
 
       def find(domain) = entries.find { |e| e.domain == domain }
 
-      def revisitable?(reason) = reasons.dig(reason.to_s, 'revisitable') == true
+      def revisitable?(reason) = reasons.dig(reason.to_s, "revisitable") == true
 
       def reason?(reason) = reasons.key?(reason.to_s)
 
@@ -156,12 +156,12 @@ module Scrapers
 
       def build_entry(row)
         Entry.new(
-          domain: row.fetch('domain'),
-          name: row['name'],
-          disposition: row.fetch('disposition'),
-          reason: row['reason'],
-          checked: row['checked'],
-          aliases: row['aliases'] || {}
+          domain: row.fetch("domain"),
+          name: row["name"],
+          disposition: row.fetch("disposition"),
+          reason: row["reason"],
+          checked: row["checked"],
+          aliases: row["aliases"] || {}
         )
       end
 

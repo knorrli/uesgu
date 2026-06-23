@@ -1,15 +1,15 @@
 module Scrapers
   class NouveauMonde < Agent
     def self.location
-      'Nouveau Monde'
+      "Nouveau Monde"
     end
 
     def self.locations
-      [location, 'Fribourg', 'FR']
+      [location, "Fribourg", "FR"]
     end
 
     def self.url
-      URI.parse('https://www.nouveaumonde.ch/agenda/')
+      URI.parse("https://www.nouveaumonde.ch/agenda/")
     end
 
     # Nouveau Monde's only taxonomy is activity-type filters (concert / expo /
@@ -17,7 +17,7 @@ module Scrapers
     field_gaps genres: :no_field
 
     def event_rows
-      page.css('.poster[data-tofilter*=concert]')
+      page.css(".poster[data-tofilter*=concert]")
     end
 
     def event_url(row)
@@ -29,30 +29,30 @@ module Scrapers
     end
 
     def event_start_time(content)
-      schedule = content.css('#section-schedule')
+      schedule = content.css("#section-schedule")
       date_string = schedule.children.first.text.squish[/\d{1,2}\.\d{1,2}\.\d{4}/]
       raise "Unparseable date #{schedule.children.first.text.squish.inspect}" if date_string.blank?
 
-      time_node = schedule.css('.scheduleLine').find { |node| node.text.squish.match?(/\d{1,2}h\d{1,2}/) }
+      time_node = schedule.css(".scheduleLine").find { |node| node.text.squish.match?(/\d{1,2}h\d{1,2}/) }
       time_string = time_node&.text&.squish&.slice(/\d{1,2}h\d{1,2}/)
-      Time.zone.parse([date_string, time_string].compact.join(', '))
+      Time.zone.parse([date_string, time_string].compact.join(", "))
     end
 
     def event_title(content)
       # Some events render multiple `.groupHeading` sections (the lineup acts
       # each get one, doubling as `.groupIntro`); only the first carries the
       # event title — taking all of them jams the artist names onto the title.
-      content.at_css('.groupHeading h2')&.text&.squish
+      content.at_css(".groupHeading h2")&.text&.squish
     end
 
     def event_description(content)
-      content.css('.groupIntro').map do |node|
-        country_code = node.css('.plateMedium').text.squish
+      content.css(".groupIntro").map do |node|
+        country_code = node.css(".plateMedium").text.squish
         act_name = StringIO.new
-        act_name << node.children.find { |child| child.name == 'h2' }.text
+        act_name << node.children.find { |child| child.name == "h2" }.text
         act_name << " (#{country_code})" if country_code.present?
         act_name.string
-      end.compact_blank.join(', ')
+      end.compact_blank.join(", ")
     end
 
     # No genre extraction: the live ProcessWire template exposes no genre/style

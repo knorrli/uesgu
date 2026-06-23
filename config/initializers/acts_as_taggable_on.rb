@@ -17,21 +17,21 @@ ActsAsTaggableOn.strict_case_match = true
 module ActsAsTaggableOn
   class Tagging < ActsAsTaggableOn.base_class.constantize
     def self.ransackable_associations(auth_object = nil)
-      ['tags']
+      ["tags"]
     end
 
     def self.ransackable_attributes(auth_object = nil)
-      ['context']
+      ["context"]
     end
   end
 
   class Tag < ActsAsTaggableOn.base_class.constantize
     def self.ransackable_associations(auth_object = nil)
-      ['taggings']
+      ["taggings"]
     end
 
     def self.ransackable_attributes(auth_object = nil)
-      ['name']
+      ["name"]
     end
 
     def to_combobox_display

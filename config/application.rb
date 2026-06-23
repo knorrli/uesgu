@@ -50,14 +50,14 @@ module Uesgu
     config.i18n.default_locale = :de
     config.i18n.available_locales = [:de, :fr, :en]
     config.i18n.fallbacks = [:de]
-    config.time_zone = 'Europe/Berlin'
+    config.time_zone = "Europe/Berlin"
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Disable CSRF tokens per form because it does not work when turbo is disabled for a form...
     config.action_controller.per_form_csrf_tokens = false
 
     Rails.application.reloader.to_prepare do
-      Dir[Rails.root.join('app/services/scrapers/**/*.rb')].each { |file| require_dependency(file) }
+      Dir[Rails.root.join("app/services/scrapers/**/*.rb")].each { |file| require_dependency(file) }
     end
 
     # Don't generate system test files.

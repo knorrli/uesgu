@@ -14,7 +14,7 @@ module Admin
       )
 
       if @invitation.save
-        redirect_to admin_invitations_path, notice: t('admin.invitations.created', code: @invitation.formatted_code)
+        redirect_to admin_invitations_path, notice: t("admin.invitations.created", code: @invitation.formatted_code)
       else
         load_invitations
         render :index, status: :unprocessable_entity
@@ -25,10 +25,10 @@ module Admin
       invitation = Invitation.find(params[:id])
 
       if invitation.redeemed?
-        redirect_to admin_invitations_path, alert: t('admin.invitations.cant_revoke_redeemed'), status: :see_other
+        redirect_to admin_invitations_path, alert: t("admin.invitations.cant_revoke_redeemed"), status: :see_other
       else
         invitation.destroy
-        redirect_to admin_invitations_path, notice: t('admin.invitations.revoked'), status: :see_other
+        redirect_to admin_invitations_path, notice: t("admin.invitations.revoked"), status: :see_other
       end
     end
 

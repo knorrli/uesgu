@@ -5,23 +5,23 @@ namespace :scrapers do
   #
   #   bin/rails scrapers:capture_fixtures            # all venues
   #   bin/rails scrapers:capture_fixtures[kofmehl]   # one venue
-  desc 'Save live HTML fixtures for the scraper golden tests'
+  desc "Save live HTML fixtures for the scraper golden tests"
   task :capture_fixtures, [:only] => :environment do |_task, args|
-    root = Rails.root.join('test/fixtures/scrapers')
+    root = Rails.root.join("test/fixtures/scrapers")
 
     # First-detail-link selector for each click-into-detail (Shape B) scraper, so we
     # can grab a representative detail page the same way the scraper would.
     detail_link = {
-      'bad_bonn'      => '.program-row .program-bands a',
-      'kofmehl'       => '.events .events__element a.events__link',
-      'docks'         => '.programme-container .mix.concerts a',
-      'boeroem'       => '.ast-article-single .veranstaltung .elementor-heading-title a',
-      'isc'           => 'a.event_preview',
-      'kiff'          => '.FilterPage__FilterResults > .Card-Event .Card__Link',
-      'nouveau_monde' => '.poster[data-tofilter*=concert]',
-      'sedel'         => '.programm ul > li a',
-      'sous_soul'     => '.event_item.w-dyn-item a.link-block',
-      'neubad'        => 'ul.liste li.zeile .views-field-title a'
+      "bad_bonn"      => ".program-row .program-bands a",
+      "kofmehl"       => ".events .events__element a.events__link",
+      "docks"         => ".programme-container .mix.concerts a",
+      "boeroem"       => ".ast-article-single .veranstaltung .elementor-heading-title a",
+      "isc"           => "a.event_preview",
+      "kiff"          => ".FilterPage__FilterResults > .Card-Event .Card__Link",
+      "nouveau_monde" => ".poster[data-tofilter*=concert]",
+      "sedel"         => ".programm ul > li a",
+      "sous_soul"     => ".event_item.w-dyn-item a.link-block",
+      "neubad"        => "ul.liste li.zeile .views-field-title a"
     }
 
     only = args[:only]
@@ -35,18 +35,18 @@ namespace :scrapers do
 
       print "#{slug}: list… "
       agent.get(klass.url)
-      File.binwrite(dir.join('list.html'), agent.page.body)
-      print 'ok'
+      File.binwrite(dir.join("list.html"), agent.page.body)
+      print "ok"
 
       if (selector = detail_link[slug])
         node = agent.page.at_css(selector)
-        href = node && node['href']
+        href = node && node["href"]
         if href.present?
           detail_url = URI.join(klass.url.to_s, href).to_s
           print ", detail (#{detail_url})… "
           agent.get(detail_url)
-          File.binwrite(dir.join('detail.html'), agent.page.body)
-          print 'ok'
+          File.binwrite(dir.join("detail.html"), agent.page.body)
+          print "ok"
         else
           print ", detail SELECTOR MISSED (#{selector})"
         end
@@ -73,7 +73,7 @@ namespace :scrapers do
   # per-event parse error is skipped and counted inside the scraper.
   #
   #   bin/rails scrapers:run_all
-  desc 'Run all scrapers once, recording a ScrapeRun and per-scraper summary (daily cron entrypoint)'
+  desc "Run all scrapers once, recording a ScrapeRun and per-scraper summary (daily cron entrypoint)"
   task run_all: :environment do
     run = Scrapers::Sweep.run!
 
@@ -84,14 +84,14 @@ namespace :scrapers do
       reasons = []
       reasons << "#{failed.size} FAILED (#{failed.join(', ')})" if failed.any?
       reasons << "#{dropped.size} DROPPED TO ZERO (#{dropped.join(', ')})" if dropped.any?
-      puts format('scrapers:run_all: %s of %d scrapers in %.1fs — see /admin/scrape_runs',
-                  reasons.join('; '), run.scrapers_total, run.duration)
-      abort('scrapers:run_all finished with failures')
+      puts format("scrapers:run_all: %s of %d scrapers in %.1fs — see /admin/scrape_runs",
+                  reasons.join("; "), run.scrapers_total, run.duration)
+      abort("scrapers:run_all finished with failures")
     elsif run.scrapers_empty.positive?
-      puts format('scrapers:run_all: all %d ran but %d produced no events in %.1fs — see /admin/scrape_runs',
+      puts format("scrapers:run_all: all %d ran but %d produced no events in %.1fs — see /admin/scrape_runs",
                   run.scrapers_total, run.scrapers_empty, run.duration)
     else
-      puts format('scrapers:run_all: all %d scrapers OK in %.1fs', run.scrapers_total, run.duration)
+      puts format("scrapers:run_all: all %d scrapers OK in %.1fs", run.scrapers_total, run.duration)
     end
   end
 
@@ -111,13 +111,13 @@ namespace :scrapers do
   #   bin/rails scrapers:rote_fabrik:fix_urls          # apply
   #   DRY_RUN=1 bin/rails scrapers:rote_fabrik:fix_urls # preview only
   namespace :rote_fabrik do
-    desc 'Backfill Rote Fabrik event URLs from the dead kalender. backend to the public SPA route'
+    desc "Backfill Rote Fabrik event URLs from the dead kalender. backend to the public SPA route"
     task fix_urls: :environment do
-      dry = ENV['DRY_RUN'].present?
+      dry = ENV["DRY_RUN"].present?
       old = Event.where(data_source: Scrapers::RoteFabrik.source_key)
-                 .where('url LIKE ?', '%kalender.rotefabrik.ch%')
+                 .where("url LIKE ?", "%kalender.rotefabrik.ch%")
       if old.none?
-        puts 'rote_fabrik:fix_urls: nothing to do (no events on the old kalender. host)'
+        puts "rote_fabrik:fix_urls: nothing to do (no events on the old kalender. host)"
         next
       end
 
@@ -125,7 +125,7 @@ namespace :scrapers do
       agent.get(Scrapers::RoteFabrik.url)
       # r_f_event_id (the id baked into the OLD url) → the live row, so we can rebuild
       # the new url via the scraper's own event_url.
-      rows_by_rf = agent.send(:event_rows).index_by { |r| r['r_f_event_id'].to_s }
+      rows_by_rf = agent.send(:event_rows).index_by { |r| r["r_f_event_id"].to_s }
 
       fixed = skipped = collided = 0
       old.find_each do |event|
@@ -150,7 +150,7 @@ namespace :scrapers do
         fixed += 1
       end
 
-      verb = dry ? 'would fix' : 'fixed'
+      verb = dry ? "would fix" : "fixed"
       puts "rote_fabrik:fix_urls: #{verb} #{fixed}, skipped #{skipped} (not in feed), #{collided} collision(s)#{' [DRY RUN]' if dry}"
     end
   end
@@ -163,9 +163,9 @@ namespace :scrapers do
   # summary. NOT part of the nightly sweep.
   #
   #   bin/rails "scrapers:dry_run[Treibhaus]"   # by demodulized class name
-  desc 'Dry-run one scraper live and dump parsed events to tmp/dry_run/<slug>.json (no DB writes)'
+  desc "Dry-run one scraper live and dump parsed events to tmp/dry_run/<slug>.json (no DB writes)"
   task :dry_run, [:scraper] => :environment do |_task, args|
-    name = args[:scraper] or abort 'usage: scrapers:dry_run[ClassName]'
+    name = args[:scraper] or abort "usage: scrapers:dry_run[ClassName]"
     klass = Scrapers::All.scrapers[name] or abort "unknown scraper #{name.inspect} (have: #{Scrapers::All.scrapers.keys.sort.join(', ')})"
 
     agent = klass.new
@@ -201,7 +201,7 @@ namespace :scrapers do
       skipped << { url: url, error: "#{e.class}: #{e.message}" }
     end
 
-    dir = Rails.root.join('tmp/dry_run')
+    dir = Rails.root.join("tmp/dry_run")
     FileUtils.mkdir_p(dir)
     out = dir.join("#{name.underscore}.json")
     File.write(out, "#{JSON.pretty_generate(scraper: name, seen: rows.size, parsed: events.size, skipped: skipped, events: events)}\n")

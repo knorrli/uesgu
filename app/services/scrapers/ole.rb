@@ -1,5 +1,5 @@
-require 'nokogiri'
-require 'cgi'
+require "nokogiri"
+require "cgi"
 
 module Scrapers
   # OLE (Open Linked Event Data) — a single standardized XML schema that many
@@ -53,8 +53,8 @@ module Scrapers
     SOURCES = [
       # Dachstock is also in PETZI — included on purpose to prove Dedup absorbs the
       # overlap (venue + date + title) instead of duplicating it.
-      { key: 'Dachstock',  feed_url: 'https://api.dachstock.ch/wp-json/ds/v1/hinto',
-        location: ['Dachstock', 'Bern', 'BE'] },
+      { key: "Dachstock",  feed_url: "https://api.dachstock.ch/wp-json/ds/v1/hinto",
+        location: ["Dachstock", "Bern", "BE"] },
 
       # Net-new, non-PETZI single-venue Bern feeds.
       # { key: 'Klangkeller', feed_url: 'https://www.klangkeller-bern.ch/app/klangkeller/action/oleexport',
@@ -93,7 +93,7 @@ module Scrapers
       # Dampfzentrale, Dynamo, Turnhalle, Rote Fabrik, …) is folded by Scrapers::
       # Dedup. ~Half the programme is non-music (Theater/Party/Tanz/…); the music
       # gate hides it via db/genres.yml dispositions (curated, not gated at ingest).
-      { key: 'Bewegungsmelder', feed_url: 'https://bewegungsmelder.ch/oleexport/',
+      { key: "Bewegungsmelder", feed_url: "https://bewegungsmelder.ch/oleexport/",
         aggregator: true, link_via: :source }
     ].freeze
 
@@ -107,9 +107,9 @@ module Scrapers
     # / #locations_for). The messy aggregates (Konzerte Bern = 0 genres + address
     # in <name>; Hinto ALL = 46 venues) stay deferred too. See BACKLOG.
     DEFERRED = [
-      { key: 'Birdseye', feed_url: 'https://www.birdseye.ch/HintoEventlist.php',
-        location: ['Birdseye', 'Basel', 'BS'], reason: :robots },
-      { key: 'BeJazz', feed_url: 'http://www.bejazz.ch/app/bejazz/action/oleexport/',
+      { key: "Birdseye", feed_url: "https://www.birdseye.ch/HintoEventlist.php",
+        location: ["Birdseye", "Basel", "BS"], reason: :robots },
+      { key: "BeJazz", feed_url: "http://www.bejazz.ch/app/bejazz/action/oleexport/",
         aggregator: true, reason: :robots }
     ].freeze
 
@@ -239,7 +239,7 @@ module Scrapers
 
     # name → title, squished with any trailing ":" removed (OLE titles often read
     # "Artist:" with the lineup appended after the colon).
-    def event_title(row) = clean_title(text(row.event, 'name'))
+    def event_title(row) = clean_title(text(row.event, "name"))
 
     # <lead> is the event's teaser line and makes a good description — EXCEPT the
     # feed injects the generic VENUE blurb into <lead> for bare listings (club
@@ -251,13 +251,13 @@ module Scrapers
     def event_description(row)
       return nil unless description_present?(row.event)
 
-      plain_text(text(row.event, 'lead')).presence
+      plain_text(text(row.event, "lead")).presence
     end
 
     # <categories> mint taxonomy (unrecognised tokens land UNPLACED in the curation
     # queue), so we keep every token and curate downstream rather than gate at ingest.
     def event_genres(row)
-      row.event.css('categories category').map { |c| squish(decode(c.text)) }.reject(&:blank?).uniq
+      row.event.css("categories category").map { |c| squish(decode(c.text)) }.reject(&:blank?).uniq
     end
 
     def event_locations(row) = row.locations
@@ -276,12 +276,12 @@ module Scrapers
     # event with N shows becomes N events, each keyed on the venue url + its show
     # date so the upsert keys stay distinct.
     def rows_from(doc)
-      doc.css('event').flat_map do |event_node|
+      doc.css("event").flat_map do |event_node|
         base_url = event_base_url(event_node)
         next [] if base_url.blank?
 
         locations = locations_for(event_node)
-        rows = event_node.css('shows show').filter_map do |show_node|
+        rows = event_node.css("shows show").filter_map do |show_node|
           start = parse_start(show_node)
           next if start.nil? || start.to_date < Date.current # drop past shows
 
@@ -313,10 +313,10 @@ module Scrapers
     # aggregator; otherwise we fall back to the per-event <source_url> (the
     # aggregator's own event page) — never the useless, collision-prone homepage.
     def event_base_url(event_node)
-      venue = decode(text(event_node, 'url'))
+      venue = decode(text(event_node, "url"))
       return venue unless self.class.link_via == :source
 
-      venue_event_link?(venue) ? venue : decode(text(event_node, 'source_url')).presence
+      venue_event_link?(venue) ? venue : decode(text(event_node, "source_url")).presence
     end
 
     def decode(raw) = raw.blank? ? raw : CGI.unescapeHTML(raw)
@@ -333,7 +333,7 @@ module Scrapers
       uri = URI.parse(url)
       return true if uri.query.present?
 
-      uri.path.to_s.split('/').any? { |seg| seg.match?(/\d/) }
+      uri.path.to_s.split("/").any? { |seg| seg.match?(/\d/) }
     rescue URI::InvalidURIError
       false
     end
@@ -341,7 +341,7 @@ module Scrapers
     # ISO-8601 so no fuzzy parsing; a blank/garbled date is skipped with a warn
     # (like the Schüür parser) rather than aborting the feed.
     def parse_start(show_node)
-      raw = text(show_node, 'date_start')
+      raw = text(show_node, "date_start")
       return nil if raw.blank?
 
       Time.zone.parse(raw)
@@ -363,7 +363,7 @@ module Scrapers
     # its real PLZ is 3084/BE). Keyed on the downcased locality, so it corrects the
     # specific place without remapping a PLZ that's legitimately VS for elsewhere.
     # Add a row when a venue lands in the wrong canton in the WHERE tree.
-    CITY_CANTON_FIXES = { 'wabern' => 'BE' }.freeze
+    CITY_CANTON_FIXES = { "wabern" => "BE" }.freeze
 
     # Single-venue: the configured place. Aggregator: resolve per event from
     # <location>, deriving canton from the PLZ (the only canton signal OLE gives),
@@ -371,10 +371,10 @@ module Scrapers
     def locations_for(event_node)
       return self.class.locations unless self.class.aggregator?
 
-      loc    = event_node.at_css('location')
-      venue  = clean_title(text(loc, 'name'))
-      city   = squish(text(loc, 'locality'))
-      canton = CITY_CANTON_FIXES[city.downcase] || SwissPostcode.canton(text(loc, 'code'))
+      loc    = event_node.at_css("location")
+      venue  = clean_title(text(loc, "name"))
+      city   = squish(text(loc, "locality"))
+      canton = CITY_CANTON_FIXES[city.downcase] || SwissPostcode.canton(text(loc, "code"))
       [venue, city, canton].compact_blank.presence || self.class.locations
     end
 
@@ -404,9 +404,9 @@ module Scrapers
     # bare listing's description is just "<br/>", which reads as blank here, so it
     # gates the venue-blurb <lead> out of the description (see #event_description).
     def description_present?(event_node)
-      text(event_node, 'description').to_s
-        .gsub(/<[^>]+>/, ' ')
-        .gsub(/&[^;\s]+;/, ' ')
+      text(event_node, "description").to_s
+        .gsub(/<[^>]+>/, " ")
+        .gsub(/&[^;\s]+;/, " ")
         .strip.present?
     end
 
@@ -415,17 +415,17 @@ module Scrapers
     # simple_format (which would otherwise show a literal "&amp;").
     def plain_text(html) = squish(Nokogiri::HTML.fragment(html.to_s).text)
 
-    def squish(str) = str.to_s.gsub(/\s+/, ' ').strip
+    def squish(str) = str.to_s.gsub(/\s+/, " ").strip
 
     # Decode HTML char-refs + squish + drop a trailing colon ("Mardi Gras:" →
     # "Mardi Gras"). The decode handles feeds that ship "&amp;" literally inside a
     # CDATA title or venue name ("Speis &amp; Trank" → "Speis & Trank"), matching
     # how <lead> is already entity-decoded in #plain_text.
-    def clean_title(str) = squish(decode(str)).sub(/\s*:\z/, '')
+    def clean_title(str) = squish(decode(str)).sub(/\s*:\z/, "")
 
-    def next_url(doc) = squish(text(doc, 'meta next_url'))
+    def next_url(doc) = squish(text(doc, "meta next_url"))
 
-    def max_pages(doc) = text(doc, 'meta max_pages').to_i
+    def max_pages(doc) = text(doc, "meta max_pages").to_i
   end
 
   # The base registered itself via Agent.inherited (the `class Ole < Agent` keyword

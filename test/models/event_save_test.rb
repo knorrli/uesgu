@@ -1,7 +1,7 @@
-require 'db_test_helper'
+require "db_test_helper"
 
 class EventSaveTest < ActiveSupport::TestCase
-  test 'a user cannot save the same event twice' do
+  test "a user cannot save the same event twice" do
     u = user
     e = event
     u.event_saves.create!(event: e)
@@ -11,7 +11,7 @@ class EventSaveTest < ActiveSupport::TestCase
     assert dup.errors[:event_id].any?
   end
 
-  test 'saved_events returns the bookmarked events' do
+  test "saved_events returns the bookmarked events" do
     u = user
     e1 = event
     e2 = event

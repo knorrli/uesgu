@@ -10,29 +10,29 @@ module Admin
     # "duplicates" = events merged into a canonical (their own dedicated bucket,
     # hidden from the default list which is canonical-only — see #index).
     STATUS_SCOPES = {
-      'visible' => -> { Event.visible },
-      'hidden' => -> { Event.kept.where(hidden: true) },
-      'cancelled' => -> { Event.kept.cancelled },
-      'discarded' => -> { Event.discarded },
-      'duplicates' => -> { Event.duplicates },
-      'dismissed' => -> { Event.dismissed }
+      "visible" => -> { Event.visible },
+      "hidden" => -> { Event.kept.where(hidden: true) },
+      "cancelled" => -> { Event.kept.cancelled },
+      "discarded" => -> { Event.discarded },
+      "duplicates" => -> { Event.duplicates },
+      "dismissed" => -> { Event.dismissed }
     }.freeze
 
     # Chronological by default — oldest/nearest-term events first (the bulk of the
     # table is upcoming, so this surfaces what's current rather than the furthest-
     # out shows); 'title' is the alphabetical lookup.
     SORT_SCOPES = {
-      'date' => ->(scope) { scope.order(start_date: :asc, start_time: :asc) },
-      'title' => ->(scope) { scope.order(:title) }
+      "date" => ->(scope) { scope.order(start_date: :asc, start_time: :asc) },
+      "title" => ->(scope) { scope.order(:title) }
     }.freeze
 
     def index
-      @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : 'all'
-      @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : 'date'
+      @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : "all"
+      @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : "date"
       # "all" means all kept *canonical* events — duplicates merged into a
       # canonical are reached via their own filter, dismissed ones via theirs.
-      scope = @status == 'all' ? Event.kept.canonical : STATUS_SCOPES[@status].call
-      scope = scope.where('title ILIKE ?', "%#{params[:q]}%") if params[:q].present?
+      scope = @status == "all" ? Event.kept.canonical : STATUS_SCOPES[@status].call
+      scope = scope.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @events = SORT_SCOPES[@sort].call(scope)
                                   .includes(:locations, :genres, :discarded_by_rule, :canonical_event)
                                   .page(params[:page]).per(50)
@@ -51,7 +51,7 @@ module Admin
     # being edited (passed as `exclude`). Renders combobox options (turbo_stream).
     def search
       scope = Event.kept.canonical.where.not(id: params[:exclude])
-      scope = scope.where('title ILIKE ?', "%#{params[:q]}%") if params[:q].present?
+      scope = scope.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @events = scope.includes(:locations).order(start_date: :asc).limit(20)
     end
 
@@ -67,11 +67,11 @@ module Admin
       assign_scalars(@event, attrs)
       locked = @event.changed & Event::OVERRIDABLE_FIELDS
       locked |= SCHEDULE_FIELDS if locked.intersect?(SCHEDULE_FIELDS)
-      locked << 'genres' if assign_genres(@event, attrs)
+      locked << "genres" if assign_genres(@event, attrs)
       @event.overridden_fields = (@event.overridden_fields + locked).uniq
       @event.save!
-      @event.recompute_visibility! if locked.include?('genres')
-      redirect_to admin_event_path(@event), notice: t('.saved')
+      @event.recompute_visibility! if locked.include?("genres")
+      redirect_to admin_event_path(@event), notice: t(".saved")
     end
 
     # Release one locked field (or the date/time pair) back to the scraper; the
@@ -80,7 +80,7 @@ module Admin
       event = Event.find(params.expect(:id))
       fields = SCHEDULE_FIELDS.include?(params[:field]) ? SCHEDULE_FIELDS : [params[:field]]
       fields.each { |field| event.release_field!(field) }
-      redirect_to admin_event_path(event), notice: t('.reverted')
+      redirect_to admin_event_path(event), notice: t(".reverted")
     end
 
     # Soft-delete: the event drops out of every public listing and is never
@@ -89,14 +89,14 @@ module Admin
     def destroy
       event = Event.find(params.expect(:id))
       event.dismiss!
-      redirect_to admin_events_path(status: 'dismissed'), notice: t('.dismissed')
+      redirect_to admin_events_path(status: "dismissed"), notice: t(".dismissed")
     end
 
     # Lift a dismissal so the event reappears and re-scrapes resume updating it.
     def undismiss
       event = Event.find(params.expect(:id))
       event.undismiss!
-      redirect_to admin_event_path(event), notice: t('.restored')
+      redirect_to admin_event_path(event), notice: t(".restored")
     end
 
     # Manually mark this event a duplicate of another (the canonical), pinning the
@@ -105,10 +105,10 @@ module Admin
     def merge
       event = Event.find(params.expect(:id))
       canonical = Event.find_by(id: params[:canonical_id])
-      return redirect_to admin_event_path(event), alert: t('.merge_missing') if canonical.nil?
+      return redirect_to admin_event_path(event), alert: t(".merge_missing") if canonical.nil?
 
       event.merge_into!(canonical)
-      redirect_to admin_event_path(canonical), notice: t('.merged')
+      redirect_to admin_event_path(canonical), notice: t(".merged")
     rescue ArgumentError => e
       redirect_to admin_event_path(event), alert: e.message
     end
@@ -118,7 +118,7 @@ module Admin
     def unmerge
       event = Event.find(params.expect(:id))
       event.mark_standalone!
-      redirect_to admin_event_path(event), notice: t('.unmerged')
+      redirect_to admin_event_path(event), notice: t(".unmerged")
     end
 
     private
@@ -134,7 +134,7 @@ module Admin
       event.start_date = date
       event.start_time =
         if attrs[:time].present?
-          hour, minute = attrs[:time].split(':').map(&:to_i)
+          hour, minute = attrs[:time].split(":").map(&:to_i)
           Time.zone.local(date.year, date.month, date.day, hour, minute)
         end
     end
@@ -146,7 +146,7 @@ module Admin
     def assign_genres(event, attrs)
       return false unless attrs.key?(:override_genre_ids)
 
-      ids = attrs[:override_genre_ids].to_s.split(',').map(&:strip).reject(&:blank?)
+      ids = attrs[:override_genre_ids].to_s.split(",").map(&:strip).reject(&:blank?)
       before = event.genre_list.sort
       event.genre_list = Genre.where(id: ids).pluck(:name)
       event.genre_list.sort != before

@@ -77,7 +77,7 @@ class EventReminder
   def deliver(events)
     I18n.with_locale(locale) do
       note = @user.notifications.create!(
-        title: I18n.t('event_reminder.title', count: events.size),
+        title: I18n.t("event_reminder.title", count: events.size),
         event_ids: events.map(&:id),
         period_start: target_date.beginning_of_day,
         period_end: target_date.end_of_day
@@ -92,8 +92,8 @@ class EventReminder
     return unless WebPushConfig.configured?
     return if @user.push_subscriptions.none?
 
-    title = I18n.t('push.digest.title')
-    body = I18n.t('event_reminder.push_body', count: events.size)
+    title = I18n.t("push.digest.title")
+    body = I18n.t("event_reminder.push_body", count: events.size)
     path = Rails.application.routes.url_helpers.notification_path(note)
     @user.push_subscriptions.find_each { |sub| sub.deliver(title: title, body: body, path: path) }
   end

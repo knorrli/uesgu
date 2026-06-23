@@ -13,7 +13,7 @@ class SavedEventsController < ApplicationController
     @calendar_interactive = true
 
     scope = current_user.saved_events.includes(:locations, :genres)
-    if @view == 'calendar'
+    if @view == "calendar"
       @calendar_start = (Date.parse(params[:start_date]) rescue nil) || Date.current
       # The focused month plus a week of padding so adjacent-month grid cells are
       # covered (mirrors EventsController#index).
@@ -26,7 +26,7 @@ class SavedEventsController < ApplicationController
     else
       # Compare the date column against a plain Date — a zoned beginning_of_day
       # timestamp slips a day across the +0200 offset (date-vs-timestamp footgun).
-      @events = scope.where('events.start_date >= ?', Date.current)
+      @events = scope.where("events.start_date >= ?", Date.current)
                      .order(:start_date, :start_time, :title)
     end
   end

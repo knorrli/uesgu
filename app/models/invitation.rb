@@ -9,11 +9,11 @@ class Invitation < ApplicationRecord
 
   # Crockford-ish alphabet: no 0/O/1/I/L so a code is safe to read aloud or
   # copy from a chat without ambiguity. 31^8 ≈ 8.5e11 combinations.
-  CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'.freeze
+  CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789".freeze
   CODE_LENGTH = 8
 
-  belongs_to :created_by, class_name: 'User'
-  belongs_to :redeemed_by, class_name: 'User', optional: true
+  belongs_to :created_by, class_name: "User"
+  belongs_to :redeemed_by, class_name: "User", optional: true
 
   validates :code, presence: true, uniqueness: true
 
@@ -21,14 +21,14 @@ class Invitation < ApplicationRecord
 
   # Usable right now: not yet redeemed and not past its (optional) expiry.
   scope :available, -> {
-    where(redeemed_at: nil).where('expires_at IS NULL OR expires_at > ?', Time.current)
+    where(redeemed_at: nil).where("expires_at IS NULL OR expires_at > ?", Time.current)
   }
   scope :redeemed, -> { where.not(redeemed_at: nil) }
-  scope :expired, -> { where(redeemed_at: nil).where('expires_at <= ?', Time.current) }
+  scope :expired, -> { where(redeemed_at: nil).where("expires_at <= ?", Time.current) }
 
   # Strip formatting/case so a friend can type "abcd-2345" or "ABCD 2345".
   def self.normalize_code(raw)
-    raw.to_s.gsub(/[^A-Za-z0-9]/, '').upcase
+    raw.to_s.gsub(/[^A-Za-z0-9]/, "").upcase
   end
 
   # Look up an available invitation by a user-entered code, or nil.
@@ -71,7 +71,7 @@ class Invitation < ApplicationRecord
 
   # ABCD-2345 — for display only; never used for lookup.
   def formatted_code
-    code.scan(/.{1,4}/).join('-')
+    code.scan(/.{1,4}/).join("-")
   end
 
   private

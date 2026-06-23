@@ -21,7 +21,7 @@ module Admin
       @rule = DiscardRule.new(rule_params)
       if @rule.save
         DiscardRule.reapply_all!
-        redirect_to admin_discard_rules_path, notice: t('.created')
+        redirect_to admin_discard_rules_path, notice: t(".created")
       else
         render :new, status: :unprocessable_entity
       end
@@ -31,7 +31,7 @@ module Admin
       @rule = DiscardRule.find(params.expect(:id))
       if @rule.update(rule_params)
         DiscardRule.reapply_all!
-        redirect_to admin_discard_rules_path, notice: t('.updated')
+        redirect_to admin_discard_rules_path, notice: t(".updated")
       else
         render :edit, status: :unprocessable_entity
       end
@@ -40,7 +40,7 @@ module Admin
     def destroy
       DiscardRule.find(params.expect(:id)).destroy
       DiscardRule.reapply_all!
-      redirect_to admin_discard_rules_path, notice: t('.deleted'), status: :see_other
+      redirect_to admin_discard_rules_path, notice: t(".deleted"), status: :see_other
     end
 
     # Live lookup for the editor: the events the typed pattern/venue would catch,
@@ -57,7 +57,7 @@ module Admin
         @total = 0
         @events = Event.none
       end
-      render partial: 'admin/discard_rules/preview', locals: { events: @events, total: @total }
+      render partial: "admin/discard_rules/preview", locals: { events: @events, total: @total }
     end
 
     private

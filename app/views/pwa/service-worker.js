@@ -20,60 +20,69 @@ self.addEventListener("notificationclick", (event) => {
   const path = event.notification.data?.path || "/"
   const url = new URL(path, self.location.origin).href
 
-  event.waitUntil(openNotificationPath(path, url))
+  event.waitUntil(diagnoseAndOpen(path, url))
 })
 
-// Bring the PWA to `path` when a push notification is tapped. Three cases, and iOS
-// standalone makes them subtle:
+// ⚠️ TEMPORARY DIAGNOSTIC BUILD. Reports what notificationclick decides via a "DEBUG"
+// notification, and tries WindowClient.navigate() as the candidate deep-link fix.
+// Once we know how iOS actually behaves, revert this to the clean handler.
 //
-//  1. A live window is already sitting on `path` — just focus it.
-//  2. A live window is on some OTHER path (e.g. the app was backgrounded on the feed)
-//     — we must navigate it. iOS won't do this for us: clients.openWindow() on an
-//     already-running standalone PWA only FOCUSES the single window, it does not load
-//     the new URL — that's the deep-link bug this handler exists to fix. And
-//     WindowClient.navigate() is unsafe: if iOS had evicted the window's web-content
-//     process, navigate() resurrects the dead chrome to a blank white screen. So
-//     instead we postMessage the live page and let it navigate ITSELF (location-level
-//     visit), which is reliable precisely because the page is running to receive the
-//     message and ACK it.
-//  3. No live window — cold start, or the process was evicted and can't answer our
-//     message. clients.openWindow() forces a real load (reusing the one window on iOS).
-//
-// We can't tell a live window from an evicted-but-still-listed one synchronously, so
-// case 2 probes with a short ACK timeout and falls through to case 3 on silence.
-async function openNotificationPath(path, url) {
-  const clientList = await clients.matchAll({ type: "window", includeUncontrolled: true })
+// Reading the DEBUG body: it lists how many window clients matchAll() saw (and each
+// one's path / focused / visibility), then which branch ran (act=focus-exact /
+// navigate / openWindow) and whether navigate() succeeded. If you see NO debug
+// notification at all when you tap, notificationclick never fired (or the new SW
+// isn't active) — that's the most important signal.
+async function diagnoseAndOpen(path, url) {
+  const log = []
+  try {
+    const clientList = await clients.matchAll({ type: "window", includeUncontrolled: true })
+    log.push(`clients=${clientList.length}`)
+    clientList.forEach((c, i) => log.push(`#${i} ${pathOf(c)} foc=${c.focused} vis=${c.visibilityState}`))
 
-  for (const client of clientList) {
-    if (new URL(client.url).pathname === path && "focus" in client) {
-      return client.focus()
+    // 1) A window is already on the target path — just focus it.
+    for (const client of clientList) {
+      if (pathOf(client) === path && "focus" in client) {
+        log.push("act=focus-exact")
+        await report(log)
+        return client.focus()
+      }
     }
-  }
 
-  for (const client of clientList) {
-    if (await navigateLiveClient(client, path, url)) return
-  }
+    // 2) A window exists on another path — try to navigate IT (the candidate fix).
+    for (const client of clientList) {
+      if ("navigate" in client) {
+        log.push("act=navigate")
+        try {
+          const navigated = await client.navigate(url)
+          log.push("navigate=ok")
+          await report(log)
+          return navigated && "focus" in navigated ? navigated.focus() : undefined
+        } catch (e) {
+          log.push("navigate=ERR:" + (e && e.message))
+        }
+      }
+    }
 
-  if (clients.openWindow) return clients.openWindow(url)
+    // 3) Nothing to navigate — open fresh.
+    log.push("act=openWindow")
+    await report(log)
+    if (clients.openWindow) return clients.openWindow(url)
+  } catch (e) {
+    log.push("FATAL:" + (e && e.message))
+    await report(log)
+  }
 }
 
-// Focus a window and ask its page to navigate itself to `url`. Resolves true only if
-// the page answers within the timeout — i.e. it's genuinely alive and has taken over
-// the navigation. false means "treat it as dead; let the caller fall back to
-// openWindow()". The page-side listener lives in app/javascript/application.js.
-function navigateLiveClient(client, path, url) {
-  if (!("focus" in client) || !("postMessage" in client)) return Promise.resolve(false)
+function pathOf(client) {
+  try { return new URL(client.url).pathname } catch (e) { return "?" }
+}
 
-  return new Promise((resolve) => {
-    const channel = new MessageChannel()
-    const timer = setTimeout(() => resolve(false), 600)
-    channel.port1.onmessage = () => {
-      clearTimeout(timer)
-      resolve(true)
-    }
-    client.focus()
-    client.postMessage({ type: "navigate", path, url }, [channel.port2])
-  })
+function report(log) {
+  return self.registration.showNotification("DEBUG", {
+    body: log.join(" | "),
+    tag: "usgu-debug",
+    data: { path: "/" }
+  }).catch(() => {})
 }
 
 // App-shell caching. The app is online-first for *content* — HTML, API calls and

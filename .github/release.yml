@@ -2,7 +2,7 @@
 # in release.yml). PRs are grouped by label; label-pr.yml auto-labels each PR from
 # its branch prefix, and Dependabot self-labels `dependencies`, so this needs no
 # manual upkeep. Add the `skip-changelog` label to a PR to keep it out of the notes
-# (handy for pure BACKLOG/docs churn). These notes are the changelog — the footer
+# (handy for pure docs churn). These notes are the changelog — the footer
 # version links straight to them.
 changelog:
   exclude:

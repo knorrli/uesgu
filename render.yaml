@@ -18,6 +18,13 @@ projects:
           - type: web
             name: uesgu
             repo: https://github.com/knorrli/uesgu
+            # All services track the `release` branch, NOT main. A push to main
+            # never deploys; the release workflow fast-forwards `release` to a
+            # pushed vX.Y.Z tag, so web + both crons redeploy together, on the
+            # same commit, only on a release. (Crons can't be deploy-hook/API
+            # triggered on Render — auto-deploy on push is their only mechanism —
+            # so a shared deploy branch is what keeps everything in lockstep.)
+            branch: release
             runtime: ruby
             plan: starter
             region: frankfurt
@@ -54,12 +61,10 @@ projects:
               # under the 512MB starter limit.
               - key: MALLOC_ARENA_MAX
                 value: 2
-            # Release-only deploys. We do NOT auto-deploy on every commit to main;
-            # production moves only when a `vX.Y.Z` tag is pushed, which fires
-            # .github/workflows/release.yml → hits this service's deploy hook with
-            # ?ref=<tag>. Blueprint auto-sync (render.yaml changes) is a separate
-            # dashboard setting and is unaffected by this.
-            autoDeployTrigger: "off"
+            # Auto-deploy when the `release` branch moves (the release workflow
+            # advances it to a tag). Blueprint auto-sync (render.yaml changes on
+            # main) is a separate mechanism and still applies to config edits.
+            autoDeployTrigger: commit
 
           # Daily scrape of every venue — replaces the in-Puma Solid Queue scheduler.
           # Runs on its own ephemeral instance (billed per second), so scraping no longer
@@ -71,6 +76,13 @@ projects:
           - type: cron
             name: scrape-all
             repo: https://github.com/knorrli/uesgu
+            # All services track the `release` branch, NOT main. A push to main
+            # never deploys; the release workflow fast-forwards `release` to a
+            # pushed vX.Y.Z tag, so web + both crons redeploy together, on the
+            # same commit, only on a release. (Crons can't be deploy-hook/API
+            # triggered on Render — auto-deploy on push is their only mechanism —
+            # so a shared deploy branch is what keeps everything in lockstep.)
+            branch: release
             runtime: ruby
             plan: starter
             region: frankfurt
@@ -85,9 +97,8 @@ projects:
               - fromGroup: uesgu-env
               - key: RAILS_ENV
                 value: production
-            # Release-only: deploys on a pushed tag via the cron's deploy hook
-            # (see the web service above + .github/workflows/release.yml).
-            autoDeployTrigger: "off"
+            # Deploys with web when the `release` branch moves (see web above).
+            autoDeployTrigger: commit
 
           # Per-user-due notification sweep. Runs every 15 min so each alert fires
           # within a quarter-hour of its chosen time; the rake task is idempotent
@@ -97,6 +108,13 @@ projects:
           - type: cron
             name: notify-due
             repo: https://github.com/knorrli/uesgu
+            # All services track the `release` branch, NOT main. A push to main
+            # never deploys; the release workflow fast-forwards `release` to a
+            # pushed vX.Y.Z tag, so web + both crons redeploy together, on the
+            # same commit, only on a release. (Crons can't be deploy-hook/API
+            # triggered on Render — auto-deploy on push is their only mechanism —
+            # so a shared deploy branch is what keeps everything in lockstep.)
+            branch: release
             runtime: ruby
             plan: starter
             region: frankfurt
@@ -111,9 +129,8 @@ projects:
               - fromGroup: uesgu-env
               - key: RAILS_ENV
                 value: production
-            # Release-only: deploys on a pushed tag via the cron's deploy hook
-            # (see the web service above + .github/workflows/release.yml).
-            autoDeployTrigger: "off"
+            # Deploys with web when the `release` branch moves (see web above).
+            autoDeployTrigger: commit
 
         databases:
           - name: uesgu-db

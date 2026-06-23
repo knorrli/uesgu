@@ -20,8 +20,9 @@ This release also introduces the release engineering itself:
 
 ### Added
 
-- Release-only deploys: Render auto-deploy is off; pushing a `vX.Y.Z` tag
-  triggers the deploy via per-service deploy hooks.
+- Release-only deploys: all services track a `release` branch; pushing a
+  `vX.Y.Z` tag fast-forwards it, redeploying web + both crons together on the
+  same commit.
 - CI on every pull request: Rubocop, Brakeman, and the Minitest + system suites.
 - The running version (git tag) is shown in the site footer.
 - Dependabot for Bundler and GitHub Actions.

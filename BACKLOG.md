@@ -23,11 +23,6 @@
   `test/`, `docs/`, screenshots/scratch, and other non-runtime assets so builds are
   smaller and faster. Confirm exclusions don't drop anything the build/runtime needs.
 
-- **Merge open Dependabot PRs.** Six open at time of writing: #2 actions/upload-artifact
-  4→7, #3 actions/checkout 4→7, #4 ruby-minor-and-patch group (16 updates), #5 discard
-  1.4.0→2.0.0 (major — check changelog), #6 brakeman 7.0.2→8.0.5, #7 puma 6.6.0→8.0.2
-  (major — check changelog). Review/CI each, watch the majors (discard, puma), merge.
-
 ## Maybe-later (explicitly deferred)
 
 - **Turbo progress-bar CSP console error (cosmetic).** On prod every page logs a

@@ -1,0 +1,31 @@
+name: Label PR
+
+# Auto-labels each PR from its branch prefix so the release notes (.github/release.yml)
+# group themselves with no manual labeling. Dependabot already self-labels its PRs
+# `dependencies`, and runs with a read-only token, so we skip it here.
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  label:
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label from branch prefix
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          HEAD: ${{ github.head_ref }}
+        run: |
+          case "$HEAD" in
+            feat/*|feature/*)                     label=feature ;;
+            fix/*|bugfix/*|hotfix/*)              label=bug ;;
+            *)                                     label=chore ;;
+          esac
+          echo "Branch '$HEAD' -> label '$label'"
+          gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --add-label "$label"

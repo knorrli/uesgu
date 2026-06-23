@@ -60,12 +60,22 @@ module Scrapers
     end
 
 
-    # Free-text genre fields the venue types per event; tokens mint and are curated
-    # downstream (typos/marketing terms land UNPLACED for filing/aliasing/blocking).
-    # `musicradar` is a rich HTML blurb (Wer:/Stil:/Aktuell:/…); only its "Stil:"
-    # line is genre data, so parse that segment out rather than the whole prose.
+    # beschreibungstag-1/2/3 are the short genre/type tags the venue types per
+    # event — clean enough to MINT new taxonomy from (typos/marketing terms land
+    # UNPLACED for filing/aliasing/blocking downstream). The `musicradar` blurb's
+    # "Stil:" line is genre data too, but the venue writes it as free-flowing prose
+    # as often as a comma-list ("…modernen Lieblingssongs, die verbinden, bewegen
+    # und gute Laune machen."), so splitting it on commas minted junk clauses like
+    # "Die Verbinden". It's mined MATCH-ONLY via event_genre_prose instead.
     def event_genres(row)
-      extract_tag_genres(row) | extract_musicradar_genres(row)
+      extract_tag_genres(row)
+    end
+
+    # The musicradar "Stil:" line, handed to the match-only miner as prose rather
+    # than tokenised (see event_genres). Mints nothing — only attaches genres the
+    # taxonomy already knows, so a prose clause that isn't a real genre never sticks.
+    def event_genre_prose(row)
+      musicradar_stil_text(row)
     end
 
     private
@@ -88,20 +98,21 @@ module Scrapers
       end
     end
 
-    # Walk the DOM from the <strong>Stil:</strong> label to the next <strong>, so
-    # the surrounding marketing HTML (data-* attrs, decorative <strong>, <br>)
-    # can't derail it.
-    def extract_musicradar_genres(row)
+    # The plain text of the musicradar blurb's "Stil:" segment — walking the DOM
+    # from the <strong>Stil:</strong> label to the next <strong> so the surrounding
+    # marketing HTML (data-* attrs, decorative <strong>, <br>) can't derail the
+    # boundary. Returns the raw prose for match-only mining, NOT a token list.
+    def musicradar_stil_text(row)
       doc   = Nokogiri::HTML.fragment(artist_field(row, 'musicradar'))
       label = doc.css('strong').find { |s| s.text.squish =~ /\AStil:?\z/i }
-      return [] unless label
+      return '' unless label
 
       parts, node = [], label.next_sibling
       while node && !(node.element? && node.name == 'strong')
         parts << node.text if node.text?
         node = node.next_sibling
       end
-      parts.join(' ').split(%r{[,/]}).map(&:squish).reject(&:blank?)
+      parts.join(' ').squish
     end
   end
 end

@@ -54,4 +54,16 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     assert_includes text, 'experimental music' # the prose survives...
     refute_includes text, '<p'                  # ...with its HTML markup stripped
   end
+
+  # The musicradar "Stil:" line is venue prose (commas don't make it a token list),
+  # so it's mined match-only rather than minted — and the walk must stop at the next
+  # <strong>, never bleeding the "Aktuell:" section into the genre text.
+  def test_bierhuebeli_mines_the_musicradar_stil_line_only
+    row  = JSON.parse(fixture('bierhuebeli', 'list.html'))
+             .find { |r| r['link'].to_s.include?('best-of-2000er-party-september') }
+    text = Scrapers::Bierhuebeli.new.event_genre_prose(row)
+
+    assert_includes text, 'Heartbeat-Faktor' # the Stil prose is captured...
+    refute_includes text, 'kollektiver'       # ...but the next section (Aktuell:) is not
+  end
 end

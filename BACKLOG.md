@@ -10,7 +10,44 @@
 - **Datenschutz wording is not lawyer-reviewed.** The `/privacy` (Datenschutz) copy
   in de/fr/en is a best-effort revDSG notice — sanity-check before relying on it.
 
+- **Clean repo of unused deploy plumbing.** We're on Render, not Kamal, but the
+  Kamal scaffolding is still in the tree: `.kamal/` (hooks + secrets),
+  `config/deploy.yml`, `bin/kamal`. Remove the dead Kamal plumbing (and any
+  Docker/Kamal-only bits no longer referenced) so the repo reflects the actual
+  Render deploy path. Verify nothing in CI / `render.yaml` references them before
+  deleting.
+
+- **Optimize Render build by excluding unnecessary dirs/files.** The Render build
+  currently ships the whole repo. Trim what gets uploaded/built — e.g. via
+  `.renderignore` and/or `.slugignore` (none present today) — excluding things like
+  `test/`, `docs/`, screenshots/scratch, and other non-runtime assets so builds are
+  smaller and faster. Confirm exclusions don't drop anything the build/runtime needs.
+
+- **Merge open Dependabot PRs.** Six open at time of writing: #2 actions/upload-artifact
+  4→7, #3 actions/checkout 4→7, #4 ruby-minor-and-patch group (16 updates), #5 discard
+  1.4.0→2.0.0 (major — check changelog), #6 brakeman 7.0.2→8.0.5, #7 puma 6.6.0→8.0.2
+  (major — check changelog). Review/CI each, watch the majors (discard, puma), merge.
+
 ## Maybe-later (explicitly deferred)
+
+- **Turbo progress-bar CSP console error (cosmetic).** On prod every page logs a
+  CSP violation: `style-src-elem` blocked at `turbo.es2017-esm.js` →
+  `installStylesheetElement`. Cause: Turbo's navigation progress bar injects one
+  inline `<style>` (`.turbo-progress-bar`, the 3px top loading bar) into `<head>`.
+  Turbo *does* stamp our `<meta name="csp-nonce">` nonce onto that element, but our
+  `style-src` directive lists no nonce (only `script-src` is in
+  `content_security_policy_nonce_directives`), so the browser has nothing to match
+  → blocked. Impact is cosmetic only: the bar is unstyled/invisible (its
+  width/opacity are CSSOM property writes, which CSP doesn't police, so no other
+  errors); navigation is unaffected. The only cost is the recurring console noise.
+  Fix (one line): add `style-src` to `content_security_policy_nonce_directives` in
+  `config/initializers/content_security_policy.rb` → header becomes
+  `style-src 'self' 'nonce-…'` and Turbo's nonce'd `<style>` is accepted, with no
+  `'unsafe-inline'`/`'unsafe-hashes'` loosening. **Trade-off:** this re-introduces a
+  nonce on `style-src`, which was deliberately dropped (the `style-src 'self'`
+  "no inline styles, all CSS external" stance). Alternatives: a CSP hash of the
+  static CSS (brittle — the rule interpolates `animationDuration`, breaks on Turbo
+  upgrades) or just living with the console noise. Nonce is the clean option.
 
 - **Upstream Turbo scroll bug — workaround shipped, PR optional.** A
   `data-turbo-action="advance"` turbo-frame navigation (our calendar's open-day

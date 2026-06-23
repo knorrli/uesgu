@@ -15,11 +15,14 @@ module Scrapers
     # url.host — declare it for the ledger drift test.
     def self.venue_domains = ["bar59.ch"]
 
-    # Public web API key (same one the browser uses). The collection holds the full
-    # history back to 2024 in document-id order, so we page through everything and
-    # filter to active, upcoming events below.
+    # Public web API key (the same one the browser ships in its JS bundle; a Firebase
+    # web key is a project identifier, not a secret — read access is gated by the
+    # collection's public-read security rule, not the key). The collection holds the
+    # full history back to 2024, so we query newest-first (orderBy=date desc) and page
+    # only until events drop below today (see #all_documents) rather than walking the
+    # whole archive every run; the upcoming subset is selected below.
     API_KEY = "AIzaSyDALptf6C6dG09tEfMdikBrMSAPPZqyHgk".freeze
-    BASE = "https://firestore.googleapis.com/v1/projects/bar59-b8e95/databases/(default)/documents/events?key=#{API_KEY}&pageSize=300".freeze
+    BASE = "https://firestore.googleapis.com/v1/projects/bar59-b8e95/databases/(default)/documents/events?key=#{API_KEY}&pageSize=300&orderBy=date%20desc".freeze
 
     def self.url
       URI.parse(BASE)
@@ -71,16 +74,28 @@ module Scrapers
 
     def all_documents
       # The base already fetched page 1 into `page`; start from it and follow
-      # nextPageToken for the rest (a no-op when there's only one page).
+      # nextPageToken for the rest. Because the feed is ordered date-desc, upcoming
+      # events lead and each page is older than the last — so we stop as soon as a
+      # page's oldest row falls before today instead of paging the full archive
+      # (a no-op when there's only one page).
       body = JSON.parse(page.body)
       docs = Array(body["documents"])
       token = body["nextPageToken"]
-      while token.present? && (resp = get("#{BASE}&pageToken=#{token}"))
+      while token.present? && upcoming_on?(docs.last) && (resp = get("#{BASE}&pageToken=#{token}"))
         body = JSON.parse(resp.body)
         docs.concat(Array(body["documents"]))
         token = body["nextPageToken"]
       end
       docs
+    end
+
+    # True if a Firestore doc's event date is today or later. Drives the date-desc
+    # paging early-stop: once the oldest doc fetched so far is in the past, every
+    # remaining (older) page holds nothing upcoming. A missing/unparseable date reads
+    # as "keep going" so a malformed boundary row can never truncate the feed early.
+    def upcoming_on?(doc)
+      stamp = doc&.dig("fields", "date", "timestampValue").to_s[/\d{4}-\d{2}-\d{2}/]
+      stamp.nil? || Date.parse(stamp) >= Date.current
     end
 
     # Firestore wraps every field in a typed object ({"stringValue": …}); pull the

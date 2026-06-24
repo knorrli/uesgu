@@ -3,13 +3,16 @@ require "public_suffix"
 module Scrapers
   # Source/venue discoverability. Finds venues/feeds we don't yet consume by
   # diffing upstream indices (OLE registry, Hinto ALL, PETZI sitemap) against the
-  # ledger of what we've already decided on. See docs/discovery-design.md.
+  # record of what we've already decided on. See docs/discovery-design.md.
+  #
+  # That record is the venue registry (config/venues.yml, wrapped by the Venue
+  # model); the Ledger below is a thin read-only PROJECTION of it that keeps the existing
+  # consumers (drift test, discovery report) working unchanged. See
+  # docs/venue-registry-design.md.
   #
   # This module holds the two pieces the rest of the system reconciles against:
-  # the canonical-domain normalizer (#domain) and the ledger loader (Ledger).
+  # the canonical-domain normalizer (#domain) and the ledger projection (Ledger).
   module Discovery
-    LEDGER_PATH = Rails.root.join("config/venue_ledger.yml")
-
     # The canonical venue key: the registrable domain (eTLD+1), lowercased, with
     # scheme / userinfo / port / path and any subdomain ("www.", "api.", …)
     # stripped. "https://www.dachstock.ch/events" and "api.dachstock.ch" both
@@ -86,16 +89,49 @@ module Scrapers
       def blocked? = !consume?
     end
 
-    # Loads + exposes config/venue_ledger.yml. The authoritative "have we decided
-    # on this source?" record; the drift test reconciles it against the live
-    # scraper registry, and the discovery report subtracts it from the upstreams.
+    # A read-only projection of the venue registry (config/venues.yml via Venue). The
+    # authoritative "have we decided on this source?" record now lives in that
+    # registry; this exposes it in the shape the drift test (which reconciles it against
+    # the live scraper registry) and the discovery report (which subtracts it from
+    # the upstreams) already consume.
     class Ledger
       DISPOSITIONS = %w[consume defer reject].freeze
 
-      def self.load(path = LEDGER_PATH)
-        # `checked` parses to a Date; nothing else exotic is permitted.
-        data = YAML.safe_load_file(path, permitted_classes: [Date])
-        new(data)
+      # Why a venue is deferred/rejected — the controlled vocabulary the drift test
+      # validates reasons against, and whose `revisitable` flag drives the discovery
+      # report's staleness re-check. Moved here from venue_ledger.yml when the ledger
+      # became a projection of the Venue registry: the keys + `revisitable` flags are
+      # load-bearing; the explanations are documentation (nothing renders them).
+      REASONS = {
+        "robots"       => { "revisitable" => true,  "explanation" => "robots.txt disallows the feed/pages we'd need for our UA. May change; opting out is a deliberate per-venue call (cf. Scrapers::BadBonn)." },
+        "js_only"      => { "revisitable" => true,  "explanation" => "Events render via JavaScript with no machine-readable data, and Mechanize can't run JS. Re-check: sites add JSON-LD / a JSON API." },
+        "no_date"      => { "revisitable" => true,  "explanation" => "Listings exist but carry no scrapeable date/time (e.g. a WP REST endpoint exposing the post date, not the event date)." },
+        "inactive"     => { "revisitable" => true,  "explanation" => "Feed/site exists but is unmaintained — stale or frozen data. Worth re-checking in case it revives." },
+        "needs_work"   => { "revisitable" => true,  "explanation" => "Wanted, but needs significant custom integration (scale, per-event keying, music-only filtering) before clean ingest. A build task, not a venue defect." },
+        "feed_quality" => { "revisitable" => true,  "explanation" => "Feed parses but is too poor to ingest cleanly — no per-event URLs, no structured genres, or addresses jammed into the venue name." },
+        "non_music"    => { "revisitable" => false, "explanation" => "Not a music venue (cinema, cabaret/Kleinkunst, theatre, museum). Its programme would flood the taxonomy with non-music genres." },
+        "promoter"     => { "revisitable" => false, "explanation" => "A roving promoter/series with no fixed venue — events scatter across guest venues we already cover. Following it would mislead and duplicate." }
+      }.freeze
+
+      # The ledger is PROJECTED from the venue registry (config/venues.yml via the
+      # Venue model): that registry is the single source of truth, and this
+      # serializes each Venue into the internal row shape #initialize already understands,
+      # so every consumer stays unchanged. The `path` arg is kept for signature
+      # compatibility and ignored.
+      def self.load(_path = nil)
+        new("reasons" => REASONS, "venues" => Venue.all.map { |v| row_for(v) })
+      end
+
+      # One ledger row from a Venue.
+      def self.row_for(venue)
+        {
+          "domain" => venue.domain,
+          "name" => venue.name,
+          "disposition" => venue.disposition,
+          "reason" => venue.reason&.to_s,
+          "checked" => venue.checked,
+          "aliases" => venue.aliases
+        }
       end
 
       attr_reader :reasons, :entries

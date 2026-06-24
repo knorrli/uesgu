@@ -156,17 +156,60 @@ visible/behavioural changes get review + a live sweep.
   sweep to confirm what changes before flipping anything to `:strict`.
 - **PR 3 — invert sourcing.** Scrapers read their place *from* the linked venue
   (removes the last duplication; the drift test becomes a safety net, not a
-  necessity). Touches every scraper, so done supervised.
+  necessity), and the OLE/PETZI sourcing config is absorbed into the registry (see
+  *End state* below). Touches every scraper, so done supervised.
 - **PR 4 — admin inbox UI** over `VenueLead`, ranked by event count, + the
   generated inventory artifact.
+
+## End state — the registry absorbs the data-shaped sourcing
+
+The target (reached via PR 3) is **one registry for everything except the parsing
+code that genuinely has to be code.** The rule that decides what moves into
+`config/venues.yml` and what stays out:
+
+> Store sourcing in the venue row when the config **is just data**; keep it as code
+> (linked by domain) when it's a genuine **code artifact**.
+
+- **OLE → absorbed.** An OLE source is literally a feed URL ("a source is a URL,
+  not code"). There's no separate code artifact to point at, so the URL's home is
+  the venue row; the generic OLE adapter iterates `Venue.all` for venues with an
+  `ole` source instead of a separate list. `Scrapers::Ole::SOURCES` **goes away.**
+
+  ```yaml
+  - domain: klangkeller-bern.ch
+    name: Klangkeller Bern
+    place: { city: Bern, canton: BE }
+    sources:
+      - via: ole
+        feed_url: https://www.klangkeller-bern.ch/.../oleexport
+  ```
+
+- **PETZI → absorbed.** The slug→place+domain maps collapse into the row: place
+  comes from the venue, the domain *is* the venue's domain, and the slug is already
+  the `petzi` alias. PETZI builds its slug→venue map at runtime from `Venue.all`.
+  `Petzi::VENUES` / `Petzi::DOMAINS` **go away.**
+
+- **Bespoke scrapers → stay.** A custom HTML parser is real logic, not data, so it
+  remains a scraper class — linked to its venue **by domain** (no redundant string),
+  reading its place from the venue. This is the *only* sourcing left outside the
+  registry, and correctly so.
+
+Why this isn't the `scraper:` string we rejected: that string was *redundant* (the
+scraper already declares its domain). A `feed_url` or `petzi` slug is the **sole**
+definition of that source — not redundant, nothing to derive it from — so the row
+is its natural home. The distinction is **redundant-with-code → derive; sole
+definition → store.**
 
 ## Rejected / not doing
 
 - **A PORO-per-venue registry** — built it, reversed off it: it didn't earn the
   53-file cost (see Decision 1). One YAML file + one `Venue` class gives the same
   single-source-of-truth, computed API, and drift safety, leaner.
-- **Storing sourcing/wiring in the registry** — a `scraper:` string is redundant
-  with the scraper's own `venue_domains` and would drift; sourcing is derived.
+- **A redundant `scraper:` string in the registry** — the bespoke scraper already
+  declares its domain, so a name string just duplicates an existing link and would
+  drift; bespoke sourcing is derived by domain instead. (Data-shaped sourcing that
+  has no other home — OLE feed URLs, PETZI slugs — *does* live in the row; see *End
+  state*. The line is redundant-with-code → derive vs sole-definition → store.)
 - **Dynamic venue addition from aggregators** — deliberately traded away for a
   fully-managed list (Decision 2); the inbox keeps discovery cheap.
 - **Inverting every scraper in PR 1** — too much surface to land unsupervised;

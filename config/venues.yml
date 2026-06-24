@@ -1,0 +1,409 @@
+# VENUE REGISTRY — the single, code-controlled record of every venue we've
+# decided on: its identity (domain, name, place), our decision (consume / defer /
+# reject + reason), and discovery aliases. Wrapped by the Venue model
+# (app/models/venue.rb), which exposes the computed API and the registry
+# (Venue.all). See docs/venue-registry-design.md.
+#
+# IDENTITY + DECISION live here; SOURCING (which bespoke scraper / OLE feed /
+# PETZI slug feeds a venue) is DERIVED from the live registry, not configured
+# here — so there's no redundant wiring string to drift. `bin/rails
+# venues:inventory` shows the joined picture.
+#
+#   domain      canonical eTLD+1, one row per venue (the key).
+#   name        display label.
+#   disposition consume | defer | reject. consume MUST be backed by a live
+#               scraper (ledger drift test). defer/reject need a `reason`.
+#   reason      one of Scrapers::Discovery::Ledger::REASONS (defer/reject only).
+#   place       { city, canton } — venue identity; only for placed venues.
+#   checked     date the decision was last evaluated (staleness re-check).
+#   aliases     per-upstream raw keys that resolve here (petzi slug / ole host /
+#               hinto <location> name) — discovery-dedup keys.
+
+venues:
+- domain: badbonn.ch
+  name: Bad Bonn
+  disposition: consume
+  place:
+    city: Düdingen
+    canton: FR
+  checked: 2026-06-21
+- domain: bar59.ch
+  name: Bar 59
+  disposition: consume
+  place:
+    city: Luzern
+    canton: LU
+  checked: 2026-06-21
+- domain: bee-flat.ch
+  name: Turnhalle (bee-flat)
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+- domain: bejazz.ch
+  name: BeJazz
+  disposition: defer
+  reason: robots
+  checked: 2026-06-21
+  aliases:
+    ole:
+    - www.bejazz.ch
+- domain: bewegungsmelder.ch
+  name: Bewegungsmelder
+  disposition: consume
+  checked: 2026-06-21
+  aliases:
+    ole:
+    - bewegungsmelder.ch
+- domain: bierhuebeli.ch
+  name: Bierhübeli
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+- domain: birdseye.ch
+  name: Bird's Eye
+  disposition: defer
+  reason: robots
+  checked: 2026-06-21
+  aliases:
+    ole:
+    - www.birdseye.ch
+- domain: boeroem.ch
+  name: Böröm
+  disposition: consume
+  place:
+    city: Aarau
+    canton: AG
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - borom
+- domain: breitsch-traeff.ch
+  name: Breitsch-Träff
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: cafe-kairo.ch
+  name: Café Kairo
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - cafe-kairo
+- domain: cafehueber.ch
+  name: Café Hueber
+  disposition: reject
+  reason: no_date
+  checked: 2026-06-14
+- domain: casinobern.ch
+  name: Casino Bern
+  disposition: reject
+  reason: inactive
+  checked: 2026-06-21
+  aliases:
+    ole:
+    - www.casinobern.ch
+- domain: dachstock.ch
+  name: Dachstock
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - dachstock
+    ole:
+    - api.dachstock.ch
+- domain: dampfzentrale.ch
+  name: Dampfzentrale
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+- domain: dieheiterefahne.ch
+  name: Heitere Fahne
+  disposition: reject
+  reason: js_only
+  checked: 2026-06-17
+- domain: docks.ch
+  name: Docks
+  disposition: consume
+  place:
+    city: Lausanne
+    canton: VD
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - docks
+- domain: ducommerce-biel.ch
+  name: Café du Commerce
+  disposition: reject
+  reason: js_only
+  checked: 2026-06-14
+- domain: dynamo.ch
+  name: Dynamo
+  disposition: consume
+  place:
+    city: Zürich
+    canton: ZH
+  checked: 2026-06-21
+- domain: fri-son.ch
+  name: FriSon
+  disposition: consume
+  place:
+    city: Fribourg
+    canton: FR
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - fri-son
+- domain: futurina.ch
+  name: Futurina
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: gaskessel.ch
+  name: Gaskessel
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - gaskessel
+- domain: helsinkiklub.ch
+  name: Helsinki Klub
+  disposition: consume
+  place:
+    city: Zürich
+    canton: ZH
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - helsinki
+- domain: isc-club.ch
+  name: ISC
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - isc
+- domain: kartellculturel.ch
+  name: Le Singe
+  disposition: consume
+  place:
+    city: Biel
+    canton: BE
+  checked: 2026-06-21
+- domain: kaserne-basel.ch
+  name: Kaserne Basel
+  disposition: consume
+  place:
+    city: Basel
+    canton: BS
+  checked: 2026-06-21
+- domain: kiff.ch
+  name: KIFF
+  disposition: consume
+  place:
+    city: Aarau
+    canton: AG
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - kiff
+- domain: klangkeller-bern.ch
+  name: Klangkeller Bern
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: kofmehl.net
+  name: Kofmehl
+  disposition: consume
+  place:
+    city: Solothurn
+    canton: SO
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - kulturfabrik-kofmehl
+- domain: konzerte-bern.ch
+  name: Konzerte Bern
+  disposition: reject
+  reason: feed_quality
+  checked: 2026-06-21
+- domain: kulturdietikon.ch
+  name: Kultur Dietikon
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: la-cappella.ch
+  name: La Cappella
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+  aliases:
+    ole:
+    - www.la-cappella.ch
+- domain: lichtspiel.ch
+  name: Lichtspiel
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: mahogany.ch
+  name: Mahogany Hall
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+- domain: mariansjazzroom.ch
+  name: Marians Jazzroom
+  disposition: reject
+  reason: js_only
+  checked: 2026-06-14
+- domain: mobilservice.ch
+  name: Mobilservice
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: mokka.ch
+  name: Café Bar Mokka
+  disposition: reject
+  reason: js_only
+  checked: 2026-06-14
+- domain: muehlehunziken.ch
+  name: Mühle Hunziken
+  disposition: consume
+  place:
+    city: Rubigen
+    canton: BE
+  checked: 2026-06-21
+- domain: neubad.org
+  name: Neubad
+  disposition: consume
+  place:
+    city: Luzern
+    canton: LU
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - neubad
+- domain: nouveaumonde.ch
+  name: Nouveau Monde
+  disposition: consume
+  place:
+    city: Fribourg
+    canton: FR
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - nouveau-monde
+- domain: onobern.ch
+  name: ONO
+  disposition: reject
+  reason: no_date
+  checked: 2026-06-14
+- domain: prozess.be
+  name: PROZESS
+  disposition: reject
+  reason: js_only
+  checked: 2026-06-14
+- domain: refbern.ch
+  name: Reformierte Kirchen Bern
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: restaurant-zent.ch
+  name: Zent
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+- domain: rotefabrik.ch
+  name: Rote Fabrik
+  disposition: consume
+  place:
+    city: Zürich
+    canton: ZH
+  checked: 2026-06-21
+- domain: saegegasse.ch
+  name: Sägegasse
+  disposition: consume
+  place:
+    city: Burgdorf
+    canton: BE
+  checked: 2026-06-21
+- domain: schuur.ch
+  name: Schüür
+  disposition: consume
+  place:
+    city: Luzern
+    canton: LU
+  checked: 2026-06-21
+- domain: sedel.ch
+  name: Sedel
+  disposition: consume
+  place:
+    city: Luzern
+    canton: LU
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - sedel
+- domain: sous-soul.love
+  name: Sous Soul
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+- domain: souslepont-roessli.ch
+  name: Rössli
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-06-21
+- domain: stattland.ch
+  name: Stattland
+  disposition: reject
+  reason: non_music
+  checked: 2026-06-21
+- domain: sudpol.ch
+  name: Südpol
+  disposition: consume
+  place:
+    city: Kriens
+    canton: LU
+  checked: 2026-06-21
+- domain: treibhausluzern.ch
+  name: Treibhaus
+  disposition: consume
+  place:
+    city: Luzern
+    canton: LU
+  checked: 2026-06-21
+  aliases:
+    petzi:
+    - treibhaus
+- domain: volkshaus-basel.ch
+  name: Volkshaus Basel
+  disposition: consume
+  place:
+    city: Basel
+    canton: BS
+  checked: 2026-06-21

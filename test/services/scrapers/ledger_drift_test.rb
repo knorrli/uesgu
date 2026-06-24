@@ -1,14 +1,14 @@
 require "test_helper"
 
-# Drift detection for the venue ledger (config/venue_ledger.yml). The ledger is
-# the authoritative "have we decided on this source?" record; these rules keep it
-# reconciled with the live scraper registry and internally well-formed, so it can
-# never silently diverge from what we actually scrape. A failure here means the
-# ledger and the code disagree — the message says exactly how. See
-# docs/discovery-design.md for the rationale.
+# Drift detection for the venue registry (config/venues.yml), via its ledger
+# projection. The registry is the authoritative "have we decided on this source?"
+# record; these rules keep it reconciled with the live scraper registry and
+# internally well-formed, so it can never silently diverge from what we actually
+# scrape. A failure here means the registry and the code disagree — the message
+# says exactly how. See docs/venue-registry-design.md and docs/discovery-design.md.
 #
-# This is data hygiene, not behaviour: it reads the real ledger + the real
-# registry, no fixtures, no DB.
+# This is data hygiene, not behaviour: it reads the real registry + the real
+# scraper registry, no fixtures, no DB.
 class Scrapers::LedgerDriftTest < Minitest::Test
   def setup
     @ledger = Scrapers::Discovery::Ledger.load
@@ -39,8 +39,8 @@ class Scrapers::LedgerDriftTest < Minitest::Test
   def test_every_scraped_domain_has_a_consume_row
     missing = registry_domains - @ledger.consume_domains
     assert_empty missing,
-                 "These domains are scraped but have no `consume` row in config/venue_ledger.yml — " \
-                 "add one (or, for a SaaS-hosted feed, override the scraper's `venue_domains`): #{missing.to_a.sort.join(', ')}"
+                 "These domains are scraped but have no `consume` row in config/venues.yml — " \
+                 "add a venue row (or, for a SaaS-hosted feed, override the scraper's `venue_domains`): #{missing.to_a.sort.join(', ')}"
   end
 
   # Rule 3 — reason well-formedness: defer/reject carry a valid reason; consume

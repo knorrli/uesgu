@@ -1,9 +1,10 @@
 namespace :discovery do
   # READ-ONLY triage report: which venues/feeds the upstream indices expose that
   # we don't already consume/defer/reject. Fetches each upstream, subtracts the
-  # ledger (config/venue_ledger.yml), and prints the unknowns for a human to add.
-  # Never enables anything — the only write path is editing the ledger in a PR.
-  # See docs/discovery-design.md. Suitable for a periodic (weekly) cron.
+  # venue registry (config/venues.yml), and prints the unknowns for a human to
+  # add. Never enables anything — the only write path is adding/editing a venue
+  # row in a PR. See docs/venue-registry-design.md + docs/discovery-design.md.
+  # Suitable for a periodic (weekly) cron.
   #
   #   bin/rails discovery:report
   desc "Report upstream venues/feeds we do not yet consume (read-only triage)"

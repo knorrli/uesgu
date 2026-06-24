@@ -115,6 +115,8 @@ def classify_tribe(f)
   return nil unless f.ok? && f.type =~ /json/i
 
   data = JSON.parse(f.body) rescue (return nil)
+  return nil unless data.is_a?(Hash) # Tribe envelope; a bare Array is a wp/v2 CPT
+
   events = data['events']
   return nil unless events.is_a?(Array) && events.any?
 
@@ -263,15 +265,19 @@ def recon(domain, label)
 
   # JSON-LD Event across fetched HTML pages + autodiscovery links
   disco = { rss: [], ics: [], json: [] }
+  ld    = []
   pages.each do |pg|
     next unless pg.ok? && pg.type =~ /html/i
 
-    jsonld_events(pg.body).each do |e|
-      add.call(e[:start] ? :time : :weak,
-               "json-ld: Event \"#{e[:title]}\"#{e[:start] ? " startDate #{e[:start]}" : ' (no startDate)'}")
-    end
+    ld.concat(jsonld_events(pg.body))
     a = autodiscovery(pg.body)
     %i[rss ics json].each { |k| disco[k] |= a[k] }
+  end
+  unless ld.empty?
+    dated  = ld.select { |e| e[:start] }
+    sample = dated.first || ld.first
+    add.call(dated.any? ? :time : :weak,
+             "json-ld: #{ld.size} Event#{'s' if ld.size != 1} on listing#{dated.any? ? ", e.g. \"#{sample[:title]}\" @ #{sample[:start]}" : ' (no startDate)'}")
   end
   add.call(:weak, "autodiscovery → RSS #{disco[:rss].first}") if disco[:rss].any?
   add.call(:time, "autodiscovery → iCal #{disco[:ics].first}") if disco[:ics].any?
@@ -293,11 +299,14 @@ def recon(domain, label)
     if types.ok? && (j = (JSON.parse(types.body) rescue nil))
       (j.keys & WP_EVENT_PLUGINS.keys).each do |slug|
         name, route, kind = WP_EVENT_PLUGINS[slug]
-        if kind == :rest && route
-          r = fetch(base + route)
-          d = classify_tribe(r) ||
-              (r.ok? && (JSON.parse(r.body) rescue nil).is_a?(Array) ? "REST collection live (#{name})" : nil)
+        if slug == 'tribe_events'
+          d = classify_tribe(fetch(base + route)) # real event start_date envelope
           add.call(d ? :time : :weak, "wp-rest: #{name} → #{d || 'route present'}")
+        elsif kind == :rest && route
+          r = fetch(base + route)
+          live = r.ok? && ((JSON.parse(r.body) rescue nil).is_a?(Array))
+          # wp/v2 CPT carries the POST date, not the event date (cf. ONO no_date).
+          add.call(:weak, "wp-rest: #{name} → #{live ? 'collection live (post dates — verify event date)' : 'route present'}")
         else
           add.call(:weak, "wp: #{name} detected (#{kind} — no clean public REST)")
         end
@@ -390,7 +399,7 @@ puts "Legend: ★ time-bearing structured feed  ·  ✓ weak signal  ·  · noth
 targets.each do |domain, label|
   recon(domain, label)
 rescue StandardError => e
-  puts "· #{domain}  [#{label}]\n    ERROR: #{e.class}: #{e.message}\n\n"
+  puts "· #{domain}  [#{label}]\n    ERROR: #{e.class}: #{e.message} (#{e.backtrace.first})\n\n"
 end
 
 puts 'Done. (Reconnaissance only — nothing persisted. Record decisions in config/venue_ledger.yml.)'

@@ -51,7 +51,7 @@ module Scrapers
     end
 
     # The canonical venue domain(s) this scraper consumes (eTLD+1), reconciled
-    # against config/venue_ledger.yml by the ledger drift test. Single-venue
+    # against the venue registry (config/venues.yml) by the ledger drift test. Single-venue
     # default: the registrable domain of its `url`. Overridden by: a multi-venue
     # aggregator that can enumerate its venues (Petzi), and a single-venue scraper
     # whose feed is hosted on a SaaS/operator backend so `url.host` isn't the venue
@@ -80,7 +80,7 @@ module Scrapers
     end
 
     # The controlled vocabulary of *why* a coverage field is absent at a source,
-    # mirroring venue_ledger.yml's `reasons:` map — a small fixed set so the
+    # mirroring the venue registry's `Ledger::REASONS` map — a small fixed set so the
     # coverage page can explain every gap consistently and a settled "does this
     # source even expose X?" call isn't re-litigated. The symbol is the stable
     # key; the human text lives in i18n (admin.scraper_coverage.index.gap_reason.*).

@@ -1,9 +1,17 @@
 # Source/venue discoverability — design
 
+> **Partially superseded (2026-06-25).** The "Known" record moved from this
+> `config/venue_ledger.yml` into the code-controlled **venue registry**
+> (`config/venues.yml`, wrapped by the `Venue` model); `Scrapers::Discovery::Ledger`
+> is now a read-only projection of it. The *discovery* design below (diffing
+> upstreams, normalizing domains, clustering PETZI slugs) is unchanged and still
+> current; wherever this doc says "edit the ledger", read "edit `config/venues.yml`".
+> See `docs/venue-registry-design.md`.
+
 How we find venues/feeds we don't yet consume, without re-evaluating ones we've
-already judged. **Read-once rationale.** The edit-time field reference lives in
-the header of `config/venue_ledger.yml`; the rules below are enforced by
-`test/services/scrapers/ledger_drift_test.rb`. This doc is the *why*.
+already judged. **Read-once rationale.** The edit-time field reference now lives in
+the `config/venues.yml` header (and the `Venue` model); the rules below are enforced
+by `test/services/scrapers/ledger_drift_test.rb`. This doc is the *why*.
 
 ## The problem
 
@@ -63,12 +71,15 @@ Edge: a roving promoter/series (BeJazz) has no fixed venue — its domain keys a
 that hosts two halls collapses them into one row (usually what we want). Le Singe
 has no own site; its operator/feed host `kartellculturel.ch` is the honest key.
 
-## Where "Known" lives: a repo-side YAML ledger
+## Where "Known" lives: the code-controlled Venue registry
 
-`config/venue_ledger.yml` is the authoritative record of every venue-identity
-we've decided on. One entry per canonical domain.
+The **venue registry** (`config/venues.yml`, wrapped by the `Venue` model) is the
+authoritative record of every venue-identity we've decided on. One row per
+canonical domain. (It was renamed/reshaped from `config/venue_ledger.yml` on
+2026-06-25; the rationale below is why it's repo-side config rather than a DB
+table, and still applies.)
 
-We chose **repo YAML over a DB table** because *enabling a source is already a
+We chose **repo code over a DB table** because *enabling a source is already a
 code change* (a new `Ole::SOURCES` entry → generated subclass, or a new
 `Petzi::VENUES`/bespoke scraper). Keeping the decision in the same place as the
 consequence means it's code-reviewed, versioned, diffs cleanly in PRs, and

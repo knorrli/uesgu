@@ -1,13 +1,5 @@
 module Scrapers
   class Roessli < Agent
-    def self.location
-      "Rössli"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://www.souslepont-roessli.ch/")
     end

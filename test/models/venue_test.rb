@@ -120,4 +120,16 @@ class VenueTest < ActiveSupport::TestCase
     assert_equal 1, bejazz.ole_feeds.size, "the feed URL is recorded on the row"
     refute bejazz.consume?, "defer status keeps it un-generated"
   end
+
+  # The place-inversion invariant: a bespoke scraper reads its place FROM its venue
+  # (Agent#location / #locations), so the two can never silently diverge.
+  test "every bespoke scraper's place is its venue's place (derived, not declared)" do
+    bespoke = Scrapers::All.scrapers.reject { |name, k| k.aggregator? || name.start_with?("Ole") }
+    bespoke.each do |name, k|
+      v = Venue.find_by_domain(k.venue_domains.first)
+      assert v, "#{name}: no venue for #{k.venue_domains.first.inspect}"
+      assert_equal v.name, k.location, "#{name}: scraper location must equal its venue name"
+      assert_equal v.place_tuple, k.locations, "#{name}: scraper place must equal its venue's"
+    end
+  end
 end

@@ -1,13 +1,5 @@
 module Scrapers
   class Sedel < Agent
-    def self.location
-      "Sedel"
-    end
-
-    def self.locations
-      [location, "Luzern", "LU"]
-    end
-
     def self.url
       URI.parse("https://sedel.ch")
     end

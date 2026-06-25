@@ -1,13 +1,5 @@
 module Scrapers
   class Dachstock < Agent
-    def self.location
-      "Dachstock"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://www.dachstock.ch/events")
     end

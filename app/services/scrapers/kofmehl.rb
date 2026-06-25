@@ -1,13 +1,5 @@
 module Scrapers
   class Kofmehl < Agent
-    def self.location
-      "Kofmehl"
-    end
-
-    def self.locations
-      [location, "Solothurn", "SO"]
-    end
-
     def self.url
       URI.parse("https://kofmehl.net/")
     end

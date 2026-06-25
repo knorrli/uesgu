@@ -1,13 +1,5 @@
 module Scrapers
   class FriSon < Agent
-    def self.location
-      "FriSon"
-    end
-
-    def self.locations
-      [location, "Fribourg", "FR"]
-    end
-
     def self.url
       URI.parse("https://www.fri-son.ch/fr/programme?f%5B0%5D=category%3A1")
     end

@@ -1,13 +1,5 @@
 module Scrapers
   class Neubad < Agent
-    def self.location
-      "Neubad"
-    end
-
-    def self.locations
-      [location, "Luzern", "LU"]
-    end
-
     def self.url
       URI.parse("https://neubad.org/veranstaltungen")
     end

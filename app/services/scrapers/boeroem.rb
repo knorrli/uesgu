@@ -1,13 +1,5 @@
 module Scrapers
   class Boeroem < Agent
-    def self.location
-      "Böröm"
-    end
-
-    def self.locations
-      [location, "Aarau", "AG"]
-    end
-
     def self.url
       URI.parse("https://boeroem.ch/")
     end

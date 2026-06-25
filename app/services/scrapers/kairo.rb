@@ -5,14 +5,6 @@ module Scrapers
   # zone offset is wrong (server-misconfigured to a US offset), so read only the
   # local date/time portion and treat it as Swiss wall-clock.
   class Kairo < Agent
-    def self.location
-      "Café Kairo"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://www.cafe-kairo.ch/programm")
     end

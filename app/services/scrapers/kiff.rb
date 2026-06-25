@@ -1,13 +1,5 @@
 module Scrapers
   class Kiff < Agent
-    def self.location
-      "KIFF"
-    end
-
-    def self.locations
-      [location, "Aarau", "AG"]
-    end
-
     def self.url
       URI.parse("https://www.kiff.ch/programm")
     end

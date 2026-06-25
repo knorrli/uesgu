@@ -3,14 +3,6 @@ module Scrapers
   # homepage (Jimdo, server-rendered). No detail pages, no genres, and the date is
   # split across weekday/day/month divs with NO year — infer it.
   class Helsinki < Agent
-    def self.location
-      "Helsinki Klub"
-    end
-
-    def self.locations
-      [location, "Zürich", "ZH"]
-    end
-
     def self.url
       URI.parse("https://www.helsinkiklub.ch/")
     end

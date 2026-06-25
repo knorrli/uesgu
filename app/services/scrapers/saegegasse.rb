@@ -1,13 +1,5 @@
 module Scrapers
   class Saegegasse < Agent
-    def self.location
-      "Sägegasse"
-    end
-
-    def self.locations
-      [location, "Burgdorf", "BE"]
-    end
-
     def self.url
       URI.parse("https://www.saegegasse.ch/programm")
     end

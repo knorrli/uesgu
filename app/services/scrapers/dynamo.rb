@@ -5,14 +5,6 @@ module Scrapers
   # Drupal/NodeHive JSON:API. We query upcoming events server-side, keep the ones
   # tagged as concerts, and map the finer category tags to genres. Rows are Hashes.
   class Dynamo < Agent
-    def self.location
-      "Dynamo"
-    end
-
-    def self.locations
-      [location, "Zürich", "ZH"]
-    end
-
     # The feed is on the NodeHive backend (see #url), so the venue domain isn't
     # derivable from url.host — declare it for the ledger drift test.
     def self.venue_domains = ["dynamo.ch"]

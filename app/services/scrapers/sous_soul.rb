@@ -2,14 +2,6 @@ require "set"
 
 module Scrapers
   class SousSoul < Agent
-    def self.location
-      "Sous Soul"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     # The Webflow homepage is the event listing. List rows carry the start time
     # only on the detail page, which also exposes a year-qualified date in its
     # <title>, so click through for the fields.

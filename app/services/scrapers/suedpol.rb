@@ -6,14 +6,6 @@ module Scrapers
   # category taxonomy, so we can filter to music (the house also programmes
   # theatre/dance). Rows are WP post Hashes.
   class Suedpol < Agent
-    def self.location
-      "Südpol"
-    end
-
-    def self.locations
-      [location, "Kriens", "LU"]
-    end
-
     # Music category term ids: Konzert=4, Club=13, Sound=63.
     def self.endpoint(page)
       URI.parse("https://cms.sudpol.ch/?rest_route=/wp/v2/events&categories=4,13,63&per_page=100&page=#{page}")

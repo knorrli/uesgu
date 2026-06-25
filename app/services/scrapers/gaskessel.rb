@@ -1,13 +1,5 @@
 module Scrapers
   class Gaskessel < Agent
-    def self.location
-      "Gaskessel"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://gaskessel.ch/programm/")
     end

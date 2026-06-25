@@ -1,13 +1,5 @@
 module Scrapers
   class Kaserne < Agent
-    def self.location
-      "Kaserne Basel"
-    end
-
-    def self.locations
-      [location, "Basel", "BS"]
-    end
-
     # The /de homepage is the event index (SvelteKit SSR — all events in the HTML).
     def self.url
       URI.parse("https://kaserne-basel.ch/de")

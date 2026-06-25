@@ -4,15 +4,7 @@ module Scrapers
   # curated genre arrays), so this scraper reads JSON rather than HTML. Rows are
   # plain Hashes — the field extractors read keys instead of CSS.
   class LeSinge < Agent
-    def self.location
-      "Le Singe"
-    end
-
     # Biel/Bienne is in canton Bern.
-    def self.locations
-      [location, "Biel", "BE"]
-    end
-
     # location=1 is Le Singe. The endpoint pages by `offset` in steps of 10.
     def self.endpoint(offset)
       URI.parse("https://kartellculturel.ch/getEvents?startDate=#{Date.current.iso8601}&lang=de&offset=#{offset}&location=1")

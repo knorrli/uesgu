@@ -3,14 +3,6 @@ module Scrapers
   # Firebase Firestore collection; the served HTML is an empty Vue shell, so this
   # scraper reads the Firestore REST API. Rows are flattened Hashes.
   class Bar59 < Agent
-    def self.location
-      "Bar 59"
-    end
-
-    def self.locations
-      [location, "Luzern", "LU"]
-    end
-
     # The feed is on Firestore (see #url), so the venue domain isn't derivable from
     # url.host — declare it for the ledger drift test.
     def self.venue_domains = ["bar59.ch"]

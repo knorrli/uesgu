@@ -1,13 +1,5 @@
 module Scrapers
   class Schueuer < Agent
-    def self.location
-      "Schüür"
-    end
-
-    def self.locations
-      [location, "Luzern", "LU"]
-    end
-
     def self.url
       URI.parse("https://www.schuur.ch/programm")
     end

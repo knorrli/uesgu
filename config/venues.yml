@@ -52,6 +52,11 @@ venues:
   aliases:
     ole:
     - www.bejazz.ch
+  sources:
+  # Deferred (robots-blocked) — recorded, but defer status keeps it un-generated.
+  - via: ole
+    feed_url: http://www.bejazz.ch/app/bejazz/action/oleexport/
+    aggregator: true
 - domain: bewegungsmelder.ch
   name: Bewegungsmelder
   disposition: consume
@@ -59,6 +64,12 @@ venues:
   aliases:
     ole:
     - bewegungsmelder.ch
+  sources:
+  - via: ole
+    feed_url: https://bewegungsmelder.ch/oleexport/
+    aggregator: true
+    link_via: source
+    gate: strict
 - domain: bierhuebeli.ch
   name: Bierhübeli
   disposition: consume
@@ -74,6 +85,10 @@ venues:
   aliases:
     ole:
     - www.birdseye.ch
+  sources:
+  # Deferred (robots-blocked) — recorded, but defer status keeps it un-generated.
+  - via: ole
+    feed_url: https://www.birdseye.ch/HintoEventlist.php
 - domain: boeroem.ch
   name: Böröm
   disposition: consume
@@ -124,6 +139,9 @@ venues:
     - dachstock
     ole:
     - api.dachstock.ch
+  sources:
+  - via: ole
+    feed_url: https://api.dachstock.ch/wp-json/ds/v1/hinto
 - domain: dampfzentrale.ch
   name: Dampfzentrale
   disposition: consume

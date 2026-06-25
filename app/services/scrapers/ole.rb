@@ -41,82 +41,22 @@ module Scrapers
   # venue page), so an overlapping PETZI/bespoke copy folds onto the OLE event,
   # not the other way round. (See dedup_test.rb for the proof.)
   class Ole < Agent
-    # --- Source registry. A single-venue source declares its [venue, city,
-    # canton] place; its venue lives in the registry (config/venues.yml) and seeds
-    # the location taxonomy like any consume venue. An aggregator (multi-venue)
-    # declares `aggregator: true`; its venue is resolved per event from <location>,
-    # and only an APPROVED venue (a registry row, possibly aggregator-sourced) enters
-    # the taxonomy — the aggregator feed host itself is placeless and excluded.
+    # --- Source registry. OLE feeds live ON the venue rows in the registry
+    # (config/venues.yml `sources: [{ via: ole, feed_url:, … }]`), not in a constant
+    # here — a source is a URL in the registry, not code. The generation loop at the
+    # bottom of this file builds one scraper per OLE feed on a CONSUME venue.
     #
-    # This is the SHIPPING list: every feed here was dry-parsed live against the
-    # real endpoint (script/ole_dry_parse.rb) and is robots-allowed + parses
-    # clean. Adding a venue is a one-line entry — a source is config, not code.
-    SOURCES = [
-      # Dachstock is also in PETZI — included on purpose to prove Dedup absorbs the
-      # overlap (venue + date + title) instead of duplicating it.
-      { key: "Dachstock",  feed_url: "https://api.dachstock.ch/wp-json/ds/v1/hinto",
-        location: ["Dachstock", "Bern", "BE"] },
-
-      # Net-new, non-PETZI single-venue Bern feeds.
-      # { key: 'Klangkeller', feed_url: 'https://www.klangkeller-bern.ch/app/klangkeller/action/oleexport',
-      #   location: ['Klangkeller', 'Bern', 'BE'] },
-      # La Cappella dropped: it's a Kleinkunst/cabaret house, not a music venue —
-      # its feed is ~80% Kabarett & Comedy / Theater / Mundart / Worte / Zauberkunst,
-      # which clashes with our music focus and would flood the taxonomy. (Also an
-      # oldest-first feed, so it walks its full history every sweep, and it acts as
-      # an organiser — events it promotes at other venues we scrape would duplicate
-      # under a "La Cappella" tag that dedup can't merge.)
-      # { key: 'LaCappella',  feed_url: 'https://www.la-cappella.ch/app/lacappella/action/oleexport',
-      #   location: ['La Cappella', 'Bern', 'BE'] },
-      # CasinoBern dropped: only ever exposed a 2019 dataset, never updated since.
-      # { key: 'CasinoBern',  feed_url: 'https://www.casinobern.ch/wp-content/themes/casinobern/views/component/event/ole/',
-      #   location: ['Casino Bern', 'Bern', 'BE'] }
-      # { key: 'Lichtspiel',  feed_url: 'https://www.lichtspiel.ch/oleexport/',
-      #   location: ['Lichtspiel', 'Bern', 'BE'] },
-      # { key: 'Stattland',   feed_url: 'https://stattland.ch/feed/ole',
-      #   location: ['Stattland', 'Bern', 'BE'] }
-
-      # Bewegungsmelder — a Bern-region editorial culture AGGREGATOR (robots-OK;
-      # ~7600 events / 152 pages, newest-first). Two things make it different from
-      # the single-venue feeds above and drive the two non-default flags:
-      #   aggregator: true  — venue is resolved per event from <location> (+PLZ→
-      #                       canton), and it stays OUT of the location taxonomy.
-      #   link_via: :source — its <url> is unreliable: a real per-event deep link
-      #                       for some venues, but a bare homepage (identical per
-      #                       event, can't be a key) for most. We PREFER the venue
-      #                       deep link when present, else fall back to the stable
-      #                       per-event <source_url> — never the homepage (see
-      #                       #event_base_url / #venue_event_link?). (The
-      #                       <ticket_url> eventfrog mirror is never used, so
-      #                       eventfrog-republished rows need no special handling
-      #                       — see FINDINGS-bewegungsmelder.md.)
-      # Heavy overlap with venues we already consume (Bee-Flat, Dachstock,
-      # Dampfzentrale, Dynamo, Turnhalle, Rote Fabrik, …) is folded by Scrapers::
-      # Dedup. ~Half the programme is non-music (Theater/Party/Tanz/…); the music
-      # gate hides it via db/genres.yml dispositions (curated, not gated at ingest).
-      # gate: :strict (the default, stated for visibility) — only registry-approved
-      # venues ingest; the rest are recorded as VenueLead leads for review. Both
-      # surfaced venues (Heitere Fahne, Kulturhof Schloss Köniz) are approved, so
-      # strict drops nothing today. Flip to :lenient to ingest unapproved venues too.
-      { key: "Bewegungsmelder", feed_url: "https://bewegungsmelder.ch/oleexport/",
-        aggregator: true, link_via: :source, gate: :strict }
-    ].freeze
-
-    # Configured + parseable but DEFERRED, for reference (NOT swept). Both return
-    # Mechanize::RobotsDisallowedError: their OLE export endpoint is robots-
-    # disallowed for our UA. We enforce robots (Agent#respect_robots) and treat
-    # opting out as a deliberate per-venue decision (cf. Scrapers::BadBonn's
-    # documented opt-out), not one to make unattended — so they wait for a human
-    # robots call. NB: BeJazz was the intended aggregator proof; aggregator
-    # support is implemented + covered by ole_test.rb regardless (see #aggregator?
-    # / #locations_for). The messy aggregates (Konzerte Bern = 0 genres + address
-    # in <name>; Hinto ALL = 46 venues) stay deferred too. See BACKLOG.
-    DEFERRED = [
-      { key: "Birdseye", feed_url: "https://www.birdseye.ch/HintoEventlist.php",
-        location: ["Birdseye", "Basel", "BS"], reason: :robots },
-      { key: "BeJazz", feed_url: "http://www.bejazz.ch/app/bejazz/action/oleexport/",
-        aggregator: true, reason: :robots }
-    ].freeze
+    #   single-venue feed  → `{ via: ole, feed_url: }`; place comes from the venue,
+    #                         which seeds the taxonomy like any consume venue.
+    #   aggregator feed    → `{ via: ole, feed_url:, aggregator: true, link_via:
+    #                         source, gate: strict }`; venue resolved per event from
+    #                         <location>, the feed host itself placeless + excluded.
+    #   deferred (robots)  → recorded on a `defer` venue row (BeJazz, Bird's Eye);
+    #                         defer status keeps it un-generated, no sweep.
+    #
+    # Provenance comes from the SOURCE-OWNING venue (Bewegungsmelder stamps
+    # OLE:Bewegungsmelder on every event it resolves; the resolved venue is in the
+    # location tags). See FINDINGS-bewegungsmelder.md for the link_via/gate rationale.
 
     # One occurrence (event × show) carrying everything the field extractors need;
     # the event/show nodes plus the bits we resolved while expanding (start_time,
@@ -146,6 +86,13 @@ module Scrapers
       # ingests everything. Either way every unapproved venue is recorded as a
       # discovery lead (VenueLead). Single-venue sources are never gated.
       def strict? = gate != :lenient
+
+      # The const + provenance key for a venue's OLE feed: its name transliterated to
+      # ASCII alphanumerics ("Café Kairo" → "CafeKairo"; "Bewegungsmelder" stays), so
+      # the generated class is Ole<Key> and events stamp data_source "OLE:<Key>".
+      def feed_key(venue)
+        ActiveSupport::Inflector.transliterate(venue.name).gsub(/[^a-zA-Z0-9]/, "")
+      end
 
       # Build (but do NOT register) a configured source subclass. The shipping
       # loop at the bottom of this file names + registers each; tests call this to
@@ -476,14 +423,24 @@ module Scrapers
   # names it before the hook runs) — drop it: it's abstract and must never sweep.
   All.scrapers.delete(Ole.name.demodulize)
 
-  # Generate + name + register one Agent subclass per shipping source. Done here
-  # (not via a file per venue) so a new feed is a SOURCES entry, not code.
-  Ole::SOURCES.each do |src|
-    const = "Ole#{src[:key]}"
-    klass = Ole.build(key: src[:key], feed_url: src[:feed_url],
-                      place: src[:location], aggregator: src.fetch(:aggregator, false),
-                      link_via: src.fetch(:link_via, :venue), gate: src.fetch(:gate, :strict))
-    Scrapers.const_set(const, klass)
-    All.scrapers[const] = klass
+  # Generate + name + register one Agent subclass per OLE feed in the registry.
+  # The feeds live ON the venue rows (config/venues.yml `sources: [{ via: ole, … }]`)
+  # — a source is a URL in the registry, not code. Only CONSUME venues are swept;
+  # a deferred feed (robots-blocked BeJazz/Bird's Eye) stays recorded but ungenerated.
+  # The scraper's key/provenance comes from the SOURCE-OWNING venue (so an aggregator
+  # like Bewegungsmelder stamps OLE:Bewegungsmelder on every event it resolves,
+  # regardless of which venue that event lands at — the venue is in the location tags).
+  Venue.consuming.each do |venue|
+    venue.ole_feeds.each do |feed|
+      key   = Ole.feed_key(venue)
+      const = "Ole#{key}"
+      klass = Ole.build(key: key, feed_url: feed.feed_url,
+                        place: feed.aggregator_feed? ? nil : venue.place_tuple,
+                        aggregator: feed.aggregator_feed?,
+                        link_via: (feed.link_via || "venue").to_sym,
+                        gate: (feed.gate || "strict").to_sym)
+      Scrapers.const_set(const, klass)
+      All.scrapers[const] = klass
+    end
   end
 end

@@ -15,14 +15,26 @@ class Venue
   CONFIG_PATH = Rails.root.join("config/venues.yml")
   STATUSES = %w[consume defer reject].freeze
 
-  # One declared, data-shaped source (see docs/venue-registry-design.md "End
-  # state"). Bespoke/PETZI sourcing is derived from the live registry by domain and
-  # isn't listed here; this is for sourcing that has no other home — today, an OLE
-  # aggregator that resolves this venue per event (`via: ole, aggregator: <label>`).
-  # `matches` lists the raw <location> names the aggregator emits for this venue
-  # (defaults to the venue name).
-  Source = Struct.new(:via, :aggregator, :matches, keyword_init: true) do
-    def aggregator? = aggregator.present?
+  # One declared, data-shaped source (see docs/venue-registry-design.md "End state").
+  # Bespoke/PETZI sourcing is derived from the live registry by domain and isn't
+  # listed here. Two OLE shapes live here:
+  #   - this venue HOSTS its own OLE feed: `via: ole, feed_url:` (plus `aggregator:
+  #     true` + `link_via:` + `gate:` if the feed is a multi-venue aggregator).
+  #   - this venue is RESOLVED BY an aggregator per event: `via: ole, aggregator:
+  #     <label>` (a string; it has no feed_url of its own).
+  # `matches` lists the raw <location> names an aggregator emits for this venue.
+  Source = Struct.new(:via, :aggregator, :matches, :feed_url, :link_via, :gate, :enabled,
+                      keyword_init: true) do
+    # This venue hosts its own OLE feed (vs only being resolved by an aggregator).
+    def feed? = feed_url.present?
+
+    # This source IS an OLE aggregator feed (resolves many venues per event).
+    def aggregator_feed? = aggregator == true
+
+    # The named aggregator that RESOLVES this venue (nil unless it's that shape).
+    def via_aggregator = (aggregator if aggregator.is_a?(String))
+
+    def enabled? = enabled != false
   end
 
   class << self
@@ -69,7 +81,8 @@ class Venue
     @checked = row["checked"]
     @aliases = (row["aliases"] || {}).transform_values { |keys| Array(keys) }
     @sources = Array(row["sources"]).map do |s|
-      Source.new(via: s["via"], aggregator: s["aggregator"], matches: Array(s["matches"]))
+      Source.new(via: s["via"], aggregator: s["aggregator"], matches: Array(s["matches"]),
+                 feed_url: s["feed_url"], link_via: s["link_via"], gate: s["gate"], enabled: s["enabled"])
     end
   end
 
@@ -80,16 +93,17 @@ class Venue
   def blocked? = !consume?
   def disposition = status
 
-  # OLE-aggregator sources that resolve this venue per event.
-  def aggregator_sources = sources.select(&:aggregator?)
+  # OLE feeds this venue HOSTS (its own single-venue feed and/or an aggregator feed),
+  # enabled only. These drive the generated OLE scrapers (see Scrapers::Ole).
+  def ole_feeds = sources.select { |s| s.via.to_s == "ole" && s.feed? && s.enabled? }
 
-  # True when this venue is fed by an aggregator (e.g. Bewegungsmelder) rather than
-  # a scraper covering its own domain — so the ledger drift check looks for it under
-  # the aggregator, not its own host. See Scrapers::Ole#venue_domains.
-  def sourced_via_aggregator? = aggregator_sources.any?
+  # True when this venue is RESOLVED by an aggregator (e.g. Bewegungsmelder) rather
+  # than a scraper covering its own domain — so the ledger drift check looks for it
+  # under the aggregator, not its own host. See Scrapers::Ole#venue_domains.
+  def sourced_via_aggregator? = aggregator_names.any?
 
-  # The aggregator labels feeding this venue (matched against a scraper's `label`).
-  def aggregator_names = aggregator_sources.map(&:aggregator)
+  # The aggregator labels that resolve this venue (matched against a scraper's `label`).
+  def aggregator_names = sources.filter_map(&:via_aggregator)
 
   # The raw <location> names this venue answers to when an aggregator resolves it
   # per event: its name, any explicit source `matches`, and any hinto aliases,

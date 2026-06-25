@@ -169,9 +169,14 @@ visible/behavioural changes get review + a live sweep.
 
 ## End state — the registry absorbs the data-shaped sourcing
 
-The target (reached via PR 3) is **one registry for everything except the parsing
-code that genuinely has to be code.** The rule that decides what moves into
-`config/venues.yml` and what stays out:
+> **Progress:** PETZI absorbed (PR #30) and OLE absorbed (`Ole::SOURCES`/`DEFERRED`
+> deleted; feeds live on the venue rows as `sources: [{ via: ole, feed_url:, … }]`).
+> Remaining: bespoke scrapers reading their place *from* the venue (the last
+> duplication).
+
+The target is **one registry for everything except the parsing code that genuinely
+has to be code.** The rule that decides what moves into `config/venues.yml` and
+what stays out:
 
 > Store sourcing in the venue row when the config **is just data**; keep it as code
 > (linked by domain) when it's a genuine **code artifact**.

@@ -149,17 +149,23 @@ visible/behavioural changes get review + a live sweep.
   rejected+why, sourcing-by-means — as a readable, single-file, code-controlled
   list. **No behaviour changes; all existing tests stay green.** (Per-source
   enable/disable switches land with PR 2/3, when there's wiring to switch.)
-- **PR 2 — taxonomy + inbox (with review).** Point `Location` at the registry
-  (severs `VenuePlace` from the WHERE tree); add the `VenueLead` discovery inbox
-  and the aggregator `:lenient`/`:strict` mode. Behavioural + visible (it decides
-  which venues appear and which aggregator events ingest), so it wants a live
-  sweep to confirm what changes before flipping anything to `:strict`.
+- **PR 2a — taxonomy on the registry (done, #29).** `Location` reads
+  `Venue.in_taxonomy` instead of scrapers + `VenuePlace`; `VenuePlace` severed from
+  the WHERE tree.
+- **PR 2b — discovery inbox + the gate.** `VenuePlace` → **`VenueLead`** (renamed
+  table + model): the inbox of aggregator-resolved venues matching no *consume*
+  venue, recorded fresh per run with an upcoming-event count for ranking. The
+  aggregator gate ships **`:strict` by default** (a per-aggregator toggle): only
+  consume venues ingest, the rest are dropped (a rejected one silently, an unseen
+  one as a lead). Strict was chosen over lenient because a live probe showed
+  Bewegungsmelder surfaces only Heitere Fahne + Köniz, both already approved — so
+  strict drops nothing today and gates future junk immediately.
 - **PR 3 — invert sourcing.** Scrapers read their place *from* the linked venue
   (removes the last duplication; the drift test becomes a safety net, not a
   necessity), and the OLE/PETZI sourcing config is absorbed into the registry (see
   *End state* below). Touches every scraper, so done supervised.
-- **PR 4 — admin inbox UI** over `VenueLead`, ranked by event count, + the
-  generated inventory artifact.
+- **PR 4 — admin inbox UI** over `VenueLead`, ranked by event count (`by_demand`),
+  + the generated inventory artifact.
 
 ## End state — the registry absorbs the data-shaped sourcing
 

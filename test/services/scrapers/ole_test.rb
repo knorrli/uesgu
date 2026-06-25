@@ -21,15 +21,19 @@ class Scrapers::OleTest < Minitest::Test
                         place: ["Klangkeller", "Bern", "BE"])
   end
 
+  # :lenient so the parse-focused tests below see EVERY resolved event regardless of
+  # whether its (synthetic) venue is approved in the registry. The :strict gate is
+  # exercised separately (test_strict_gate_*).
   def aggregator
-    Scrapers::Ole.build(key: "TestAgg", feed_url: "https://agg.example/oleexport", aggregator: true)
+    Scrapers::Ole.build(key: "TestAgg", feed_url: "https://agg.example/oleexport",
+                        aggregator: true, gate: :lenient)
   end
 
   # An editorial aggregator that keys + links on the per-event <source_url>
   # instead of the venue homepage <url> (Bewegungsmelder-shaped).
   def source_aggregator
     Scrapers::Ole.build(key: "TestSrc", feed_url: "https://bm.example/oleexport",
-                        aggregator: true, link_via: :source)
+                        aggregator: true, link_via: :source, gate: :lenient)
   end
 
   # --- single-venue: pagination + date filter + multi-show + URL rule ---------
@@ -202,6 +206,36 @@ class Scrapers::OleTest < Minitest::Test
     s = single_venue.new
     url = s.send(:occurrence_url, "https://x.example/y", Time.zone.parse("2026-07-01T20:30:00+02:00"))
     assert_equal "https://x.example/y#show-2026-07-01", url
+  end
+
+  # --- the closed-allowlist gate (#skip_row?) --------------------------------
+
+  # gate defaults to :strict in Scrapers::Ole.build.
+  def strict_aggregator
+    Scrapers::Ole.build(key: "TestStrict", feed_url: "https://s.example/oleexport", aggregator: true)
+  end
+
+  def row_for(venue) = Scrapers::Ole::Row.new(locations: [venue, "Somewhere", "BE"])
+
+  def test_strict_gate_drops_unapproved_and_rejected_venues_but_keeps_consume
+    s = strict_aggregator.new
+    assert s.send(:skip_row?, row_for("Totally Unknown Venue 9000")),
+           "an unseen venue's events are dropped under :strict"
+    assert s.send(:skip_row?, row_for("La Cappella")),
+           "a REJECTED registry venue's events are also dropped (consume? is false)"
+    refute s.send(:skip_row?, row_for("Dachstock")),
+           "a consume venue's events ingest even under :strict"
+  end
+
+  def test_lenient_gate_keeps_an_unapproved_venue
+    s = aggregator.new # gate: :lenient
+    refute s.send(:skip_row?, row_for("Totally Unknown Venue 9000")),
+           ":lenient ingests unapproved venues too"
+  end
+
+  def test_a_single_venue_source_is_never_gated
+    s = single_venue.new
+    refute s.send(:skip_row?, row_for("Totally Unknown Venue 9000"))
   end
 
   private

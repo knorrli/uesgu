@@ -5,8 +5,8 @@
 # taxonomy, and discovery read from. See docs/venue-registry-design.md.
 #
 # Not an ActiveRecord model — a plain value object over YAML, like Location is a
-# plain class over the scraper registry. (VenuePlace is the separate AR table for
-# aggregator-resolved places.)
+# plain class over the scraper registry. (VenueLead is the separate AR table that
+# records aggregator-resolved venues NOT in this registry — the discovery inbox.)
 #
 # IDENTITY + DECISION live in the YAML; SOURCING (which scraper / OLE feed / PETZI
 # slug feeds a venue) is DERIVED from the live registry, not stored here — so there

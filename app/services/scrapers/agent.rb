@@ -41,13 +41,34 @@ module Scrapers
       name.demodulize
     end
 
-    # Most scrapers represent exactly one venue and declare a real
-    # `[venue, city, canton]` place (see Location). A multi-venue aggregator
+    # Most scrapers represent exactly one venue and read their `[venue, city,
+    # canton]` place from the registry (see #venue below). A multi-venue aggregator
     # (e.g. Petzi) resolves the venue per event instead, so its class-level
     # `location`/`locations` are placeholders that must NOT seed the location
     # taxonomy — Location skips aggregators when building its hierarchy.
     def self.aggregator?
       false
+    end
+
+    # The registry venue this single-venue scraper covers (matched by its declared
+    # domain). A bespoke scraper reads its PLACE from here rather than re-declaring
+    # it — the venue (config/venues.yml) is the single source of truth, kept honest
+    # by the ledger drift test. Aggregators (Petzi, OLE aggregator) resolve the venue
+    # per event and override #location/#locations, so they don't use this.
+    def self.venue
+      Venue.find_by_domain(venue_domains.first)
+    end
+
+    # The venue's display name — the location tag this scraper's events carry.
+    # Aggregators and OLE sources override this.
+    def self.location
+      venue&.name
+    end
+
+    # [venue, city, canton] for event tags + the WHERE tree, read from the venue's
+    # place. Falls back to a bare [location] for a placeless/unmatched scraper.
+    def self.locations
+      venue&.place_tuple || [location].compact
     end
 
     # The canonical venue domain(s) this scraper consumes (eTLD+1), reconciled

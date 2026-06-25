@@ -1,13 +1,5 @@
 module Scrapers
   class Dampfzentrale < Agent
-    def self.location
-      "Dampfzentrale"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     # The homepage IS the full agenda (server-rendered). /spielplan and
     # /veranstaltungen are near-empty placeholders — do not use them.
     def self.url

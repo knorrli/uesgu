@@ -1,13 +1,5 @@
 module Scrapers
   class Treibhaus < Agent
-    def self.location
-      "Treibhaus"
-    end
-
-    def self.locations
-      [location, "Luzern", "LU"]
-    end
-
     # `?filter=konzerte` is server-rendered and keeps only live concerts (the
     # unfiltered programme mixes in quiz nights, public-viewings, e-sports, etc.),
     # so the music filter is done by URL — no per-event detail fetch needed. Club

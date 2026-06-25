@@ -169,10 +169,12 @@ visible/behavioural changes get review + a live sweep.
 
 ## End state — the registry absorbs the data-shaped sourcing
 
-> **Progress:** PETZI absorbed (PR #30) and OLE absorbed (`Ole::SOURCES`/`DEFERRED`
-> deleted; feeds live on the venue rows as `sources: [{ via: ole, feed_url:, … }]`).
-> Remaining: bespoke scrapers reading their place *from* the venue (the last
-> duplication).
+> **Reached.** PETZI absorbed (#30), OLE absorbed (#32; `Ole::SOURCES`/`DEFERRED`
+> deleted, feeds live on the rows), and bespoke scrapers now read their place *from*
+> the venue (`Agent#location`/`#locations`; the 32 `self.location`/`self.locations`
+> declarations are gone). The registry is the single source of truth for venue
+> identity, place, decisions, the WHERE tree, ingestion gating, and discovery — the
+> only sourcing left in code is the bespoke parsing logic, linked by domain.
 
 The target is **one registry for everything except the parsing code that genuinely
 has to be code.** The rule that decides what moves into `config/venues.yml` and

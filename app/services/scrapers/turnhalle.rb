@@ -4,14 +4,6 @@ module Scrapers
   # agenda and keep only the Turnhalle dates. See scraper_review.md — this venue
   # is the ambiguous one and may warrant the PROGR house agenda instead.
   class Turnhalle < Agent
-    def self.location
-      "Turnhalle"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://www.bee-flat.ch/programm/aktuell/")
     end

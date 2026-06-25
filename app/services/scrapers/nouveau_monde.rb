@@ -1,13 +1,5 @@
 module Scrapers
   class NouveauMonde < Agent
-    def self.location
-      "Nouveau Monde"
-    end
-
-    def self.locations
-      [location, "Fribourg", "FR"]
-    end
-
     def self.url
       URI.parse("https://www.nouveaumonde.ch/agenda/")
     end

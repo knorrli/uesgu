@@ -1,13 +1,5 @@
 module Scrapers
   class Volkshaus < Agent
-    def self.location
-      "Volkshaus Basel"
-    end
-
-    def self.locations
-      [location, "Basel", "BS"]
-    end
-
     def self.url
       URI.parse("https://volkshaus-basel.ch/programm/")
     end

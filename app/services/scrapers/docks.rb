@@ -1,13 +1,5 @@
 module Scrapers
   class Docks < Agent
-    def self.location
-      "Docks"
-    end
-
-    def self.locations
-      [location, "Lausanne", "VD"]
-    end
-
     def self.url
       URI.parse("https://www.docks.ch/programme")
     end

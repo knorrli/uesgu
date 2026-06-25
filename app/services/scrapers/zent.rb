@@ -1,16 +1,8 @@
 module Scrapers
   class Zent < Agent
-    def self.location
-      "Zent"
-    end
-
     # Restaurant Zent — the bistro-with-stage inside the bimano complex at
     # Zentweg 1A, Bern. The music programme lives on restaurant-zent.ch, not
     # bimano.ch (which is the bouldering/booking side).
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://restaurant-zent.ch/kulturprogramm")
     end

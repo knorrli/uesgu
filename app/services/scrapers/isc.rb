@@ -1,13 +1,5 @@
 module Scrapers
   class Isc < Agent
-    def self.location
-      "ISC"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://isc-club.ch/")
     end

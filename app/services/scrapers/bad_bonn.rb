@@ -8,14 +8,6 @@ module Scrapers
     # still identify honestly and crawl gently (one daily pass).
     self.respect_robots = false
 
-    def self.location
-      "Bad Bonn"
-    end
-
-    def self.locations
-      [location, "Düdingen", "FR"]
-    end
-
     def self.url
       URI.parse("https://club.badbonn.ch/program")
     end

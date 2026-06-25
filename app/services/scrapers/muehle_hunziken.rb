@@ -6,14 +6,6 @@ module Scrapers
   class MuehleHunziken < Agent
     DATE_SLUG = /-(?<y>\d{4})-(?<mo>\d{2})-(?<d>\d{2})\z/
 
-    def self.location
-      "Mühle Hunziken"
-    end
-
-    def self.locations
-      [location, "Rubigen", "BE"]
-    end
-
     def self.url
       URI.parse("https://muehlehunziken.ch/programm")
     end

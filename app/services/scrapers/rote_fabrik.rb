@@ -3,14 +3,6 @@ module Scrapers
   # a clean public JSON API. The `?categories=konzert` feed returns only concerts,
   # keyed by event id. Rows are Hashes.
   class RoteFabrik < Agent
-    def self.location
-      "Rote Fabrik"
-    end
-
-    def self.locations
-      [location, "Zürich", "ZH"]
-    end
-
     def self.url
       URI.parse("https://kalender.rotefabrik.ch/api/events?categories=konzert")
     end

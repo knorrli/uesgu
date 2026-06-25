@@ -14,14 +14,6 @@ module Scrapers
       URI.parse("https://bierhuebeli.ch/wp-json/wp/v2/event?per_page=100")
     end
 
-    def self.location
-      "Bierhübeli"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def event_rows
       parse_json(page.body)
     end
@@ -58,7 +50,6 @@ module Scrapers
       html = event_field(row, "billboard-byline").to_s.gsub(%r{<br\s*/?>}i, " · ")
       CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(html)).squish.presence
     end
-
 
     # beschreibungstag-1/2/3 are the short genre/type tags the venue types per
     # event — clean enough to MINT new taxonomy from (typos/marketing terms land

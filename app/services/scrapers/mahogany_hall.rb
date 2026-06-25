@@ -1,13 +1,5 @@
 module Scrapers
   class MahoganyHall < Agent
-    def self.location
-      "Mahogany Hall"
-    end
-
-    def self.locations
-      [location, "Bern", "BE"]
-    end
-
     def self.url
       URI.parse("https://www.mahogany.ch/konzerte")
     end

@@ -15,28 +15,36 @@
 # parses and that every event is upcoming (the date filter actually fired) before
 # trusting it in a real sweep.
 
-DEFAULT_KEYS = %w[Klangkeller Dachstock].freeze
+DEFAULT_KEYS = %w[Dachstock Bewegungsmelder].freeze
 
-# Every configured source by key → its config. SOURCES are the shipping (named +
-# registered) classes; DEFERRED ones (e.g. robots-blocked BeJazz) aren't
-# registered, so we build a throwaway class on demand to still dry-parse them.
-def config_by_key
-  (Scrapers::Ole::SOURCES + Scrapers::Ole::DEFERRED).index_by { |s| s[:key] }
+# Every OLE feed in the registry by its feed_key → { venue:, source: }. Consume
+# feeds are also registered classes; deferred ones (robots-blocked BeJazz / Bird's
+# Eye) aren't generated, so we build a throwaway class on demand to still dry-parse.
+def feed_configs
+  Venue.all.each_with_object({}) do |venue, acc|
+    venue.sources.each do |source|
+      next unless source.via.to_s == "ole" && source.feed?
+
+      acc[Scrapers::Ole.feed_key(venue)] = { venue: venue, source: source }
+    end
+  end
 end
 
 def source_classes(args)
-  keys = args.include?('all') ? Scrapers::Ole::SOURCES.map { |s| s[:key] } : (args.presence || DEFAULT_KEYS)
-  configs = config_by_key
+  configs = feed_configs
+  keys = args.include?('all') ? configs.keys : (args.presence || DEFAULT_KEYS)
   keys.filter_map do |k|
-    src = configs[k]
-    next warn "  ! unknown source key #{k.inspect} — known: #{configs.keys.join(', ')}" unless src
+    cfg = configs[k]
+    next warn "  ! unknown feed key #{k.inspect} — known: #{configs.keys.join(', ')}" unless cfg
 
-    if Scrapers.const_defined?("Ole#{k}")
-      Scrapers.const_get("Ole#{k}")
-    else
-      Scrapers::Ole.build(key: src[:key], feed_url: src[:feed_url],
-                          place: src[:location], aggregator: src.fetch(:aggregator, false))
-    end
+    next Scrapers.const_get("Ole#{k}") if Scrapers.const_defined?("Ole#{k}")
+
+    venue, source = cfg.values_at(:venue, :source)
+    Scrapers::Ole.build(key: k, feed_url: source.feed_url,
+                        place: source.aggregator_feed? ? nil : venue.place_tuple,
+                        aggregator: source.aggregator_feed?,
+                        link_via: (source.link_via || 'venue').to_sym,
+                        gate: (source.gate || 'strict').to_sym)
   end
 end
 

@@ -238,6 +238,26 @@ class Scrapers::OleTest < Minitest::Test
     refute s.send(:skip_row?, row_for("Totally Unknown Venue 9000"))
   end
 
+  # --- generated from the registry (config/venues.yml `sources:`) -------------
+
+  def test_feeds_generate_from_the_registry_with_source_owning_venue_provenance
+    d = Scrapers::OleDachstock
+    assert_equal ["Dachstock", "Bern", "BE"], d.locations, "single-venue place comes from the venue"
+    assert_equal "OLE:Dachstock", d.source_key
+    refute d.aggregator?
+
+    bm = Scrapers::OleBewegungsmelder
+    assert bm.aggregator?
+    assert_equal :strict, bm.gate
+    assert_equal "OLE:Bewegungsmelder", bm.source_key,
+                 "provenance is the SOURCE-OWNING venue, stamped on every event it resolves"
+  end
+
+  def test_a_deferred_feed_is_recorded_but_not_generated
+    refute Scrapers.const_defined?("OleBeJazz"), "BeJazz is defer/robots — recorded, not swept"
+    refute Scrapers.const_defined?("OleBirdsEye"), "Bird's Eye is defer/robots — recorded, not swept"
+  end
+
   private
 
   # Drive #process_events fully offline. `get` serves the next fixture page from a

@@ -103,4 +103,21 @@ class VenueTest < ActiveSupport::TestCase
       assert v.sourced_via_aggregator?, "#{v.domain}: consume but no own scraper and not aggregator-sourced"
     end
   end
+
+  test "a hosted OLE feed surfaces via ole_feeds; an aggregator feed is flagged" do
+    bm_feed = Venue.find_by_domain("bewegungsmelder.ch").ole_feeds.sole
+    assert bm_feed.aggregator_feed?
+    assert_equal "https://bewegungsmelder.ch/oleexport/", bm_feed.feed_url
+    assert_equal "source", bm_feed.link_via
+    assert_equal "strict", bm_feed.gate
+
+    refute Venue.find_by_domain("dachstock.ch").ole_feeds.sole.aggregator_feed?,
+           "a single-venue feed is not an aggregator"
+  end
+
+  test "a deferred venue's feed is recorded but it is not consumed (so never swept)" do
+    bejazz = Venue.find_by_domain("bejazz.ch")
+    assert_equal 1, bejazz.ole_feeds.size, "the feed URL is recorded on the row"
+    refute bejazz.consume?, "defer status keeps it un-generated"
+  end
 end

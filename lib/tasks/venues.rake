@@ -1,5 +1,3 @@
-require "uri"
-
 namespace :venues do
   # READ-ONLY inventory of the venue registry (config/venues.yml): every venue we
   # know, grouped by decision, showing where it is and HOW it's sourced. Identity +
@@ -40,7 +38,7 @@ namespace :venues do
     # Derived sourcing (bespoke / single-venue OLE / PETZI, by domain) plus any
     # aggregator source the venue declares (resolved per event, so not domain-derivable).
     labels = sources_for(venue.domain)
-    labels += venue.aggregator_sources.map { |s| "ole(#{s.aggregator}, via aggregator)" }
+    labels += venue.aggregator_names.map { |name| "ole(#{name}, via aggregator)" }
     labels.empty? ? "(no source)" : labels.join("  ")
   end
 
@@ -56,10 +54,9 @@ namespace :venues do
 
       out << "direct(#{name}·#{DIRECT_TRANSPORT.fetch(name, 'html')})"
     end
-    Scrapers::Ole::SOURCES.each do |s|
-      next unless Scrapers::Discovery.domain(URI.parse(s[:feed_url]).host) == domain
-
-      out << "ole(#{s[:key]}#{s[:aggregator] ? ', aggregator' : ''})"
+    venue = Venue.find_by_domain(domain)
+    venue&.ole_feeds&.each do |feed|
+      out << "ole(#{Scrapers::Ole.feed_key(venue)}#{feed.aggregator_feed? ? ', aggregator' : ''})"
     end
     if (slug = Scrapers::Petzi.domains.key(domain))
       out << "petzi(#{slug})"

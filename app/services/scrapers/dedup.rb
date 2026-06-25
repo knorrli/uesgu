@@ -35,10 +35,10 @@ module Scrapers
     private
 
     # Every venue where more than one source can land an event: the PETZI member
-    # venues plus the single-venue OLE feeds. Config-driven — adding an OLE venue
-    # or a PETZI member is enough, there's no separate list to maintain here.
+    # venues plus the venues with their own single-venue OLE feed. Both come from the
+    # registry — adding an OLE feed or a PETZI member is enough, no list to maintain.
     def dedup_venues
-      ole = Ole::SOURCES.reject { |s| s[:aggregator] }.filter_map { |s| s[:location]&.first }
+      ole = Venue.consuming.select { |v| v.ole_feeds.any? { |s| !s.aggregator_feed? } }.map(&:name)
       (Petzi.venues.values.map(&:first) + ole).uniq
     end
 

@@ -29,7 +29,7 @@ namespace :discovery do
     # --- PETZI sitemap: event URLs whose venue slug we don't track ---
     petzi_doc  = fetch.call("PETZI sitemap", Scrapers::Petzi.url.to_s)
     petzi_urls = petzi_doc ? petzi_doc.css("loc").map(&:text).select { |u| u.include?("/events/") } : []
-    known_slugs = ledger.alias_keys("petzi") | Scrapers::Petzi::VENUES.keys.to_set
+    known_slugs = ledger.alias_keys("petzi") | Scrapers::Petzi.venues.keys.to_set
     petzi_new = Scrapers::Discovery.petzi_unknown_clusters(petzi_urls, known_slugs)
 
     # --- Re-check: blocked venues whose revisitable reason may have gone stale ---

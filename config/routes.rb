@@ -123,6 +123,11 @@ Rails.application.routes.draw do
     # triggers a full sweep on demand (runs in a background thread).
     resources :scrape_runs, only: %i[index show create]
 
+    # Discovery inbox: venues an aggregator surfaced that aren't approved in the
+    # registry (VenueLead), ranked by upcoming-event demand. Read-only — approving
+    # one is a config/venues.yml edit (a PR).
+    resources :venue_leads, only: %i[index]
+
     # Catalogue browsers reached from the dashboard stats: events (the scraped
     # table) and locations (derived from the location tags). Each mirrors the
     # genres index idiom — filter / sort / search / paginate. (Genres keep their

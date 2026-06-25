@@ -164,8 +164,9 @@ visible/behavioural changes get review + a live sweep.
   (removes the last duplication; the drift test becomes a safety net, not a
   necessity), and the OLE/PETZI sourcing config is absorbed into the registry (see
   *End state* below). Touches every scraper, so done supervised.
-- **PR 4 — admin inbox UI** over `VenueLead`, ranked by event count (`by_demand`),
-  + the generated inventory artifact.
+- **PR 4 — admin inbox UI (done).** `/admin/venue_leads` lists `VenueLead.by_demand`
+  (read-only; approving a lead is a `config/venues.yml` edit), linked from the admin
+  dashboard with a live count.
 
 ## End state — the registry absorbs the data-shaped sourcing
 

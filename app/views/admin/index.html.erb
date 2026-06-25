@@ -75,6 +75,11 @@
         <span class="stat__leader"></span>
         <dd class="muted"></dd>
       </div>
+      <div class="stat">
+        <dt><%= link_to t('.discovery_leads'), admin_venue_leads_path, class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= VenueLead.count %></dd>
+      </div>
     </dl>
   </section>
 

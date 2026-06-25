@@ -42,10 +42,11 @@ module Scrapers
   # not the other way round. (See dedup_test.rb for the proof.)
   class Ole < Agent
     # --- Source registry. A single-venue source declares its [venue, city,
-    # canton] place and seeds the location taxonomy like a normal scraper. An
-    # aggregator (multi-venue) declares `aggregator: true`; its venue is resolved
-    # per event from <location> and it is kept OUT of the taxonomy (see #aggregator?
-    # and Location.place_scrapers) — exactly like PETZI.
+    # canton] place; its venue lives in the registry (config/venues.yml) and seeds
+    # the location taxonomy like any consume venue. An aggregator (multi-venue)
+    # declares `aggregator: true`; its venue is resolved per event from <location>,
+    # and only an APPROVED venue (a registry row, possibly aggregator-sourced) enters
+    # the taxonomy — the aggregator feed host itself is placeless and excluded.
     #
     # This is the SHIPPING list: every feed here was dry-parsed live against the
     # real endpoint (script/ole_dry_parse.rb) and is robots-allowed + parses
@@ -196,11 +197,13 @@ module Scrapers
     end
 
     # Real sweep entry point. After the base run (fetch → build → save events),
-    # persist the venue places this aggregator resolved so they enter the location
-    # taxonomy. Only #call does this — the golden/OLE offline tests drive
-    # #process_events directly and the dry parse calls #event_rows, so neither
-    # writes VenuePlace rows. A no-op for single-venue sources (which declare their
-    # place in code and so are already in the taxonomy — see #note_place).
+    # persist the venue places this aggregator resolved (VenuePlace). NOTE: these no
+    # longer feed the location taxonomy — that now reads the approved venues in the
+    # registry (config/venues.yml). The persisted places are kept as the record of
+    # what the aggregator surfaced, pending repurposing into the discovery-lead inbox
+    # (a future PR records only the UNAPPROVED ones). Only #call does this — the
+    # golden/OLE offline tests drive #process_events directly and the dry parse calls
+    # #event_rows, so neither writes VenuePlace rows. A no-op for single-venue sources.
     def call
       result = super
       persist_discovered_places

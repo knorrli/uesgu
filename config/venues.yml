@@ -35,7 +35,10 @@ venues:
     canton: LU
   checked: 2026-06-21
 - domain: bee-flat.ch
-  name: Turnhalle (bee-flat)
+  # The venue is the Turnhalle (its events are tagged "Turnhalle"); bee-flat is the
+  # concert series/operator whose site (bee-flat.ch) we scrape. Name must equal the
+  # event tag so the WHERE tree matches.
+  name: Turnhalle
   disposition: consume
   place:
     city: Bern

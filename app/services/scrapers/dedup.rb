@@ -39,7 +39,7 @@ module Scrapers
     # or a PETZI member is enough, there's no separate list to maintain here.
     def dedup_venues
       ole = Ole::SOURCES.reject { |s| s[:aggregator] }.filter_map { |s| s[:location]&.first }
-      (Petzi::VENUES.values.map(&:first) + ole).uniq
+      (Petzi.venues.values.map(&:first) + ole).uniq
     end
 
     # All future, non-dismissed events for this venue, processed in descending

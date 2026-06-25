@@ -84,10 +84,9 @@ class Scrapers::LedgerDriftTest < Minitest::Test
                  "#{clashes.map { |(u, k), pairs| "#{u}:#{k} -> #{pairs.map(&:last).join('/')}" }.join('; ')}"
   end
 
-  # Parity guard: Petzi::VENUES (slug -> place) and Petzi::DOMAINS (slug -> domain)
-  # must cover the same slugs, so neither can gain/lose a venue without the other.
-  def test_petzi_venues_and_domains_stay_aligned
-    assert_equal Scrapers::Petzi::VENUES.keys.sort, Scrapers::Petzi::DOMAINS.keys.sort,
-                 "Petzi::VENUES and Petzi::DOMAINS have diverged — every slug needs both a place and a domain"
-  end
+  # Petzi slug→place and slug→domain are now both DERIVED from the registry's
+  # `petzi` aliases (Petzi.venues / .domains), so they can't diverge by construction
+  # — the old parity guard is obsolete. A petzi alias on a non-consume venue is
+  # caught by the consume/scraped reconciliation above (its domain enters
+  # Petzi.venue_domains but has no consume row).
 end

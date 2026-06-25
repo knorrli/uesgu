@@ -170,15 +170,26 @@ module Scrapers
 
       def aggregator? = !!is_aggregator
 
-      # The domain reconciled against the ledger's `consume` row (see the drift
+      # The domain(s) reconciled against the registry's `consume` rows (see the drift
       # test). Agent returns [] for any aggregator, because a member-enumerating
       # one (Petzi) commits to no single host. An OLE aggregator is different: it's
       # ONE fixed feed endpoint, so the domain we commit to scraping IS that feed
       # host — it takes a single `consume` row, even though it still resolves the
       # actual VENUE per event (#aggregator? keeps it out of the location taxonomy).
       # Single-venue OLE sources already got this from Agent; we just opt
-      # aggregators back in so the ledger can record the decision.
-      def venue_domains = [Discovery.domain(url.host)].compact
+      # aggregators back in so the registry can record the decision.
+      #
+      # An aggregator ALSO covers the approved venues that name it as their source
+      # (`sources: [{ via: ole, aggregator: <label> }]` in config/venues.yml) — those
+      # venues have no own-domain scraper, so the aggregator is what backs their
+      # `consume` row. Including them here is what lets the drift test reconcile an
+      # aggregator-sourced venue (e.g. Heitere Fahne via Bewegungsmelder) cleanly.
+      def venue_domains
+        own = [Discovery.domain(url.host)].compact
+        return own unless aggregator?
+
+        own + Venue.all.select { |v| v.consume? && v.aggregator_names.include?(label) }.map(&:domain)
+      end
 
       # Provenance stamped on every event (Event#data_source), e.g. "OLE:Klangkeller".
       def source_key = provenance

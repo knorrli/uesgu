@@ -15,6 +15,16 @@ class Venue
   CONFIG_PATH = Rails.root.join("config/venues.yml")
   STATUSES = %w[consume defer reject].freeze
 
+  # One declared, data-shaped source (see docs/venue-registry-design.md "End
+  # state"). Bespoke/PETZI sourcing is derived from the live registry by domain and
+  # isn't listed here; this is for sourcing that has no other home — today, an OLE
+  # aggregator that resolves this venue per event (`via: ole, aggregator: <label>`).
+  # `matches` lists the raw <location> names the aggregator emits for this venue
+  # (defaults to the venue name).
+  Source = Struct.new(:via, :aggregator, :matches, keyword_init: true) do
+    def aggregator? = aggregator.present?
+  end
+
   class << self
     # The registry: every venue, memoized. Cleared automatically on code reload in
     # dev (the class is redefined); edit the YAML → restart, like any config.
@@ -46,7 +56,7 @@ class Venue
     end
   end
 
-  attr_reader :domain, :name, :city, :canton, :status, :reason, :checked, :aliases
+  attr_reader :domain, :name, :city, :canton, :status, :reason, :checked, :aliases, :sources
 
   def initialize(row)
     @domain  = row.fetch("domain")
@@ -58,6 +68,9 @@ class Venue
     @reason  = row["reason"]
     @checked = row["checked"]
     @aliases = (row["aliases"] || {}).transform_values { |keys| Array(keys) }
+    @sources = Array(row["sources"]).map do |s|
+      Source.new(via: s["via"], aggregator: s["aggregator"], matches: Array(s["matches"]))
+    end
   end
 
   def label = name
@@ -67,10 +80,23 @@ class Venue
   def blocked? = !consume?
   def disposition = status
 
+  # OLE-aggregator sources that resolve this venue per event.
+  def aggregator_sources = sources.select(&:aggregator?)
+
+  # True when this venue is fed by an aggregator (e.g. Bewegungsmelder) rather than
+  # a scraper covering its own domain — so the ledger drift check looks for it under
+  # the aggregator, not its own host. See Scrapers::Ole#venue_domains.
+  def sourced_via_aggregator? = aggregator_sources.any?
+
+  # The aggregator labels feeding this venue (matched against a scraper's `label`).
+  def aggregator_names = aggregator_sources.map(&:aggregator)
+
   # The raw <location> names this venue answers to when an aggregator resolves it
-  # per event: its name plus any hinto aliases, normalized. The closed-allowlist key.
+  # per event: its name, any explicit source `matches`, and any hinto aliases,
+  # normalized. The closed-allowlist key.
   def match_keys
-    ([name] + Array(aliases["hinto"])).compact.map { |s| Venue.normalize(s) }.uniq
+    ([name] + sources.flat_map(&:matches) + Array(aliases["hinto"]))
+      .compact.map { |s| Venue.normalize(s) }.uniq
   end
 
   def matches?(raw) = match_keys.include?(Venue.normalize(raw))

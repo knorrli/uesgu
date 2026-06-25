@@ -130,9 +130,14 @@ venues:
   checked: 2026-06-21
 - domain: dieheiterefahne.ch
   name: Heitere Fahne
-  disposition: reject
-  reason: js_only
-  checked: 2026-06-17
+  disposition: consume
+  place:
+    city: Wabern
+    canton: BE
+  checked: 2026-06-25
+  sources:
+  - via: ole
+    aggregator: Bewegungsmelder
 - domain: docks.ch
   name: Docks
   disposition: consume
@@ -249,6 +254,16 @@ venues:
   disposition: reject
   reason: non_music
   checked: 2026-06-21
+- domain: kulturhof.ch
+  name: Kulturhof Schloss Köniz
+  disposition: consume
+  place:
+    city: Köniz
+    canton: BE
+  checked: 2026-06-25
+  sources:
+  - via: ole
+    aggregator: Bewegungsmelder
 - domain: la-cappella.ch
   name: La Cappella
   disposition: reject

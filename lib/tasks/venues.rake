@@ -61,7 +61,7 @@ namespace :venues do
 
       out << "ole(#{s[:key]}#{s[:aggregator] ? ', aggregator' : ''})"
     end
-    if (slug = Scrapers::Petzi::DOMAINS.key(domain))
+    if (slug = Scrapers::Petzi.domains.key(domain))
       out << "petzi(#{slug})"
     end
     out

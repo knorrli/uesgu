@@ -15,50 +15,30 @@ module Scrapers
   # the venue's curated-but-coarse tags; like every source they mint taxonomy and
   # are curated downstream.
   class Petzi < Agent
-    # slug (the leading venue segment of /events/{id}-{slug}-{title}) => the exact
-    # [venue, city, canton] our bespoke scrapers already declare, so a merged event
-    # keeps one consistent location and dedup matches by venue.
-    VENUES = {
-      "dachstock"            => ["Dachstock", "Bern", "BE"],
-      "isc"                  => ["ISC", "Bern", "BE"],
-      "cafe-kairo"           => ["Café Kairo", "Bern", "BE"],
-      "gaskessel"            => ["Gaskessel", "Bern", "BE"],
-      "kulturfabrik-kofmehl" => ["Kofmehl", "Solothurn", "SO"],
-      "fri-son"              => ["FriSon", "Fribourg", "FR"],
-      "sedel"                => ["Sedel", "Luzern", "LU"],
-      "nouveau-monde"        => ["Nouveau Monde", "Fribourg", "FR"],
-      "helsinki"             => ["Helsinki Klub", "Zürich", "ZH"],
-      "docks"                => ["Docks", "Lausanne", "VD"],
-      "treibhaus"            => ["Treibhaus", "Luzern", "LU"],
-      "neubad"               => ["Neubad", "Luzern", "LU"],
-      "kiff"                 => ["KIFF", "Aarau", "AG"],
-      "borom"                => ["Böröm", "Aarau", "AG"]
-    }.freeze
+    # Petzi covers exactly the registry venues that declare a `petzi: [slug]` alias —
+    # it adds no venue of its own (every slug also has a bespoke scraper that already
+    # declares the place + domain). So its slug→place and slug→domain maps are
+    # DERIVED from the registry (config/venues.yml), not duplicated here. (Was the
+    # parallel VENUES/DOMAINS constants kept in sync by a drift test; the registry is
+    # now the single source — see docs/venue-registry-design.md.)
+    #
+    # slug (the leading venue segment of /events/{id}-{slug}-{title}) => the venue's
+    # [venue, city, canton], so a merged event keeps one consistent location.
+    def self.venues
+      Venue.all.each_with_object({}) do |venue, map|
+        Array(venue.aliases["petzi"]).each { |slug| map[slug] = venue.place_tuple }
+      end
+    end
 
-    # slug => the venue's canonical domain (eTLD+1), so this aggregator can declare
-    # which venues it covers for the ledger drift test (Petzi adds no new venue —
-    # every slug also has a bespoke scraper, so these match those scrapers' domains
-    # and fold onto the same consume row). Kept parallel to VENUES; the drift test
-    # asserts the two key sets stay aligned.
-    DOMAINS = {
-      "dachstock"            => "dachstock.ch",
-      "isc"                  => "isc-club.ch",
-      "cafe-kairo"           => "cafe-kairo.ch",
-      "gaskessel"            => "gaskessel.ch",
-      "kulturfabrik-kofmehl" => "kofmehl.net",
-      "fri-son"              => "fri-son.ch",
-      "sedel"                => "sedel.ch",
-      "nouveau-monde"        => "nouveaumonde.ch",
-      "helsinki"             => "helsinkiklub.ch",
-      "docks"                => "docks.ch",
-      "treibhaus"            => "treibhausluzern.ch",
-      "neubad"               => "neubad.org",
-      "kiff"                 => "kiff.ch",
-      "borom"                => "boeroem.ch"
-    }.freeze
+    # slug => the venue's canonical domain (eTLD+1), for the ledger drift reconcile.
+    def self.domains
+      Venue.all.each_with_object({}) do |venue, map|
+        Array(venue.aliases["petzi"]).each { |slug| map[slug] = venue.domain }
+      end
+    end
 
-    # Multi-venue but statically enumerable: the 14 venue domains it covers.
-    def self.venue_domains = DOMAINS.values
+    # Multi-venue but statically enumerable: the venue domains it covers (derived).
+    def self.venue_domains = domains.values
 
     def self.url
       URI.parse("https://www.petzi.ch/en/sitemap.xml")
@@ -95,7 +75,7 @@ module Scrapers
     # The canonical link is the venue's OWN event page. PETZI exposes it on the
     # detail page as the optional "official website" link (the lone external,
     # non-social <a>); we use it only when it resolves to the venue's known domain
-    # (Petzi::DOMAINS) — never an artist/promoter site a venue may have entered
+    # (Petzi.domains) — never an artist/promoter site a venue may have entered
     # there instead — and fall back to the PETZI URL when it's absent or off-domain.
     # So a PETZI-only show still points at the venue where it can; where we also
     # scrape the venue bespoke/OLE, Dedup ranks PETZI last and hides this copy.
@@ -165,7 +145,7 @@ module Scrapers
     # The detail page's "official website" link iff it resolves to this venue's
     # known domain; nil otherwise (absent, or an off-domain artist/promoter link).
     def venue_url(page, row)
-      domain = Petzi::DOMAINS[slug_for(row)]
+      domain = self.class.domains[slug_for(row)]
       return if domain.blank?
 
       page.links.filter_map(&:href)
@@ -173,9 +153,9 @@ module Scrapers
     end
 
     def slug_for(url)
-      VENUES.keys.find { |s| url =~ %r{/events/\d+-#{Regexp.escape(s)}-} }
+      self.class.venues.keys.find { |s| url =~ %r{/events/\d+-#{Regexp.escape(s)}-} }
     end
 
-    def venue_for(url) = VENUES[slug_for(url)]
+    def venue_for(url) = self.class.venues[slug_for(url)]
   end
 end

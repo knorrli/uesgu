@@ -37,7 +37,10 @@ namespace :venues do
   def sourcing_of(venue)
     return venue.reason.to_s if venue.blocked?
 
+    # Derived sourcing (bespoke / single-venue OLE / PETZI, by domain) plus any
+    # aggregator source the venue declares (resolved per event, so not domain-derivable).
     labels = sources_for(venue.domain)
+    labels += venue.aggregator_sources.map { |s| "ole(#{s.aggregator}, via aggregator)" }
     labels.empty? ? "(no source)" : labels.join("  ")
   end
 

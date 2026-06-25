@@ -73,4 +73,34 @@ class VenueTest < ActiveSupport::TestCase
     assert_equal "dachstock.ch", Venue.matching("dachstock")&.domain
     assert_nil Venue.matching("Totally Unknown Venue")
   end
+
+  test "an aggregator-sourced venue is consumed, placed, and names its aggregator" do
+    hf = Venue.find_by_domain("dieheiterefahne.ch")
+    assert hf.consume?, "Heitere Fahne should be a consume venue (sourced via Bewegungsmelder)"
+    assert hf.placed?
+    assert hf.sourced_via_aggregator?
+    assert_includes hf.aggregator_names, "Bewegungsmelder"
+    assert hf.matches?("Heitere Fahne"), "must match the raw <location> name the feed emits"
+  end
+
+  # An aggregator-sourced venue has no scraper covering its own domain — the
+  # aggregator backs its consume row. This is what keeps the drift test green.
+  test "an OLE aggregator's venue_domains include the approved venues that name it" do
+    bm = Scrapers::OleBewegungsmelder
+    sourced = Venue.consuming.select { |v| v.aggregator_names.include?(bm.label) }.map(&:domain)
+    assert_operator sourced.size, :>=, 1, "expected venues sourced via Bewegungsmelder"
+    sourced.each { |d| assert_includes bm.venue_domains, d, "#{d} must be covered by its aggregator" }
+    assert_includes bm.venue_domains, "bewegungsmelder.ch", "still covers its own feed host"
+  end
+
+  # The invariant the registry must keep: every consume venue is backed either by a
+  # scraper covering its own domain, or by an aggregator it names as a source.
+  test "every consume venue is backed by an own-domain scraper or an aggregator" do
+    own = Scrapers::All.scrapers.values.reject(&:aggregator?).flat_map(&:venue_domains).to_set
+    feeds = Scrapers::All.scrapers.values.select(&:aggregator?).map { |k| Scrapers::Discovery.domain(k.url.host) }.to_set
+    Venue.consuming.each do |v|
+      next if own.include?(v.domain) || feeds.include?(v.domain) # own scraper or the feed host itself
+      assert v.sourced_via_aggregator?, "#{v.domain}: consume but no own scraper and not aggregator-sourced"
+    end
+  end
 end

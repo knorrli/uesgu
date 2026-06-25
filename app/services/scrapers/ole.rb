@@ -94,8 +94,12 @@ module Scrapers
       # Dampfzentrale, Dynamo, Turnhalle, Rote Fabrik, …) is folded by Scrapers::
       # Dedup. ~Half the programme is non-music (Theater/Party/Tanz/…); the music
       # gate hides it via db/genres.yml dispositions (curated, not gated at ingest).
+      # gate: :strict (the default, stated for visibility) — only registry-approved
+      # venues ingest; the rest are recorded as VenueLead leads for review. Both
+      # surfaced venues (Heitere Fahne, Kulturhof Schloss Köniz) are approved, so
+      # strict drops nothing today. Flip to :lenient to ingest unapproved venues too.
       { key: "Bewegungsmelder", feed_url: "https://bewegungsmelder.ch/oleexport/",
-        aggregator: true, link_via: :source }
+        aggregator: true, link_via: :source, gate: :strict }
     ].freeze
 
     # Configured + parseable but DEFERRED, for reference (NOT swept). Both return
@@ -135,7 +139,13 @@ module Scrapers
     end
 
     class << self
-      attr_accessor :feed_url, :place, :is_aggregator, :label, :provenance, :link_via
+      attr_accessor :feed_url, :place, :is_aggregator, :label, :provenance, :link_via, :gate
+
+      # The aggregator ingest gate (closed allowlist): :strict (default) ingests
+      # events only for venues approved in the registry and DROPS the rest; :lenient
+      # ingests everything. Either way every unapproved venue is recorded as a
+      # discovery lead (VenueLead). Single-venue sources are never gated.
+      def strict? = gate != :lenient
 
       # Build (but do NOT register) a configured source subclass. The shipping
       # loop at the bottom of this file names + registers each; tests call this to
@@ -149,7 +159,7 @@ module Scrapers
       # event there, so <url>+date collides for two same-night shows at one venue —
       # while <source_url> is a stable, rich, per-event page on the aggregator. For
       # those, :source is both the only safe key AND the better user link.
-      def build(key:, feed_url:, place: nil, aggregator: false, link_via: :venue)
+      def build(key:, feed_url:, place: nil, aggregator: false, link_via: :venue, gate: :strict)
         Class.new(self) do
           self.feed_url      = feed_url
           self.place         = place
@@ -157,6 +167,7 @@ module Scrapers
           self.label         = key
           self.provenance    = "OLE:#{key}"
           self.link_via      = link_via
+          self.gate          = gate
         end
       end
 
@@ -197,16 +208,13 @@ module Scrapers
     end
 
     # Real sweep entry point. After the base run (fetch → build → save events),
-    # persist the venue places this aggregator resolved (VenuePlace). NOTE: these no
-    # longer feed the location taxonomy — that now reads the approved venues in the
-    # registry (config/venues.yml). The persisted places are kept as the record of
-    # what the aggregator surfaced, pending repurposing into the discovery-lead inbox
-    # (a future PR records only the UNAPPROVED ones). Only #call does this — the
+    # record the discovery leads this aggregator surfaced (VenueLead) — the venues it
+    # resolved that aren't approved in the registry. Only #call does this; the
     # golden/OLE offline tests drive #process_events directly and the dry parse calls
-    # #event_rows, so neither writes VenuePlace rows. A no-op for single-venue sources.
+    # #event_rows, so neither writes VenueLead rows. A no-op for single-venue sources.
     def call
       result = super
-      persist_discovered_places
+      persist_leads
       result
     end
 
@@ -276,6 +284,19 @@ module Scrapers
 
     def event_locations(row) = row.locations
 
+    # Closed-allowlist gate: an aggregator ingests an event only if its resolved
+    # venue is a CONSUME venue in the registry. A venue we've rejected/deferred — or
+    # never seen — is dropped under the default :strict gate (kept under :lenient).
+    # An unseen venue is also recorded as a lead (#persist_leads); a rejected one is
+    # not (already triaged). Single-venue sources declare an approved place, so they
+    # are never gated.
+    def skip_row?(row)
+      return false unless self.class.aggregator?
+      return false if Venue.matching(row.locations.first)&.consume?
+
+      self.class.strict?
+    end
+
     private
 
     # Parse the current page body as namespaced-stripped XML.
@@ -306,7 +327,7 @@ module Scrapers
         # show, so Location can fold the venue into the WHERE tree (see #call →
         # #persist_discovered_places). In-memory only — never writes here, so the
         # read-only dry parse (which calls #event_rows, not #call) stays read-only.
-        note_place(locations) if rows.any?
+        note_place(locations, rows.size) if rows.any?
         rows
       end
     end
@@ -392,21 +413,30 @@ module Scrapers
       [venue, city, canton].compact_blank.presence || self.class.locations
     end
 
-    # Accumulate an aggregator's distinct resolved [venue, city, canton] tuples in
-    # memory during the run; persisted later by #persist_discovered_places. Only
-    # aggregators need this — single-venue sources are already in the taxonomy via
-    # their declared place. Skip a tuple too thin to place (no city).
-    def note_place(locations)
+    # Tally an aggregator's resolved [venue, city, canton] tuples and their upcoming-
+    # event counts during the run; persisted later by #persist_leads. Only
+    # aggregators need this — single-venue sources declare an approved place. Skip a
+    # tuple too thin to place (no city).
+    def note_place(locations, count)
       return unless self.class.aggregator? && locations.size >= 2
 
-      (@discovered_places ||= Set.new) << locations
+      (@discovered_places ||= Hash.new(0))[locations] += count
     end
 
-    # Upsert the run's resolved venue places (idempotent — see VenuePlace.record!).
-    def persist_discovered_places
-      @discovered_places&.each do |venue, city, canton|
-        VenuePlace.record!(venue: venue, city: city, canton: canton, source: self.class.source_key)
+    # Record the discovery LEADS this run surfaced: resolved venues that match NO
+    # approved venue in the registry (the approved ones are ingested, not leads),
+    # with their upcoming-event count for ranking. Rewritten fresh per source, so an
+    # approved or aged-out venue drops off the inbox. (Was persist_discovered_places,
+    # which fed the taxonomy; that now reads the registry — see VenueLead.)
+    def persist_leads
+      return unless self.class.aggregator?
+
+      leads = (@discovered_places || {}).filter_map do |(venue, city, canton), count|
+        next if Venue.matching(venue)
+
+        { venue: venue, city: city, canton: canton, event_count: count }
       end
+      VenueLead.refresh!(source: self.class.source_key, leads: leads)
     end
 
     def text(node, css)
@@ -452,7 +482,7 @@ module Scrapers
     const = "Ole#{src[:key]}"
     klass = Ole.build(key: src[:key], feed_url: src[:feed_url],
                       place: src[:location], aggregator: src.fetch(:aggregator, false),
-                      link_via: src.fetch(:link_via, :venue))
+                      link_via: src.fetch(:link_via, :venue), gate: src.fetch(:gate, :strict))
     Scrapers.const_set(const, klass)
     All.scrapers[const] = klass
   end

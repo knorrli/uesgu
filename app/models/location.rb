@@ -4,7 +4,8 @@
 # the placed, consumed venues (Venue.in_taxonomy) are the source of truth for the
 # venue/city/canton roles and for the WHERE-filter tree.
 #
-# (Until 2026-06-25 this was derived from the scrapers + the VenuePlace table; the
+# (Until 2026-06-25 this was derived from the scrapers + the VenuePlace table, now
+# repurposed as VenueLead; the
 # registry unified both — a bespoke scraper and an aggregator-resolved venue are now
 # the same kind of row, so the taxonomy reads one place. A venue's `name` must equal
 # the location tag its events carry, which the ledger drift + registry keep true.)

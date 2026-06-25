@@ -1,0 +1,25 @@
+<% content_for :title, t('.title') %>
+<div class="flex flex-col gap-large">
+  <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>
+    <h1><%= t('admin.venue_leads.index.title') %> <span class="muted"><%= @leads.size %></span></h1>
+  <% end %>
+
+  <p class="muted"><%= t('.intro') %></p>
+
+  <% if @leads.any? %>
+    <div class="flex flex-col gap-small">
+      <% @leads.each do |lead| %>
+        <div class="flex align-baseline gap-medium wrap catalogue-row">
+          <span><%= lead.venue %></span>
+          <% if lead.city.present? %>
+            <span class="muted"><%= [lead.city, lead.canton].compact_blank.join(', ') %></span>
+          <% end %>
+          <span class="muted catalogue-count"><%= lead.event_count %>&times;</span>
+          <span class="chip"><%= lead.source %></span>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

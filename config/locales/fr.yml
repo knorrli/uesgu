@@ -336,6 +336,7 @@ fr:
       no_scrapes: Aucun passage de scraper pour l'instant.
       discard_rules: Règles de filtrage
       scraper_coverage: Couverture des données
+      discovery_leads: Pistes de lieux
       accounts_heading: Comptes et invitations
       users: Comptes
       open_invitations: Invitations ouvertes
@@ -514,6 +515,11 @@ fr:
         merge_missing: Choisis d'abord un événement.
       unmerge:
         unmerged: Événement séparé comme autonome.
+    venue_leads:
+      index:
+        title: Pistes de lieux
+        intro: Des lieux qu'un agrégateur a repérés mais qui ne sont pas encore dans le registre, triés par événements à venir. Pour en ajouter un, édite config/venues.yml.
+        empty: Aucune piste. Chaque lieu repéré par un agrégateur est déjà dans le registre.
     locations:
       index:
         title: Lieux

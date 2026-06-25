@@ -336,6 +336,7 @@ en:
       no_scrapes: No scraper runs yet.
       discard_rules: Discard rules
       scraper_coverage: Data coverage
+      discovery_leads: Venue leads
       accounts_heading: Accounts & invitations
       users: Accounts
       open_invitations: Open invitations
@@ -514,6 +515,11 @@ en:
         merge_missing: Pick an event first.
       unmerge:
         unmerged: Event split out as standalone.
+    venue_leads:
+      index:
+        title: Venue leads
+        intro: Venues an aggregator surfaced that aren't in the registry yet, ranked by upcoming events. To add one, edit config/venues.yml.
+        empty: No leads. Every venue an aggregator surfaced is already in the registry.
     locations:
       index:
         title: Locations

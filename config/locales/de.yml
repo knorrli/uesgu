@@ -336,6 +336,7 @@ de:
       no_scrapes: Noch keine Scraper-Läufe.
       discard_rules: Filterregeln
       scraper_coverage: Datenabdeckung
+      discovery_leads: Venue-Leads
       accounts_heading: Konten & Einladungen
       users: Konten
       open_invitations: Offene Einladungen
@@ -514,6 +515,11 @@ de:
         merge_missing: Wähle zuerst eine Veranstaltung aus.
       unmerge:
         unmerged: Veranstaltung als eigenständig getrennt.
+    venue_leads:
+      index:
+        title: Venue-Leads
+        intro: Venues, die ein Aggregator gefunden hat, die aber noch nicht in der Registry stehen, sortiert nach anstehenden Events. Zum Aufnehmen in config/venues.yml ergänzen.
+        empty: Keine Leads. Jeder von einem Aggregator gefundene Venue steht bereits in der Registry.
     locations:
       index:
         title: Orte

@@ -70,6 +70,15 @@ module Scrapers
     # later page can briefly poke back above today). See #event_rows.
     STOP_AFTER_EMPTY_PAGES = 3
 
+    # A <lead> that recurs across THIS MANY+ distinct events in one feed pull is a
+    # house/section blurb the feed injects venue-wide ("Seit 1987 offenbart sich
+    # der Dachstock…"), not real per-event copy, so it's dropped from the
+    # description. Complements #description_present? (which drops the empty-
+    # <description> bare listings); this also catches the leak where a generic
+    # <lead> sits alongside a populated <description>. A deliberate floor: a real
+    # multi-night festival / recurring-series blurb (repeated 2–4×) survives.
+    REPEAT_DROP_THRESHOLD = 5
+
     # Sources are generated subclasses (see bottom of file). They're created
     # anonymously via Class.new, so they have no name when Ruby fires `inherited`
     # — suppress Registerable's auto-registration here (no super) and register each
@@ -199,6 +208,7 @@ module Scrapers
         doc = current_doc
         pages += 1
       end
+      record_lead_frequencies(rows)
       rows
     end
 
@@ -217,8 +227,14 @@ module Scrapers
     # have an empty <description> (just a stray <br/>) while real events carry a
     # populated one, so we gate on it: keep <lead> only when the event actually
     # has a description. Drops the repeated venue blurb without losing real descriptions.
+    #
+    # The <description> gate isn't airtight: a few events carry a populated
+    # <description> AND the generic house blurb in <lead>, so the blurb leaks
+    # through. #repeated_house_blurb? catches those by frequency — a <lead> the feed
+    # repeats across REPEAT_DROP_THRESHOLD+ events this run is boilerplate, not copy.
     def event_description(row)
       return nil unless description_present?(row.event)
+      return nil if repeated_house_blurb?(row.event)
 
       plain_text(text(row.event, "lead")).presence
     end
@@ -399,6 +415,32 @@ module Scrapers
         .gsub(/<[^>]+>/, " ")
         .gsub(/&[^;\s]+;/, " ")
         .strip.present?
+    end
+
+    # Tally how many DISTINCT events in this run carry each <lead> text. One event
+    # yields N rows (one per show) sharing the same node, so dedup by node identity
+    # before counting. Computed once at the end of #event_rows so #event_description
+    # (called per row in build_event) can read it. Defensive default: an extractor
+    # invoked without #event_rows (no harness drives that today) sees no repeats.
+    def record_lead_frequencies(rows)
+      @lead_counts = Hash.new(0)
+      rows.map(&:event).uniq.each do |event_node|
+        lead = normalized_lead(event_node)
+        @lead_counts[lead] += 1 if lead.present?
+      end
+    end
+
+    # This event's <lead> as the plain-text key the frequency map is built on, so
+    # the count and the lookup normalize identically.
+    def normalized_lead(event_node) = plain_text(text(event_node, "lead"))
+
+    # True when this event's <lead> is a house/section blurb the feed repeats across
+    # the run (>= REPEAT_DROP_THRESHOLD events) rather than real per-event copy.
+    def repeated_house_blurb?(event_node)
+      lead = normalized_lead(event_node)
+      return false if lead.blank?
+
+      (@lead_counts || {}).fetch(lead, 0) >= REPEAT_DROP_THRESHOLD
     end
 
     # <lead> is HTML-ish prose (entities like &amp;, the odd inline tag). Render it

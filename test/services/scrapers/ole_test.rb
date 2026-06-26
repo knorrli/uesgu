@@ -93,6 +93,30 @@ class Scrapers::OleTest < Minitest::Test
     assert_nil wibble.description, "no real <description> → venue-blurb <lead> is gated out"
   end
 
+  # The frequency filter: even when <description> is populated (so the gate above
+  # passes), a <lead> the feed repeats across REPEAT_DROP_THRESHOLD+ events is a
+  # house blurb, not per-event copy, and must be dropped — while a genuinely shared
+  # festival blurb (below threshold) and unique copy both survive.
+  def test_repeated_house_blurb_dropped_but_low_repeat_and_unique_kept
+    by_title = run_offline(single_venue, "repeated_blurb.xml").index_by(&:title)
+
+    # 5 events share the house blurb -> dropped despite each having a <description>.
+    %w[One Two Three Four Five].each do |n|
+      assert_nil by_title["Echo #{n}"].description,
+                 "a lead repeated across >= #{Scrapers::Ole::REPEAT_DROP_THRESHOLD} events is a house blurb"
+    end
+
+    # The festival blurb appears on only 2 days (below threshold) -> kept.
+    assert_equal "Das Glorpfest kehrt zurueck mit drei Tagen Programm.",
+                 by_title["Glorpfest Day One"].description
+    assert_equal "Das Glorpfest kehrt zurueck mit drei Tagen Programm.",
+                 by_title["Glorpfest Day Two"].description
+
+    # A unique per-event lead -> kept.
+    assert_equal "Original per-event copy that appears exactly once.",
+                 by_title["Wibble Trio"].description
+  end
+
   def test_past_shows_are_dropped_but_future_kept
     a = run_offline(single_venue, "single_page1.xml", "single_page2.xml").first
     # Only the 2026-07-01 show survives the 2020-01-15 drop.

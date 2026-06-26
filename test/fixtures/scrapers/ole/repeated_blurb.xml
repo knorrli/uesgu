@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Synthetic single-venue OLE feed exercising the repeated-house-blurb filter
+  (REPEAT_DROP_THRESHOLD). Invented taxonomy + names (project-test-synthetic-taxonomy).
+  Every event here carries a POPULATED <description> so it clears #description_present?
+  — that's the leak the frequency filter is for. Three lead shapes:
+    - "Echo One…Five": the same house blurb on 5 events  -> dropped (>= threshold).
+    - "Glorpfest" blurb on 2 festival days               -> kept (below threshold).
+    - "Wibble Trio": a unique per-event lead             -> kept.
+  All shows are future relative to the suite's pinned TODAY (2026-06-10).
+-->
+<export>
+  <meta>
+    <max_pages>1</max_pages>
+    <next_url></next_url>
+  </meta>
+  <events>
+    <event source_id="echo-1">
+      <name>Echo One</name>
+      <url>https://venue.example/events/echo-1</url>
+      <lead>Willkommen im Klangkeller, dem Ort fuer Musik seit 1987.</lead>
+      <description>Real populated description one.</description>
+      <shows><show source_id="echo-1-s"><date_start>2026-07-01T20:00:00+02:00</date_start></show></shows>
+      <categories><category>Zorpjazz</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+    <event source_id="echo-2">
+      <name>Echo Two</name>
+      <url>https://venue.example/events/echo-2</url>
+      <lead>Willkommen im Klangkeller, dem Ort fuer Musik seit 1987.</lead>
+      <description>Real populated description two.</description>
+      <shows><show source_id="echo-2-s"><date_start>2026-07-02T20:00:00+02:00</date_start></show></shows>
+      <categories><category>Zorpjazz</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+    <event source_id="echo-3">
+      <name>Echo Three</name>
+      <url>https://venue.example/events/echo-3</url>
+      <lead>Willkommen im Klangkeller, dem Ort fuer Musik seit 1987.</lead>
+      <description>Real populated description three.</description>
+      <shows><show source_id="echo-3-s"><date_start>2026-07-03T20:00:00+02:00</date_start></show></shows>
+      <categories><category>Zorpjazz</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+    <event source_id="echo-4">
+      <name>Echo Four</name>
+      <url>https://venue.example/events/echo-4</url>
+      <lead>Willkommen im Klangkeller, dem Ort fuer Musik seit 1987.</lead>
+      <description>Real populated description four.</description>
+      <shows><show source_id="echo-4-s"><date_start>2026-07-04T20:00:00+02:00</date_start></show></shows>
+      <categories><category>Zorpjazz</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+    <event source_id="echo-5">
+      <name>Echo Five</name>
+      <url>https://venue.example/events/echo-5</url>
+      <lead>Willkommen im Klangkeller, dem Ort fuer Musik seit 1987.</lead>
+      <description>Real populated description five.</description>
+      <shows><show source_id="echo-5-s"><date_start>2026-07-05T20:00:00+02:00</date_start></show></shows>
+      <categories><category>Zorpjazz</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+    <event source_id="fest-1">
+      <name>Glorpfest Day One</name>
+      <url>https://venue.example/events/fest-1</url>
+      <lead>Das Glorpfest kehrt zurueck mit drei Tagen Programm.</lead>
+      <description>Festival populated description one.</description>
+      <shows><show source_id="fest-1-s"><date_start>2026-07-10T18:00:00+02:00</date_start></show></shows>
+      <categories><category>Wibblecore</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+    <event source_id="fest-2">
+      <name>Glorpfest Day Two</name>
+      <url>https://venue.example/events/fest-2</url>
+      <lead>Das Glorpfest kehrt zurueck mit drei Tagen Programm.</lead>
+      <description>Festival populated description two.</description>
+      <shows><show source_id="fest-2-s"><date_start>2026-07-11T18:00:00+02:00</date_start></show></shows>
+      <categories><category>Wibblecore</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+    <event source_id="unique-1">
+      <name>Wibble Trio</name>
+      <url>https://venue.example/events/unique-1</url>
+      <lead>Original per-event copy that appears exactly once.</lead>
+      <description>Unique populated description.</description>
+      <shows><show source_id="unique-1-s"><date_start>2026-07-20T21:00:00+02:00</date_start></show></shows>
+      <categories><category>Bliptronica</category></categories>
+      <location><name>Klangkeller Saal</name><code>3011</code><locality>Bern</locality></location>
+    </event>
+  </events>
+</export>

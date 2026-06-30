@@ -83,7 +83,7 @@ group :test do
   # Pin to 5.x: minitest 6 extracted `Minitest::Mock`/`stub` into a separate,
   # version-skewed gem. Our golden/scraper suites lean on the built-in mock, so we
   # hold the stable framework rather than chase the unsettled major.
-  gem "minitest", "~> 5.25"
+  gem "minitest", "~> 6.0"
 end
 
 group :development do

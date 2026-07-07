@@ -358,9 +358,14 @@ venues:
   checked: 2026-07-07
 - domain: prozess.be
   name: PROZESS
+  # NOT js_only after all: the SPA hydrates from a clean JSON feed at
+  # https://prozess.be/content/content.json (a `programm` array of id/title/date/
+  # time). Held as `inactive` instead — currently dormant (summer Saisonpause + an
+  # "Ohni Bar kei Bühni" survival crowdfunding, only ~2 upcoming events) and with no
+  # genre/category field to music-gate on. Revisit once the autumn programme is up.
   disposition: reject
-  reason: js_only
-  checked: 2026-06-14
+  reason: inactive
+  checked: 2026-07-07
 - domain: refbern.ch
   name: Reformierte Kirchen Bern
   disposition: reject

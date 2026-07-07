@@ -349,9 +349,11 @@ venues:
     - nouveau-monde
 - domain: onobern.ch
   name: ONO
-  disposition: reject
-  reason: no_date
-  checked: 2026-06-14
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-07-07
 - domain: prozess.be
   name: PROZESS
   disposition: reject

@@ -11,6 +11,16 @@ updates:
     groups:
       ruby-minor-and-patch:
         update-types: [minor, patch]
+    # Hold minitest on 5.x. minitest 6 removed `minitest/mock` (the `Mock` class
+    # and `stub`) from core into a separate, version-skewed gem. Our golden/scraper
+    # suites rely on it (13 `.stub` sites), AND railties' own minitest plugin still
+    # hard-requires `minitest/mock` (railties 8.1.3 → LoadError on boot), so 6.0 is
+    # an ecosystem-wide wall, not just our code. See the pin + comment in the
+    # Gemfile, and closed PR #37. REMOVE THIS once Rails' minitest plugin no longer
+    # requires `minitest/mock`; then bump the pin and add the extracted mock gem.
+    ignore:
+      - dependency-name: minitest
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: "/"

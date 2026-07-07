@@ -319,9 +319,11 @@ venues:
   checked: 2026-06-21
 - domain: mokka.ch
   name: Café Bar Mokka
-  disposition: reject
-  reason: js_only
-  checked: 2026-06-14
+  disposition: consume
+  place:
+    city: Thun
+    canton: BE
+  checked: 2026-07-07
 - domain: muehlehunziken.ch
   name: Mühle Hunziken
   disposition: consume

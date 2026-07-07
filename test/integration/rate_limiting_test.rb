@@ -21,14 +21,20 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
   test "throttles a single IP past the per-minute limit" do
     limit = 60
 
-    limit.times do
-      get root_path, headers: CLIENT
-      assert_response :success
-    end
+    # Rack::Attack counts within fixed, clock-aligned period buckets
+    # (floor(now / period)). Freeze time so all limit+1 requests fall in ONE
+    # bucket — otherwise a burst that straddles a minute boundary resets the
+    # counter mid-run and the (limit+1)th request isn't throttled (flaky 200).
+    freeze_time do
+      limit.times do
+        get root_path, headers: CLIENT
+        assert_response :success
+      end
 
-    get root_path, headers: CLIENT
-    assert_response :too_many_requests
-    assert_equal "60", response.headers["Retry-After"]
+      get root_path, headers: CLIENT
+      assert_response :too_many_requests
+      assert_equal "60", response.headers["Retry-After"]
+    end
   end
 
   test "does not count fingerprinted asset requests toward the limit" do

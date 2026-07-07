@@ -307,9 +307,11 @@ venues:
   checked: 2026-06-21
 - domain: mariansjazzroom.ch
   name: Marians Jazzroom
-  disposition: reject
-  reason: js_only
-  checked: 2026-06-14
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-07-07
 - domain: mobilservice.ch
   name: Mobilservice
   disposition: reject

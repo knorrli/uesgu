@@ -31,6 +31,25 @@ module Scrapers
       self.robots = respect_robots
     end
 
+    # Mechanize consults robots.txt before every fetch, and webrobots (0.1.2)
+    # FAIL-CLOSES on a robots.txt it can't fetch: when the robots.txt request
+    # itself raises — a TLS handshake failure, a reset connection, a timeout — it
+    # fabricates a synthetic "Disallow: /" and Mechanize raises
+    # RobotsDisallowedError. That names robots.txt as the culprit even when the
+    # real fault lies elsewhere: Südpol served a wrong-host TLS cert on
+    # cms.sudpol.ch, the robots.txt fetch failed hostname verification, and the
+    # scrape surfaced as a phantom robots ban with no such rule anywhere in sight.
+    # webrobots stashes the swallowed fetch error, so re-raise IT and the run
+    # reports the true root cause. A GENUINE ban (a real Disallow, or a page-level
+    # noindex meta tag) carries no stashed error, so robots_error! is a no-op there
+    # and the honest RobotsDisallowedError still propagates unchanged.
+    def get(*args, &block)
+      super
+    rescue Mechanize::RobotsDisallowedError => e
+      agent.robots_error!(e.uri)
+      raise
+    end
+
     def self.call
       new.call
     end

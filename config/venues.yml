@@ -119,6 +119,13 @@ venues:
   disposition: reject
   reason: no_date
   checked: 2026-06-14
+- domain: cafete.ch
+  name: Cafete
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-07-09
 - domain: casinobern.ch
   name: Casino Bern
   disposition: reject

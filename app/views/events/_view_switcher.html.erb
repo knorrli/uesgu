@@ -1,7 +1,10 @@
 <%# Route-agnostic: links back to the current listing (events or saved_events)
     via url_for, preserving filter/state and just flipping ?view=. %>
 <% base = request.query_parameters.except('view', 'page', 'start_date', 'day') %>
-<nav class="view-switcher flex gap-small justify-end" aria-label="<%= t('events.index.view.label') %>">
+<%# Alignment is the caller's job: the events toolbar right-aligns it via its own
+    justify-end wrapper; the Merkliste header places it left-aligned below the
+    title. So this partial only lays the two links out in a row. %>
+<nav class="view-switcher flex gap-small" aria-label="<%= t('events.index.view.label') %>">
   <%= link_to t('events.index.view.list'), url_for(base.merge('view' => 'list', only_path: true)),
         class: class_names('view-switch__item', active: view != 'calendar') %>
   <%= link_to t('events.index.view.calendar'), url_for(base.merge('view' => 'calendar', only_path: true)),

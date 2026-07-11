@@ -5,12 +5,12 @@
 
 <div class="flex flex-col gap-large">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
-    <%# The view switcher only appears once there's something to look at — a brand
-        new shelf just shows the empty state, nothing to toggle between. %>
-    <div class="flex justify-between align-baseline wrap gap-medium">
-      <h1><%= t('saved_events.title') %></h1>
-      <% if @any_saved %><%= render 'events/view_switcher', view: @view %><% end %>
-    </div>
+    <h1><%= t('saved_events.title') %></h1>
+    <%# List / Kalender switcher on its own row below the title (left-aligned, not
+        inline beside it) so a long title can't clip it on narrow screens — mirrors
+        the notifications header. Only appears once there's something to toggle
+        between; a brand-new shelf just shows the empty state. %>
+    <% if @any_saved %><%= render 'events/view_switcher', view: @view %><% end %>
   <% end %>
 
   <%# Day-of reminder opt-in: a property of the saved-shows feature (it nudges you

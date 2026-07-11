@@ -2,21 +2,20 @@
 
 <div class="flex flex-col gap-large">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
-    <div class="notifications-header flex justify-between align-center gap-medium">
-      <h1><%= t('inbox.title') %></h1>
-      <%# Ungelesen | Gelesen — the shared flat-text toggle (.view-switch__item),
-          same component as the list/calendar switcher. Hidden until the user has
-          at least one notification (no point offering a read archive on a
-          never-used inbox). %>
-      <% if @read_count.positive? || @unread_count.positive? %>
-        <nav class="view-switcher flex" aria-label="<%= t('notifications.index.view_label') %>">
-          <%= link_to t('notifications.index.tab_unread'), notifications_path,
-                class: class_names('view-switch__item', active: !@show_read) %>
-          <%= link_to t('notifications.index.tab_read'), notifications_path(read: 1),
-                class: class_names('view-switch__item', active: @show_read) %>
-        </nav>
-      <% end %>
-    </div>
+    <h1><%= t('inbox.title') %></h1>
+    <%# Ungelesen | Gelesen — the shared flat-text toggle (.view-switch__item),
+        same component as the list/calendar switcher. On its own row below the
+        title (not inline beside it) so the long monospace heading can't shove it
+        off the right edge on narrow screens. Hidden until the user has at least
+        one notification (no point offering a read archive on a never-used inbox). %>
+    <% if @read_count.positive? || @unread_count.positive? %>
+      <nav class="view-switcher flex" aria-label="<%= t('notifications.index.view_label') %>">
+        <%= link_to t('notifications.index.tab_unread'), notifications_path,
+              class: class_names('view-switch__item', active: !@show_read) %>
+        <%= link_to t('notifications.index.tab_read'), notifications_path(read: 1),
+              class: class_names('view-switch__item', active: @show_read) %>
+      </nav>
+    <% end %>
   <% end %>
 
   <% if @notifications.any? %>

@@ -159,8 +159,20 @@ class Genre < ApplicationRecord
     DISPLAY_OVERRIDES[fingerprint_for(str)] || titleize_genre(str)
   end
 
+  # The leading/trailing noise a prose miner or sloppy scraper leaves welded to a
+  # token — sentence punctuation, quotes, brackets, a stray separator ("Virtuos."
+  # → "Virtuos", "…Bässe" → "Bässe"). It trims exactly the characters the
+  # fingerprint already discards (everything non-alphanumeric), so the match key
+  # is untouched and only the human-readable spelling gets cleaned. Unicode-aware:
+  # accented edge letters (Bässe, Éthérée) are alphanumeric and survive; interior
+  # separators (Post-Punk, Drum & Bass) are left alone. A token that is ALL noise
+  # (".", "…") trims to "" and is dropped by the blank guards in ensure! /
+  # canonicalize_names / Event#genre_list=.
+  GENRE_EDGE_NOISE = /\A[^[:alnum:]]+|[^[:alnum:]]+\z/
+
   def self.titleize_genre(str)
-    str.to_s.strip.split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
+    str.to_s.strip.gsub(GENRE_EDGE_NOISE, "")
+       .split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
   end
 
   # The genre names a picked-genre filter should match: every name in the picked
@@ -352,7 +364,9 @@ class Genre < ApplicationRecord
     representative = names.index_by { |name| fingerprint_for(name) } # fingerprint => a raw name
     existing = where(fingerprint: representative.keys).pluck(:fingerprint)
     (representative.keys - existing).each do |fingerprint|
-      create!(name: display_name_for(representative[fingerprint]))
+      display = display_name_for(representative[fingerprint])
+      next if display.blank? # an all-punctuation token ("...") normalizes to nothing
+      create!(name: display)
     rescue ActiveRecord::RecordNotUnique
       next # a concurrent insert or fingerprint race already created it
     end

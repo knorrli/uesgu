@@ -184,6 +184,7 @@ class Event < ApplicationRecord
   def genre_list=(value)
     super
     genre_list.replace(Genre.canonicalize_names(genre_list))
+    genre_list.reject!(&:blank?) # an all-punctuation token normalizes to "" — don't tag it
     blocked = Genre.blocked_fingerprints
     genre_list.reject! { |name| blocked.include?(Genre.fingerprint_for(name)) } if blocked.any?
   end

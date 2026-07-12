@@ -51,13 +51,13 @@ class GenresController < ApplicationController
   def queue
     @remaining = Genre.unplaced.count
     @genre = Genre.unplaced.by_usage.first
-    @alias_suggestions = @genre ? AliasSuggester.call(@genre) : []
+    load_suggestions
     @sample_events = sample_events_for(@genre)
   end
 
   def edit
     @genre = Genre.find(params[:id])
-    @alias_suggestions = AliasSuggester.call(@genre)
+    load_suggestions
     @sample_events = sample_events_for(@genre)
   end
 
@@ -117,6 +117,14 @@ class GenresController < ApplicationController
   def return_to
     to = params[:return_to].to_s
     to.start_with?("/") ? to : genres_path
+  end
+
+  # The two suggestion rows: tight Levenshtein near-spellings to merge, plus
+  # word-overlap "related genres" for filing (tighter parent / merge target).
+  # Related excludes anything already shown as an alias so the two never repeat.
+  def load_suggestions
+    @alias_suggestions = @genre ? AliasSuggester.call(@genre) : []
+    @related_suggestions = @genre ? RelatedGenreSuggester.call(@genre, exclude: @alias_suggestions.map(&:id)) : []
   end
 
   def sample_events_for(genre)

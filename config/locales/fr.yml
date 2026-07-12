@@ -321,6 +321,8 @@ fr:
       merge: Fusionner
       merge_into: "Fusionner avec un autre genre…"
       merge_suggested: "Fusionner avec un genre similaire"
+      related: "Genres apparentés"
+      set_as_parent: "Parent"
       appears_on: Apparaît sur
   admin:
     back: "Admin"

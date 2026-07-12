@@ -69,6 +69,23 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "treehidden", "disposed genres sit outside the tree"
   end
 
+  test "queue editor surfaces related genres with file + merge actions" do
+    # Exact names (not the suffixing `genre` helper) so 'flarn' really is a
+    # substring of 'flarnwave' — the relationship the suggester keys on.
+    Genre.create!(name: "Flarn", events_count: 1)                 # an existing stem
+    compound = Genre.create!(name: "Flarnwave", events_count: 99) # the queue head
+
+    get queue_genres_path
+
+    assert_response :success
+    assert_select ".genre-related" do
+      assert_select "h3", text: I18n.t("genres.editor.related")
+      assert_select ".genre-related__label", text: /Flarn/
+      assert_select "form[action=?]", set_parent_genre_path(compound) # file under it
+      assert_select "form[action=?]", merge_genre_path(compound)      # or merge into it
+    end
+  end
+
   test "index and edit render for an admin" do
     g = genre(events_count: 1)
     get genres_path

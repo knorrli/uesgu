@@ -321,6 +321,8 @@ de:
       merge: Zusammenführen
       merge_into: "Mit anderem Genre zusammenführen…"
       merge_suggested: "Mit ähnlichem Genre zusammenführen"
+      related: "Verwandte Genres"
+      set_as_parent: "Übergeordnet"
       appears_on: Erscheint bei
   admin:
     back: "Admin"

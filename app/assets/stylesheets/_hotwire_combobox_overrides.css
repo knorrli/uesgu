@@ -140,12 +140,6 @@ body {
     white-space: normal;
     overflow: visible;
   }
-  /* Never let the count wrap or shrink — it stays a one-line anchor on the right
-     while the name column takes the wrapping. */
-  .hw-combobox__dialog__listbox .genre-option-count {
-    flex: none;
-  }
-
   /* Our global `input[type="text"] { flex-grow: 1 }` (so inputs fill their flex
      ROW) also lands on the dialog's search input — but the dialog is a flex
      COLUMN, so there flex-grow stretches the input VERTICALLY (measured ~550px

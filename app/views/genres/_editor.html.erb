@@ -56,6 +56,33 @@
       <%= f.submit t('genres.editor.set_parent') %>
     <% end %>
 
+    <%# Related existing genres — the filing shortcut. Word-overlap matches (filing
+        "Grindpunk" surfaces "Grind", "Punk"), each shown with its tree path so you
+        can see it IS the precise parent you were after ("Grind · Metal › Grind").
+        One tap files this genre under it, or merges into it — answering "where does
+        this go?" without hunting the tree. Distinct from the spelling-distance
+        "did you mean" in the merge group below (which excludes these). %>
+    <% if related_suggestions.any? %>
+      <div class="flex flex-col gap-small genre-related">
+        <h3><%= t('genres.editor.related') %></h3>
+        <% related_suggestions.each do |candidate| %>
+          <div class="genre-related__row flex justify-between align-baseline gap-medium wrap">
+            <span class="genre-related__label">
+              <span class="genre-option-name"><%= candidate.name %></span>
+              <% path = genre_ancestor_label(candidate) %>
+              <% if path.present? %><span class="genre-option-path">· <%= path %></span><% end %>
+            </span>
+            <div class="flex gap-small genre-related__actions">
+              <%= button_to t('genres.editor.set_as_parent'), set_parent_genre_path(genre),
+                    params: { genre: { parent_genre_id: candidate.id }, return_to: return_to }, class: 'tag' %>
+              <%= button_to t('genres.editor.merge'), merge_genre_path(genre),
+                    params: { genre: { canonical_genre_id: candidate.id }, return_to: return_to }, class: 'tag' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <%# Three terminal dispositions besides "set parent" (the form above): ignore =
         keep the genre but leave it unfiled; hide = non-music, drop the event; block
         = scraper noise, strip the tag entirely. %>
@@ -98,7 +125,7 @@
           class: 'flex justify-between gap-medium wrap align-end genre-merge' do |f| %>
       <%= hidden_field_tag :return_to, return_to %>
       <div class="input-wrapper flex flex-grow">
-        <%= f.combobox :canonical_genre_id, merge_candidates,
+        <%= f.combobox :canonical_genre_id, genre_combobox_options(merge_candidates, preserve_order: true),
               placeholder: t('genres.editor.merge_into') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>

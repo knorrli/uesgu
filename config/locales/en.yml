@@ -321,6 +321,8 @@ en:
       merge: Merge
       merge_into: "Merge into another genre…"
       merge_suggested: "Merge into a similar genre"
+      related: "Related genres"
+      set_as_parent: "Parent"
       appears_on: Appears on
   admin:
     back: "Admin"

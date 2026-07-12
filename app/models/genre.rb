@@ -142,6 +142,24 @@ class Genre < ApplicationRecord
     counts
   end
 
+  # For every genre, the chain of ancestor NAMES from the root down to its
+  # immediate parent (empty for a root) — e.g. Grindcore under Metal → Grind
+  # yields ["Metal", "Grind"]. One query + an in-memory walk, so annotating a
+  # whole picker's worth of options with where-it-sits context costs nothing per
+  # row. Powers the tree-path suffix on the parent/merge pickers and the related-
+  # genre suggestions (see GenresHelper#genre_ancestor_label).
+  def self.ancestor_paths
+    rows      = pluck(:id, :parent_id, :name)
+    name_of   = rows.to_h { |id, _parent, name| [id, name] }
+    parent_of = rows.to_h { |id, parent, _name| [id, parent] }
+    paths = {}
+    build = lambda do |id|
+      paths[id] ||= (parent = parent_of[id]) ? build.call(parent) + [name_of[parent]] : []
+    end
+    parent_of.each_key { |id| build.call(id) }
+    paths
+  end
+
   # The normalized matching key. MUST reproduce the SQL `fingerprint` generated
   # column exactly (AddFingerprintToGenres) — verified by test. Used at ingest on
   # raw scraped strings that have no row to read the stored column off.

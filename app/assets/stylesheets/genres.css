@@ -69,20 +69,37 @@
   font-weight: bold;
 }
 
-/* Genre pickers that surface umbrellas — the editor's "set parent" picker and the
-   admin event editor's genre assignment — lay each option out as name (left) +
-   descendant count (right), so the umbrella genres (which also sort to the top)
-   read at a glance. Scoped to these two so other comboboxes are untouched. */
+/* Genre pickers that surface umbrellas — the editor's "set parent" + "merge"
+   pickers and the admin event editor's genre assignment — lay each option out as
+   name + its tree path (left) and descendant count (right), so you can read where
+   a candidate sits and how broad it is at a glance. Scoped to these pickers so
+   other comboboxes are untouched. */
 .genre-set-parent .hw-combobox__option,
+.genre-merge .hw-combobox__option,
 .genre-combobox .hw-combobox__option {
   display: flex;
   justify-content: space-between;
   gap: var(--gap-medium);
+  align-items: baseline;
+}
+
+/* Name + ancestor path share the left column and take any wrapping (the mobile
+   dialog wraps; the inline dropdown clips at its edge, inheriting the option's
+   own white-space); min-width:0 lets that column actually shrink in the flex row. */
+.genre-option-main {
+  min-width: 0;
+}
+
+.genre-option-path {
+  color: var(--theme-fg-muted);
+  font-size: 0.85em;
+  margin-left: var(--gap-xsmall);
 }
 
 .genre-option-count {
   color: var(--theme-fg-muted);
   font-size: 0.85em;
+  flex: none; /* a one-line anchor on the right; never wrap or shrink it */
 }
 
 /* Genre editor — separate the three task groups (file under a parent / merge /

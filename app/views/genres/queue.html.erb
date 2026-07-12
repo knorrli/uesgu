@@ -9,6 +9,7 @@
   <% if @genre %>
     <%= render 'genres/editor', genre: @genre,
           alias_suggestions: @alias_suggestions,
+          related_suggestions: @related_suggestions,
           sample_events: @sample_events, return_to: queue_genres_path %>
   <% else %>
     <p class="muted"><%= t('.empty') %></p>

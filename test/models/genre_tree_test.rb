@@ -23,6 +23,17 @@ class GenreTreeTest < ActiveSupport::TestCase
     assert_equal [a.id, a_child.id, b.id].sort, Genre.subtree_ids([a.id, b.id]).sort
   end
 
+  test "ancestor_paths gives each genre its root-to-parent name chain" do
+    rock = genre(name: "flux-rock")
+    punk = genre(name: "flux-punk");  punk.set_parent!(rock)
+    crust = genre(name: "flux-crust"); crust.set_parent!(punk)
+
+    paths = Genre.ancestor_paths
+    assert_equal [], paths[rock.id]                      # a root has no ancestors
+    assert_equal [rock.name], paths[punk.id]             # parent only
+    assert_equal [rock.name, punk.name], paths[crust.id] # root → parent, in order
+  end
+
   test "descendant_ids excludes self" do
     parent = genre(name: "flux-parent")
     child = genre(name: "flux-child"); child.set_parent!(parent)

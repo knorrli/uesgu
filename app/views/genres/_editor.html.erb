@@ -34,14 +34,13 @@
         Crustpunk → Punk). Blank = a top-level (root) genre. Parents exclude this
         genre and its own descendants (which would form a cycle) and any
         hidden/blocked/aliased genre. The parent-based successor to "Assign".
-        Ordered (via genre_combobox_options) by each candidate's descendant count,
-        also shown right-aligned in the dropdown, so the broad umbrella genres you
-        reach for most (Rock, Electronic …) — the ones that already have sub-genres
-        — sit at the top instead of being scattered alphabetically. The count is
-        render-only, so typing still filters on the name. %>
+        Rendered (via genre_tree_options) as the actual tree — umbrellas first,
+        their sub-genres nested and indented beneath them — so you can see the
+        hierarchy you're filing into and pick the right branch at a glance. The
+        indent/count is render-only, so typing still filters on the name. %>
     <% parent_candidates = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
                                 .where.not(id: [genre.id, *genre.descendant_ids]) %>
-    <% parent_options = genre_combobox_options(parent_candidates) %>
+    <% parent_options = genre_tree_options(parent_candidates) %>
     <%= form_with url: set_parent_genre_path(genre), method: :post, scope: :genre,
           class: 'flex justify-between gap-medium wrap align-end genre-set-parent' do |f| %>
       <%= hidden_field_tag :return_to, return_to %>
@@ -66,7 +65,7 @@
       <div class="flex flex-col gap-small genre-related">
         <h3><%= t('genres.editor.related') %></h3>
         <% related_suggestions.each do |candidate| %>
-          <div class="genre-related__row flex justify-between align-baseline gap-medium wrap">
+          <div class="genre-related__row">
             <span class="genre-related__label">
               <span class="genre-option-name"><%= candidate.name %></span>
               <% path = genre_ancestor_label(candidate) %>
@@ -85,11 +84,15 @@
 
     <%# Three terminal dispositions besides "set parent" (the form above): ignore =
         keep the genre but leave it unfiled; hide = non-music, drop the event; block
-        = scraper noise, strip the tag entirely. %>
-    <div class="flex gap-small wrap genre-dispositions">
-      <%= button_to t('genres.editor.ignore'), ignore_genre_path(genre), params: { return_to: return_to } %>
-      <%= button_to t('genres.editor.hide'), hide_genre_path(genre), params: { return_to: return_to } %>
-      <%= button_to t('genres.editor.block'), block_genre_path(genre), params: { return_to: return_to } %>
+        = scraper noise, strip the tag entirely. A quiet label sets them apart as
+        the "none of the above" escape hatches rather than a fourth filing option. %>
+    <div class="flex flex-col gap-small genre-dispositions-group">
+      <span class="muted genre-dispositions-label"><%= t('genres.editor.disposition_group') %></span>
+      <div class="flex gap-small wrap genre-dispositions">
+        <%= button_to t('genres.editor.ignore'), ignore_genre_path(genre), params: { return_to: return_to } %>
+        <%= button_to t('genres.editor.hide'), hide_genre_path(genre), params: { return_to: return_to } %>
+        <%= button_to t('genres.editor.block'), block_genre_path(genre), params: { return_to: return_to } %>
+      </div>
     </div>
   </div>
 
@@ -120,18 +123,20 @@
         valid target (the live event often carries the messy variant, leaving the
         clean canonical at count 0). Ordered most-used first. %>
     <% merge_candidates = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
-                               .where.not(id: genre.id).by_usage %>
+                               .where.not(id: genre.id) %>
     <%= form_with url: merge_genre_path(genre), method: :post, scope: :genre,
           class: 'flex justify-between gap-medium wrap align-end genre-merge' do |f| %>
       <%= hidden_field_tag :return_to, return_to %>
       <div class="input-wrapper flex flex-grow">
-        <%= f.combobox :canonical_genre_id, genre_combobox_options(merge_candidates, preserve_order: true),
+        <%= f.combobox :canonical_genre_id, genre_tree_options(merge_candidates),
               placeholder: t('genres.editor.merge_into') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>
         <% end %>
       </div>
-      <%= f.submit t('genres.editor.merge') %>
+      <%# Secondary (a <button>, not input[type=submit]) so the page keeps a single
+          filled primary — filing under a parent, the main curation act. %>
+      <%= f.button t('genres.editor.merge'), type: :submit %>
     <% end %>
   </div>
 

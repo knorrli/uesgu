@@ -323,6 +323,7 @@ fr:
       merge_suggested: "Fusionner avec un genre similaire"
       related: "Genres apparentés"
       set_as_parent: "Parent"
+      disposition_group: "Écarter"
       appears_on: Apparaît sur
   admin:
     back: "Admin"

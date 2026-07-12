@@ -323,6 +323,7 @@ en:
       merge_suggested: "Merge into a similar genre"
       related: "Related genres"
       set_as_parent: "Parent"
+      disposition_group: "Set aside"
       appears_on: Appears on
   admin:
     back: "Admin"

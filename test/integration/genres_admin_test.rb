@@ -86,6 +86,22 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "the set-parent picker renders the tree indented, umbrellas first" do
+    root  = genre(name: "flarnroot", events_count: 5)
+    child = genre(name: "flarnchild", events_count: 2, parent: root)
+    subject = genre(name: "flarnsubject", events_count: 9)
+
+    get edit_genre_path(subject)
+
+    assert_response :success
+    # The root sits at depth 0 (flush) and its sub-genre one level in — the tree
+    # is visible in the dropdown, not a flat alphabetical wall.
+    assert_select ".genre-set-parent .genre-tree-option[data-depth=0] .genre-option-name.umbrella",
+                  text: root.name
+    assert_select ".genre-set-parent .genre-tree-option[data-depth=1] .genre-option-name",
+                  text: child.name
+  end
+
   test "index and edit render for an admin" do
     g = genre(events_count: 1)
     get genres_path

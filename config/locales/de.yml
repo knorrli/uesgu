@@ -323,6 +323,7 @@ de:
       merge_suggested: "Mit ähnlichem Genre zusammenführen"
       related: "Verwandte Genres"
       set_as_parent: "Übergeordnet"
+      disposition_group: "Aussortieren"
       appears_on: Erscheint bei
   admin:
     back: "Admin"

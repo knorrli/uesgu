@@ -8,6 +8,36 @@
   padding: var(--gap-xsmall) var(--gap-small);
 }
 
+/* A quiet lead-in over the ignore/hide/block cluster, marking it off as the
+   "none of the above" escape hatches rather than a fourth way to file the genre.
+   Small caps-ish muted label, matching the section headings' quieter sibling. */
+.genre-dispositions-label {
+  font-size: var(--font-size-small);
+}
+
+/* Related-genre suggestions: a clean two-column list — name + its tree path on the
+   left, the file/merge actions pinned right — instead of a justify-between row that
+   zig-zagged (short labels kept the buttons inline, long ones bumped them to their
+   own line). minmax(0,1fr) lets the label column shrink and wrap so the actions
+   stay put on one axis; baseline keeps the name aligned to the buttons' text. */
+.genre-related__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--gap-small) var(--gap-medium);
+  align-items: baseline;
+}
+
+.genre-related__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Keep the two action chips together on the right, top-aligned with the label's
+   first line even when a long name wraps. */
+.genre-related__actions {
+  justify-content: flex-end;
+}
+
 /* Genre index tab groups: a short vertical rule separating the tree-status
    filters (all / placed / unplaced) from the parked dispositions. */
 .genre-status-filters .filter-divider {
@@ -69,18 +99,44 @@
   font-weight: bold;
 }
 
-/* Genre pickers that surface umbrellas — the editor's "set parent" + "merge"
-   pickers and the admin event editor's genre assignment — lay each option out as
-   name + its tree path (left) and descendant count (right), so you can read where
-   a candidate sits and how broad it is at a glance. Scoped to these pickers so
-   other comboboxes are untouched. */
-.genre-set-parent .hw-combobox__option,
-.genre-merge .hw-combobox__option,
+/* The admin event editor's genre-assignment picker lays each option out as name +
+   its tree path (left) and descendant count (right), so you can read where a
+   candidate sits and how broad it is at a glance. Scoped to this picker so other
+   comboboxes are untouched. (The genre editor's own "set parent" / "merge" pickers
+   use the indented .genre-tree-option layout below instead.) */
 .genre-combobox .hw-combobox__option {
   display: flex;
   justify-content: space-between;
   gap: var(--gap-medium);
   align-items: baseline;
+}
+
+/* The genre editor's "set parent" + "merge" pickers render the actual tree: each
+   option is its name (left), indented by its depth so a sub-genre sits visibly
+   under its umbrella, with a right-aligned descendant count for the umbrellas.
+   flex:1/min-width:0 fills the option row and lets the name shrink so the count
+   stays pinned right — including inside the mobile dialog, where the gem also
+   makes the option a flex row (so this is a flex item there). */
+.genre-tree-option {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--gap-medium);
+}
+
+/* Indent a nested genre one step per level of depth (capped at MAX_INDENT_DEPTH),
+   so the tree structure reads down the dropdown; roots sit flush at depth 0. */
+.genre-tree-option[data-depth="1"] { padding-left: 1.2em; }
+.genre-tree-option[data-depth="2"] { padding-left: 2.4em; }
+.genre-tree-option[data-depth="3"] { padding-left: 3.6em; }
+.genre-tree-option[data-depth="4"] { padding-left: 4.8em; }
+
+/* The umbrella genres (those with sub-genres) are the branches you file into most,
+   so bold them — they lead the list and anchor each indented subtree. */
+.genre-option-name.umbrella {
+  font-weight: bold;
 }
 
 /* Name + ancestor path share the left column and take any wrapping (the mobile

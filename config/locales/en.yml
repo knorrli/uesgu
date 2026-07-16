@@ -350,6 +350,7 @@ en:
         errors: "ok, with errors"
         empty: empty
         failed: failed
+        snoozed: snoozed
       run_status:
         running: running
         ok: all ok
@@ -360,6 +361,10 @@ en:
         started_one: "%{scraper} started — refresh in a few seconds to see the result."
         already_running: A scraper run is already in progress.
         unknown_scraper: Unknown scraper.
+      snooze:
+        snoozed: "%{scraper} snoozed for two weeks — it won't run or alert until then."
+      wake:
+        woke: "%{scraper} woken — it'll run again on the next sweep."
       index:
         title: Scraper runs
         trigger: Run scrapers now
@@ -368,6 +373,13 @@ en:
         auto_refreshing: auto-refreshing every 5s…
         run_one: Run
         run_one_title: "Run only %{scraper}"
+        snooze: Snooze 2 weeks
+        snooze_title: "Skip %{scraper} for two weeks — it re-runs automatically after"
+        snooze_confirm: "Snooze %{scraper} for two weeks? It'll be skipped by the nightly run and won't trigger failure alerts until then."
+        wake: Wake now
+        wake_title: "Resume %{scraper} on the next run"
+        snoozed_until: "until %{date}"
+        snoozed_tally: "%{count} snoozed"
         tally: "%{total} scrapers · %{ok} ok · %{empty} empty · %{failed} failed"
         took: "%{seconds}s"
         recent_runs: Recent runs

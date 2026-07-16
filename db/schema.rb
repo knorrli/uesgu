@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_16_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -176,6 +176,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_25_120000) do
     t.string "status", default: "running", null: false
     t.datetime "updated_at", null: false
     t.index ["started_at"], name: "index_scrape_runs_on_started_at"
+  end
+
+  create_table "scraper_snoozes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "scraper", null: false
+    t.datetime "snoozed_until", null: false
+    t.datetime "updated_at", null: false
+    t.index ["scraper"], name: "index_scraper_snoozes_on_scraper", unique: true
   end
 
   create_table "sessions", force: :cascade do |t|

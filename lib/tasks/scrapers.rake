@@ -79,19 +79,23 @@ namespace :scrapers do
 
     failed = run.scrape_results.failed.pluck(:scraper)
     dropped = run.dropped_to_zero
+    # Snoozed scrapers were skipped on purpose — never a failure — but note them
+    # so the cron log doesn't overstate coverage (and reminds you they're muted).
+    snoozed = run.scrape_results.snoozed.pluck(:scraper)
+    snoozed_note = snoozed.any? ? " · #{snoozed.size} snoozed (#{snoozed.join(', ')})" : ""
 
     if failed.any? || dropped.any?
       reasons = []
       reasons << "#{failed.size} FAILED (#{failed.join(', ')})" if failed.any?
       reasons << "#{dropped.size} DROPPED TO ZERO (#{dropped.join(', ')})" if dropped.any?
-      puts format("scrapers:run_all: %s of %d scrapers in %.1fs — see /admin/scrape_runs",
-                  reasons.join("; "), run.scrapers_total, run.duration)
+      puts format("scrapers:run_all: %s of %d scrapers in %.1fs%s — see /admin/scrape_runs",
+                  reasons.join("; "), run.scrapers_total, run.duration, snoozed_note)
       abort("scrapers:run_all finished with failures")
     elsif run.scrapers_empty.positive?
-      puts format("scrapers:run_all: all %d ran but %d produced no events in %.1fs — see /admin/scrape_runs",
-                  run.scrapers_total, run.scrapers_empty, run.duration)
+      puts format("scrapers:run_all: all %d ran but %d produced no events in %.1fs%s — see /admin/scrape_runs",
+                  run.scrapers_total, run.scrapers_empty, run.duration, snoozed_note)
     else
-      puts format("scrapers:run_all: all %d scrapers OK in %.1fs", run.scrapers_total, run.duration)
+      puts format("scrapers:run_all: all %d scrapers OK in %.1fs%s", run.scrapers_total, run.duration, snoozed_note)
     end
   end
 

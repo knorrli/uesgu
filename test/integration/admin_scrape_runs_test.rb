@@ -112,6 +112,49 @@ class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?][method=post]", admin_scrape_runs_path
   end
 
+  test "snoozing a scraper mutes it, and waking clears the snooze" do
+    sign_in_as user(admin: true)
+
+    assert_difference -> { ScraperSnooze.active.count }, 1 do
+      post snooze_admin_scrape_runs_path, params: { scraper: "bad_bonn" }
+    end
+    assert_redirected_to admin_scrape_runs_path
+    assert ScraperSnooze.active_by_slug.key?("bad_bonn")
+
+    assert_difference -> { ScraperSnooze.count }, -1 do
+      post wake_admin_scrape_runs_path, params: { scraper: "bad_bonn" }
+    end
+    assert_redirected_to admin_scrape_runs_path
+  end
+
+  test "snooze refuses an unknown scraper slug" do
+    sign_in_as user(admin: true)
+    assert_no_difference -> { ScraperSnooze.count } do
+      post snooze_admin_scrape_runs_path, params: { scraper: "no_such_venue" }
+    end
+    assert_redirected_to admin_scrape_runs_path
+  end
+
+  test "non-admins cannot snooze a scraper" do
+    sign_in_as user(admin: false)
+    assert_no_difference -> { ScraperSnooze.count } do
+      post snooze_admin_scrape_runs_path, params: { scraper: "bad_bonn" }
+    end
+    assert_response :forbidden
+  end
+
+  test "a snoozed scraper shows a Wake button and its snoozed status on the index" do
+    run = ScrapeRun.create!(started_at: Time.current, finished_at: Time.current, status: :finished)
+    run.scrape_results.create!(scraper: "bad_bonn", status: :snoozed)
+    ScraperSnooze.snooze!("bad_bonn")
+    sign_in_as user(admin: true)
+
+    get admin_scrape_runs_path
+    assert_response :success
+    assert_select "form[action=?]", wake_admin_scrape_runs_path
+    assert_select ".scrape-badge--snoozed"
+  end
+
   test "the admin dashboard links to scraper runs" do
     sign_in_as user(admin: true)
 

@@ -1,0 +1,16 @@
+<%# Per-scraper row actions. A live scraper can be run now or snoozed; a snoozed
+    one shows Wake instead, since snoozing already skips it from the sweep.
+    locals: (scraper:, snooze: nil) %>
+<span class="scrape-actions">
+  <% if snooze %>
+    <%= button_to t('admin.scrape_runs.index.wake'), wake_admin_scrape_runs_path,
+          params: { scraper: scraper }, class: 'button-small',
+          title: t('admin.scrape_runs.index.wake_title', scraper: scraper) %>
+  <% else %>
+    <%= render 'admin/scrape_runs/run_button', scraper: scraper %>
+    <%= button_to t('admin.scrape_runs.index.snooze'), snooze_admin_scrape_runs_path,
+          params: { scraper: scraper }, class: 'button-small',
+          title: t('admin.scrape_runs.index.snooze_title', scraper: scraper),
+          data: { turbo_confirm: t('admin.scrape_runs.index.snooze_confirm', scraper: scraper) } %>
+  <% end %>
+</span>

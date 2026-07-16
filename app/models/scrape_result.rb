@@ -4,7 +4,9 @@
 class ScrapeResult < ApplicationRecord
   belongs_to :scrape_run
 
-  enum :status, { ok: "ok", empty: "empty", failed: "failed" }
+  # snoozed = the sweep deliberately skipped this scraper (see ScraperSnooze), so
+  # it's neither a success nor a fault — kept out of the attention/alert paths.
+  enum :status, { ok: "ok", empty: "empty", failed: "failed", snoozed: "snoozed" }
 
   scope :attention, -> { where(status: %w[empty failed]) }
 

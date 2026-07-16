@@ -37,6 +37,18 @@ class ScrapeRunsPresenter
     result_for(latest, scraper)
   end
 
+  # {slug => ScraperSnooze} for the scrapers muted right now — drives the "until
+  # <date>" status and the Snooze/Wake button swap. Loaded once.
+  def active_snoozes
+    @active_snoozes ||= ScraperSnooze.active_by_slug
+  end
+
+  # Snoozed scrapers in a run: shown as a tally clause so the ok+empty+failed
+  # counts still reconcile against the scraper total.
+  def snoozed_count(run)
+    run.scrape_results.count(&:snoozed?)
+  end
+
   # Oldest → newest, so the strip reads left-to-right like a timeline. nil slots
   # are runs where this scraper produced no result.
   def history(scraper)

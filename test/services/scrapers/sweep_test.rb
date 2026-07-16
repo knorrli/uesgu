@@ -54,6 +54,33 @@ class Scrapers::SweepTest < ActiveSupport::TestCase
     assert_equal "empty", run.scrape_results.sole.status
   end
 
+  test "an actively-snoozed scraper is skipped and recorded snoozed, not run" do
+    CountingScraperHarness.next_rows = [{ url: "https://fixture.test/should-not-be-seen" }]
+    ScraperSnooze.snooze!("counting_scraper_harness")
+
+    run = sweep("CountingScraperHarness" => CountingScraperHarness)
+
+    result = run.scrape_results.sole
+    assert_equal "snoozed", result.status
+    # Skipped entirely: no site hit, no events, and — the point — not an alert.
+    assert_equal 0, result.created_count
+    assert_equal 0, run.scrapers_ok
+    assert_equal 0, run.scrapers_empty
+    assert_equal 0, run.scrapers_failed
+    refute run.needs_attention?
+    assert_equal 0, run.created_events.count
+  end
+
+  test "an expired snooze lets the scraper run again and is pruned" do
+    CountingScraperHarness.next_rows = [{ url: "https://fixture.test/a" }]
+    ScraperSnooze.create!(scraper: "counting_scraper_harness", snoozed_until: 1.day.ago)
+
+    run = sweep("CountingScraperHarness" => CountingScraperHarness)
+
+    assert_equal "ok", run.scrape_results.sole.status
+    assert_equal 0, ScraperSnooze.count, "expired snooze should be pruned during the sweep"
+  end
+
   test "a raising scraper is recorded failed, not fatal to the sweep" do
     failing = Class.new do
       def self.url = "https://fixture.test/down"

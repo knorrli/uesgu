@@ -286,10 +286,11 @@
         <span class="scrape-badge scrape-badge--empty">No results</span>
         <span class="scrape-badge scrape-badge--failed">2 failed</span>
         <span class="scrape-badge scrape-badge--running">Running</span>
+        <span class="scrape-badge scrape-badge--snoozed">Snoozed</span>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Status badge</span> · <code>.scrape-badge--{ok,empty,failed,running}</code>
-        <p class="sg-purpose">Scrape outcome, encoded by hue (green/amber/red/grey). The one place a solid green pill means "success" rather than "primary/selected".</p>
+        <span class="sg-spec__name">Status badge</span> · <code>.scrape-badge--{ok,empty,failed,running,snoozed}</code>
+        <p class="sg-purpose">Scrape outcome, encoded by hue (green/amber/red/grey). The one place a solid green pill means "success" rather than "primary/selected". Snoozed is grey — a deliberately skipped scraper, not a fault.</p>
       </div>
     </div>
   </section>

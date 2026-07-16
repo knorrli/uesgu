@@ -350,6 +350,7 @@ fr:
         errors: "ok, avec erreurs"
         empty: vide
         failed: échec
+        snoozed: en pause
       run_status:
         running: en cours
         ok: tout ok
@@ -360,6 +361,10 @@ fr:
         started_one: "%{scraper} lancé — actualise dans quelques secondes pour voir le résultat."
         already_running: Un passage des scrapers est déjà en cours.
         unknown_scraper: Scraper inconnu.
+      snooze:
+        snoozed: "%{scraper} mis en pause pour deux semaines — ne tourne ni n'alerte jusque-là."
+      wake:
+        woke: "%{scraper} réactivé — il tournera au prochain passage."
       index:
         title: Passages des scrapers
         trigger: Lancer les scrapers
@@ -368,6 +373,13 @@ fr:
         auto_refreshing: actualisation toutes les 5 s…
         run_one: Lancer
         run_one_title: "Lancer uniquement %{scraper}"
+        snooze: Pause 2 semaines
+        snooze_title: "Ignorer %{scraper} pendant deux semaines — il repart automatiquement ensuite"
+        snooze_confirm: "Mettre %{scraper} en pause deux semaines ? Il sera ignoré par le passage nocturne et ne déclenchera pas d'alerte jusque-là."
+        wake: Réactiver
+        wake_title: "Relancer %{scraper} au prochain passage"
+        snoozed_until: "jusqu'au %{date}"
+        snoozed_tally: "%{count} en pause"
         tally: "%{total} scrapers · %{ok} ok · %{empty} vides · %{failed} échecs"
         took: "%{seconds}s"
         recent_runs: Passages récents

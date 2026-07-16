@@ -39,10 +39,9 @@ class SavedFilter < ApplicationRecord
   validates :time_of_day, numericality: { in: 0..1439 }
   validates :weekday, inclusion: { in: 0..6 }, if: -> { cadence.in?(%w[weekly biweekly]) }
   validates :monthday, inclusion: { in: 1..28 }, if: -> { cadence == "monthly" }
-  # No unconstrained firehose: a rule must target *something* — some filter, or
-  # the live-favorites flag. (The "Notify me" button is also hidden on an empty
-  # filter; this is the backstop.)
-  validate :targets_something
+  # An empty filter is allowed on purpose: it's the "notify me about *every* new
+  # event" rule. With no criteria the matcher (Filter#ransack_query) resolves to
+  # "every visible event from today on", and describe() names it "Alle Events".
   # One saved filter per fingerprint: the save-from-events flow lands on the
   # existing filter instead of cloning (see SavedFiltersController#create),
   # and this enforces it on both create and edit. Duplicate fingerprints would
@@ -66,12 +65,6 @@ class SavedFilter < ApplicationRecord
   # so push/email can't ride on a digest that never fires — force them off. Mirrors
   # the editor's client-side disable (notify-channels controller).
   before_validation :silence_other_channels
-
-  def targets_something
-    return if queries.any? || genres.any? || location_list.any? || date_ranges.any?
-
-    errors.add(:base, I18n.t("saved_filters.errors.empty_filter"))
-  end
 
   def no_duplicate_filter
     return unless user

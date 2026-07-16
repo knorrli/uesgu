@@ -172,7 +172,6 @@ fr:
     type:
       added: Nouveautés
     errors:
-      empty_filter: Choisis d'abord un filtre (genre, lieu, date …).
       duplicate: Tu as déjà un filtre enregistré pour ça.
     new:
       title: Enregistrer un filtre
@@ -650,6 +649,7 @@ fr:
         list: Liste
         calendar: Calendrier
       save_filter: Enregistrer le filtre
+      save_filter_all: Me notifier de tout
       save_filter_saved: Enregistré — modifier
     day:
       empty: Aucun événement ce jour-là.

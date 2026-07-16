@@ -23,7 +23,7 @@ class EventsController < ApplicationController
     # present → the saved-filters menu's funnel is lit (filled) and its top item
     # edits that filter; nil → the menu offers to save the active filter as a new
     # draft (see _saved_filters_menu + SavedFilter.matching).
-    if current_user && @filter.active?
+    if current_user
       @saved_filter = current_user.saved_filters.matching(SavedFilter.fingerprint_for(@filter))
     end
     # The chip-row saved-filters menu (signed-in only) lists these to apply: each

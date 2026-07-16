@@ -1,17 +1,19 @@
 require "db_test_helper"
 
-# Locks the reframed web flow: the landing "Notify me" button (filter-gated), the
+# Locks the reframed web flow: the landing "Notify me" button (shown for any
+# signed-in user — an empty filter saves as the notify-on-everything rule), the
 # new-alert page (filter carried through + sync checkbox when it matches
-# favorites), create from filter params, the no-empty-firehose guard, the
-# read-only list, and fire/toggle/destroy. Email channel stays off.
+# favorites), create from filter params, the read-only list, and
+# fire/toggle/destroy. Email channel stays off.
 class SavedFiltersTest < ActionDispatch::IntegrationTest
   # --- landing-page button ---------------------------------------------------
 
-  test "the save action shows only with an active filter" do
+  test "the save action shows for a signed-in user, empty filter included" do
     sign_in_as user
 
+    # An empty filter still offers to save — it's the notify-on-everything rule.
     get events_path
-    assert_select "a.filter-menu__save", false, "no save on an empty filter"
+    assert_select "a.filter-menu__save"
 
     get events_path(g: ["Rock"])
     assert_select "a.filter-menu__save"
@@ -34,10 +36,10 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
                   events_path(q: [], g: ["Rock"], l: ["Bern"], d: [])
   end
 
-  test "no saved-filters menu without saved filters (empty filter) or when signed out" do
+  test "the saved-filters menu shows for any signed-in user, but never when signed out" do
     sign_in_as user
     get events_path
-    assert_select "details.filter-menu", false, "no menu with no active filter and none saved"
+    assert_select "details.filter-menu", true, "menu shows on an empty feed (save-everything)"
 
     reset! # drop the session → signed out
     get events_path
@@ -128,12 +130,14 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     refute r.notify_email?
   end
 
-  test "create rejects an empty firehose filter" do
+  test "create accepts an empty filter as the notify-on-everything rule" do
     u = sign_in_as user
-    assert_no_difference -> { u.saved_filters.count } do
+    assert_difference -> { u.saved_filters.count }, 1 do
       post saved_filters_path, params: { saved_filter: { cadence: "daily", time_string: "09:00" } }
     end
-    assert_response :unprocessable_entity # re-renders the editor with the error
+    assert_redirected_to saved_filters_path
+    r = u.saved_filters.last
+    assert_empty r.queries + r.genres + r.location_list + r.date_ranges, "no criteria => all events"
   end
 
   # --- one rule per filter set -----------------------------------------------

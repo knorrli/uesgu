@@ -172,7 +172,6 @@ en:
     type:
       added: New events
     errors:
-      empty_filter: Pick a filter first (genre, location, date …).
       duplicate: You already have a saved filter for this.
     new:
       title: Save a filter
@@ -650,6 +649,7 @@ en:
         list: List
         calendar: Calendar
       save_filter: Save this filter
+      save_filter_all: Notify me about everything
       save_filter_saved: Saved — edit
     day:
       empty: No events on this day.

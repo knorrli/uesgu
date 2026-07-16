@@ -51,7 +51,9 @@
         reserved min-height, see .filter-sheets__summary) and only its CONTENTS are
         conditional — so activating a filter fills the space already held instead of
         inserting a new row that shoves the toolbar + results down. ── %>
-    <% show_saved_menu = current_user.present? && (@filter.active? || @saved_filters.present?) %>
+    <%# Signed-in users always get the menu: even on an empty feed it offers to save
+        the all-events rule ("notify me about everything"). %>
+    <% show_saved_menu = current_user.present? %>
     <div class="<%= class_names('filter-sheets__summary', 'filter-sheets__summary--empty': !@filter.active? && !show_saved_menu) %>">
       <% if @filter.active? %>
         <div class="filter-sheets__summary-chips">

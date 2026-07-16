@@ -120,8 +120,14 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show destroy]
     resources :invitations, only: %i[index create destroy]
     # Scraper run oversight: nightly sweep health + per-venue outcomes. create
-    # triggers a full sweep on demand (runs in a background thread).
-    resources :scrape_runs, only: %i[index show create]
+    # triggers a full sweep on demand (runs in a background thread). snooze/wake
+    # mute a single flaky scraper for a while (self-expiring — see ScraperSnooze).
+    resources :scrape_runs, only: %i[index show create] do
+      collection do
+        post :snooze
+        post :wake
+      end
+    end
 
     # Discovery inbox: venues an aggregator surfaced that aren't approved in the
     # registry (VenueLead), ranked by upcoming-event demand. Read-only — approving

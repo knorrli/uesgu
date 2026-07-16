@@ -36,7 +36,16 @@ module Scrapers
 
     # Returns the finished ScrapeRun so the caller can decide exit status.
     def perform(run)
-      @scrapers.each { |name, klass| record(run, name.underscore, klass) }
+      ScraperSnooze.prune_expired!
+      snoozed = ScraperSnooze.active_by_slug
+      @scrapers.each do |name, klass|
+        slug = name.underscore
+        if (snooze = snoozed[slug])
+          skip(run, slug, snooze)
+        else
+          record(run, slug, klass)
+        end
+      end
 
       # Collapse cross-source duplicates (PETZI vs our bespoke scrapers) once every
       # scraper has run, before reconcile so the canonical's merged genres count.
@@ -51,6 +60,16 @@ module Scrapers
     end
 
     private
+
+    # A snoozed scraper: record it (so the admin page shows *why* the row is
+    # blank, rather than looking like a scraper that silently never ran) but
+    # don't touch the site. status: :snoozed keeps it out of both the failed and
+    # the drop-to-zero alert paths — the whole point of snoozing a flaky venue.
+    def skip(run, slug, snooze)
+      @out.puts "[#{slug}] SNOOZED until #{snooze.snoozed_until.iso8601} — skipping"
+      run.scrape_results.create!(scraper: slug, status: :snoozed,
+                                 started_at: Time.current, duration_ms: 0)
+    end
 
     def record(run, slug, klass)
       started = Time.current

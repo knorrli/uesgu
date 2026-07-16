@@ -25,6 +25,9 @@
       </h2>
       <p class="muted">
         <%= t('.tally', **@presenter.tally(latest)) %>
+        <% if (snoozed = @presenter.snoozed_count(latest)).positive? %>
+          · <%= t('.snoozed_tally', count: snoozed) %>
+        <% end %>
         <% if latest.running? %>
           · <%= t('.auto_refreshing') %>
         <% elsif latest.duration %>
@@ -53,7 +56,7 @@
               <% result = @presenter.latest_result(slug) %>
               <tr>
                 <td><%= slug %></td>
-                <td><%= render 'admin/scrape_runs/status', result: result %></td>
+                <td><%= render 'admin/scrape_runs/status', result: result, snooze: @presenter.active_snoozes[slug] %></td>
                 <td class="num"><%= result&.rows_seen %></td>
                 <td class="num"><%= result&.created_count %></td>
                 <td class="num"><%= result&.updated_count %></td>
@@ -73,7 +76,7 @@
                     <% end %>
                   </span>
                 </td>
-                <td><% unless @presenter.in_progress? %><%= render 'admin/scrape_runs/run_button', scraper: slug %><% end %></td>
+                <td><% unless @presenter.in_progress? %><%= render 'admin/scrape_runs/scraper_actions', scraper: slug, snooze: @presenter.active_snoozes[slug] %><% end %></td>
               </tr>
             <% end %>
           </tbody>

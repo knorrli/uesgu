@@ -1,6 +1,12 @@
-<%# Per-scraper status pill. nil = the scraper produced no result in this run. %>
-<%# locals: (result:) %>
-<% if result %>
+<%# Per-scraper status pill. nil result = the scraper produced nothing this run.
+    A snoozed scraper carries its wake date (from the live snooze, when passed).
+    locals: (result:, snooze: nil) %>
+<% if result&.snoozed? %>
+  <span class="scrape-badge scrape-badge--snoozed"><%= t('admin.scrape_runs.status.snoozed') %></span>
+  <% if snooze %>
+    <span class="muted"><%= t('admin.scrape_runs.index.snoozed_until', date: l(snooze.snoozed_until.to_date)) %></span>
+  <% end %>
+<% elsif result %>
   <span class="scrape-badge scrape-badge--<%= result.display_status %>"><%= t("admin.scrape_runs.status.#{result.display_status}") %></span>
 <% else %>
   <span class="muted">—</span>

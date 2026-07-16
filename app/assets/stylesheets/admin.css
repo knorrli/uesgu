@@ -256,6 +256,18 @@
   background: var(--theme-fg-muted);
 }
 
+/* Deliberately skipped (see ScraperSnooze): muted grey, never an alarm colour —
+   a snooze is an intentional state, not a fault. */
+.scrape-badge--snoozed {
+  background: var(--theme-fg-muted);
+}
+
+/* Run + Snooze (or the lone Wake) sit side by side in the row's action cell. */
+.scrape-actions {
+  display: inline-flex;
+  gap: var(--gap-xsmall);
+}
+
 .scrape-history {
   display: inline-flex;
   gap: 2px;
@@ -284,6 +296,10 @@
 
 .scrape-dot--failed {
   background: var(--color-red);
+}
+
+.scrape-dot--snoozed {
+  background: var(--theme-fg-muted);
 }
 
 /* A run where this scraper produced no result at all. */

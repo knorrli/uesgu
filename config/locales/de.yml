@@ -350,6 +350,7 @@ de:
         errors: "ok, mit Fehlern"
         empty: leer
         failed: fehlgeschlagen
+        snoozed: pausiert
       run_status:
         running: läuft
         ok: alles ok
@@ -360,6 +361,10 @@ de:
         started_one: "%{scraper} gestartet — in ein paar Sekunden neu laden, um das Ergebnis zu sehen."
         already_running: Ein Scraper-Lauf läuft bereits.
         unknown_scraper: Unbekannter Scraper.
+      snooze:
+        snoozed: "%{scraper} für zwei Wochen pausiert — läuft und alarmiert bis dahin nicht."
+      wake:
+        woke: "%{scraper} reaktiviert — läuft beim nächsten Durchlauf wieder."
       index:
         title: Scraper-Läufe
         trigger: Scraper jetzt starten
@@ -368,6 +373,13 @@ de:
         auto_refreshing: aktualisiert sich alle 5s…
         run_one: Starten
         run_one_title: "Nur %{scraper} starten"
+        snooze: 2 Wochen pausieren
+        snooze_title: "%{scraper} zwei Wochen überspringen — läuft danach automatisch wieder"
+        snooze_confirm: "%{scraper} zwei Wochen pausieren? Wird vom nächtlichen Lauf übersprungen und löst bis dahin keine Fehler-Alarme aus."
+        wake: Jetzt reaktivieren
+        wake_title: "%{scraper} beim nächsten Lauf wieder aktivieren"
+        snoozed_until: "bis %{date}"
+        snoozed_tally: "%{count} pausiert"
         tally: "%{total} Scraper · %{ok} ok · %{empty} leer · %{failed} fehlgeschlagen"
         took: "%{seconds}s"
         recent_runs: Letzte Läufe

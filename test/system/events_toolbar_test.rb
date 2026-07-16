@@ -1,9 +1,10 @@
 require "application_system_test_case"
 
 # The events toolbar (the list/calendar view switcher) and the chip-row
-# saved-filters menu — a funnel <details> dropdown that SAVES the active filter and
-# APPLIES a saved one. The toggle sits by the applied-filter chips whenever there's
-# something to do here; its items live in the dropdown panel. Desktop + phone.
+# saved-filters menu — a funnel <details> dropdown that SAVES the current filter and
+# APPLIES a saved one. The toggle sits by the applied-filter chips for any signed-in
+# user (an empty filter saves as the all-events rule); its items live in the dropdown
+# panel. Desktop + phone.
 class EventsToolbarTest < ApplicationSystemTestCase
   test "the saved-filters menu shows by the chips at all widths when a filter is active" do
     event(start_date: Date.current + 3, genre_list: ["Rock"])
@@ -34,12 +35,16 @@ class EventsToolbarTest < ApplicationSystemTestCase
     assert_no_selector ".save-filter-plus"
   end
 
-  test "no saved-filters menu when the filter is empty and none are saved" do
+  test "on an empty feed the menu offers the notify-on-everything save" do
     event(start_date: Date.current + 3)
     sign_in_as user
 
     visit events_path # no filter, no saved filters
 
-    assert_no_selector ".filter-menu"
+    # The funnel toggle still shows: opening it reveals the save item (the + badge)
+    # which saves the empty filter as the all-events rule.
+    assert_selector ".filter-menu__toggle .ph-funnel", visible: true
+    find(".filter-menu__toggle").click
+    assert_selector ".filter-menu__save .save-filter-plus", visible: true
   end
 end

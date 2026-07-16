@@ -2,7 +2,7 @@ require "db_test_helper"
 
 # Locks the reframed rule engine: a saved filter + schedule. Inference
 # (date window => happening, none => added), matched_events for both, live
-# favorites, due? scheduling, fire! snapshot, and the no-empty-firehose guard.
+# favorites, due? scheduling, fire! snapshot, and the empty=all-events rule.
 # Synthetic events/styles only (see taxonomy rule in db_test_helper).
 class SavedFilterTest < ActiveSupport::TestCase
   NOON = Time.zone.local(2030, 6, 3, 12, 0, 0).freeze # a Monday
@@ -141,8 +141,8 @@ class SavedFilterTest < ActiveSupport::TestCase
 
   # --- validations -----------------------------------------------------------
 
-  test "an empty filter is rejected" do
-    refute rule(user, filter: {}).valid?, "empty filter => invalid"
+  test "an empty filter is allowed — it's the notify-on-everything rule" do
+    assert rule(user, filter: {}).valid?, "empty filter => the all-events rule"
     assert rule(user, filter: { q: ["x"] }).valid?, "any filter is valid"
   end
 

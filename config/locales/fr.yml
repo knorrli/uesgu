@@ -679,6 +679,8 @@ fr:
       search_for: 'Rechercher « %{query} »'
       search_anything: Tape pour tout rechercher
       custom_range: Période personnalisée
+  shared:
+    cancel: Annuler
   helpers:
     page_entries_info:
       more_pages:

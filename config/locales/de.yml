@@ -679,6 +679,8 @@ de:
       search_for: 'Suchen nach „%{query}“'
       search_anything: Tippe, um nach allem zu suchen
       custom_range: Eigener Zeitraum
+  shared:
+    cancel: Abbrechen
   helpers:
     page_entries_info:
       more_pages:

@@ -679,6 +679,8 @@ en:
       search_for: 'Search for “%{query}”'
       search_anything: Type to search for anything
       custom_range: Custom range
+  shared:
+    cancel: Cancel
   helpers:
     page_entries_info:
       more_pages:

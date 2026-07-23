@@ -185,6 +185,7 @@ de:
     push_unavailable: Push in den Einstellungen aktivieren
     section_filter: Filter
     section_notifications: Benachrichtigungen
+    section_feed: Feed
     section_when: Wann
     schedule_label: Wie oft
     cadences:
@@ -216,6 +217,7 @@ de:
       notify_in_app: Benachrichtigungen in der App
       notify_push: Push auf meine Geräte
       notify_email: E-Mail an mich
+      highlight_in_feed: Im Feed hervorheben
   notification_mailer:
     digest:
       subject:

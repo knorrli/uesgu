@@ -202,7 +202,15 @@
   font-weight: normal;
 }
 
+/* Some venues (Cafete et al.) ship whole-flyer prose as the description; clamp
+   the display so a card stays card-sized. Display-only on purpose — the full
+   text stays stored (admin edit, future uses), nothing is cut at scrape time. */
 .event-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
   color: var(--theme-fg-muted);
   font-size: var(--font-size-small);
 }

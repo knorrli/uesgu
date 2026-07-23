@@ -185,6 +185,7 @@ fr:
     push_unavailable: active le push dans les réglages
     section_filter: Filtre
     section_notifications: Notifications
+    section_feed: Feed
     section_when: Quand
     schedule_label: À quelle fréquence
     cadences:
@@ -216,6 +217,7 @@ fr:
       notify_in_app: Notifications dans l'app
       notify_push: Push sur mes appareils
       notify_email: M'envoyer un e-mail
+      highlight_in_feed: Mettre en avant dans le feed
   notification_mailer:
     digest:
       subject:

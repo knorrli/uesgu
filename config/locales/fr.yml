@@ -130,6 +130,8 @@ fr:
     toggle: Enregistrer l'événement
     reminders_label: Me rappeler mes événements enregistrés
     reminders_hint: Un rappel vers midi le jour de l'événement enregistré — dans tes notifications, et par push ou e-mail si tu les as configurés.
+    calendar_feed_hint_html: Ta liste existe aussi en abonnement pour ton app calendrier — %{link}.
+    calendar_feed_link: à configurer dans les réglages
   copy_field:
     copy: Copier
     copied: Copié !

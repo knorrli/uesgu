@@ -44,6 +44,17 @@ class SavedEventsTest < ActionDispatch::IntegrationTest
     assert_select ".saved-reminder input[type=checkbox]"
   end
 
+  test "the saved-shows page points at the calendar subscription in Settings" do
+    u = sign_in_as user
+    get saved_events_path
+    assert_select "a[href=?]", settings_path(anchor: "calendar-feed"), false,
+                  "no calendar pointer before anything is saved"
+
+    u.event_saves.create!(event: event(start_date: Date.current + 3))
+    get saved_events_path
+    assert_select "a[href=?]", settings_path(anchor: "calendar-feed")
+  end
+
   test "index lists upcoming saved shows and hides past ones" do
     u = sign_in_as user
     upcoming = event(start_date: Date.current + 3, title: "Upcoming Save")

@@ -26,6 +26,15 @@
       </label>
       <p class="muted saved-reminder__hint"><%= t('saved_events.reminders_hint') %></p>
     </div>
+
+    <%# Calendar-subscription pointer (#64): the ICS feed of exactly this list
+        exists but lived only in Settings, where nobody looked for "calendar
+        export". Point from the list it carries; setup itself stays in Settings
+        (minting the token is a deliberate opt-in — the URL is a credential). %>
+    <p class="muted">
+      <%= t('saved_events.calendar_feed_hint_html',
+            link: link_to(t('saved_events.calendar_feed_link'), settings_path(anchor: 'calendar-feed'))).html_safe %>
+    </p>
   <% end %>
 
   <% if !@any_saved %>

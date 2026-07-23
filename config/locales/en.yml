@@ -130,6 +130,8 @@ en:
     toggle: Save show
     reminders_label: Remind me about my saved shows
     reminders_hint: A nudge around midday on the day of each saved show — in your notifications, and by push or email if you've set those up.
+    calendar_feed_hint_html: Your watchlist is also available as a subscription for your calendar app — %{link}.
+    calendar_feed_link: set it up in settings
   copy_field:
     copy: Copy
     copied: Copied!

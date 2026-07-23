@@ -29,8 +29,16 @@ module Scrapers
       content.css(".field-name-field-veranstalter").text.squish
     end
 
+    # The style field is a Drupal entity reference, but the venue's terms are
+    # themselves combined strings ("Crustpunk Hardcore / Speed Metal D-Beat Punk",
+    # "Darkmetal | Blackmetal", "Punkrock/Folk") — split each term on the
+    # separators the source actually uses ("/" and "|", spaced or not). NOT on
+    # whitespace: multi-word genres ("Speed Metal", "Punk Rock") are legitimate
+    # single tokens, and hyphens ("D-Punk", "Garage-Punk-n-Roll") stay intact.
     def event_genres(content)
-      content.css(".field-name-field-stil-taxo").text.split(" | ").compact_blank.map(&:squish)
+      content.css(".field-name-field-stil-taxo .field-item")
+             .flat_map { |item| item.text.split(%r{[/|]}) }
+             .map(&:squish).compact_blank
     end
 
     private

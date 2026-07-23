@@ -98,4 +98,26 @@ class InterestProfileTest < ActiveSupport::TestCase
     assert_not profile.any?
     assert_not profile.interesting?(event_with_genres("anything"))
   end
+
+  test "a filter with the highlight toggle off is skipped entirely" do
+    g = genre(name: "dubwave")
+    u = user
+    saved(u, g: [g.name]).update!(highlight_in_feed: false)
+
+    profile = InterestProfile.for(u)
+    assert_not profile.any?
+    assert_not profile.interesting?(event_with_genres(g.name))
+  end
+
+  test "the highlight toggle is per-filter: an off filter doesn't dim the others" do
+    on  = genre(name: "zapcore")
+    off = genre(name: "quietwave")
+    u = user
+    saved(u, g: [on.name])
+    saved(u, g: [off.name]).update!(highlight_in_feed: false)
+
+    profile = InterestProfile.for(u)
+    assert profile.interesting?(event_with_genres(on.name))
+    assert_not profile.interesting?(event_with_genres(off.name))
+  end
 end

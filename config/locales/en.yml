@@ -183,6 +183,7 @@ en:
     push_unavailable: turn on push in settings
     section_filter: Filter
     section_notifications: Notifications
+    section_feed: Feed
     section_when: When
     schedule_label: How often
     cadences:
@@ -214,6 +215,7 @@ en:
       notify_in_app: In-app notifications
       notify_push: Push to my devices
       notify_email: Email me
+      highlight_in_feed: Highlight in the feed
   notification_mailer:
     digest:
       subject:

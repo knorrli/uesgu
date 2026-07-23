@@ -99,7 +99,7 @@ class SavedFiltersController < ApplicationController
   def rule_params
     params.require(:saved_filter).permit(
       :name, :cadence, :weekday, :monthday, :time_string, :time_hour, :time_minute,
-      :notify_in_app, :notify_push, :notify_email
+      :notify_in_app, :notify_push, :notify_email, :highlight_in_feed
     )
   end
 

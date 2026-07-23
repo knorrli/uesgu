@@ -130,6 +130,19 @@
       </div>
     </fieldset>
 
+    <%# ── FEED ── the third consequence of saving a filter (#66): mark matches in
+        the feed (row flag, sidebar accent, calendar dots). Default ON; someone with
+        a broad scope-filter (canton + date) unticks it once so highlighting stays
+        reserved for taste. Independent of the channels above — no notify-channels
+        wiring, a silent filter can still highlight. %>
+    <fieldset class="saved-filter-fieldset flex flex-col gap-small">
+      <legend><%= t('saved_filters.section_feed') %></legend>
+      <label class="saved-filter-check flex gap-small">
+        <%= form.check_box :highlight_in_feed %>
+        <span><%= t('saved_filters.fields.highlight_in_feed') %></span>
+      </label>
+    </fieldset>
+
     <%# Explicit Save (the form commits everything at once); "Löschen" removes the
         rule. Delete is a turbo_method link (not button_to, which would nest a form). %>
     <div class="flex gap-small saved-filter-actions">

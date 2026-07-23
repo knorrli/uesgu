@@ -12,7 +12,9 @@
 #
 # exactly as Filter#ransack_query combines them, just without the date clause.
 # Filters with no taste dimension at all (a pure date window) are ignored, so an
-# "everything this weekend" rule never paints the whole list.
+# "everything this weekend" rule never paints the whole list. Filters with the
+# per-filter "Im Feed hervorheben" toggle off (highlight_in_feed, #66) are
+# skipped entirely — the owner has said this one is scope, not taste.
 class InterestProfile
   # One saved filter reduced to the lowercased sets we match against. Genres are
   # pre-expanded over the tree (a "Rock" filter carries "Shoegaze" et al.).
@@ -32,7 +34,7 @@ class InterestProfile
   def self.for(user)
     return EMPTY unless user
 
-    criteria = user.saved_filters.filter_map do |saved|
+    criteria = user.saved_filters.highlighting.filter_map do |saved|
       # Strip the date window: build a Filter from the taste dimensions only, reusing
       # its tree expansion so a parent-genre filter matches its descendants.
       filter = Filter.build(queries: saved.queries, genres: saved.genres,

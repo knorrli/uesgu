@@ -35,6 +35,13 @@ class SavedFilter < ApplicationRecord
   # also "anything that can fire". A saved filter with it off is a silent scope.
   scope :notifying, -> { where(notify_in_app: true) }
 
+  # Highlighting = this filter's matches get the interest treatment in the feed
+  # (row flag, sidebar accent, calendar dots — see InterestProfile). Per-filter
+  # and on by default; a broad scope-filter ("canton BE") gets unticked so it
+  # stops painting half the list. Orthogonal to the notification channels: a
+  # silent filter can highlight, a notifying one can stay unhighlighted.
+  scope :highlighting, -> { where(highlight_in_feed: true) }
+
   validates :cadence, inclusion: { in: CADENCES }
   validates :time_of_day, numericality: { in: 0..1439 }
   validates :weekday, inclusion: { in: 0..6 }, if: -> { cadence.in?(%w[weekly biweekly]) }

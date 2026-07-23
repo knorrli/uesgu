@@ -126,4 +126,16 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     ENV.delete("VAPID_PUBLIC_KEY")
     ENV.delete("VAPID_PRIVATE_KEY")
   end
+
+  test "unticking 'highlight in feed' persists (default is on)" do
+    visit edit_saved_filter_path(@rule)
+
+    box = find("input[type=checkbox][name='saved_filter[highlight_in_feed]']", visible: :all)
+    assert box.checked?, "highlight starts on (the DB default)"
+
+    box.click
+    find(".saved-filter-form input[type=submit]").click
+    assert_current_path saved_filters_path
+    assert_not @rule.reload.highlight_in_feed?, "the unticked toggle is persisted"
+  end
 end

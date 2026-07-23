@@ -154,7 +154,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/saint-stacy-2/",
+    "url": "https://schadaukonzerte.ch/lineup/saintstacy/#mokka-20260905",
     "start_time": "2026-09-05T17:30:00+02:00",
     "start_date": "2026-09-05",
     "title": "SAINT STACY",
@@ -336,34 +336,6 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/betriebsfreier-samstag-2/",
-    "start_time": "2026-06-12T21:00:00+02:00",
-    "start_date": "2026-06-12",
-    "title": "BETRIEBSFREIER FREITAG",
-    "description": "AUSATMEN VOR DER GROSSEN FAHRT! – WIR SIND AB DEM 17. JUNI WIEDER FÜR EUCH DA!",
-    "genre_list": [],
-    "location_list": [
-      "Café Bar Mokka",
-      "Thun",
-      "BE"
-    ],
-    "cancelled_at": false
-  },
-  {
-    "url": "https://mokka.ch/event/betriebsfreier-samstag/",
-    "start_time": "2026-06-13T21:00:00+02:00",
-    "start_date": "2026-06-13",
-    "title": "BETRIEBSFREIER SAMSTAG",
-    "description": "AUSATMEN VOR DER GROSSEN FAHRT! – WIR SIND AB DEM 17. JUNI WIEDER FÜR EUCH DA!",
-    "genre_list": [],
-    "location_list": [
-      "Café Bar Mokka",
-      "Thun",
-      "BE"
-    ],
-    "cancelled_at": false
-  },
-  {
     "url": "https://mokka.ch/event/sofa-sessions-mit-andri-baenziger-regula-hueppin/",
     "start_time": "2026-08-09T21:00:00+02:00",
     "start_date": "2026-08-09",
@@ -383,20 +355,6 @@
     "start_date": "2026-07-12",
     "title": "TINU OESCH & JULIEN PAILLARD",
     "description": "MUSIKALISCHE CARTOON-LESUNG: «FLEISCHESLUST»",
-    "genre_list": [],
-    "location_list": [
-      "Café Bar Mokka",
-      "Thun",
-      "BE"
-    ],
-    "cancelled_at": false
-  },
-  {
-    "url": "https://mokka.ch/event/23957/",
-    "start_time": "2026-08-14T21:00:00+02:00",
-    "start_date": "2026-08-14",
-    "title": "",
-    "description": null,
     "genre_list": [],
     "location_list": [
       "Café Bar Mokka",
@@ -518,7 +476,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/migi-ruben/",
+    "url": "https://amschluss.ch/lineup/migi-ruben/#mokka-20260801",
     "start_time": "2026-08-01T21:00:00+02:00",
     "start_date": "2026-08-01",
     "title": "MIGI & RUBÉN",
@@ -532,7 +490,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/moictani/",
+    "url": "https://amschluss.ch/lineup/moictani/#mokka-20260731",
     "start_time": "2026-07-31T21:00:00+02:00",
     "start_date": "2026-07-31",
     "title": "MOICTANI",
@@ -546,7 +504,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/omar-dahl/",
+    "url": "https://amschluss.ch/lineup/omar-dahl/#mokka-20260725",
     "start_time": "2026-07-25T21:00:00+02:00",
     "start_date": "2026-07-25",
     "title": "OMAR DAHL",
@@ -560,7 +518,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/bon-jour/",
+    "url": "https://amschluss.ch/lineup/bon-jour/#mokka-20260724",
     "start_time": "2026-07-24T21:00:00+02:00",
     "start_date": "2026-07-24",
     "title": "BON JOUR",
@@ -574,7 +532,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/bohemian-betyars/",
+    "url": "https://amschluss.ch/lineup/bohemian-betyars/#mokka-20260802",
     "start_time": "2026-08-02T21:00:00+02:00",
     "start_date": "2026-08-02",
     "title": "BOHEMIAN BETYARS",
@@ -588,7 +546,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/megaloh-band/",
+    "url": "https://amschluss.ch/lineup/megaloh-band/#mokka-20260801",
     "start_time": "2026-08-01T21:00:00+02:00",
     "start_date": "2026-08-01",
     "title": "MEGALOH & BAND",
@@ -602,7 +560,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/worries-other-plants/",
+    "url": "https://amschluss.ch/lineup/worries-and-other-plants/#mokka-20260731",
     "start_time": "2026-07-31T21:00:00+02:00",
     "start_date": "2026-07-31",
     "title": "WORRIES & OTHER PLANTS",
@@ -616,7 +574,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/sababa-5-2/",
+    "url": "https://amschluss.ch/lineup/sababa5/#mokka-20260731",
     "start_time": "2026-07-31T21:00:00+02:00",
     "start_date": "2026-07-31",
     "title": "SABABA 5",
@@ -630,7 +588,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/mind-enterprises-2/",
+    "url": "https://amschluss.ch/lineup/mind-enterprises/#mokka-20260730",
     "start_time": "2026-07-30T21:00:00+02:00",
     "start_date": "2026-07-30",
     "title": "MIND ENTERPRISES",
@@ -644,7 +602,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/cordoba78-2/",
+    "url": "https://amschluss.ch/lineup/cordoba78/#mokka-20260729",
     "start_time": "2026-07-29T21:00:00+02:00",
     "start_date": "2026-07-29",
     "title": "CORDOBA78",
@@ -658,7 +616,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/kefaya-elaha-soroor/",
+    "url": "https://amschluss.ch/lineup/kefaya-elaha-soroor/#mokka-20260728",
     "start_time": "2026-07-28T21:00:00+02:00",
     "start_date": "2026-07-28",
     "title": "KEFAYA & ELAHA SOROOR",
@@ -672,7 +630,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/nana-benz-du-togo/",
+    "url": "https://amschluss.ch/lineup/nana-benz-du-togo/#mokka-20260727",
     "start_time": "2026-07-27T21:00:00+02:00",
     "start_date": "2026-07-27",
     "title": "NANA BENZ DU TOGO",
@@ -686,7 +644,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/manillio-4/",
+    "url": "https://amschluss.ch/lineup/manillio/#mokka-20260726",
     "start_time": "2026-07-26T21:00:00+02:00",
     "start_date": "2026-07-26",
     "title": "MANILLIO",
@@ -700,7 +658,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/bombino/",
+    "url": "https://amschluss.ch/lineup/bombino/#mokka-20260725",
     "start_time": "2026-07-25T21:00:00+02:00",
     "start_date": "2026-07-25",
     "title": "BOMBINO",
@@ -714,7 +672,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/kochkraft-durch-kma-2/",
+    "url": "https://amschluss.ch/lineup/samora-reggae-voices/#mokka-20260724",
     "start_time": "2026-07-24T21:00:00+02:00",
     "start_date": "2026-07-24",
     "title": "SAMORA PRESENTS FEMALE REGGAE VOICES",
@@ -728,7 +686,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/kochkraft-durch-kma/",
+    "url": "https://amschluss.ch/lineup/kochkraft-durch-kma/#mokka-20260723",
     "start_time": "2026-07-23T21:00:00+02:00",
     "start_date": "2026-07-23",
     "title": "KOCHKRAFT DURCH KMA",
@@ -742,7 +700,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/stereo-luchs-2/",
+    "url": "https://amschluss.ch/lineup/stereo-luchs/#mokka-20260722",
     "start_time": "2026-07-22T21:00:00+02:00",
     "start_date": "2026-07-22",
     "title": "STEREO LUCHS",
@@ -896,34 +854,6 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/23805/",
-    "start_time": "2026-12-01T21:00:00+01:00",
-    "start_date": "2026-12-01",
-    "title": "",
-    "description": null,
-    "genre_list": [],
-    "location_list": [
-      "Café Bar Mokka",
-      "Thun",
-      "BE"
-    ],
-    "cancelled_at": false
-  },
-  {
-    "url": "https://mokka.ch/event/23804/",
-    "start_time": "2026-11-01T21:00:00+01:00",
-    "start_date": "2026-11-01",
-    "title": "",
-    "description": null,
-    "genre_list": [],
-    "location_list": [
-      "Café Bar Mokka",
-      "Thun",
-      "BE"
-    ],
-    "cancelled_at": false
-  },
-  {
     "url": "https://mokka.ch/event/quiz-night-im-garten/",
     "start_time": "2026-08-21T21:00:00+02:00",
     "start_date": "2026-08-21",
@@ -1022,35 +952,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/23738/",
-    "start_time": "2026-10-01T21:00:00+02:00",
-    "start_date": "2026-10-01",
-    "title": "",
-    "description": null,
-    "genre_list": [],
-    "location_list": [
-      "Café Bar Mokka",
-      "Thun",
-      "BE"
-    ],
-    "cancelled_at": false
-  },
-  {
-    "url": "https://mokka.ch/event/23737/",
-    "start_time": "2026-09-01T21:00:00+02:00",
-    "start_date": "2026-09-01",
-    "title": "",
-    "description": null,
-    "genre_list": [],
-    "location_list": [
-      "Café Bar Mokka",
-      "Thun",
-      "BE"
-    ],
-    "cancelled_at": false
-  },
-  {
-    "url": "https://mokka.ch/event/soundyoga-20/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260912",
     "start_time": "2026-09-12T21:00:00+02:00",
     "start_date": "2026-09-12",
     "title": "SOUNDYOGA",
@@ -1064,7 +966,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-19/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260905",
     "start_time": "2026-09-05T21:00:00+02:00",
     "start_date": "2026-09-05",
     "title": "SOUNDYOGA",
@@ -1078,7 +980,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-18/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260829",
     "start_time": "2026-08-29T21:00:00+02:00",
     "start_date": "2026-08-29",
     "title": "SOUNDYOGA",
@@ -1092,7 +994,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-17/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260822",
     "start_time": "2026-08-22T21:00:00+02:00",
     "start_date": "2026-08-22",
     "title": "SOUNDYOGA",
@@ -1106,7 +1008,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-16/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260815",
     "start_time": "2026-08-15T21:00:00+02:00",
     "start_date": "2026-08-15",
     "title": "SOUNDYOGA",
@@ -1120,7 +1022,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-15/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260801",
     "start_time": "2026-08-01T21:00:00+02:00",
     "start_date": "2026-08-01",
     "title": "SOUNDYOGA",
@@ -1134,7 +1036,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-14/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260725",
     "start_time": "2026-07-25T21:00:00+02:00",
     "start_date": "2026-07-25",
     "title": "SOUNDYOGA",
@@ -1148,7 +1050,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-13/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260711",
     "start_time": "2026-07-11T21:00:00+02:00",
     "start_date": "2026-07-11",
     "title": "SOUNDYOGA",
@@ -1162,7 +1064,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-12/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260704",
     "start_time": "2026-07-04T21:00:00+02:00",
     "start_date": "2026-07-04",
     "title": "SOUNDYOGA",
@@ -1176,7 +1078,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-11/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260627",
     "start_time": "2026-06-27T21:00:00+02:00",
     "start_date": "2026-06-27",
     "title": "SOUNDYOGA",
@@ -1190,7 +1092,7 @@
     "cancelled_at": false
   },
   {
-    "url": "https://mokka.ch/event/soundyoga-10/",
+    "url": "https://www.yogabude.ch/soundyoga#mokka-20260620",
     "start_time": "2026-06-20T21:00:00+02:00",
     "start_date": "2026-06-20",
     "title": "SOUNDYOGA",

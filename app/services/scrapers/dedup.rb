@@ -7,6 +7,16 @@ module Scrapers
   # unioned onto it. Duplicates are never deleted — bookmarks stay intact — just
   # hidden by Event.visible.
   #
+  # ONE source can also list one show twice — a venue double-posting on an
+  # aggregator (Köniz posted the same Salsa night twice on Bewegungsmelder,
+  # distinct post ids → distinct upsert keys), or a scraper's URL scheme change
+  # stranding the old-keyed copy next to the freshly-keyed one. Those fold too,
+  # but only on the IDENTICAL start time: two same-titled events at different
+  # times on one day are genuinely distinct happenings (ONO lists a 15:00
+  # workshop and a 20:00 concert under one title — see #59), while cross-source
+  # copies keep date-level matching because different sources routinely disagree
+  # on doors-vs-show time for the same gig.
+  #
   # Source authority (most authoritative wins the canonical, see #source_rank).
   # We rank by which copy links most DIRECTLY to the venue's own event page:
   #   OLE  — venue-published, structured, links to the venue's OWN page; the
@@ -34,12 +44,14 @@ module Scrapers
 
     private
 
-    # Every venue where more than one source can land an event: the PETZI member
-    # venues plus the venues with their own single-venue OLE feed. Both come from the
-    # registry — adding an OLE feed or a PETZI member is enough, no list to maintain.
+    # Every venue we consume, plus the PETZI members — all from the registry, no
+    # list to maintain. (Was only the venues where a SECOND source could land an
+    # event, but same-source double-posts happen at any venue — the Köniz case —
+    # so every venue gets the pass; one small query per venue, nightly.) A
+    # registry row that never becomes a location tag (an aggregator's own row,
+    # e.g. Bewegungsmelder) simply matches no events and is a no-op.
     def dedup_venues
-      ole = Venue.consuming.select { |v| v.ole_feeds.any? { |s| !s.aggregator_feed? } }.map(&:name)
-      (Petzi.venues.values.map(&:first) + ole).uniq
+      (Petzi.venues.values.map(&:first) + Venue.consuming.map(&:name)).uniq
     end
 
     # All future, non-dismissed events for this venue, processed in descending
@@ -50,7 +62,11 @@ module Scrapers
       events = Event.kept.where(start_date: Date.current..).tagged_with(venue, on: :locations).to_a
       return if events.size < 2
 
-      ranked     = events.sort_by { |e| [source_rank(e), e.id] }
+      # Within one rank the NEWEST copy is preferred as canonical: for a true
+      # double-post either copy would do, but for a re-keyed strand (a scraper's
+      # URL scheme changed — Mokka #55, Südpol #56) the newer row carries the
+      # working link while the stale one folds away beneath it.
+      ranked     = events.sort_by { |e| [source_rank(e), -e.id] }
       canonicals = []
 
       ranked.each do |e|
@@ -102,11 +118,14 @@ module Scrapers
 
     # Best canonical for an event: same date, highest title similarity, accepting a
     # subset relationship (our club scrapers truncate "Darkside" where the feed
-    # lists the full DJ lineup) or Jaccard >= threshold.
+    # lists the full DJ lineup) or Jaccard >= threshold. A same-source candidate
+    # must additionally share the exact start TIME (see the class comment: a
+    # double-post is identical; a same-titled show at another hour is a second,
+    # real happening).
     def best_match(event, candidates)
       bt = tokens(event.title)
       scored = candidates
-               .select { |c| c.start_date == event.start_date }
+               .select { |c| c.start_date == event.start_date && time_compatible?(event, c) }
                .map do |c|
                  ct = tokens(c.title)
                  subset = !bt.empty? && !ct.empty? && (bt.subset?(ct) || ct.subset?(bt))
@@ -116,6 +135,15 @@ module Scrapers
       return nil unless best
 
       (best[:jaccard] >= MATCH_THRESHOLD || best[:subset]) ? best[:event] : nil
+    end
+
+    # Cross-source copies match on the date alone (sources disagree on doors vs
+    # show time); a same-source pair is only a duplicate when the start time is
+    # identical too.
+    def time_compatible?(event, candidate)
+      return true if candidate.data_source != event.data_source
+
+      candidate.start_time == event.start_time
     end
 
     def jaccard(a, b)

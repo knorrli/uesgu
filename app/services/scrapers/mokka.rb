@@ -44,8 +44,28 @@ module Scrapers
       rows
     end
 
+    # The WP `link` permalink only actually renders when the venue enables the
+    # detail page (ACF has_detail_page) — external co-promotions (the Schadau-
+    # Konzerte series etc.) keep it false, so their /event/<slug>/ permalink
+    # 404s while the site links them out via the ACF external_link instead.
+    # Mirror the site: own page when it exists, else the external link — with
+    # the event date as a fragment so two shows sharing one external target
+    # (a real case: one festival page for several nights) keep distinct upsert
+    # keys, like OLE's occurrence URLs. Neither present → nil, and the base
+    # skips the row (those are title-less placeholder posts).
     def event_url(row)
-      row["link"].presence
+      return row["link"].presence if row.dig("acf", "has_detail_page")
+
+      external = row.dig("acf", "external_link")
+      url = external.is_a?(Hash) ? external["url"].presence : nil
+      url && "#{url}#mokka-#{row.dig('acf', 'event_date')}"
+    end
+
+    # Own detail pages live on mokka.ch, but external co-promotions legitimately
+    # link out to the partner's site, so the golden's URL-shape assertion can
+    # only pin the scheme here.
+    def self.event_url_pattern
+      %r{\Ahttps://}
     end
 
     # ACF `event_date` is "YYYYMMDD"; `event_start` is "HH.MM Uhr" (dot separator).

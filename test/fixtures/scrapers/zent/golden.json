@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "url": "https://restaurant-zent.ch/kulturprogramm/fete-d-ete",
+    "start_time": "2026-07-23T18:30:00+02:00",
+    "start_date": "2026-07-23",
+    "title": "Fête D'Été",
+    "description": null,
+    "genre_list": [],
+    "location_list": [
+      "Zent",
+      "Bern",
+      "BE"
+    ],
+    "cancelled_at": false
+  }
+]

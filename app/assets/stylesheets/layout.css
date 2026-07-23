@@ -170,7 +170,9 @@
   width: 100%;
   max-width: var(--content-max-width);
   margin-inline: auto;
-  padding: var(--gap-large) var(--content-padding);
+  /* Wider inline inset than --content-padding on purpose: the footer's small
+     links sat too close to the viewport edge on phones (#63). */
+  padding: var(--gap-large);
   border-top: var(--border-width) solid var(--border-color);
   font-size: var(--font-size-small);
 }

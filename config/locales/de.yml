@@ -130,6 +130,8 @@ de:
     toggle: Veranstaltung speichern
     reminders_label: An gespeicherte Veranstaltungen erinnern
     reminders_hint: Ein Hinweis um die Mittagszeit am Tag der gespeicherten Veranstaltung — in deinen Benachrichtigungen, und per Push oder E-Mail, falls eingerichtet.
+    calendar_feed_hint_html: Die Merkliste gibts auch als Abo für deine Kalender-App — %{link}.
+    calendar_feed_link: in den Einstellungen einrichten
   copy_field:
     copy: Kopieren
     copied: Kopiert!

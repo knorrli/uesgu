@@ -192,8 +192,8 @@ en:
       monthly: Monthly
     monthday_option: "On the %{day}."
     push_body:
-      one: "%{name}: 1 new event. Tap to view."
-      other: "%{name}: %{count} new events. Tap to view."
+      one: "%{name}: 1 new event."
+      other: "%{name}: %{count} new events."
     channels:
       in_app: App
       push: Push

@@ -143,15 +143,16 @@
       </label>
     </fieldset>
 
-    <%# Explicit Save (the form commits everything at once); "Löschen" removes the
-        rule. Delete is a turbo_method link (not button_to, which would nest a form). %>
-    <div class="flex gap-small saved-filter-actions">
-      <%= form.submit t('saved_filters.save_button'), class: 'button-small primary' %>
+    <%# Explicit Save (the form commits everything at once) + Abbrechen via the
+        shared actions row; "Löschen" rides along in the block, pushed to the far
+        end. Delete is a turbo_method link (not button_to, which would nest a form). %>
+    <%= render layout: 'shared/form_actions',
+          locals: { form: form, submit_label: t('saved_filters.save_button'), cancel_path: saved_filters_path } do %>
       <% if rule.persisted? %>
         <%= link_to t('saved_filters.delete'), saved_filter_path(rule),
               class: 'button-small danger',
               data: { turbo_method: :delete, turbo_confirm: t('saved_filters.delete_confirm') } %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
 </div>

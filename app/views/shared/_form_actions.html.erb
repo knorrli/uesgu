@@ -1,0 +1,14 @@
+<%# The standard closing row of a task-style form (one you enter, then finish or
+    abandon): the primary submit plus an explicit "Abbrechen" that navigates back
+    without saving — so backing out never depends on finding the page header's
+    back link again (#65). Render with `render layout:` when the form also carries
+    extra actions (e.g. the saved-filter form's danger delete); the block's
+    content lands after the pair, and anything .danger/.delete is pushed to the
+    row's far end by the CSS. Label i18n inside a block must use ABSOLUTE keys
+    (see the page_header gotcha). %>
+<%# locals: (form:, submit_label:, cancel_path:) %>
+<div class="form-actions">
+  <%= form.submit submit_label, class: 'button-small primary' %>
+  <%= link_to t('shared.cancel'), cancel_path, class: 'button-small' %>
+  <%= yield if block_given? %>
+</div>

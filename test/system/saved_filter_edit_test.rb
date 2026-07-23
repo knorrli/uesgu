@@ -56,6 +56,21 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     assert_includes @rule.genres, @genre.name
   end
 
+  test "Abbrechen leaves the editor without saving applied edits" do
+    visit edit_saved_filter_path(@rule)
+
+    # Stage a pick and Apply it into the form — but abandon instead of Save.
+    find(".filter-trigger[data-filter-sheets-field-param='what']").click
+    find(".sheet[data-field=what] .opt--canton", text: @root.name).click
+    find(".sheet[data-field=what] .sheet__apply").click
+    # The shared actions row: submit + cancel link (+ danger delete). The cancel
+    # link is the non-danger anchor.
+    find(".form-actions > a.button-small:not(.danger)").click
+
+    assert_current_path saved_filters_path
+    refute_includes @rule.reload.genres, @root.name
+  end
+
   test "the What free-text row stages a typed query, persisted on Save" do
     visit edit_saved_filter_path(@rule)
 

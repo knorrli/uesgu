@@ -151,6 +151,22 @@
     </div>
 
     <div class="sg-row">
+      <div class="sg-specimen">
+        <%# The real partial, in its two modes: bare (Save + Abbrechen) is the
+            plain render; extras (a danger delete) ride in via render layout:. %>
+        <%= form_with url: "#buttons", method: :get do |f| %>
+          <%= render layout: "shared/form_actions", locals: { form: f, submit_label: "Speichern", cancel_path: "#buttons" } do %>
+            <a href="#buttons" class="button-small danger">Löschen</a>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Form actions</span> · <code>render "shared/form_actions", form:, submit_label:, cancel_path:</code>
+        <p class="sg-purpose">The standard closing row of a task-style form (a page you enter, then finish or abandon): primary submit + an explicit <b>Abbrechen</b> back to <code>cancel_path</code> — backing out never depends on scrolling back up to the header's back link. Extra actions go in a block via <code>render layout:</code>; anything <code>.danger</code>/<code>.delete</code> is pushed to the far end. In-place forms that aren't a task (Settings) and entry gates with an alternate-path link (login/signup) don't take one.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
       <div class="sg-specimen"><a href="#buttons" class="text-link">Open filter</a></div>
       <div class="sg-spec">
         <span class="sg-spec__name">Text link</span> · <code>.text-link</code>

@@ -180,6 +180,23 @@ input[type=submit] {
   cursor: pointer;
 }
 
+/* ── Form actions row ────────────────────────────────────────────────────────
+   The standard closing row of a task-style form (shared/_form_actions): primary
+   Save + secondary Abbrechen side by side, so backing out is as explicit as
+   committing. A destructive extra (.danger/.delete, e.g. the saved-filter
+   Löschen) is pushed to the far end — the safe pair and the dangerous one never
+   sit shoulder to shoulder. */
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+}
+
+.form-actions > .danger,
+.form-actions > .delete {
+  margin-inline-start: auto;
+}
+
 /* ── Checkbox ─────────────────────────────────────────────────────────────────
    One custom box everywhere (forms, the favorites picker, …) so a native browser
    checkbox never sneaks in beside it. appearance:none lets us draw the box on the

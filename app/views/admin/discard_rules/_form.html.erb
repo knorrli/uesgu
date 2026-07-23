@@ -31,7 +31,7 @@
       <span><%= t('.active_label') %></span>
     </label>
 
-    <%= f.submit t('.save') %>
+    <%= render 'shared/form_actions', form: f, submit_label: t('.save'), cancel_path: admin_discard_rules_path %>
   <% end %>
 
   <section class="flex flex-col gap-small">

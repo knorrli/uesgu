@@ -292,6 +292,13 @@ venues:
   sources:
   - via: ole
     aggregator: Bewegungsmelder
+- domain: kulturspinnerei.ch
+  name: Kulturspinnerei
+  disposition: consume
+  place:
+    city: Bern
+    canton: BE
+  checked: 2026-07-25
 - domain: la-cappella.ch
   name: La Cappella
   disposition: reject

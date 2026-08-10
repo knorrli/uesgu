@@ -150,6 +150,83 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  ### Measurement probe #################################################
+
+  def with_probe_enabled
+    ENV["PROBE_REQUESTS"] = "1"
+    yield
+  ensure
+    ENV.delete("PROBE_REQUESTS")
+  end
+
+  def capture_rails_log
+    io = StringIO.new
+    original = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = original
+  end
+
+  test "the probe observes faceted requests without blocking them" do
+    log = nil
+    with_probe_enabled do
+      log = capture_rails_log do
+        get root_path(g: [ "Rock" ]),
+            headers: edge_request(client_ip: "198.51.100.20", edge_ip: "104.23.175.21")
+      end
+    end
+
+    # The whole point of track() over throttle(): it must never change the response.
+    assert_response :success
+    assert_match(/\[probe\]/, log)
+    assert_match(/session=0/, log)
+    assert_match(/ip=198\.51\.100\.20/, log)
+    assert_match(/edge=104\.23\.175\.21/, log)
+  end
+
+  test "the probe stays silent unless PROBE_REQUESTS is set" do
+    log = capture_rails_log do
+      get root_path(g: [ "Rock" ]),
+          headers: edge_request(client_ip: "198.51.100.21", edge_ip: "104.23.175.21")
+    end
+
+    assert_response :success
+    assert_no_match(/\[probe\]/, log)
+  end
+
+  test "the probe records cookie PRESENCE and never cookie values" do
+    # A session cookie in a log line is a hijackable credential for anyone who can
+    # read logs. Presence is all the diagnostic needs; the value must never appear.
+    secret = "s3cret-session-value-that-must-never-be-logged"
+    log = nil
+    with_probe_enabled do
+      cookies[:_uesgu_session] = secret
+      log = capture_rails_log do
+        get root_path(g: [ "Rock" ]),
+            headers: edge_request(client_ip: "198.51.100.22", edge_ip: "104.23.175.21")
+      end
+    end
+
+    assert_match(/session=1/, log, "cookie presence must be recorded")
+    assert_no_match(/#{Regexp.escape(secret)}/, log, "cookie VALUES must never reach the logs")
+  end
+
+  test "the probe reduces the referer to its host" do
+    log = nil
+    with_probe_enabled do
+      log = capture_rails_log do
+        get root_path(g: [ "Rock" ]),
+            headers: edge_request(client_ip: "198.51.100.23", edge_ip: "104.23.175.21")
+              .merge("HTTP_REFERER" => "https://xn--sgu-goa.ch/events?q%5B%5D=something-private")
+      end
+    end
+
+    assert_match(/ref=xn--sgu-goa\.ch/, log)
+    assert_no_match(/something-private/, log, "referer paths/queries must not be logged")
+  end
+
   test "never UA-blocks the subscribable calendar feed" do
     # Real calendar clients poll on a schedule with bot-shaped or absent UAs; a 403
     # here would silently break every subscription.

@@ -70,6 +70,26 @@ class Rack::Attack
     def calendar_feed?
       path.start_with?("/calendar/")
     end
+
+    # Rails sets _uesgu_session on the first response to EVERY visitor, signed in or
+    # not. So this asks "has this client been here before AND does it keep cookies?",
+    # NOT "is this client logged in" — anonymous browsing stays fully supported, and
+    # an account only buys persisted filters. The only humans who answer false are
+    # first-request-of-a-fresh-client, e.g. a cold click on a shared filtered link.
+    def session_cookie?
+      cookies.key?("_uesgu_session")
+    end
+
+    # Host only, deliberately never the full URL: enough to separate "followed one of
+    # our own chip links" from "arrived cold", without writing visitors' browsing
+    # paths into the logs. See the privacy note on the probe subscriber below.
+    def referer_host
+      return nil if referer.blank?
+
+      URI.parse(referer).host
+    rescue URI::InvalidURIError
+      "invalid"
+    end
   end
 
   ### Safelists — never throttled #######################################
@@ -159,6 +179,20 @@ class Rack::Attack
     "global-facets" if req.faceted? && !req.asset?
   end
 
+  ### Measurement — matches, never blocks ###############################
+
+  # Temporary diagnostic. The Aug 2026 crawl survived every rule above: it is spread
+  # across a large pool of client IPs (so the per-IP caps never trip — measured at
+  # ~39 faceted renders/min site-wide, with no single client near the 12/min limit)
+  # and it sends realistic browser User-Agents (so the UA blocklist misses it).
+  #
+  # Per-IP limits are structurally the wrong instrument against a distributed crawl,
+  # so the next rule has to key on something that separates a bot from a visitor.
+  # Rather than guess which signal that is, measure it: `track` matches a request and
+  # fires a notification WITHOUT blocking, throttling, or altering the response, so
+  # this is pure observation. The subscriber below decides whether to log.
+  track("measure/facets") { |req| req.faceted? && !req.asset? }
+
   ### Responses #########################################################
 
   self.throttled_responder = lambda do |req|
@@ -194,6 +228,32 @@ end
       "ua=#{req.user_agent.inspect}"
     )
   end
+end
+
+# One line per faceted request, answering the single question the next rule depends
+# on: does the traffic burning the bandwidth carry a session cookie or a referer?
+# Query it with `render logs --text "[probe]"` and compare the session=1 / session=0
+# split against the known ~39 faceted req/min.
+#
+# PRIVACY: presence booleans only — never cookie VALUES. A session cookie written to
+# a log is a hijackable credential for anyone who can read logs, which is a genuine
+# vulnerability rather than a style point. Same reason the referer is reduced to its
+# host: we need "own link vs. cold arrival", not visitors' browsing paths.
+#
+# Gated at request time rather than at boot so the switch is a Render env-var flip,
+# and so the test suite can exercise the whole path. Delete this block (and the
+# `track` rule above) once the shedding rule it informs has landed.
+ActiveSupport::Notifications.subscribe("track.rack_attack") do |_name, _start, _finish, _id, payload|
+  next if ENV["PROBE_REQUESTS"].blank?
+
+  req = payload[:request]
+  Rails.logger.info(
+    "[probe] session=#{req.session_cookie? ? 1 : 0} " \
+    "filter_cookie=#{req.cookies.key?('events_filter') ? 1 : 0} " \
+    "ref=#{req.referer_host || '-'} " \
+    "ip=#{req.true_ip} edge=#{req.ip} " \
+    "ua=#{req.user_agent.to_s[0, 80].inspect}"
+  )
 end
 
 # Keep the middleware out of the test suite so system/integration tests can hammer

@@ -10,6 +10,8 @@
 # infinite) at ~1 req/s for ten days. ~55k full page renders/day × ~18KB gzipped
 # ≈ 1GB/day — it burned the entire 5GB/month bandwidth allowance twice over.
 # Every defense below exists because of a specific way that crawl got through.
+require "ipaddr"
+
 class Rack::Attack
   # rack-attack defaults to Rails.cache for counters, but production has no explicit
   # cache_store (it can silently resolve to :null_store, which would make every
@@ -78,6 +80,19 @@ class Rack::Attack
     # first-request-of-a-fresh-client, e.g. a cold click on a shared filtered link.
     def session_cookie?
       cookies.key?("_uesgu_session")
+    end
+
+    # Parsed form of true_ip, or nil when it isn't a usable address. Memoised through
+    # `defined?` rather than `||=` so a nil result isn't re-parsed (and re-raised) on
+    # every rule that consults it.
+    def true_ip_addr
+      return @true_ip_addr if defined?(@true_ip_addr)
+
+      @true_ip_addr = begin
+        IPAddr.new(true_ip)
+      rescue IPAddr::InvalidAddressError, ArgumentError
+        nil
+      end
     end
 
     # Host only, deliberately never the full URL: enough to separate "followed one of
@@ -150,6 +165,40 @@ class Rack::Attack
   # (uptime checks, a quick sanity probe) keeps working.
   blocklist("block/anonymous-facet-crawl") do |req|
     req.user_agent.to_s.strip.empty? && req.faceted? && !req.calendar_feed?
+  end
+
+  # Cloud/datacenter networks with no plausible human audience here. Established by
+  # measurement rather than assumption (the [probe] instrumentation from #82): over a
+  # 7-minute window, ALL 431 faceted requests came from Alibaba Cloud, rotating across
+  # 118 client IPs, and zero came from anywhere else.
+  #
+  # This rule exists because every cheaper discriminator was measured and found dead:
+  # the crawler carries a session cookie on 100% of requests and a plausible
+  # same-origin referer on 43%, and it is spread thinly enough across its pool that no
+  # per-IP cap ever trips (118 IPs in 7 minutes; the 12/min facet limit saw nothing).
+  # The source network was the only signal that separated it from a visitor — and it
+  # separated perfectly.
+  #
+  # Deliberately the whole ARIN allocation for Alibaba Cloud LLC (AL-3),
+  # 47.74.0.0–47.87.255.255, so rotation inside their pool doesn't evade it. üsgu is
+  # invite-only with a handful of users in Switzerland; none of them browses from a
+  # datacenter in Singapore. Cloudflare's edge ranges are nowhere near 47.x, so this
+  # cannot misfire even if true_ip resolution ever degrades to the edge address.
+  #
+  # NOTE: expect rotation to another cloud. If that happens the fix is another entry
+  # here — and with a user base this small, blocking datacenter ranges wholesale stays
+  # a defensible option in a way it never would be for a public site.
+  DATACENTER_NETS = %w[
+    47.74.0.0/15
+    47.76.0.0/14
+    47.80.0.0/13
+  ].map { |cidr| IPAddr.new(cidr) }.freeze
+
+  blocklist("block/datacenter-nets") do |req|
+    ip = req.true_ip_addr
+    # ipv4? guard: IPAddr#include? across address families is not worth relying on,
+    # and every range above is v4 — a v6 client simply never matches.
+    ip&.ipv4? && DATACENTER_NETS.any? { |net| net.include?(ip) }
   end
 
   ### Throttles #########################################################

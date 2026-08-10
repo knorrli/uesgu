@@ -49,4 +49,112 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     70.times { get "/up", headers: CLIENT }
     assert_response :success
   end
+
+  ### True client IP ####################################################
+
+  # A plausible desktop browser UA — faceted requests need one, or they trip the
+  # blank-UA blocklist below and 403 before any throttle is consulted.
+  BROWSER = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " \
+            "(KHTML, like Gecko) Chrome/126.0 Safari/537.36".freeze
+
+  # Render fronts the app with a Cloudflare edge, so REMOTE_ADDR is an edge address
+  # and the real client arrives in CF-Connecting-IP.
+  def edge_request(client_ip:, edge_ip:, ua: BROWSER)
+    {
+      "REMOTE_ADDR" => edge_ip,
+      "HTTP_CF_CONNECTING_IP" => client_ip,
+      "HTTP_USER_AGENT" => ua
+    }
+  end
+
+  # THE regression test for the August 2026 bandwidth incident. One crawler reached
+  # the app over 12 distinct Cloudflare edge IPs in 41 seconds; because the throttle
+  # keyed on REMOTE_ADDR (always an edge address) each key saw a trickle and the
+  # limit never fired. Same client, many edges ⇒ ONE bucket.
+  test "counts one client across many Cloudflare edge IPs as a single bucket" do
+    freeze_time do
+      12.times do |i|
+        get root_path(g: [ "Rock" ]),
+            headers: edge_request(client_ip: "198.51.100.9", edge_ip: "104.23.175.#{i + 1}")
+        assert_response :success
+      end
+
+      # A 13th request from a 13th edge IP — still the same true client.
+      get root_path(g: [ "Rock" ]),
+          headers: edge_request(client_ip: "198.51.100.9", edge_ip: "162.158.111.26")
+      assert_response :too_many_requests
+    end
+  end
+
+  test "keeps genuinely different clients behind the same edge in separate buckets" do
+    freeze_time do
+      # Exhaust this client's faceted budget (12 allowed, the 13th trips it).
+      13.times do
+        get root_path(g: [ "Rock" ]),
+            headers: edge_request(client_ip: "198.51.100.9", edge_ip: "104.23.175.21")
+      end
+      assert_response :too_many_requests
+
+      # A different visitor that happens to share one Cloudflare edge must not
+      # inherit the first one's exhausted budget.
+      get root_path(g: [ "Rock" ]),
+          headers: edge_request(client_ip: "203.0.113.55", edge_ip: "104.23.175.21")
+      assert_response :success
+    end
+  end
+
+  ### Faceted-URL throttle ##############################################
+
+  # The combinatorial filter space is the expensive surface (a full render behind
+  # ~30 queries), so it gets a much tighter cap than the general 60/min.
+  test "throttles faceted filter URLs well below the general limit" do
+    freeze_time do
+      12.times do
+        get root_path(g: [ "Rock" ]), headers: edge_request(client_ip: "198.51.100.10", edge_ip: "104.23.175.21")
+        assert_response :success
+      end
+
+      get root_path(g: [ "Rock" ]), headers: edge_request(client_ip: "198.51.100.10", edge_ip: "104.23.175.21")
+      assert_response :too_many_requests
+    end
+  end
+
+  test "leaves unfiltered browsing on the general limit" do
+    freeze_time do
+      # Comfortably past the faceted cap of 12 — a bare path is not faceted.
+      20.times do
+        get root_path, headers: edge_request(client_ip: "198.51.100.11", edge_ip: "104.23.175.21")
+        assert_response :success
+      end
+    end
+  end
+
+  ### User-Agent blocking ###############################################
+
+  test "blocks self-identifying crawlers outright" do
+    %w[GPTBot ClaudeBot AhrefsBot SemrushBot Bytespider python-requests/2.31].each do |ua|
+      get root_path, headers: edge_request(client_ip: "198.51.100.12", edge_ip: "104.23.175.21", ua: ua)
+      assert_response :forbidden, "expected #{ua} to be blocked"
+    end
+  end
+
+  test "blocks an anonymous client crawling the facet space" do
+    get root_path(g: [ "Rock" ]),
+        headers: edge_request(client_ip: "198.51.100.13", edge_ip: "104.23.175.21", ua: "")
+    assert_response :forbidden
+  end
+
+  test "still serves an anonymous client on a bare path" do
+    # A UA-less curl of the homepage is not a crawl — only the facet space is gated.
+    get root_path, headers: edge_request(client_ip: "198.51.100.14", edge_ip: "104.23.175.21", ua: "")
+    assert_response :success
+  end
+
+  test "never UA-blocks the subscribable calendar feed" do
+    # Real calendar clients poll on a schedule with bot-shaped or absent UAs; a 403
+    # here would silently break every subscription.
+    get "/calendar/nonexistent-token.ics",
+        headers: edge_request(client_ip: "198.51.100.15", edge_ip: "104.23.175.21", ua: "Google-Calendar-Importer")
+    assert_not_equal 403, response.status
+  end
 end

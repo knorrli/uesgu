@@ -152,8 +152,12 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
 
   ### Datacenter-network blocking #######################################
 
-  # 47.74.0.0-47.87.255.255 is the Alibaba Cloud allocation the Aug 2026 crawl came
-  # from. One address from each of the three CIDRs that make it up.
+  # The list itself (boundaries, per-provider coverage, and the consumer ISPs it
+  # must never contain) is tested in test/lib/datacenter_nets_test.rb. These cover
+  # the wiring: that the rule consults it, on the right address, for the right
+  # requests.
+
+  # One address from each CIDR of the Alibaba allocation the Aug 2026 crawl came from.
   test "blocks clients inside a listed datacenter range" do
     %w[47.74.0.1 47.79.51.85 47.82.54.165 47.87.255.254].each do |ip|
       get root_path, headers: edge_request(client_ip: ip, edge_ip: "104.23.175.21")
@@ -161,8 +165,10 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "leaves clients just outside the listed ranges alone" do
-    %w[47.73.255.255 47.88.0.0 85.195.234.25].each do |ip|
+  # Swiss consumer ISPs — the actual user base. 47.73.255.255 sits immediately below
+  # the Alibaba allocation and is nobody's datacenter.
+  test "serves clients on consumer ISPs and just outside a listed range" do
+    %w[47.73.255.255 195.186.1.1 83.76.0.1 178.197.0.1 84.75.0.1 77.109.128.1].each do |ip|
       get root_path, headers: edge_request(client_ip: ip, edge_ip: "104.23.175.21")
       assert_response :success, "expected #{ip} to be served"
     end
@@ -200,6 +206,104 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
   test "handles an unparseable forwarded client address" do
     get root_path, headers: edge_request(client_ip: "not-an-ip-address", edge_ip: "104.23.175.21")
     assert_response :success
+  end
+
+  # THE reason the datacenter list can be this broad. /calendar/:token is polled by
+  # Google, Apple and Microsoft SERVERS on a subscriber's behalf, from precisely the
+  # ranges this rule blocks. A 403 here doesn't surface as an error to the person who
+  # subscribed — their calendar just quietly stops updating, so nobody finds out.
+  test "never network-blocks the subscribable calendar feed" do
+    %w[47.82.54.165 3.5.0.1 13.64.0.1].each do |ip|
+      get "/calendar/nonexistent-token.ics",
+          headers: edge_request(client_ip: ip, edge_ip: "104.23.175.21", ua: "Google-Calendar-Importer")
+      assert_not_equal 403, response.status,
+                       "a calendar poll from #{ip} must not be blocked — it breaks silently"
+    end
+  end
+
+  test "still blocks a datacenter client on ordinary paths while the feed is exempt" do
+    # The exemption is scoped to the feed, not granted to the client.
+    get root_path, headers: edge_request(client_ip: "47.82.54.165", edge_ip: "104.23.175.21")
+    assert_response :forbidden
+  end
+
+  ### The blocked response ##############################################
+
+  test "tells a network-blocked client it was blocked, and which address to quote" do
+    # A bare "Forbidden" is indistinguishable from an outage, so a false positive
+    # would be read as "üsgu is down" and never reported.
+    get root_path, headers: edge_request(client_ip: "47.82.54.165", edge_ip: "104.23.175.21")
+
+    assert_response :forbidden
+    assert_match(/Blocked/i, response.body)
+    assert_match(/47\.82\.54\.165/, response.body, "the user needs an address to quote")
+    assert_equal "text/plain", response.media_type
+  end
+
+  test "puts no contact address in the blocked response" do
+    # This body is served to every blocked crawler, and 403s are what address
+    # harvesters chew through. Diagnosability, never an inbox.
+    get root_path, headers: edge_request(client_ip: "47.82.54.165", edge_ip: "104.23.175.21")
+
+    assert_no_match(/@/, response.body)
+    assert_no_match(/mailto|http/i, response.body)
+  end
+
+  test "echoes the parsed address rather than the raw forwarded header" do
+    # true_ip falls back to X-Forwarded-For, which is attacker-controlled. Only a
+    # value that survived IPAddr parsing may reach the response body.
+    get root_path, headers: {
+      "REMOTE_ADDR" => "104.23.175.21",
+      "HTTP_X_FORWARDED_FOR" => "47.82.54.165, <script>alert(1)</script>",
+      "HTTP_USER_AGENT" => BROWSER
+    }
+
+    assert_response :forbidden
+    assert_no_match(/script/, response.body)
+  end
+
+  test "keeps the other blocklists on a bare Forbidden" do
+    # Nothing that hints at what to change to get through.
+    get root_path, headers: edge_request(client_ip: "198.51.100.30", edge_ip: "104.23.175.21", ua: "GPTBot")
+
+    assert_response :forbidden
+    assert_equal "Forbidden\n", response.body
+  end
+
+  ### Manual allowlist ##################################################
+
+  # ALLOWED_IPS is parsed from DATACENTER_ALLOW_IPS once at boot, so exercising the
+  # safelist means swapping the constant rather than the env var.
+  def with_allowed_ips(*cidrs)
+    original = Rack::Attack::ALLOWED_IPS
+    Rack::Attack.send(:remove_const, :ALLOWED_IPS)
+    Rack::Attack.const_set(:ALLOWED_IPS, cidrs.map { |cidr| IPAddr.new(cidr) }.freeze)
+    yield
+  ensure
+    Rack::Attack.send(:remove_const, :ALLOWED_IPS)
+    Rack::Attack.const_set(:ALLOWED_IPS, original)
+  end
+
+  test "lets an allowlisted address through a network block" do
+    # The escape hatch for a false positive: an env-var flip on Render, no deploy.
+    with_allowed_ips("47.82.54.165") do
+      get root_path, headers: edge_request(client_ip: "47.82.54.165", edge_ip: "104.23.175.21")
+      assert_response :success
+    end
+  end
+
+  test "accepts a CIDR in the allowlist, not just a single address" do
+    with_allowed_ips("47.82.0.0/16") do
+      get root_path, headers: edge_request(client_ip: "47.82.54.165", edge_ip: "104.23.175.21")
+      assert_response :success
+    end
+  end
+
+  test "keeps blocking everything the allowlist does not name" do
+    with_allowed_ips("47.82.54.165") do
+      get root_path, headers: edge_request(client_ip: "47.74.0.1", edge_ip: "104.23.175.21")
+      assert_response :forbidden
+    end
   end
 
   ### Measurement probe #################################################

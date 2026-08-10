@@ -150,6 +150,58 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  ### Datacenter-network blocking #######################################
+
+  # 47.74.0.0-47.87.255.255 is the Alibaba Cloud allocation the Aug 2026 crawl came
+  # from. One address from each of the three CIDRs that make it up.
+  test "blocks clients inside a listed datacenter range" do
+    %w[47.74.0.1 47.79.51.85 47.82.54.165 47.87.255.254].each do |ip|
+      get root_path, headers: edge_request(client_ip: ip, edge_ip: "104.23.175.21")
+      assert_response :forbidden, "expected #{ip} to be blocked"
+    end
+  end
+
+  test "leaves clients just outside the listed ranges alone" do
+    %w[47.73.255.255 47.88.0.0 85.195.234.25].each do |ip|
+      get root_path, headers: edge_request(client_ip: ip, edge_ip: "104.23.175.21")
+      assert_response :success, "expected #{ip} to be served"
+    end
+  end
+
+  # The measured crawl carried a session cookie on 100% of requests and a plausible
+  # same-origin referer on 43% — the two signals that would normally read as "human".
+  # The network block must not care about either.
+  test "blocks a datacenter client even when it looks like a returning visitor" do
+    cookies[:_uesgu_session] = "looks-like-a-real-visitor"
+    get root_path(g: [ "Rock" ]),
+        headers: edge_request(client_ip: "47.82.54.165", edge_ip: "104.23.175.21")
+          .merge("HTTP_REFERER" => "https://xn--sgu-goa.ch/events")
+
+    assert_response :forbidden
+  end
+
+  # The rule keys on the resolved client, never the edge. A Cloudflare edge address
+  # is not in these ranges, so this only ever fires on a real datacenter client.
+  test "keys the datacenter block on the true client, not the edge" do
+    # Real client outside the range, arriving over an edge — must be served.
+    get root_path, headers: edge_request(client_ip: "85.195.234.25", edge_ip: "104.23.175.21")
+    assert_response :success
+
+    # Real client inside the range, arriving over that same edge — must be blocked.
+    get root_path, headers: edge_request(client_ip: "47.82.54.165", edge_ip: "104.23.175.21")
+    assert_response :forbidden
+  end
+
+  test "handles an IPv6 client without erroring or blocking" do
+    get root_path, headers: edge_request(client_ip: "2001:db8::1", edge_ip: "104.23.175.21")
+    assert_response :success
+  end
+
+  test "handles an unparseable forwarded client address" do
+    get root_path, headers: edge_request(client_ip: "not-an-ip-address", edge_ip: "104.23.175.21")
+    assert_response :success
+  end
+
   ### Measurement probe #################################################
 
   def with_probe_enabled

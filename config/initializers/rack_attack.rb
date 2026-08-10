@@ -119,6 +119,30 @@ class Rack::Attack
     req.ip == "127.0.0.1" || req.ip == "::1"
   end
 
+  # Escape hatch for a false positive. The datacenter list below is generated from
+  # third-party feeds, so the day it wrongly catches a real user the fix has to be
+  # faster than a release: this is a comma-separated list of addresses or CIDRs
+  # (DATACENTER_ALLOW_IPS on Render) that bypasses every rule in this file. An
+  # env-var change restarts the worker — no PR, no CI, no tag.
+  #
+  # Keyed on true_ip, unlike the localhost safelist: CF-Connecting-IP is stamped by
+  # Render's edge on every request and cannot be forged from outside, so there is
+  # nothing here for an attacker to aim at. Garbage entries are dropped rather than
+  # raised on — a typo in an env var must not take the site down at boot.
+  ALLOWED_IPS = ENV.fetch("DATACENTER_ALLOW_IPS", "").split(",").filter_map do |raw|
+    IPAddr.new(raw.strip)
+  rescue IPAddr::InvalidAddressError, ArgumentError
+    Rails.logger.warn("[Rack::Attack] ignoring unparseable DATACENTER_ALLOW_IPS entry #{raw.inspect}")
+    nil
+  end.freeze
+
+  safelist("allow/manual-ip") do |req|
+    next false if ALLOWED_IPS.empty?
+
+    ip = req.true_ip_addr
+    ip && ALLOWED_IPS.any? { |allowed| allowed.include?(ip) }
+  end
+
   ### Blocklists — dropped outright, before routing #####################
 
   # Vulnerability scanners and script-kiddie bots constantly probe for software we
@@ -179,26 +203,32 @@ class Rack::Attack
   # The source network was the only signal that separated it from a visitor — and it
   # separated perfectly.
   #
-  # Deliberately the whole ARIN allocation for Alibaba Cloud LLC (AL-3),
-  # 47.74.0.0–47.87.255.255, so rotation inside their pool doesn't evade it. üsgu is
-  # invite-only with a handful of users in Switzerland; none of them browses from a
-  # datacenter in Singapore. Cloudflare's edge ranges are nowhere near 47.x, so this
-  # cannot misfire even if true_ip resolution ever degrades to the edge address.
+  # Whole allocations rather than the individual addresses seen, so rotation inside
+  # a provider's pool doesn't evade it. üsgu is invite-only with a handful of users
+  # in Switzerland; none of them browses from a datacenter in Singapore. A posture
+  # this blunt would be reckless for a public site and is proportionate here.
   #
-  # NOTE: expect rotation to another cloud. If that happens the fix is another entry
-  # here — and with a user base this small, blocking datacenter ranges wholesale stays
-  # a defensible option in a way it never would be for a public site.
-  DATACENTER_NETS = %w[
-    47.74.0.0/15
-    47.76.0.0/14
-    47.80.0.0/13
-  ].map { |cidr| IPAddr.new(cidr) }.freeze
-
+  # The crawler did not stop when the Alibaba block landed — it kept driving ~1.3
+  # req/s into 403s, so rotating to another cloud was always its next move. Rather
+  # than wait to lose the IP signal, the list now covers the compute providers it
+  # could rotate to: AWS, GCP, Azure, Hetzner, OVH, DigitalOcean, Linode, Vultr,
+  # Scaleway, Oracle, Contabo, Alibaba, Tencent, Huawei (~13.7k CIDRs, generated
+  # into config/datacenter_nets.txt by `bin/rails datacenter_nets:refresh`).
+  #
+  # It covers COMPUTE only and deliberately not CDN or consumer-proxy egress —
+  # blocking Cloudflare/Fastly/Akamai/Apple would catch iCloud Private Relay users,
+  # and blocking Google beyond GCP would catch Chrome's IP Protection. Real people
+  # do come through those. See lib/datacenter_nets.rb and issue #85 for the full
+  # reasoning, including why Swiss consumer ISPs cannot collide with any of this.
+  #
+  # The calendar exemption is load-bearing: /calendar/:token is polled by Google,
+  # Apple and Microsoft SERVERS on the subscriber's behalf, from exactly the ranges
+  # this rule blocks. Without it, adding Azure would silently stop every ICS
+  # subscription — the subscriber sees stale events, not an error, so neither side
+  # would ever find out. The feed is token-guarded, cheap, and still counts against
+  # the per-IP throttle.
   blocklist("block/datacenter-nets") do |req|
-    ip = req.true_ip_addr
-    # ipv4? guard: IPAddr#include? across address families is not worth relying on,
-    # and every range above is v4 — a v6 client simply never matches.
-    ip&.ipv4? && DATACENTER_NETS.any? { |net| net.include?(ip) }
+    !req.calendar_feed? && DatacenterNets.include?(req.true_ip_addr)
   end
 
   ### Throttles #########################################################
@@ -256,8 +286,29 @@ class Rack::Attack
 
   # Blocked clients get a flat 403 with no body worth parsing — cheapest possible
   # answer, and nothing that hints at what to change to get through.
-  self.blocklisted_responder = lambda do |_req|
-    [403, { "Content-Type" => "text/plain" }, ["Forbidden\n"]]
+  #
+  # The network block is the one exception. It is the only rule that could plausibly
+  # catch a real person (the ranges come from third-party feeds and are not verified
+  # against our own traffic), and a bare "Forbidden" is indistinguishable from the
+  # site being down — a false positive would read as an outage and never get
+  # reported. So that rule alone names itself and echoes the address, which is all a
+  # user needs to say "üsgu is blocking me, it says 203.0.113.5".
+  #
+  # Deliberately NOT a contact address: this body is served to every blocked crawler,
+  # and 403 endpoints are exactly what address harvesters chew through. The user base
+  # is a handful of people who already have a direct line. Deliberately no hint that
+  # a different network would work, and text/plain so there is nothing to render.
+  #
+  # The address is echoed from the PARSED form, never the raw header, so an
+  # attacker-supplied X-Forwarded-For cannot put arbitrary bytes in a response body.
+  self.blocklisted_responder = lambda do |req|
+    if req.env["rack.attack.matched"] == "block/datacenter-nets"
+      body = "Blocked: requests from this network aren't accepted.\n" \
+             "Reference: #{req.true_ip_addr}\n"
+      [403, { "Content-Type" => "text/plain" }, [body]]
+    else
+      [403, { "Content-Type" => "text/plain" }, ["Forbidden\n"]]
+    end
   end
 end
 

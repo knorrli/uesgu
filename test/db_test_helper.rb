@@ -86,4 +86,15 @@ end
 
 class ActiveSupport::TestCase
   include TaxonomyFixtures
+
+  # I18n.locale is process-global, and ApplicationController#set_locale assigns it on
+  # every request — so an integration test that finishes as an :en user (settings_test
+  # switching the preference, set_locale_test signing in an :en account) silently
+  # leaves the entire rest of the suite running in English.
+  #
+  # That made unrelated, locale-sensitive assertions fail as a function of the random
+  # seed: the notification-mailer digest test passes in isolation and fails when it
+  # happens to run after one of those, which is a miserable thing to debug from a CI
+  # log. Reset before every test so ordering can never carry a locale across.
+  setup { I18n.locale = I18n.default_locale }
 end

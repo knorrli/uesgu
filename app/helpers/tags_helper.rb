@@ -45,6 +45,14 @@ module TagsHelper
     "#{ICON_BASE} #{FILTER_CHIP_GLYPH.fetch(param, 'ph-lightning')}"
   end
 
+  # The turbo-frame holding a filter sheet's option tree. One home for the id, so
+  # the placeholder frame in the sheet and the one the response wraps its rows in
+  # can't drift apart (a mismatch would blank the frame — and with it the applied
+  # values it holds until the tree lands).
+  def filter_sheet_frame_id(field)
+    "filter_sheet_#{field}"
+  end
+
   def available_tags(context:, applied: [])
     ActsAsTaggableOn::Tag
       .where.not(name: applied)

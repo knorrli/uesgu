@@ -679,6 +679,7 @@ en:
       search_for: 'Search for “%{query}”'
       search_anything: Type to search for anything
       custom_range: Custom range
+      loading: Loading…
   shared:
     cancel: Cancel
   helpers:

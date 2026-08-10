@@ -679,6 +679,7 @@ fr:
       search_for: 'Rechercher « %{query} »'
       search_anything: Tape pour tout rechercher
       custom_range: Période personnalisée
+      loading: Chargement…
   shared:
     cancel: Annuler
   helpers:

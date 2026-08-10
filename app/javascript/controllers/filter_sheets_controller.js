@@ -35,17 +35,28 @@ export default class extends Controller {
     }
     document.addEventListener("click", this.onClickOutside)
 
-    // Reveal any canton that already holds a checked city/venue, so a pre-applied
-    // location isn't hidden inside a collapsed group.
-    this.groupTargets.forEach((group) => {
-      if (group.querySelector("input:checked")) group.classList.remove("collapsed")
-    })
+    // A tree that failed to arrive must not leave the sheet stuck on its loading
+    // row: drop the src again so the next open retries. The staged values are
+    // untouched — Turbo only replaces the frame's contents once a response lands.
+    this.onFetchError = (event) => {
+      const frame = event.target.closest?.("turbo-frame[data-src]")
+      frame?.removeAttribute("src")
+    }
+    this.element.addEventListener("turbo:fetch-request-error", this.onFetchError)
   }
 
   disconnect() {
     document.removeEventListener("keydown", this.onKeydown)
     document.removeEventListener("click", this.onClickOutside)
+    this.element.removeEventListener("turbo:fetch-request-error", this.onFetchError)
     document.body.classList.remove("filter-sheet-open")
+  }
+
+  // Reveal any group that already holds a checked row, so a pre-applied genre or
+  // location isn't hidden inside a collapsed one. A target callback, not a loop in
+  // connect(): most groups arrive later, with their lazily-loaded tree.
+  groupTargetConnected(group) {
+    if (group.querySelector("input:checked")) group.classList.remove("collapsed")
   }
 
   open(event) {
@@ -53,6 +64,8 @@ export default class extends Controller {
     if (!sheet) return
     // Toggle: clicking the trigger of an already-open panel closes it.
     if (sheet.classList.contains("sheet--open")) { this.#commit(sheet); return }
+    // First open of a sheet whose options are lazy: go get them.
+    this.#loadOptions(sheet)
     // Desktop shows panels inline, so a second trigger could open a second panel.
     // Hide any already-open one WITHOUT committing — its checkbox state persists in
     // the form and applies on the next submit, so nothing is lost. (On mobile only
@@ -177,6 +190,16 @@ export default class extends Controller {
       this.element.querySelectorAll(".range-cal").forEach((cal) => cal.dispatchEvent(new CustomEvent("range-calendar:reset")))
     }
     this.#submit()
+  }
+
+  // Fetch a sheet's option tree, which the page deliberately doesn't ship (see
+  // tags/_sheet_options_frame). Copying data-src onto src is what starts the frame
+  // — the attribute is held back precisely so nothing loads it before this point.
+  // The staged values sitting in the frame keep the form correct until it lands.
+  #loadOptions(sheet) {
+    const frame = sheet.querySelector("turbo-frame[data-src]")
+    if (!frame || frame.hasAttribute("src")) return
+    frame.setAttribute("src", frame.dataset.src)
   }
 
   #updateNewQuery(sheet, raw) {

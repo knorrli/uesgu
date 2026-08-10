@@ -413,6 +413,19 @@
         <span class="sg-ok">One row component, two semantics — the box shape (square vs round) is the only signal, so multi- and single-select read consistently across every sheet.</span>
       </div>
     </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <div style="min-width: 12rem; border: var(--border-width) solid var(--rule-color);">
+          <p class="sheet__loading"><%= t('events.filter.loading') %></p>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Sheet loading row</span> · <code>.sheet__loading</code>
+        <p class="sg-purpose">Stands in for a sheet's option rows while they load. The What and Where trees are ~360 rows, so they're fetched the first time the sheet opens instead of riding along on every page (#81) — this is what fills the panel in the meantime.</p>
+        <span class="sg-ok">Muted, one line, and it reserves a few rows' height, so the in-flow desktop panel doesn't jump when the tree lands.</span>
+      </div>
+    </div>
   </section>
 
   <%# ============================================================ ICONS %>

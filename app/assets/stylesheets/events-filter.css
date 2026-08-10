@@ -342,6 +342,18 @@
   padding: var(--gap-small) 0;
 }
 
+/* Placeholder while a sheet's option tree is on its way (the What/Where trees load
+   on first open, not with the page — see tags/_sheet_options_frame). Holds a few
+   rows' worth of height so the desktop panel, which is in-flow and pushes the
+   results down, doesn't visibly grow under the pointer when the rows land. */
+.sheet__loading {
+  margin: 0;
+  padding: var(--gap-medium) var(--content-padding);
+  min-height: 6rem;
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
 .sheet__footer {
   padding: var(--gap-medium) var(--content-padding);
   border-top: var(--tag-border-width) solid var(--border-color);

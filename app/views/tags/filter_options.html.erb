@@ -1,0 +1,7 @@
+<%# The response to a sheet's first open: the rows that replace the frame's staged
+    placeholder (see tags/_sheet_options_frame). The frame id must match the one on
+    the page — a miss blanks the frame, taking the applied values with it — so both
+    sides read it from filter_sheet_frame_id. %>
+<%= turbo_frame_tag filter_sheet_frame_id(@field) do %>
+  <%= render @options_partial, filter: @filter %>
+<% end %>

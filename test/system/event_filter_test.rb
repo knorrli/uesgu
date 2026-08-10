@@ -34,13 +34,40 @@ class EventFilterTest < ApplicationSystemTestCase
     event(start_date: Date.current + 3, genre_list: [child.name])
 
     visit events_path("g[]": rock.name)
-    # filter-sheets#connect un-collapses the group holding the checked genre — wait
-    # for it so the chip's remove action is bound before we click (else, under
-    # full-suite load, the click can land before Stimulus connects and do nothing).
-    assert_selector ".sheet[data-field=what] .loc-group:not(.collapsed)", visible: :all
-    find(".filter-sheets__summary .filter-chip", text: rock.name).click # filter-sheets#remove
+    # The chip's remove action binds when filter-sheets connects, so under full-suite
+    # load the first click can land before Stimulus is there and simply do nothing.
+    # Retry until the filter is gone. (There used to be a DOM proxy for "connected" —
+    # the un-collapsed group holding the checked genre — but the What tree now loads
+    # only when its sheet is opened, so nothing about it is on the page here. The
+    # applied genre still is: it rides as the sheet frame's staged g[] input, which
+    # is what #remove unchecks.) Capybara's waits poll; no fixed sleeps.
+    10.times do
+      break if has_no_current_path?(/g%5B%5D=/, wait: 0.5)
+      find(".filter-sheets__summary .filter-chip", text: rock.name).click # filter-sheets#remove
+    end
 
     assert_no_current_path(/g%5B%5D=/)
+  end
+
+  # The What tree isn't on the page until its sheet is opened, so an applied genre
+  # rides along as the frame's staged g[] input. Removing a DIFFERENT chip re-submits
+  # the form, and that submit still has to carry the genre — exactly what breaks if
+  # an unopened sheet contributes nothing.
+  test "removing one chip keeps a filter whose sheet was never opened" do
+    rock = genre(name: "Zylokeep", events_count: 1)
+    child = genre(name: "Zylokidkeep", events_count: 1)
+    child.set_parent!(rock)
+    event(start_date: Date.current + 3, genre_list: [child.name], title: "Zzqxshow")
+
+    visit events_path("g[]": rock.name, "q[]": "Zzqx")
+    10.times do
+      break if has_no_current_path?(/q%5B%5D=/, wait: 0.5)
+      find(".filter-sheets__summary .filter-chip", text: "Zzqx").click
+    end
+
+    assert_no_current_path(/q%5B%5D=/)
+    assert_current_path(/g%5B%5D=#{Regexp.escape(rock.name)}/)
+    assert_selector ".filter-sheets__summary .filter-chip", text: rock.name
   end
 
   test "tapping a genre on an event row filters by it (g[]) and lights it" do

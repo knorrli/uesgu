@@ -277,6 +277,8 @@ fr:
       tab_unread: Non lues
       tab_read: Lues
       none_read: Aucune notification lue pour l'instant.
+      mark_all_read: Tout est lu
+      all_marked_read: Tout a été marqué comme lu.
       event_count:
         one: 1 événement
         other: "%{count} événements"

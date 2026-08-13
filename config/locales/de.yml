@@ -277,6 +277,8 @@ de:
       tab_unread: Ungelesen
       tab_read: Gelesen
       none_read: Noch nichts gelesen.
+      mark_all_read: Alles gelesen
+      all_marked_read: Alles als gelesen markiert.
       event_count:
         one: 1 Veranstaltung
         other: "%{count} Veranstaltungen"

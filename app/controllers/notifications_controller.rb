@@ -14,6 +14,18 @@ class NotificationsController < ApplicationController
     @event_counts = Notification.visible_event_counts(@notifications)
   end
 
+  # Mark every unread digest read in one UPDATE. update_all (not each(&:mark_read!))
+  # because Notification has no callbacks or validations worth running here and an
+  # inbox can hold a lot of rows; updated_at is set by hand since update_all skips
+  # the timestamp. Scoped through current_user, so it can only ever clear your own.
+  def mark_all_read
+    now = Time.current
+    current_user.notifications.unread.update_all(read_at: now, updated_at: now)
+    # Back to the unread tab — now the "Alles gelesen" empty state, which also
+    # re-renders the nav without its unread dot/badge.
+    redirect_to notifications_path, notice: t("notifications.index.all_marked_read")
+  end
+
   def show
     @notification = current_user.notifications.find(params[:id])
     @notification.mark_read!

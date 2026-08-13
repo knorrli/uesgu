@@ -2,7 +2,19 @@
 
 <div class="flex flex-col gap-large">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
-    <h1><%= t('inbox.title') %></h1>
+    <div class="flex justify-between align-center wrap gap-medium">
+      <h1><%= t('inbox.title') %></h1>
+      <%# Bulk "clear the unread pile" — an in-place commit, so the secondary
+          (hollow) pill, right-aligned across the header like the saved-filters
+          list's Neuer Filter and settings' Abmelden. `wrap` on the row drops it
+          below the long monospace title on narrow screens instead of pushing it
+          off the edge. Offered only on the Ungelesen tab, and only when there is
+          something unread to clear — never on the read archive. %>
+      <% if @unread_count.positive? && !@show_read %>
+        <%= button_to t('notifications.index.mark_all_read'), mark_all_read_notifications_path,
+              class: 'button-small' %>
+      <% end %>
+    </div>
     <%# Ungelesen | Gelesen — the shared flat-text toggle (.view-switch__item),
         same component as the list/calendar switcher. On its own row below the
         title (not inline beside it) so the long monospace heading can't shove it

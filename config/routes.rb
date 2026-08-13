@@ -37,7 +37,11 @@ Rails.application.routes.draw do
   resource :registration, only: %i[new create destroy]
   get "signup", to: "registrations#new"
   resource :settings, only: %i[show update]
-  resources :notifications, only: %i[index show]
+  resources :notifications, only: %i[index show] do
+    # Clear the whole unread slice at once — the inbox's bulk escape hatch, so a
+    # pile of digests needn't be opened one by one to stop reading as new.
+    post :mark_all_read, on: :collection
+  end
 
   # "Save this show": the saved-shows list + an inline per-event save toggle.
   resources :saved_events, only: %i[index] do

@@ -106,6 +106,77 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_select ".view-switcher .view-switch__item[href=?]", notifications_path(read: 1)
   end
 
+  test "mark_all_read clears the whole unread slice" do
+    u = user
+    sign_in_as u
+    e = event(start_date: Date.current + 2)
+    a = u.notifications.create!(title: "One", event_ids: [e.id],
+                                period_start: 1.week.ago, period_end: Time.current)
+    b = u.notifications.create!(title: "Two", event_ids: [e.id],
+                                period_start: 1.week.ago, period_end: Time.current)
+
+    post mark_all_read_notifications_path
+
+    assert_redirected_to notifications_path
+    assert a.reload.read?
+    assert b.reload.read?
+  end
+
+  test "mark_all_read leaves already-read digests read_at untouched" do
+    u = user
+    sign_in_as u
+    e = event(start_date: Date.current + 2)
+    was_read_at = 3.days.ago
+    read = u.notifications.create!(title: "Old", event_ids: [e.id],
+                                  period_start: 1.week.ago, period_end: Time.current,
+                                  read_at: was_read_at)
+
+    post mark_all_read_notifications_path
+
+    # The unread scope excludes it, so its original read timestamp survives —
+    # the archive's ordering/dates don't get rewritten by a bulk clear.
+    assert_in_delta was_read_at, read.reload.read_at, 1.second
+  end
+
+  test "mark_all_read only touches the signed-in users digests" do
+    mine = user
+    theirs = user
+    e = event(start_date: Date.current + 2)
+    other = theirs.notifications.create!(title: "Not mine", event_ids: [e.id],
+                                         period_start: 1.week.ago, period_end: Time.current)
+    sign_in_as mine
+
+    post mark_all_read_notifications_path
+
+    assert_not other.reload.read?
+  end
+
+  test "the mark-all-read button is offered only where there is unread to clear" do
+    u = user
+    sign_in_as u
+    e = event(start_date: Date.current + 2)
+    digest = u.notifications.create!(title: "Fresh", event_ids: [e.id],
+                                     period_start: 1.week.ago, period_end: Time.current)
+
+    # Unread tab, something unread: offered.
+    get notifications_path
+    assert_select "form[action=?]", mark_all_read_notifications_path
+
+    # Read archive: never offered, even while unread digests exist elsewhere.
+    get notifications_path(read: 1)
+    assert_select "form[action=?]", mark_all_read_notifications_path, count: 0
+
+    # Nothing left unread: gone.
+    digest.mark_read!
+    get notifications_path
+    assert_select "form[action=?]", mark_all_read_notifications_path, count: 0
+  end
+
+  test "mark_all_read requires authentication" do
+    post mark_all_read_notifications_path
+    assert_redirected_to new_session_path
+  end
+
   test "show marks the digest read" do
     u = user
     sign_in_as u

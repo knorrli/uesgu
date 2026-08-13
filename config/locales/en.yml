@@ -277,6 +277,8 @@ en:
       tab_unread: Unread
       tab_read: Read
       none_read: No read notifications yet.
+      mark_all_read: All read
+      all_marked_read: Everything marked as read.
       event_count:
         one: 1 event
         other: "%{count} events"

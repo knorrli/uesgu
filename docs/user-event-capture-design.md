@@ -1,9 +1,10 @@
 # User event capture — design decisions and model evaluation
 
-> Status: **decided; the schema prerequisites and the contributor flag are built**
-> (2026-08-19) — decisions 4–6 shipped as the `places` table plus the location
-> taxonomy reading it, decision 10 as the nullable `events.url`, and the
-> `users.contributor` half of decision 7. Everything else (the capture funnel, the
+> Status: **decided; the schema prerequisites, the contributor flag and the
+> extraction service are built** (2026-08-19) — decisions 4–6 shipped as the
+> `places` table plus the location taxonomy reading it, decision 10 as the nullable
+> `events.url`, the `users.contributor` half of decision 7, and the extract half of
+> the funnel as `EventCapture` (see "Provider evaluation"). Everything else (the
 > three adapters, the verify screen, VenueLead nomination) is still design only.
 > Supersedes the framing in
 > [`user-event-capture.md`](user-event-capture.md), which stays as the original
@@ -108,8 +109,8 @@ text** — feeding a shared *extract → verify → create* path.
    character-identical to the genres one, with the Ruby reproduction extracted to a
    shared `Fingerprint` so there is one normalizer rather than two copies drifting.
    `Place.matching` resolves a raw name and follows a merge to its canonical.
-   Match-at-entry itself is not built — nothing offers *near* candidates yet, and
-   there is no admin merge UI.
+   Match-at-entry itself is not built, and there is no admin merge UI. The *near*
+   half is now decided — see "Matching at entry" below.
 
 6. **Canton and locality are both required.** The earlier version of this
    decision made the middle tier optional, reasoning that a concert in a forest
@@ -326,6 +327,116 @@ these rows live in the database, which is empty in CI. So the intended drift tes
 ships as `bin/rails places:drift` instead — it reports every `Place` the registry
 has since absorbed and exits nonzero, which makes deleting the graduated row a
 command the graduating PR runs rather than a thing someone remembers.
+
+### Matching at entry
+
+Decision 5 named match-at-entry as the real defence against a dirty place field and
+left the mechanism open. This is that mechanism. It is a prerequisite for the
+verify screen (#106), not a refinement of it.
+
+The stake is higher than tidiness. A place that splits across three near-identical
+rows does not merely clutter the WHERE tree — the tree self-heals when the shows
+pass. It breaks the **promotion signal**: nomination fires at `events_count >= 2`
+on a `Place` (see "VenueLead promotion"), so three captures spread over
+`Quartierfest` / `Quarterfest` / `Marzili Quartierfest` never reach the threshold,
+and a real venue stays invisible in the discovery inbox forever. The one failure
+mode with no self-correcting path is the one a split name causes.
+
+#### Trigram similarity, not edit distance
+
+`pg_trgm`'s `word_similarity`, scored in Postgres.
+
+The case that decides it is a **subset, not a typo**: the extracted name is
+regularly a fragment of the stored one ("Quartierfest" against an existing "Marzili
+Quartierfest"), and Levenshtein scores that pair as wildly distant while trigram
+word-similarity scores it near 1.0. Typos are the easier half of the problem and
+both approaches handle them; only trigrams handle the half that actually shows up.
+
+The extension is being added for the **measure, not for speed**. `places` is a
+tens-of-rows table, so a sequential scan is free and no GIN index is needed up
+front — worth stating so nobody later reads the extension as a performance
+decision and "optimises" around it.
+
+**Prerequisite, and the one thing that can invalidate this:** confirm
+`CREATE EXTENSION pg_trgm` is permitted on Render's managed Postgres. It is
+standard contrib and should be, but the whole decision rests on it, and deploy time
+is the wrong moment to find out.
+
+#### Two columns, two jobs
+
+The comparison must NOT run on `fingerprint`. The fingerprint strips every
+non-alphanumeric, so "Marzili Quartierfest" becomes `marziliquartierfest` — a
+single word. `word_similarity` matches the query against *words* in the target, so
+with the boundaries gone it degrades to roughly plain `similarity` (~0.65 on that
+pair instead of ~1.0), throwing away the exact property that chose trigrams over
+edit distance.
+
+So a second stored generated column beside it, per compared field:
+
+```
+places
+  name              not null
+  fingerprint       stored generated (unique)  — exact identity: the unique index,
+                                                 Place.matching, the drift check
+  name_folded       stored generated           — case + accents folded, separators
+                                                 collapsed to single spaces
+  locality          not null
+  locality_folded   stored generated           — same rule, same job
+  canton            not null
+```
+
+The difference is one clause: the fingerprint folds separators **away**, the folded
+form folds them **to spaces**. Same `translate()` over the fixed accent set the
+fingerprint already uses — `unaccent` is not IMMUTABLE and STORED requires it (see
+`AddFingerprintToGenres`). Both columns are generated, so neither can drift from
+the other or from the name they derive from.
+
+#### Locality gets the same treatment, and still no table
+
+Locality has the identical splitting failure mode and, unlike the place name, no
+normalization at all today: `places.locality` is a plain string and
+`Location.hierarchy` groups on the literal value, so "Zorpwil" and "zorpwil" are two
+tree nodes. The registry stays clean only because its rows are PR-reviewed; the
+captured half has no such gate.
+
+It gets `locality_folded` and the same scoring, and it does **not** get a table.
+Decision 6 made locality free text deliberately — closed-where-finite,
+open-where-not — and a `localities` registry would reopen that for no gain.
+
+The candidate set spans two sources: captured localities in `places`, and the
+registry's 16 distinct values from `Venue.in_taxonomy`. They merge into **one query**,
+with the registry side passed as a `VALUES` list built in Ruby, so there is a single
+scoring path rather than one SQL implementation and one in-memory implementation
+that quietly disagree at the threshold.
+
+#### Rules that hold whatever the threshold turns out to be
+
+- **A suggestion never auto-applies.** The contributor taps one. A near-match must
+  not silently rewrite what the model extracted — same spirit as the genre alias
+  rule, where a match is a link and never a rewrite of the source data.
+- **Candidates include registry venues, not only places.** The most valuable
+  outcome of match-at-entry is "this is actually Dachstock": tag the event and
+  create no `Place` row at all. A suggestion list that only offers captured places
+  cannot produce it.
+- **A carried URL short-circuits the whole thing.** The registry is keyed by
+  `domain`, so a capture carrying `zar.ch` resolves to the ZAR row exactly, even
+  when the poster spells the name "Z.A.R." and no similarity measure would reach it.
+- **The threshold is tuned, not guessed.** `script/event_capture_bakeoff.rb` and
+  `script/event_capture_bakeoff_truth.json` still hold the six real samples,
+  including the one that produced four spellings of "Marzili". Start near 0.4 and
+  fit it to those.
+
+Rejected:
+
+- **Levenshtein** (`fuzzystrmatch`). Loses the subset case above, which is the
+  common one; also punishes length differences and word reordering, both of which
+  a poster produces routinely.
+- **Scoring in Ruby** over `Place.pluck`. Tempting at this table size and it needs
+  no extension, but it would have to reimplement trigram similarity to match the
+  subset case, and the locality path would then have two scoring implementations
+  across two sources. One measure, one place.
+- **A `localities` table.** See above — it reopens a decision 6 settled, to
+  normalize a field that a generated column normalizes for free.
 
 ### VenueLead promotion
 
@@ -559,6 +670,35 @@ used to match against a venue database.
 (registrar + DNS are already moving there), ~6 cents/month, and nothing leaves
 Switzerland. No Anthropic/OpenAI account needed.
 
+**Built** as `EventCapture` (`app/services/event_capture/`): `Prompt` carries the
+tuned text and the strict JSON schema, `Infomaniak` makes the one call,
+`Normalizer` + `YearResolver` decide every deterministic field, and `Extractor`
+returns 0..n `Candidate`s or a failure. Credentials follow the `WebPushConfig` /
+`MailConfig` pattern — `INFOMANIAK_API_TOKEN` + `INFOMANIAK_PRODUCT_ID` via env or
+credentials, absent means inert rather than broken.
+
+The entry point is `bin/rails "event_capture:extract[poster.jpg,...]"`, deliberately
+ahead of any UI so the verify screen is written against a real contract. It takes
+an image; text and URL inputs arrive with the adapters, which is also where image
+downscaling belongs (the bake-off capped the long edge at 1568px with `sips`,
+which is not a thing that exists on the deployed box).
+
+**Downscaling is a latency decision, not a cost one** — worth stating before the
+adapters are built, because the 1568px cap above reads like a cost measure and is
+not. Gemma bills a *fixed* image cost, so across the bake-off its input was ~1294
+tokens whatever the image: the 915x1568 sample came in at 1282, twelve tokens
+*under* the 723x1568 one. Mistral does scale with pixels on the same pair (2496 →
+2881), which is where the intuition comes from. The consequence is that the system
+prompt, not the image, is ~95% of what a request costs — one extraction is ~1350 in
+and 130–370 out, roughly $0.0005. So the only real cost lever is prompt length, and
+shortening the prompt is exactly what the fabrication numbers say not to do.
+
+The prompt is a **copy** of the bake-off script's, not a shared constant: that
+script's recorded `prompt_sha` is what makes its sessions comparable, so it stays
+frozen as the tuning rig. Two edits against it, both mandated above — `city`
+became `locality`, and locality is defined as the tier below canton rather than
+left to mean whatever "city" means.
+
 ### Two findings worth keeping
 
 **Prompt tuning does not transfer between models.** The prompt revision that took
@@ -600,15 +740,55 @@ runs and still resolved it to **2025** in two of them — where 19 Aug 2025 is a
 Tuesday and 19 Aug 2026 is a Wednesday, so "Mi" rules 2025 out.
 
 It is tractable in code because the candidate set is tiny. A user photographing a
-poster is looking at something happening soon, so the year is last, this, or next —
-and a printed weekday picks exactly one of those, since a given day/month lands on
-a given weekday only once every 5–6 years. Past dates are allowed but penalised:
-a poster for 08.08 seen on 19.08 means the show was 11 days ago (stale poster), not
-next year. All nine test cases resolve correctly.
+poster is looking at something happening soon, so the year is last, this, or next,
+and the **nearest occurrence** decides which. Past dates are allowed but penalised
+3x: a poster for 08.08 seen on 19.08 means the show was 11 days ago (stale poster),
+not next year.
+
+**The printed weekday is a check on that answer, not the thing that picks it.** An
+earlier version of this decision had it the other way round — a given day/month
+lands on a given weekday only once every 5–6 years, so a printed weekday looked
+like it selected the year outright. Two things overturned that.
+
+It earns almost nothing. Across *every* `date_evidence` string the bake-off runs
+produced, filtering by weekday changed the resolved date **0 times out of 10** —
+including `"Mi 19. August"`, the case this section credits it for. The model's error
+there was resolving to 2025, and the distance rule rejects 2025 on its own (nought
+days away versus 365 x the past penalty). The weekday agreed; it was never what
+fixed it. That is not a coincidence: the two rules only ever disagree when the true
+date is more than six months out, which is rare for a concert poster.
+
+And it costs a great deal when wrong, because as a filter it overrode the distance
+rule outright — one bad token moved the answer a full year, silently. The tokens are
+two- and three-letter strings matched against verbatim poster text, which is
+inherently collision-prone: `mar` is *mardi*, *martedi* and an abbreviation of
+*März*; `so`, `die`, `mit` are ordinary German words. Three of the six defects found
+in review of #104 came from this one mechanism.
+
+So the distance rule resolves, and a weekday that contradicts the result raises
+`:date_weekday_conflict` for the human already sitting on the verify screen. A token
+collision now costs one false alarm instead of one wrong year, and *how often it
+fires, and which side turns out to be right,* becomes measurable (#112) rather than
+arguable. Revisit promoting it back once there is data.
+
+The token list covers the three languages the prompt declares — German, French,
+English — and standard abbreviations only. It previously carried German and French
+abbreviations but English full names alone (`mon` was present only because it is
+also short for *Montag*), and padded itself with `die` / `mit` / `son`, which are
+words before they are weekdays.
 
 A value failing validation is **nulled** and kept under `*_raw`, never trusted. A
 null gets completed by a human in one tap; a malformed date silently corrupts the
-feed.
+feed. Shipped as `Candidate#raw` (keyed by field) plus `#issues` saying why — one
+rule for every field, so the verify screen can show what the model claimed
+alongside the null without a per-field special case.
+
+The evidence rule earns one more thing there, read backwards: a **populated value
+with a null evidence field is nulled too**, not merely flagged. A place the model
+could not quote is self-reported invention (the bake-off's "Café Liebig" was not in
+the image), and the citation requirement is only worth its prompt space if
+something acts on it. The raw string survives, so nothing is lost — a human still
+sees the claim, it just no longer arrives pre-accepted.
 
 ## Residual risk
 

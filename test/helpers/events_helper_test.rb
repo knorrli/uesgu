@@ -7,6 +7,17 @@ class EventsHelperTest < ActionView::TestCase
   attr_writer :current_user
   def current_user = @current_user
 
+  test "event_offsite_source badges a listing or social host, but not the venue's own page" do
+    assert_equal "Bewegungsmelder", event_offsite_source(event(url: "https://www.bewegungsmelder.ch/e/1"))
+    assert_equal "Instagram", event_offsite_source(event(url: "https://instagram.com/p/abc"))
+    assert_equal "Facebook", event_offsite_source(event(url: "https://m.facebook.com/events/1"))
+    assert_nil event_offsite_source(event(url: "https://venue.test/show"))
+  end
+
+  test "event_offsite_source is nil for a captured event with no url" do
+    assert_nil event_offsite_source(event(url: nil))
+  end
+
   test "calendar_nav_path drops the open day but preserves the filter" do
     result = calendar_nav_path("http://test.host/events?view=calendar&day=2030-01-01&l%5B%5D=Venue")
     query = Rack::Utils.parse_nested_query(URI.parse(result).query)

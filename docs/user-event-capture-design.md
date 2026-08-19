@@ -1,9 +1,10 @@
 # User event capture — design decisions and model evaluation
 
-> Status: **decided; the place model is built** (2026-08-19) — decisions 4–6
-> shipped as the `places` table plus the location taxonomy reading it. Everything
-> else (the capture funnel, the three adapters, the verify screen, VenueLead
-> nomination) is still design only. Supersedes the framing in
+> Status: **decided; the schema prerequisites are built** (2026-08-19) —
+> decisions 4–6 shipped as the `places` table plus the location taxonomy reading
+> it, and decision 10 as the nullable `events.url`. Everything else (the capture
+> funnel, the three adapters, the verify screen, VenueLead nomination) is still
+> design only. Supersedes the framing in
 > [`user-event-capture.md`](user-event-capture.md), which stays as the original
 > idea note. This document records what we settled on and the evidence behind the
 > provider choice, so neither gets re-litigated.
@@ -185,9 +186,12 @@ text** — feeding a shared *extract → verify → create* path.
    The verify screen doubles as the PII checkpoint: the human sees, and edits,
    exactly what will be persisted.
 
-10. **`events.url` becomes nullable, and a capture keeps ONE url column.** The
-    column is not the dedup key, which is what made this look hard. It is the
-    *scraper's upsert key* — `find_or_initialize_by(url:)` (`agent.rb:269`) — so a
+10. **`events.url` becomes nullable, and a capture keeps ONE url column.**
+    **Built** as written — the column is nullable, `validates :url` is
+    `allow_nil`, the card branches, and `OFFSITE_SOURCES` carries the social
+    hosts. Nothing writes a NULL yet; this is the seam, opened ahead of the
+    funnel. The column is not the dedup key, which is what made this look hard.
+    It is the *scraper's upsert key* — `find_or_initialize_by(url:)` (`agent.rb:269`) — so a
     nightly re-scrape updates last night's row instead of creating a second. Real
     dedup is `Scrapers::Dedup`, grouping on venue + date + fuzzy title and linking
     losers via `canonical_event_id`; it never keys on `url`, and its own header
@@ -213,7 +217,9 @@ text** — feeding a shared *extract → verify → create* path.
     Postgres, no rewrite and no scan — it is *adding* one that hurts. No partial
     index is needed either, since a Postgres unique index already permits
     unlimited NULLs (`NULL != NULL`), so `index_events_on_url` stands untouched.
-    Only `validates :url, presence: true` becomes conditional.
+    Only `validates :url, presence: true` becomes conditional — `allow_nil`, which
+    keeps rejecting `""`: an empty string is a third state, and it is one the
+    unique index *does* compare, so the second url-less event would fail to save.
 
     **No separate `source_url`.** Where a pasted link *is* the venue's own event
     page, colliding with the scraper's key is the point: the scraper adopts the

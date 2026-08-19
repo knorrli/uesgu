@@ -54,11 +54,6 @@ class Genre < ApplicationRecord
   scope :by_usage, -> { order(events_count: :desc, name: :asc) }
   scope :by_name, -> { order(name: :asc) }
 
-  # Folded accented Latin letters used by both the SQL `fingerprint` generated
-  # column (see AddFingerprintToGenres) and fingerprint_for below. Keep in sync.
-  FINGERPRINT_ACCENTS_FROM = "äöüàâéèêëïîôûç".freeze
-  FINGERPRINT_ACCENTS_TO   = "aouaaeeeeiiouc".freeze
-
   # Curated display spellings, keyed by fingerprint. Reuses the alias-map
   # canonicals so collapsed variants surface with a nice name (the lowercase
   # taxonomy seed and raw scrapes both store a pretty `name`; `fingerprint` stays
@@ -160,14 +155,12 @@ class Genre < ApplicationRecord
     paths
   end
 
-  # The normalized matching key. MUST reproduce the SQL `fingerprint` generated
-  # column exactly (AddFingerprintToGenres) — verified by test. Used at ingest on
-  # raw scraped strings that have no row to read the stored column off.
+  # The normalized matching key, shared with Place (see Fingerprint). MUST
+  # reproduce the SQL `fingerprint` generated column exactly
+  # (AddFingerprintToGenres) — verified by test. Used at ingest on raw scraped
+  # strings that have no row to read the stored column off.
   def self.fingerprint_for(str)
-    str.to_s.downcase
-       .gsub("&", "and").gsub("'n'", "and")
-       .tr(FINGERPRINT_ACCENTS_FROM, FINGERPRINT_ACCENTS_TO)
-       .gsub(/[^a-z0-9]/, "")
+    Fingerprint.for(str)
   end
 
   # The display spelling for a (possibly messy) scraped/seeded name: a curated

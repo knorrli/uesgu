@@ -1,10 +1,11 @@
 # Location tags (the `:locations` acts_as_taggable_on context on Event) are flat:
 # a single tag list mixing venues, localities, and canton codes. There is no stored
-# type. We DERIVE the type: venue names come from the VENUE REGISTRY
-# (config/venues.yml via Venue) — the placed, consumed venues (Venue.in_taxonomy)
-# are the source of truth for the venue role and for the WHERE-filter tree —
-# while the canton codes are the closed list of 26 (CANTON_CODES), independent of
-# which cantons we happen to source from. Everything else is a locality.
+# type. We DERIVE the type from two disjoint sources, registry first: venue names
+# come from the VENUE REGISTRY (config/venues.yml via Venue) — the placed, consumed
+# venues (Venue.in_taxonomy) — plus the captured PLACES (the Place table), which
+# cover exactly what the registry does not. Canton codes are the closed list of 26
+# (CANTON_CODES), independent of which cantons we happen to source from. Everything
+# else is a locality.
 #
 # (Until 2026-06-25 this was derived from the scrapers + the VenuePlace table, now
 # repurposed as VenueLead; the
@@ -21,9 +22,18 @@ class Location
     Venue.in_taxonomy
   end
 
-  # Every venue name in the taxonomy.
+  # Fingerprints of every registry venue name — the key Place validates against so
+  # a captured place can never duplicate a venue we already source from.
+  def self.venue_registry_fingerprints
+    taxonomy_venues.to_set { |venue| Fingerprint.for(venue.name) }
+  end
+
+  # Every name that plays the venue role: the registry venues plus the captured
+  # places. The Place read lands on the per-event path (Event#venue), so it leans
+  # on the per-request query cache — places is a tens-of-rows table and the SQL is
+  # identical every call.
   def self.venue_names
-    taxonomy_venues.map(&:name).to_set
+    taxonomy_venues.map(&:name).to_set | Place.names
   end
 
   # The 26 Swiss cantons, keyed by the code a location tag carries. This is a
@@ -79,12 +89,22 @@ class Location
 
   # Grouped tree for the favorites + WHERE filter UI:
   #   { "BE" => { "Bern" => ["Dachstock", "Gaskessel", ...] }, ... }
-  # Built from each placed, consumed venue. A venue too thin to place (no locality
-  # or canton) is skipped — Venue.in_taxonomy already excludes those, so no nil keys.
+  # Built from each placed, consumed venue plus each captured place, so a captured
+  # event is findable by browsing and not only by typing its exact name. A venue
+  # too thin to place (no locality or canton) is skipped — Venue.in_taxonomy
+  # already excludes those, so no nil keys; a Place cannot be thin (both NOT NULL).
+  #
+  # One-offs do not accumulate here: location_filter_tree prunes every node to what
+  # events currently carry, so a captured place leaves the tree once its show has
+  # passed. Nothing expires it manually.
   def self.hierarchy
-    taxonomy_venues.each_with_object({}) do |venue, tree|
-      add_to_tree(tree, venue.canton, venue.locality, venue.name)
+    tree = taxonomy_venues.each_with_object({}) do |venue, acc|
+      add_to_tree(acc, venue.canton, venue.locality, venue.name)
     end
+    Place.pluck(:canton, :locality, :name).each do |canton, locality, name|
+      add_to_tree(tree, canton, locality, name)
+    end
+    tree
   end
 
   # Nest venue under canton > locality, skipping a tuple too thin to place.

@@ -2,10 +2,11 @@ require "db_test_helper"
 
 # Locks the location type derivation. Locations have no stored type — venue vs
 # region is derived from the VENUE REGISTRY (config/venues.yml via Venue): the
-# placed, consumed venues (Venue.in_taxonomy) are the source of truth. Expectations
-# are derived from the live registry, never hardcoded venue names, so this stays
-# correct as the registry changes. The canton codes are the exception: a closed
-# list of 26 that must NOT follow the registry.
+# placed, consumed venues (Venue.in_taxonomy) are the source of truth, joined by
+# the captured places (Place), which cover only what the registry does not.
+# Expectations are derived from the live registry, never hardcoded venue names, so
+# this stays correct as the registry changes. The canton codes are the exception: a
+# closed list of 26 that must NOT follow the registry.
 class LocationTest < ActiveSupport::TestCase
   setup do
     @venue = Venue.in_taxonomy.first # a placed, consumed venue
@@ -85,6 +86,43 @@ class LocationTest < ActiveSupport::TestCase
     tree = Location.hierarchy
     assert_includes tree[agg.canton].keys, agg.locality
     assert_includes tree[agg.canton][agg.locality], agg.name
+  end
+
+  # --- Captured places -------------------------------------------------------
+  #
+  # A captured place plays the venue role exactly like a registry venue: same
+  # type, same tree tier. Anything less and the captured event is unfindable by
+  # anyone who does not already know its name.
+
+  test "a captured place is classified as :venue, like a registry venue" do
+    zorpsaal = place(name: "Zorpsaal")
+
+    assert Location.venue?(zorpsaal.name)
+    assert_equal :venue, Location.type_for(zorpsaal.name)
+    assert_includes Location.venue_names, zorpsaal.name
+  end
+
+  test "hierarchy nests a captured place under its canton and locality" do
+    zorpsaal = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    tree = Location.hierarchy
+
+    assert_includes tree["BE"].keys, "Zorpwil"
+    assert_includes tree["BE"]["Zorpwil"], zorpsaal.name
+  end
+
+  test "captured places extend the registry tree rather than replacing it" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    tree = Location.hierarchy
+
+    assert_includes tree[@venue.canton][@venue.locality], @venue.name
+  end
+
+  test "venue_registry_fingerprints covers the registry only, never a place" do
+    zorpsaal = place(name: "Zorpsaal")
+    fingerprints = Location.venue_registry_fingerprints
+
+    assert_includes fingerprints, Fingerprint.for(@venue.name)
+    refute_includes fingerprints, zorpsaal.fingerprint
   end
 
   # A consume venue with no place (e.g. the Bewegungsmelder aggregator feed itself)

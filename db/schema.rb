@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -111,6 +111,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_140000) do
     t.index ["user_id", "period_end"], name: "index_notifications_on_user_id_and_period_end"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "places", force: :cascade do |t|
+    t.bigint "canonical_id"
+    t.string "canton", null: false
+    t.datetime "created_at", null: false
+    t.virtual "fingerprint", type: :string, as: "regexp_replace(translate(replace(replace(lower((name)::text), '&'::text, 'and'::text), '''n'''::text, 'and'::text), 'äöüàâéèêëïîôûç'::text, 'aouaaeeeeiiouc'::text), '[^a-z0-9]'::text, ''::text, 'g'::text)", stored: true
+    t.string "locality", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+    t.index ["canonical_id"], name: "index_places_on_canonical_id"
+    t.index ["fingerprint"], name: "index_places_on_fingerprint", unique: true
+    t.check_constraint "canonical_id IS NULL OR canonical_id <> id", name: "places_canonical_not_self"
   end
 
   create_table "push_subscriptions", force: :cascade do |t|
@@ -270,6 +284,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_140000) do
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
   add_foreign_key "notifications", "saved_filters"
   add_foreign_key "notifications", "users"
+  add_foreign_key "places", "places", column: "canonical_id"
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "saved_filters", "users"
   add_foreign_key "scrape_results", "scrape_runs", on_delete: :cascade

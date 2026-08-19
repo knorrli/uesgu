@@ -13,9 +13,10 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(event, today:)
+    def initialize(event, today:, source_url: nil)
       @event = event.is_a?(Hash) ? event : {}
       @today = today
+      @source_url = source_url
       @raw = {}
       @issues = []
       @salvaged_time = nil
@@ -35,7 +36,7 @@ module EventCapture
         locality: string(event["locality"]),
         canton: normalized_canton,
         genres: Array(event["genres"]).filter_map { |genre| string(genre) },
-        source_url: string(event["source_url"]),
+        source_url: string(event["source_url"]) || source_url,
         raw: raw,
         issues: issues
       )
@@ -43,7 +44,7 @@ module EventCapture
 
     private
 
-    attr_reader :event, :today, :raw, :issues, :salvaged_time
+    attr_reader :event, :today, :source_url, :raw, :issues, :salvaged_time
 
     def string(value) = value.to_s.strip.presence
 

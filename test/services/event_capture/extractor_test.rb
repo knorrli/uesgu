@@ -29,7 +29,7 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
 
   def extract(client)
     EventCaptureConfig.stub(:configured?, true) do
-      EventCapture::Extractor.call(image_data: "\x89PNG-ish", media_type: "image/png",
+      EventCapture::Extractor.call(input: EventCapture::Input.image("PNG-ish", media_type: "image/png"),
                                    today: TODAY, client: client)
     end
   end
@@ -81,11 +81,43 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     client = FakeClient.new(text: payload)
 
     extraction = EventCaptureConfig.stub(:configured?, false) do
-      EventCapture::Extractor.call(image_data: "x", media_type: "image/png", client: client)
+      EventCapture::Extractor.call(input: EventCapture::Input.image("x", media_type: "image/png"), client: client)
     end
 
     refute_predicate extraction, :ok?
     assert_match(/INFOMANIAK_API_TOKEN/, extraction.error)
     assert_empty client.calls
+  end
+
+  # An adapter failure is already the shape a provider failure is, so the funnel
+  # has one error path rather than two: the verify screen shows a refused paste and
+  # an upstream outage the same way, and neither reaches the provider.
+  test "a failed input is returned as a failed extraction, unsent" do
+    client = FakeClient.new(text: payload)
+    input = EventCapture::Input.failure(:robots_disallowed, "bejazz.ch/robots.txt disallows this path")
+
+    extraction = EventCaptureConfig.stub(:configured?, true) do
+      EventCapture::Extractor.call(input: input, client: client)
+    end
+
+    refute_predicate extraction, :ok?
+    assert_equal :robots_disallowed, extraction.code
+    assert_empty client.calls
+  end
+
+  # Decision 10: where a pasted link is the venue's own event page it becomes the
+  # event's url. The model may also read a link off the page, and that one wins —
+  # a poster's own "tickets at…" link is more specific than the page we fetched.
+  test "the fetched URL fills source_url only where the model found none" do
+    client = FakeClient.new(text: payload({ title: "Zorpcore" },
+                                          { title: "Grumf", source_url: "https://example.ch/tickets" }))
+    input = EventCapture::Input.text("Zorpcore, Sa 22. August", source_url: "https://example.ch/programm")
+
+    extraction = EventCaptureConfig.stub(:configured?, true) do
+      EventCapture::Extractor.call(input: input, today: TODAY, client: client)
+    end
+
+    assert_equal "https://example.ch/programm", extraction.candidates.first.source_url
+    assert_equal "https://example.ch/tickets", extraction.candidates.second.source_url
   end
 end

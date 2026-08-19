@@ -545,6 +545,12 @@ Nothing. The `events.url` seam was the last one — settled in decision 10.
 
 ### The URL adapter
 
+> **Built** in #105 — `EventCapture::SafeFetch` (robots + SSRF + manual redirects),
+> `EventCapture::AddressCheck` (the address list below), and
+> `EventCapture::Adapters::Url`, which routes what came back to the image or the
+> text adapter. Nothing in the funnel is wired to a screen yet — the entry point
+> is `bin/rails "event_capture:extract[…]"`.
+
 Two questions specific to the adapter that fetches a pasted link server-side.
 
 #### It honours `robots.txt`, and a refusal falls back rather than fails
@@ -617,6 +623,79 @@ Explicitly **not** doing the DNS-rebinding guard (resolve once, validate, connec
 to that pinned IP with an explicit `Host:` header). It closes a real TOCTOU gap and
 is the thorough version, but it is disproportionate to an admin-gated contributor
 list — revisit if capture is ever opened up.
+
+### The image and text adapters
+
+The two plain ones, and the two decisions they turned out to carry.
+
+#### Image size: downscale on the client, cap on the server
+
+The bake-off capped every sample's long edge with `sips` before sending it, and
+the extraction service (#104) deferred reproducing that to the adapters. It is not
+reproducible server-side: there is no image library in the bundle — no
+`image_processing`, no `mini_magick`, no `ruby-vips` — and Render's native Ruby
+runtime carries neither libvips nor ImageMagick, so adding one means a system
+dependency on a 512MB starter instance whose memory we already trim arenas to
+protect.
+
+**So the resize moves to the client**, in the verify screen (#106): a canvas
+`drawImage` to a capped long edge before upload. That is the better place for it
+anyway — the browser already holds the decoded pixels, and it makes the upload
+smaller too, which the server-side version never could. The one thing it is not is
+a guarantee, since the adapter is reachable from the rake task and from anything
+built later.
+
+What the adapter does instead is **cap and refuse**: 8MB, checked before anything
+is encoded. Base64 inflates by ~4/3 and one Puma worker with three threads holds
+every byte of the request in memory at once, so the cap is a memory decision, not
+a provider one.
+
+Two smaller calls that fell out of writing it:
+
+- **The media type is sniffed from the magic bytes**, never taken from a filename
+  or a browser-supplied content-type. Both are caller-controlled, and a wrong type
+  goes into the data URL and comes back as "unreadable image" — a failure that
+  looks like a bad photo rather than a bad header.
+- **HEIC is refused by name.** Safari converts it to JPEG through an
+  `<input type="file">`, so this is the AirDropped-then-uploaded path rather than
+  the common one, but it is a whole class of image arriving with a fix a human can
+  act on ("re-save as JPEG"), which beats one more `image_unsupported`.
+
+#### The prompt gets a text medium, and it is unmeasured
+
+The tuned prompt is written at an image throughout — "read in the image", "ONE
+IMAGE MAY ADVERTISE SEVERAL EVENTS", "the largest text on a poster is usually the
+ARTIST". None of that can be sent with a pasted page attached; a prompt telling
+the model to read an image it was never given is how a tuned instruction turns
+into noise.
+
+So `Prompt.instructions` takes a `medium:`, and the phrases that name the medium
+are collected in one `MEDIA` table rather than scattered through the text. The
+rules are shared because **the rules are the tuned part**; only the naming
+differs. The image rendering is word-for-word what the bake-off scored — verified
+against the pre-split version and pinned by a test that asserts the nine
+load-bearing sentences verbatim. The single deliberate change is that `SCHEMA`,
+one frozen constant shared by both media, now says "the input" where it said "the
+image".
+
+**The text prompt is UNMEASURED.** The bake-off scores six images against image
+ground truth and cannot say anything about a text prompt; #112 (recording every
+extraction) is what will tell us whether it needs tuning of its own, and prompt
+tuning was measured not to transfer even between models, let alone between media.
+Treat the text medium as a plausible first draft, not as a scored one.
+
+#### Failure codes are symbols; the verify screen owns the copy
+
+Every adapter returns either an `Input` or a failure carrying a **symbol** —
+`:robots_disallowed`, `:image_too_large`, `:address_blocked` — plus a
+developer-facing English message for the rake task and the logs. The three-locale
+copy lives in the verify screen, keyed on the symbol. A service returning
+translated prose would put user-facing copy behind a rake task nobody translates,
+and `:robots_disallowed` in particular is not a message at all: it is the signal
+that the funnel should offer the other two adapters.
+
+An adapter failure is the same shape as a provider failure, so `Extractor` returns
+it unchanged and the funnel has one error path rather than two.
 
 ## Provider evaluation
 

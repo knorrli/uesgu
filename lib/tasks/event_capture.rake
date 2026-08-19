@@ -1,53 +1,60 @@
 namespace :event_capture do
-  # The console entry point for the extraction service, built BEFORE any UI so the
+  # The console entry point for the capture funnel, built BEFORE any UI so the
   # verify screen (#106) is written against a real contract rather than a guessed
-  # one. Sends the image to Infomaniak and prints what the funnel would hand the
-  # verify screen; writes nothing to the database.
+  # one. Runs a target through its adapter and the extractor, then prints what the
+  # verify screen would receive; writes nothing to the database and stores no image.
   #
   #   bin/rails "event_capture:extract[poster.jpg]"
-  #   bin/rails "event_capture:extract[poster.jpg,screenshot.png]"
+  #   bin/rails "event_capture:extract[poster.jpg,https://example.ch/konzerte]"
+  #   pbpaste | bin/rails "event_capture:extract[-]"
   #
   # Needs INFOMANIAK_API_TOKEN + INFOMANIAK_PRODUCT_ID (see
   # config/initializers/event_capture.rb).
-  desc "Extract event candidates from image files (read-only; prints, persists nothing)"
-  task :extract, [:path] => :environment do |_task, args|
-    paths = [args[:path], *args.extras].compact_blank
-    abort 'usage: bin/rails "event_capture:extract[poster.jpg,...]"' if paths.empty?
+  desc "Extract event candidates from images, pasted text (-) or URLs (read-only; prints, persists nothing)"
+  task :extract, [:target] => :environment do |_task, args|
+    targets = [args[:target], *args.extras].compact_blank
+    abort 'usage: bin/rails "event_capture:extract[poster.jpg|https://…|-]"' if targets.empty?
     abort EventCapture::Extractor::UNCONFIGURED unless EventCaptureConfig.configured?
 
     puts "model: #{EventCaptureConfig.model}   today: #{Time.zone.today}"
 
-    failures = paths.count do |path|
-      abort "no such file: #{path}" unless File.exist?(path)
+    failures = targets.count { |target| report(target, EventCapture::Extractor.call(input: input_for(target))) }
 
-      extraction = EventCapture::Extractor.call(image_data: File.binread(path), media_type: media_type_for(path))
-      puts "\n#{File.basename(path)}"
-
-      unless extraction.ok?
-        puts "  FAILED: #{extraction.error}"
-        next true
-      end
-
-      puts format("  %d candidate(s)  %.1fs  %d in / %d out tokens",
-                  extraction.candidates.size, extraction.elapsed,
-                  extraction.input_tokens, extraction.output_tokens)
-      extraction.candidates.each_with_index { |candidate, i| print_candidate(candidate, i) }
-      false
-    end
-
-    abort "\n#{failures} of #{paths.size} image(s) failed" if failures.positive?
+    abort "\n#{failures} of #{targets.size} input(s) failed" if failures.positive?
   end
 
-  # Only what a poster or a chat screenshot actually arrives as. An unknown
-  # extension aborts rather than guessing: the media type goes into the data URL,
-  # and a wrong one gets read as an unreadable image rather than as an error.
-  MEDIA_TYPES = { ".png" => "image/png", ".jpg" => "image/jpeg", ".jpeg" => "image/jpeg",
-                  ".webp" => "image/webp", ".gif" => "image/gif" }.freeze
+  # Which adapter a target gets is decided by the target, not by a flag — the same
+  # three-doors-one-funnel shape the UI will have. A URL is a URL; a file is an
+  # image if its bytes say so and text otherwise; "-" is a paste.
+  def input_for(target)
+    return EventCapture::Adapters::Url.call(target) if target.match?(%r{\Ahttps?://}i)
+    return EventCapture::Adapters::Text.call($stdin.read) if target == "-"
 
-  def media_type_for(path)
-    MEDIA_TYPES.fetch(File.extname(path).downcase) do
-      abort "unsupported image type: #{File.extname(path).presence || path} (#{MEDIA_TYPES.keys.join(' ')})"
+    abort "no such file: #{target}" unless File.exist?(target)
+
+    data = File.binread(target)
+    return EventCapture::Adapters::Image.call(data) if EventCapture::Adapters::Image.media_type_for(data)
+
+    EventCapture::Adapters::Text.call(html?(target, data) ? EventCapture::HtmlText.call(data) : data)
+  end
+
+  def html?(path, data)
+    File.extname(path).downcase.in?([".html", ".htm"]) || data.lstrip.start_with?("<!", "<html", "<HTML")
+  end
+
+  def report(target, extraction)
+    puts "\n#{target}"
+
+    unless extraction.ok?
+      puts "  FAILED (#{extraction.code}): #{extraction.error}"
+      return true
     end
+
+    puts format("  %d candidate(s)  %.1fs  %d in / %d out tokens",
+                extraction.candidates.size, extraction.elapsed,
+                extraction.input_tokens, extraction.output_tokens)
+    extraction.candidates.each_with_index { |candidate, i| print_candidate(candidate, i) }
+    false
   end
 
   def print_candidate(candidate, index)

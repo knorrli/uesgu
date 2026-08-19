@@ -1,7 +1,8 @@
 module EventCapture
   # The provider call. Infomaniak's AI tools speak an OpenAI-shaped API under a
-  # product-scoped path, so the body below is the ordinary chat-completions shape
-  # with the image inlined as a data URL.
+  # product-scoped path, so the body below is the ordinary chat-completions
+  # shape: an image is inlined as a data URL, while pasted text rides in a second
+  # text part.
   #
   # Swiss-hosted, and chosen on accuracy rather than price: 0/6 fabricated dates
   # against Mistral Small 4's 5/6, at ~6 cents a month either way (see "Provider
@@ -17,9 +18,8 @@ module EventCapture
     READ_TIMEOUT = 60
     MAX_TOKENS = 4000
 
-    def call(image_data:, media_type:, today:)
-      body = request_body(image_data, media_type, today)
-      response = post(body)
+    def call(input:, today:)
+      response = post(request_body(input, today))
 
       Response.new(
         text: response.dig("choices", 0, "message", "content"),
@@ -35,7 +35,7 @@ module EventCapture
       URI("https://api.infomaniak.com/2/ai/#{EventCaptureConfig.product_id}/openai/v1/chat/completions")
     end
 
-    def request_body(image_data, media_type, today)
+    def request_body(input, today)
       {
         model: EventCaptureConfig.model,
         max_tokens: MAX_TOKENS,
@@ -44,13 +44,32 @@ module EventCapture
         # omitted `date` cannot read as a considered null.
         response_format: { type: "json_schema", json_schema: Prompt::SCHEMA },
         messages: [
-          { role: "system", content: Prompt.instructions(today: today) },
-          { role: "user", content: [
-            { type: "text", text: Prompt::REQUEST },
-            { type: "image_url", image_url: { url: "data:#{media_type};base64,#{Base64.strict_encode64(image_data)}" } }
-          ] }
+          { role: "system", content: Prompt.instructions(today: today, medium: input.kind) },
+          { role: "user", content: content_for(input) }
         ]
       }
+    end
+
+    def content_for(input)
+      return [request_part(input), text_part(input)] unless input.image?
+
+      [request_part(input),
+       { type: "image_url",
+         image_url: { url: "data:#{input.media_type};base64,#{Base64.strict_encode64(input.image_data)}" } }]
+    end
+
+    def request_part(input) = { type: "text", text: Prompt.request(medium: input.kind) }
+
+    # Fenced, because pasted text is third-party content sharing a channel with the
+    # instructions: the contributor vouches for pasting it, not for what it says — it
+    # is a venue's page, someone else's chat message, a programme listing. Not a
+    # security boundary, since nothing stops the text writing a fence of its own; it
+    # makes "everything after this is data" a claim the model can act on at all, with
+    # the rules it would have to overturn in the system message above. The verify
+    # screen, where a human reads every field before anything persists, is the actual
+    # check.
+    def text_part(input)
+      { type: "text", text: "<<<INPUT\n#{input.text}\nINPUT" }
     end
 
     def post(body)

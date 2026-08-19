@@ -29,7 +29,7 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
 
   def extract(client)
     EventCaptureConfig.stub(:configured?, true) do
-      EventCapture::Extractor.call(image_data: "\x89PNG-ish", media_type: "image/png",
+      EventCapture::Extractor.call(input: EventCapture::Input.image("PNG-ish", media_type: "image/png"),
                                    today: TODAY, client: client)
     end
   end
@@ -81,11 +81,24 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     client = FakeClient.new(text: payload)
 
     extraction = EventCaptureConfig.stub(:configured?, false) do
-      EventCapture::Extractor.call(image_data: "x", media_type: "image/png", client: client)
+      EventCapture::Extractor.call(input: EventCapture::Input.image("x", media_type: "image/png"), client: client)
     end
 
     refute_predicate extraction, :ok?
     assert_match(/INFOMANIAK_API_TOKEN/, extraction.error)
+    assert_empty client.calls
+  end
+
+  test "a failed input is returned as a failed extraction, unsent" do
+    client = FakeClient.new(text: payload)
+    input = EventCapture::Input.failure(:image_unsupported, "not a PNG, JPEG, WebP or GIF")
+
+    extraction = EventCaptureConfig.stub(:configured?, true) do
+      EventCapture::Extractor.call(input: input, client: client)
+    end
+
+    refute_predicate extraction, :ok?
+    assert_equal :image_unsupported, extraction.code
     assert_empty client.calls
   end
 end

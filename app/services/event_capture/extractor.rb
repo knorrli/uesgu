@@ -1,16 +1,19 @@
 module EventCapture
-  # Image in, event candidates out. The whole extraction path in one call: prompt
-  # the model, read its JSON, then hand every event it claims to the Normalizer,
-  # which is where the deterministic fields are actually decided.
+  # One Input in, event candidates out. The whole extraction path in one call:
+  # prompt the model, read its JSON, then hand every event it claims to the
+  # Normalizer, which is where the deterministic fields are actually decided.
   #
-  # One image per call, deliberately. The verify screen fires N of these — one per
+  # An adapter's failure is already the shape this returns, so the funnel has one
+  # error path: an unreadable upload and a provider outage look the same downstream.
+  #
+  # One input per call, deliberately. The verify screen fires N of these — one per
   # uploaded image, driven by the client — because 8 x 2.3s does not fit in one
   # request and there is no queue to reach for (the adapter is :inline and Solid
   # Queue was removed for competing with Puma for RAM). A failure is returned, not
   # raised, so a bad image is one row to retry rather than a dead batch.
   class Extractor
-    Extraction = Data.define(:candidates, :model, :input_tokens, :output_tokens, :elapsed, :error) do
-      def initialize(candidates: [], model: nil, input_tokens: 0, output_tokens: 0, elapsed: 0.0, error: nil)
+    Extraction = Data.define(:candidates, :model, :input_tokens, :output_tokens, :elapsed, :code, :error) do
+      def initialize(candidates: [], model: nil, input_tokens: 0, output_tokens: 0, elapsed: 0.0, code: nil, error: nil)
         super
       end
 
@@ -19,9 +22,8 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(image_data:, media_type:, today: Time.zone.today, client: Infomaniak.new)
-      @image_data = image_data
-      @media_type = media_type
+    def initialize(input:, today: Time.zone.today, client: Infomaniak.new)
+      @input = input
       @today = today
       @client = client
     end
@@ -30,9 +32,10 @@ module EventCapture
 
     def call
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      return Extraction.new(error: UNCONFIGURED) unless EventCaptureConfig.configured?
+      return Extraction.new(error: input.error, code: input.code) unless input.ok?
+      return Extraction.new(error: UNCONFIGURED, code: :unconfigured) unless EventCaptureConfig.configured?
 
-      response = client.call(image_data: image_data, media_type: media_type, today: today)
+      response = client.call(input: input, today: today)
       events = Array(parse(response.text)["events"])
 
       Extraction.new(
@@ -43,12 +46,12 @@ module EventCapture
         elapsed: since(started)
       )
     rescue ProviderError => e
-      Extraction.new(error: e.message, elapsed: since(started))
+      Extraction.new(error: e.message, code: :provider_error, elapsed: since(started))
     end
 
     private
 
-    attr_reader :image_data, :media_type, :today, :client
+    attr_reader :input, :today, :client
 
     def since(started) = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
 

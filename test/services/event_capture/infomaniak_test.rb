@@ -27,12 +27,12 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
     end
   end
 
-  def call_with(canned)
+  def call_with(canned, input: EventCapture::Input.image("PNGDATA", media_type: "image/png"))
     http = FakeHTTP.new(canned)
     result = EventCaptureConfig.stub(:api_token, "tok-123") do
       EventCaptureConfig.stub(:product_id, "4242") do
         Net::HTTP.stub(:new, http) do
-          yield_result { EventCapture::Infomaniak.new.call(image_data: "PNGDATA", media_type: "image/png", today: Date.new(2026, 8, 19)) }
+          yield_result { EventCapture::Infomaniak.new.call(input: input, today: Date.new(2026, 8, 19)) }
         end
       end
     end
@@ -77,7 +77,7 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
   test "a malformed product id becomes a ProviderError, not a raw exception" do
     result = EventCaptureConfig.stub(:api_token, "tok-123") do
       EventCaptureConfig.stub(:product_id, "42 42") do
-        yield_result { EventCapture::Infomaniak.new.call(image_data: "x", media_type: "image/png", today: Date.new(2026, 8, 19)) }
+        yield_result { EventCapture::Infomaniak.new.call(input: EventCapture::Input.image("x", media_type: "image/png"), today: Date.new(2026, 8, 19)) }
       end
     end
 

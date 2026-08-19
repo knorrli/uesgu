@@ -1,4 +1,4 @@
-# User event capture: turning a poster, a screenshot or a pasted page into event
+# User event capture: turning a poster, a screenshot or pasted text into event
 # candidates a human then verifies. This namespace holds the extraction half —
 # the prompt, the provider call, and the code-side validators that undo what a
 # language model reliably gets wrong. Nothing here persists anything.

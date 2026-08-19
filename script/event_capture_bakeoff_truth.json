@@ -1,0 +1,127 @@
+{
+  "_comment": "Ground truth for the extraction bake-off. VERIFY THESE before trusting the scores — I read them off the images by eye, and the year on most posters is inferred (they state no year). 'events' is the number of distinct events the image advertises. Dates are ISO. Set a field to null to skip scoring it.",
+
+  "IMG_2019.PNG": {
+    "label": "ZAR poster (brush script over photo)",
+    "events": 1,
+    "expect": [
+      {
+        "title": "Camilla Gyda Trio",
+        "date": "2026-08-20",
+        "time": "20:00",
+        "place": "ZAR",
+        "city": "Bern",
+        "canton": "BE",
+        "note": "Poster says 'Donnerstag 20 August' with no year. 20 Aug 2026 IS a Thursday, so the weekday checksum confirms 2026. Address Pestalozzistrasse 9, 3007 Bern."
+      }
+    ]
+  },
+
+  "IMG_2020.PNG": {
+    "label": "Bigote Verde (photo with overlaid text, no address)",
+    "events": 1,
+    "expect": [
+      {
+        "title": "Camilla Gyda / Jhony del Rio / Pedro Paz",
+        "date": "2026-08-19",
+        "time": "19:30",
+        "place": "Bigote Verde",
+        "city": "Bern",
+        "canton": "BE",
+        "note": "'Mi 19. August', no year. 19 Aug 2026 IS a Wednesday. Genres stated: Bossa, Latin, Jazz."
+      }
+    ]
+  },
+
+  "IMG_2021.PNG": {
+    "label": "Punto de Partida (year stated; venue is a street festival, not a venue)",
+    "events": 1,
+    "expect": [
+      {
+        "title": "Punto de Partida",
+        "date": "2026-08-22",
+        "time": "20:30",
+        "place": "Marzili Quartierfest",
+        "city": "Bern",
+        "canton": "BE",
+        "note": "The ONLY sample stating a year. Place is ad-hoc — a neighbourhood festival. City 'Bern' must be INFERRED from 'Marzili'; a model that leaves it null is being honest, not wrong."
+      }
+    ]
+  },
+
+  "IMG_2022.PNG": {
+    "label": "Parterre — TWO events on one poster, no city anywhere",
+    "events": 2,
+    "expect": [
+      {
+        "title": "message: incomplete",
+        "date": "2026-08-08",
+        "time": "21:00",
+        "place": "Parterre",
+        "city": null,
+        "canton": null,
+        "note": "'Sa. 08.08.' — no year. 8 Aug 2026 IS a Saturday. Already in the PAST as of 2026-08-19: a correct pipeline should flag it stale, not silently roll it to 2027."
+      },
+      {
+        "title": "Bb Bird & Lazy Cat meet Nico Wolf",
+        "date": "2026-08-21",
+        "time": "20:00",
+        "place": "Parterre",
+        "city": null,
+        "canton": null,
+        "note": "'Fr. 21.8.' — 21 Aug 2026 IS a Friday. THE KEY TEST: does the model return BOTH events, or collapse the poster into one?"
+      }
+    ]
+  },
+
+  "IMG_2023.PNG": {
+    "label": "WhatsApp text screenshot — clean rendered text, contains a URL",
+    "events": 1,
+    "expect": [
+      {
+        "title": "Trauma Glow & Big Radio",
+        "date": "2026-08-26",
+        "time": null,
+        "place": "Café Kairo",
+        "city": "Bern",
+        "canton": "BE",
+        "note": "No time stated. Place appears ONLY inside the URL cafe-kairo.ch — extracting it requires reading the link, not the prose. This is the sample that should dedup against an event we already scrape."
+      }
+    ]
+  },
+
+  "IMG_2024.PNG": {
+    "label": "WhatsApp screenshot OF a screenshot — cropped top and bottom, no date visible",
+    "events": 3,
+    "expect": [
+      {
+        "title": "Yagnan Zegbeu",
+        "date": null,
+        "time": "18:30",
+        "place": "Schützenmatte",
+        "city": "Bern",
+        "canton": "BE",
+        "note": "Afro-Workshop."
+      },
+      {
+        "title": "Nomonde Maxeen / Sixolo Gerlach",
+        "date": null,
+        "time": "20:30",
+        "place": "Schützenmatte",
+        "city": "Bern",
+        "canton": "BE",
+        "note": "Poesie, Performance, Musik."
+      },
+      {
+        "title": "Kaddour",
+        "date": null,
+        "time": "22:00",
+        "place": "Schützenmatte",
+        "city": "Bern",
+        "canton": "BE",
+        "note": "Chaâbi, Pop, Electro — the genre line is cut off mid-word."
+      }
+    ],
+    "note": "HARDEST SAMPLE. No date is legible (the image is cropped). The correct behaviour is to return the acts with date=null and low confidence, NOT to hallucinate a date. A model that confidently invents one FAILS this sample even if everything else is right."
+  }
+}

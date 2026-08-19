@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -245,6 +245,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_180000) do
   create_table "users", force: :cascade do |t|
     t.boolean "admin", default: false, null: false
     t.string "calendar_feed_token"
+    t.boolean "contributor", default: false, null: false
     t.datetime "created_at", null: false
     t.string "email_address"
     t.boolean "event_reminders", default: false, null: false

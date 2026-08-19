@@ -424,6 +424,9 @@ fr:
           distinct_genres: genres distincts
     users:
       admin_badge: Admin
+      contributor_badge: Saisie
+      contributor_granted: "%{username} peut désormais saisir des événements."
+      contributor_revoked: "%{username} ne peut plus saisir d'événements."
       cant_delete_self: Tu ne peux pas supprimer ton propre compte ici.
       deleted: "Le compte %{username} a été supprimé."
       index:
@@ -437,6 +440,10 @@ fr:
         sessions: Sessions actives
         invited_by: Invité par
         saved_filters: Filtres enregistrés
+        contributor_heading: Saisir des événements
+        contributor_hint: Permet à ce compte de saisir lui-même des événements — depuis un lien, une affiche ou une capture d'écran.
+        contributor_grant: Autoriser la saisie
+        contributor_revoke: Retirer la saisie
         delete_heading: Supprimer le compte
         delete_hint: Supprime définitivement ce compte et ses données.
         delete: Supprimer le compte

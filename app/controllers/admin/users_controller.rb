@@ -9,6 +9,14 @@ module Admin
       @user = User.includes(:sessions, accepted_invitation: :created_by).find(params[:id])
     end
 
+    def toggle_contributor
+      @user = User.find(params[:id])
+      @user.update!(contributor: !@user.contributor?)
+
+      notice = @user.contributor? ? "admin.users.contributor_granted" : "admin.users.contributor_revoked"
+      redirect_to admin_user_path(@user), notice: t(notice, username: @user.username), status: :see_other
+    end
+
     def destroy
       @user = User.find(params[:id])
 

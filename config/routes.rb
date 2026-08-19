@@ -128,7 +128,9 @@ Rails.application.routes.draw do
   # get their own admin_users_/admin_invitations_ helpers, distinct from the
   # legacy scoped dashboard/genre routes above.
   namespace :admin do
-    resources :users, only: %i[index show destroy]
+    resources :users, only: %i[index show destroy] do
+      member { patch :toggle_contributor }
+    end
     resources :invitations, only: %i[index create destroy]
     # Scraper run oversight: nightly sweep health + per-venue outcomes. create
     # triggers a full sweep on demand (runs in a background thread). snooze/wake

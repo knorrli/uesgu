@@ -424,6 +424,9 @@ de:
           distinct_genres: versch. Genres
     users:
       admin_badge: Admin
+      contributor_badge: Erfassung
+      contributor_granted: "%{username} kann jetzt Events erfassen."
+      contributor_revoked: "%{username} kann keine Events mehr erfassen."
       cant_delete_self: Du kannst dein eigenes Konto hier nicht löschen.
       deleted: "Konto %{username} wurde gelöscht."
       index:
@@ -437,6 +440,10 @@ de:
         sessions: Aktive Sitzungen
         invited_by: Eingeladen von
         saved_filters: Gespeicherte Filter
+        contributor_heading: Events erfassen
+        contributor_hint: Erlaubt diesem Konto, selbst Events zu erfassen – aus Link, Poster oder Screenshot.
+        contributor_grant: Erfassung erlauben
+        contributor_revoke: Erfassung entziehen
         delete_heading: Konto löschen
         delete_hint: Entfernt dieses Konto und seine Daten endgültig.
         delete: Konto löschen

@@ -97,7 +97,7 @@
 
 /* Venue-led row, zero boxes. Hierarchy comes from structure + weight — the venue
    anchor (bold ink) on its own line, the underlined event title as the primary
-   link, a quiet metadata line (city/canton) beneath. Colour is rationed: green
+   link, a quiet metadata line (locality/canton) beneath. Colour is rationed: green
    marks an *applied* filter term (.filter-link.active) and nothing else on the row;
    muted grey = passive info; ink = structure and the event itself. */
 .event {
@@ -123,9 +123,9 @@
   color: var(--theme-fg-color);
 }
 
-/* Every taxonomy term (venue, city/canton, style, genre) is a filter link:
+/* Every taxonomy term (venue, locality/canton, style, genre) is a filter link:
    tapping it toggles the programme's filter by that term. At REST it carries no
-   colour of its own — it inherits its context (venue = fg, city/canton = muted,
+   colour of its own — it inherits its context (venue = fg, locality/canton = muted,
    styles = fg bold, genres = muted), so the row reads as calm structure, not a
    field of green. Affordance comes from weight/hierarchy + a hover underline on
    desktop and tap convention on touch. Colour is spent only on .active below. */
@@ -146,7 +146,7 @@
 /* An APPLIED term — this tag is in your active filter — lights GREEN. It's the one
    place green is earned on a row, so green now means "your filter" (resting tags
    stay neutral). Lit ⇔ tapping removes it (see EventsHelper#event_filter_tag). Two
-   classes outrank the contextual muted/fg, so an active city/canton or genre lights
+   classes outrank the contextual muted/fg, so an active locality/canton or genre lights
    up regardless of its rest colour. */
 .filter-link.active {
   color: var(--theme-accent-color);
@@ -401,7 +401,7 @@
    - Big text links use the UNDERLINE family: event title = solid (primary),
      venue = dotted (the same language, a weaker member) — so a venue reads as
      tappable without a pill, which would be clunky at headline size.
-   - Small filter tokens (styles, genres, city/canton) use the PILL family: an
+   - Small filter tokens (styles, genres, locality/canton) use the PILL family: an
      outline pill at rest = "tap me", and when applied it fills green — which is
      exactly the filter CHIP in the chips row, so the tag and the chip are one
      object in two states. Mobile-first: the pill outline carries the affordance
@@ -455,7 +455,7 @@
   color: var(--theme-on-accent);
 }
 
-/* Locations (venue + city/canton) use the UNDERLINE family: dotted = tappable,
+/* Locations (venue + locality/canton) use the UNDERLINE family: dotted = tappable,
    deliberately distinct from the event title's solid underline so the two link
    tiers never blur. City/canton stay muted text (not pills) — same affordance as
    the venue, just quieter, which also keeps the metadata line from boxing up. */
@@ -511,7 +511,7 @@
   border-left: 0;
 }
 
-/* On the venue / city-canton (text, not a chip) it's a bare trailing glyph,
+/* On the venue / locality-canton (text, not a chip) it's a bare trailing glyph,
    centred to the line. Sized up from the body default so it stays legible beside
    the bold venue headline; the meta line a touch smaller, matching its text. */
 .event-where .interest-flag {

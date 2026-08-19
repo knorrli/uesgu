@@ -546,7 +546,7 @@ fr:
         title: Lieux
         type_all: Tous
         type_venue: Lieu
-        type_city: Ville
+        type_locality: Localité
         type_canton: Canton
         search: Rechercher des lieux…
         sort_by: Trier par
@@ -667,13 +667,13 @@ fr:
       where: Où ?
       location_types:
         venue: Salle
-        city: Ville
+        locality: Localité
         canton: Canton
       sheet:
         what: Quoi
         where: Où
         when: Quand
-      search_where: "Rechercher salles, villes, cantons…"
+      search_where: "Rechercher salles, localités, cantons…"
       saved:
         menu: Filtres enregistrés
       apply: Appliquer

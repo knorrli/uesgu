@@ -14,7 +14,7 @@
 #   disposition consume | defer | reject. consume MUST be backed by a live
 #               scraper (ledger drift test). defer/reject need a `reason`.
 #   reason      one of Scrapers::Discovery::Ledger::REASONS (defer/reject only).
-#   place       { city, canton } — venue identity; only for placed venues.
+#   place       { locality, canton } — venue identity; only for placed venues.
 #   checked     date the decision was last evaluated (staleness re-check).
 #   aliases     per-upstream raw keys that resolve here (petzi slug / ole host /
 #               hinto <location> name) — discovery-dedup keys.
@@ -24,14 +24,14 @@ venues:
   name: Bad Bonn
   disposition: consume
   place:
-    city: Düdingen
+    locality: Düdingen
     canton: FR
   checked: 2026-06-21
 - domain: bar59.ch
   name: Bar 59
   disposition: consume
   place:
-    city: Luzern
+    locality: Luzern
     canton: LU
   checked: 2026-06-21
 - domain: bee-flat.ch
@@ -41,7 +41,7 @@ venues:
   name: Turnhalle
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
 - domain: bejazz.ch
@@ -74,7 +74,7 @@ venues:
   name: Bierhübeli
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
 - domain: birdseye.ch
@@ -93,7 +93,7 @@ venues:
   name: Böröm
   disposition: consume
   place:
-    city: Aarau
+    locality: Aarau
     canton: AG
   checked: 2026-06-21
   aliases:
@@ -108,7 +108,7 @@ venues:
   name: Café Kairo
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
   aliases:
@@ -123,7 +123,7 @@ venues:
   name: Cafete
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-07-09
 - domain: casinobern.ch
@@ -138,7 +138,7 @@ venues:
   name: Dachstock
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
   aliases:
@@ -153,14 +153,14 @@ venues:
   name: Dampfzentrale
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
 - domain: dieheiterefahne.ch
   name: Heitere Fahne
   disposition: consume
   place:
-    city: Wabern
+    locality: Wabern
     canton: BE
   checked: 2026-06-25
   sources:
@@ -170,7 +170,7 @@ venues:
   name: Docks
   disposition: consume
   place:
-    city: Lausanne
+    locality: Lausanne
     canton: VD
   checked: 2026-06-21
   aliases:
@@ -185,14 +185,14 @@ venues:
   name: Dynamo
   disposition: consume
   place:
-    city: Zürich
+    locality: Zürich
     canton: ZH
   checked: 2026-06-21
 - domain: fri-son.ch
   name: FriSon
   disposition: consume
   place:
-    city: Fribourg
+    locality: Fribourg
     canton: FR
   checked: 2026-06-21
   aliases:
@@ -207,7 +207,7 @@ venues:
   name: Gaskessel
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
   aliases:
@@ -217,7 +217,7 @@ venues:
   name: Helsinki Klub
   disposition: consume
   place:
-    city: Zürich
+    locality: Zürich
     canton: ZH
   checked: 2026-06-21
   aliases:
@@ -227,7 +227,7 @@ venues:
   name: ISC
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
   aliases:
@@ -237,21 +237,21 @@ venues:
   name: Le Singe
   disposition: consume
   place:
-    city: Biel
+    locality: Biel
     canton: BE
   checked: 2026-06-21
 - domain: kaserne-basel.ch
   name: Kaserne Basel
   disposition: consume
   place:
-    city: Basel
+    locality: Basel
     canton: BS
   checked: 2026-06-21
 - domain: kiff.ch
   name: KIFF
   disposition: consume
   place:
-    city: Aarau
+    locality: Aarau
     canton: AG
   checked: 2026-06-21
   aliases:
@@ -266,7 +266,7 @@ venues:
   name: Kofmehl
   disposition: consume
   place:
-    city: Solothurn
+    locality: Solothurn
     canton: SO
   checked: 2026-06-21
   aliases:
@@ -286,7 +286,7 @@ venues:
   name: Kulturhof Schloss Köniz
   disposition: consume
   place:
-    city: Köniz
+    locality: Köniz
     canton: BE
   checked: 2026-06-25
   sources:
@@ -296,7 +296,7 @@ venues:
   name: Kulturspinnerei
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-07-25
 - domain: la-cappella.ch
@@ -316,14 +316,14 @@ venues:
   name: Mahogany Hall
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
 - domain: mariansjazzroom.ch
   name: Marians Jazzroom
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-07-07
 - domain: mobilservice.ch
@@ -335,21 +335,21 @@ venues:
   name: Café Bar Mokka
   disposition: consume
   place:
-    city: Thun
+    locality: Thun
     canton: BE
   checked: 2026-07-07
 - domain: muehlehunziken.ch
   name: Mühle Hunziken
   disposition: consume
   place:
-    city: Rubigen
+    locality: Rubigen
     canton: BE
   checked: 2026-06-21
 - domain: neubad.org
   name: Neubad
   disposition: consume
   place:
-    city: Luzern
+    locality: Luzern
     canton: LU
   checked: 2026-06-21
   aliases:
@@ -359,7 +359,7 @@ venues:
   name: Nouveau Monde
   disposition: consume
   place:
-    city: Fribourg
+    locality: Fribourg
     canton: FR
   checked: 2026-06-21
   aliases:
@@ -369,7 +369,7 @@ venues:
   name: ONO
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-07-07
 - domain: prozess.be
@@ -391,35 +391,35 @@ venues:
   name: Zent
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
 - domain: rotefabrik.ch
   name: Rote Fabrik
   disposition: consume
   place:
-    city: Zürich
+    locality: Zürich
     canton: ZH
   checked: 2026-06-21
 - domain: saegegasse.ch
   name: Sägegasse
   disposition: consume
   place:
-    city: Burgdorf
+    locality: Burgdorf
     canton: BE
   checked: 2026-06-21
 - domain: schuur.ch
   name: Schüür
   disposition: consume
   place:
-    city: Luzern
+    locality: Luzern
     canton: LU
   checked: 2026-06-21
 - domain: sedel.ch
   name: Sedel
   disposition: consume
   place:
-    city: Luzern
+    locality: Luzern
     canton: LU
   checked: 2026-06-21
   aliases:
@@ -429,14 +429,14 @@ venues:
   name: Sous Soul
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
 - domain: souslepont-roessli.ch
   name: Rössli
   disposition: consume
   place:
-    city: Bern
+    locality: Bern
     canton: BE
   checked: 2026-06-21
 - domain: stattland.ch
@@ -448,14 +448,14 @@ venues:
   name: Südpol
   disposition: consume
   place:
-    city: Kriens
+    locality: Kriens
     canton: LU
   checked: 2026-06-21
 - domain: treibhausluzern.ch
   name: Treibhaus
   disposition: consume
   place:
-    city: Luzern
+    locality: Luzern
     canton: LU
   checked: 2026-06-21
   aliases:
@@ -465,6 +465,6 @@ venues:
   name: Volkshaus Basel
   disposition: consume
   place:
-    city: Basel
+    locality: Basel
     canton: BS
   checked: 2026-06-21

@@ -42,7 +42,7 @@ class MobileFilterTest < ApplicationSystemTestCase
 
     open_what_sheet
     # The root is a visible browse row; its expand chevron reveals the child.
-    assert_selector ".sheet[data-field=what] .opt--canton", text: rock.name, visible: true
+    assert_selector ".sheet[data-field=what] .opt--top", text: rock.name, visible: true
 
     # Pick the root — subtree expansion must catch the child-tagged event. The row's
     # action can bind a tick after the sheet opens, so the first tap may no-op; re-tap
@@ -50,7 +50,7 @@ class MobileFilterTest < ApplicationSystemTestCase
     # effective tap toggling it back off. (No fixed sleeps.)
     checked = ".sheet[data-field=what] input[value='#{rock.name}']:checked"
     10.times do
-      find(".sheet[data-field=what] .opt--canton", text: rock.name).click
+      find(".sheet[data-field=what] .opt--top", text: rock.name).click
       break if has_selector?(checked, visible: :all, wait: 1)
     end
     assert_selector checked, visible: :all

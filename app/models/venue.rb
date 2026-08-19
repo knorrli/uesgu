@@ -68,13 +68,13 @@ class Venue
     end
   end
 
-  attr_reader :domain, :name, :city, :canton, :status, :reason, :checked, :aliases, :sources
+  attr_reader :domain, :name, :locality, :canton, :status, :reason, :checked, :aliases, :sources
 
   def initialize(row)
     @domain  = row.fetch("domain")
     @name    = row["name"]
     place    = row["place"] || {}
-    @city    = place["city"]
+    @locality = place["locality"]
     @canton  = place["canton"]
     @status  = row["disposition"] || "consume"
     @reason  = row["reason"]
@@ -87,8 +87,8 @@ class Venue
   end
 
   def label = name
-  def place_tuple = [name, city, canton].compact
-  def placed? = city.present? && canton.present?
+  def place_tuple = [name, locality, canton].compact
+  def placed? = locality.present? && canton.present?
   def consume? = status == "consume"
   def blocked? = !consume?
   def disposition = status

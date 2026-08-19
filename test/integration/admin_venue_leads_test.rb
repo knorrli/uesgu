@@ -23,8 +23,8 @@ class AdminVenueLeadsTest < ActionDispatch::IntegrationTest
 
   test "an admin sees the surfaced leads with place, count and source" do
     VenueLead.refresh!(source: "OLE:TestAgg", leads: [
-      { venue: "Glorphalle", city: "Snarftown", canton: "BE", event_count: 9 },
-      { venue: "Blipbar", city: "Blipcity", canton: "ZH", event_count: 2 }
+      { venue: "Glorphalle", locality: "Snarftown", canton: "BE", event_count: 9 },
+      { venue: "Blipbar", locality: "Blipcity", canton: "ZH", event_count: 2 }
     ])
     sign_in_as user(admin: true)
 

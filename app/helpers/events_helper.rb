@@ -55,7 +55,7 @@ module EventsHelper
     uri.to_s
   end
 
-  # A taxonomy term on an event — venue, city/canton, style, or genre. Tapping it
+  # A taxonomy term on an event — venue, locality/canton, style, or genre. Tapping it
   # FILTERS the programme by that term ("tap rock → rock events"), the behaviour
   # cold users expect. One action per tag: the whole tag is the filter link, so a
   # tag means exactly one thing (no tiny secondary follow target crammed onto a

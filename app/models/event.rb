@@ -162,7 +162,7 @@ class Event < ApplicationRecord
   end
 
   # The venue location among this event's flat location tags (the rest are
-  # city/canton). See Location for how the type is derived.
+  # locality/canton). See Location for how the type is derived.
   def venue
     locations.detect { |location| Location.venue?(location.name) }
   end

@@ -58,8 +58,8 @@ text** — feeding a shared *extract → verify → create* path.
      distinction is *emergent*, never recorded at capture time. See "VenueLead
      promotion".
    - `Location.type_for` must consult both. Today it classifies anything unknown
-     as a **city** (`app/models/location.rb`), so a captured "ZAR" reads as a city
-     in the filter chips, the location combobox suffix, and the admin browser. It
+     as a **locality** (`app/models/location.rb`), so a captured "ZAR" reads as a
+     locality in the filter chips, the location combobox suffix, and the admin browser. It
      cannot yet reach the WHERE *tree* at all — `Location.hierarchy` is built
      purely from `Venue.in_taxonomy` — which is what decision 4 changes.
    - The same registry-derivation bug bit cantons, independently of capture:
@@ -97,7 +97,7 @@ text** — feeding a shared *extract → verify → create* path.
 6. **Canton and locality are both required.** The earlier version of this
    decision made the middle tier optional, reasoning that a concert in a forest
    between Bern and Luzern has no *city*. Decision 4 kills that: `add_to_tree`
-   bails on a blank middle tier (`return if canton.blank? || city.blank?`), so a
+   bails on a blank middle tier (`return if canton.blank? || locality.blank?`), so a
    place without one cannot be a tree node. Optional means the events most likely
    to need the tree — the forest, the field, the barn — are the ones silently
    missing from it.
@@ -130,7 +130,8 @@ text** — feeding a shared *extract → verify → create* path.
    not a location; a captured place exists *only* to be a location.
 
    **Prerequisite: rename `city` → `locality` first, everywhere, as its own
-   `chore/` PR (issue #93).** Not cosmetic — the extraction prompt is a consumer of this
+   `chore/` PR (issue #93). Landed in #99** — the attribute *and* the type symbol
+   (`type_for` returns `:locality`), so no half-rename survives. Not cosmetic — the extraction prompt is a consumer of this
    name: ask Gemma for a `city` and it will try to produce a city and null out on
    a hamlet, which is the failure mode this decision exists to remove.
    `locality` over the alternatives — `municipality` means Gemeinde and would
@@ -139,8 +140,6 @@ text** — feeding a shared *extract → verify → create* path.
    the worst option (a new table saying `locality` next to `venues.yml` saying
    `city` splits one hierarchy tier across two names), so it is all or nothing.
    There is no data migration — location tags are just names and do not change.
-   The change is `config/venues.yml` (20 rows), `Venue`, the `venue_leads.city`
-   column, `Location`, and the `location_types.city` label in three locale files.
 
 7. **Captured events go live immediately**, and a report **quarantines the event,
    not the person**. Contributors are admin-enabled, so the abuse surface is
@@ -223,7 +222,7 @@ Rejected:
   the table that fed the location taxonomy until PR #29 retired it precisely
   because two sources of "what is a venue" drift. `Location` reads the registry
   first, then `Place`; two disjoint sets, one precedence rule.
-- **Extending `VenueLead`.** It already has `venue/city/canton/event_count`, but
+- **Extending `VenueLead`.** It already has `venue/locality/canton/event_count`, but
   `refresh!` is `delete_all` + reinsert per source — correct for a run-scoped
   discovery snapshot, fatal for a record live events depend on. `VenueLead` stays
   the *inbox*; nomination is a projection into it (see decision 3).
@@ -246,7 +245,7 @@ configures **one feed URL**. Bewegungsmelder's single feed emits events for ever
 venue it covers, each with its own `<location>`, so the aggregator sees well beyond
 the registry. What the registry gates is whether we *keep* what it sees. Per run:
 
-1. `locations_for` (`ole.rb:369`) resolves each event's `[venue, city, canton]`
+1. `locations_for` (`ole.rb:369`) resolves each event's `[venue, locality, canton]`
    from the feed's `<location>`, canton derived from the PLZ via `SwissPostcode`.
 2. `note_place(locations, rows.size)` (`ole.rb:293`) tallies that tuple in memory,
    but only `if rows.any?` — only when the event has an upcoming show. In-memory

@@ -441,7 +441,7 @@ en:
         invited_by: Invited by
         saved_filters: Saved filters
         contributor_heading: Capture events
-        contributor_hint: Lets this account capture events itself — from a link, a poster or a screenshot.
+        contributor_hint: Lets this account capture events itself — from a poster or pasted text.
         contributor_grant: Allow capturing
         contributor_revoke: Revoke capturing
         delete_heading: Delete account

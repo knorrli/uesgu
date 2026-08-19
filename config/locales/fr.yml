@@ -441,7 +441,7 @@ fr:
         invited_by: Invité par
         saved_filters: Filtres enregistrés
         contributor_heading: Saisir des événements
-        contributor_hint: Permet à ce compte de saisir lui-même des événements — depuis un lien, une affiche ou une capture d'écran.
+        contributor_hint: Permet à ce compte de saisir lui-même des événements — depuis une affiche ou du texte collé.
         contributor_grant: Autoriser la saisie
         contributor_revoke: Retirer la saisie
         delete_heading: Supprimer le compte

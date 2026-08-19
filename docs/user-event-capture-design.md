@@ -4,8 +4,9 @@
 > extraction service are built** (2026-08-19) — decisions 4–6 shipped as the
 > `places` table plus the location taxonomy reading it, decision 10 as the nullable
 > `events.url`, the `users.contributor` half of decision 7, and the extract half of
-> the funnel as `EventCapture` (see "Provider evaluation"). Everything else (the
-> three adapters, the verify screen, VenueLead nomination) is still design only.
+> the funnel as `EventCapture` (see "Provider evaluation"), and the image and text
+> adapters in #105. The URL adapter is **rejected** — see "The URL adapter" below.
+> What is left as design only is the verify screen and VenueLead nomination.
 > Supersedes the framing in
 > [`user-event-capture.md`](user-event-capture.md), which stays as the original
 > idea note. This document records what we settled on and the evidence behind the
@@ -25,9 +26,10 @@ posters, two WhatsApp screenshots), **one** was at a venue in `config/venues.yml
 
 ## The feature
 
-One capture funnel, three input adapters — **image**, **pasted/screenshot text**,
-and **URL** — feeding a shared *extract → verify → create* path. The first two
-shipped in #105; the URL adapter is deferred (see "The URL adapter" below).
+One capture funnel, **two** input adapters — **image** and **pasted/screenshot
+text** — feeding a shared *extract → verify → create* path. Both shipped in #105.
+A third door, URL, was designed and built and then **rejected**; see "The URL
+adapter" below for why, so it does not get re-proposed.
 
 ### Decided
 
@@ -571,34 +573,51 @@ three-locale copy change that belongs in this work, not after it.
 
 Nothing. The `events.url` seam was the last one — settled in decision 10.
 
-### The URL adapter
+### The URL adapter — rejected
 
-> **DEFERRED, not reversed.** It was built in #105 and then cut from that PR
-> before merge. Everything below still stands as the design; what changed is the
-> sequencing. Measured against the branch, the URL adapter was 316 of 442 lines of
-> new production code, 27 of 40 new tests, and **five of the seven findings a
-> high-effort review raised** — for the one door of three with the weakest product
-> case, since a contributor who cannot paste a link can paste the text or a
-> screenshot, which is already what this section's robots fallback tells them to
-> do. Image and text carry the long tail this feature exists for (a poster photo, a
-> WhatsApp screenshot) and carry no fetch surface at all.
->
-> The five findings are the opening brief for the follow-up issue, not a reason the
-> design is wrong: the fetched body was decoded as Latin-1 (mangling exactly the
-> umlauts prompt rule 4 depends on); webrobots follows up to five redirects on its
-> own robots.txt fetch with no re-validation, which defeats the hop checking below;
-> webrobots also ignores our timeouts and sleeps for an attacker-chosen
-> `Crawl-delay` on a request someone is watching; and `URI.parse` rejects IDN
-> hosts, which on a site called üsgu.ch is its own kind of answer.
->
-> **What was NOT deferred: a captured event can still have a URL.** Decision 10's
-> `events.url` is a field on the verify screen a contributor types into. No fetch,
-> no robots, no SSRF. What is deferred is only auto-filling the other fields from a
-> link.
+**REJECTED (2026-08-19). Do not re-propose it.** It was built to spec in #105 —
+robots honoured, SSRF validated on every redirect hop — then cut from that PR
+before merge, and #114 closed `wontfix`. What follows is recorded so the rejection
+stays legible, not as a plan.
 
-Two questions specific to the adapter that fetches a pasted link server-side.
+**It lost on its own numbers.** Measured against the branch, the URL adapter was
+316 of 442 lines of new production code, 27 of 40 new tests, and **five of the
+seven findings** a high-effort review raised — for the one door of three with the
+weakest product case, since a contributor who cannot paste a link can paste the
+text or a screenshot, which is already what the robots fallback below would have
+told them to do. Image and text carry the long tail this feature exists for (a
+poster photo, a WhatsApp screenshot) and carry no fetch surface at all.
 
-#### It honours `robots.txt`, and a refusal falls back rather than fails
+Those five findings are also a fair estimate of what fetching costs to keep
+correct, not a one-time bill: the fetched body was decoded as Latin-1 (mangling
+exactly the umlauts prompt rule 4 depends on); webrobots follows up to five
+redirects on its own `robots.txt` fetch with no re-validation, which defeats the
+hop checking below; webrobots also ignores our timeouts and sleeps for an
+attacker-chosen `Crawl-delay` on a request someone is watching; and `URI.parse`
+rejects IDN hosts, which on a site called üsgu.ch is its own kind of answer.
+
+**"Just send the URL to the model" is not the cheap version of it.** Infomaniak's
+endpoint is OpenAI-shaped chat completions and **cannot fetch**. Function calling,
+where a model has it, is the model asking *our* server to make the request — it
+moves the decision, never the fetch. And handing a bare URL to a non-browsing model
+produces fabrication *undetectably*: verbatim citation (`date_evidence` /
+`place_evidence`) is the one defence the provider evaluation found against
+invention, and a model that never saw the page will quote text it invented just as
+readily as text it read. Provider-hosted fetch tools (Anthropic `web_fetch`, Gemini
+URL context) would genuinely work, but mean a US provider — reversing the bake-off
+— and their crawler routes around the registry's `disposition: defer, reason:
+robots` rows, which is the same "decision not overturned, just routed around" the
+robots argument below rejects.
+
+**What was NOT rejected: a captured event can still have a URL.** Decision 10's
+`events.url` is a field on the verify screen a contributor types into. No fetch, no
+robots, no SSRF. What is gone is only auto-filling the other fields from a link.
+
+The two decisions the adapter carried are kept below because both outlive it: one
+is a policy about doors, the other applies to any server-side fetch of a
+user-supplied URL we might ever write.
+
+#### It would have honoured `robots.txt`, and degraded rather than refused
 
 The argument for exempting it is real: the Robots Exclusion Protocol governs
 *automatic* clients — recursive, scheduled, broad retrieval — and this is one
@@ -613,16 +632,13 @@ And the fetch leaves *our* server with *our* UA, so from the venue's logs it is
 indistinguishable from the scraper; "it is really the user's agent" does not
 survive contact with how it looks from the other side.
 
-**So: honour it, and degrade instead of refusing.** The funnel already has three
-adapters, so a disallowed fetch falls back to the other two — "we can't fetch this
-page, paste the text or a screenshot instead". The user pasting text they can
-legitimately read is not our automated fetch, it costs one tap, and the coverage
-goal survives. A hard refusal is the only genuinely bad outcome, because the long
-tail is the entire point of the feature.
-
-Note who this actually affects: the adapter's real target is a house show, a
-one-page venue site, a WhatsApp link — places with no `robots.txt` or an
-unconsidered CMS default. An assessed, robots-blocking venue is the rare case.
+**So: honour it, and degrade instead of refusing.** A disallowed fetch falls back
+to the other doors — "we can't fetch this page, paste the text or a screenshot
+instead". The user pasting text they can legitimately read is not our automated
+fetch, it costs one tap, and the coverage goal survives. A hard refusal is the only
+genuinely bad outcome, because the long tail is the entire point of the feature.
+That fallback is, in the end, the whole adapter's product case turned inside out —
+it is why two doors were enough.
 
 **No per-user override.** `Scrapers::Agent` already has the right escape hatch —
 `respect_robots = false`, set per-venue in code with a comment explaining why (the
@@ -635,16 +651,15 @@ fabricates a synthetic `Disallow: /` when the robots.txt fetch itself fails, so
 without it the fallback message above would regularly have told a contributor "this
 site says no" about a site that never said anything (Schüür 500s on `/robots.txt`
 while serving its programme at 200). An unreachable robots.txt is now treated as
-unknown and recorded on the `ScrapeResult`, so the adapter can trust that a refusal
-means a real `Disallow`.
+unknown and recorded on the `ScrapeResult`.
 
-#### SSRF: validate before fetching, and on every hop
+#### If we ever fetch a user-supplied URL: validate before, and on every hop
 
-Fetching arbitrary user-supplied URLs from our server is an SSRF surface, and the
-doc previously did not mention it. Decision 7 keeps it moderate — contributors are
-admin-enabled, so the threat model is "a friend you approved pastes a link someone
-sent them", not an anonymous attacker — but that is a reason to size the work, not
-to skip it.
+Fetching arbitrary user-supplied URLs from our server is an SSRF surface. Decision
+7 kept it moderate — contributors are admin-enabled, so the threat model is "a
+friend you approved pastes a link someone sent them", not an anonymous attacker —
+but that sizes the work, it does not skip it. The checklist, for whatever fetch
+comes next:
 
 - **Scheme allowlist**: `http`/`https` only. Kills `file://`, `gopher://`, `ftp://`,
   `data:` in one line.
@@ -656,18 +671,17 @@ to skip it.
   cover this — no new dependency.
 - **Re-check every redirect hop.** The commonly missed step: an innocent public URL
   can `302` to `169.254.169.254`. Follow redirects manually, cap at 3–5, run the
-  full check on each hop rather than only on what the user typed.
-- **Timeouts, a response size cap, and a content-type allowlist** (`text/html`,
-  plus image types if the adapter accepts poster URLs). These are the boring
-  failure modes you actually hit.
-- **Never echo the response body back.** Already satisfied: fetched text goes to
-  the extractor and the verify screen shows extracted fields, not raw remote
-  content.
+  full check on each hop rather than only on what the user typed. Note that any
+  library making its own side fetches (webrobots did) has its own redirect chain
+  that this check never sees.
+- **Timeouts, a response size cap, and a content-type allowlist.** These are the
+  boring failure modes you actually hit.
+- **Never echo the response body back.**
 
-Explicitly **not** doing the DNS-rebinding guard (resolve once, validate, connect
-to that pinned IP with an explicit `Host:` header). It closes a real TOCTOU gap and
-is the thorough version, but it is disproportionate to an admin-gated contributor
-list — revisit if capture is ever opened up.
+Explicitly **not** worth doing at this scale: the DNS-rebinding guard (resolve
+once, validate, connect to that pinned IP with an explicit `Host:` header). It
+closes a real TOCTOU gap and is the thorough version, but it is disproportionate to
+an admin-gated contributor list.
 
 ### The image and text adapters
 
@@ -737,8 +751,7 @@ English message for the rake task and the logs. The three-locale copy lives in t
 verify screen, keyed on the symbol. A service returning translated prose would put
 user-facing copy behind a rake task nobody translates, and some codes are not
 messages at all: `:image_unsupported` on a HEIC file is the signal to tell the
-contributor to re-save it, and the URL adapter's `:robots_disallowed`, when it
-returns, is the signal to offer the other two doors.
+contributor to re-save it — a fix a human can act on, not an apology.
 
 An adapter failure is the same shape as a provider failure, so `Extractor` returns
 it unchanged and the funnel has one error path rather than two.
@@ -804,7 +817,7 @@ credentials, absent means inert rather than broken.
 
 The entry point is `bin/rails "event_capture:extract[poster.jpg,...]"`, deliberately
 ahead of any UI so the verify screen is written against a real contract. It takes
-an image; text and URL inputs arrive with the adapters, which is also where image
+an image; text input arrives with the adapters, which is also where image
 downscaling belongs (the bake-off capped the long edge at 1568px with `sips`,
 which is not a thing that exists on the deployed box).
 

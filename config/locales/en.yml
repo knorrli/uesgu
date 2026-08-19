@@ -135,27 +135,25 @@ en:
     calendar_feed_link: set it up in settings
   capture:
     title: Capture an event
-    intro: Photographed a poster, copied some text? We read it out, you check it — nothing goes live before that.
+    intro: Photographed a poster or copied some text? We read it, you check it card by card – whatever you publish goes live right away.
     images_label: Posters
     images_hint: Several at once is fine. The images are never stored.
     text_label: Text
     text_hint: From a chat, a newsletter, wherever.
     text_button: Read the text
     empty: Nothing read yet.
-    publish: Publish events
-    published:
-      zero: Nothing was published.
-      one: One event is live.
-      other: "%{count} events are live."
-    partly_published:
-      zero: "Nothing published — %{failed} still need something."
-      one: "One event is live, %{failed} still need something."
-      other: "%{count} events are live, %{failed} still need something."
+    queue:
+      label: Queue
+      done: All decided. Another poster? Add it above.
+    actions:
+      accept: Publish
+      reject: Drop
+    card:
+      published: "%{title} is live."
     errors:
       incomplete: Title, date, locality and canton are needed.
       duplicate: This event already exists.
       url_invalid: The link has to start with http:// or https://.
-      duplicate_in_batch: This event shares its link with another one here — clear the link on one of them.
       place_invalid: That venue couldn't be created.
       unknown: That didn't work.
     row:
@@ -165,7 +163,6 @@ en:
       source_alt: The image this was read from
       nth: "%{index} of %{count}"
     candidate:
-      accept: Keep
       title: Title
       date: Date
       time: Time

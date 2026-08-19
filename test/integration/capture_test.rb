@@ -100,139 +100,74 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match ERB::Util.html_escape(I18n.t("capture.failures.image_unsupported", locale: :en)), response.body
   end
 
-  test "create publishes only the candidates that were kept" do
-    sign_in_as user(contributor: true)
+  test "create publishes the one candidate on the card" do
+    sign_in_as user(contributor: true, locale: "en")
 
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "Kept", date: "2026-09-01", locality: "Zorpwil", canton: "BE", place: "Zorpsaal" },
-      b: { accept: "0", title: "Dropped", date: "2026-09-02", locality: "Zorpwil", canton: "BE" }
-    } }
+    post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
+                                 locality: "Zorpwil", canton: "BE", place: "Zorpsaal" }
 
-    assert_redirected_to root_path
+    assert_response :success
     assert_equal ["Kept"], Event.pluck(:title)
+    assert_match 'target="capture-row-abc-0-status"', response.body
+    assert_match I18n.t("capture.card.published", title: "Kept", locale: :en), response.body
   end
 
-  test "create writes nothing when everything was dropped" do
-    sign_in_as user(contributor: true)
-
-    post capture_path, params: { candidates: {
-      a: { accept: "0", title: "Dropped", date: "2026-09-01", locality: "Zorpwil", canton: "BE" }
-    } }
-
-    assert_redirected_to root_path
-    assert_empty Event.all
-  end
-
-  # Nothing is persisted before create, so redirecting a partial failure away would
-  # cost the contributor every extraction that did not publish — including the ones
-  # that need a single field corrected.
-  test "a refused candidate comes back as an editable row instead of being lost" do
+  # The card in front of the contributor is the only thing that can carry the
+  # reason, and it still holds their edits — so the response addresses the status
+  # region rather than re-rendering fields over the top of them.
+  test "a refusal lands on the card that caused it and writes nothing" do
     sign_in_as user(contributor: true, locale: "en")
-    event(url: "https://zorp.example/show", title: "Scraped")
 
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "Fine", date: "2026-09-01", locality: "Zorpwil", canton: "BE" },
-      b: { accept: "1", title: "Clashes", date: "2026-09-02", locality: "Zorpwil", canton: "BE",
-           url: "https://zorp.example/show" }
-    } }
+    post capture_path, params: { card_id: "capture-row-abc-0", title: "No canton",
+                                 date: "2026-09-01", locality: "Zorpwil", canton: "" }
 
     assert_response :unprocessable_entity
-    assert_select "input[value=?]", "Clashes"
-    assert_select "input[value=?]", "Fine", count: 0
-    assert_match I18n.t("capture.errors.duplicate", locale: :en), response.body
-    assert_equal %w[Fine Scraped], Event.pluck(:title).sort
-  end
-
-  # `hidden` is a boolean attribute, so hidden="false" is still hidden — and the
-  # reset makes that display:none !important. Rendering it wrong took the Publish
-  # button off the one screen that needs it, stranding the whole corrected batch.
-  test "the publish button is present on a returned batch and absent before one" do
-    sign_in_as user(contributor: true)
-
-    get capture_path
-    assert_select "[data-capture-target=actions][hidden]"
-    assert_select ".empty-state:not([hidden])"
-
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "No canton", date: "2026-09-01", locality: "Zorpwil", canton: "" }
-    } }
-
-    assert_select "[data-capture-target=actions]:not([hidden])"
-    assert_select "input[type=submit]"
-    assert_select ".empty-state[hidden]"
-  end
-
-  test "keeping nothing does not claim zero events are live" do
-    sign_in_as user(contributor: true, locale: "en")
-
-    post capture_path, params: { candidates: {
-      a: { accept: "0", title: "Dropped", date: "2026-09-01", locality: "Zorpwil", canton: "BE" }
-    } }
-
-    assert_equal I18n.t("capture.published", count: 0, locale: :en), flash[:notice]
-  end
-
-  # Two candidates off one poster carry the same source_url. The clash is with a
-  # sibling in the same unpersisted batch, not with anything the scraper holds.
-  test "siblings sharing a link are named as such, not as an existing event" do
-    sign_in_as user(contributor: true, locale: "en")
-
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "First", date: "2026-09-01", locality: "Zorpwil", canton: "BE",
-           url: "https://zorp.example/poster" },
-      b: { accept: "1", title: "Second", date: "2026-09-02", locality: "Zorpwil", canton: "BE",
-           url: "https://zorp.example/poster" }
-    } }
-
-    assert_match I18n.t("capture.errors.duplicate_in_batch", locale: :en), response.body
-    assert_equal ["First"], Event.pluck(:title)
-  end
-
-  test "a malformed candidates param is not a 500" do
-    sign_in_as user(contributor: true)
-
-    post capture_path, params: { candidates: "1" }
-    assert_redirected_to root_path
-
-    post capture_path, params: { candidates: { a: "x" } }
-    assert_redirected_to root_path
-    assert_empty Event.all
-  end
-
-  test "a returned row says what was wrong with it" do
-    sign_in_as user(contributor: true, locale: "en")
-
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "No canton", date: "2026-09-01", locality: "Zorpwil", canton: "" }
-    } }
-
-    assert_response :unprocessable_entity
+    assert_match 'target="capture-row-abc-0-status"', response.body
     assert_match I18n.t("capture.errors.incomplete", locale: :en), response.body
-    assert_select "input[value=?]", "No canton"
+    assert_empty Event.all
+  end
+
+  # Two candidates off one poster carry the same source_url. Per card there is no
+  # batch to pre-check against: the second one accepted simply meets the unique
+  # index, which is the honest answer — by then the first one IS an existing event.
+  test "a link already published reads as an existing event" do
+    sign_in_as user(contributor: true, locale: "en")
+    event(url: "https://zorp.example/poster", title: "Scraped")
+
+    post capture_path, params: { card_id: "capture-row-abc-1", title: "Clashes",
+                                 date: "2026-09-02", locality: "Zorpwil", canton: "BE",
+                                 url: "https://zorp.example/poster" }
+
+    assert_response :unprocessable_entity
+    assert_match I18n.t("capture.errors.duplicate", locale: :en), response.body
+    assert_equal ["Scraped"], Event.pluck(:title)
+  end
+
+  # A DOM id is interpolated from it, so anything else must not reach the markup.
+  test "create ignores a card id that is not a plain token" do
+    sign_in_as user(contributor: true)
+
+    post capture_path, params: { card_id: '"><script>x</script>', title: "Kept",
+                                 date: "2026-09-01", locality: "Zorpwil", canton: "BE" }
+
+    assert_no_match "<script>x</script>", response.body
+  end
+
+  test "a candidate with no fields at all is a refusal, not a 500" do
+    sign_in_as user(contributor: true)
+
+    post capture_path
+    assert_response :unprocessable_entity
+    assert_empty Event.all
   end
 
   test "create splits comma-separated genres onto the event" do
     sign_in_as user(contributor: true)
 
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "Kept", date: "2026-09-01", locality: "Zorpwil", canton: "BE",
-           genres: "Zorpwave, Flarncore" }
-    } }
+    post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
+                                 locality: "Zorpwil", canton: "BE", genres: "Zorpwave, Flarncore" }
 
     assert_equal %w[Flarncore Zorpwave], Event.sole.genre_list.sort
-  end
-
-  # The field round-trips through a failed publish and is re-rendered with join(", "),
-  # so an unstripped split gained one space per retry round.
-  test "genres do not accumulate whitespace across a retry" do
-    sign_in_as user(contributor: true)
-
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "No canton", date: "2026-09-01", locality: "Zorpwil", canton: "",
-           genres: "Zorpwave, Flarncore" }
-    } }
-
-    assert_select "input[value=?]", "Zorpwave, Flarncore"
   end
 
   # An 8MB cap applied after `read` is not a cap: this endpoint is reachable
@@ -257,9 +192,8 @@ class CaptureTest < ActionDispatch::IntegrationTest
   test "publishing is closed to accounts without the capability" do
     sign_in_as user
 
-    post capture_path, params: { candidates: {
-      a: { accept: "1", title: "Kept", date: "2026-09-01", locality: "Zorpwil", canton: "BE" }
-    } }
+    post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
+                                 locality: "Zorpwil", canton: "BE" }
 
     assert_response :forbidden
     assert_empty Event.all

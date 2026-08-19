@@ -1,93 +1,30 @@
-/* The capture screen: pick posters or paste text, then prune the list of what the
-   model claims it read. Deliberately plain — the page is a review queue, and every
-   box on it is something a human is about to correct. Follows the settings/filter
-   aesthetic (hairlines, no boxes-in-boxes, accent green for actions only). */
+/* The capture screen: pick posters or paste text, then decide one card at a time
+   on what the model claims it read. Deliberately plain — every box on it is
+   something a human is about to correct. Follows the settings/filter aesthetic
+   (hairlines, no boxes-in-boxes, accent green for actions only). The card frame
+   itself is shared: see review_card.css. */
 
 .capture-picker {
   padding-bottom: var(--gap-medium);
   border-bottom: var(--border-width) solid var(--rule-color);
 }
 
-/* One input's outcome. The label (a filename, or the head of the pasted text) is
-   what ties a row back to the poster it came from while several are in flight. */
+/* One input's outcome that never became a card: a failure or an empty read. The
+   label (a filename, or the head of the pasted text) is what ties it back to the
+   input it came from while several are in flight. */
 .capture-row {
   display: flex;
   flex-direction: column;
   gap: var(--gap-small);
 }
 
-.capture-row__failure,
-.capture-candidate__error {
+.capture-row__failure {
   color: var(--theme-warn-color);
-}
-
-/* Candidates are separated by a hairline rather than framed: a frame around each
-   would read as "record", and these are drafts until the form is submitted. */
-.capture-candidate {
-  margin: 0;
-  padding: var(--gap-medium) 0;
-  border: 0;
-  border-top: var(--border-width) solid var(--border-color);
-}
-
-.capture-candidate__accept {
-  display: flex;
-  align-items: center;
-  gap: var(--gap-small);
-  font-weight: bold;
-}
-
-/* Amber, not red: a past date is a thing to look at, not a thing that failed —
-   the same channel the feed already uses for a passive "this concerns you" hint. */
-.capture-candidate__warning {
-  color: var(--theme-interest-color);
-}
-
-/* Match-at-entry candidates. Chips, so tapping one reads as picking from a
-   vocabulary rather than as filling a field — which is exactly what it is. */
-.capture-candidate__suggestions {
-  align-items: baseline;
-}
-
-.capture-candidate__suggestions .chip {
-  cursor: pointer;
-}
-
-.capture-candidate__issues {
-  font-size: var(--font-size-small);
-}
-
-/* The shared .account-form skin sizes fields to their content; a review queue
-   wants them filling the column instead, so a long title is not read through a
-   letterbox. */
-.capture-candidate input:not([type="checkbox"]),
-.capture-candidate select,
-.capture-picker textarea {
-  width: 100%;
-}
-
-/* Two fields to a row where they belong together (date + time, locality +
-   canton), each taking half. Without the grow the wrapped field keeps its content
-   width and its underline stops mid-column, which reads as a different kind of
-   field rather than the same one on a narrow screen. */
-.capture-candidate__when > label,
-.capture-candidate__where > label {
-  flex: 1 1 8rem;
-}
-
-/* The source the row was read from, kept beside its fields because verifying an
-   extraction is a comparison and a filename cannot answer "does the poster really
-   say 20:00". Capped by height, not width, so a portrait poster (what a phone
-   camera produces) and a wide screenshot are both one glance. */
-.capture-row__source img {
-  width: auto;
-  max-height: 40vh;
-  border: var(--border-width) solid var(--border-color);
 }
 
 .capture-row__excerpt {
   margin: 0;
-  max-height: 40vh;
+  max-height: 38vh;
   overflow: auto;
   padding: var(--gap-small);
   border: var(--border-width) solid var(--border-color);
@@ -95,6 +32,126 @@
   white-space: pre-wrap;
 }
 
-.capture-row__nth {
+/* The queue: progress, navigation and receipt in one strip. It stays put while a
+   card scrolls because it is the only place a decided card still exists — accepting
+   publishes and moves on, so the tile is the receipt. */
+.capture-queue {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  gap: var(--gap-xsmall);
+  overflow-x: auto;
+  padding-block: var(--gap-small);
+  background: var(--theme-bg-color);
+}
+
+/* Out-specifies the boxed <button> base rather than relying on stylesheet order. */
+button.capture-queue__tile {
+  position: relative;
+  flex: 0 0 auto;
+  width: 3.25rem;
+  height: 3.25rem;
+  padding: 0;
+  overflow: hidden;
+  border: var(--border-width) solid var(--border-color);
+  border-radius: 0;
+  background: var(--theme-bg-muted);
+  color: var(--theme-fg-muted);
+}
+
+button.capture-queue__tile.is-current {
+  border-color: var(--theme-accent-color);
+}
+
+/* A dropped tile is dimmed, a published one is not: the published event is live and
+   the strip is the only thing still saying so. */
+button.capture-queue__tile[data-state="dropped"] {
+  opacity: 0.45;
+}
+
+.capture-queue__tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.capture-queue__snippet {
+  display: block;
+  padding: var(--gap-xsmall);
   font-size: var(--font-size-small);
+  line-height: 1.2;
+  text-align: left;
+  overflow: hidden;
+}
+
+.capture-queue__tile .ph {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  padding: 1px;
+  background: var(--theme-bg-color);
+  color: var(--theme-accent-color);
+}
+
+.capture-queue__tile[data-state="dropped"] .ph {
+  color: var(--theme-fg-muted);
+}
+
+.capture-card__label {
+  display: flex;
+  gap: var(--gap-small);
+  align-items: baseline;
+}
+
+.capture-card__status {
+  margin: 0;
+}
+
+.capture-card__status--published {
+  color: var(--theme-accent-color);
+}
+
+.capture-card__status--refused {
+  color: var(--theme-warn-color);
+}
+
+/* Amber, not red: a past date is a thing to look at, not a thing that failed —
+   the same channel the feed already uses for a passive "this concerns you" hint. */
+.capture-card__warning {
+  color: var(--theme-interest-color);
+}
+
+/* Match-at-entry candidates. Chips, so tapping one reads as picking from a
+   vocabulary rather than as filling a field — which is exactly what it is. */
+.capture-card__suggestions {
+  align-items: baseline;
+}
+
+.capture-card__suggestions .chip {
+  cursor: pointer;
+}
+
+.capture-card__issues {
+  font-size: var(--font-size-small);
+}
+
+/* The shared .account-form skin sizes fields to their content; a review card wants
+   them filling the column instead, so a long title is not read through a
+   letterbox. Scoped to the field list, not the card: the accept button is an
+   <input> too, and full-width it reads as the batch submit this screen stopped
+   having. */
+.capture-card__fields input,
+.capture-card__fields select,
+.capture-picker textarea {
+  width: 100%;
+}
+
+/* Two fields to a row where they belong together (date + time, locality + canton),
+   each taking half. Without the grow the wrapped field keeps its content width and
+   its underline stops mid-column, which reads as a different kind of field rather
+   than the same one on a narrow screen. */
+.capture-card__when > label,
+.capture-card__where > label {
+  flex: 1 1 8rem;
 }

@@ -2,10 +2,16 @@
 # client fires it once per poster (see EventCapture::Extractor for why there is no
 # queue), so nothing here holds a request open for a batch.
 #
-# No image is ever stored, and nothing at all is persisted before `create` —
-# between the two the batch lives only in the DOM. Closing the tab therefore leaves
-# nothing behind, which is what makes the human review a real checkpoint on what
-# gets kept rather than a formality after the fact.
+# No image is ever stored, and nothing at all is persisted until a card is
+# accepted — between the two the queue lives only in the DOM. Closing the tab
+# therefore leaves nothing behind, which is what makes the human review a real
+# checkpoint on what gets kept rather than a formality after the fact.
+#
+# `create` publishes ONE candidate, the one whose card is in front of the
+# contributor. A refusal renders on that card, so there is no batch to keep
+# survivable: no partial-success flash, no re-render of everything that did not
+# publish, and no sibling-collision pre-check — two candidates off one poster
+# simply read as "this event already exists" on whichever is accepted second.
 class CapturesController < ApplicationController
   before_action :require_contributor
   # Every extract is a paid third-party call. Keyed by user, not IP: on Render
@@ -15,7 +21,6 @@ class CapturesController < ApplicationController
              by: -> { current_user&.id }, with: -> { head :too_many_requests }
 
   def show
-    @retries ||= []
   end
 
   def extract
@@ -27,22 +32,20 @@ class CapturesController < ApplicationController
     )
   end
 
-  # Refused candidates are re-rendered rather than redirected away: nothing is
-  # persisted before this point, so a redirect would throw away every extraction
-  # that did not publish, including the ones needing one field corrected.
   def create
-    results = publish_each(accepted_candidates)
-    published = results.count { |_, result| result.ok? }
-    @retries = results.reject { |_, result| result.ok? }
-                      .map { |attrs, result| [candidate_from(attrs), result.error] }
+    result = EventCapture::Creator.call(candidate_attributes)
+    return render_status("captures/published", title: result.event.title) if result.ok?
 
-    return redirect_to root_path, notice: t("capture.published", count: published) if @retries.empty?
-
-    flash.now[:alert] = t("capture.partly_published", count: published, failed: @retries.size)
-    render :show, status: :unprocessable_entity
+    render_status("captures/refusal", error: result.error, status: :unprocessable_entity)
   end
 
   private
+
+  def render_status(partial, status: :ok, **locals)
+    render turbo_stream: turbo_stream.replace(status_id, partial: partial,
+                                              locals: locals.merge(id: status_id)),
+           status: status
+  end
 
   # One input per request, and the target picks the adapter — the same rule the
   # rake task follows, so there is one funnel and not a UI-shaped second one.
@@ -65,45 +68,16 @@ class CapturesController < ApplicationController
     id ? "capture-row-#{id}" : "capture-row"
   end
 
-  def candidate_from(attrs)
-    EventCapture::Candidate.new(
-      title: attrs[:title], date: parsed_date(attrs[:date]), time: attrs[:time],
-      place: attrs[:place], locality: attrs[:locality], canton: attrs[:canton],
-      source_url: attrs[:url], genres: attrs[:genres]
-    )
+  # Same constraint as row_id, and same reason: the card's id addresses the region
+  # this response replaces.
+  def status_id
+    id = params[:card_id].to_s[/\A[a-zA-Z0-9-]{1,80}\z/]
+    "#{id || 'capture-card'}-status"
   end
 
-  def parsed_date(value)
-    Date.strptime(value.to_s, "%Y-%m-%d")
-  rescue Date::Error
-    nil
-  end
-
-  # Two candidates off one poster carry the same source_url, so the second would
-  # hit the unique index and be reported as "the scraper already has this" — true of
-  # the index, misleading about the cause, and unfixable without knowing the clash
-  # is with its own sibling.
-  def publish_each(candidates)
-    seen = Set.new
-    candidates.map do |attrs|
-      next [attrs, EventCapture::Creator::Result.new(error: :duplicate_in_batch)] if
-        attrs[:url].present? && !seen.add?(attrs[:url])
-
-      [attrs, EventCapture::Creator.call(attrs)]
-    end
-  end
-
-  def accepted_candidates
-    submitted = params[:candidates]
-    return [] unless submitted.respond_to?(:values)
-
-    submitted.values.filter_map do |candidate|
-      next unless candidate.respond_to?(:permit)
-      next unless ActiveModel::Type::Boolean.new.cast(candidate[:accept])
-
-      candidate.permit(:title, :date, :time, :place, :locality, :canton, :url, :genres)
-               .to_h.symbolize_keys
-               .then { |attrs| attrs.merge(genres: attrs[:genres].to_s.split(",").map(&:strip)) }
-    end
+  def candidate_attributes
+    params.permit(:title, :date, :time, :place, :locality, :canton, :url, :genres)
+          .to_h.symbolize_keys
+          .then { |attrs| attrs.merge(genres: attrs[:genres].to_s.split(",").map(&:strip)) }
   end
 end

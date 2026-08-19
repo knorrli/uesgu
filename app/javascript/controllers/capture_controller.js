@@ -5,9 +5,14 @@ import { Turbo } from "@hotwired/turbo-rails"
 // input, because a batch cannot be held open in one and there is no queue to reach
 // for (see EventCapture::Extractor).
 //
+// It also drives the review queue. Only the card in front of the contributor is on
+// screen; the strip carries the rest, and — since accepting publishes immediately —
+// a decided tile is the only thing left saying what happened to a card that has
+// already moved on.
+//
 // Connects to data-controller="capture".
 export default class extends Controller {
-  static targets = ["files", "text", "rows", "empty", "actions", "accept", "source"]
+  static targets = ["files", "text", "rows", "empty", "done", "strip", "card", "source"]
   static values = {
     url: String,
     pending: String,
@@ -23,6 +28,7 @@ export default class extends Controller {
   // against, and it has to outlive the turbo-stream that replaces the whole row.
   initialize() {
     this.sources = new Map()
+    this.currentId = null
   }
 
   disconnect() {
@@ -53,46 +59,124 @@ export default class extends Controller {
       })])
   }
 
-  // Unchecking "keep" does not lift `required`, so one dropped row missing the
-  // canton no poster prints makes the whole form unsubmittable, pointing at a row
-  // the contributor does not want. The marker outlives the removal so re-checking
-  // restores it.
-  //
-  // Publish is revealed from here rather than once the last extraction settles: a
-  // stream lands a frame later than the request that fetched it (see #extract), so
-  // that check ran before the row existed and left Publish hidden on a batch that
-  // had extracted fine. A row carrying no candidate never reaches here, so a failed
-  // batch still cannot offer a button that submits nothing.
-  acceptTargetConnected(checkbox) {
-    const fieldset = checkbox.closest(".capture-candidate")
-    fieldset.querySelectorAll("[required]").forEach((field) => field.setAttribute("data-required-when-kept", ""))
-    this.applyRequired(checkbox)
-    this.actionsTarget.hidden = false
+  // A card takes its place in the strip as it lands and waits its turn off screen.
+  // The first one to arrive opens, so a contributor who picked one poster is looking
+  // at it rather than at a queue of one.
+  cardTargetConnected(card) {
+    this.stripTarget.hidden = false
+    this.stripTarget.appendChild(this.tileFor(card))
+    card.hidden = card.id !== this.currentId
+    if (!this.currentId) this.open(card.id)
   }
 
-  syncRequired(event) {
-    this.applyRequired(event.target)
+  jump(event) {
+    this.open(event.currentTarget.dataset.card)
   }
 
-  applyRequired(checkbox) {
-    const fieldset = checkbox.closest(".capture-candidate")
-    fieldset.querySelectorAll("[data-required-when-kept]").forEach((field) => {
-      field.required = checkbox.checked
-    })
+  open(id) {
+    this.currentId = id
+    this.cardTargets.forEach((card) => { card.hidden = card.id !== id })
+    this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === id) })
+    this.doneTarget.hidden = true
+  }
+
+  // Only a landed publish decides a card: turbo:submit-end fires for the refusal
+  // too, and that response is the stream putting the reason on the card the
+  // contributor is still looking at.
+  decided(event) {
+    if (!event.detail.success) return
+
+    this.settle(event.target.closest(".capture-card"), "published")
+  }
+
+  reject(event) {
+    this.settle(event.target.closest(".capture-card"), "dropped")
+  }
+
+  // A published card is frozen — the event is live and the form behind it would
+  // publish a second one. A dropped card is not: rejecting is the reversible half of
+  // the decision, so tapping its tile brings it back to be accepted after all.
+  settle(card, state) {
+    card.dataset.state = state
+    this.markTile(this.tileFor(card), state)
+    if (state === "published") {
+      card.querySelectorAll("input, select, button").forEach((field) => { field.disabled = true })
+    }
+    this.advance()
+  }
+
+  // Forward from the current card and then round to the front, so a card left
+  // behind by a jump backwards is picked up rather than stranded.
+  advance() {
+    const cards = this.cardTargets
+    const from = cards.findIndex((card) => card.id === this.currentId)
+    const next = cards.slice(from + 1).concat(cards.slice(0, from + 1))
+                      .find((card) => card.dataset.state === "open")
+    if (next) return this.open(next.id)
+
+    cards.forEach((card) => { card.hidden = true })
+    this.currentId = null
+    this.doneTarget.hidden = false
+  }
+
+  // Full-bleed, because the small print on a poster is the reason to look at it at
+  // all and a pane sized to sit beside the fields cannot show it.
+  zoom(event) {
+    const pane = event.currentTarget
+    if (pane.querySelector("img")) pane.classList.toggle("review-card__source--zoomed")
+  }
+
+  get tiles() {
+    return Array.from(this.stripTarget.querySelectorAll("[data-card]"))
+  }
+
+  tileFor(card) {
+    const existing = this.stripTarget.querySelector(`[data-card="${card.id}"]`)
+    if (existing) return existing
+
+    const tile = document.createElement("button")
+    tile.type = "button"
+    tile.className = "capture-queue__tile"
+    tile.dataset.card = card.id
+    tile.dataset.state = "open"
+    tile.dataset.action = "capture#jump"
+    tile.setAttribute("aria-label", card.querySelector(".capture-card__label")?.textContent.trim() ?? "")
+    tile.appendChild(this.thumbnail(this.sources.get(card.closest(".capture-row")?.id)))
+    return tile
+  }
+
+  markTile(tile, state) {
+    tile.dataset.state = state
+    tile.querySelector(".ph")?.remove()
+    const mark = document.createElement("span")
+    mark.className = state === "published" ? "ph ph-check-circle" : "ph ph-x"
+    mark.setAttribute("aria-hidden", "true")
+    tile.appendChild(mark)
+  }
+
+  // A pasted text has no picture to shrink, so its tile carries the head of the text
+  // instead — the strip has to stay scannable when the queue mixes the two.
+  thumbnail(source) {
+    if (source?.objectUrl) return this.poster(source.objectUrl)
+
+    const snippet = document.createElement("span")
+    snippet.className = "capture-queue__snippet"
+    snippet.textContent = source?.text?.slice(0, 24) ?? ""
+    return snippet
   }
 
   // Fill the place tuple from a near-match instead of minting a variant spelling.
-  // Scoped to the fieldset the chip sits in — every candidate carries its own.
+  // Scoped to the card the chip sits in — every candidate carries its own.
   applySuggestion(event) {
-    const fieldset = event.target.closest(".capture-candidate")
+    const card = event.target.closest(".capture-card")
     const { name, locality, canton } = event.params
-    this.setField(fieldset, "place", name)
-    if (locality) this.setField(fieldset, "locality", locality)
-    if (canton) this.setField(fieldset, "canton", canton)
+    this.setField(card, "place", name)
+    if (locality) this.setField(card, "locality", locality)
+    if (canton) this.setField(card, "canton", canton)
   }
 
-  setField(fieldset, suffix, value) {
-    const field = fieldset.querySelector(`[name$="[${suffix}]"]`)
+  setField(card, name, value) {
+    const field = card.querySelector(`[name="${name}"]`)
     if (field) field.value = value
   }
 
@@ -116,8 +200,8 @@ export default class extends Controller {
   // The row is appended BEFORE the decode, not after: createImageBitmap rejects on
   // a HEIC picked from Finder (accept="image/*" allows it and no desktop browser
   // decodes it) and on anything corrupt, and with the row created afterwards that
-  // threw before anything was on screen — the picker cleared, the Publish button
-  // appeared, and nothing else happened.
+  // threw before anything was on screen — the picker cleared and nothing else
+  // happened.
   async extractImage(file) {
     const id = crypto.randomUUID()
     this.appendPending(id, file.name)
@@ -194,7 +278,7 @@ export default class extends Controller {
     const source = this.sources.get(slot.closest(".capture-row")?.id)
     // Emptied first because a Turbo-cached snapshot restores an <img> whose object
     // URL this controller revoked on the way out — left alone it paints a broken
-    // image, which is worse than the empty slot the restored row has earned.
+    // image, which is worse than the empty slot the restored card has earned.
     slot.replaceChildren()
     if (!source) return
 

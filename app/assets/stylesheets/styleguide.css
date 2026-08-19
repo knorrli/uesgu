@@ -59,6 +59,13 @@
   }
 }
 
+/* A specimen that is itself responsive (the review card switches to two columns at
+   900px) cannot be judged in a half-width cell: it would render its wide layout in
+   a narrow box, which is the one situation the app never puts it in. */
+.sg-row--stack {
+  grid-template-columns: 1fr;
+}
+
 /* The neutral stage the element sits on. */
 .sg-specimen {
   display: flex;

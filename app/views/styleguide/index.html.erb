@@ -34,6 +34,7 @@
     <a href="#nav">Navigation</a>
     <a href="#pagination">Pagination</a>
     <a href="#page-header">Page header</a>
+    <a href="#review-card">Review card</a>
     <a href="#footer">Footer</a>
   </nav>
 
@@ -569,6 +570,50 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Page header</span> · <code>render layout: "shared/page_header"</code>
         <p class="sg-purpose">Put the <code>&lt;h1&gt;</code> (plus any kicker, count, meta or inline action) in the block; pass <code>back_path</code> / <code>back_label</code> for the up-link, or omit them on a top-level page. Renders as the first child of the page's <code>flex flex-col gap-large</code> column.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# ======================================================= REVIEW CARD %>
+  <section class="sg-section" id="review-card">
+    <h2>Review card</h2>
+    <p class="sg-section__intro">One thing being judged, with the evidence that settles it and the decision itself on screen at the same time — the shape the capture queue uses to review an extracted event. The source pane is pinned (above the fields on a phone, left of them from 900px) and the action bar is pinned to the bottom edge, because the job is a <b>comparison</b>: a source that scrolls away turns "does this poster really say 20:00" back into remembering.</p>
+
+    <div class="sg-row sg-row--stack">
+      <div class="sg-specimen">
+        <%# The real partials. The pane normally holds evidence the browser never
+            uploaded, so this specimen stands an app icon in its place. %>
+        <%= render layout: "shared/review_card",
+              locals: { id: "sg-review-card", source: image_tag("/icon.png", alt: ""),
+                        actions: render(layout: "shared/action_bar") {
+                          safe_join([tag.button("Veröffentlichen", class: "button-small primary", type: "button"),
+                                     tag.button("Verwerfen", class: "button-small", type: "button")])
+                        } } do %>
+          <p class="field-label">poster.png</p>
+          <div class="account-form flex flex-col gap-small">
+            <label class="flex flex-col gap-xsmall">
+              <span class="field-label">Titel</span>
+              <input type="text" value="Zorpcore Nacht">
+            </label>
+          </div>
+        <% end %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Review card</span> · <code>render layout: "shared/review_card", id:, actions:, source:</code>
+        <p class="sg-purpose">The block is the body. <code>actions</code> is pre-rendered markup rather than a second block because the bar sits outside the scrolling body; <code>source</code> is the evidence, or is left out and written into the pane by a client that holds it in memory only. Pass <code>frame_class</code>/<code>frame_attrs</code> for the caller's own hooks — never a second <code>class</code> attribute.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <%= render layout: "shared/action_bar" do %>
+          <button type="button" class="button-small primary">Veröffentlichen</button>
+          <button type="button" class="button-small">Verwerfen</button>
+        <% end %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Action bar</span> · <code>render layout: "shared/action_bar"</code>
+        <p class="sg-purpose">The decision row of a review card, pinned to its bottom edge so it stays in thumb reach however long the field list runs. The commit comes first (primary), anything asking for another go sits in the middle, and the quiet way out is <b>last</b> — pushed to the far end, because a dismissal next to the commit is one mis-tap away from being it. Unlike <code>form_actions</code> this closes a decision, not a form: there is no <b>Abbrechen</b>, since leaving decides nothing.</p>
       </div>
     </div>
   </section>

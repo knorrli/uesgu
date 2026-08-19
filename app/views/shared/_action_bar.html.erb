@@ -1,0 +1,8 @@
+<%# The decision row of a review card, pinned to its bottom edge. The actions are
+    unequal and look it, in this order: the commit first (primary), anything that
+    asks for another go in the middle (small), and the quiet way out last — a
+    dismissal must never be as loud as the thing it dismisses.
+
+    Yields, so the caller supplies the actual controls; what lives here is the
+    pinning and that ordering. %>
+<div class="action-bar"><%= yield %></div>

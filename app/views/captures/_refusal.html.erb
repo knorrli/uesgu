@@ -1,0 +1,4 @@
+<%# locals: (id:, error:) %>
+<p id="<%= id %>" class="capture-card__status capture-card__status--refused">
+  <%= t("capture.errors.#{error}", default: t('capture.errors.unknown')) %>
+</p>

@@ -135,27 +135,25 @@ de:
     calendar_feed_link: in den Einstellungen einrichten
   capture:
     title: Event erfassen
-    intro: Poster fotografiert oder Text kopiert? Wir lesen aus, du prüfst – erst dann geht etwas live.
+    intro: Poster fotografiert oder Text kopiert? Wir lesen aus, du prüfst Karte für Karte – was du übernimmst, geht sofort live.
     images_label: Poster
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
     text_button: Text auslesen
     empty: Noch nichts ausgelesen.
-    publish: Events veröffentlichen
-    published:
-      zero: Es wurde nichts veröffentlicht.
-      one: Ein Event ist live.
-      other: "%{count} Events sind live."
-    partly_published:
-      zero: "Nichts veröffentlicht – %{failed} brauchen noch etwas."
-      one: "Ein Event ist live, %{failed} brauchen noch etwas."
-      other: "%{count} Events sind live, %{failed} brauchen noch etwas."
+    queue:
+      label: Warteschlange
+      done: Alles entschieden. Neues Poster? Oben weiter.
+    actions:
+      accept: Veröffentlichen
+      reject: Verwerfen
+    card:
+      published: "%{title} ist live."
     errors:
       incomplete: Titel, Datum, Ort und Kanton braucht es.
       duplicate: Dieses Event gibt es schon.
       url_invalid: Der Link muss mit http:// oder https:// beginnen.
-      duplicate_in_batch: Dieses Event teilt sich den Link mit einem anderen hier – bei einem den Link leeren.
       place_invalid: Diese Venue liess sich nicht anlegen.
       unknown: Das hat nicht geklappt.
     row:
@@ -165,7 +163,6 @@ de:
       source_alt: Das ausgelesene Bild
       nth: "%{index} von %{count}"
     candidate:
-      accept: Übernehmen
       title: Titel
       date: Datum
       time: Zeit

@@ -16,20 +16,14 @@ module EventCapture
   # tuning was measured NOT to transfer between models — treat any edit here as
   # something to re-run the bake-off over.
   #
-  # The text medium (#105) is the one addition. The rules are shared because the
-  # rules are the tuned part; only the phrases that name the medium differ, and they
-  # are collected in MEDIA rather than scattered. The text medium is UNMEASURED
-  # against the sample set, which is six images: the bake-off cannot score a text
-  # prompt without text ground truth, and #112 is what will say whether it needs
-  # tuning of its own.
+  # The text medium (#105) is UNMEASURED: the bake-off scores six images against
+  # image ground truth and can say nothing about a text prompt. #112 is what will.
   #
-  # Two things the split did change on the image side, neither of them wording.
-  # Interpolating a phrase moves where the heredoc's hard line breaks fall, so the
-  # rendering is word-identical to the pre-split version but NOT byte-identical —
-  # the whitespace differs from the text that scored 0/6, and the test below cannot
-  # see that because it compares squished. And SCHEMA is one frozen constant shared
-  # by both media, so its field descriptions say "the input" where they used to say
-  # "the image" — true of both, and cheaper than building the schema per call.
+  # Two things the split changed on the image side, neither of them wording.
+  # Interpolating a phrase moves where the heredoc's line breaks fall, so the
+  # rendering is word-identical to the pre-split version but NOT byte-identical, and
+  # the test below compares squished so it cannot see that. And SCHEMA is shared by
+  # both media, so its descriptions say "the input" where they said "the image".
   module Prompt
     MEDIA = {
       image: {

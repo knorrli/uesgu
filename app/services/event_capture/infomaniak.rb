@@ -1,8 +1,8 @@
 module EventCapture
   # The provider call. Infomaniak's AI tools speak an OpenAI-shaped API under a
   # product-scoped path, so the body below is the ordinary chat-completions
-  # shape: an image is inlined as a data URL, while pasted or fetched text rides
-  # in a second text part.
+  # shape: an image is inlined as a data URL, while pasted text rides in a second
+  # text part.
   #
   # Swiss-hosted, and chosen on accuracy rather than price: 0/6 fabricated dates
   # against Mistral Small 4's 5/6, at ~6 cents a month either way (see "Provider
@@ -60,11 +60,14 @@ module EventCapture
 
     def request_part(input) = { type: "text", text: Prompt.request(medium: input.kind) }
 
-    # Fenced, because a fetched page is untrusted text arriving in the same channel
-    # as the instructions. The fence is not a security boundary — nothing stops a
-    # page from writing one — but it is what makes "everything after this line is
-    # data" a claim the model can act on at all, and the rules it would have to
-    # overturn live in the system message above.
+    # Fenced, because pasted text is third-party content sharing a channel with the
+    # instructions: the contributor vouches for pasting it, not for what it says — it
+    # is a venue's page, someone else's chat message, a programme listing. Not a
+    # security boundary, since nothing stops the text writing a fence of its own; it
+    # makes "everything after this is data" a claim the model can act on at all, with
+    # the rules it would have to overturn in the system message above. The verify
+    # screen, where a human reads every field before anything persists, is the actual
+    # check.
     def text_part(input)
       { type: "text", text: "<<<INPUT\n#{input.text}\nINPUT" }
     end

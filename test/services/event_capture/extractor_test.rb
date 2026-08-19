@@ -89,9 +89,6 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     assert_empty client.calls
   end
 
-  # An adapter failure is already the shape a provider failure is, so the funnel
-  # has one error path rather than two: the verify screen shows an unreadable
-  # upload and an upstream outage the same way, and neither reaches the provider.
   test "a failed input is returned as a failed extraction, unsent" do
     client = FakeClient.new(text: payload)
     input = EventCapture::Input.failure(:image_unsupported, "not a PNG, JPEG, WebP or GIF")

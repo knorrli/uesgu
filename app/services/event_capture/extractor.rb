@@ -3,9 +3,8 @@ module EventCapture
   # prompt the model, read its JSON, then hand every event it claims to the
   # Normalizer, which is where the deterministic fields are actually decided.
   #
-  # The Input comes from an adapter (image or text), and an adapter's failure is
-  # already the shape this returns — so an unreadable upload and a provider outage
-  # arrive at the verify screen looking the same.
+  # An adapter's failure is already the shape this returns, so the funnel has one
+  # error path: an unreadable upload and a provider outage look the same downstream.
   #
   # One input per call, deliberately. The verify screen fires N of these — one per
   # uploaded image, driven by the client — because 8 x 2.3s does not fit in one

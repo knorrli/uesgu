@@ -28,9 +28,8 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     assert_match "place_evidence", instructions
   end
 
-  # The text medium exists so a paste and a fetched page can use the same funnel.
-  # What must not happen is the medium leaking: a prompt telling the model to read
-  # an image it was never sent is how a tuned instruction turns into noise.
+  # A prompt telling the model to read an image it was never sent is how a tuned
+  # instruction turns into noise.
   test "each medium names only its own input" do
     image = EventCapture::Prompt.instructions(today: TODAY, medium: :image)
     text = EventCapture::Prompt.instructions(today: TODAY, medium: :text)
@@ -44,9 +43,8 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     assert_match(/text below/, EventCapture::Prompt.request(medium: :text))
   end
 
-  # These are the sentences the bake-off measured — most of the difference between
-  # 0/6 and 5/6 fabricated dates. Refactoring the prompt into media must not quietly
-  # reword the tuned half; the image rendering is still word-for-word what was scored.
+  # The sentences the bake-off measured — most of the difference between 0/6 and 5/6
+  # fabricated dates. Splitting the prompt by medium must not reword the tuned half.
   test "the tuned rules survive the medium split" do
     image = EventCapture::Prompt.instructions(today: TODAY).squish
 
@@ -63,9 +61,8 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     ].each { |sentence| assert_match sentence, image }
   end
 
-  # An unknown medium is a programming error, not something to paper over with the
-  # image prompt: sending poster instructions with a pasted page attached is worse
-  # than failing.
+  # Falling back to the image prompt would send poster instructions with pasted text
+  # attached, which is worse than failing.
   test "an unknown medium raises rather than falling back" do
     assert_raises(KeyError) { EventCapture::Prompt.instructions(today: TODAY, medium: :pdf) }
   end

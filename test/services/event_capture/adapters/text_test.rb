@@ -12,10 +12,6 @@ class EventCapture::Adapters::TextTest < ActiveSupport::TestCase
     refute_predicate input, :image?
   end
 
-  # A file read off disk arrives as ASCII-8BIT, and any byte over 0x7F in it makes
-  # JSON.generate raise inside the provider call — an exception that is neither a
-  # JSON::ParserError nor a ProviderError, so it escapes both rescues instead of
-  # coming back as one failed row.
   test "binary-encoded input is scrubbed to UTF-8 rather than reaching the provider call" do
     input = call("Café Kairo, Sa 22. August".dup.force_encoding(Encoding::ASCII_8BIT))
 
@@ -36,8 +32,6 @@ class EventCapture::Adapters::TextTest < ActiveSupport::TestCase
     assert_equal :text_empty, call(nil).code
   end
 
-  # A whole programme archive pasted by accident is truncated rather than sent:
-  # the caller is a person watching a spinner.
   test "over-long input is truncated to the limit" do
     limit = EventCapture::Adapters::Text::LIMIT
 

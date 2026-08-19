@@ -1,13 +1,10 @@
 module EventCapture
   module Adapters
-    # Pasted text: a chat message, a copied programme listing, a transcription. The
-    # plainest of the three — the model reads what it is given, and rule 2 of the
-    # prompt (chat chrome is not event data) already covers the messy case.
+    # Chat chrome is not stripped here — prompt rule 2 makes the model ignore it, and
+    # a screenshot of the same message gets no such help from us either.
     module Text
-      # Far past any poster or chat message, and short enough that a whole
-      # programme archive pasted by accident is truncated rather than sent. The
-      # extraction is one interactive request someone is watching, so an input that
-      # would take a minute to read is the wrong thing to be polite about.
+      # The extraction is one request someone is watching, so a programme archive
+      # pasted by accident is truncated rather than sent.
       LIMIT = 20_000
 
       module_function
@@ -19,10 +16,10 @@ module EventCapture
         Input.text(truncated(text))
       end
 
-      # A paste arrives as UTF-8, but a file read off disk arrives as ASCII-8BIT and
-      # any byte over 0x7F in it makes JSON.generate raise in the provider call —
-      # neither a JSON::ParserError nor a ProviderError, so it would escape both
-      # rescues as a 500 rather than the returned failure this whole path rests on.
+      # A file read off disk arrives ASCII-8BIT, and any byte over 0x7F in it makes
+      # JSON.generate raise inside the provider call — neither a JSON::ParserError
+      # nor a ProviderError, so it escapes both rescues instead of coming back as one
+      # failed row.
       def scrubbed(text)
         text.to_s.dup.force_encoding(Encoding::UTF_8).scrub.strip
       end

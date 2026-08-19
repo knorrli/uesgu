@@ -1,13 +1,10 @@
 module EventCapture
-  # What an adapter hands the Extractor: one thing the model can read, or one
-  # failure saying why there isn't one. Returned rather than raised, for the same
-  # reason Extraction is — in a bulk capture a single bad input is one row to
+  # What an adapter hands the Extractor. A failure is returned rather than raised,
+  # for the same reason Extraction's is: in a bulk capture one bad input is a row to
   # retry, not a dead batch.
   #
-  # `code` is a symbol and `error` is developer-facing English (rake, logs). The
-  # verify screen (#106) chooses its own three-locale copy per code rather than
-  # rendering these strings: a service returning translated prose would put UI
-  # copy behind a rake task nobody translates.
+  # `code` is a symbol because the verify screen (#106) owns the three-locale copy;
+  # `error` is developer-facing English, for the rake task and the logs.
   Input = Data.define(:kind, :image_data, :media_type, :text, :code, :error) do
     def self.image(image_data, media_type:) = new(kind: :image, image_data: image_data, media_type: media_type)
 

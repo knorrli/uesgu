@@ -23,7 +23,7 @@ class EventCapture::Adapters::ImageTest < ActiveSupport::TestCase
       end
   end
 
-  # "RIFF" alone is also AVI and WAV, so the second probe is what makes WebP WebP.
+  # "RIFF" alone is also AVI and WAV.
   test "a RIFF container that is not WebP is not accepted as one" do
     input = call("RIFF".b + "\x24\0\0\0".b + "AVI ".b + ("\0" * 16))
 
@@ -31,8 +31,6 @@ class EventCapture::Adapters::ImageTest < ActiveSupport::TestCase
     assert_equal :image_unsupported, input.code
   end
 
-  # A whole class of image with a name the contributor can act on, rather than one
-  # more "unsupported".
   test "HEIC is refused by name, with the fix in the message" do
     input = call(HEIC)
 

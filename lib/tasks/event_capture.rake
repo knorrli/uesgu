@@ -23,9 +23,8 @@ namespace :event_capture do
     abort "\n#{failures} of #{targets.size} input(s) failed" if failures.positive?
   end
 
-  # Which adapter a target gets is decided by the target, not by a flag — the same
-  # doors-into-one-funnel shape the UI will have. A file is an image if its bytes
-  # say so and text otherwise; "-" is a paste.
+  # No --image/--text flag: the target picks the adapter, the same way the UI's one
+  # funnel will.
   def input_for(target)
     return EventCapture::Adapters::Text.call($stdin.read) if target == "-"
 

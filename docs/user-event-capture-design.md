@@ -25,8 +25,24 @@ text** — feeding a shared *extract → verify → create* path.
 ### Decided
 
 1. **Bulk-first.** Upload N images, extract all, review them on one screen with
-   per-candidate accept/edit/drop. Single capture is just N=1. Extraction must be
-   async — you cannot hold a request open for eight vision calls.
+   per-candidate accept/edit/drop. Single capture is just N=1.
+
+   **Extraction is one request per image, driven by the client — no job queue.**
+   The constraint is real (you cannot hold a request open for eight vision calls),
+   but "async" was the wrong conclusion drawn from it. There is no async substrate
+   to reach for: `config.active_job.queue_adapter = :inline`, `app/jobs/` holds
+   only `ApplicationJob`, and `render.yaml` runs one web service plus two crons —
+   Solid Queue was deliberately removed because it competed with Puma for RAM.
+
+   Gemma measures 2.3s, so the problem is never 2.3s, only 8 × 2.3s in one
+   request. Upload all N, then fire one extraction request per image and fill the
+   verify list progressively via Turbo Streams. No worker service, no queue, no
+   cron latency in an interactive flow, and a failed image is one row to retry
+   rather than a dead batch. At ~5 captures/day the thread pressure is nil.
+
+   Rejected: a Render worker service (money, and it re-adds what was removed), and
+   a DB-backed queue drained by cron in the shape `notify-due` uses (free, but
+   minutes of latency is the wrong trade for a screen someone is waiting on).
 
 2. **The unit is 0..n events per input, not one.** A poster can advertise two
    concerts; a festival timetable three acts. Both occur in the sample set.
@@ -133,6 +149,13 @@ text** — feeding a shared *extract → verify → create* path.
    Auto-suspending a user on one report is a griefing vector and punitive
    machinery for people you personally approved. Reports from signed-in users
    only. Framing is *"stimmt etwas nicht?"*, not an abuse report.
+
+   Capture is gated by a new **`users.contributor` boolean** — a *capability*,
+   deliberately not a role. Today the model is two-level (`users.admin` →
+   `User#admin?` → `Admin::BaseController`), everyone else is a regular user, and
+   `users` already carries capability-shaped booleans like `event_reminders`. A
+   flag sits beside `admin`; a role hierarchy would be machinery for a site whose
+   users you personally invited.
 
 8. **Captured events live outside the scraper's re-derivation domain.**
    `Scrapers::Agent#build_event` re-derives every field from source nightly and
@@ -313,6 +336,14 @@ The page needs new copy. `admin.venue_leads.index.intro` and `.empty` both descr
 an aggregator-triage queue ("Venues, die ein Aggregator gefunden hat…"). Once
 capture is the live producer, the page is the demand-side discovery queue — a
 three-locale copy change that belongs in this work, not after it.
+
+### Still open
+
+- **The `events.url` seam.** Decision 8 settles *that* captured events sit outside
+  the scraper's re-derivation domain, not *how*. `events.url` is `NOT NULL` +
+  unique and a poster has no URL, so this is either a synthetic value
+  (`uesgu:capture/<uuid>`) or a nullable column with a partial unique index —
+  a migration on the busiest table, and unresolved.
 
 ### The URL adapter
 

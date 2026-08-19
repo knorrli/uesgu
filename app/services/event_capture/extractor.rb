@@ -22,7 +22,18 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(input:, today: Time.zone.today, client: Infomaniak.new)
+    # The provider is resolved through a factory, and asked whether it is configured
+    # rather than consulting EventCaptureConfig here, so a browser test can install a
+    # canned client: extraction then runs on a Puma thread, where a block-scoped stub
+    # is not reliably in force and where credentials may be absent anyway (CI holds
+    # no master key).
+    class << self
+      attr_writer :client_factory
+
+      def client_factory = @client_factory || -> { Infomaniak.new }
+    end
+
+    def initialize(input:, today: Time.zone.today, client: self.class.client_factory.call)
       @input = input
       @today = today
       @client = client
@@ -33,7 +44,7 @@ module EventCapture
     def call
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       return Extraction.new(error: input.error, code: input.code) unless input.ok?
-      return Extraction.new(error: UNCONFIGURED, code: :unconfigured) unless EventCaptureConfig.configured?
+      return Extraction.new(error: UNCONFIGURED, code: :unconfigured) unless client.configured?
 
       response = client.call(input: input, today: today)
       events = Array(parse(response.text)["events"])

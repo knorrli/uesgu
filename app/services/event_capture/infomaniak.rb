@@ -18,6 +18,8 @@ module EventCapture
     READ_TIMEOUT = 60
     MAX_TOKENS = 4000
 
+    def configured? = EventCaptureConfig.configured?
+
     def call(input:, today:)
       response = post(request_body(input, today))
 

@@ -1,0 +1,75 @@
+/* The capture screen: pick posters or paste text, then prune the list of what the
+   model claims it read. Deliberately plain — the page is a review queue, and every
+   box on it is something a human is about to correct. Follows the settings/filter
+   aesthetic (hairlines, no boxes-in-boxes, accent green for actions only). */
+
+.capture-picker {
+  padding-bottom: var(--gap-medium);
+  border-bottom: var(--border-width) solid var(--rule-color);
+}
+
+/* One input's outcome. The label (a filename, or the head of the pasted text) is
+   what ties a row back to the poster it came from while several are in flight. */
+.capture-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+}
+
+.capture-row__failure {
+  color: var(--theme-warn-color);
+}
+
+/* Candidates are separated by a hairline rather than framed: a frame around each
+   would read as "record", and these are drafts until the form is submitted. */
+.capture-candidate {
+  margin: 0;
+  padding: var(--gap-medium) 0;
+  border: 0;
+  border-top: var(--border-width) solid var(--border-color);
+}
+
+.capture-candidate__accept {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  font-weight: bold;
+}
+
+/* Amber, not red: a past date is a thing to look at, not a thing that failed —
+   the same channel the feed already uses for a passive "this concerns you" hint. */
+.capture-candidate__warning {
+  color: var(--theme-interest-color);
+}
+
+/* Match-at-entry candidates. Chips, so tapping one reads as picking from a
+   vocabulary rather than as filling a field — which is exactly what it is. */
+.capture-candidate__suggestions {
+  align-items: baseline;
+}
+
+.capture-candidate__suggestions .chip {
+  cursor: pointer;
+}
+
+.capture-candidate__issues {
+  font-size: var(--font-size-small);
+}
+
+/* The shared .account-form skin sizes fields to their content; a review queue
+   wants them filling the column instead, so a long title is not read through a
+   letterbox. */
+.capture-candidate input,
+.capture-candidate select,
+.capture-picker textarea {
+  width: 100%;
+}
+
+/* Two fields to a row where they belong together (date + time, locality +
+   canton), each taking half. Without the grow the wrapped field keeps its content
+   width and its underline stops mid-column, which reads as a different kind of
+   field rather than the same one on a narrow screen. */
+.capture-candidate__when > label,
+.capture-candidate__where > label {
+  flex: 1 1 8rem;
+}

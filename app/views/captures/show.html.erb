@@ -1,0 +1,51 @@
+<% content_for :title, t('capture.title') %>
+
+<div class="capture flex flex-col gap-large"
+     data-controller="capture"
+     data-capture-url-value="<%= extract_capture_path %>"
+     data-capture-max-edge-value="1568"
+     data-capture-pending-value="<%= t('capture.row.pending') %>"
+     data-capture-error-value="<%= t('capture.failures.unreachable') %>">
+  <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
+    <h1><%= t('capture.title') %></h1>
+    <p class="muted"><%= t('capture.intro') %></p>
+  <% end %>
+
+  <%# Outside the publish form on purpose: picking an input fires its own request
+      per file, and a file field inside the form would re-upload every poster when
+      the verified events are finally submitted. %>
+  <div class="capture-picker account-form flex flex-col gap-medium">
+    <label class="flex flex-col gap-small">
+      <span class="field-label"><%= t('capture.images_label') %></span>
+      <p class="muted"><%= t('capture.images_hint') %></p>
+      <input type="file" accept="image/*" multiple data-capture-target="files"
+             data-action="change->capture#pickFiles">
+    </label>
+
+    <label class="flex flex-col gap-small">
+      <span class="field-label"><%= t('capture.text_label') %></span>
+      <p class="muted"><%= t('capture.text_hint') %></p>
+      <textarea rows="4" data-capture-target="text"></textarea>
+    </label>
+    <div>
+      <button type="button" class="button-small" data-action="capture#pickText"><%= t('capture.text_button') %></button>
+    </div>
+  </div>
+
+  <%# Every locality the app already knows, so the common answer is one keystroke
+      and a new one is still typeable — decision 6 kept this field free text. %>
+  <datalist id="capture-localities">
+    <% capture_localities.each do |locality| %><option value="<%= locality %>"></option><% end %>
+  </datalist>
+
+  <%= form_with url: capture_path, method: :post, class: 'capture-form account-form flex flex-col gap-large' do |form| %>
+    <div id="capture-rows" class="flex flex-col gap-large" data-capture-target="rows"></div>
+
+    <p class="empty-state" data-capture-target="empty"><%= t('capture.empty') %></p>
+
+    <div data-capture-target="actions" hidden>
+      <%= render "shared/form_actions", form: form,
+            submit_label: t('capture.publish'), cancel_path: root_path %>
+    </div>
+  <% end %>
+</div>

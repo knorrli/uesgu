@@ -1,0 +1,19 @@
+<%# One input's outcome, replacing its pending row in place — so a failed poster is
+    one row to retry rather than a dead batch. Three shapes: a failure, nothing
+    found, or 1..n candidate fieldsets (a poster can advertise two concerts). %>
+<%# locals: (id:, label:, extraction:) %>
+<div id="<%= id %>" class="capture-row flex flex-col gap-small">
+  <p class="field-label"><%= label.presence || t('capture.row.untitled') %></p>
+
+  <% if !extraction.ok? %>
+    <p class="capture-row__failure">
+      <%= t("capture.failures.#{extraction.code}", default: t('capture.failures.unknown')) %>
+    </p>
+  <% elsif extraction.candidates.empty? %>
+    <p class="muted"><%= t('capture.row.nothing_found') %></p>
+  <% else %>
+    <% extraction.candidates.each_with_index do |candidate, index| %>
+      <%= render "captures/candidate", candidate: candidate, key: "#{id}-#{index}" %>
+    <% end %>
+  <% end %>
+</div>

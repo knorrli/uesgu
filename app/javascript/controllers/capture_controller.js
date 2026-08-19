@@ -1,0 +1,134 @@
+import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
+
+// Drives the capture screen: one extraction request per input, fired from the
+// client, each replacing its own pending row as it lands. The server never holds a
+// request open for the whole batch (8 x 2.3s does not fit in one) and there is no
+// queue to reach for, so the fan-out lives here.
+//
+// Connects to data-controller="capture".
+export default class extends Controller {
+  static targets = ["files", "text", "rows", "empty", "actions"]
+  static values = {
+    url: String,
+    pending: String,
+    error: String,
+    maxEdge: { type: Number, default: 1568 },
+    concurrency: { type: Number, default: 3 }
+  }
+
+  pickFiles() {
+    const files = Array.from(this.filesTarget.files)
+    if (files.length === 0) return
+
+    this.filesTarget.value = ""
+    this.run(files.map((file) => () => this.extractImage(file)))
+  }
+
+  pickText() {
+    const text = this.textTarget.value.trim()
+    if (text === "") return
+
+    this.textTarget.value = ""
+    this.run([() => this.extract({ text }, text.slice(0, 40))])
+  }
+
+  // Fill the place tuple from a near-match instead of minting a variant spelling.
+  // Scoped to the fieldset the chip sits in — every candidate carries its own.
+  applySuggestion(event) {
+    const fieldset = event.target.closest(".capture-candidate")
+    const { name, locality, canton } = event.params
+    this.setField(fieldset, "place", name)
+    if (locality) this.setField(fieldset, "locality", locality)
+    if (canton) this.setField(fieldset, "canton", canton)
+  }
+
+  setField(fieldset, suffix, value) {
+    const field = fieldset.querySelector(`[name$="[${suffix}]"]`)
+    if (field) field.value = value
+  }
+
+  // Capped rather than all-at-once: Puma runs three threads, so eight parallel
+  // uploads would queue behind each other anyway while holding every byte of the
+  // request in memory at the same time.
+  async run(tasks) {
+    this.emptyTarget.hidden = true
+    this.actionsTarget.hidden = false
+
+    const queue = tasks.slice()
+    const workers = Array.from({ length: Math.min(this.concurrencyValue, queue.length) }, async () => {
+      while (queue.length > 0) await queue.shift()()
+    })
+    await Promise.all(workers)
+  }
+
+  async extractImage(file) {
+    const image = await this.downscale(file)
+    return this.extract({ image, filename: file.name }, file.name)
+  }
+
+  async extract(payload, label) {
+    const id = crypto.randomUUID()
+    this.appendPending(id, label)
+
+    const body = new FormData()
+    body.append("row_id", id)
+    body.append("label", label)
+    if (payload.text !== undefined) body.append("text", payload.text)
+    if (payload.image !== undefined) body.append("image", payload.image, payload.filename)
+
+    try {
+      const response = await fetch(this.urlValue, {
+        method: "POST",
+        body,
+        headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
+      })
+      Turbo.renderStreamMessage(await response.text())
+    } catch {
+      // A dropped connection must not leave a row spinning forever with no way to
+      // tell that from a slow provider.
+      const row = document.getElementById(`capture-row-${id}`)
+      if (row) row.querySelector("[data-pending]").textContent = this.errorValue
+    }
+  }
+
+  appendPending(id, label) {
+    const row = document.createElement("div")
+    row.id = `capture-row-${id}`
+    row.className = "capture-row"
+    row.innerHTML = `<p class="field-label"></p><p class="muted" data-pending></p>`
+    row.querySelector(".field-label").textContent = label
+    row.querySelector("[data-pending]").textContent = this.pendingValue
+    this.rowsTarget.appendChild(row)
+  }
+
+  // The bake-off capped every sample's long edge at 1568px and there is no image
+  // library on the deployed box to reproduce that server-side, so it happens where
+  // the pixels already are. Re-encoding through the canvas also drops EXIF — a
+  // poster photo's GPS never leaves the device, which decision 9 wants anyway.
+  //
+  // Encoded BOTH ways and the smaller one wins, rather than picking by source
+  // type. Measured on a bake-off poster already at 1568px: canvas PNG came out at
+  // 1.81MB — 32% LARGER than the 1.37MB source, because canvas PNG output is
+  // unoptimised — against 221KB as JPEG. Keeping PNG for PNG sources would have
+  // sent eight times the necessary bytes on exactly the input this feature is for.
+  // Flat-colour screenshots, where PNG genuinely wins, still get PNG; the rule
+  // decides per image instead of guessing from the file extension.
+  async downscale(file) {
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, this.maxEdgeValue / Math.max(bitmap.width, bitmap.height))
+    const canvas = document.createElement("canvas")
+    canvas.width = Math.round(bitmap.width * scale)
+    canvas.height = Math.round(bitmap.height * scale)
+    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    bitmap.close()
+
+    const encode = (type) => new Promise((resolve) => canvas.toBlob(resolve, type, 0.9))
+    const [png, jpeg] = await Promise.all([encode("image/png"), encode("image/jpeg")])
+    return png.size <= jpeg.size ? png : jpeg
+  }
+
+  get csrfToken() {
+    return document.querySelector('meta[name="csrf-token"]')?.content
+  }
+}

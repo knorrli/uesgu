@@ -1,6 +1,7 @@
 ---
 de:
   nav:
+    capture: Erfassen
     events: Veranstaltungen
     admin: Admin
     notifications: Benachrichtigungen
@@ -132,6 +133,46 @@ de:
     reminders_hint: Ein Hinweis um die Mittagszeit am Tag der gespeicherten Veranstaltung — in deinen Benachrichtigungen, und per Push oder E-Mail, falls eingerichtet.
     calendar_feed_hint_html: Die Merkliste gibts auch als Abo für deine Kalender-App — %{link}.
     calendar_feed_link: in den Einstellungen einrichten
+  capture:
+    title: Event erfassen
+    intro: Poster fotografiert oder Text kopiert? Wir lesen aus, du prüfst – erst dann geht etwas live.
+    images_label: Poster
+    images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
+    text_label: Text
+    text_hint: Aus einem Chat, einem Newsletter, egal woher.
+    text_button: Text auslesen
+    empty: Noch nichts ausgelesen.
+    publish: Events veröffentlichen
+    published:
+      one: Ein Event ist live.
+      other: "%{count} Events sind live."
+    none_published: Es wurde nichts veröffentlicht.
+    row:
+      pending: wird gelesen …
+      untitled: Text
+      nothing_found: Nichts gefunden, was nach einem Event aussieht.
+    candidate:
+      accept: Übernehmen
+      title: Titel
+      date: Datum
+      time: Zeit
+      place: Venue
+      suggestions: "Gibt es schon:"
+      locality: Ort
+      canton: Kanton
+      url: Link
+      genres: Genres
+      past: Dieses Datum ist vorbei.
+      refused: "Nicht übernommen: %{values}"
+    failures:
+      image_empty: Das Bild war leer.
+      image_too_large: Das Bild ist zu gross (max. 8 MB).
+      image_unsupported: Dieses Bildformat können wir nicht lesen – speichere es als JPEG oder PNG.
+      text_empty: Da war kein Text.
+      provider_error: Das Auslesen hat nicht geklappt. Nochmal versuchen?
+      unconfigured: Das Auslesen ist gerade nicht eingerichtet.
+      unreachable: Keine Verbindung. Nochmal versuchen?
+      unknown: Das hat nicht geklappt.
   copy_field:
     copy: Kopieren
     copied: Kopiert!

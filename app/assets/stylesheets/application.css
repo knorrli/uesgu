@@ -71,6 +71,8 @@ a {
 .account-form input[type="password"],
 .account-form input[type="time"],
 .account-form input[type="date"],
+.account-form input[type="url"],
+.account-form textarea,
 .account-form select {
   padding: var(--gap-small) 0;
   border: 0;
@@ -79,6 +81,14 @@ a {
   color: inherit;
   font: inherit;
   max-width: 100%;
+}
+
+/* A textarea carries the underline like every other field, but keeps its own
+   box-model habits: it must not be resizable sideways (that breaks the column) and
+   the underline needs the text to sit off it. */
+.account-form textarea {
+  resize: vertical;
+  padding-bottom: var(--gap-small);
 }
 
 /* The native time/date pickers ship as bordered, opaque-white boxes that ignored
@@ -101,6 +111,8 @@ a {
 .account-form input[type="email"]:focus,
 .account-form input[type="password"]:focus,
 .account-form input[type="time"]:focus,
+.account-form input[type="url"]:focus,
+.account-form textarea:focus,
 .account-form select:focus {
   outline: none;
   border-bottom-color: var(--theme-accent-color);

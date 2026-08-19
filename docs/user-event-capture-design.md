@@ -698,11 +698,28 @@ dependency on a 512MB starter instance whose memory we already trim arenas to
 protect.
 
 **So the resize moves to the client**, in the verify screen (#106): a canvas
-`drawImage` to a capped long edge before upload. That is the better place for it
-anyway — the browser already holds the decoded pixels, and it makes the upload
-smaller too, which the server-side version never could. The one thing it is not is
-a guarantee, since the adapter is reachable from the rake task and from anything
-built later.
+`drawImage` to a capped long edge before upload. **Built.** That is the better
+place for it anyway — the browser already holds the decoded pixels, and it makes
+the upload smaller too, which the server-side version never could. The one thing it
+is not is a guarantee, since the adapter is reachable from the rake task and from
+anything built later.
+
+Two things the build measured that the plan did not anticipate:
+
+**The canvas encodes to BOTH formats and the smaller one is sent** — the obvious
+rule, "keep a PNG as a PNG so the bake-off's screenshot condition is preserved",
+is wrong. Canvas PNG output is unoptimised: a bake-off poster already at 1568px
+came back as **1.81MB against a 1.37MB source** — 32% *larger* than the file it
+downscaled — while the same canvas gave **221KB as JPEG**. End to end that was the
+difference between an 80-second round trip and a 1.7-second one, because the
+bottleneck is the upload to the provider, not the provider. Flat-colour
+screenshots, where PNG genuinely wins, still get PNG; the rule decides per image
+instead of guessing from the file extension.
+
+**Re-encoding through the canvas also strips EXIF**, so a poster photo's GPS never
+leaves the device. That falls out of the resize rather than being designed, but it
+is the same instinct as decision 9 and worth not losing: the server could not have
+done it, because by the time the bytes arrive the metadata has already travelled.
 
 What the adapter does instead is **cap and refuse**: 8MB, checked before anything
 is encoded. Base64 inflates by ~4/3 and one Puma worker with three threads holds

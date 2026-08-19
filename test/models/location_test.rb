@@ -4,7 +4,8 @@ require "db_test_helper"
 # region is derived from the VENUE REGISTRY (config/venues.yml via Venue): the
 # placed, consumed venues (Venue.in_taxonomy) are the source of truth. Expectations
 # are derived from the live registry, never hardcoded venue names, so this stays
-# correct as the registry changes.
+# correct as the registry changes. The canton codes are the exception: a closed
+# list of 26 that must NOT follow the registry.
 class LocationTest < ActiveSupport::TestCase
   setup do
     @venue = Venue.in_taxonomy.first # a placed, consumed venue
@@ -28,6 +29,34 @@ class LocationTest < ActiveSupport::TestCase
 
   test "a registry canton code is classified as :canton" do
     assert_equal :canton, Location.type_for(@venue.canton)
+  end
+
+  # The bug this list replaced: canton_codes was Venue.in_taxonomy's cantons, so a
+  # tag for a canton we do not source from fell through to :city and rendered with
+  # a city icon and a "· Stadt" suffix everywhere a location is shown.
+  test "a canton we source no venue from is still classified as :canton" do
+    uncovered = Location::CANTON_CODES - Location.taxonomy_venues.map(&:canton).to_set
+    skip "the registry covers all 26 cantons" if uncovered.empty?
+
+    uncovered.each do |code|
+      assert_equal :canton, Location.type_for(code), "#{code} must type as a canton"
+    end
+  end
+
+  test "canton_codes is the closed set of all 26 Swiss cantons" do
+    assert_equal 26, Location.canton_codes.size
+    assert Location.canton_codes.frozen?
+  end
+
+  # The codes and their display names are two lists in two places; if they drift, a
+  # canton renders as a raw code (missing name) or a name is dead weight (missing
+  # code). Locked against every locale, not just the default.
+  test "every canton code has a display name in every locale, and vice versa" do
+    I18n.available_locales.each do |locale|
+      names = I18n.t("cantons", locale: locale).keys.map(&:to_s).to_set
+
+      assert_equal Location.canton_codes, names, "cantons: in #{locale}.yml must match CANTON_CODES"
+    end
   end
 
   test "a registry city is classified as :city" do

@@ -82,6 +82,30 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     end
   end
 
+  # The bake-off samples were German, so a parser built from their vocabulary would
+  # encode an accident of six posters. These are the shapes the long tail carries.
+  test "French, English and marker-less clock formats normalise too" do
+    { "20h30" => "20:30", "20 h 30" => "20:30", "20h" => "20:00", "21 heures" => "21:00",
+      "8pm" => "20:00", "8:30 PM" => "20:30", "12 am" => "00:00", "12pm" => "12:00",
+      "9 o'clock" => "09:00", "20.00" => "20:00", "20:00-23:00" => "20:00" }.each do |printed, expected|
+      assert_equal expected, normalize("time" => printed).time, printed
+    end
+  end
+
+  test "a date in the time field is not read as a time" do
+    ["20.08.", "20.08.2026", "31.12."].each do |printed|
+      candidate = normalize("time" => printed)
+
+      assert_nil candidate.time, printed
+      assert_equal printed, candidate.raw["time"]
+    end
+  end
+
+  test "a time that does not lead with the clock is nulled rather than guessed" do
+    assert_nil normalize("time" => "Doors 19:00").time
+    assert_nil normalize("time" => "halb acht").time
+  end
+
   test "a time that is neither a clock nor a number is dropped and kept" do
     candidate = normalize("time" => "doors at dusk")
 

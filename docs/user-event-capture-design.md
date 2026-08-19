@@ -241,6 +241,22 @@ adapter" below for why, so it does not get re-proposed.
     precedent — an image capture already retains zero provenance, so a column that
     preserves it for the easier case only is asymmetric.
 
+    **`places.url` is auto-filled from the capture's link, and knowingly imperfect.**
+    It is skipped for `OFFSITE_SOURCES` (Instagram, Facebook, Bewegungsmelder,
+    PETZI), but that list exists to badge event cards, so a Ticketcorner or
+    Starticket deep link passes it and becomes a place's "own" URL — which fails
+    the column's purpose (making a `VenueLead` actionable enough to write a scraper
+    against) exactly as an Instagram link would. It is also permanent: the first
+    capture at a place fixes it, since later ones reuse the row.
+
+    Left as-is deliberately (2026-08-19). Contributors are admin-enabled and can be
+    trusted to paste something sensible, and a wrong URL costs one glance during
+    lead triage. **The trigger for revisiting is evidence of misuse**, not a better
+    heuristic — at which point the answer is to drop the auto-fill entirely rather
+    than grow the reject list, since any host allowlist is permanently incomplete.
+    Rejected now: extending the reject list with ticketing hosts (endless), and
+    storing only the origin (makes a wrong value visible but no less wrong).
+
     **A social or ticketing paste does populate `url`** — reluctantly. We would
     rather not send people to Instagram, but for the ad-hoc events this feature
     exists to catch it is regularly the only page that exists, and a link that

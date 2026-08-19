@@ -648,12 +648,7 @@ def slug(str)
 end
 
 stamp   = Time.now.strftime("%Y%m%d-%H%M%S")
-tag     = if active.size == 1
-            n = active.keys.first
-            "#{n}-#{slug(MODEL_IDS[n])}"
-          else
-            active.keys.map { |n| "#{n}-#{slug(MODEL_IDS[n])}" }.join("_")
-          end
+tag     = active.keys.map { |n| "#{n}-#{slug(MODEL_IDS[n])}" }.join("_")
 SESSION = File.join(OUT, "#{stamp}-#{tag}")
 FileUtils.mkdir_p(SESSION)
 

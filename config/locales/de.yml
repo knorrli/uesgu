@@ -441,7 +441,7 @@ de:
         invited_by: Eingeladen von
         saved_filters: Gespeicherte Filter
         contributor_heading: Events erfassen
-        contributor_hint: Erlaubt diesem Konto, selbst Events zu erfassen – aus Link, Poster oder Screenshot.
+        contributor_hint: Erlaubt diesem Konto, selbst Events zu erfassen – aus einem Poster oder kopiertem Text.
         contributor_grant: Erfassung erlauben
         contributor_revoke: Erfassung entziehen
         delete_heading: Konto löschen

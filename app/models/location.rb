@@ -1,8 +1,10 @@
 # Location tags (the `:locations` acts_as_taggable_on context on Event) are flat:
 # a single tag list mixing venues, cities, and canton codes. There is no stored
-# type. We DERIVE the type from the VENUE REGISTRY (config/venues.yml via Venue):
-# the placed, consumed venues (Venue.in_taxonomy) are the source of truth for the
-# venue/city/canton roles and for the WHERE-filter tree.
+# type. We DERIVE the type: venue names come from the VENUE REGISTRY
+# (config/venues.yml via Venue) — the placed, consumed venues (Venue.in_taxonomy)
+# are the source of truth for the venue role and for the WHERE-filter tree —
+# while the canton codes are the closed list of 26 (CANTON_CODES), independent of
+# which cantons we happen to source from. Everything else is a city.
 #
 # (Until 2026-06-25 this was derived from the scrapers + the VenuePlace table, now
 # repurposed as VenueLead; the
@@ -24,13 +26,24 @@ class Location
     taxonomy_venues.map(&:name).to_set
   end
 
-  # Every canton code in the taxonomy.
+  # The 26 Swiss cantons, keyed by the code a location tag carries. This is a
+  # CLOSED list and deliberately NOT registry-derived: which cantons we happen to
+  # source venues from says nothing about which codes are cantons, and deriving it
+  # made a tag for an uncovered canton (e.g. "VS") type as a city. The display
+  # names live in the `cantons:` map in config/locales/*.yml (TagsHelper#canton_name);
+  # a test locks the two lists together so neither can drift.
+  CANTON_CODES = %w[
+    AG AI AR BE BL BS FR GE GL GR JU LU NE
+    NW OW SG SH SO SZ TG TI UR VD VS ZG ZH
+  ].to_set.freeze
+
+  # Every canton code. A constant read — this sits on the hot WHERE-filter path.
   def self.canton_codes
-    taxonomy_venues.map(&:canton).to_set
+    CANTON_CODES
   end
 
-  # :venue for a concrete venue, :canton for a canton code, :city otherwise. The
-  # canton codes are the registry's; anything else that is not a venue is a city.
+  # :venue for a concrete venue, :canton for a canton code, :city otherwise.
+  # Anything that is neither a registry venue nor a canton code is a city.
   def self.type_for(name)
     name = name.to_s
     return :venue if venue_names.include?(name)
@@ -45,11 +58,12 @@ class Location
 
   # Every location tag actually in use, as { name:, count:, type: } rows for the
   # admin locations browser. Counts come from the taggings (a location has no table
-  # of its own); the type is the same registry-derived classification as type_for.
+  # of its own); the type is the same derived classification as type_for.
   # Tags that no event carries don't appear — this is "what's live".
   def self.usage
-    # Classify against the venue/canton sets computed ONCE (each is a small read),
-    # not via type_for per tag — this runs on the hot WHERE-filter path.
+    # Classify against the venue/canton sets resolved ONCE (venues are a small read,
+    # cantons a constant) — not via type_for per tag, this runs on the hot
+    # WHERE-filter path.
     venues = venue_names
     cantons = canton_codes
     ActsAsTaggableOn::Tagging

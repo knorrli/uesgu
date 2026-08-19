@@ -32,8 +32,15 @@
   color: var(--theme-accent-color);
 }
 
+/* nowrap keeps the count and the date range each unbroken, which is what makes
+   the dates line up flush right across rows (see the ordering comment in
+   notifications/index). It is NOT allowed to push the row wider than the
+   viewport: at 320px the German meta line ("3 Veranstaltungen · 06.08.2026 –
+   13.08.2026") is ~50px too wide and used to overflow the page horizontally, so
+   the segments wrap onto a second line instead. */
 .notification__meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: var(--gap-small);
   color: var(--theme-fg-muted);

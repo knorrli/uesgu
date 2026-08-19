@@ -34,7 +34,8 @@
   </div>
 
   <%# Every locality the app already knows, so the common answer is one keystroke
-      and a new one is still typeable — decision 6 kept this field free text. %>
+      while an unlisted one can still be typed: this field is free text, not a
+      closed set. %>
   <datalist id="capture-localities">
     <% capture_localities.each do |locality| %><option value="<%= locality %>"></option><% end %>
   </datalist>

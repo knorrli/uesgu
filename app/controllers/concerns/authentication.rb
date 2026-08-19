@@ -29,10 +29,10 @@ module Authentication
       head :forbidden unless current_user&.admin?
     end
 
-    # Capture is admin-enabled per account (decision 7): the threat model for the
-    # funnel is "a friend you approved", not the open internet. Not implied by
-    # admin — granting yourself the flag is one toggle away, and keeping the two
-    # separate means the capability is always something someone decided.
+    # Capturing events is granted per account by an admin, so the threat model is
+    # "a friend you approved", not the open internet. Deliberately not implied by
+    # admin: keeping the two separate means the capability is always something
+    # somebody granted on purpose.
     def require_contributor
       head :forbidden unless current_user&.contributor?
     end

@@ -8,7 +8,6 @@ module CapturesHelper
     PlaceSuggester.for_name(candidate.place, url: candidate.source_url)
   end
 
-  # A suggestion list, not a closed set — decision 6 made locality free text.
   def capture_localities
     (Venue.in_taxonomy.map(&:locality) + Place.distinct.pluck(:locality)).compact_blank.uniq.sort
   end

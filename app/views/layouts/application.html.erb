@@ -123,8 +123,8 @@
                   <span class="ph ph-gear" aria-hidden="true"></span>
                   <span><%= t('nav.settings') %></span>
                 <% end %>
-                <%# Capture is a per-account capability (decision 7), so the door
-                    only exists for accounts that were given it. %>
+                <%# Capturing events is granted per account, so the door only
+                    exists for accounts that have it. %>
                 <% if current_user.contributor? %>
                   <%= link_to capture_path, class: 'nav-menu__item' do %>
                     <span class="ph ph-camera" aria-hidden="true"></span>

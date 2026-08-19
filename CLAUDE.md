@@ -62,6 +62,24 @@ Never write a comment that restates the code, narrates control flow, labels a
 block, announces what the next line does, or repeats intent already stated by the
 method or test name.
 
+**A comment must be understandable on its own, by someone reading only this file.**
+It may not lean on context the reader has no way to resolve from the code in front
+of them. Concretely, never write:
+
+- `decision 6`, `decision 9` — ordinals in a design doc's numbered list. Nothing in
+  the code identifies them, and they renumber.
+- `(#119)`, `PR #113`, `shipped in #97` — issue and PR numbers. They say a
+  conversation happened somewhere else, not what the reader needs to know.
+- in-house shorthand for artifacts the sentence never names (`the bake-off`, `the
+  audit`, `the walkthrough`).
+
+State the substance instead: *why* the field is free text, *what* the threat model
+is, *which* measurement produced the number. If the full reasoning is too long,
+give the one-line reason in the comment and cite a **file path** (`see
+EventCapture::Extractor`, `docs/user-event-capture-design.md`) — a path is
+something the reader can open; an ordinal or a ticket number is not. The comment
+still has to make sense if they never open it.
+
 Prefer one dense comment at the top of a construct over running commentary inside
 it, and never explain the same thing at two altitudes — a class header that
 re-explains what a method's own comment already says is duplication that will drift.

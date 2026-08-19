@@ -163,13 +163,14 @@ export default class extends Controller {
     this.rowsTarget.appendChild(row)
   }
 
-  // The bake-off capped every sample's long edge at 1568px and there is no image
-  // library on the deployed box to reproduce that server-side, so it happens where
-  // the pixels already are. Re-encoding through the canvas also drops EXIF — a
-  // poster photo's GPS never leaves the device, which decision 9 wants anyway.
+  // The long edge is capped at 1568px, which is where the provider's accuracy was
+  // measured. It happens here because there is no image library in the bundle and
+  // none on the deployed box, so the server cannot resize. Re-encoding through the
+  // canvas also drops EXIF, so a poster photo's GPS never leaves the device — which
+  // the server could never have achieved, the metadata having already travelled.
   //
   // Encoded BOTH ways and the smaller one wins, rather than picking by source
-  // type. Measured on a bake-off poster already at 1568px: canvas PNG came out at
+  // type. Measured on a real poster sample already at 1568px: canvas PNG came out at
   // 1.81MB — 32% LARGER than the 1.37MB source, because canvas PNG output is
   // unoptimised — against 221KB as JPEG. Keeping PNG for PNG sources would have
   // sent eight times the necessary bytes on exactly the input this feature is for.

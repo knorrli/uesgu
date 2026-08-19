@@ -16,8 +16,7 @@
 # the most valuable outcome is "this is actually Dachstock": tag the event, create
 # no Place at all. The registry side has no table, so it is passed in as a VALUES
 # list and scored by the same SQL, rather than growing a second implementation that
-# quietly disagrees at the threshold. See docs/user-event-capture-design.md
-# "Matching at entry".
+# quietly disagrees at the threshold.
 class PlaceSuggester
   Suggestion = Struct.new(:name, :locality, :canton, :source, :score, keyword_init: true) do
     # A registry hit means tag the event and write no Place row.

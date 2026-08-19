@@ -2,9 +2,10 @@
 # client fires it once per poster (see EventCapture::Extractor for why there is no
 # queue), so nothing here holds a request open for a batch.
 #
-# NOTHING is persisted before `create`, images least of all (decision 9) — between
-# the two the batch lives only in the DOM, which is what makes "the verify screen is
-# the PII checkpoint" literally true. See docs/user-event-capture-design.md.
+# No image is ever stored, and nothing at all is persisted before `create` —
+# between the two the batch lives only in the DOM. Closing the tab therefore leaves
+# nothing behind, which is what makes the human review a real checkpoint on what
+# gets kept rather than a formality after the fact.
 class CapturesController < ApplicationController
   before_action :require_contributor
   # Every extract is a paid third-party call. Keyed by user, not IP: on Render

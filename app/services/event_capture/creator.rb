@@ -32,10 +32,10 @@ module EventCapture
         Result.new(event: publish(place), place: place.is_a?(Place) ? place : nil)
       end
     rescue ActiveRecord::RecordNotUnique
-      # The unique index on events.url. Not a 500: "this event already exists" is
-      # precisely what a contributor pasting a link the scraper already has should
-      # be told, and decision 10 chose that collision deliberately over a second
-      # column that would let the duplicate through.
+      # The unique index on events.url. Not a 500: a contributor pasting a link a
+      # scraper already holds should be told "this event already exists", and that
+      # collision is wanted — a second column for the pasted link would let the
+      # duplicate through instead of catching it.
       Result.new(error: :duplicate)
     end
 

@@ -73,7 +73,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
 
   # No string measure reaches Freiburg -> Fribourg or a Luzren -> Luzern
   # transposition, so a genuine variant is left alone rather than guessed at. That
-  # class needs a curated alias list (#119).
+  # class needs a curated alias list of known name pairs instead.
   test "a genuinely different spelling is left as typed" do
     place(name: "Zorpsaal", locality: "Zorpwil")
 
@@ -140,8 +140,8 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "2026-09-01 20:00", event.start_time.strftime("%Y-%m-%d %H:%M")
   end
 
-  # Decision 10 chose this collision deliberately: the scraper's upsert key is the
-  # url, so a paste of a page we already have is "this event already exists".
+  # The collision is wanted: a scraper upserts on the url, so pasting a page we
+  # already hold means the event exists rather than that something went wrong.
   test "a url the scraper already holds is a duplicate, not a 500" do
     event(url: "https://zorp.example/show", title: "Scraped")
 

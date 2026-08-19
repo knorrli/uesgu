@@ -28,9 +28,8 @@ class Location
     taxonomy_venues.to_set { |venue| Fingerprint.for(venue.name) }
   end
 
-  # Every name that plays the venue role: the registry venues plus the captured
-  # places. The Place read lands on the per-event path (Event#venue), so it leans
-  # on the per-request query cache — places is a tens-of-rows table and the SQL is
+  # The Place read lands on the per-event path (Event#venue), so it leans on the
+  # per-request query cache — places is a tens-of-rows table and the SQL is
   # identical every call.
   def self.venue_names
     taxonomy_venues.map(&:name).to_set | Place.names
@@ -93,10 +92,8 @@ class Location
   # event is findable by browsing and not only by typing its exact name. A venue
   # too thin to place (no locality or canton) is skipped — Venue.in_taxonomy
   # already excludes those, so no nil keys; a Place cannot be thin (both NOT NULL).
-  #
-  # One-offs do not accumulate here: location_filter_tree prunes every node to what
-  # events currently carry, so a captured place leaves the tree once its show has
-  # passed. Nothing expires it manually.
+  # One-offs need no expiry: location_filter_tree prunes every node to what events
+  # currently carry, so a captured place leaves the tree when its show passes.
   def self.hierarchy
     tree = taxonomy_venues.each_with_object({}) do |venue, acc|
       add_to_tree(acc, venue.canton, venue.locality, venue.name)

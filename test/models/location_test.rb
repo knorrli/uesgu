@@ -88,13 +88,7 @@ class LocationTest < ActiveSupport::TestCase
     assert_includes tree[agg.canton][agg.locality], agg.name
   end
 
-  # --- Captured places -------------------------------------------------------
-  #
-  # A captured place plays the venue role exactly like a registry venue: same
-  # type, same tree tier. Anything less and the captured event is unfindable by
-  # anyone who does not already know its name.
-
-  test "a captured place is classified as :venue, like a registry venue" do
+    test "a captured place is classified as :venue, like a registry venue" do
     zorpsaal = place(name: "Zorpsaal")
 
     assert Location.venue?(zorpsaal.name)

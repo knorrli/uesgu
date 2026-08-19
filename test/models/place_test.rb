@@ -58,9 +58,7 @@ class PlaceTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::StatementInvalid) { zorpsaal.update_column(:canonical_id, zorpsaal.id) }
   end
 
-  # The complement rule: config/venues.yml owns the venues we source from, and a
-  # second row for one of them is the VenuePlace drift that PR #29 retired.
-  test "a place may not duplicate a registry venue, in any spelling" do
+    test "a place may not duplicate a registry venue, in any spelling" do
     venue = Venue.in_taxonomy.first
     skip "no venues in the taxonomy" if venue.nil?
 
@@ -81,9 +79,7 @@ class PlaceTest < ActiveSupport::TestCase
     assert_equal [graduated], Place.shadowed
   end
 
-  # What the whole model is for: a captured event renders with its place as the
-  # venue, exactly like a scraped one.
-  test "an event tagged with a captured place surfaces it as the event's venue" do
+    test "an event tagged with a captured place surfaces it as the event's venue" do
     zorpsaal = place(name: "Zorpsaal")
     captured = event(location_list: [zorpsaal.name, zorpsaal.locality, zorpsaal.canton])
 

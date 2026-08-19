@@ -55,7 +55,12 @@
           </tr>
           <% if result.failed? && result.error_message.present? %>
             <tr>
-              <td colspan="9" class="scrape-error"><%= result.error_class %>: <%= result.error_message %></td>
+              <td colspan="10" class="scrape-error"><%= result.error_class %>: <%= result.error_message %></td>
+            </tr>
+          <% end %>
+          <% if result.robots_note.present? %>
+            <tr>
+              <td colspan="10" class="scrape-note"><%= t('.robots_note', note: result.robots_note) %></td>
             </tr>
           <% end %>
         <% end %>

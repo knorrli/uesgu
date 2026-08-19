@@ -44,6 +44,32 @@ class Scrapers::SweepTest < ActiveSupport::TestCase
     assert_equal 1, run.scrape_results.sole.discarded_count
   end
 
+  class RobotsNoteHarness < CountingScraperHarness
+    NOTE = "https://fixture.test/robots.txt unreachable — Mechanize::ResponseCodeError: 500".freeze
+    def robots_note = NOTE
+  end
+  Scrapers::All.scrapers.delete("RobotsNoteHarness")
+
+  test "an unreachable robots.txt is recorded on the result and in the summary" do
+    RobotsNoteHarness.next_rows = [{ url: "https://fixture.test/a" }]
+    out = StringIO.new
+
+    run = Scrapers::Sweep.run!(scrapers: { "RobotsNoteHarness" => RobotsNoteHarness }, out: out)
+
+    result = run.scrape_results.sole
+    assert_equal "ok", result.status, "an unreachable robots.txt is a note, not a failure"
+    assert_equal RobotsNoteHarness::NOTE, result.robots_note
+    assert_includes out.string, "ROBOTS #{RobotsNoteHarness::NOTE}"
+  end
+
+  test "a healthy run records no robots note" do
+    CountingScraperHarness.next_rows = [{ url: "https://fixture.test/a" }]
+
+    run = sweep("CountingScraperHarness" => CountingScraperHarness)
+
+    assert_nil run.scrape_results.sole.robots_note
+  end
+
   test "a scraper that writes nothing is recorded empty (the silent regression)" do
     CountingScraperHarness.next_rows = []
 

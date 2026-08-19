@@ -86,8 +86,9 @@ module Scrapers
         scraper: slug, status: status, started_at: started, duration_ms: ms_since(started),
         rows_seen: result.seen, created_count: result.created, updated_count: result.updated,
         unchanged_count: result.unchanged, errored_count: result.errored,
-        discarded_count: result.discarded
+        discarded_count: result.discarded, robots_note: result.robots_note
       )
+      @out.puts "[#{slug}] ROBOTS #{result.robots_note}" if result.robots_note.present?
       if result.created_ids.any?
         Event.where(id: result.created_ids).update_all(created_in_scrape_run_id: run.id)
       end

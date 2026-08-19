@@ -31,23 +31,33 @@ module Scrapers
       self.robots = respect_robots
     end
 
-    # Mechanize consults robots.txt before every fetch, and webrobots (0.1.2)
-    # FAIL-CLOSES on a robots.txt it can't fetch: when the robots.txt request
-    # itself raises — a TLS handshake failure, a reset connection, a timeout — it
-    # fabricates a synthetic "Disallow: /" and Mechanize raises
-    # RobotsDisallowedError. That names robots.txt as the culprit even when the
-    # real fault lies elsewhere: Südpol served a wrong-host TLS cert on
-    # cms.sudpol.ch, the robots.txt fetch failed hostname verification, and the
-    # scrape surfaced as a phantom robots ban with no such rule anywhere in sight.
-    # webrobots stashes the swallowed fetch error, so re-raise IT and the run
-    # reports the true root cause. A GENUINE ban (a real Disallow, or a page-level
-    # noindex meta tag) carries no stashed error, so robots_error! is a no-op there
-    # and the honest RobotsDisallowedError still propagates unchanged.
+    # webrobots (0.1.2) FAIL-CLOSES: when the robots.txt REQUEST fails — a 5xx, a
+    # TLS handshake failure, a reset, a timeout — it fabricates a synthetic
+    # "Disallow: /" and Mechanize raises RobotsDisallowedError, a verdict the venue
+    # never issued. So an unreachable robots.txt is UNKNOWN, not a ban: proceed,
+    # and record it. RFC 9309 §2.3.1.4 permits this for a site we can tell is
+    # misconfigured — schuur.ch serves its programme at 200 and 500s only on
+    # /robots.txt. A genuine Disallow (or a `noindex` meta tag) stashes no fetch
+    # error, which is what tells the two apart. 4xx never reaches here: Mechanize's
+    # get_robots maps it to an empty robots.txt (§2.3.1.3, allow-all).
     def get(*args, &block)
+      # Assigning `robots=` drops webrobots' whole cache, so without this memo
+      # every page would re-request the broken robots.txt and re-raise first.
+      return without_robots { super } if robots_unreachable?(robots_origin(args.first))
+
       super
     rescue Mechanize::RobotsDisallowedError => e
-      agent.robots_error!(e.uri)
-      raise
+      cause = robots_fetch_error(e.uri)
+      raise unless cause
+
+      note_robots_unreachable(e.uri, cause)
+      without_robots { super }
+    end
+
+    def robots_note
+      return nil if robots_unreachable.empty?
+
+      robots_unreachable.map { |origin, cause| "#{origin}/robots.txt unreachable — #{cause}" }.join("; ")
     end
 
     def self.call
@@ -177,10 +187,54 @@ module Scrapers
 
       Result.new(seen: @seen, created: @created, updated: @updated,
                  unchanged: @unchanged, errored: @failures, discarded: @discarded,
-                 created_ids: @created_ids)
+                 created_ids: @created_ids, robots_note: robots_note)
     end
 
     private
+
+    # Keyed by origin, not global: an aggregator talks to many hosts, and one
+    # venue's broken robots.txt must not switch enforcement off for the rest.
+    def robots_unreachable
+      @robots_unreachable ||= {}
+    end
+
+    def robots_unreachable?(origin)
+      origin.present? && robots_unreachable.key?(origin)
+    end
+
+    def note_robots_unreachable(uri, cause)
+      origin = robots_origin(uri)
+      return if origin.blank? || robots_unreachable.key?(origin)
+
+      robots_unreachable[origin] = "#{cause.class}: #{cause.message}"
+      Rails.logger.warn(
+        "[#{self.class.location}] #{origin}/robots.txt is unreachable " \
+        "(#{cause.class}: #{cause.message}) — no ban was published, so proceeding"
+      )
+    end
+
+    # Nil is fine — #get accepts a Mechanize::Link too, which stringifies to its
+    # link text rather than a URL. That just costs the memo; the rescue still runs.
+    def robots_origin(target)
+      uri = URI(target.to_s)
+      "#{uri.scheme}://#{uri.host}" if uri.scheme && uri.host
+    rescue StandardError
+      nil
+    end
+
+    def robots_fetch_error(uri)
+      agent.robots_error(uri)
+    end
+
+    # Mechanize's single `robots` flag gates BOTH robots.txt and the page-level
+    # `noindex` check, so this skips noindex for the retried fetch too — accepted:
+    # a site we cannot even reach has told us nothing to honour.
+    def without_robots
+      self.robots = false
+      yield
+    ensure
+      self.robots = respect_robots
+    end
 
     # Template method shared by every scraper. Subclasses provide only the venue
     # specifics via the hooks below (event_rows / event_url + field extractors);

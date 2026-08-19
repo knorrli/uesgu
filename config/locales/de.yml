@@ -405,6 +405,7 @@ de:
         duration: Zeit
         created_events: Erstellte Events
         no_created_events: Dieser Lauf hat keine neuen Events erstellt.
+        robots_note: "robots.txt nicht erreichbar — kein Verbot veröffentlicht, also trotzdem gelesen (%{note})"
     scraper_coverage:
       index:
         title: Datenabdeckung

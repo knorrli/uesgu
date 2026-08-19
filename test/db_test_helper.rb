@@ -59,6 +59,13 @@ module TaxonomyFixtures
     Genre.find_by(fingerprint: Genre.fingerprint_for(name))
   end
 
+  # A persisted captured Place with an invented name — one the venue registry
+  # deliberately does not cover, which is the only kind that may exist.
+  def place(**attrs)
+    n = TaxonomyFixtures.next_seq
+    Place.create!({ name: "Zorpsaal #{n}", locality: "Zorpwil", canton: "BE" }.merge(attrs))
+  end
+
   # A persisted User with a valid synthetic username + password. Pass attrs to
   # set created_at, email_address, locale, admin, etc.
   def user(**attrs)

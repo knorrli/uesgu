@@ -421,23 +421,48 @@ fingerprint already uses — `unaccent` is not IMMUTABLE and STORED requires it 
 `AddFingerprintToGenres`). Both columns are generated, so neither can drift from
 the other or from the name they derive from.
 
-#### Locality gets the same treatment, and still no table
+#### Locality does NOT get the same treatment — the measure is wrong for it
 
-Locality has the identical splitting failure mode and, unlike the place name, no
-normalization at all today: `places.locality` is a plain string and
-`Location.hierarchy` groups on the literal value, so "Zorpwil" and "zorpwil" are two
-tree nodes. The registry stays clean only because its rows are PR-reviewed; the
-captured half has no such gate.
+The earlier version of this section said locality got the identical trigram
+scoring. **Reversed**, on measurement. Locality duplicates fall into three classes
+and trigram only reaches the smallest:
 
-It gets `locality_folded` and the same scoring, and it does **not** get a table.
-Decision 6 made locality free text deliberately — closed-where-finite,
-open-where-not — and a `localities` registry would reopen that for no gain.
+| class | example | fingerprint | trigram |
+| --- | --- | --- | --- |
+| case / accents / punctuation | `bern`, `Zurich`, `St.Gallen` | exact | 1.0 |
+| typo, word order | `Berrn`, `Sankt Gallen` | no | 0.57–0.70 |
+| other-language, transposition | `Freiburg`→Fribourg, `Genf`→Genève, `Luzren`→Luzern | no | **0.21–0.33** |
 
-The candidate set spans two sources: captured localities in `places`, and the
-registry's 16 distinct values from `Venue.in_taxonomy`. They merge into **one query**,
-with the registry side passed as a `VALUES` list built in Ruby, so there is a single
-scoring path rather than one SQL implementation and one in-memory implementation
-that quietly disagree at the threshold.
+Two things that table settles. **Trigrams are weak on names this short**: `Luzren`
+is a two-letter transposition of `Luzern` and scores 0.27, because transposing
+inside a six-letter word destroys most of its trigrams. The measure that reaches
+`Quartierfest` inside `Marzili Quartierfest` is close to useless on Swiss town
+names. And **no string measure will ever reach the third class** — `Genf` and
+`Genève` share almost nothing. In a country whose registry already carries both
+`Biel` and `Fribourg`, that class is guaranteed, and it needs data, not arithmetic.
+
+So the field is served by two things instead:
+
+- **An exact fingerprint match at write time** (`EventCapture::Creator`), adopting
+  the stored spelling, registry first. This is a normalisation and not the silent
+  rewrite decision 5 forbids: `bern` and `Bern` *are* the same name, on the same
+  basis `Place.matching` already resolves a place name without asking. It uses the
+  fingerprint rather than the folded form, because folded keeps word boundaries by
+  design and would read `Zorp-wil` and `Zorpwil` as different.
+- **A datalist of every known locality**, which is the affordance for the common
+  path — typing a correct prefix.
+
+The remaining class is a curated alias list, tracked separately. `locality_folded`
+was dropped with the scoring that needed it; `name_folded` stays, since the place
+name is what the column pair was really bought for.
+
+Where this bites is narrower than it looks: a matched place contributes its own
+stored locality, so a fresh spelling only enters when a place is minted for the
+first time or when the capture has no venue at all (a show in a park).
+
+It still does **not** get a table. Decision 6 made locality free text deliberately —
+closed-where-finite, open-where-not — and a `localities` registry would reopen that
+for no gain.
 
 #### Rules that hold whatever the threshold turns out to be
 

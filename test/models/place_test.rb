@@ -32,15 +32,14 @@ class PlaceTest < ActiveSupport::TestCase
     assert_equal "zorpsaalandbar", zorpsaal.fingerprint
   end
 
-  # The folded columns are the fingerprint's rule with word boundaries kept, and
-  # match-at-entry scores a raw extracted string (folded in Ruby) against them.
+  # name_folded is the fingerprint's rule with word boundaries kept, and
+  # match-at-entry scores a raw extracted string (folded in Ruby) against it.
   # Same drift risk as the fingerprint, same lock.
-  test "the stored folded columns reproduce Fingerprint.folded exactly" do
-    zorpsaal = place(name: "Zörp-Saal & Bar", locality: "Ober Zorpwil")
+  test "the stored name_folded reproduces Fingerprint.folded exactly" do
+    zorpsaal = place(name: "Zörp-Saal & Bar")
 
     assert_equal "zorp saal and bar", zorpsaal.name_folded
     assert_equal Fingerprint.folded("Zörp-Saal & Bar"), zorpsaal.name_folded
-    assert_equal Fingerprint.folded("Ober Zorpwil"), zorpsaal.locality_folded
   end
 
   test "spelling variants of one name cannot become two places" do

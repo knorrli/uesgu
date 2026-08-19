@@ -1,4 +1,11 @@
-# Match-at-entry: the candidates a contributor taps instead of minting a new place.
+# Match-at-entry for a PLACE NAME: the candidates a contributor taps instead of
+# minting a new one.
+#
+# Deliberately not used for locality. Trigrams are weak on names that short — a
+# plain transposition, Luzren -> Luzern, scores 0.27, and no measure reaches
+# Freiburg -> Fribourg — so that field is served by an exact fold-match in
+# EventCapture::Creator plus a datalist, and its remaining variants need a curated
+# alias list rather than a similarity score.
 # The stake is not tidiness — nomination into /admin/venue_leads fires at
 # events_count >= 2 on a Place, so three captures split across "Quartierfest" /
 # "Quarterfest" / "Marzili Quartierfest" never reach the threshold and a real venue
@@ -32,14 +39,6 @@ class PlaceSuggester
       return [suggestion(venue.name, venue.locality, venue.canton, "registry", 1.0)] if venue
 
       score(name, name_candidates, limit: limit)
-    end
-
-    # Locality has the identical splitting failure mode and no normalization at all
-    # today — Location.hierarchy groups on the literal string, so "Zorpwil" and
-    # "zorpwil" are two tree nodes. Deliberately NOT backed by a table: decision 6
-    # made locality free text (closed-where-finite, open-where-not).
-    def for_locality(name, limit: LIMIT)
-      score(name, locality_candidates, limit: limit).map(&:name)
     end
 
     private
@@ -102,11 +101,6 @@ class PlaceSuggester
     def name_candidates
       registry(Venue.in_taxonomy) { |venue| [venue.name, venue.locality, venue.canton, venue.name] }
         .then { |rows| union("SELECT name, locality, canton, name_folded, 'place' FROM places WHERE canonical_id IS NULL", rows) }
-    end
-
-    def locality_candidates
-      registry(Venue.in_taxonomy.uniq(&:locality)) { |v| [v.locality, v.locality, v.canton, v.locality] }
-        .then { |rows| union("SELECT DISTINCT locality, locality, canton, locality_folded, 'place' FROM places", rows) }
     end
 
     def registry(venues)

@@ -48,11 +48,39 @@ module EventCapture
     def incomplete? = title.blank? || start_date.blank? || locality.blank? || canton.blank?
 
     def title = attrs[:title].to_s.strip
-    def locality = attrs[:locality].to_s.strip
+    def locality = @locality ||= canonical_locality(attrs[:locality].to_s.strip)
     def canton = attrs[:canton].to_s.strip
     def place_name = attrs[:place].to_s.strip
     def url = attrs[:url].presence
     def genres = Array(attrs[:genres]).map { |g| g.to_s.strip }.compact_blank
+
+    # Identity modulo case, accents and punctuation is not a near-match: "bern" and
+    # "Bern" ARE the same name, so adopting the stored spelling is a normalisation,
+    # not the silent rewrite the design forbids — the same basis on which
+    # Place.matching already resolves a place name without asking. It matters because
+    # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
+    # second node in the WHERE tree forever.
+    #
+    # A genuine variant is deliberately left alone. No string measure reaches
+    # Freiburg -> Fribourg (0.29) or Genf -> Genève (0.33), and even a plain
+    # transposition, Luzren -> Luzern, scores 0.27: trigrams are weak on names this
+    # short. That class needs a curated alias list, not arithmetic.
+    def canonical_locality(typed)
+      return typed if typed.blank?
+
+      # The FINGERPRINT, not the folded form: folded keeps word boundaries (by
+      # design — the trigram measure needs them), so it reads "Zorp-wil" and
+      # "Zorpwil" as different. Separator-insensitivity is exactly what identity
+      # means for a town name.
+      key = Fingerprint.for(typed)
+      known_localities.find { |known| Fingerprint.for(known) == key } || typed
+    end
+
+    # Registry first, so its PR-reviewed spelling is the one that wins.
+    def known_localities
+      @known_localities ||= Venue.in_taxonomy.map(&:locality).compact_blank +
+                            Place.distinct.pluck(:locality).compact_blank
+    end
 
     # Strict ISO, not Date.parse: Date.parse("next Friday") does not raise, it
     # returns a date near today — the same silent-today footgun the scrapers hit

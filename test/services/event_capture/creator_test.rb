@@ -49,6 +49,39 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_includes result.event.location_list, venue.name
   end
 
+  # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
+  # second node in the WHERE tree forever. Identity modulo case/accents/punctuation
+  # is a normalisation, not the near-match the design forbids auto-applying.
+  test "a locality differing only in case or accents adopts the stored spelling" do
+    venue = Venue.in_taxonomy.find { |v| v.locality.present? }
+    skip "no placed venue" if venue.nil?
+
+    result = EventCapture::Creator.call(attrs(place: "", locality: venue.locality.downcase,
+                                              canton: venue.canton))
+
+    assert_includes result.event.location_list, venue.locality
+  end
+
+  test "a captured locality is reused rather than re-minted in another casing" do
+    place(name: "Zorpsaal", locality: "Zorpwil")
+
+    result = EventCapture::Creator.call(attrs(place: "Flarnhalle", locality: "ZORP-WIL"))
+
+    assert_equal "Zorpwil", result.place.locality
+    assert_includes result.event.location_list, "Zorpwil"
+  end
+
+  # No string measure reaches Freiburg -> Fribourg or a Luzren -> Luzern
+  # transposition, so a genuine variant is left alone rather than guessed at. That
+  # class needs a curated alias list (#119).
+  test "a genuinely different spelling is left as typed" do
+    place(name: "Zorpsaal", locality: "Zorpwil")
+
+    result = EventCapture::Creator.call(attrs(place: "Flarnhalle", locality: "Zorpvil"))
+
+    assert_equal "Zorpvil", result.place.locality
+  end
+
   # Both lookups match on NAME alone, so the form's locality can disagree with where
   # the place actually is — and Location.hierarchy nests the venue node under the
   # STORED locality, leaving the venue chip and the canton chip describing one event

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -120,7 +120,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_200000) do
     t.datetime "created_at", null: false
     t.virtual "fingerprint", type: :string, as: "regexp_replace(translate(replace(replace(lower((name)::text), '&'::text, 'and'::text), '''n'''::text, 'and'::text), 'äöüàâéèêëïîôûç'::text, 'aouaaeeeeiiouc'::text), '[^a-z0-9]'::text, ''::text, 'g'::text)", stored: true
     t.string "locality", null: false
-    t.virtual "locality_folded", type: :string, as: "btrim(regexp_replace(translate(replace(replace(lower((locality)::text), '&'::text, 'and'::text), '''n'''::text, 'and'::text), 'äöüàâéèêëïîôûç'::text, 'aouaaeeeeiiouc'::text), '[^a-z0-9]+'::text, ' '::text, 'g'::text))", stored: true
     t.string "name", null: false
     t.virtual "name_folded", type: :string, as: "btrim(regexp_replace(translate(replace(replace(lower((name)::text), '&'::text, 'and'::text), '''n'''::text, 'and'::text), 'äöüàâéèêëïîôûç'::text, 'aouaaeeeeiiouc'::text), '[^a-z0-9]+'::text, ' '::text, 'g'::text))", stored: true
     t.datetime "updated_at", null: false

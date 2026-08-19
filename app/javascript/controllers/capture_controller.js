@@ -42,10 +42,17 @@ export default class extends Controller {
   // canton no poster prints makes the whole form unsubmittable, pointing at a row
   // the contributor does not want. The marker outlives the removal so re-checking
   // restores it.
+  //
+  // Publish is revealed from here rather than once the last extraction settles: a
+  // stream lands a frame later than the request that fetched it (see #extract), so
+  // that check ran before the row existed and left Publish hidden on a batch that
+  // had extracted fine. A row carrying no candidate never reaches here, so a failed
+  // batch still cannot offer a button that submits nothing.
   acceptTargetConnected(checkbox) {
     const fieldset = checkbox.closest(".capture-candidate")
     fieldset.querySelectorAll("[required]").forEach((field) => field.setAttribute("data-required-when-kept", ""))
     this.applyRequired(checkbox)
+    this.actionsTarget.hidden = false
   }
 
   syncRequired(event) {
@@ -89,9 +96,6 @@ export default class extends Controller {
       }
     })
     await Promise.all(workers)
-    // Only once something is actually there to publish: three failed extractions
-    // used to leave a live Publish button that submits an empty batch.
-    this.actionsTarget.hidden = this.rowsTarget.querySelector(".capture-candidate") === null
   }
 
   // The row is appended BEFORE the decode, not after: createImageBitmap rejects on
@@ -136,14 +140,25 @@ export default class extends Controller {
       // from a slow provider, which is the exact failure this rescue exists to prevent.
       if (!response.ok) return this.failRow(id)
 
-      Turbo.renderStreamMessage(await response.text())
+      const stream = await response.text()
+      Turbo.renderStreamMessage(stream)
       // A provider failure comes back as a turbo-stream with status 200 — the
-      // request succeeded, the extraction did not — so the rendered row is the only
-      // honest signal of whether anything was actually read.
-      return !document.querySelector(`#capture-row-${id} [data-failed]`)
+      // request succeeded, the extraction did not — so the row is the only honest
+      // signal of whether anything was read. It has to be read out of the markup:
+      // Turbo performs the action on the NEXT ANIMATION FRAME, so the page still
+      // holds the pending row here and every failure read as a success, which
+      // cleared the textarea out from under a paste the provider had just refused.
+      return this.failureIn(stream) === null
     } catch {
       return this.failRow(id)
     }
+  }
+
+  // The template of a <turbo-stream> is inert markup, so the row has to be reached
+  // through it rather than by querying the parsed document.
+  failureIn(stream) {
+    const template = new DOMParser().parseFromString(stream, "text/html").querySelector("turbo-stream template")
+    return template?.content.querySelector("[data-failed]") ?? null
   }
 
   // Returns false so a caller can tell a landed extraction from a failed one.

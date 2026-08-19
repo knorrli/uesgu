@@ -12,11 +12,14 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
   class FakeClient
     attr_reader :calls
 
-    def initialize(text: nil, raises: nil)
+    def initialize(text: nil, raises: nil, configured: true)
       @text = text
       @raises = raises
+      @configured = configured
       @calls = []
     end
+
+    def configured? = @configured
 
     def call(**args)
       @calls << args
@@ -28,10 +31,8 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
   end
 
   def extract(client)
-    EventCaptureConfig.stub(:configured?, true) do
-      EventCapture::Extractor.call(input: EventCapture::Input.image("PNG-ish", media_type: "image/png"),
-                                   today: TODAY, client: client)
-    end
+    EventCapture::Extractor.call(input: EventCapture::Input.image("PNG-ish", media_type: "image/png"),
+                                 today: TODAY, client: client)
   end
 
   def payload(*events) = JSON.generate({ events: events })
@@ -78,11 +79,10 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
   end
 
   test "without credentials nothing is sent and the reason says which ones" do
-    client = FakeClient.new(text: payload)
+    client = FakeClient.new(text: payload, configured: false)
 
-    extraction = EventCaptureConfig.stub(:configured?, false) do
-      EventCapture::Extractor.call(input: EventCapture::Input.image("x", media_type: "image/png"), client: client)
-    end
+    extraction = EventCapture::Extractor.call(input: EventCapture::Input.image("x", media_type: "image/png"),
+                                              client: client)
 
     refute_predicate extraction, :ok?
     assert_match(/INFOMANIAK_API_TOKEN/, extraction.error)
@@ -93,9 +93,7 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     client = FakeClient.new(text: payload)
     input = EventCapture::Input.failure(:image_unsupported, "not a PNG, JPEG, WebP or GIF")
 
-    extraction = EventCaptureConfig.stub(:configured?, true) do
-      EventCapture::Extractor.call(input: input, client: client)
-    end
+    extraction = EventCapture::Extractor.call(input: input, client: client)
 
     refute_predicate extraction, :ok?
     assert_equal :image_unsupported, extraction.code

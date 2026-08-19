@@ -3,7 +3,7 @@ ActsAsTaggableOn.remove_unused_tags = true
 # Case-SENSITIVE tag matching. Every tag source now produces a consistent casing
 # on its own — genres via Genre.canonicalize_names (fingerprint-backed), styles
 # from the fixed Style set, locations from each scraper's hardcoded
-# [venue, city, canton] — so the global case-insensitive dedup is redundant, and
+# [venue, locality, canton] — so the global case-insensitive dedup is redundant, and
 # it was actively harmful: it shared one row across contexts, e.g. the Fribourg
 # canton location "FR" shadowing the artist-origin genre "Fr". Strict matching
 # keeps "FR" (canton) and "Fr" (genre) as distinct tags. NOTE: this trades a

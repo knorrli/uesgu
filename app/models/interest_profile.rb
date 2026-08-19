@@ -68,7 +68,7 @@ class InterestProfile
     event.genres.select { |genre| wanted.include?(genre.name.to_s.downcase) }
   end
 
-  # The event's OWN locations (venue / city / canton) that explain a match. Drives
+  # The event's OWN locations (venue / locality / canton) that explain a match. Drives
   # the "why" flag on the venue header.
   def why_locations(event)
     wanted = matching(event).reduce(Set.new) { |set, criteria| set | criteria.locations }

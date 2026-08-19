@@ -15,7 +15,7 @@ module TagsHelper
       "ph-tag"
     when "locations", "venue"
       "ph-house"
-    when "city"
+    when "locality"
       "ph-map-pin"
     when "canton"
       "ph-map-trifold"
@@ -32,7 +32,7 @@ module TagsHelper
   # The leading icon on an applied-filter chip, derived from its param so the
   # events filter and the rule form render the same glyph for the same kind of
   # token. Freetext + genre (q[]) share the search glyph. Locations (l[]) resolve
-  # PER-TYPE from the value (canton/city/venue), so a location chip's icon tells
+  # PER-TYPE from the value (canton/locality/venue), so a location chip's icon tells
   # you which kind of place.
   FILTER_CHIP_GLYPH = {
     "q[]" => "ph-magnifying-glass",
@@ -66,7 +66,7 @@ module TagsHelper
   # The curated genre tree for the "what" filter, shaped exactly like
   # location_filter_tree so the What and Where pickers render through the same
   # markup. Roots → children → grandchildren (the tree maxes at 3 levels, mapping
-  # onto canton → city → venue), each annotated with a subtree event count and a
+  # onto canton → locality → venue), each annotated with a subtree event count and a
   # search blob. Pruned to subtrees that carry events right now, and to genuine
   # roots (a top-level genre with children) so the unplaced queue backlog stays
   # out. Filtering by any node matches it + its descendants (see
@@ -108,36 +108,36 @@ module TagsHelper
     Location.type_for(name) == :canton ? canton_name(name) : name
   end
 
-  # A canton > city > venue tree for the mobile "where" filter sheet, annotated
+  # A canton > locality > venue tree for the mobile "where" filter sheet, annotated
   # with live event counts. Structure comes from the scraper-derived hierarchy
   # (Location.hierarchy) but every node is pruned to what events actually carry
   # right now (Location.usage), so the sheet never offers a venue with nothing on.
   #
   # Each node: { name:, value:, type:, count:, children: }. A canton filters by
   # its CODE (the tag events carry, e.g. "BE") but is shown by its localized name,
-  # so name and value differ there; cities/venues tag by their own name.
+  # so name and value differ there; localities/venues tag by their own name.
   def location_filter_tree
     counts = Location.usage.to_h { |row| [row[:name], row[:count]] }
 
-    Location.hierarchy.sort.filter_map do |canton, cities|
-      city_nodes = cities.sort.filter_map do |city, venues|
+    Location.hierarchy.sort.filter_map do |canton, localities|
+      locality_nodes = localities.sort.filter_map do |locality, venues|
         venue_nodes = venues.uniq.sort.filter_map do |venue|
           count = counts[venue].to_i
           { name: venue, value: venue, type: :venue, count: count, search: venue } if count.positive?
         end
-        next if venue_nodes.empty? && counts[city].to_i.zero?
+        next if venue_nodes.empty? && counts[locality].to_i.zero?
 
-        { name: city, value: city, type: :city,
-          count: counts[city] || venue_nodes.sum { |v| v[:count] },
-          search: ([city] + venue_nodes.map { |v| v[:name] }).join(" "), children: venue_nodes }
+        { name: locality, value: locality, type: :locality,
+          count: counts[locality] || venue_nodes.sum { |v| v[:count] },
+          search: ([locality] + venue_nodes.map { |v| v[:name] }).join(" "), children: venue_nodes }
       end
-      next if city_nodes.empty? && counts[canton].to_i.zero?
+      next if locality_nodes.empty? && counts[canton].to_i.zero?
 
       name = canton_name(canton)
       { name: name, value: canton, type: :canton,
-        count: counts[canton] || city_nodes.sum { |c| c[:count] },
-        search: ([name, canton] + city_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(" "),
-        children: city_nodes }
+        count: counts[canton] || locality_nodes.sum { |c| c[:count] },
+        search: ([name, canton] + locality_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(" "),
+        children: locality_nodes }
     end
   end
 end

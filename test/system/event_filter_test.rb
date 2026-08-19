@@ -17,7 +17,7 @@ class EventFilterTest < ApplicationSystemTestCase
     open_sheet("what")
 
     # Pick the ROOT — its subtree expansion must catch the child-tagged event.
-    find(".sheet[data-field=what] .opt--canton", text: rock.name).click
+    find(".sheet[data-field=what] .opt--top", text: rock.name).click
     assert_selector ".sheet[data-field=what] input[value='#{rock.name}']:checked", visible: :all
     find(".sheet[data-field=what] .sheet__apply").click
 

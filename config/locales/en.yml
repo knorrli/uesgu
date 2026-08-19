@@ -546,7 +546,7 @@ en:
         title: Locations
         type_all: All
         type_venue: Venue
-        type_city: City
+        type_locality: Locality
         type_canton: Canton
         search: Search locations…
         sort_by: Sort by
@@ -667,13 +667,13 @@ en:
       where: Where?
       location_types:
         venue: Venue
-        city: City
+        locality: Locality
         canton: Canton
       sheet:
         what: What
         where: Where
         when: When
-      search_where: "Search venues, cities, cantons…"
+      search_where: "Search venues, localities, cantons…"
       saved:
         menu: Saved filters
       apply: Apply

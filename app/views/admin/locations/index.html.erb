@@ -5,7 +5,7 @@
   <% end %>
 
   <div class="flex gap-small wrap align-baseline catalogue-filters">
-    <% %w[all venue city canton].each do |type| %>
+    <% %w[all venue locality canton].each do |type| %>
       <%= link_to t(".type_#{type}"),
             admin_locations_path(type: (type == 'all' ? nil : type), q: params[:q].presence, sort: params[:sort].presence),
             class: class_names(:tag, active: @type == type) %>

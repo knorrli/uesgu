@@ -1,7 +1,7 @@
 require "db_test_helper"
 
 # Locks TagsHelper's pure logic: the context→icon mapping, the canton fallback,
-# and the hierarchical ordering of location tags (canton › city › venue, with
+# and the hierarchical ordering of location tags (canton › locality › venue, with
 # unknown names appended). Derived from the live scraper hierarchy, not hardcoded.
 class TagsHelperTest < ActionView::TestCase
   test "tag_icon_glyph maps known contexts and falls back for the rest" do
@@ -9,14 +9,14 @@ class TagsHelperTest < ActionView::TestCase
     assert_equal "ph-calendar-dots", tag_icon_glyph(context: "date")
     assert_equal "ph-tag", tag_icon_glyph(context: "genres")
     assert_equal "ph-house", tag_icon_glyph(context: "venue")
-    assert_equal "ph-map-pin", tag_icon_glyph(context: "city")
+    assert_equal "ph-map-pin", tag_icon_glyph(context: "locality")
     assert_equal "ph-map-trifold", tag_icon_glyph(context: "canton")
     assert_equal "ph-lightning", tag_icon_glyph(context: "something-unknown")
   end
 
   test "tag_icon_class prefixes the glyph with the Phosphor base weight" do
     assert_equal "ph ph-house", tag_icon_class(context: "venue")
-    assert_equal "ph ph-map-pin", tag_icon_class(context: "city")
+    assert_equal "ph ph-map-pin", tag_icon_class(context: "locality")
   end
 
   test "canton_name falls back to the raw code for an unknown canton" do

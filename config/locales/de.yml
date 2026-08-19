@@ -546,7 +546,7 @@ de:
         title: Orte
         type_all: Alle
         type_venue: Venue
-        type_city: Stadt
+        type_locality: Ort
         type_canton: Kanton
         search: Orte suchen…
         sort_by: Sortieren nach
@@ -667,13 +667,13 @@ de:
       where: Wo?
       location_types:
         venue: Lokal
-        city: Stadt
+        locality: Ort
         canton: Kanton
       sheet:
         what: Was
         where: Wo
         when: Wann
-      search_where: "Lokale, Städte, Kantone suchen…"
+      search_where: "Lokale, Orte, Kantone suchen…"
       saved:
         menu: Gespeicherte Filter
       apply: Anwenden

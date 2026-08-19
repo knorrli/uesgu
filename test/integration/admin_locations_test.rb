@@ -1,9 +1,9 @@
 require "db_test_helper"
 
 # Read-only locations browser under /admin/locations: admin-gated. Locations
-# have no table — the type (venue / city / canton) is derived from the scrapers
+# have no table — the type (venue / locality / canton) is derived from the scrapers
 # via Location.type_for — so the type filter is exercised with a real venue and
-# canton (scraper code, not churned taxonomy) plus a synthetic city.
+# canton (scraper code, not churned taxonomy) plus a synthetic locality.
 class AdminLocationsTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_locations_path
@@ -29,7 +29,7 @@ class AdminLocationsTest < ActionDispatch::IntegrationTest
     assert_select "a", text: venue
     assert_select "a", text: "Synthville", count: 0
 
-    get admin_locations_path(type: "city")
+    get admin_locations_path(type: "locality")
     assert_select "a", text: "Synthville"
     assert_select "a", text: venue, count: 0
 

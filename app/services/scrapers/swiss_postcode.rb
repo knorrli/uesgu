@@ -2,9 +2,9 @@ module Scrapers
   # Best-effort Swiss PLZ (postal code) → canton code.
   #
   # OLE aggregator feeds (e.g. BeJazz) give a venue's street / PLZ / locality but
-  # NO canton, yet our location hierarchy is venue > city > canton. The PLZ is the
+  # NO canton, yet our location hierarchy is venue > locality > canton. The PLZ is the
   # only canton signal in the payload, so we derive it here. Single-venue OLE
-  # sources don't need this — they carry an explicit [venue, city, canton] in
+  # sources don't need this — they carry an explicit [venue, locality, canton] in
   # config — so in practice this only fires for aggregator venues, which (for the
   # feeds we ship) are Bern-region (3xxx → BE).
   #

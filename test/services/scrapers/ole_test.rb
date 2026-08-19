@@ -205,9 +205,9 @@ class Scrapers::OleTest < Minitest::Test
     refute(florp.genre_list.any? { |g| g.include?("amp;") }, "no raw HTML entity may leak into a genre")
   end
 
-  # A city the feed mis-tags via a wrong PLZ is corrected to its real canton
+  # A locality the feed mis-tags via a wrong PLZ is corrected to its real canton
   # (Wabern → BE, not VS as PLZ 3984/Fiesch would resolve).
-  def test_city_canton_fix_overrides_a_wrong_plz
+  def test_locality_canton_fix_overrides_a_wrong_plz
     s = aggregator.new
     node = Nokogiri::XML(<<~XML).remove_namespaces!.at_css("event")
       <event><url>https://x.example/e</url>

@@ -109,7 +109,7 @@ venues:
 - domain: dachstock.ch
   name: Dachstock
   disposition: consume
-  place: { city: Bern, canton: BE }
+  place: { locality: Bern, canton: BE }
   checked: 2026-06-21
   aliases: { petzi: [dachstock], ole: [api.dachstock.ch] }
 - domain: dieheiterefahne.ch
@@ -192,7 +192,7 @@ what stays out:
   ```yaml
   - domain: klangkeller-bern.ch
     name: Klangkeller Bern
-    place: { city: Bern, canton: BE }
+    place: { locality: Bern, canton: BE }
     sources:
       - via: ole
         feed_url: https://www.klangkeller-bern.ch/.../oleexport

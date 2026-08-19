@@ -27,7 +27,7 @@ namespace :venues do
 
   # "Bern, BE" / "—" when the venue carries no place (blocked or an aggregator feed).
   def place_of(venue)
-    venue.placed? ? "#{venue.city}, #{venue.canton}" : "—"
+    venue.placed? ? "#{venue.locality}, #{venue.canton}" : "—"
   end
 
   # How a venue is actually fed, derived from the live registry. Blocked venues show

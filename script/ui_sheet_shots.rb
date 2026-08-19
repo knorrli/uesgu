@@ -53,7 +53,7 @@ open_sheet(b, "what")
 b.screenshot(path: File.join(OUT, "03-what-open.png"))
 puts "03-what-open"
 
-# 4) WHERE sheet — canton > city > venue tree.
+# 4) WHERE sheet — canton > locality > venue tree.
 b.goto("#{BASE}/?view=list")
 b.network.wait_for_idle(timeout: 10) rescue nil
 open_sheet(b, "where")

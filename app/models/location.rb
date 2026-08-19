@@ -1,10 +1,10 @@
 # Location tags (the `:locations` acts_as_taggable_on context on Event) are flat:
-# a single tag list mixing venues, cities, and canton codes. There is no stored
+# a single tag list mixing venues, localities, and canton codes. There is no stored
 # type. We DERIVE the type: venue names come from the VENUE REGISTRY
 # (config/venues.yml via Venue) — the placed, consumed venues (Venue.in_taxonomy)
 # are the source of truth for the venue role and for the WHERE-filter tree —
 # while the canton codes are the closed list of 26 (CANTON_CODES), independent of
-# which cantons we happen to source from. Everything else is a city.
+# which cantons we happen to source from. Everything else is a locality.
 #
 # (Until 2026-06-25 this was derived from the scrapers + the VenuePlace table, now
 # repurposed as VenueLead; the
@@ -15,7 +15,7 @@ class Location
   include ActiveModel::Model
 
   # The placed, consumed venues that seed the taxonomy. A consume venue with a
-  # city + canton — whether fed by a bespoke scraper, PETZI, or an aggregator.
+  # locality + canton — whether fed by a bespoke scraper, PETZI, or an aggregator.
   # Placeless venues (e.g. the Bewegungsmelder aggregator feed itself) are excluded.
   def self.taxonomy_venues
     Venue.in_taxonomy
@@ -29,7 +29,7 @@ class Location
   # The 26 Swiss cantons, keyed by the code a location tag carries. This is a
   # CLOSED list and deliberately NOT registry-derived: which cantons we happen to
   # source venues from says nothing about which codes are cantons, and deriving it
-  # made a tag for an uncovered canton (e.g. "VS") type as a city. The display
+  # made a tag for an uncovered canton (e.g. "VS") type as a locality. The display
   # names live in the `cantons:` map in config/locales/*.yml (TagsHelper#canton_name);
   # a test locks the two lists together so neither can drift.
   CANTON_CODES = %w[
@@ -42,14 +42,14 @@ class Location
     CANTON_CODES
   end
 
-  # :venue for a concrete venue, :canton for a canton code, :city otherwise.
-  # Anything that is neither a registry venue nor a canton code is a city.
+  # :venue for a concrete venue, :canton for a canton code, :locality otherwise.
+  # A locality is any place name — city, town, village, hamlet or quarter.
   def self.type_for(name)
     name = name.to_s
     return :venue if venue_names.include?(name)
     return :canton if canton_codes.include?(name)
 
-    :city
+    :locality
   end
 
   def self.venue?(name)
@@ -72,26 +72,26 @@ class Location
       .group("tags.name")
       .count
       .map do |name, count|
-        type = venues.include?(name) ? :venue : (cantons.include?(name) ? :canton : :city)
+        type = venues.include?(name) ? :venue : (cantons.include?(name) ? :canton : :locality)
         { name: name, count: count, type: type }
       end
   end
 
   # Grouped tree for the favorites + WHERE filter UI:
   #   { "BE" => { "Bern" => ["Dachstock", "Gaskessel", ...] }, ... }
-  # Built from each placed, consumed venue. A venue too thin to place (no city or
-  # canton) is skipped — Venue.in_taxonomy already excludes those, so no nil keys.
+  # Built from each placed, consumed venue. A venue too thin to place (no locality
+  # or canton) is skipped — Venue.in_taxonomy already excludes those, so no nil keys.
   def self.hierarchy
     taxonomy_venues.each_with_object({}) do |venue, tree|
-      add_to_tree(tree, venue.canton, venue.city, venue.name)
+      add_to_tree(tree, venue.canton, venue.locality, venue.name)
     end
   end
 
-  # Nest venue under canton > city, skipping a tuple too thin to place.
-  def self.add_to_tree(tree, canton, city, venue)
-    return if canton.blank? || city.blank? || venue.blank?
+  # Nest venue under canton > locality, skipping a tuple too thin to place.
+  def self.add_to_tree(tree, canton, locality, venue)
+    return if canton.blank? || locality.blank? || venue.blank?
 
     tree[canton] ||= {}
-    (tree[canton][city] ||= []) << venue
+    (tree[canton][locality] ||= []) << venue
   end
 end

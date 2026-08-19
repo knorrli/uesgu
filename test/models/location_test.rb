@@ -22,9 +22,9 @@ class LocationTest < ActiveSupport::TestCase
     assert_equal :venue, Location.type_for(@venue.name)
   end
 
-  test "an unknown place is classified as a region (:city), not a venue" do
+  test "an unknown place is classified as a region (:locality), not a venue" do
     refute Location.venue?("Definitely Not A Venue 9000")
-    assert_equal :city, Location.type_for("Definitely Not A Venue 9000")
+    assert_equal :locality, Location.type_for("Definitely Not A Venue 9000")
   end
 
   test "a registry canton code is classified as :canton" do
@@ -32,8 +32,8 @@ class LocationTest < ActiveSupport::TestCase
   end
 
   # The bug this list replaced: canton_codes was Venue.in_taxonomy's cantons, so a
-  # tag for a canton we do not source from fell through to :city and rendered with
-  # a city icon and a "· Stadt" suffix everywhere a location is shown.
+  # tag for a canton we do not source from fell through to :locality and rendered
+  # with a locality icon and a "· Ort" suffix everywhere a location is shown.
   test "a canton we source no venue from is still classified as :canton" do
     uncovered = Location::CANTON_CODES - Location.taxonomy_venues.map(&:canton).to_set
     skip "the registry covers all 26 cantons" if uncovered.empty?
@@ -59,16 +59,16 @@ class LocationTest < ActiveSupport::TestCase
     end
   end
 
-  test "a registry city is classified as :city" do
-    assert_equal :city, Location.type_for(@venue.city)
+  test "a registry locality is classified as :locality" do
+    assert_equal :locality, Location.type_for(@venue.locality)
   end
 
-  test "hierarchy groups each venue under its canton and city" do
+  test "hierarchy groups each venue under its canton and locality" do
     tree = Location.hierarchy
 
     assert_includes tree.keys, @venue.canton
-    assert_includes tree[@venue.canton].keys, @venue.city
-    assert_includes tree[@venue.canton][@venue.city], @venue.name
+    assert_includes tree[@venue.canton].keys, @venue.locality
+    assert_includes tree[@venue.canton][@venue.locality], @venue.name
   end
 
   # A venue fed by an aggregator (no scraper covering its own domain) is approved
@@ -83,19 +83,19 @@ class LocationTest < ActiveSupport::TestCase
     assert_equal :venue, Location.type_for(agg.name)
 
     tree = Location.hierarchy
-    assert_includes tree[agg.canton].keys, agg.city
-    assert_includes tree[agg.canton][agg.city], agg.name
+    assert_includes tree[agg.canton].keys, agg.locality
+    assert_includes tree[agg.canton][agg.locality], agg.name
   end
 
   # A consume venue with no place (e.g. the Bewegungsmelder aggregator feed itself)
   # must be excluded from the tree — otherwise the favorites location picker calls
-  # parameterize on a nil city and the whole /favorites page 500s.
-  test "hierarchy excludes placeless venues and never yields a nil city/canton" do
+  # parameterize on a nil locality and the whole /favorites page 500s.
+  test "hierarchy excludes placeless venues and never yields a nil locality/canton" do
     placeless = Venue.consuming.reject(&:placed?).first
     tree = Location.hierarchy
 
     refute_includes tree.keys, placeless.name if placeless
     assert_empty tree.keys.select(&:nil?), "no canton key may be nil"
-    assert_empty tree.values.flat_map(&:keys).select(&:nil?), "no city key may be nil"
+    assert_empty tree.values.flat_map(&:keys).select(&:nil?), "no locality key may be nil"
   end
 end

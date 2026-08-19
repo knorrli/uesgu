@@ -345,7 +345,8 @@ mode with no self-correcting path is the one a split name causes.
 
 #### Trigram similarity, not edit distance
 
-`pg_trgm`'s `word_similarity`, scored in Postgres.
+`pg_trgm`'s `strict_word_similarity`, scored in Postgres. **Built** as
+`PlaceSuggester`.
 
 The case that decides it is a **subset, not a typo**: the extracted name is
 regularly a fragment of the stored one ("Quartierfest" against an existing "Marzili
@@ -358,10 +359,36 @@ tens-of-rows table, so a sequential scan is free and no GIN index is needed up
 front — worth stating so nobody later reads the extension as a performance
 decision and "optimises" around it.
 
-**Prerequisite, and the one thing that can invalidate this:** confirm
-`CREATE EXTENSION pg_trgm` is permitted on Render's managed Postgres. It is
-standard contrib and should be, but the whole decision rests on it, and deploy time
-is the wrong moment to find out.
+**The prerequisite that could have invalidated this is answered.**
+`CREATE EXTENSION pg_trgm` is permitted on Render's managed Postgres: the same
+contrib family already ships there — `fuzzystrmatch` was enabled by migration in
+May 2025 and `AliasSuggester` runs `levenshtein()` in production today.
+
+**Strict, not loose, and symmetric.** Two refinements the implementation measured,
+both of which change results:
+
+`strict_word_similarity` anchors the match to word boundaries; the loose
+`word_similarity` matches any continuous extent. Both keep the deciding subset case
+at 1.0 ("Quartierfest" inside "Marzili Quartierfest"), but the loose form also
+scores "Bern" against **Wabern at 0.6** and Luzern at 0.4 — substrings that are not
+words, and exactly how a locality field fills with noise. Strict drops that pair to
+0.33 while costing the typo cases almost nothing.
+
+And the measure is applied in **both directions**, `GREATEST(strict(q, target),
+strict(target, q))`. It reaches 1.0 only when the first string sits inside the
+second, and a split name arrives in either order depending on which spelling was
+captured first — "Quartierfest" stored and "Marzili Quartierfest" extracted, or the
+reverse. One direction catches half the cases the measure exists for.
+
+With both, the separation is clean enough that **0.4 is not a delicate number**:
+every real pair in the sample set scores >= 0.58 ("Dachstok" -> Dachstock 0.583,
+"Kocher Park" -> Kocherpark 0.643, "Quarterfest" -> Marzili Quartierfest 0.667) and
+every unrelated one <= 0.33. The threshold sits in a gap, not on a slope.
+
+One consequence to expect rather than tune away: names sharing a common German
+suffix co-suggest — an invented "Flarnhalle" surfaces the registry's Turnhalle at
+just over threshold. A suggestion never auto-applies, so that costs one row to
+ignore, which is the error this feature should prefer.
 
 #### Two columns, two jobs
 

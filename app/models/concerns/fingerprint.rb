@@ -16,4 +16,17 @@ module Fingerprint
        .tr(ACCENTS_FROM, ACCENTS_TO)
        .gsub(/[^a-z0-9]/, "")
   end
+
+  # The same normalization with word boundaries KEPT, for pg_trgm's
+  # word_similarity — which compares the query against words in the target, and so
+  # needs the separators the fingerprint destroys. `Place` stores this as a second
+  # generated column per compared field; this reproduces it for the query string
+  # and for registry venues, which have no row.
+  def self.folded(str)
+    str.to_s.downcase
+       .gsub("&", "and").gsub("'n'", "and")
+       .tr(ACCENTS_FROM, ACCENTS_TO)
+       .gsub(/[^a-z0-9]+/, " ")
+       .strip
+  end
 end

@@ -57,7 +57,7 @@ class Scrapers::OleLeadsTest < ActiveSupport::TestCase
     end
   end
 
-  test "a place too thin to nest (no city) is skipped" do
+  test "a place too thin to nest (no locality) is skipped" do
     s = aggregator.new
     s.send(:note_place, ["LonelyVenue"], 1) # size 1 — nothing to nest under
 

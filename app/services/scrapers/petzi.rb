@@ -23,7 +23,7 @@ module Scrapers
     # now the single source — see docs/venue-registry-design.md.)
     #
     # slug (the leading venue segment of /events/{id}-{slug}-{title}) => the venue's
-    # [venue, city, canton], so a merged event keeps one consistent location.
+    # [venue, locality, canton], so a merged event keeps one consistent location.
     def self.venues
       Venue.all.each_with_object({}) do |venue, map|
         Array(venue.aliases["petzi"]).each { |slug| map[slug] = venue.place_tuple }

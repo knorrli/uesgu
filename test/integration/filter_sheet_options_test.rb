@@ -24,7 +24,7 @@ class FilterSheetOptionsTest < ActionDispatch::IntegrationTest
       assert_select "turbo-frame##{"filter_sheet_#{field}"}[data-src]"
       # No src: the frame must sit inert until a real user opens the sheet.
       assert_select "turbo-frame##{"filter_sheet_#{field}"}[src]", false
-      assert_select ".sheet[data-field=#{field}] .opt--canton", false
+      assert_select ".sheet[data-field=#{field}] .opt--top", false
     end
   end
 

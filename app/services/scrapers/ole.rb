@@ -60,7 +60,7 @@ module Scrapers
 
     # One occurrence (event × show) carrying everything the field extractors need;
     # the event/show nodes plus the bits we resolved while expanding (start_time,
-    # the venue-pointing url, the [venue, city, canton] tags).
+    # the venue-pointing url, the [venue, locality, canton] tags).
     Row = Struct.new(:event, :show, :start_time, :url, :locations, keyword_init: true)
 
     # Pagination early-exit margin. Feeds dump full history (back to ~2012) over
@@ -355,31 +355,31 @@ module Scrapers
       "#{base_url}#show-#{start.to_date.iso8601}"
     end
 
-    # Manual canton corrections for cities an aggregator mis-tags via a wrong PLZ.
+    # Manual canton corrections for localities an aggregator mis-tags via a wrong PLZ.
     # The only canton signal OLE gives is the PLZ, so a typo'd code resolves to the
     # wrong canton (Bewegungsmelder lists Wabern bei Köniz under 3984 = Fiesch/VS;
     # its real PLZ is 3084/BE). Keyed on the downcased locality, so it corrects the
     # specific place without remapping a PLZ that's legitimately VS for elsewhere.
     # Add a row when a venue lands in the wrong canton in the WHERE tree.
-    CITY_CANTON_FIXES = { "wabern" => "BE" }.freeze
+    LOCALITY_CANTON_FIXES = { "wabern" => "BE" }.freeze
 
     # Single-venue: the configured place. Aggregator: resolve per event from
     # <location>, deriving canton from the PLZ (the only canton signal OLE gives),
-    # with CITY_CANTON_FIXES overriding known upstream PLZ typos.
+    # with LOCALITY_CANTON_FIXES overriding known upstream PLZ typos.
     def locations_for(event_node)
       return self.class.locations unless self.class.aggregator?
 
-      loc    = event_node.at_css("location")
-      venue  = clean_title(text(loc, "name"))
-      city   = squish(text(loc, "locality"))
-      canton = CITY_CANTON_FIXES[city.downcase] || SwissPostcode.canton(text(loc, "code"))
-      [venue, city, canton].compact_blank.presence || self.class.locations
+      loc      = event_node.at_css("location")
+      venue    = clean_title(text(loc, "name"))
+      locality = squish(text(loc, "locality"))
+      canton   = LOCALITY_CANTON_FIXES[locality.downcase] || SwissPostcode.canton(text(loc, "code"))
+      [venue, locality, canton].compact_blank.presence || self.class.locations
     end
 
-    # Tally an aggregator's resolved [venue, city, canton] tuples and their upcoming-
+    # Tally an aggregator's resolved [venue, locality, canton] tuples and their upcoming-
     # event counts during the run; persisted later by #persist_leads. Only
     # aggregators need this — single-venue sources declare an approved place. Skip a
-    # tuple too thin to place (no city).
+    # tuple too thin to place (no locality).
     def note_place(locations, count)
       return unless self.class.aggregator? && locations.size >= 2
 
@@ -394,10 +394,10 @@ module Scrapers
     def persist_leads
       return unless self.class.aggregator?
 
-      leads = (@discovered_places || {}).filter_map do |(venue, city, canton), count|
+      leads = (@discovered_places || {}).filter_map do |(venue, locality, canton), count|
         next if Venue.matching(venue)
 
-        { venue: venue, city: city, canton: canton, event_count: count }
+        { venue: venue, locality: locality, canton: canton, event_count: count }
       end
       VenueLead.refresh!(source: self.class.source_key, leads: leads)
     end

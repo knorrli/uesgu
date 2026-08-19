@@ -36,7 +36,7 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     # Pick the root genre in the What panel — the h1 reflects it immediately, with
     # no round-trip (the form hasn't been submitted).
     find(".filter-trigger[data-filter-sheets-field-param='what']").click
-    find(".sheet[data-field=what] .opt--canton", text: @root.name).click
+    find(".sheet[data-field=what] .opt--top", text: @root.name).click
     assert_selector "h1", text: /#{@root.name}/
     assert_selector "h1", text: /Zylopunk/ # the original pick is still named too
   end
@@ -46,7 +46,7 @@ class SavedFilterEditTest < ApplicationSystemTestCase
 
     # Open the What panel (inline dropdown at desktop width) and pick the root.
     find(".filter-trigger[data-filter-sheets-field-param='what']").click
-    find(".sheet[data-field=what] .opt--canton", text: @root.name).click
+    find(".sheet[data-field=what] .opt--top", text: @root.name).click
     find(".sheet[data-field=what] .sheet__apply").click
 
     # Explicit Save → back to the list, with both genres persisted.
@@ -61,7 +61,7 @@ class SavedFilterEditTest < ApplicationSystemTestCase
 
     # Stage a pick and Apply it into the form — but abandon instead of Save.
     find(".filter-trigger[data-filter-sheets-field-param='what']").click
-    find(".sheet[data-field=what] .opt--canton", text: @root.name).click
+    find(".sheet[data-field=what] .opt--top", text: @root.name).click
     find(".sheet[data-field=what] .sheet__apply").click
     # The shared actions row: submit + cancel link (+ danger delete). The cancel
     # link is the non-danger anchor.

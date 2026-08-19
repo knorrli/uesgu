@@ -6,7 +6,7 @@ namespace :locations do
        "whenever scraper location metadata changes."
   task reconcile: :environment do
     valid = Location.hierarchy
-                    .flat_map { |canton, cities| [canton] + cities.keys + cities.values.flatten }
+                    .flat_map { |canton, localities| [canton] + localities.keys + localities.values.flatten }
                     .to_set
 
     events_changed = 0

@@ -15,7 +15,7 @@ class VenueLead < ApplicationRecord
   scope :by_demand, -> { order(event_count: :desc, venue: :asc) }
 
   # Replace this source's leads with the current run's set (idempotent per run).
-  # `leads` is an array of { venue:, city:, canton:, event_count: } hashes.
+  # `leads` is an array of { venue:, locality:, canton:, event_count: } hashes.
   def self.refresh!(source:, leads:)
     transaction do
       where(source: source).delete_all

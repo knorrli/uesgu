@@ -452,10 +452,12 @@
   font-size: var(--font-size-small);
 }
 
-/* Tree depth: cities indent one step, venues two; venues read a touch quieter. */
-.opt--city  { padding-left: calc(var(--content-padding) + 1.5rem); }
-.opt--venue { padding-left: calc(var(--content-padding) + 3rem); }
-.opt--venue .opt__label { font-size: var(--font-size-small); }
+/* Tree depth, NOT tag type: the Where and What trees share these rows, so a
+   middle tier is a locality in one and a genre in the other. Depth 1 (.opt--top)
+   carries no rule — its row is styled by .loc-group__head. */
+.opt--mid  { padding-left: calc(var(--content-padding) + 1.5rem); }
+.opt--leaf { padding-left: calc(var(--content-padding) + 3rem); }
+.opt--leaf .opt__label { font-size: var(--font-size-small); }
 
 /* ── Location group ── canton row + expand toggle; collapsed hides its body. */
 .loc-group--hidden { display: none; }

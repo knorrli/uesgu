@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -250,13 +250,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_120000) do
 
   create_table "venue_leads", force: :cascade do |t|
     t.string "canton"
-    t.string "city"
     t.datetime "created_at", null: false
     t.integer "event_count", default: 0, null: false
+    t.string "locality"
     t.string "source", null: false
     t.datetime "updated_at", null: false
     t.string "venue", null: false
-    t.index ["source", "venue", "city", "canton"], name: "index_venue_leads_on_source_and_place", unique: true
+    t.index ["source", "venue", "locality", "canton"], name: "index_venue_leads_on_source_and_place", unique: true
   end
 
   add_foreign_key "event_saves", "events"

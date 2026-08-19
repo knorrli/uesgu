@@ -70,7 +70,7 @@ module Scrapers
       name.demodulize
     end
 
-    # Most scrapers represent exactly one venue and read their `[venue, city,
+    # Most scrapers represent exactly one venue and read their `[venue, locality,
     # canton]` place from the registry (see #venue below). A multi-venue aggregator
     # (e.g. Petzi) resolves the venue per event instead, so its class-level
     # `location`/`locations` are placeholders that must NOT seed the location
@@ -94,7 +94,7 @@ module Scrapers
       venue&.name
     end
 
-    # [venue, city, canton] for event tags + the WHERE tree, read from the venue's
+    # [venue, locality, canton] for event tags + the WHERE tree, read from the venue's
     # place. Falls back to a bare [location] for a placeless/unmatched scraper.
     def self.locations
       venue&.place_tuple || [location].compact
@@ -461,7 +461,7 @@ module Scrapers
     # The node field extractors read from. List-page default: the row itself.
     def event_content(row) = row
 
-    # The [venue, city, canton] tags for this event. Single-venue scrapers use the
+    # The [venue, locality, canton] tags for this event. Single-venue scrapers use the
     # class constant; a multi-venue scraper (PETZI) overrides this to resolve the
     # venue per event. Default preserves every existing scraper's behaviour.
     def event_locations(_content) = self.class.locations

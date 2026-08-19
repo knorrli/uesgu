@@ -1,6 +1,6 @@
 <%# The What sheet's curated GENRE TREE — roots → children → grandchildren,
     rendered through the same collapsible markup as the Where sheet's canton >
-    city > venue so What and Where read identically. A pick commits its g[] genre,
+    locality > venue so What and Where read identically. A pick commits its g[] genre,
     which matches that genre + every descendant (Filter#expanded_genre_names). The
     search box filters the whole tree live (data-search).
 
@@ -9,7 +9,7 @@
 <% genre_filter_tree.each do |root| %>
   <div class="loc-group collapsed" data-filter-sheets-target="group">
     <div class="loc-group__head">
-      <label class="opt opt--canton" data-search="<%= root[:search] %>">
+      <label class="opt opt--top" data-search="<%= root[:search] %>">
         <input type="checkbox" name="g[]" value="<%= root[:value] %>" <%= 'checked' if filter.genres.include?(root[:value]) %>>
         <span class="opt__box"></span>
         <span class="opt__label"><%= root[:name] %></span>
@@ -22,14 +22,14 @@
     </div>
     <div class="loc-group__body">
       <% root[:children].each do |child| %>
-        <label class="opt opt--city" data-search="<%= child[:search] %>">
+        <label class="opt opt--mid" data-search="<%= child[:search] %>">
           <input type="checkbox" name="g[]" value="<%= child[:value] %>" <%= 'checked' if filter.genres.include?(child[:value]) %>>
           <span class="opt__box"></span>
           <span class="opt__label"><%= child[:name] %></span>
           <span class="opt__count"><%= child[:count] %></span>
         </label>
         <% child[:children].each do |grandchild| %>
-          <label class="opt opt--venue" data-search="<%= grandchild[:search] %>">
+          <label class="opt opt--leaf" data-search="<%= grandchild[:search] %>">
             <input type="checkbox" name="g[]" value="<%= grandchild[:value] %>" <%= 'checked' if filter.genres.include?(grandchild[:value]) %>>
             <span class="opt__box"></span>
             <span class="opt__label"><%= grandchild[:name] %></span>

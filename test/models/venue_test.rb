@@ -39,7 +39,7 @@ class VenueTest < ActiveSupport::TestCase
     end
   end
 
-  test "placed consume venues have a full [venue, city, canton] tuple" do
+  test "placed consume venues have a full [venue, locality, canton] tuple" do
     Venue.in_taxonomy.each do |v|
       assert_equal 3, v.place_tuple.size, "#{v.domain}: incomplete place #{v.place_tuple.inspect}"
     end

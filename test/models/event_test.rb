@@ -5,12 +5,20 @@ require "db_test_helper"
 # location tags, and the to_s summary. Visibility derivation (the music gate) is
 # covered by genre_disposition_test.
 class EventTest < ActiveSupport::TestCase
-  test "title, start_date and url are required" do
+  test "title and start_date are required, url is not" do
     e = Event.new
     refute e.valid?
     assert_predicate e.errors[:title], :any?
     assert_predicate e.errors[:start_date], :any?
-    assert_predicate e.errors[:url], :any?
+    assert_empty e.errors[:url]
+  end
+
+  test "url may be missing entirely, but never blank" do
+    assert Event.new(title: "T", start_date: Date.current, url: nil).valid?
+
+    blank = Event.new(title: "T", start_date: Date.current, url: "")
+    refute blank.valid?, "an empty string is a third state the unique index would collide on"
+    assert_predicate blank.errors[:url], :any?
   end
 
   test "visible scope excludes hidden events" do

@@ -23,6 +23,14 @@ class SavedEventsCalendarTest < ActiveSupport::TestCase
     assert_match(/DTSTART:\d{8}T\d{6}Z/, ics)
   end
 
+  test "a show with no url still exports, without an empty URL property" do
+    u = user
+    saved(u, title: "Captured Show", start_date: Date.current + 5, url: nil)
+    ics = SavedEventsCalendar.ics(u)
+    assert_includes ics, "SUMMARY:Captured Show"
+    refute_match(/^URL[:;]/, ics)
+  end
+
   test "a show with no time becomes an all-day entry" do
     u = user
     saved(u, title: "Untimed Show", start_date: Date.current + 5, start_time: nil)

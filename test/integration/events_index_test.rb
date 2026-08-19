@@ -14,6 +14,28 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "HiddenMarkerShow"
   end
 
+  test "a scraped event's title links out, marker and all" do
+    e = event(title: "LinkedShow", start_date: Date.current + 3, url: "https://venue.test/show")
+
+    get events_path
+
+    assert_select "##{ActionView::RecordIdentifier.dom_id(e)} .event-title a[href=?]", e.url do
+      assert_select ".event-link-marker"
+    end
+  end
+
+  test "a captured event carries no url, so its title is plain text" do
+    e = event(title: "CapturedShow", start_date: Date.current + 3, url: nil)
+
+    get events_path
+
+    assert_includes response.body, "CapturedShow"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(e)} .event-title" do
+      assert_select "a", false, "nothing to link to"
+      assert_select ".event-link-marker", false, "and no arrow promising one"
+    end
+  end
+
   test "calendar view renders" do
     sign_in_as user
     get events_path(view: "calendar")

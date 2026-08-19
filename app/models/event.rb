@@ -26,7 +26,11 @@ class Event < ApplicationRecord
   has_many :duplicate_events, class_name: "Event", foreign_key: :canonical_event_id,
                               dependent: :nullify, inverse_of: :canonical_event
 
-  validates :title, :start_date, :url, presence: true
+  validates :title, :start_date, presence: true
+  # A user-captured event has no source page (docs/user-event-capture-design.md,
+  # decision 10). NULL only, never "": the unique index doesn't compare NULLs but
+  # does compare empty strings, so a second url-less event would collide.
+  validates :url, presence: true, allow_nil: true
 
   # Public-facing events: non-music events (carrying a hidden genre, with no
   # music style) are hidden, events matched by an admin discard rule are filtered

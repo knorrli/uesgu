@@ -88,7 +88,7 @@ class LocationTest < ActiveSupport::TestCase
     assert_includes tree[agg.canton][agg.locality], agg.name
   end
 
-    test "a captured place is classified as :venue, like a registry venue" do
+  test "a captured place is classified as :venue, like a registry venue" do
     zorpsaal = place(name: "Zorpsaal")
 
     assert Location.venue?(zorpsaal.name)
@@ -111,9 +111,9 @@ class LocationTest < ActiveSupport::TestCase
     assert_includes tree[@venue.canton][@venue.locality], @venue.name
   end
 
-  test "venue_registry_fingerprints covers the registry only, never a place" do
+  test "taxonomy_venue_fingerprints covers the registry only, never a place" do
     zorpsaal = place(name: "Zorpsaal")
-    fingerprints = Location.venue_registry_fingerprints
+    fingerprints = Location.taxonomy_venue_fingerprints
 
     assert_includes fingerprints, Fingerprint.for(@venue.name)
     refute_includes fingerprints, zorpsaal.fingerprint

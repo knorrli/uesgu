@@ -35,7 +35,16 @@ class PlaceTest < ActiveSupport::TestCase
   test "spelling variants of one name cannot become two places" do
     place(name: "Zorpsaal")
 
-    assert_raises(ActiveRecord::RecordNotUnique) { place(name: "ZORP SAAL") }
+    refute Place.new(name: "ZORP SAAL", locality: "Zorpwil", canton: "BE").valid?
+  end
+
+  # The duplicate check is check-then-create, so two concurrent captures can both
+  # pass it. The index is what actually holds the line.
+  test "the unique index backstops the duplicate validation" do
+    place(name: "Zorpsaal")
+    duplicate = Place.new(name: "ZORP SAAL", locality: "Zorpwil", canton: "BE")
+
+    assert_raises(ActiveRecord::RecordNotUnique) { duplicate.save!(validate: false) }
   end
 
   test "matching resolves a variant spelling to the stored place" do
@@ -58,12 +67,22 @@ class PlaceTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::StatementInvalid) { zorpsaal.update_column(:canonical_id, zorpsaal.id) }
   end
 
-    test "a place may not duplicate a registry venue, in any spelling" do
+  test "a place may not duplicate a registry venue, in any spelling" do
     venue = Venue.in_taxonomy.first
     skip "no venues in the taxonomy" if venue.nil?
 
     refute Place.new(name: venue.name, locality: venue.locality, canton: venue.canton).valid?
     refute Place.new(name: venue.name.upcase, locality: venue.locality, canton: venue.canton).valid?
+  end
+
+  # The complement is drawn at the taxonomy, not at the file: a venue we decided
+  # not to scrape (or never placed) is still somewhere a captured show can happen,
+  # and the docs' "rejecting a lead" flow depends on the two rows coexisting.
+  test "a place may duplicate a registry venue we do not source from" do
+    unsourced = Venue.all.find { |v| !Venue.in_taxonomy.include?(v) }
+    skip "every registry venue is in the taxonomy" if unsourced.nil?
+
+    assert Place.new(name: unsourced.name, locality: "Zorpwil", canton: "BE").valid?
   end
 
   # The reverse direction the validation can't catch: the registry gains a row for
@@ -79,7 +98,7 @@ class PlaceTest < ActiveSupport::TestCase
     assert_equal [graduated], Place.shadowed
   end
 
-    test "an event tagged with a captured place surfaces it as the event's venue" do
+  test "an event tagged with a captured place surfaces it as the event's venue" do
     zorpsaal = place(name: "Zorpsaal")
     captured = event(location_list: [zorpsaal.name, zorpsaal.locality, zorpsaal.canton])
 

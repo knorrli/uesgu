@@ -1,6 +1,6 @@
 namespace :places do
-  desc "Report captured places the venue registry has since absorbed. A captured " \
-       "venue that graduates to a config/venues.yml row must lose its Place row in " \
+  desc "Report captured places the venue taxonomy has since absorbed. A captured " \
+       "venue that graduates to a placed consume row must lose its Place row in " \
        "the same PR, or one name has two identities. Read-only; exits nonzero on drift."
   task drift: :environment do
     shadowed = Place.shadowed

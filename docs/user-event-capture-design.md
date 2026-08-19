@@ -304,8 +304,12 @@ Rejected:
   nothing to merge.
 
 Registry collisions run in **two directions, and only one of them can gate the
-build**. Forward — capturing a place the registry already covers — is a validation
-on `Place`, matched by fingerprint so a variant spelling cannot slip past. Backward
+build**. Forward — capturing a place we already source from — is a validation on
+`Place`, matched by fingerprint so a variant spelling cannot slip past. Both
+directions are drawn at `Venue.in_taxonomy` rather than at the whole file, which is
+what makes the caveat under "Rejecting a lead" work: a `disposition: reject` row
+and a `Place` for the same name coexist deliberately, and neither the validation
+nor the drift report objects. Backward
 — a captured venue graduating to a YAML row — is not reachable by a test at all:
 the ledger drift test works because both of its sides are files in the repo, and
 these rows live in the database, which is empty in CI. So the intended drift test

@@ -22,15 +22,18 @@ class Location
     Venue.in_taxonomy
   end
 
-  # Fingerprints of every registry venue name — the key Place validates against so
-  # a captured place can never duplicate a venue we already source from.
-  def self.venue_registry_fingerprints
+  # Fingerprints of the taxonomy venue names — the key Place validates against, so
+  # a captured place can never duplicate a venue we already source from. Narrower
+  # than the registry on purpose: a deferred or rejected row is a decision not to
+  # SCRAPE a venue, not a claim that nobody plays there, so a capture at one still
+  # needs its own place.
+  def self.taxonomy_venue_fingerprints
     taxonomy_venues.to_set { |venue| Fingerprint.for(venue.name) }
   end
 
-  # The Place read lands on the per-event path (Event#venue), so it leans on the
-  # per-request query cache — places is a tens-of-rows table and the SQL is
-  # identical every call.
+  # The Place read lands on the per-event path (Event#venue). Inside a request the
+  # query cache collapses it to one SELECT; a rake loop over events has no such
+  # cache and should hoist this call out, the way usage below does.
   def self.venue_names
     taxonomy_venues.map(&:name).to_set | Place.names
   end

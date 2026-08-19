@@ -1,5 +1,10 @@
 # User-contributed event capture — idea note (2026-06-23)
 
+> **Superseded for anything actionable.** The design was settled on 2026-08-19 —
+> see [`user-event-capture-design.md`](user-event-capture-design.md) for the
+> decisions and the model evaluation behind them. This note is kept as the
+> original framing.
+
 > Status: **maybe-later / idea preservation.** Not planned, not scoped for
 > delivery — a brain-dump so the ideas aren't lost. Linked from `BACKLOG.md`
 > ("Maybe-later"). Two specific prompts (a WhatsApp concert-tip group; snapping a

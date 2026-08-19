@@ -1,6 +1,9 @@
 # User event capture — design decisions and model evaluation
 
-> Status: **decided, not yet built** (2026-08-19). Supersedes the framing in
+> Status: **decided; the place model is built** (2026-08-19) — decisions 4–6
+> shipped as the `places` table plus the location taxonomy reading it. Everything
+> else (the capture funnel, the three adapters, the verify screen, VenueLead
+> nomination) is still design only. Supersedes the framing in
 > [`user-event-capture.md`](user-event-capture.md), which stays as the original
 > idea note. This document records what we settled on and the evidence behind the
 > provider choice, so neither gets re-litigated.
@@ -57,11 +60,12 @@ text** — feeding a shared *extract → verify → create* path.
      are ad-hoc (Marzili Quartierfest, "Konzert im Kocherpark") — but the
      distinction is *emergent*, never recorded at capture time. See "VenueLead
      promotion".
-   - `Location.type_for` must consult both. Today it classifies anything unknown
-     as a **locality** (`app/models/location.rb`), so a captured "ZAR" reads as a
-     locality in the filter chips, the location combobox suffix, and the admin browser. It
-     cannot yet reach the WHERE *tree* at all — `Location.hierarchy` is built
-     purely from `Venue.in_taxonomy` — which is what decision 4 changes.
+   - `Location.type_for` must consult both. **Built.** It classified anything
+     unknown as a **locality** (`app/models/location.rb`), so a captured "ZAR"
+     read as a locality in the filter chips, the location combobox suffix, and the
+     admin browser, and could not reach the WHERE *tree* at all
+     (`Location.hierarchy` was built purely from `Venue.in_taxonomy`). Both halves
+     now union the registry with `Place`, registry first.
    - The same registry-derivation bug bit cantons, independently of capture:
      `Location.canton_codes` was the set the *registry* covers, so a tag for an
      uncovered canton ("VS") typed as a city. **Fixed in #95** — `CANTON_CODES` is
@@ -86,6 +90,10 @@ text** — feeding a shared *extract → verify → create* path.
    currently carry, so a captured place drops out of the tree by itself once the
    show has passed. Nothing expires it manually.
 
+   **Built** — `Location.hierarchy` folds `Place.pluck(:canton, :locality, :name)`
+   onto the registry tree through the same `add_to_tree`, and it did land at
+   roughly the estimated size.
+
 5. **Place-name normalisation uses the genre fingerprint pattern** — the stored
    generated column that folds case, spacing, punctuation and umlauts, plus
    `canonical_id` for alias-merge. Its reach is limited: it collapses
@@ -93,6 +101,13 @@ text** — feeding a shared *extract → verify → create* path.
    `Schützenmatt`/`Schützenmatte`. **The real defence is match-at-entry** — the
    verify UI offers existing places that fingerprint-near the extracted name and
    the user taps one. Fingerprint + admin merge is the safety net, not the plan.
+
+   **The fingerprint half is built**: a stored generated column on `places`,
+   character-identical to the genres one, with the Ruby reproduction extracted to a
+   shared `Fingerprint` so there is one normalizer rather than two copies drifting.
+   `Place.matching` resolves a raw name and follows a merge to its canonical.
+   Match-at-entry itself is not built — nothing offers *near* candidates yet, and
+   there is no admin merge UI.
 
 6. **Canton and locality are both required.** The earlier version of this
    decision made the middle tier optional, reasoning that a concert in a forest
@@ -126,7 +141,9 @@ text** — feeding a shared *extract → verify → create* path.
 
    The NOT NULL lands on the captured-place table only. `Venue` stays
    placeless-tolerant — the Bewegungsmelder aggregator row has no place and
-   `in_taxonomy` correctly excludes it. A venue can be a sourcing record that is
+   `in_taxonomy` correctly excludes it. **Built** as written: both columns are
+   `NOT NULL` on `places`, canton is validated against the closed 26, and `Venue`
+   is untouched. A venue can be a sourcing record that is
    not a location; a captured place exists *only* to be a location.
 
    **Prerequisite: rename `city` → `locality` first, everywhere, as its own
@@ -159,15 +176,72 @@ text** — feeding a shared *extract → verify → create* path.
    `Scrapers::Agent#build_event` re-derives every field from source nightly and
    `find_or_initialize_by(url:)` resurrects deleted rows. A captured event has no
    source to re-derive from, and `events.url` is `NOT NULL` + unique while a
-   poster has no URL. Use the existing `data_source` column as the seam. When a
-   venue later gains a scraper, the duplicate is handled by `canonical_event_id`.
+   poster has no URL (decision 10 makes it nullable). Use the existing
+   `data_source` column as the seam. When a venue later gains a scraper, the
+   duplicate is handled by `canonical_event_id`.
 
 9. **No image is stored.** Processed then discarded, consistent with the rejected
    `image` field (see [`richer-fields-proposal.md`](richer-fields-proposal.md)).
    The verify screen doubles as the PII checkpoint: the human sees, and edits,
    exactly what will be persisted.
 
+10. **`events.url` becomes nullable, and a capture keeps ONE url column.** The
+    column is not the dedup key, which is what made this look hard. It is the
+    *scraper's upsert key* — `find_or_initialize_by(url:)` (`agent.rb:269`) — so a
+    nightly re-scrape updates last night's row instead of creating a second. Real
+    dedup is `Scrapers::Dedup`, grouping on venue + date + fuzzy title and linking
+    losers via `canonical_event_id`; it never keys on `url`, and its own header
+    describes cleaning up *after* URL-identity fails (a scraper's scheme change
+    stranding the old-keyed copy — Mokka #55, Südpol #56). A captured event
+    therefore loses nothing by having no URL, and per decision 8 nothing
+    re-derives it, so it needs no upsert key at all: a human creates it once and
+    edits it by `id`.
+
+    Rejected the synthetic `uesgu:capture/<uuid>`. Two of the four `event.url`
+    readers already refuse a non-http value — `digest_event_href` links only
+    `https?://`, `event_offsite_source` parses it to a nil host — so a synthetic
+    value would pass review while `events/_event.html.erb` shipped a **dead link
+    on every captured event**, rendering fine and failing in the browser. NULL
+    forces that line to branch, and the branch is the actual product question the
+    synthetic value hides: a captured event's title is not an outbound link.
+    Precedent for identity-without-a-URL is already in `SavedEventsCalendar`,
+    which builds its stable uid from `event.id` — "just the identifier namespace
+    here, not a routable link".
+
+    The migration is cheap, contrary to the earlier framing of this as "a
+    migration on the busiest table": dropping a NOT NULL is catalog-only in
+    Postgres, no rewrite and no scan — it is *adding* one that hurts. No partial
+    index is needed either, since a Postgres unique index already permits
+    unlimited NULLs (`NULL != NULL`), so `index_events_on_url` stands untouched.
+    Only `validates :url, presence: true` becomes conditional.
+
+    **No separate `source_url`.** Where a pasted link *is* the venue's own event
+    page, colliding with the scraper's key is the point: the scraper adopts the
+    captured row, which keeps its `id` — so saves, reminders and notification
+    history survive — while the data upgrades to maintained. `data_source` flips
+    to the scraper, which is correct; it is scraped now. That is the best outcome
+    available, not a defect. It is also self-limiting: pasting a URL that already
+    exists fails the unique index, which is precisely the "this event already
+    exists" the verify screen should say. A second column would let that duplicate
+    through. Keeping the paste as *evidence* was rejected on decision 9's
+    precedent — an image capture already retains zero provenance, so a column that
+    preserves it for the easier case only is asymmetric.
+
+    **A social or ticketing paste does populate `url`** — reluctantly. We would
+    rather not send people to Instagram, but for the ad-hoc events this feature
+    exists to catch it is regularly the only page that exists, and a link that
+    sets expectations beats no link at all. `OFFSITE_SOURCES`
+    (`app/helpers/events_helper.rb`) gains `instagram.com` / `facebook.com` rows
+    so the card badges where the link lands — the mechanism already built for
+    "this link leaves you at Bewegungsmelder, not the venue". Adoption only ever
+    fires when the paste was the venue's own page, so social-sourced captures keep
+    their link permanently; the badge is what keeps that honest.
+
 ### The place model
+
+> **Built.** `app/models/place.rb`, `db/migrate/20260819160000_create_places.rb`,
+> and the `Location` changes that read them. Nothing writes a `Place` yet outside
+> tests — the capture path that would is still design only.
 
 A new `places` table, scoped as the **complement** of `Venue` — not a superset and
 not a mirror. A registry venue never gets a `Place` row: if the extracted name
@@ -229,10 +303,15 @@ Rejected:
 - **Fields on `Event`.** No dedup surface, no suggestion list for match-at-entry,
   nothing to merge.
 
-A **drift test in the ledger's style** should fail the build if a `Place`
-fingerprint collides with a registry venue, so that when a captured venue graduates
-to a YAML row the same PR deletes the `Place` row — mechanical instead of
-remembered.
+Registry collisions run in **two directions, and only one of them can gate the
+build**. Forward — capturing a place the registry already covers — is a validation
+on `Place`, matched by fingerprint so a variant spelling cannot slip past. Backward
+— a captured venue graduating to a YAML row — is not reachable by a test at all:
+the ledger drift test works because both of its sides are files in the repo, and
+these rows live in the database, which is empty in CI. So the intended drift test
+ships as `bin/rails places:drift` instead — it reports every `Place` the registry
+has since absorbed and exits nonzero, which makes deleting the graduated row a
+command the graduating PR runs rather than a thing someone remembers.
 
 ### VenueLead promotion
 
@@ -337,11 +416,7 @@ three-locale copy change that belongs in this work, not after it.
 
 ### Still open
 
-- **The `events.url` seam.** Decision 8 settles *that* captured events sit outside
-  the scraper's re-derivation domain, not *how*. `events.url` is `NOT NULL` +
-  unique and a poster has no URL, so this is either a synthetic value
-  (`uesgu:capture/<uuid>`) or a nullable column with a partial unique index —
-  a migration on the busiest table, and unresolved.
+Nothing. The `events.url` seam was the last one — settled in decision 10.
 
 ### The URL adapter
 

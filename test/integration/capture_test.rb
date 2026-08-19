@@ -222,6 +222,38 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_equal %w[Flarncore Zorpwave], Event.sole.genre_list.sort
   end
 
+  # The field round-trips through a failed publish and is re-rendered with join(", "),
+  # so an unstripped split gained one space per retry round.
+  test "genres do not accumulate whitespace across a retry" do
+    sign_in_as user(contributor: true)
+
+    post capture_path, params: { candidates: {
+      a: { accept: "1", title: "No canton", date: "2026-09-01", locality: "Zorpwil", canton: "",
+           genres: "Zorpwave, Flarncore" }
+    } }
+
+    assert_select "input[value=?]", "Zorpwave, Flarncore"
+  end
+
+  # An 8MB cap applied after `read` is not a cap: this endpoint is reachable
+  # directly, and the client-side downscale is not a control.
+  test "an oversize upload is refused before its bytes are read" do
+    sign_in_as user(contributor: true, locale: "en")
+    oversize = Rack::Test::UploadedFile.new(
+      StringIO.new("x" * (EventCapture::Adapters::Image::LIMIT + 1)), "image/png",
+      original_filename: "big.png"
+    )
+
+    # Adapters::Image.call is what pulls the bytes in, so the guard works only if it
+    # is never reached. (Extractor.call always runs — it passes a failure through.)
+    EventCapture::Adapters::Image.stub(:call, ->(_) { flunk "read the upload before capping it" }) do
+      post extract_capture_path, params: { row_id: "abc123", image: oversize },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_match ERB::Util.html_escape(I18n.t("capture.failures.image_too_large", locale: :en)), response.body
+  end
+
   test "publishing is closed to accounts without the capability" do
     sign_in_as user
 

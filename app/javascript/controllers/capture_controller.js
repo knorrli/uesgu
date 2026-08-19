@@ -79,7 +79,6 @@ export default class extends Controller {
   // request in memory at the same time.
   async run(tasks) {
     this.emptyTarget.hidden = true
-    this.actionsTarget.hidden = false
 
     const queue = tasks.slice()
     const workers = Array.from({ length: Math.min(this.concurrencyValue, queue.length) }, async () => {
@@ -90,6 +89,9 @@ export default class extends Controller {
       }
     })
     await Promise.all(workers)
+    // Only once something is actually there to publish: three failed extractions
+    // used to leave a live Publish button that submits an empty batch.
+    this.actionsTarget.hidden = this.rowsTarget.querySelector(".capture-candidate") === null
   }
 
   // The row is appended BEFORE the decode, not after: createImageBitmap rejects on
@@ -135,7 +137,10 @@ export default class extends Controller {
       if (!response.ok) return this.failRow(id)
 
       Turbo.renderStreamMessage(await response.text())
-      return true
+      // A provider failure comes back as a turbo-stream with status 200 — the
+      // request succeeded, the extraction did not — so the rendered row is the only
+      // honest signal of whether anything was actually read.
+      return !document.querySelector(`#capture-row-${id} [data-failed]`)
     } catch {
       return this.failRow(id)
     }

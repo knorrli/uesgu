@@ -7,6 +7,11 @@
 # the PII checkpoint" literally true. See docs/user-event-capture-design.md.
 class CapturesController < ApplicationController
   before_action :require_contributor
+  # Every extract is a paid third-party call. Keyed by user, not IP: on Render
+  # req.ip is always a Cloudflare edge address, so an IP-keyed limit is inert. The
+  # 429 renders no stream, which the client already reads as a failed row.
+  rate_limit to: 60, within: 1.minute, only: :extract,
+             by: -> { current_user&.id }, with: -> { head :too_many_requests }
 
   def show
     @retries ||= []
@@ -41,9 +46,15 @@ class CapturesController < ApplicationController
   # One input per request, and the target picks the adapter — the same rule the
   # rake task follows, so there is one funnel and not a UI-shaped second one.
   def input_for(params)
-    return EventCapture::Adapters::Image.call(params[:image].read) if params[:image].respond_to?(:read)
+    image = params[:image]
+    return EventCapture::Adapters::Text.call(params[:text]) unless image.respond_to?(:read)
 
-    EventCapture::Adapters::Text.call(params[:text])
+    # Size FIRST: the adapter's cap is a memory decision, and checking it after
+    # `read` means the allocation it guards against has already happened. The
+    # client-side downscale is not a control — this endpoint is reachable directly.
+    return EventCapture::Adapters::Image.too_large if image.size > EventCapture::Adapters::Image::LIMIT
+
+    EventCapture::Adapters::Image.call(image.read)
   end
 
   # Client-generated so each row can be replaced in place as its extraction lands.
@@ -91,7 +102,7 @@ class CapturesController < ApplicationController
 
       candidate.permit(:title, :date, :time, :place, :locality, :canton, :url, :genres)
                .to_h.symbolize_keys
-               .then { |attrs| attrs.merge(genres: attrs[:genres].to_s.split(",")) }
+               .then { |attrs| attrs.merge(genres: attrs[:genres].to_s.split(",").map(&:strip)) }
     end
   end
 end

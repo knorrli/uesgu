@@ -6,7 +6,7 @@
   <p class="field-label"><%= label.presence || t('capture.row.untitled') %></p>
 
   <% if !extraction.ok? %>
-    <p class="capture-row__failure">
+    <p class="capture-row__failure" data-failed>
       <%= t("capture.failures.#{extraction.code}", default: t('capture.failures.unknown')) %>
     </p>
   <% elsif extraction.candidates.empty? %>

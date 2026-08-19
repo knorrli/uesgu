@@ -60,7 +60,7 @@
 /* The shared .account-form skin sizes fields to their content; a review queue
    wants them filling the column instead, so a long title is not read through a
    letterbox. */
-.capture-candidate input,
+.capture-candidate input:not([type="checkbox"]),
 .capture-candidate select,
 .capture-picker textarea {
   width: 100%;

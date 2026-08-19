@@ -154,6 +154,7 @@ de:
     errors:
       incomplete: Titel, Datum, Ort und Kanton braucht es.
       duplicate: Dieses Event gibt es schon.
+      url_invalid: Der Link muss mit http:// oder https:// beginnen.
       duplicate_in_batch: Dieses Event teilt sich den Link mit einem anderen hier – bei einem den Link leeren.
       place_invalid: Diese Venue liess sich nicht anlegen.
       unknown: Das hat nicht geklappt.

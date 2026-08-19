@@ -20,6 +20,7 @@ module EventCapture
 
     def call
       return Result.new(error: :incomplete) if incomplete?
+      return Result.new(error: :url_invalid) if attrs[:url].present? && url.nil?
 
       # resolve_place WRITES and publish can raise after it: without the transaction
       # the duplicate-url path leaves an orphan place behind, with no events and no
@@ -47,11 +48,24 @@ module EventCapture
     # can reach. The form marks both required, but the form is not the only caller.
     def incomplete? = title.blank? || start_date.blank? || locality.blank? || canton.blank?
 
+    # events.url is rendered as a bare link_to href in the PUBLIC feed, so this is
+    # the first path by which a contributor-typed string could reach every user's
+    # browser. "mailto:" opens a mail client and a bare word becomes a same-origin
+    # relative link; the browser's own url-input validation is client-side only.
+    HTTP_SCHEMES = %w[http https].freeze
+
     def title = attrs[:title].to_s.strip
     def locality = @locality ||= canonical_locality(attrs[:locality].to_s.strip)
     def canton = attrs[:canton].to_s.strip
     def place_name = attrs[:place].to_s.strip
-    def url = attrs[:url].presence
+    def url
+      raw = attrs[:url].presence
+      return if raw.blank?
+
+      HTTP_SCHEMES.include?(URI.parse(raw).scheme) ? raw : nil
+    rescue URI::InvalidURIError
+      nil
+    end
     def genres = Array(attrs[:genres]).map { |g| g.to_s.strip }.compact_blank
 
     # Identity modulo case, accents and punctuation is not a near-match: "bern" and

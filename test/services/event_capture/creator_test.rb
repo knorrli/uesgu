@@ -155,6 +155,16 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_predicate EventCapture::Creator.call(attrs(title: "Zorp Fest 2")), :ok?
   end
 
+  # events.url is rendered as a bare link_to href in the public feed, so a typed
+  # string reaching it would land in every user's browser. The url input's own
+  # validation is client-side only.
+  test "a link that is not http(s) is refused rather than published" do
+    assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "mailto:x@example.com")).error
+    assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "see poster")).error
+    assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "javascript:alert(1)")).error
+    assert_predicate EventCapture::Creator.call(attrs(url: "https://zorp.example/x")), :ok?
+  end
+
   # places.url exists to make a VenueLead actionable ("write a scraper"), and a
   # scraper cannot be written against someone's Instagram post.
   test "a social link lands on the event but never on the place" do

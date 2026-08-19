@@ -30,13 +30,17 @@ module EventCapture
       def call(data)
         data = data.to_s.b
         return Input.failure(:image_empty, "no image data") if data.empty?
-        return Input.failure(:image_too_large, "image is over #{LIMIT / 1.megabyte}MB") if data.bytesize > LIMIT
+        return too_large if data.bytesize > LIMIT
 
         media_type = media_type_for(data)
         return Input.failure(:image_unsupported, unsupported(data)) unless media_type
 
         Input.image(data, media_type: media_type)
       end
+
+      # Callable before the bytes are read, so an upload can be refused on its
+      # declared size rather than after it has been pulled into memory whole.
+      def too_large = Input.failure(:image_too_large, "image is over #{LIMIT / 1.megabyte}MB")
 
       def media_type_for(data)
         SIGNATURES.find { |_type, matches| matches.call(data) }&.first

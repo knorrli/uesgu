@@ -154,6 +154,7 @@ fr:
     errors:
       incomplete: Il faut un titre, une date, une localité et un canton.
       duplicate: Cet événement existe déjà.
+      url_invalid: Le lien doit commencer par http:// ou https://.
       duplicate_in_batch: Cet événement partage son lien avec un autre ici — vide le lien sur l'un des deux.
       place_invalid: Ce lieu n'a pas pu être créé.
       unknown: Ça n'a pas marché.

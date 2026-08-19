@@ -44,6 +44,20 @@ class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
     assert_select "input[name=scraper][value=?]", "bad_bonn" # a per-scraper re-run button
   end
 
+  test "show surfaces the robots note on an otherwise-ok result" do
+    run = ScrapeRun.create!(started_at: Time.zone.local(2030, 1, 1, 2, 0), status: :finished)
+    run.scrape_results.create!(
+      scraper: "schueuer", status: :ok, rows_seen: 5, created_count: 1, duration_ms: 900,
+      robots_note: "https://www.schuur.ch/robots.txt unreachable — Mechanize::ResponseCodeError: 500"
+    )
+    sign_in_as user(admin: true)
+
+    get admin_scrape_run_path(run)
+
+    assert_response :success
+    assert_select ".scrape-note", text: /schuur\.ch\/robots\.txt unreachable/
+  end
+
   test "non-admins cannot trigger a run" do
     sign_in_as user(admin: false)
     assert_no_difference -> { ScrapeRun.count } do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_23_133125) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_19_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -153,6 +153,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_23_133125) do
     t.string "error_class"
     t.text "error_message"
     t.integer "errored_count", default: 0, null: false
+    t.text "robots_note"
     t.integer "rows_seen", default: 0, null: false
     t.bigint "scrape_run_id", null: false
     t.string "scraper", null: false

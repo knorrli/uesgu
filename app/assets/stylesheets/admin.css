@@ -314,6 +314,14 @@
   color: var(--theme-warn-color);
 }
 
+/* .scrape-error's sibling, muted rather than warn: a note about how the run
+   proceeded, not a fault. */
+.scrape-note {
+  white-space: normal;
+  font-size: var(--font-size-small);
+  color: var(--theme-fg-muted);
+}
+
 /* A non-zero per-run error count: warn colour so it stands out in the table,
    mirroring the coverage matrix's low-fill highlight. */
 .scrape-num--errors {

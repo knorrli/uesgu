@@ -405,6 +405,7 @@ en:
         duration: Time
         created_events: Events created
         no_created_events: This run created no new events.
+        robots_note: "robots.txt unreachable — no ban was published, so we read the site anyway (%{note})"
     scraper_coverage:
       index:
         title: Data coverage

@@ -49,4 +49,28 @@ class EventCapture::YearResolverTest < ActiveSupport::TestCase
   test "an impossible day is not invented into a neighbouring one" do
     assert_nil resolve("30. Februar")
   end
+
+  # The weekday has to be the one printed with THIS date. A whole-string scan let a
+  # later token win and put the show a year out.
+  test "a second date later in the evidence does not supply the weekday" do
+    assert_equal Date.new(2026, 8, 8), resolve("Sa 08.08. + So 09.08.")
+  end
+
+  test "the weekday beside the date beats one earlier in the sentence" do
+    assert_equal Date.new(2026, 6, 12), resolve("So viel Musik, Fr 12. Juni") # a Friday
+  end
+
+  # "die"/"mit"/"so" are an article, a preposition and an adverb; "mar" is both
+  # mardi and an abbreviation of März. A checksum taken from prose is worse than
+  # none, because it silently selects a year.
+  test "ordinary prose does not supply a weekday checksum" do
+    assert_equal Date.new(2027, 5, 5), resolve("Die Türen öffnen um 20 Uhr, 5. Mai")
+    assert_equal Date.new(2027, 3, 3), resolve("3. Mar")
+  end
+
+  # The first digit pair on a poster line is regularly a time; stopping there threw
+  # the date away and skipped the year check entirely.
+  test "a leading time does not hide the date behind it" do
+    assert_equal Date.new(2026, 12, 5), resolve("Doors 19.30 Uhr, Konzert am 5.12.")
+  end
 end

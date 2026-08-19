@@ -140,6 +140,24 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_equal "Marzili Quartierfest", candidate.place
   end
 
+  # A quote can legitimately span more than one date ("Fr 20. & Sa 21. Februar" on a
+  # two-night poster). Taking the resolver's whole answer there turned a wrong year
+  # into a wrong show.
+  test "evidence describing another date corrects nothing and says so" do
+    candidate = normalize("date" => "2026-02-20", "date_evidence" => "Fr 20. & Sa 21. Februar")
+
+    assert_equal Date.new(2026, 2, 20), candidate.date
+    assert_includes candidate.issues, :date_evidence_mismatch
+    assert_empty candidate.raw
+  end
+
+  test "a rejected datetime is kept in raw as the model wrote it" do
+    candidate = normalize("date" => "2026-02-30T20:00:00", "date_evidence" => "30. Februar")
+
+    assert_nil candidate.date
+    assert_equal "2026-02-30T20:00:00", candidate.raw["date"]
+  end
+
   test "past is computed, never asked of the model" do
     assert normalize(dated("date" => "2026-08-01", "date_evidence" => "1. August")).past?(today: TODAY)
     refute normalize(dated).past?(today: TODAY)

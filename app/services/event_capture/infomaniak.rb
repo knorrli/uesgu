@@ -71,7 +71,11 @@ module EventCapture
       JSON.parse(response.body)
     rescue JSON::ParserError => e
       raise ProviderError, "unreadable response: #{e.message}"
-    rescue Timeout::Error, IOError, SystemCallError, SocketError, Net::HTTPBadResponse, OpenSSL::SSL::SSLError => e
+    # URI::InvalidURIError belongs here too: the product id is interpolated into the
+    # path, so a malformed one must fail like any other bad configuration rather
+    # than escape Extractor's rescue as a 500 on the verify screen.
+    rescue Timeout::Error, IOError, SystemCallError, SocketError, Net::HTTPBadResponse,
+           OpenSSL::SSL::SSLError, URI::InvalidURIError => e
       raise ProviderError, "#{e.class}: #{e.message}"
     end
   end

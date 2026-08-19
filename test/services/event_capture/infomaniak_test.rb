@@ -71,6 +71,19 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
     assert_match(/HTTP 503/, result.message)
   end
 
+  # The product id is interpolated into the request path, so a malformed one has to
+  # fail like any other bad configuration — Extractor rescues ProviderError only, and
+  # anything else reaches the verify screen as a 500 instead of one retryable row.
+  test "a malformed product id becomes a ProviderError, not a raw exception" do
+    result = EventCaptureConfig.stub(:api_token, "tok-123") do
+      EventCaptureConfig.stub(:product_id, "42 42") do
+        yield_result { EventCapture::Infomaniak.new.call(image_data: "x", media_type: "image/png", today: Date.new(2026, 8, 19)) }
+      end
+    end
+
+    assert_kind_of EventCapture::ProviderError, result
+  end
+
   test "a transport failure becomes a ProviderError too" do
     result, = call_with(Net::OpenTimeout.new("execution expired"))
 

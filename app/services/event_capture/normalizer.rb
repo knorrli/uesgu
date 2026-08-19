@@ -69,6 +69,10 @@ module EventCapture
       value = cited(:date)
       return if value.nil?
 
+      # `raw` must show what the MODEL said, so a human on the verify screen judges
+      # its output rather than our half-transformed copy of it.
+      claimed = value
+
       # "2026-08-19T19:30:00" is a right answer in a wrong shape — split it rather
       # than bin it. The time half is only a fallback for an empty `time`.
       if (match = value.match(DATETIME))
@@ -78,17 +82,29 @@ module EventCapture
       end
 
       date = value.match?(ISO_DATE) ? Date.parse(value) : nil
-      date.nil? ? reject(:date, value, :date_not_iso) : recomputed_year(date) || date
+      date.nil? ? reject(:date, claimed, :date_not_iso) : recomputed_year(date) || date
     rescue Date::Error
-      reject(:date, value, :date_not_iso)
+      reject(:date, claimed, :date_not_iso)
     end
 
     # Prefer the year computed from the verbatim evidence over the model's own: the
     # evidence is the one thing it read correctly every time, and it still resolved
     # the year wrong in two runs of six.
+    #
+    # The YEAR, and nothing else. A quote can legitimately span more than this event
+    # — "Fr 20. & Sa 21. Februar" on a two-night poster — and taking the resolver's
+    # whole answer there turned a wrong year into a wrong show (2026-02-20 became
+    # 2025-02-21). A day or month disagreement means the evidence is not describing
+    # this date, so the model's value stands and the disagreement is flagged for a
+    # human instead of being silently resolved.
     def recomputed_year(date)
       computed = YearResolver.call(event["date_evidence"], today: today)
       return if computed.nil? || computed == date
+
+      unless computed.month == date.month && computed.day == date.day
+        issues << :date_evidence_mismatch
+        return
+      end
 
       raw["date"] = date.to_s
       issues << :year_recomputed

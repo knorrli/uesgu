@@ -20,13 +20,19 @@ module EventCaptureConfig
 
   module_function
 
+  # Trimmed, and forced to a string: a value pasted with a trailing newline makes
+  # Net::HTTP raise on the header, and a product id stored as a YAML integer has no
+  # `.presence`. Both would surface as an unhandled exception rather than as the
+  # "not configured" the caller knows how to show.
   def api_token
-    ENV["INFOMANIAK_API_TOKEN"].presence || Rails.application.credentials.dig(:infomaniak, :api_token)
+    trimmed(ENV["INFOMANIAK_API_TOKEN"]) || trimmed(Rails.application.credentials.dig(:infomaniak, :api_token))
   end
 
   def product_id
-    ENV["INFOMANIAK_PRODUCT_ID"].presence || Rails.application.credentials.dig(:infomaniak, :product_id)
+    trimmed(ENV["INFOMANIAK_PRODUCT_ID"]) || trimmed(Rails.application.credentials.dig(:infomaniak, :product_id))
   end
+
+  def trimmed(value) = value.to_s.strip.presence
 
   def model
     ENV["INFOMANIAK_MODEL"].presence || DEFAULT_MODEL

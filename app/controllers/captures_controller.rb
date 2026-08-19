@@ -25,7 +25,7 @@ class CapturesController < ApplicationController
   # persisted before this point, so a redirect would throw away every extraction
   # that did not publish, including the ones needing one field corrected.
   def create
-    results = accepted_candidates.map { |attrs| [attrs, EventCapture::Creator.call(attrs)] }
+    results = publish_each(accepted_candidates)
     published = results.count { |_, result| result.ok? }
     @retries = results.reject { |_, result| result.ok? }
                       .map { |attrs, result| [candidate_from(attrs), result.error] }
@@ -67,8 +67,26 @@ class CapturesController < ApplicationController
     nil
   end
 
+  # Two candidates off one poster carry the same source_url, so the second would
+  # hit the unique index and be reported as "the scraper already has this" — true of
+  # the index, misleading about the cause, and unfixable without knowing the clash
+  # is with its own sibling.
+  def publish_each(candidates)
+    seen = Set.new
+    candidates.map do |attrs|
+      next [attrs, EventCapture::Creator::Result.new(error: :duplicate_in_batch)] if
+        attrs[:url].present? && !seen.add?(attrs[:url])
+
+      [attrs, EventCapture::Creator.call(attrs)]
+    end
+  end
+
   def accepted_candidates
-    params.fetch(:candidates, {}).values.filter_map do |candidate|
+    submitted = params[:candidates]
+    return [] unless submitted.respond_to?(:values)
+
+    submitted.values.filter_map do |candidate|
+      next unless candidate.respond_to?(:permit)
       next unless ActiveModel::Type::Boolean.new.cast(candidate[:accept])
 
       candidate.permit(:title, :date, :time, :place, :locality, :canton, :url, :genres)

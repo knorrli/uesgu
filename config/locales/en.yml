@@ -144,6 +144,7 @@ en:
     empty: Nothing read yet.
     publish: Publish events
     published:
+      zero: Nothing was published.
       one: One event is live.
       other: "%{count} events are live."
     partly_published:
@@ -153,6 +154,7 @@ en:
     errors:
       incomplete: Title, date, locality and canton are needed.
       duplicate: This event already exists.
+      duplicate_in_batch: This event shares its link with another one here — clear the link on one of them.
       place_invalid: That venue couldn't be created.
       unknown: That didn't work.
     row:

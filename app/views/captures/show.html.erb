@@ -49,11 +49,12 @@
       <% end %>
     </div>
 
-    <p class="empty-state" data-capture-target="empty" hidden="<%= @retries.any? %>"><%= t('capture.empty') %></p>
+    <%= tag.p t('capture.empty'), class: "empty-state",
+          data: { capture_target: "empty" }, hidden: @retries.any? %>
 
-    <div data-capture-target="actions" hidden="<%= @retries.empty? %>">
+    <%= tag.div data: { capture_target: "actions" }, hidden: @retries.empty? do %>
       <%= render "shared/form_actions", form: form,
             submit_label: t('capture.publish'), cancel_path: root_path %>
-    </div>
+    <% end %>
   <% end %>
 </div>

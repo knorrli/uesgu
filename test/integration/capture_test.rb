@@ -143,6 +143,62 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_equal %w[Fine Scraped], Event.pluck(:title).sort
   end
 
+  # `hidden` is a boolean attribute, so hidden="false" is still hidden — and the
+  # reset makes that display:none !important. Rendering it wrong took the Publish
+  # button off the one screen that needs it, stranding the whole corrected batch.
+  test "the publish button is present on a returned batch and absent before one" do
+    sign_in_as user(contributor: true)
+
+    get capture_path
+    assert_select "[data-capture-target=actions][hidden]"
+    assert_select ".empty-state:not([hidden])"
+
+    post capture_path, params: { candidates: {
+      a: { accept: "1", title: "No canton", date: "2026-09-01", locality: "Zorpwil", canton: "" }
+    } }
+
+    assert_select "[data-capture-target=actions]:not([hidden])"
+    assert_select "input[type=submit]"
+    assert_select ".empty-state[hidden]"
+  end
+
+  test "keeping nothing does not claim zero events are live" do
+    sign_in_as user(contributor: true, locale: "en")
+
+    post capture_path, params: { candidates: {
+      a: { accept: "0", title: "Dropped", date: "2026-09-01", locality: "Zorpwil", canton: "BE" }
+    } }
+
+    assert_equal I18n.t("capture.published", count: 0, locale: :en), flash[:notice]
+  end
+
+  # Two candidates off one poster carry the same source_url. The clash is with a
+  # sibling in the same unpersisted batch, not with anything the scraper holds.
+  test "siblings sharing a link are named as such, not as an existing event" do
+    sign_in_as user(contributor: true, locale: "en")
+
+    post capture_path, params: { candidates: {
+      a: { accept: "1", title: "First", date: "2026-09-01", locality: "Zorpwil", canton: "BE",
+           url: "https://zorp.example/poster" },
+      b: { accept: "1", title: "Second", date: "2026-09-02", locality: "Zorpwil", canton: "BE",
+           url: "https://zorp.example/poster" }
+    } }
+
+    assert_match I18n.t("capture.errors.duplicate_in_batch", locale: :en), response.body
+    assert_equal ["First"], Event.pluck(:title)
+  end
+
+  test "a malformed candidates param is not a 500" do
+    sign_in_as user(contributor: true)
+
+    post capture_path, params: { candidates: "1" }
+    assert_redirected_to root_path
+
+    post capture_path, params: { candidates: { a: "x" } }
+    assert_redirected_to root_path
+    assert_empty Event.all
+  end
+
   test "a returned row says what was wrong with it" do
     sign_in_as user(contributor: true, locale: "en")
 

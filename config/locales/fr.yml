@@ -144,6 +144,7 @@ fr:
     empty: Rien de lu pour l'instant.
     publish: Publier les événements
     published:
+      zero: Rien n'a été publié.
       one: Un événement est en ligne.
       other: "%{count} événements sont en ligne."
     partly_published:
@@ -153,6 +154,7 @@ fr:
     errors:
       incomplete: Il faut un titre, une date, une localité et un canton.
       duplicate: Cet événement existe déjà.
+      duplicate_in_batch: Cet événement partage son lien avec un autre ici — vide le lien sur l'un des deux.
       place_invalid: Ce lieu n'a pas pu être créé.
       unknown: Ça n'a pas marché.
     row:

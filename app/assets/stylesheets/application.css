@@ -83,12 +83,9 @@ a {
   max-width: 100%;
 }
 
-/* A textarea carries the underline like every other field, but keeps its own
-   box-model habits: it must not be resizable sideways (that breaks the column) and
-   the underline needs the text to sit off it. */
+/* Sideways resizing would break the form column. */
 .account-form textarea {
   resize: vertical;
-  padding-bottom: var(--gap-small);
 }
 
 /* The native time/date pickers ship as bordered, opaque-white boxes that ignored

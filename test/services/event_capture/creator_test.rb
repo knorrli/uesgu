@@ -49,6 +49,27 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_includes result.event.location_list, venue.name
   end
 
+  # Both lookups match on NAME alone, so the form's locality can disagree with where
+  # the place actually is — and Location.hierarchy nests the venue node under the
+  # STORED locality, leaving the venue chip and the canton chip describing one event
+  # differently.
+  test "a matched place is tagged with its own locality and canton, not the form's" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+
+    result = EventCapture::Creator.call(attrs(place: "ZORP-SAAL", locality: "Flarnhausen", canton: "ZH"))
+
+    assert_equal %w[BE Zorpsaal Zorpwil], result.event.location_list.sort
+  end
+
+  test "a registry venue is tagged with the registry's own place" do
+    venue = Venue.in_taxonomy.first
+    skip "no venues in the taxonomy" if venue.nil?
+
+    result = EventCapture::Creator.call(attrs(place: venue.name, locality: "Flarnhausen", canton: "ZH"))
+
+    assert_equal [venue.canton, venue.locality, venue.name].sort, result.event.location_list.sort
+  end
+
   # A show in a park: located by locality + canton alone, which is still a node
   # the WHERE tree can reach.
   test "a blank place publishes without minting one" do

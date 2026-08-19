@@ -25,12 +25,17 @@ export default class extends Controller {
     this.run(files.map((file) => () => this.extractImage(file)))
   }
 
+  // The textarea is cleared only once the extraction has landed. A file can be
+  // re-picked from disk; a long paste from a newsletter cannot be, and the provider
+  // fails often enough that clearing first loses it for real.
   pickText() {
     const text = this.textTarget.value.trim()
     if (text === "") return
 
-    this.textTarget.value = ""
-    this.run([() => this.extract({ text }, text.slice(0, 40))])
+    this.run([() => this.extract({ text }, text.slice(0, 40))
+      .then((landed) => {
+        if (landed && this.textTarget.value.trim() === text) this.textTarget.value = ""
+      })])
   }
 
   // Unchecking "keep" does not lift `required`, so one dropped row missing the
@@ -130,14 +135,17 @@ export default class extends Controller {
       if (!response.ok) return this.failRow(id)
 
       Turbo.renderStreamMessage(await response.text())
+      return true
     } catch {
-      this.failRow(id)
+      return this.failRow(id)
     }
   }
 
+  // Returns false so a caller can tell a landed extraction from a failed one.
   failRow(id, message = this.errorValue) {
     const row = document.getElementById(`capture-row-${id}`)
     if (row) row.querySelector("[data-pending]").textContent = message
+    return false
   }
 
   appendPending(id, label) {

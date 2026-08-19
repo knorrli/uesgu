@@ -79,7 +79,7 @@ module EventCapture
       event = Event.new(
         title: title, start_date: start_date, start_time: start_time, url: url,
         data_source: DATA_SOURCE,
-        location_list: [place&.name, locality, canton].compact_blank,
+        location_list: located(place),
         genre_list: genres
       )
       event.save!
@@ -88,6 +88,17 @@ module EventCapture
       # the same rule rather than by a second one written here.
       event.recompute_visibility!
       event
+    end
+
+    # A matched place carries ITS OWN locality and canton, not the form's. Both
+    # lookups are by name alone, so a capture that reads "Dachstock" but "Zürich"
+    # would otherwise publish tagged Zürich/ZH while Location.hierarchy nests the
+    # Dachstock node under Bern — the venue chip and the canton chip disagreeing
+    # about one event, and the Bern filter missing it.
+    def located(place)
+      return [locality, canton].compact_blank if place.nil?
+
+      [place.name, place.locality.presence || locality, place.canton.presence || canton].compact_blank
     end
 
     # A registry venue gets NO Place row — the taxonomy reads the registry first, and

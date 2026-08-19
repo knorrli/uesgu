@@ -144,6 +144,7 @@ de:
     empty: Noch nichts ausgelesen.
     publish: Events veröffentlichen
     published:
+      zero: Es wurde nichts veröffentlicht.
       one: Ein Event ist live.
       other: "%{count} Events sind live."
     partly_published:
@@ -153,6 +154,7 @@ de:
     errors:
       incomplete: Titel, Datum, Ort und Kanton braucht es.
       duplicate: Dieses Event gibt es schon.
+      duplicate_in_batch: Dieses Event teilt sich den Link mit einem anderen hier – bei einem den Link leeren.
       place_invalid: Diese Venue liess sich nicht anlegen.
       unknown: Das hat nicht geklappt.
     row:

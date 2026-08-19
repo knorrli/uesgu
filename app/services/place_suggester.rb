@@ -56,15 +56,21 @@ class PlaceSuggester
       nil
     end
 
-    def score(name, candidates_sql, limit:)
+    def score(name, candidates, limit:)
       folded = Fingerprint.folded(name)
       return [] if folded.blank?
 
-      rows = ActiveRecord::Base.connection.select_all(sanitize([<<~SQL, THRESHOLD]))
+      # ONE sanitize pass over the whole statement, with every value bound rather
+      # than inlined. The earlier shape built the VALUES rows through their own
+      # sanitize call and then passed the result through a second one, so a '?' in a
+      # registry venue name arrived at the outer pass looking like a bind placeholder
+      # and raised PreparedStatementInvalid.
+      binds = [folded, folded, *candidates.binds, folded, folded, THRESHOLD]
+      rows = ActiveRecord::Base.connection.select_all(sanitize([<<~SQL, *binds]))
         SELECT candidates.name, candidates.locality, candidates.canton, candidates.source,
-               #{measure(folded)} AS score
-        FROM (#{candidates_sql}) AS candidates(name, locality, canton, folded, source)
-        WHERE #{measure(folded)} >= ?
+               #{MEASURE} AS score
+        FROM (#{candidates.sql}) AS candidates(name, locality, canton, folded, source)
+        WHERE #{MEASURE} >= ?
         ORDER BY score DESC, candidates.name ASC
       SQL
 
@@ -85,39 +91,36 @@ class PlaceSuggester
     # Symmetric because a split name shows up in both orders depending on which
     # spelling was captured first: strict_word_similarity(a, b) reaches 1.0 only
     # when a sits inside b, so scoring one direction would catch half the cases.
-    def measure(folded)
-      sanitize([
-        "GREATEST(strict_word_similarity(?, candidates.folded), " \
-        "strict_word_similarity(candidates.folded, ?))",
-        folded, folded
-      ])
-    end
+    MEASURE = "GREATEST(strict_word_similarity(?, candidates.folded), " \
+              "strict_word_similarity(candidates.folded, ?))".freeze
+
+    Candidates = Data.define(:sql, :binds)
 
     # Aliases are excluded rather than resolved: their canonical is already in the
     # set and scores at least as well, so offering the merged-away spelling would
     # only invite re-minting it.
     def name_candidates
-      places = "SELECT name, locality, canton, name_folded, 'place' FROM places WHERE canonical_id IS NULL"
-      registry = Venue.in_taxonomy.map do |venue|
-        sanitize(["(?, ?, ?, ?, 'registry')", venue.name, venue.locality, venue.canton,
-                  Fingerprint.folded(venue.name)])
-      end
-      union(places, registry)
+      registry(Venue.in_taxonomy) { |venue| [venue.name, venue.locality, venue.canton, venue.name] }
+        .then { |rows| union("SELECT name, locality, canton, name_folded, 'place' FROM places WHERE canonical_id IS NULL", rows) }
     end
 
     def locality_candidates
-      places = "SELECT DISTINCT locality, locality, canton, locality_folded, 'place' FROM places"
-      registry = Venue.in_taxonomy.uniq(&:locality).map do |venue|
-        sanitize(["(?, ?, ?, ?, 'registry')", venue.locality, venue.locality, venue.canton,
-                  Fingerprint.folded(venue.locality)])
-      end
-      union(places, registry)
+      registry(Venue.in_taxonomy.uniq(&:locality)) { |v| [v.locality, v.locality, v.canton, v.locality] }
+        .then { |rows| union("SELECT DISTINCT locality, locality, canton, locality_folded, 'place' FROM places", rows) }
     end
 
-    def union(places_sql, registry_rows)
-      return places_sql if registry_rows.empty?
+    def registry(venues)
+      venues.map do |venue|
+        name, locality, canton, folded_from = yield(venue)
+        [name, locality, canton, Fingerprint.folded(folded_from)]
+      end
+    end
 
-      "#{places_sql} UNION ALL VALUES #{registry_rows.join(', ')}"
+    def union(places_sql, rows)
+      return Candidates.new(sql: places_sql, binds: []) if rows.empty?
+
+      values = Array.new(rows.size, "(?, ?, ?, ?, 'registry')").join(", ")
+      Candidates.new(sql: "#{places_sql} UNION ALL VALUES #{values}", binds: rows.flatten)
     end
 
     def suggestion(name, locality, canton, source, score)

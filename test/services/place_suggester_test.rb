@@ -119,6 +119,16 @@ class PlaceSuggesterTest < ActiveSupport::TestCase
     assert_equal suggestions.uniq, suggestions
   end
 
+  # Every value is bound in one pass. Building the VALUES rows through their own
+  # sanitize call and then re-sanitizing the statement made a '?' in a stored name
+  # look like a bind placeholder, raising PreparedStatementInvalid.
+  test "a question mark in a stored name does not break the query" do
+    place(name: "Warum? Bar", locality: "Zorp? wil")
+
+    assert_includes names_for("Warum Bar"), "Warum? Bar"
+    assert_includes PlaceSuggester.for_locality("Zorp wil"), "Zorp? wil"
+  end
+
   private
 
   def names_for(query) = PlaceSuggester.for_name(query).map(&:name)

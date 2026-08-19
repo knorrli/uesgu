@@ -32,11 +32,11 @@ module EventCapture
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       return Extraction.new(error: UNCONFIGURED) unless EventCaptureConfig.configured?
 
-      response = @client.call(image_data: @image_data, media_type: @media_type, today: @today)
+      response = client.call(image_data: image_data, media_type: media_type, today: today)
       events = Array(parse(response.text)["events"])
 
       Extraction.new(
-        candidates: events.map { |event| Normalizer.call(event, today: @today) },
+        candidates: events.map { |event| Normalizer.call(event, today: today) },
         model: response.model,
         input_tokens: response.input_tokens,
         output_tokens: response.output_tokens,
@@ -47,6 +47,8 @@ module EventCapture
     end
 
     private
+
+    attr_reader :image_data, :media_type, :today, :client
 
     def since(started) = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started
 

@@ -683,6 +683,16 @@ an image; text and URL inputs arrive with the adapters, which is also where imag
 downscaling belongs (the bake-off capped the long edge at 1568px with `sips`,
 which is not a thing that exists on the deployed box).
 
+**Downscaling is a latency decision, not a cost one** — worth stating before the
+adapters are built, because the 1568px cap above reads like a cost measure and is
+not. Gemma bills a *fixed* image cost, so across the bake-off its input was ~1294
+tokens whatever the image: the 915x1568 sample came in at 1282, twelve tokens
+*under* the 723x1568 one. Mistral does scale with pixels on the same pair (2496 →
+2881), which is where the intuition comes from. The consequence is that the system
+prompt, not the image, is ~95% of what a request costs — one extraction is ~1350 in
+and 130–370 out, roughly $0.0005. So the only real cost lever is prompt length, and
+shortening the prompt is exactly what the fabrication numbers say not to do.
+
 The prompt is a **copy** of the bake-off script's, not a shared constant: that
 script's recorded `prompt_sha` is what makes its sessions comparable, so it stays
 frozen as the tuning rig. Two edits against it, both mandated above — `city`

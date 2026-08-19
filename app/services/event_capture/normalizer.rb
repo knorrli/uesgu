@@ -26,28 +26,30 @@ module EventCapture
       time = normalized_time
 
       Candidate.new(
-        title: string(@event["title"]),
+        title: string(event["title"]),
         date: date,
-        date_evidence: string(@event["date_evidence"]),
+        date_evidence: string(event["date_evidence"]),
         time: time,
         place: cited(:place),
-        place_evidence: string(@event["place_evidence"]),
-        locality: string(@event["locality"]),
+        place_evidence: string(event["place_evidence"]),
+        locality: string(event["locality"]),
         canton: normalized_canton,
-        genres: Array(@event["genres"]).filter_map { |genre| string(genre) },
-        source_url: string(@event["source_url"]),
-        raw: @raw,
-        issues: @issues
+        genres: Array(event["genres"]).filter_map { |genre| string(genre) },
+        source_url: string(event["source_url"]),
+        raw: raw,
+        issues: issues
       )
     end
 
     private
 
+    attr_reader :event, :today, :raw, :issues, :salvaged_time
+
     def string(value) = value.to_s.strip.presence
 
     def reject(field, value, issue)
-      @raw[field.to_s] = value
-      @issues << issue
+      raw[field.to_s] = value
+      issues << issue
       nil
     end
 
@@ -56,9 +58,9 @@ module EventCapture
     # the citation requirement buys for free, and it catches invented venues on
     # images our ground truth has no opinion about.
     def cited(field)
-      value = string(@event[field.to_s])
+      value = string(event[field.to_s])
       return if value.nil?
-      return value if string(@event["#{field}_evidence"])
+      return value if string(event["#{field}_evidence"])
 
       reject(field, value, :"#{field}_uncited")
     end
@@ -71,7 +73,7 @@ module EventCapture
       # than bin it. The time half is only a fallback for an empty `time`.
       if (match = value.match(DATETIME))
         @salvaged_time = match[2]
-        @issues << :date_was_datetime
+        issues << :date_was_datetime
         value = match[1]
       end
 
@@ -85,24 +87,24 @@ module EventCapture
     # evidence is the one thing it read correctly every time, and it still resolved
     # the year wrong in two runs of six.
     def recomputed_year(date)
-      computed = YearResolver.call(@event["date_evidence"], today: @today)
+      computed = YearResolver.call(event["date_evidence"], today: today)
       return if computed.nil? || computed == date
 
-      @raw["date"] = date.to_s
-      @issues << :year_recomputed
+      raw["date"] = date.to_s
+      issues << :year_recomputed
       computed
     end
 
     def normalized_time
-      value = string(@event["time"]) || @salvaged_time
+      value = string(event["time"]) || salvaged_time
       return if value.nil?
 
       normalized = clock_time(value)
       return reject(:time, value, :time_unparseable) if normalized.nil?
 
       if normalized != value
-        @raw["time"] = value
-        @issues << :time_normalized
+        raw["time"] = value
+        issues << :time_normalized
       end
       normalized
     end
@@ -121,7 +123,7 @@ module EventCapture
     end
 
     def normalized_canton
-      value = string(@event["canton"])
+      value = string(event["canton"])
       return if value.nil?
       return value.upcase if Location::CANTON_CODES.include?(value.upcase)
 

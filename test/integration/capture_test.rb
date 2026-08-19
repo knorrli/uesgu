@@ -120,8 +120,40 @@ class CaptureTest < ActionDispatch::IntegrationTest
       a: { accept: "0", title: "Dropped", date: "2026-09-01", locality: "Zorpwil", canton: "BE" }
     } }
 
-    assert_redirected_to capture_path
+    assert_redirected_to root_path
     assert_empty Event.all
+  end
+
+  # Nothing is persisted before create, so redirecting a partial failure away would
+  # cost the contributor every extraction that did not publish — including the ones
+  # that need a single field corrected.
+  test "a refused candidate comes back as an editable row instead of being lost" do
+    sign_in_as user(contributor: true, locale: "en")
+    event(url: "https://zorp.example/show", title: "Scraped")
+
+    post capture_path, params: { candidates: {
+      a: { accept: "1", title: "Fine", date: "2026-09-01", locality: "Zorpwil", canton: "BE" },
+      b: { accept: "1", title: "Clashes", date: "2026-09-02", locality: "Zorpwil", canton: "BE",
+           url: "https://zorp.example/show" }
+    } }
+
+    assert_response :unprocessable_entity
+    assert_select "input[value=?]", "Clashes"
+    assert_select "input[value=?]", "Fine", count: 0
+    assert_match I18n.t("capture.errors.duplicate", locale: :en), response.body
+    assert_equal %w[Fine Scraped], Event.pluck(:title).sort
+  end
+
+  test "a returned row says what was wrong with it" do
+    sign_in_as user(contributor: true, locale: "en")
+
+    post capture_path, params: { candidates: {
+      a: { accept: "1", title: "No canton", date: "2026-09-01", locality: "Zorpwil", canton: "" }
+    } }
+
+    assert_response :unprocessable_entity
+    assert_match I18n.t("capture.errors.incomplete", locale: :en), response.body
+    assert_select "input[value=?]", "No canton"
   end
 
   test "create splits comma-separated genres onto the event" do

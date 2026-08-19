@@ -16,7 +16,8 @@
   gap: var(--gap-small);
 }
 
-.capture-row__failure {
+.capture-row__failure,
+.capture-candidate__error {
   color: var(--theme-warn-color);
 }
 

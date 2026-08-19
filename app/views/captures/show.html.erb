@@ -5,7 +5,8 @@
      data-capture-url-value="<%= extract_capture_path %>"
      data-capture-max-edge-value="1568"
      data-capture-pending-value="<%= t('capture.row.pending') %>"
-     data-capture-error-value="<%= t('capture.failures.unreachable') %>">
+     data-capture-error-value="<%= t('capture.failures.unreachable') %>"
+     data-capture-undecodable-value="<%= t('capture.failures.image_unsupported') %>">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1><%= t('capture.title') %></h1>
     <p class="muted"><%= t('capture.intro') %></p>
@@ -39,11 +40,18 @@
   </datalist>
 
   <%= form_with url: capture_path, method: :post, class: 'capture-form account-form flex flex-col gap-large' do |form| %>
-    <div id="capture-rows" class="flex flex-col gap-large" data-capture-target="rows"></div>
+    <%# Candidates a publish refused come back here rather than being redirected
+        away: nothing is persisted before submit, so losing them would cost every
+        extraction in the batch, including the ones that need one field fixed. %>
+    <div id="capture-rows" class="flex flex-col gap-large" data-capture-target="rows">
+      <% @retries.each_with_index do |(candidate, error), index| %>
+        <%= render "captures/candidate", candidate: candidate, key: "retry-#{index}", error: error %>
+      <% end %>
+    </div>
 
-    <p class="empty-state" data-capture-target="empty"><%= t('capture.empty') %></p>
+    <p class="empty-state" data-capture-target="empty" hidden="<%= @retries.any? %>"><%= t('capture.empty') %></p>
 
-    <div data-capture-target="actions" hidden>
+    <div data-capture-target="actions" hidden="<%= @retries.empty? %>">
       <%= render "shared/form_actions", form: form,
             submit_label: t('capture.publish'), cancel_path: root_path %>
     </div>

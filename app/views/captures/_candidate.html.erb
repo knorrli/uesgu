@@ -3,10 +3,17 @@
     shown beside it, because a human completes a null in one tap but only if they
     can still see what was claimed. Accepted by default — this is a list you prune,
     not one you assemble. %>
-<%# locals: (candidate:, key:) %>
+<%# locals: (candidate:, key:, error: nil) %>
 <fieldset class="capture-candidate flex flex-col gap-small">
+  <% if error.present? %>
+    <p class="capture-candidate__error"><%= t("capture.errors.#{error}", default: t('capture.errors.unknown')) %></p>
+  <% end %>
+
   <label class="capture-candidate__accept">
-    <%= check_box_tag "candidates[#{key}][accept]", "1", !candidate.past? %>
+    <%# A row that came back from a refused publish stays kept: the contributor
+        already chose it, and the fix is a field, not the decision. %>
+    <%= check_box_tag "candidates[#{key}][accept]", "1", error.present? || !candidate.past?,
+          data: { capture_target: "accept", action: "capture#syncRequired" } %>
     <span><%= t('capture.candidate.accept') %></span>
   </label>
 
@@ -32,8 +39,7 @@
 
   <label class="flex flex-col gap-xsmall">
     <span class="field-label"><%= t('capture.candidate.place') %></span>
-    <%= text_field_tag "candidates[#{key}][place]", candidate.place,
-          data: { capture_target: "place" } %>
+    <%= text_field_tag "candidates[#{key}][place]", candidate.place %>
   </label>
 
   <%# Match-at-entry: tapping one of these is what stops a fourth spelling of
@@ -63,13 +69,13 @@
           genuinely doesn't know, the nearest named settlement beats a blank. %>
       <span class="field-label"><%= t('capture.candidate.locality') %></span>
       <%= text_field_tag "candidates[#{key}][locality]", candidate.locality,
-            required: true, list: "capture-localities", data: { capture_target: "locality" } %>
+            required: true, list: "capture-localities" %>
     </label>
     <label class="flex flex-col gap-xsmall">
       <span class="field-label"><%= t('capture.candidate.canton') %></span>
       <%= select_tag "candidates[#{key}][canton]",
             options_for_select(canton_options, candidate.canton),
-            include_blank: true, required: true, data: { capture_target: "canton" } %>
+            include_blank: true, required: true %>
     </label>
   </div>
 
@@ -85,7 +91,7 @@
 
   <%# The interesting column: what the model claimed and we refused, and why. A
       rejected value is never silently dropped. %>
-  <% if candidate.issues.any? %>
+  <% if candidate.raw.any? %>
     <p class="capture-candidate__issues muted">
       <%= t('capture.candidate.refused', values: candidate.raw.values.join(", ")) %>
     </p>

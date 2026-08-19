@@ -146,7 +146,15 @@ fr:
     published:
       one: Un événement est en ligne.
       other: "%{count} événements sont en ligne."
-    none_published: Rien n'a été publié.
+    partly_published:
+      zero: "Rien publié — il manque quelque chose à %{failed}."
+      one: "Un événement est en ligne, il manque quelque chose à %{failed}."
+      other: "%{count} événements sont en ligne, il manque quelque chose à %{failed}."
+    errors:
+      incomplete: Il faut un titre, une date, une localité et un canton.
+      duplicate: Cet événement existe déjà.
+      place_invalid: Ce lieu n'a pas pu être créé.
+      unknown: Ça n'a pas marché.
     row:
       pending: lecture …
       untitled: Texte

@@ -146,7 +146,15 @@ en:
     published:
       one: One event is live.
       other: "%{count} events are live."
-    none_published: Nothing was published.
+    partly_published:
+      zero: "Nothing published — %{failed} still need something."
+      one: "One event is live, %{failed} still need something."
+      other: "%{count} events are live, %{failed} still need something."
+    errors:
+      incomplete: Title, date, locality and canton are needed.
+      duplicate: This event already exists.
+      place_invalid: That venue couldn't be created.
+      unknown: That didn't work.
     row:
       pending: reading …
       untitled: Text

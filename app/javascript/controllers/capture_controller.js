@@ -8,11 +8,12 @@ import { Turbo } from "@hotwired/turbo-rails"
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
-  static targets = ["files", "text", "rows", "empty", "actions"]
+  static targets = ["files", "text", "rows", "empty", "actions", "accept"]
   static values = {
     url: String,
     pending: String,
     error: String,
+    undecodable: String,
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 }
   }
@@ -31,6 +32,29 @@ export default class extends Controller {
 
     this.textTarget.value = ""
     this.run([() => this.extract({ text }, text.slice(0, 40))])
+  }
+
+  // A dropped candidate must not hold the batch hostage. `required` is what the
+  // browser blocks submission on, and unchecking "keep" does not lift it — so one
+  // row the contributor deliberately dropped, missing the canton no poster prints,
+  // makes the whole form unsubmittable with a message pointing at a row they do not
+  // want. Fires on connect too (a past-dated row arrives already unchecked), and
+  // the marker outlives the removal so re-checking restores it.
+  acceptTargetConnected(checkbox) {
+    const fieldset = checkbox.closest(".capture-candidate")
+    fieldset.querySelectorAll("[required]").forEach((field) => field.setAttribute("data-required-when-kept", ""))
+    this.applyRequired(checkbox)
+  }
+
+  syncRequired(event) {
+    this.applyRequired(event.target)
+  }
+
+  applyRequired(checkbox) {
+    const fieldset = checkbox.closest(".capture-candidate")
+    fieldset.querySelectorAll("[data-required-when-kept]").forEach((field) => {
+      field.required = checkbox.checked
+    })
   }
 
   // Fill the place tuple from a near-match instead of minting a variant spelling.
@@ -57,19 +81,37 @@ export default class extends Controller {
 
     const queue = tasks.slice()
     const workers = Array.from({ length: Math.min(this.concurrencyValue, queue.length) }, async () => {
-      while (queue.length > 0) await queue.shift()()
+      while (queue.length > 0) {
+        // A task renders its own failure row, so a throw here must not take the
+        // worker — and with it the rest of the queue — down with it.
+        try { await queue.shift()() } catch { /* already surfaced on the row */ }
+      }
     })
     await Promise.all(workers)
   }
 
+  // The row is appended BEFORE the decode, not after: createImageBitmap rejects on
+  // a HEIC picked from Finder (accept="image/*" allows it and no desktop browser
+  // decodes it) and on anything corrupt, and with the row created afterwards that
+  // threw before anything was on screen — the picker cleared, the Publish button
+  // appeared, and nothing else happened.
   async extractImage(file) {
-    const image = await this.downscale(file)
-    return this.extract({ image, filename: file.name }, file.name)
+    const id = crypto.randomUUID()
+    this.appendPending(id, file.name)
+
+    let image
+    try {
+      image = await this.downscale(file)
+    } catch {
+      // Not a network problem — say the thing the contributor can act on, which is
+      // the same advice Adapters::Image gives for a file it cannot read.
+      return this.failRow(id, this.undecodableValue)
+    }
+    return this.extract({ image, filename: file.name }, file.name, id)
   }
 
-  async extract(payload, label) {
-    const id = crypto.randomUUID()
-    this.appendPending(id, label)
+  async extract(payload, label, id = crypto.randomUUID()) {
+    if (!document.getElementById(`capture-row-${id}`)) this.appendPending(id, label)
 
     const body = new FormData()
     body.append("row_id", id)
@@ -83,13 +125,22 @@ export default class extends Controller {
         body,
         headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
       })
+      // renderStreamMessage is a silent no-op on any body without a <turbo-stream>,
+      // so an unchecked status leaves the row spinning forever on a 500, on a 403
+      // after the capability is revoked mid-session, and on an expired session
+      // (fetch follows the redirect and hands back the login page) — indistinguishable
+      // from a slow provider, which is the exact failure this rescue exists to prevent.
+      if (!response.ok) return this.failRow(id)
+
       Turbo.renderStreamMessage(await response.text())
     } catch {
-      // A dropped connection must not leave a row spinning forever with no way to
-      // tell that from a slow provider.
-      const row = document.getElementById(`capture-row-${id}`)
-      if (row) row.querySelector("[data-pending]").textContent = this.errorValue
+      this.failRow(id)
     }
+  }
+
+  failRow(id, message = this.errorValue) {
+    const row = document.getElementById(`capture-row-${id}`)
+    if (row) row.querySelector("[data-pending]").textContent = message
   }
 
   appendPending(id, label) {

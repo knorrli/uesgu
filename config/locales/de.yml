@@ -146,7 +146,15 @@ de:
     published:
       one: Ein Event ist live.
       other: "%{count} Events sind live."
-    none_published: Es wurde nichts veröffentlicht.
+    partly_published:
+      zero: "Nichts veröffentlicht – %{failed} brauchen noch etwas."
+      one: "Ein Event ist live, %{failed} brauchen noch etwas."
+      other: "%{count} Events sind live, %{failed} brauchen noch etwas."
+    errors:
+      incomplete: Titel, Datum, Ort und Kanton braucht es.
+      duplicate: Dieses Event gibt es schon.
+      place_invalid: Diese Venue liess sich nicht anlegen.
+      unknown: Das hat nicht geklappt.
     row:
       pending: wird gelesen …
       untitled: Text

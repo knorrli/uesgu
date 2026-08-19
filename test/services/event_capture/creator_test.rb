@@ -116,6 +116,41 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "https://zorpsaal.example/programm", result.place.url
   end
 
+  # Time.zone.parse RAISES on this, and a poster prints it for an after-midnight
+  # show. Unrescued it would 500 the publish and take the whole unpersisted batch.
+  test "an out-of-range clock is nulled, not raised" do
+    result = EventCapture::Creator.call(attrs(time: "25:00"))
+
+    assert_predicate result, :ok?
+    assert_nil result.event.start_time
+  end
+
+  # The field is free text pre-filled from the model, so a contributor's correction
+  # must land where the model's own answer would — Time.zone.parse would read every
+  # one of these as midnight.
+  test "a typed time is read by the same parser the model's answer went through" do
+    assert_equal "20:00", EventCapture::Creator.call(attrs(time: "20 Uhr")).event.start_time.strftime("%H:%M")
+    assert_equal "20:30", EventCapture::Creator.call(attrs(time: "20h30", title: "B")).event.start_time.strftime("%H:%M")
+    assert_nil EventCapture::Creator.call(attrs(time: "abc", title: "C")).event.start_time
+    assert_nil EventCapture::Creator.call(attrs(time: "20.08.2026", title: "D")).event.start_time
+  end
+
+  # add_to_tree bails on a blank canton exactly as it does on a blank locality, so
+  # the event would be one no node of the WHERE tree can reach.
+  test "refuses a candidate with no canton" do
+    assert_equal :incomplete, EventCapture::Creator.call(attrs(canton: "")).error
+  end
+
+  # The duplicate path raises AFTER the place is written.
+  test "a refused publish leaves no orphan place behind" do
+    event(url: "https://zorp.example/show", title: "Scraped")
+
+    result = EventCapture::Creator.call(attrs(url: "https://zorp.example/show"))
+
+    assert_equal :duplicate, result.error
+    assert_empty Place.all
+  end
+
   # Captured genres join the taxonomy exactly like scraped ones, and a capture
   # carrying only non-music genres is hidden by the same rule.
   test "genres are ensured in the taxonomy and visibility is recomputed" do

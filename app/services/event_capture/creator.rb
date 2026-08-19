@@ -28,12 +28,17 @@ module EventCapture
     end
 
     def call
-      return Result.new(error: :incomplete) if title.blank? || start_date.blank? || locality.blank?
+      return Result.new(error: :incomplete) if incomplete?
 
-      place = resolve_place
-      return Result.new(error: :place_invalid) if place.is_a?(Place) && !place.persisted?
+      # One transaction: resolve_place WRITES, and publish can raise after it. Without
+      # this the duplicate-url path leaves an orphan place behind — no events, no UI
+      # to remove it, and still feeding PlaceSuggester and the locality datalist.
+      ActiveRecord::Base.transaction do
+        place = resolve_place
+        next Result.new(error: :place_invalid) if place.is_a?(Place) && !place.persisted?
 
-      Result.new(event: publish(place), place: place.is_a?(Place) ? place : nil)
+        Result.new(event: publish(place), place: place.is_a?(Place) ? place : nil)
+      end
     rescue ActiveRecord::RecordNotUnique
       # The unique index on events.url. Not a 500: "this event already exists" is
       # precisely what a contributor pasting a link the scraper already has should
@@ -45,6 +50,11 @@ module EventCapture
     private
 
     attr_reader :attrs
+
+    # Canton is checked for the same reason locality is: Location.add_to_tree bails
+    # on a blank canton too, so an event missing it is one no node of the WHERE tree
+    # can reach. The form marks both required, but the form is not the only caller.
+    def incomplete? = title.blank? || start_date.blank? || locality.blank? || canton.blank?
 
     def title = attrs[:title].to_s.strip
     def locality = attrs[:locality].to_s.strip
@@ -67,10 +77,17 @@ module EventCapture
     # A date with no time is normal — a poster that never printed one — so the
     # column stays null rather than inventing midnight, which would read as a show
     # starting at 00:00 on every card that renders a time.
+    #
+    # Read by the SAME parser the model's answer went through, never Time.zone.parse:
+    # that one does not reject, it answers midnight for "20 Uhr" and for "abc" alike
+    # — inventing exactly the 00:00 this comment forbids — and it RAISES on the
+    # "25:00" a poster prints for an after-midnight show, which would take the whole
+    # unpersisted batch down with a 500.
     def start_time
-      return if attrs[:time].blank? || start_date.blank?
+      return if start_date.blank?
 
-      Time.zone.parse("#{start_date} #{attrs[:time]}")
+      clock = Clock.parse(attrs[:time])
+      clock.present? ? Time.zone.parse("#{start_date} #{clock}") : nil
     end
 
     def publish(place)

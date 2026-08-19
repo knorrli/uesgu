@@ -710,11 +710,20 @@ Two things the build measured that the plan did not anticipate:
 rule, "keep a PNG as a PNG so the bake-off's screenshot condition is preserved",
 is wrong. Canvas PNG output is unoptimised: a bake-off poster already at 1568px
 came back as **1.81MB against a 1.37MB source** — 32% *larger* than the file it
-downscaled — while the same canvas gave **221KB as JPEG**. End to end that was the
-difference between an 80-second round trip and a 1.7-second one, because the
-bottleneck is the upload to the provider, not the provider. Flat-colour
-screenshots, where PNG genuinely wins, still get PNG; the rule decides per image
-instead of guessing from the file extension.
+downscaled — while the same canvas gave **221KB as JPEG**. Flat-colour screenshots,
+where PNG genuinely wins, still get PNG; the rule decides per image instead of
+guessing from the file extension.
+
+The reason is bytes, **not latency** — a first reading of this blamed an 80-second
+round trip on the payload and was wrong. Measured directly against the provider,
+three calls each: 1.37MB PNG at 2.5 / 4.0 / 2.5s against 316KB JPEG at 4.2 /
+provider-error / 2.1s. Size is not what moves the clock. What moves it is the
+provider itself, which is **highly variable and occasionally fails** — one refusal
+in six calls, and single runs of 52s and 80s against a 2.1s median. That variance
+is invisible today and is one of the better arguments for #112; it is also why the
+screen fills progressively per input rather than waiting on a batch. The payload
+rule stands on its own terms: eight times the bytes off a phone connection, against
+the 8MB cap, held whole in one Puma worker's memory.
 
 **Re-encoding through the canvas also strips EXIF**, so a poster photo's GPS never
 leaves the device. That falls out of the resize rather than being designed, but it

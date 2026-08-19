@@ -7,14 +7,27 @@ import { Turbo } from "@hotwired/turbo-rails"
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
-  static targets = ["files", "text", "rows", "empty", "actions", "accept"]
+  static targets = ["files", "text", "rows", "empty", "actions", "accept", "source"]
   static values = {
     url: String,
     pending: String,
     error: String,
     undecodable: String,
+    sourceAlt: String,
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 }
+  }
+
+  // What each row was read from, held only in the browser. Nothing is uploaded for
+  // storage, so this store is the only copy a contributor can check a field
+  // against, and it has to outlive the turbo-stream that replaces the whole row.
+  initialize() {
+    this.sources = new Map()
+  }
+
+  disconnect() {
+    this.sources.forEach(({ objectUrl }) => { if (objectUrl) URL.revokeObjectURL(objectUrl) })
+    this.sources.clear()
   }
 
   pickFiles() {
@@ -32,7 +45,9 @@ export default class extends Controller {
     const text = this.textTarget.value.trim()
     if (text === "") return
 
-    this.run([() => this.extract({ text }, text.slice(0, 40))
+    const id = crypto.randomUUID()
+    this.sources.set(this.rowId(id), { text })
+    this.run([() => this.extract({ text }, text.slice(0, 40), id)
       .then((landed) => {
         if (landed && this.textTarget.value.trim() === text) this.textTarget.value = ""
       })])
@@ -115,11 +130,15 @@ export default class extends Controller {
       // the same advice Adapters::Image gives for a file it cannot read.
       return this.failRow(id, this.undecodableValue)
     }
+
+    // The downscaled blob, never the picked File: the canvas re-encode has already
+    // dropped EXIF, so the preview inherits "the GPS never leaves the device".
+    this.sources.set(this.rowId(id), { objectUrl: URL.createObjectURL(image) })
     return this.extract({ image, filename: file.name }, file.name, id)
   }
 
   async extract(payload, label, id = crypto.randomUUID()) {
-    if (!document.getElementById(`capture-row-${id}`)) this.appendPending(id, label)
+    if (!document.getElementById(this.rowId(id))) this.appendPending(id, label)
 
     const body = new FormData()
     body.append("row_id", id)
@@ -163,14 +182,46 @@ export default class extends Controller {
 
   // Returns false so a caller can tell a landed extraction from a failed one.
   failRow(id, message = this.errorValue) {
-    const row = document.getElementById(`capture-row-${id}`)
+    const row = document.getElementById(this.rowId(id))
     if (row) row.querySelector("[data-pending]").textContent = message
     return false
   }
 
+  // Filled on connect rather than straight after renderStreamMessage: Turbo performs
+  // the stream action on the next animation frame, so the row it paints does not
+  // exist yet at the point the request settles.
+  sourceTargetConnected(slot) {
+    const source = this.sources.get(slot.closest(".capture-row")?.id)
+    // Emptied first because a Turbo-cached snapshot restores an <img> whose object
+    // URL this controller revoked on the way out — left alone it paints a broken
+    // image, which is worse than the empty slot the restored row has earned.
+    slot.replaceChildren()
+    if (!source) return
+
+    slot.appendChild(source.objectUrl ? this.poster(source.objectUrl) : this.excerpt(source.text))
+  }
+
+  poster(objectUrl) {
+    const image = document.createElement("img")
+    image.src = objectUrl
+    image.alt = this.sourceAltValue
+    return image
+  }
+
+  excerpt(text) {
+    const paragraph = document.createElement("p")
+    paragraph.className = "capture-row__excerpt"
+    paragraph.textContent = text
+    return paragraph
+  }
+
+  rowId(id) {
+    return `capture-row-${id}`
+  }
+
   appendPending(id, label) {
     const row = document.createElement("div")
-    row.id = `capture-row-${id}`
+    row.id = this.rowId(id)
     row.className = "capture-row"
     row.innerHTML = `<p class="field-label"></p><p class="muted" data-pending></p>`
     row.querySelector(".field-label").textContent = label

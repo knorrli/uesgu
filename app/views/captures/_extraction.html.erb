@@ -1,9 +1,13 @@
 <%# One input's outcome, replacing its pending row in place — so a failed poster is
     one row to retry rather than a dead batch. Three shapes: a failure, nothing
-    found, or 1..n candidate fieldsets (a poster can advertise two concerts). %>
+    found, or 1..n candidate fieldsets (a poster can advertise two concerts).
+
+    The source slot is filled by the client, not here: the image is never uploaded
+    for storage, so the only copy is the blob still held in the browser. %>
 <%# locals: (id:, label:, extraction:) %>
 <div id="<%= id %>" class="capture-row flex flex-col gap-small">
   <p class="field-label"><%= label.presence || t('capture.row.untitled') %></p>
+  <div class="capture-row__source" data-capture-target="source"></div>
 
   <% if !extraction.ok? %>
     <p class="capture-row__failure" data-failed>
@@ -13,6 +17,13 @@
     <p class="muted"><%= t('capture.row.nothing_found') %></p>
   <% else %>
     <% extraction.candidates.each_with_index do |candidate, index| %>
+      <%# Two candidates off one poster share its preview, which reads as a
+          duplicated row without the count saying otherwise. %>
+      <% if extraction.candidates.size > 1 %>
+        <p class="capture-row__nth muted">
+          <%= t('capture.row.nth', index: index + 1, count: extraction.candidates.size) %>
+        </p>
+      <% end %>
       <%= render "captures/candidate", candidate: candidate, key: "#{id}-#{index}" %>
     <% end %>
   <% end %>

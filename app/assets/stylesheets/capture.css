@@ -74,3 +74,27 @@
 .capture-candidate__where > label {
   flex: 1 1 8rem;
 }
+
+/* The source the row was read from, kept beside its fields because verifying an
+   extraction is a comparison and a filename cannot answer "does the poster really
+   say 20:00". Capped by height, not width, so a portrait poster (what a phone
+   camera produces) and a wide screenshot are both one glance. */
+.capture-row__source img {
+  width: auto;
+  max-height: 40vh;
+  border: var(--border-width) solid var(--border-color);
+}
+
+.capture-row__excerpt {
+  margin: 0;
+  max-height: 40vh;
+  overflow: auto;
+  padding: var(--gap-small);
+  border: var(--border-width) solid var(--border-color);
+  font-size: var(--font-size-small);
+  white-space: pre-wrap;
+}
+
+.capture-row__nth {
+  font-size: var(--font-size-small);
+}

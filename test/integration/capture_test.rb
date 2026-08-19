@@ -40,7 +40,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select "input[type=file]"
   end
 
-  # The door only exists for accounts that were given the capability.
   test "the nav links to capture only for contributors" do
     sign_in_as user(contributor: true)
     get root_path

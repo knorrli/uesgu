@@ -1,10 +1,7 @@
 module EventCapture
-  # Reading a printed time into HH:MM. Extracted from Normalizer because the verify
-  # screen needs the identical rule: the time field is free text pre-filled from the
-  # model, so a contributor correcting it to "20 Uhr" must land where the model's
-  # own "20 Uhr" would. A second parser there meant Time.zone.parse, which does not
-  # reject — it answers 00:00 for "20 Uhr" and for "abc" alike, and raises on the
-  # "25:00" a poster prints for an after-midnight show.
+  # Reading a printed time into HH:MM. Shared by Normalizer and by the verify screen,
+  # whose time field is free text pre-filled from the model — a contributor's
+  # correction has to land where the model's own answer would.
   #
   # Shape-based on purpose, NOT a list of hour words. The formats that motivated
   # this were the German ones the sample images happened to carry (20 Uhr, 19:30h,

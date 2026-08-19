@@ -1,10 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
-// Drives the capture screen: one extraction request per input, fired from the
-// client, each replacing its own pending row as it lands. The server never holds a
-// request open for the whole batch (8 x 2.3s does not fit in one) and there is no
-// queue to reach for, so the fan-out lives here.
+// The extraction fan-out lives here rather than on the server: one request per
+// input, because a batch cannot be held open in one and there is no queue to reach
+// for (see EventCapture::Extractor).
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
@@ -34,12 +33,10 @@ export default class extends Controller {
     this.run([() => this.extract({ text }, text.slice(0, 40))])
   }
 
-  // A dropped candidate must not hold the batch hostage. `required` is what the
-  // browser blocks submission on, and unchecking "keep" does not lift it — so one
-  // row the contributor deliberately dropped, missing the canton no poster prints,
-  // makes the whole form unsubmittable with a message pointing at a row they do not
-  // want. Fires on connect too (a past-dated row arrives already unchecked), and
-  // the marker outlives the removal so re-checking restores it.
+  // Unchecking "keep" does not lift `required`, so one dropped row missing the
+  // canton no poster prints makes the whole form unsubmittable, pointing at a row
+  // the contributor does not want. The marker outlives the removal so re-checking
+  // restores it.
   acceptTargetConnected(checkbox) {
     const fieldset = checkbox.closest(".capture-candidate")
     fieldset.querySelectorAll("[required]").forEach((field) => field.setAttribute("data-required-when-kept", ""))

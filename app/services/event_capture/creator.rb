@@ -1,15 +1,6 @@
 module EventCapture
-  # The publish half of the funnel: one verified candidate in, one live Event out.
-  # Everything the model claimed has already passed a human by the time this runs —
-  # the verify screen is the PII checkpoint, and this is the first and only thing
-  # that writes.
-  #
-  # Where a place is resolved matters more than it looks. A registry venue gets NO
-  # Place row: the taxonomy reads the registry first and two sources of "what is a
-  # venue" is what VenuePlace was. Everything else finds-or-creates a Place, matched
-  # through the fingerprint (and through a merge), so a variant spelling joins the
-  # existing row instead of minting the fourth one that keeps a real venue below the
-  # nomination threshold forever.
+  # The publish half of the funnel, and the first thing in it that writes —
+  # everything here has already passed a human on the verify screen.
   class Creator
     # The seam that keeps a captured event out of the scrapers' nightly
     # re-derivation. Not a scraper source_key, and deliberately one value for the
@@ -30,9 +21,9 @@ module EventCapture
     def call
       return Result.new(error: :incomplete) if incomplete?
 
-      # One transaction: resolve_place WRITES, and publish can raise after it. Without
-      # this the duplicate-url path leaves an orphan place behind — no events, no UI
-      # to remove it, and still feeding PlaceSuggester and the locality datalist.
+      # resolve_place WRITES and publish can raise after it: without the transaction
+      # the duplicate-url path leaves an orphan place behind, with no events and no
+      # UI to remove it, still feeding PlaceSuggester and the locality datalist.
       ActiveRecord::Base.transaction do
         place = resolve_place
         next Result.new(error: :place_invalid) if place.is_a?(Place) && !place.persisted?
@@ -74,15 +65,9 @@ module EventCapture
       nil
     end
 
-    # A date with no time is normal — a poster that never printed one — so the
-    # column stays null rather than inventing midnight, which would read as a show
-    # starting at 00:00 on every card that renders a time.
-    #
-    # Read by the SAME parser the model's answer went through, never Time.zone.parse:
-    # that one does not reject, it answers midnight for "20 Uhr" and for "abc" alike
-    # — inventing exactly the 00:00 this comment forbids — and it RAISES on the
-    # "25:00" a poster prints for an after-midnight show, which would take the whole
-    # unpersisted batch down with a 500.
+    # Never Time.zone.parse: it does not reject, answering midnight for "20 Uhr" and
+    # "abc" alike, and it RAISES on the "25:00" a poster prints for an after-midnight
+    # show — a 500 that would take the whole unpersisted batch with it.
     def start_time
       return if start_date.blank?
 
@@ -105,9 +90,9 @@ module EventCapture
       event
     end
 
-    # Registry first, then an existing captured place (through a merge), then a new
-    # one. A blank name is legitimate — a show in a park with no venue — and leaves
-    # the event located by locality + canton alone.
+    # A registry venue gets NO Place row — the taxonomy reads the registry first, and
+    # two sources of "what is a venue" is what VenuePlace was. A blank name is
+    # legitimate (a show in a park), leaving the event located by locality + canton.
     def resolve_place
       return if place_name.blank?
 

@@ -25,8 +25,9 @@ posters, two WhatsApp screenshots), **one** was at a venue in `config/venues.yml
 
 ## The feature
 
-One capture funnel, three input adapters — **URL**, **image**, **pasted/screenshot
-text** — feeding a shared *extract → verify → create* path.
+One capture funnel, three input adapters — **image**, **pasted/screenshot text**,
+and **URL** — feeding a shared *extract → verify → create* path. The first two
+shipped in #105; the URL adapter is deferred (see "The URL adapter" below).
 
 ### Decided
 
@@ -545,11 +546,28 @@ Nothing. The `events.url` seam was the last one — settled in decision 10.
 
 ### The URL adapter
 
-> **Built** in #105 — `EventCapture::SafeFetch` (robots + SSRF + manual redirects),
-> `EventCapture::AddressCheck` (the address list below), and
-> `EventCapture::Adapters::Url`, which routes what came back to the image or the
-> text adapter. Nothing in the funnel is wired to a screen yet — the entry point
-> is `bin/rails "event_capture:extract[…]"`.
+> **DEFERRED, not reversed.** It was built in #105 and then cut from that PR
+> before merge. Everything below still stands as the design; what changed is the
+> sequencing. Measured against the branch, the URL adapter was 316 of 442 lines of
+> new production code, 27 of 40 new tests, and **five of the seven findings a
+> high-effort review raised** — for the one door of three with the weakest product
+> case, since a contributor who cannot paste a link can paste the text or a
+> screenshot, which is already what this section's robots fallback tells them to
+> do. Image and text carry the long tail this feature exists for (a poster photo, a
+> WhatsApp screenshot) and carry no fetch surface at all.
+>
+> The five findings are the opening brief for the follow-up issue, not a reason the
+> design is wrong: the fetched body was decoded as Latin-1 (mangling exactly the
+> umlauts prompt rule 4 depends on); webrobots follows up to five redirects on its
+> own robots.txt fetch with no re-validation, which defeats the hop checking below;
+> webrobots also ignores our timeouts and sleeps for an attacker-chosen
+> `Crawl-delay` on a request someone is watching; and `URI.parse` rejects IDN
+> hosts, which on a site called üsgu.ch is its own kind of answer.
+>
+> **What was NOT deferred: a captured event can still have a URL.** Decision 10's
+> `events.url` is a field on the verify screen a contributor types into. No fetch,
+> no robots, no SSRF. What is deferred is only auto-filling the other fields from a
+> link.
 
 Two questions specific to the adapter that fetches a pasted link server-side.
 
@@ -626,7 +644,7 @@ list — revisit if capture is ever opened up.
 
 ### The image and text adapters
 
-The two plain ones, and the two decisions they turned out to carry.
+The two that shipped, and the two decisions they turned out to carry.
 
 #### Image size: downscale on the client, cap on the server
 
@@ -687,12 +705,13 @@ Treat the text medium as a plausible first draft, not as a scored one.
 #### Failure codes are symbols; the verify screen owns the copy
 
 Every adapter returns either an `Input` or a failure carrying a **symbol** —
-`:robots_disallowed`, `:image_too_large`, `:address_blocked` — plus a
-developer-facing English message for the rake task and the logs. The three-locale
-copy lives in the verify screen, keyed on the symbol. A service returning
-translated prose would put user-facing copy behind a rake task nobody translates,
-and `:robots_disallowed` in particular is not a message at all: it is the signal
-that the funnel should offer the other two adapters.
+`:image_too_large`, `:image_unsupported`, `:text_empty` — plus a developer-facing
+English message for the rake task and the logs. The three-locale copy lives in the
+verify screen, keyed on the symbol. A service returning translated prose would put
+user-facing copy behind a rake task nobody translates, and some codes are not
+messages at all: `:image_unsupported` on a HEIC file is the signal to tell the
+contributor to re-save it, and the URL adapter's `:robots_disallowed`, when it
+returns, is the signal to offer the other two doors.
 
 An adapter failure is the same shape as a provider failure, so `Extractor` returns
 it unchanged and the funnel has one error path rather than two.

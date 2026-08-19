@@ -12,11 +12,19 @@ module EventCapture
 
       module_function
 
-      def call(text, source_url: nil)
-        text = text.to_s.strip
+      def call(text)
+        text = scrubbed(text)
         return Input.failure(:text_empty, "no text to extract from") if text.blank?
 
-        Input.text(truncated(text), source_url: source_url)
+        Input.text(truncated(text))
+      end
+
+      # A paste arrives as UTF-8, but a file read off disk arrives as ASCII-8BIT and
+      # any byte over 0x7F in it makes JSON.generate raise in the provider call —
+      # neither a JSON::ParserError nor a ProviderError, so it would escape both
+      # rescues as a 500 rather than the returned failure this whole path rests on.
+      def scrubbed(text)
+        text.to_s.dup.force_encoding(Encoding::UTF_8).scrub.strip
       end
 
       def truncated(text)

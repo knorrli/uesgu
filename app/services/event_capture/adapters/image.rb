@@ -37,7 +37,7 @@ module EventCapture
 
       module_function
 
-      def call(data, source_url: nil)
+      def call(data)
         data = data.to_s.b
         return Input.failure(:image_empty, "no image data") if data.empty?
         return Input.failure(:image_too_large, "image is over #{LIMIT / 1.megabyte}MB") if data.bytesize > LIMIT
@@ -45,7 +45,7 @@ module EventCapture
         media_type = media_type_for(data)
         return Input.failure(:image_unsupported, unsupported(data)) unless media_type
 
-        Input.image(data, media_type: media_type, source_url: source_url)
+        Input.image(data, media_type: media_type)
       end
 
       def media_type_for(data)

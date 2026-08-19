@@ -5,15 +5,15 @@ namespace :event_capture do
   # verify screen would receive; writes nothing to the database and stores no image.
   #
   #   bin/rails "event_capture:extract[poster.jpg]"
-  #   bin/rails "event_capture:extract[poster.jpg,https://example.ch/konzerte]"
+  #   bin/rails "event_capture:extract[poster.jpg,screenshot.png]"
   #   pbpaste | bin/rails "event_capture:extract[-]"
   #
   # Needs INFOMANIAK_API_TOKEN + INFOMANIAK_PRODUCT_ID (see
   # config/initializers/event_capture.rb).
-  desc "Extract event candidates from images, pasted text (-) or URLs (read-only; prints, persists nothing)"
+  desc "Extract event candidates from images or pasted text (- for stdin; read-only, persists nothing)"
   task :extract, [:target] => :environment do |_task, args|
     targets = [args[:target], *args.extras].compact_blank
-    abort 'usage: bin/rails "event_capture:extract[poster.jpg|https://…|-]"' if targets.empty?
+    abort 'usage: bin/rails "event_capture:extract[poster.jpg|-]"' if targets.empty?
     abort EventCapture::Extractor::UNCONFIGURED unless EventCaptureConfig.configured?
 
     puts "model: #{EventCaptureConfig.model}   today: #{Time.zone.today}"
@@ -24,10 +24,9 @@ namespace :event_capture do
   end
 
   # Which adapter a target gets is decided by the target, not by a flag — the same
-  # three-doors-one-funnel shape the UI will have. A URL is a URL; a file is an
-  # image if its bytes say so and text otherwise; "-" is a paste.
+  # doors-into-one-funnel shape the UI will have. A file is an image if its bytes
+  # say so and text otherwise; "-" is a paste.
   def input_for(target)
-    return EventCapture::Adapters::Url.call(target) if target.match?(%r{\Ahttps?://}i)
     return EventCapture::Adapters::Text.call($stdin.read) if target == "-"
 
     abort "no such file: #{target}" unless File.exist?(target)
@@ -35,11 +34,7 @@ namespace :event_capture do
     data = File.binread(target)
     return EventCapture::Adapters::Image.call(data) if EventCapture::Adapters::Image.media_type_for(data)
 
-    EventCapture::Adapters::Text.call(html?(target, data) ? EventCapture::HtmlText.call(data) : data)
-  end
-
-  def html?(path, data)
-    File.extname(path).downcase.in?([".html", ".htm"]) || data.lstrip.start_with?("<!", "<html", "<HTML")
+    EventCapture::Adapters::Text.call(data)
   end
 
   def report(target, extraction)

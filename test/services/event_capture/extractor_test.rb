@@ -90,34 +90,18 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
   end
 
   # An adapter failure is already the shape a provider failure is, so the funnel
-  # has one error path rather than two: the verify screen shows a refused paste and
-  # an upstream outage the same way, and neither reaches the provider.
+  # has one error path rather than two: the verify screen shows an unreadable
+  # upload and an upstream outage the same way, and neither reaches the provider.
   test "a failed input is returned as a failed extraction, unsent" do
     client = FakeClient.new(text: payload)
-    input = EventCapture::Input.failure(:robots_disallowed, "bejazz.ch/robots.txt disallows this path")
+    input = EventCapture::Input.failure(:image_unsupported, "not a PNG, JPEG, WebP or GIF")
 
     extraction = EventCaptureConfig.stub(:configured?, true) do
       EventCapture::Extractor.call(input: input, client: client)
     end
 
     refute_predicate extraction, :ok?
-    assert_equal :robots_disallowed, extraction.code
+    assert_equal :image_unsupported, extraction.code
     assert_empty client.calls
-  end
-
-  # Decision 10: where a pasted link is the venue's own event page it becomes the
-  # event's url. The model may also read a link off the page, and that one wins —
-  # a poster's own "tickets at…" link is more specific than the page we fetched.
-  test "the fetched URL fills source_url only where the model found none" do
-    client = FakeClient.new(text: payload({ title: "Zorpcore" },
-                                          { title: "Grumf", source_url: "https://example.ch/tickets" }))
-    input = EventCapture::Input.text("Zorpcore, Sa 22. August", source_url: "https://example.ch/programm")
-
-    extraction = EventCaptureConfig.stub(:configured?, true) do
-      EventCapture::Extractor.call(input: input, today: TODAY, client: client)
-    end
-
-    assert_equal "https://example.ch/programm", extraction.candidates.first.source_url
-    assert_equal "https://example.ch/tickets", extraction.candidates.second.source_url
   end
 end

@@ -740,11 +740,42 @@ runs and still resolved it to **2025** in two of them — where 19 Aug 2025 is a
 Tuesday and 19 Aug 2026 is a Wednesday, so "Mi" rules 2025 out.
 
 It is tractable in code because the candidate set is tiny. A user photographing a
-poster is looking at something happening soon, so the year is last, this, or next —
-and a printed weekday picks exactly one of those, since a given day/month lands on
-a given weekday only once every 5–6 years. Past dates are allowed but penalised:
-a poster for 08.08 seen on 19.08 means the show was 11 days ago (stale poster), not
-next year. All nine test cases resolve correctly.
+poster is looking at something happening soon, so the year is last, this, or next,
+and the **nearest occurrence** decides which. Past dates are allowed but penalised
+3x: a poster for 08.08 seen on 19.08 means the show was 11 days ago (stale poster),
+not next year.
+
+**The printed weekday is a check on that answer, not the thing that picks it.** An
+earlier version of this decision had it the other way round — a given day/month
+lands on a given weekday only once every 5–6 years, so a printed weekday looked
+like it selected the year outright. Two things overturned that.
+
+It earns almost nothing. Across *every* `date_evidence` string the bake-off runs
+produced, filtering by weekday changed the resolved date **0 times out of 10** —
+including `"Mi 19. August"`, the case this section credits it for. The model's error
+there was resolving to 2025, and the distance rule rejects 2025 on its own (nought
+days away versus 365 x the past penalty). The weekday agreed; it was never what
+fixed it. That is not a coincidence: the two rules only ever disagree when the true
+date is more than six months out, which is rare for a concert poster.
+
+And it costs a great deal when wrong, because as a filter it overrode the distance
+rule outright — one bad token moved the answer a full year, silently. The tokens are
+two- and three-letter strings matched against verbatim poster text, which is
+inherently collision-prone: `mar` is *mardi*, *martedi* and an abbreviation of
+*März*; `so`, `die`, `mit` are ordinary German words. Three of the six defects found
+in review of #104 came from this one mechanism.
+
+So the distance rule resolves, and a weekday that contradicts the result raises
+`:date_weekday_conflict` for the human already sitting on the verify screen. A token
+collision now costs one false alarm instead of one wrong year, and *how often it
+fires, and which side turns out to be right,* becomes measurable (#112) rather than
+arguable. Revisit promoting it back once there is data.
+
+The token list covers the three languages the prompt declares — German, French,
+English — and standard abbreviations only. It previously carried German and French
+abbreviations but English full names alone (`mon` was present only because it is
+also short for *Montag*), and padded itself with `die` / `mit` / `son`, which are
+words before they are weekdays.
 
 A value failing validation is **nulled** and kept under `*_raw`, never trusted. A
 null gets completed by a human in one tap; a malformed date silently corrupts the

@@ -2,21 +2,17 @@ require "test_helper"
 
 # Year resolution is the clearest case of "the model transcribes, code computes":
 # the bake-off model read "Mi 19. August" correctly in all six runs and still
-# resolved it to 2025 in two of them. These are the nine cases from the design doc.
+# resolved it to 2025 in two of them. The nearest occurrence decides; a printed
+# weekday only ever checks that answer (see the conflict tests below).
 class EventCapture::YearResolverTest < ActiveSupport::TestCase
   TODAY = Date.new(2026, 8, 19) # a Wednesday
 
   def resolve(evidence, today: TODAY) = EventCapture::YearResolver.call(evidence, today: today)
 
-  test "a printed weekday picks the year, even against the model's own answer" do
-    assert_equal Date.new(2026, 8, 19), resolve("Mi 19. August") # 19 Aug 2025 is a Tuesday
-  end
+  def conflict?(evidence, date) = EventCapture::YearResolver.weekday_conflict?(evidence, date)
 
-  test "the weekday checksum can select a year in the past" do
-    assert_equal Date.new(2025, 8, 19), resolve("Di 19. August")
-  end
-
-  test "without a weekday, the nearest occurrence wins" do
+  test "a bare date resolves to its nearest occurrence" do
+    assert_equal Date.new(2026, 8, 19), resolve("Mi 19. August")
     assert_equal Date.new(2026, 8, 26), resolve("26.8.")
   end
 
@@ -36,8 +32,8 @@ class EventCapture::YearResolverTest < ActiveSupport::TestCase
     assert_equal Date.new(2026, 8, 19), resolve("Mi 19. August 19.30h") # not day 19, month 30
   end
 
-  test "French weekday and month tokens resolve" do
-    assert_equal Date.new(2027, 3, 26), resolve("vendredi 26 mars") # 26 Mar 2027 is a Friday
+  test "French month tokens resolve" do
+    assert_equal Date.new(2027, 3, 26), resolve("vendredi 26 mars")
   end
 
   test "evidence with no legible day and month resolves to nothing" do
@@ -50,27 +46,44 @@ class EventCapture::YearResolverTest < ActiveSupport::TestCase
     assert_nil resolve("30. Februar")
   end
 
-  # The weekday has to be the one printed with THIS date. A whole-string scan let a
-  # later token win and put the show a year out.
-  test "a second date later in the evidence does not supply the weekday" do
-    assert_equal Date.new(2026, 8, 8), resolve("Sa 08.08. + So 09.08.")
-  end
-
-  test "the weekday beside the date beats one earlier in the sentence" do
-    assert_equal Date.new(2026, 6, 12), resolve("So viel Musik, Fr 12. Juni") # a Friday
-  end
-
-  # "die"/"mit"/"so" are an article, a preposition and an adverb; "mar" is both
-  # mardi and an abbreviation of März. A checksum taken from prose is worse than
-  # none, because it silently selects a year.
-  test "ordinary prose does not supply a weekday checksum" do
-    assert_equal Date.new(2027, 5, 5), resolve("Die Türen öffnen um 20 Uhr, 5. Mai")
-    assert_equal Date.new(2027, 3, 3), resolve("3. Mar")
-  end
-
   # The first digit pair on a poster line is regularly a time; stopping there threw
   # the date away and skipped the year check entirely.
   test "a leading time does not hide the date behind it" do
     assert_equal Date.new(2026, 12, 5), resolve("Doors 19.30 Uhr, Konzert am 5.12.")
+  end
+
+  # --- the weekday, as a check rather than a selector ------------------------
+
+  test "a weekday agreeing with the resolved date raises nothing" do
+    refute conflict?("Mi 19. August", Date.new(2026, 8, 19)) # a Wednesday
+    refute conflict?("Sa 08.08. + So 09.08.", Date.new(2026, 8, 8))
+    refute conflict?("So viel Musik, Fr 12. Juni", Date.new(2026, 6, 12))
+  end
+
+  test "a weekday contradicting the resolved date is reported, not obeyed" do
+    assert_equal Date.new(2026, 8, 19), resolve("Di 19. August") # nearest still decides
+    assert conflict?("Di 19. August", Date.new(2026, 8, 19))     # ...and the Tuesday is surfaced
+  end
+
+  # "die"/"mit" are a German article and preposition, "so" an adverb, and "mar" is
+  # both mardi and an abbreviation of März. Under a flag-only weekday these cost a
+  # false alarm rather than a year, but the flag is the signal #112 will read, so
+  # keep it clean.
+  test "ordinary prose raises no weekday conflict" do
+    refute conflict?("Die Türen öffnen um 20 Uhr, 5. Mai", Date.new(2027, 5, 5))
+    refute conflict?("3. Mar", Date.new(2027, 3, 3))
+    refute conflict?("Mit dabei ... Sa 20.09.", Date.new(2025, 9, 20))
+  end
+
+  # The list covered German and French abbreviations and English full names only —
+  # "mon" was there by coincidence, because it is also short for Montag.
+  test "English abbreviations are recognised, like the German and French ones" do
+    { "Sun 23 August" => 0, "Tue 25 August" => 2, "Wed 26 August" => 3,
+      "Thu 27 August" => 4, "Fri 28 August" => 5, "Sat 29 August" => 6 }.each do |evidence, wday|
+      date = resolve(evidence)
+
+      assert_equal wday, date.wday, evidence
+      refute conflict?(evidence, date), evidence
+    end
   end
 end

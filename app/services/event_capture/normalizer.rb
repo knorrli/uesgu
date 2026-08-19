@@ -82,7 +82,11 @@ module EventCapture
       end
 
       date = value.match?(ISO_DATE) ? Date.parse(value) : nil
-      date.nil? ? reject(:date, claimed, :date_not_iso) : recomputed_year(date) || date
+      return reject(:date, claimed, :date_not_iso) if date.nil?
+
+      resolved = recomputed_year(date) || date
+      issues << :date_weekday_conflict if YearResolver.weekday_conflict?(event["date_evidence"], resolved)
+      resolved
     rescue Date::Error
       reject(:date, claimed, :date_not_iso)
     end

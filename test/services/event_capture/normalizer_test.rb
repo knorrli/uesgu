@@ -151,6 +151,20 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.raw
   end
 
+  # A weekday that contradicts the date is surfaced, never obeyed: as a selector it
+  # moved the answer a whole year on one bad token, and it changed no answer at all
+  # across every evidence string the bake-off produced.
+  test "a contradicting weekday is flagged and the date left alone" do
+    candidate = normalize("date" => "2026-08-19", "date_evidence" => "Di 19. August")
+
+    assert_equal Date.new(2026, 8, 19), candidate.date
+    assert_includes candidate.issues, :date_weekday_conflict
+  end
+
+  test "a weekday that agrees raises nothing" do
+    assert_empty normalize("date" => "2026-08-19", "date_evidence" => "Mi 19. August").issues
+  end
+
   test "a rejected datetime is kept in raw as the model wrote it" do
     candidate = normalize("date" => "2026-02-30T20:00:00", "date_evidence" => "30. Februar")
 

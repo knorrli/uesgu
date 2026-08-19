@@ -4,19 +4,24 @@ module EventCapture
   # and still resolved it to 2025 in two of them, where 19 Aug 2025 is a Tuesday.
   # It can read; it cannot reliably do calendar arithmetic.
   #
-  # Tractable in code because the candidate set is tiny. Someone photographing a
+  # Tractable in code because the candidate set is tiny: someone photographing a
   # poster is looking at something happening soon, so the year is last, this or
-  # next — and a printed weekday picks exactly one of those, since a given
-  # day/month lands on a given weekday only once every 5-6 years.
+  # next, and the nearest occurrence decides it. A printed weekday is a CHECK on
+  # that answer, never the thing that picks it — see `weekday_conflict?`.
   module YearResolver
+    # The three languages the prompt declares the input will be in, and standard
+    # abbreviations only. A token that is also an ordinary word ("die", "mit",
+    # "son") buys a check we rarely need and spends it on false alarms — and since
+    # the weekday now only raises a flag, a missing token costs one missed check
+    # while a spurious one pollutes the signal that flag exists to produce.
     WEEKDAY_TOKENS = {
-      0 => %w[so son sonntag sunday dimanche dim],
-      1 => %w[mo mon montag monday lundi lun],
-      2 => %w[di die dienstag tuesday mardi mar],
-      3 => %w[mi mit mittwoch wednesday mercredi mer],
-      4 => %w[do don donnerstag thursday jeudi jeu],
-      5 => %w[fr fre freitag friday vendredi ven],
-      6 => %w[sa sam samstag saturday samedi]
+      0 => %w[so sonntag sun sunday dim dimanche],
+      1 => %w[mo montag mon monday lun lundi],
+      2 => %w[di dienstag tue tues tuesday mar mardi],
+      3 => %w[mi mittwoch wed wednesday mer mercredi],
+      4 => %w[do donnerstag thu thurs thursday jeu jeudi],
+      5 => %w[fr freitag fri friday ven vendredi],
+      6 => %w[sa samstag sat saturday sam samedi]
     }.freeze
 
     MONTH_TOKENS = {
@@ -41,24 +46,39 @@ module EventCapture
     # nil when the evidence carries no legible day+month — the caller keeps the
     # model's own value in that case rather than inventing one.
     def call(evidence, today:)
-      day, month, year, at = date_parts(evidence)
+      day, month, year, = date_parts(evidence)
       return nil unless day && month
       return date_or_nil(year, month, day) if year
 
-      wday = weekday_before(evidence, at)
-      candidates = [today.year - 1, today.year, today.year + 1].filter_map { |y| date_or_nil(y, month, day) }
-      matching = wday ? candidates.select { |d| d.wday == wday } : candidates
-      matching = candidates if matching.empty?
+      [today.year - 1, today.year, today.year + 1]
+        .filter_map { |y| date_or_nil(y, month, day) }
+        .min_by { |d| d < today ? (today - d).to_i * PAST_PENALTY : (d - today).to_i }
+    end
 
-      matching.min_by { |d| d < today ? (today - d).to_i * PAST_PENALTY : (d - today).to_i }
+    # Does a weekday printed beside the date contradict the date we resolved?
+    #
+    # A flag, deliberately not a selector. As a hard filter the weekday overrode the
+    # nearest-occurrence rule outright, so one bad token moved the answer a whole
+    # year in silence — and it caused three of the six defects found in review. It
+    # also earns less than it looks: across every date_evidence string the bake-off
+    # produced, filtering by weekday changed the answer 0 times out of 10, including
+    # the "Mi 19. August" case the design doc credits it for. So the distance rule
+    # decides, a disagreement is surfaced for the human already on the verify screen,
+    # and how often that fires — and who turns out to be right — becomes something
+    # measurable rather than something argued about.
+    def weekday_conflict?(evidence, date)
+      return false if date.nil?
+
+      day, month, _year, at = date_parts(evidence)
+      return false unless day && month
+
+      wday = weekday_before(evidence, at)
+      !wday.nil? && wday != date.wday
     end
 
     # The weekday PRINTED WITH THIS DATE, never one from elsewhere in the line.
-    # Scanning the whole string let a later token win — "Sa 08.08. + So 09.08."
-    # read as Sunday and landed a year out — and let ordinary prose supply one,
-    # since "die" and "mit" are a German article and preposition, "so" an adverb,
-    # and "mar" is both mardi and an abbreviation of März. A checksum taken from
-    # the wrong word is worse than no checksum: it silently selects a wrong year.
+    # Scanning the whole string let a later token win ("Sa 08.08. + So 09.08." read
+    # as Sunday) and let ordinary prose supply one.
     def weekday_before(text, index)
       weekday_in(text.to_s[[index - WEEKDAY_WINDOW, 0].max...index])
     end

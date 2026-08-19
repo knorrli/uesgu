@@ -37,6 +37,27 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_select "body", text: /#{invite.formatted_code}/
   end
 
+  test "an admin toggles the contributor capability on and off" do
+    member = user(username: "capturer")
+    sign_in_as user(admin: true)
+
+    patch toggle_contributor_admin_user_path(member)
+    assert_redirected_to admin_user_path(member)
+    assert_predicate member.reload, :contributor?
+
+    patch toggle_contributor_admin_user_path(member)
+    refute_predicate member.reload, :contributor?
+  end
+
+  test "a non-admin cannot grant themselves the contributor capability" do
+    member = user(admin: false)
+    sign_in_as member
+
+    patch toggle_contributor_admin_user_path(member)
+    assert_response :forbidden
+    refute_predicate member.reload, :contributor?
+  end
+
   test "an admin can delete a spam account" do
     spam = user(username: "spammer")
     sign_in_as user(admin: true)

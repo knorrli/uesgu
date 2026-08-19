@@ -31,6 +31,12 @@ class UserTest < ActiveSupport::TestCase
     refute User.new(username: "x" * 31, password: "secret123").valid?
   end
 
+  test "contributor is a capability that defaults off and is independent of admin" do
+    refute_predicate user, :contributor?
+    refute_predicate user(admin: true), :contributor?
+    assert_predicate user(contributor: true), :contributor?
+  end
+
   test "two users may both have no email" do
     user(email_address: nil)
     assert user(email_address: nil).valid?

@@ -4,6 +4,7 @@
     <h1>
       <%= @user.username %>
       <% if @user.admin? %><span class="chip"><%= t('admin.users.admin_badge') %></span><% end %>
+      <% if @user.contributor? %><span class="chip"><%= t('admin.users.contributor_badge') %></span><% end %>
     </h1>
   <% end %>
 
@@ -46,6 +47,13 @@
     <% else %>
       <p class="muted">—</p>
     <% end %>
+  </section>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= t('.contributor_heading') %></h2>
+    <p class="muted"><%= t('.contributor_hint') %></p>
+    <%= button_to t(@user.contributor? ? '.contributor_revoke' : '.contributor_grant'),
+          toggle_contributor_admin_user_path(@user), method: :patch, class: 'button-small' %>
   </section>
 
   <% unless @user == current_user %>

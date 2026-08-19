@@ -1,10 +1,11 @@
 # User event capture — design decisions and model evaluation
 
-> Status: **decided; the schema prerequisites are built** (2026-08-19) —
-> decisions 4–6 shipped as the `places` table plus the location taxonomy reading
-> it, and decision 10 as the nullable `events.url`. Everything else (the capture
-> funnel, the three adapters, the verify screen, VenueLead nomination) is still
-> design only. Supersedes the framing in
+> Status: **decided; the schema prerequisites and the contributor flag are built**
+> (2026-08-19) — decisions 4–6 shipped as the `places` table plus the location
+> taxonomy reading it, decision 10 as the nullable `events.url`, and the
+> `users.contributor` half of decision 7. Everything else (the capture funnel, the
+> three adapters, the verify screen, VenueLead nomination) is still design only.
+> Supersedes the framing in
 > [`user-event-capture.md`](user-event-capture.md), which stays as the original
 > idea note. This document records what we settled on and the evidence behind the
 > provider choice, so neither gets re-litigated.
@@ -172,6 +173,9 @@ text** — feeding a shared *extract → verify → create* path.
    `users` already carries capability-shaped booleans like `event_reminders`. A
    flag sits beside `admin`; a role hierarchy would be machinery for a site whose
    users you personally invited.
+
+   **Built** — the column, `User#contributor?`, and a toggle on
+   `/admin/users/:id`. The report/quarantine half is still design only.
 
 8. **Captured events live outside the scraper's re-derivation domain.**
    `Scrapers::Agent#build_event` re-derives every field from source nightly and

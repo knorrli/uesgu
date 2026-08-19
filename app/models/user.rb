@@ -29,10 +29,6 @@ class User < ApplicationRecord
   validates :reminder_time, numericality: { in: 0..1439 }
   validates :reminder_lead_days, numericality: { in: 0..7 }
 
-  def admin?
-    admin
-  end
-
   # Mint (or rotate) the bearer token behind the subscribable ICS feed. Rotating
   # silently invalidates any old subscription URL — the way to revoke one.
   def regenerate_calendar_feed_token!

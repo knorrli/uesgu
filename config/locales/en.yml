@@ -424,6 +424,9 @@ en:
           distinct_genres: distinct genres
     users:
       admin_badge: Admin
+      contributor_badge: Capture
+      contributor_granted: "%{username} can now capture events."
+      contributor_revoked: "%{username} can no longer capture events."
       cant_delete_self: You can't delete your own account here.
       deleted: "Account %{username} was deleted."
       index:
@@ -437,6 +440,10 @@ en:
         sessions: Active sessions
         invited_by: Invited by
         saved_filters: Saved filters
+        contributor_heading: Capture events
+        contributor_hint: Lets this account capture events itself — from a link, a poster or a screenshot.
+        contributor_grant: Allow capturing
+        contributor_revoke: Revoke capturing
         delete_heading: Delete account
         delete_hint: This permanently removes this account and its data.
         delete: Delete account

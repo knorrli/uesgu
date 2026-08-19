@@ -3,7 +3,7 @@ require "db_test_helper"
 # Match-at-entry: the near-name candidates the verify screen offers so a
 # contributor taps an existing place instead of minting a fourth spelling of it.
 # Synthetic place names throughout; the registry side is read live, never
-# hardcoded. See docs/user-event-capture-design.md "Matching at entry".
+# hardcoded.
 class PlaceSuggesterTest < ActiveSupport::TestCase
   # The case that chose trigrams over edit distance: the extracted name is a
   # FRAGMENT of the stored one, which Levenshtein scores as wildly distant.
@@ -96,27 +96,13 @@ class PlaceSuggesterTest < ActiveSupport::TestCase
     assert_equal 2, PlaceSuggester.for_name("Zorpsaal", limit: 2).size
   end
 
-  # Locality has the identical splitting failure mode and, unlike the place name,
-  # no normalization at all today — Location.hierarchy groups on the literal value.
-  test "locality suggestions span captured places and the registry" do
-    place(locality: "Zorpwil")
+  # Every value is bound in one pass. Building the VALUES rows through their own
+  # sanitize call and then re-sanitizing the statement made a '?' in a stored name
+  # look like a bind placeholder, raising PreparedStatementInvalid.
+  test "a question mark in a stored name does not break the query" do
+    place(name: "Warum? Bar")
 
-    assert_equal ["Zorpwil"], PlaceSuggester.for_locality("zorpwil")
-
-    venue = Venue.in_taxonomy.find { |v| v.locality.present? }
-    skip "no placed venue with a locality" if venue.nil?
-    assert_includes PlaceSuggester.for_locality(venue.locality), venue.locality
-  end
-
-  # A locality both sources know would otherwise fill the list with one name.
-  test "a locality reached from both sources is suggested once" do
-    venue = Venue.in_taxonomy.find { |v| v.locality.present? }
-    skip "no placed venue with a locality" if venue.nil?
-
-    place(name: "Zorpsaal", locality: venue.locality, canton: venue.canton)
-    suggestions = PlaceSuggester.for_locality(venue.locality)
-
-    assert_equal suggestions.uniq, suggestions
+    assert_includes names_for("Warum Bar"), "Warum? Bar"
   end
 
   private

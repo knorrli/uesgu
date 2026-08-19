@@ -123,6 +123,14 @@
                   <span class="ph ph-gear" aria-hidden="true"></span>
                   <span><%= t('nav.settings') %></span>
                 <% end %>
+                <%# Capturing events is granted per account, so the door only
+                    exists for accounts that have it. %>
+                <% if current_user.contributor? %>
+                  <%= link_to capture_path, class: 'nav-menu__item' do %>
+                    <span class="ph ph-camera" aria-hidden="true"></span>
+                    <span><%= t('nav.capture') %></span>
+                  <% end %>
+                <% end %>
                 <% if current_user.admin? %>
                   <%= link_to admin_path, class: 'nav-menu__item' do %>
                     <span class="ph ph-wrench" aria-hidden="true"></span>

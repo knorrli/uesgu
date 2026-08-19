@@ -241,6 +241,22 @@ adapter" below for why, so it does not get re-proposed.
     precedent — an image capture already retains zero provenance, so a column that
     preserves it for the easier case only is asymmetric.
 
+    **`places.url` is auto-filled from the capture's link, and knowingly imperfect.**
+    It is skipped for `OFFSITE_SOURCES` (Instagram, Facebook, Bewegungsmelder,
+    PETZI), but that list exists to badge event cards, so a Ticketcorner or
+    Starticket deep link passes it and becomes a place's "own" URL — which fails
+    the column's purpose (making a `VenueLead` actionable enough to write a scraper
+    against) exactly as an Instagram link would. It is also permanent: the first
+    capture at a place fixes it, since later ones reuse the row.
+
+    Left as-is deliberately (2026-08-19). Contributors are admin-enabled and can be
+    trusted to paste something sensible, and a wrong URL costs one glance during
+    lead triage. **The trigger for revisiting is evidence of misuse**, not a better
+    heuristic — at which point the answer is to drop the auto-fill entirely rather
+    than grow the reject list, since any host allowlist is permanently incomplete.
+    Rejected now: extending the reject list with ticketing hosts (endless), and
+    storing only the origin (makes a wrong value visible but no less wrong).
+
     **A social or ticketing paste does populate `url`** — reluctantly. We would
     rather not send people to Instagram, but for the ad-hoc events this feature
     exists to catch it is regularly the only page that exists, and a link that
@@ -421,23 +437,48 @@ fingerprint already uses — `unaccent` is not IMMUTABLE and STORED requires it 
 `AddFingerprintToGenres`). Both columns are generated, so neither can drift from
 the other or from the name they derive from.
 
-#### Locality gets the same treatment, and still no table
+#### Locality does NOT get the same treatment — the measure is wrong for it
 
-Locality has the identical splitting failure mode and, unlike the place name, no
-normalization at all today: `places.locality` is a plain string and
-`Location.hierarchy` groups on the literal value, so "Zorpwil" and "zorpwil" are two
-tree nodes. The registry stays clean only because its rows are PR-reviewed; the
-captured half has no such gate.
+The earlier version of this section said locality got the identical trigram
+scoring. **Reversed**, on measurement. Locality duplicates fall into three classes
+and trigram only reaches the smallest:
 
-It gets `locality_folded` and the same scoring, and it does **not** get a table.
-Decision 6 made locality free text deliberately — closed-where-finite,
-open-where-not — and a `localities` registry would reopen that for no gain.
+| class | example | fingerprint | trigram |
+| --- | --- | --- | --- |
+| case / accents / punctuation | `bern`, `Zurich`, `St.Gallen` | exact | 1.0 |
+| typo, word order | `Berrn`, `Sankt Gallen` | no | 0.57–0.70 |
+| other-language, transposition | `Freiburg`→Fribourg, `Genf`→Genève, `Luzren`→Luzern | no | **0.21–0.33** |
 
-The candidate set spans two sources: captured localities in `places`, and the
-registry's 16 distinct values from `Venue.in_taxonomy`. They merge into **one query**,
-with the registry side passed as a `VALUES` list built in Ruby, so there is a single
-scoring path rather than one SQL implementation and one in-memory implementation
-that quietly disagree at the threshold.
+Two things that table settles. **Trigrams are weak on names this short**: `Luzren`
+is a two-letter transposition of `Luzern` and scores 0.27, because transposing
+inside a six-letter word destroys most of its trigrams. The measure that reaches
+`Quartierfest` inside `Marzili Quartierfest` is close to useless on Swiss town
+names. And **no string measure will ever reach the third class** — `Genf` and
+`Genève` share almost nothing. In a country whose registry already carries both
+`Biel` and `Fribourg`, that class is guaranteed, and it needs data, not arithmetic.
+
+So the field is served by two things instead:
+
+- **An exact fingerprint match at write time** (`EventCapture::Creator`), adopting
+  the stored spelling, registry first. This is a normalisation and not the silent
+  rewrite decision 5 forbids: `bern` and `Bern` *are* the same name, on the same
+  basis `Place.matching` already resolves a place name without asking. It uses the
+  fingerprint rather than the folded form, because folded keeps word boundaries by
+  design and would read `Zorp-wil` and `Zorpwil` as different.
+- **A datalist of every known locality**, which is the affordance for the common
+  path — typing a correct prefix.
+
+The remaining class is a curated alias list, tracked separately. `locality_folded`
+was dropped with the scoring that needed it; `name_folded` stays, since the place
+name is what the column pair was really bought for.
+
+Where this bites is narrower than it looks: a matched place contributes its own
+stored locality, so a fresh spelling only enters when a place is minted for the
+first time or when the capture has no venue at all (a show in a park).
+
+It still does **not** get a table. Decision 6 made locality free text deliberately —
+closed-where-finite, open-where-not — and a `localities` registry would reopen that
+for no gain.
 
 #### Rules that hold whatever the threshold turns out to be
 
@@ -698,11 +739,37 @@ dependency on a 512MB starter instance whose memory we already trim arenas to
 protect.
 
 **So the resize moves to the client**, in the verify screen (#106): a canvas
-`drawImage` to a capped long edge before upload. That is the better place for it
-anyway — the browser already holds the decoded pixels, and it makes the upload
-smaller too, which the server-side version never could. The one thing it is not is
-a guarantee, since the adapter is reachable from the rake task and from anything
-built later.
+`drawImage` to a capped long edge before upload. **Built.** That is the better
+place for it anyway — the browser already holds the decoded pixels, and it makes
+the upload smaller too, which the server-side version never could. The one thing it
+is not is a guarantee, since the adapter is reachable from the rake task and from
+anything built later.
+
+Two things the build measured that the plan did not anticipate:
+
+**The canvas encodes to BOTH formats and the smaller one is sent** — the obvious
+rule, "keep a PNG as a PNG so the bake-off's screenshot condition is preserved",
+is wrong. Canvas PNG output is unoptimised: a bake-off poster already at 1568px
+came back as **1.81MB against a 1.37MB source** — 32% *larger* than the file it
+downscaled — while the same canvas gave **221KB as JPEG**. Flat-colour screenshots,
+where PNG genuinely wins, still get PNG; the rule decides per image instead of
+guessing from the file extension.
+
+The reason is bytes, **not latency** — a first reading of this blamed an 80-second
+round trip on the payload and was wrong. Measured directly against the provider,
+three calls each: 1.37MB PNG at 2.5 / 4.0 / 2.5s against 316KB JPEG at 4.2 /
+provider-error / 2.1s. Size is not what moves the clock. What moves it is the
+provider itself, which is **highly variable and occasionally fails** — one refusal
+in six calls, and single runs of 52s and 80s against a 2.1s median. That variance
+is invisible today and is one of the better arguments for #112; it is also why the
+screen fills progressively per input rather than waiting on a batch. The payload
+rule stands on its own terms: eight times the bytes off a phone connection, against
+the 8MB cap, held whole in one Puma worker's memory.
+
+**Re-encoding through the canvas also strips EXIF**, so a poster photo's GPS never
+leaves the device. That falls out of the resize rather than being designed, but it
+is the same instinct as decision 9 and worth not losing: the server could not have
+done it, because by the time the bytes arrive the metadata has already travelled.
 
 What the adapter does instead is **cap and refuse**: 8MB, checked before anything
 is encoded. Base64 inflates by ~4/3 and one Puma worker with three threads holds

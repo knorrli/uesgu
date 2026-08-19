@@ -1,4 +1,11 @@
-# Match-at-entry: the candidates a contributor taps instead of minting a new place.
+# Match-at-entry for a PLACE NAME: the candidates a contributor taps instead of
+# minting a new one.
+#
+# Deliberately not used for locality. Trigrams are weak on names that short — a
+# plain transposition, Luzren -> Luzern, scores 0.27, and no measure reaches
+# Freiburg -> Fribourg — so that field is served by an exact fold-match in
+# EventCapture::Creator plus a datalist, and its remaining variants need a curated
+# alias list rather than a similarity score.
 # The stake is not tidiness — nomination into /admin/venue_leads fires at
 # events_count >= 2 on a Place, so three captures split across "Quartierfest" /
 # "Quarterfest" / "Marzili Quartierfest" never reach the threshold and a real venue
@@ -9,8 +16,7 @@
 # the most valuable outcome is "this is actually Dachstock": tag the event, create
 # no Place at all. The registry side has no table, so it is passed in as a VALUES
 # list and scored by the same SQL, rather than growing a second implementation that
-# quietly disagrees at the threshold. See docs/user-event-capture-design.md
-# "Matching at entry".
+# quietly disagrees at the threshold.
 class PlaceSuggester
   Suggestion = Struct.new(:name, :locality, :canton, :source, :score, keyword_init: true) do
     # A registry hit means tag the event and write no Place row.
@@ -34,14 +40,6 @@ class PlaceSuggester
       score(name, name_candidates, limit: limit)
     end
 
-    # Locality has the identical splitting failure mode and no normalization at all
-    # today — Location.hierarchy groups on the literal string, so "Zorpwil" and
-    # "zorpwil" are two tree nodes. Deliberately NOT backed by a table: decision 6
-    # made locality free text (closed-where-finite, open-where-not).
-    def for_locality(name, limit: LIMIT)
-      score(name, locality_candidates, limit: limit).map(&:name)
-    end
-
     private
 
     # The registry is keyed by domain, so a capture carrying zar.ch resolves to the
@@ -56,15 +54,21 @@ class PlaceSuggester
       nil
     end
 
-    def score(name, candidates_sql, limit:)
+    def score(name, candidates, limit:)
       folded = Fingerprint.folded(name)
       return [] if folded.blank?
 
-      rows = ActiveRecord::Base.connection.select_all(sanitize([<<~SQL, THRESHOLD]))
+      # ONE sanitize pass over the whole statement, with every value bound rather
+      # than inlined. The earlier shape built the VALUES rows through their own
+      # sanitize call and then passed the result through a second one, so a '?' in a
+      # registry venue name arrived at the outer pass looking like a bind placeholder
+      # and raised PreparedStatementInvalid.
+      binds = [folded, folded, *candidates.binds, folded, folded, THRESHOLD]
+      rows = ActiveRecord::Base.connection.select_all(sanitize([<<~SQL, *binds]))
         SELECT candidates.name, candidates.locality, candidates.canton, candidates.source,
-               #{measure(folded)} AS score
-        FROM (#{candidates_sql}) AS candidates(name, locality, canton, folded, source)
-        WHERE #{measure(folded)} >= ?
+               #{MEASURE} AS score
+        FROM (#{candidates.sql}) AS candidates(name, locality, canton, folded, source)
+        WHERE #{MEASURE} >= ?
         ORDER BY score DESC, candidates.name ASC
       SQL
 
@@ -85,39 +89,31 @@ class PlaceSuggester
     # Symmetric because a split name shows up in both orders depending on which
     # spelling was captured first: strict_word_similarity(a, b) reaches 1.0 only
     # when a sits inside b, so scoring one direction would catch half the cases.
-    def measure(folded)
-      sanitize([
-        "GREATEST(strict_word_similarity(?, candidates.folded), " \
-        "strict_word_similarity(candidates.folded, ?))",
-        folded, folded
-      ])
-    end
+    MEASURE = "GREATEST(strict_word_similarity(?, candidates.folded), " \
+              "strict_word_similarity(candidates.folded, ?))".freeze
+
+    Candidates = Data.define(:sql, :binds)
 
     # Aliases are excluded rather than resolved: their canonical is already in the
     # set and scores at least as well, so offering the merged-away spelling would
     # only invite re-minting it.
     def name_candidates
-      places = "SELECT name, locality, canton, name_folded, 'place' FROM places WHERE canonical_id IS NULL"
-      registry = Venue.in_taxonomy.map do |venue|
-        sanitize(["(?, ?, ?, ?, 'registry')", venue.name, venue.locality, venue.canton,
-                  Fingerprint.folded(venue.name)])
-      end
-      union(places, registry)
+      registry(Venue.in_taxonomy) { |venue| [venue.name, venue.locality, venue.canton, venue.name] }
+        .then { |rows| union("SELECT name, locality, canton, name_folded, 'place' FROM places WHERE canonical_id IS NULL", rows) }
     end
 
-    def locality_candidates
-      places = "SELECT DISTINCT locality, locality, canton, locality_folded, 'place' FROM places"
-      registry = Venue.in_taxonomy.uniq(&:locality).map do |venue|
-        sanitize(["(?, ?, ?, ?, 'registry')", venue.locality, venue.locality, venue.canton,
-                  Fingerprint.folded(venue.locality)])
+    def registry(venues)
+      venues.map do |venue|
+        name, locality, canton, folded_from = yield(venue)
+        [name, locality, canton, Fingerprint.folded(folded_from)]
       end
-      union(places, registry)
     end
 
-    def union(places_sql, registry_rows)
-      return places_sql if registry_rows.empty?
+    def union(places_sql, rows)
+      return Candidates.new(sql: places_sql, binds: []) if rows.empty?
 
-      "#{places_sql} UNION ALL VALUES #{registry_rows.join(', ')}"
+      values = Array.new(rows.size, "(?, ?, ?, ?, 'registry')").join(", ")
+      Candidates.new(sql: "#{places_sql} UNION ALL VALUES #{values}", binds: rows.flatten)
     end
 
     def suggestion(name, locality, canton, source, score)

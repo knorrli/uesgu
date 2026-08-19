@@ -59,6 +59,15 @@ Rails.application.routes.draw do
   get "calendar/:token", to: "calendar_feeds#show", as: :public_calendar_feed,
       constraints: { format: "ics" }, format: true
 
+  # The capture funnel: a contributor turns a poster photo or pasted text into
+  # events we don't scrape. `show` is the one screen (pick inputs, then verify what
+  # came back); `extract` runs ONE input and streams its candidates back, fired
+  # once per input by the client — 8 x 2.3s does not fit in one request and there
+  # is no queue to reach for. `create` publishes the candidates a human accepted.
+  resource :capture, only: %i[show create] do
+    post :extract
+  end
+
   # Saved filters (a saved landing-page filter, with notification delivery
   # optional — see SavedFilter). new/create save the current events filter;
   # edit/update tune it; fire runs it on demand ("Fire now" — test without waiting

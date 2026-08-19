@@ -29,6 +29,14 @@ module Authentication
       head :forbidden unless current_user&.admin?
     end
 
+    # Capturing events is granted per account by an admin, so the threat model is
+    # "a friend you approved", not the open internet. Deliberately not implied by
+    # admin: keeping the two separate means the capability is always something
+    # somebody granted on purpose.
+    def require_contributor
+      head :forbidden unless current_user&.contributor?
+    end
+
     def resume_session
       Current.session ||= find_session_by_cookie
     end

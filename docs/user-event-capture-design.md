@@ -62,12 +62,11 @@ text** — feeding a shared *extract → verify → create* path.
      in the filter chips, the location combobox suffix, and the admin browser. It
      cannot yet reach the WHERE *tree* at all — `Location.hierarchy` is built
      purely from `Venue.in_taxonomy` — which is what decision 4 changes.
-   - The same registry-derivation bug bites cantons, independently of capture:
-     `Location.canton_codes` is the set the *registry* covers, so a captured event
-     in Valais has its "VS" tag typed as a city. The closed list of 26 already
-     exists as `cantons:` in all three locale files; `canton_codes` should read
-     that instead. Small, standalone, correct with or without this feature
-     (issue #94).
+   - The same registry-derivation bug bit cantons, independently of capture:
+     `Location.canton_codes` was the set the *registry* covers, so a tag for an
+     uncovered canton ("VS") typed as a city. **Fixed in #95** — `CANTON_CODES` is
+     now the closed list of 26, locked to the `cantons:` locale map by a test. Only
+     the venue half of `type_for` still needs the capture work.
    - A place that keeps recurring becomes a **`VenueLead`** — the existing
      discovery inbox at `/admin/venue_leads`, which already ranks by
      `event_count`. Capture three events at ZAR and it rises in the inbox; that is
@@ -381,11 +380,13 @@ Bad Bonn precedent). A venue whose `robots.txt` turns out to be a site-builder
 default is a registry decision made once in a PR, not a checkbox on a capture form
 that lets any contributor opt out of a call we recorded deliberately.
 
-This decision depends on the fail-closed fix (issue #96). webrobots fabricates a
-synthetic `Disallow: /` when the robots.txt fetch itself fails, so without that fix
-the fallback message above would regularly tell a contributor "this site says no"
-about a site that never said anything — Schüür 500s on `/robots.txt` while serving
-its programme at 200.
+This decision depended on the fail-closed fix, **shipped in #97**: webrobots
+fabricates a synthetic `Disallow: /` when the robots.txt fetch itself fails, so
+without it the fallback message above would regularly have told a contributor "this
+site says no" about a site that never said anything (Schüür 500s on `/robots.txt`
+while serving its programme at 200). An unreachable robots.txt is now treated as
+unknown and recorded on the `ScrapeResult`, so the adapter can trust that a refusal
+means a real `Disallow`.
 
 #### SSRF: validate before fetching, and on every hop
 

@@ -14,25 +14,30 @@
     <p class="muted"><%= t('capture.intro') %></p>
   <% end %>
 
-  <div class="capture-picker account-form flex flex-col gap-medium" data-capture-target="input">
-    <%= render "shared/drop_zone",
-          id: "capture-files", label: t('capture.staging.drop_label'), hint: t('capture.images_hint'),
-          input_attrs: { accept: "image/*", multiple: true,
-                         data: { capture_target: "files", action: "change->capture#stageFiles" } },
-          zone_attrs: { data: { capture_target: "zone",
-                                action: "dragover->capture#dragOver dragleave->capture#dragLeave drop->capture#dropFiles" } },
-          items_attrs: { data: { capture_target: "items" } } %>
+  <div class="flex flex-col gap-medium" data-capture-target="input">
+    <div class="capture-picker account-form flex flex-col gap-medium">
+      <%= render "shared/drop_zone",
+            id: "capture-files", label: t('capture.staging.drop_label'), hint: t('capture.images_hint'),
+            input_attrs: { accept: "image/*", multiple: true,
+                           data: { capture_target: "files", action: "change->capture#stageFiles" } },
+            zone_attrs: { data: { capture_target: "zone",
+                                  action: "dragover->capture#dragOver dragleave->capture#dragLeave drop->capture#dropFiles" } },
+            items_attrs: { data: { capture_target: "items" } } %>
 
-    <label class="flex flex-col gap-small">
-      <span class="field-label"><%= t('capture.text_label') %></span>
-      <p class="muted"><%= t('capture.text_hint') %></p>
-      <textarea rows="4" data-capture-target="text"></textarea>
-    </label>
-    <div class="flex gap-medium wrap">
-      <button type="button" class="button-small" data-action="capture#stageText"><%= t('capture.staging.add_text') %></button>
-      <button type="button" class="button-small primary" data-capture-target="commit"
-              data-action="capture#commit" disabled><%= t('capture.staging.commit') %></button>
+      <label class="flex flex-col gap-small">
+        <span class="field-label"><%= t('capture.text_label') %></span>
+        <p class="muted"><%= t('capture.text_hint') %></p>
+        <textarea rows="4" data-capture-target="text"></textarea>
+      </label>
+      <div>
+        <button type="button" class="button-small" data-action="capture#stageText"><%= t('capture.staging.add_text') %></button>
+      </div>
     </div>
+
+    <%# Below the picker and full width, so it reads as the one commit for everything
+        above it rather than as a second button belonging to the text field. %>
+    <button type="button" class="button primary capture-commit" data-capture-target="commit"
+            data-action="capture#commit" disabled><%= t('capture.staging.commit') %></button>
   </div>
 
   <%# Every locality the app already knows, so the common answer is one keystroke

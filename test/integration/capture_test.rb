@@ -270,6 +270,41 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?][value=?]", "candidate_index", "0"
   end
 
+  # The taxonomy is offered so an existing genre is picked rather than respelt, but a
+  # genre we ignore, hide or block is not something to put in front of a contributor.
+  test "genre suggestions cover what is in use and leave the dispositioned out" do
+    wanted = genre(name: "zorpwave", events_count: 3)
+    genre(name: "zorpwave-blocked", events_count: 3).block!
+    sign_in_as user(contributor: true)
+
+    get genre_options_capture_path(q: "zorpwave"), headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_match wanted.name, response.body
+    refute_match "zorpwave-blocked", response.body
+  end
+
+  test "a chip is rendered for a genre the taxonomy has never seen" do
+    sign_in_as user(contributor: true)
+
+    post genre_chips_capture_path, params: { combobox_values: "dubtronica, zorpcore" },
+                                   headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_match "dubtronica", response.body
+    assert_match "zorpcore", response.body
+  end
+
+  test "the genre endpoints are closed to accounts without the capability" do
+    sign_in_as user
+
+    get genre_options_capture_path(q: "zorp")
+    assert_response :forbidden
+
+    post genre_chips_capture_path, params: { combobox_values: "zorp" }
+    assert_response :forbidden
+  end
+
   test "publishing is closed to accounts without the capability" do
     sign_in_as user
 

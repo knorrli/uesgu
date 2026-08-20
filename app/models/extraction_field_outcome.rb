@@ -56,22 +56,32 @@ class ExtractionFieldOutcome < ApplicationRecord
   def self.row_attributes(field, proposed, accepted, normalized)
     was = normalize(field, proposed[field])
     now = accepted && normalize(field, accepted[field])
-    outcome = outcome_for(was, now, dropped: accepted.nil?)
+    outcome = outcome_for(field, was, now, dropped: accepted.nil?)
     outcome = :normalized if outcome == :corrected && normalized.include?(field)
 
     { field: field, outcome: outcome, proposed: stored(field, was), accepted: stored(field, now) }
   end
   private_class_method :row_attributes
 
-  def self.outcome_for(was, now, dropped:)
+  def self.outcome_for(field, was, now, dropped:)
     return :discarded if dropped
     return :absent if was.nil? && now.nil?
     return :supplied if was.nil?
     return :removed if now.nil?
 
-    was == now ? :unchanged : :corrected
+    same?(field, was, now) ? :unchanged : :corrected
   end
   private_class_method :outcome_for
+
+  # Genres are a set, not a sequence — the card renders them as chips a contributor
+  # removes and re-adds, so a reordering is not a correction. Compared apart from
+  # `normalize` so the stored halves stay in the order each side actually had them.
+  def self.same?(field, was, now)
+    return was == now unless field == "genres"
+
+    was.split(", ").sort == now.split(", ").sort
+  end
+  private_class_method :same?
 
   # Genres arrive as one comma-separated field, so a re-spaced list must not read as a
   # correction.

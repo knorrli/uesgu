@@ -73,6 +73,50 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpwil", locality.accepted
   end
 
+  test "the genres the model read arrive as chips and publish as they are" do
+    CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore])])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".hw-combobox__chip", text: "zorpcore"
+    assert_selector ".hw-combobox__chip", text: "flarncore"
+
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_equal %w[Flarncore Zorpcore], Event.sole.genre_list.sort
+  end
+
+  # The field used to be a comma-joined text input, so a poster naming its genres with
+  # any other separator became one genre. A chip per genre is what makes that visible.
+  test "a genre the taxonomy has never seen can still be typed in" do
+    genre(name: "zorpwave", events_count: 3)
+    CannedExtractionClient.install(events: [poster_event(genres: [])])
+    visit capture_path
+    pick "poster.png"
+
+    add_genre "dubtronica"
+
+    assert_selector ".hw-combobox__chip", text: "dubtronica"
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_equal %w[Dubtronica], Event.sole.genre_list
+  end
+
+  # The suggestions are the point of the combobox: a genre we already carry should be
+  # picked rather than respelt, which is what keeps the taxonomy from growing a fourth
+  # spelling of the same thing.
+  test "a genre already in the taxonomy is offered while typing" do
+    genre(name: "zorpwave", events_count: 3)
+    CannedExtractionClient.install(events: [poster_event(genres: [])])
+    visit capture_path
+    pick "poster.png"
+
+    find(".capture-card [role=combobox]").send_keys("zorpw")
+    find("[role=option]", text: /zorpwave/).click
+
+    assert_selector ".hw-combobox__chip", text: /zorpwave/
+  end
+
   # Tapping a suggestion swaps the poster's spelling for the registry's. Counted as a
   # correction it would inflate the one number a prompt edit is judged on.
   test "taking a place suggestion is recorded as a normalisation, not a correction" do
@@ -407,6 +451,16 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def reject = find(".capture-card .action-bar button").click
 
   def field_value(field) = find(".capture-card [name='#{field}']").value
+
+  # The genre combobox fetches its options as you type, and a name nothing matches
+  # empties the list — waiting for that is what makes the Enter land after the
+  # response rather than before it, without a sleep.
+  def add_genre(name)
+    input = find(".capture-card [role=combobox]")
+    input.send_keys(name)
+    assert_no_selector "[role=option]"
+    input.send_keys(:enter)
+  end
 
   def copy(key, **args) = I18n.t("capture.#{key}", locale: :de, **args)
 

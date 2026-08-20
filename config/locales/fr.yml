@@ -162,6 +162,8 @@ fr:
       pending: lecture …
       untitled: Texte
       nothing_found: Rien ici ne ressemble à un événement.
+      source_alt: L'image lue
+      nth: "%{index} sur %{count}"
     candidate:
       accept: Garder
       title: Titre

@@ -162,6 +162,8 @@ de:
       pending: wird gelesen …
       untitled: Text
       nothing_found: Nichts gefunden, was nach einem Event aussieht.
+      source_alt: Das ausgelesene Bild
+      nth: "%{index} von %{count}"
     candidate:
       accept: Übernehmen
       title: Titel

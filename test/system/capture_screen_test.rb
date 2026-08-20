@@ -74,6 +74,34 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".form-actions input[type=submit]"
   end
 
+  test "a picked poster is rendered beside the fields it produced" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-candidate"
+    assert_match(/\Ablob:/, find(".capture-row__source img")[:src])
+    assert_decoded ".capture-row__source img"
+  end
+
+  test "a pasted text keeps its excerpt beside the candidate" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    paste "Zorpcore Nacht, Zorpsaal, 20 Uhr"
+
+    assert_selector ".capture-row__excerpt", text: "Zorpcore Nacht, Zorpsaal, 20 Uhr"
+  end
+
+  test "two candidates off one poster are numbered rather than reading as duplicates" do
+    CannedExtractionClient.install(events: [poster_event, poster_event(title: "Zorpcore Matinee")])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-candidate", count: 2
+    assert_selector ".capture-row__nth", text: copy("row.nth", index: 2, count: 2)
+    assert_selector ".capture-row__source img", count: 1
+  end
+
   test "unchecking keep lifts required so a dropped row cannot block the batch" do
     CannedExtractionClient.install(events: [poster_event(locality: nil, canton: nil)])
     visit capture_path
@@ -114,5 +142,15 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def accept_checkbox = find(".capture-candidate input[name$='[accept]']")
 
-  def copy(key) = I18n.t("capture.#{key}", locale: :de)
+  def copy(key, **args) = I18n.t("capture.#{key}", locale: :de, **args)
+
+  # A src attribute only proves the slot was filled. naturalWidth is the one signal
+  # Chrome gives that the blob: URL was actually allowed to load — a CSP without
+  # blob: in img-src leaves the element in place and the image at zero.
+  def assert_decoded(selector)
+    find(selector)
+    page.document.synchronize(errors: [Minitest::Assertion]) do
+      assert_operator evaluate_script("document.querySelector('#{selector}').naturalWidth"), :>, 0
+    end
+  end
 end

@@ -8,7 +8,11 @@ Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src     :self
     policy.font_src        :self                 # Phosphor.woff2 etc. are local
-    policy.img_src         :self, :data, :https
+    # blob: is the capture screen's poster preview — the canvas-downscaled blob is
+    # rendered from memory so the image can be checked against the extracted fields
+    # without ever being uploaded for storage
+    # (see app/views/captures/_extraction.html.erb).
+    policy.img_src         :self, :data, :blob, :https
     policy.object_src      :none
     policy.script_src      :self                 # all JS is vendored via importmap
     policy.style_src       :self                 # CSS is external; sole inline <style> (Turbo's progress bar) is nonced below

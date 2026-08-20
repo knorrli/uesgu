@@ -34,13 +34,17 @@ class ExtractionFieldOutcome < ApplicationRecord
   # tile and published. The one exception is a late drop — publishing freezes the card
   # on screen, so a `discarded` write arriving after a published one is that drop's
   # fire-and-forget POST landing out of order, not a decision anybody made.
+  # Serialized on the attempt row: an impatient contributor can have Accept and Reject
+  # in flight on two Puma threads at once, and reading the guard outside a lock would
+  # let the drop pass its check against a publish that has not committed yet — then
+  # delete it. The unique index on (attempt, candidate, field) is the backstop.
   def self.record!(attempt:, candidate_index:, proposed:, accepted: nil, normalized: [])
     return if attempt.nil? || candidate_index.nil?
 
-    recorded = where(extraction_attempt_id: attempt.id, candidate_index: candidate_index)
-    return if accepted.nil? && recorded.where.not(outcome: :discarded).exists?
+    attempt.with_lock do
+      recorded = where(extraction_attempt_id: attempt.id, candidate_index: candidate_index)
+      next if accepted.nil? && recorded.where.not(outcome: :discarded).exists?
 
-    transaction do
       recorded.delete_all
       FIELDS.each do |field|
         create!(row_attributes(field, proposed, accepted, normalized)

@@ -13,8 +13,8 @@ class ExtractionAttemptsPresenter
   WINDOW = 100
 
   # One field's report card. `discarded` rows carry no human value, so they are the
-  # denominator of nothing — the three rates that matter are taken over the decisions
-  # where a human actually published something.
+  # denominator of nothing — every rate here is taken over the decisions where a human
+  # actually published something.
   FieldRow = Data.define(:field, :counts) do
     def total = counts.values.sum
     def count(outcome) = counts.fetch(outcome, 0)

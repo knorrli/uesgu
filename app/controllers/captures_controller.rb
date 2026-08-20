@@ -70,7 +70,7 @@ class CapturesController < ApplicationController
   # Fields the contributor filled from a place suggestion rather than by judging the
   # model's reading (see capture_controller.js).
   def normalized_fields
-    ExtractionFieldOutcome::FIELDS.select { |field| params[:"normalized_#{field}"].present? }
+    ExtractionFieldOutcome::PLACE_FIELDS.select { |field| params[:"normalized_#{field}"].present? }
   end
 
   def render_status(partial, status: :ok, **locals)

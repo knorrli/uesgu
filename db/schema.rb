@@ -89,7 +89,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_140000) do
     t.string "outcome", null: false
     t.text "proposed"
     t.datetime "updated_at", null: false
-    t.index ["extraction_attempt_id", "candidate_index"], name: "idx_on_extraction_attempt_id_candidate_index_66fd19de88"
+    t.index ["extraction_attempt_id", "candidate_index", "field"], name: "idx_on_extraction_attempt_id_candidate_index_field_3d754946ef", unique: true
     t.index ["field", "outcome"], name: "index_extraction_field_outcomes_on_field_and_outcome"
   end
 

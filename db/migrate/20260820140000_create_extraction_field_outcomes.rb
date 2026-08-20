@@ -12,7 +12,7 @@ class CreateExtractionFieldOutcomes < ActiveRecord::Migration[8.1]
       t.timestamps
     end
 
-    add_index :extraction_field_outcomes, %i[extraction_attempt_id candidate_index]
+    add_index :extraction_field_outcomes, %i[extraction_attempt_id candidate_index field], unique: true
     add_index :extraction_field_outcomes, %i[field outcome]
   end
 end

@@ -370,6 +370,19 @@ adapter" below for why, so it does not get re-proposed.
     new data is the discarded proposal. `url` is not recorded at all — it is a paste,
     not a read the prompt can be tuned against.
 
+    **The free text left in that set is accepted, not overlooked.** `place`,
+    `locality` and `genres` are free text as much as `title` is, and dropping a card
+    is exactly the reflex for a chat screenshot uploaded by mistake — so the one path
+    that keeps a value on an unpublished read is also the path a sender's name could
+    take through `place`. Kept anyway (2026-08-20): the evidence rule means `place`
+    is only filled when the model could quote it, the contributor reads every value
+    on the card before dropping it, and the discarded proposal is the only record of
+    *how* a total failure failed — the rate alone says a card was thrown away, never
+    what was on it. Rejected: recording outcomes without values on the drop path, and
+    dropping `place` / `genres` from the stored set everywhere, which would blind the
+    venue rules that most of the prompt tuning goes into. The trigger for revisiting
+    is a real capture where this bites, not a better argument.
+
 ### The place model
 
 > **Built.** `app/models/place.rb`, `db/migrate/20260819160000_create_places.rb`,

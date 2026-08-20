@@ -623,7 +623,7 @@ en:
         filtered: "Prompt %{prompt_sha} only."
         clear_filter: Clear filter
         fields_heading: Corrected fields
-        fields_intro: "What a human did to the proposal on the verify screen. Supplied means the model returned nothing; corrected means it was confidently wrong; removed means it invented a field. Discarded are candidates nobody published — the worst reads there are."
+        fields_intro: "What a human did to the proposal on the verify screen. Supplied means the model returned nothing; corrected means it was confidently wrong; normalised means someone took the registry's spelling, which no prompt edit could have got right; removed means it invented a field. Discarded are candidates nobody published — the worst reads there are."
         of_decisions: "(%{pct}%)"
         col:
           when: When
@@ -641,6 +641,7 @@ en:
           decisions: Decisions
           supplied: Supplied
           corrected: Corrected
+          normalized: Normalised
           removed: Removed
           discarded: Discarded
     locations:

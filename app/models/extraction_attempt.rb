@@ -18,6 +18,16 @@ class ExtractionAttempt < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
 
+  # What the verify screen carries so a correction can name the read that proposed
+  # it. Signed and short-lived: the card posts it back, and an id a contributor
+  # could type would let them replace someone else's outcomes.
+  TOKEN_PURPOSE = :capture
+  TOKEN_TTL = 1.day
+
+  def capture_token = signed_id(purpose: TOKEN_PURPOSE, expires_in: TOKEN_TTL)
+
+  def self.find_by_capture_token(token) = find_signed(token, purpose: TOKEN_PURPOSE)
+
   KEEP = 2000
   def self.prune!(keep: KEEP)
     keep_ids = recent.limit(keep).pluck(:id)

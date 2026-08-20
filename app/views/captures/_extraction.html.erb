@@ -15,7 +15,7 @@
   <% else %>
     <% extraction.candidates.each_with_index do |candidate, index| %>
       <%= render "captures/candidate", candidate: candidate, key: "#{id}-#{index}",
-            attempt_id: extraction.attempt_id, index: index %>
+            attempt_token: extraction.attempt_token, index: index %>
     <% end %>
   <% end %>
 </div>

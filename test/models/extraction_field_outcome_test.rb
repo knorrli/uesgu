@@ -10,9 +10,9 @@ class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
       "locality" => "Zorpwil", "canton" => "BE", "genres" => "Zorpwave" }.merge(overrides.stringify_keys)
   end
 
-  def record(proposed:, accepted: nil, index: 0)
-    ExtractionFieldOutcome.record!(attempt_id: attempt.id, candidate_index: index,
-                                   proposed: proposed, accepted: accepted)
+  def record(proposed:, accepted: nil, index: 0, normalized: [])
+    ExtractionFieldOutcome.record!(attempt: attempt, candidate_index: index, proposed: proposed,
+                                   accepted: accepted, normalized: normalized)
   end
 
   def outcome_for(field) = ExtractionFieldOutcome.find_by(field: field)
@@ -87,10 +87,35 @@ class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
     assert_empty ExtractionFieldOutcome.where(candidate_index: 1).discarded
   end
 
-  test "an unknown attempt records nothing rather than raising" do
+  test "an unresolved attempt records nothing rather than raising" do
     assert_no_difference -> { ExtractionFieldOutcome.count } do
-      ExtractionFieldOutcome.record!(attempt_id: 0, candidate_index: 0, proposed: proposed)
+      ExtractionFieldOutcome.record!(attempt: nil, candidate_index: 0, proposed: proposed)
     end
+  end
+
+  # The drop is posted fire-and-forget, so it can land after the publish that
+  # superseded it — and publishing freezes the card, so nothing legitimately follows.
+  test "a late drop does not overwrite the publish that superseded it" do
+    record(proposed: proposed, accepted: proposed)
+    record(proposed: proposed)
+
+    assert_empty ExtractionFieldOutcome.discarded
+    assert_equal ExtractionFieldOutcome::FIELDS.size, ExtractionFieldOutcome.unchanged.count
+  end
+
+  # Tapping a suggestion trades the poster's spelling for the registry's, which is not
+  # something a prompt edit could have got right.
+  test "a value taken from a place suggestion is normalized, not corrected" do
+    record(proposed: proposed(place: "Zorpsaal Zorpwil"), accepted: proposed(place: "Zorpsaal"),
+           normalized: %w[place])
+
+    assert_predicate outcome_for("place"), :normalized?
+  end
+
+  test "a flag on a field nobody changed leaves the outcome alone" do
+    record(proposed: proposed, accepted: proposed, normalized: %w[place])
+
+    assert_predicate outcome_for("place"), :unchanged?
   end
 
   test "pruning an attempt takes its outcomes with it" do

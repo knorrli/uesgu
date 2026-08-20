@@ -15,9 +15,9 @@ module EventCapture
     # `detail` is the payload-bearing half of a failure (see ProviderError) — it is
     # printed by the rake task and never persisted.
     Extraction = Data.define(:candidates, :medium, :model, :prompt_sha, :input_tokens,
-                             :output_tokens, :elapsed, :code, :error, :detail, :attempt_id) do
+                             :output_tokens, :elapsed, :code, :error, :detail, :attempt_token) do
       def initialize(candidates: [], medium: nil, model: nil, prompt_sha: nil, input_tokens: 0,
-                     output_tokens: 0, elapsed: 0.0, code: nil, error: nil, detail: nil, attempt_id: nil)
+                     output_tokens: 0, elapsed: 0.0, code: nil, error: nil, detail: nil, attempt_token: nil)
         super
       end
 
@@ -49,12 +49,13 @@ module EventCapture
 
     UNCONFIGURED = "extraction is not configured — set INFOMANIAK_API_TOKEN and INFOMANIAK_PRODUCT_ID"
 
-    # The recorded row's id rides back out on the Extraction: the verify screen puts it
-    # on every card, so the corrections a human then makes attach to the read that
-    # proposed them (see ExtractionFieldOutcome).
+    # The recorded row rides back out on the Extraction: the verify screen puts it on
+    # every card, so the corrections a human then makes attach to the read that
+    # proposed them (see ExtractionFieldOutcome). Signed, because the card posts it
+    # back — a raw id would let one contributor replace another's outcomes.
     def call
       extraction = extract
-      extraction.with(attempt_id: record(extraction)&.id)
+      extraction.with(attempt_token: record(extraction)&.capture_token)
     end
 
     private

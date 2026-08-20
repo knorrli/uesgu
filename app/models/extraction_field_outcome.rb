@@ -12,8 +12,12 @@
 class ExtractionFieldOutcome < ApplicationRecord
   belongs_to :extraction_attempt
 
+  # `normalized` is a correction the prompt cannot fix: tapping a place suggestion
+  # trades a faithful reading of the poster for the registry's spelling. Kept out of
+  # `corrected` so the rate a prompt edit is judged on stays about misreadings.
   enum :outcome, { absent: "absent", unchanged: "unchanged", supplied: "supplied",
-                   corrected: "corrected", removed: "removed", discarded: "discarded" }
+                   corrected: "corrected", normalized: "normalized", removed: "removed",
+                   discarded: "discarded" }
 
   FIELDS = %w[title date time place locality canton genres].freeze
 
@@ -22,29 +26,38 @@ class ExtractionFieldOutcome < ApplicationRecord
   # the accepted half of each is published as a public event anyway.
   VALUED = (FIELDS - %w[title]).freeze
 
-  # The last decision on a candidate wins: a dropped card can be reopened and
-  # published, and the correction that publishing records is the one that happened.
-  def self.record!(attempt_id:, candidate_index:, proposed:, accepted: nil)
-    attempt = ExtractionAttempt.find_by(id: attempt_id)
+  # The tuple a place suggestion fills in one tap, and so the only fields whose change
+  # can be a normalisation rather than a correction (see capture_controller.js).
+  PLACE_FIELDS = %w[place locality canton].freeze
+
+  # The last decision on a candidate wins: a dropped card can be reopened from its
+  # tile and published. The one exception is a late drop — publishing freezes the card
+  # on screen, so a `discarded` write arriving after a published one is that drop's
+  # fire-and-forget POST landing out of order, not a decision anybody made.
+  def self.record!(attempt:, candidate_index:, proposed:, accepted: nil, normalized: [])
     return if attempt.nil? || candidate_index.nil?
 
+    recorded = where(extraction_attempt_id: attempt.id, candidate_index: candidate_index)
+    return if accepted.nil? && recorded.where.not(outcome: :discarded).exists?
+
     transaction do
-      where(extraction_attempt_id: attempt.id, candidate_index: candidate_index).delete_all
+      recorded.delete_all
       FIELDS.each do |field|
-        create!(rows_attributes(field, proposed, accepted)
+        create!(row_attributes(field, proposed, accepted, normalized)
                   .merge(extraction_attempt_id: attempt.id, candidate_index: candidate_index))
       end
     end
   end
 
-  def self.rows_attributes(field, proposed, accepted)
+  def self.row_attributes(field, proposed, accepted, normalized)
     was = normalize(field, proposed[field])
     now = accepted && normalize(field, accepted[field])
+    outcome = outcome_for(was, now, dropped: accepted.nil?)
+    outcome = :normalized if outcome == :corrected && normalized.include?(field)
 
-    { field: field, outcome: outcome_for(was, now, dropped: accepted.nil?),
-      proposed: stored(field, was), accepted: stored(field, now) }
+    { field: field, outcome: outcome, proposed: stored(field, was), accepted: stored(field, now) }
   end
-  private_class_method :rows_attributes
+  private_class_method :row_attributes
 
   def self.outcome_for(was, now, dropped:)
     return :discarded if dropped

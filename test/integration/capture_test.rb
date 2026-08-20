@@ -193,7 +193,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
     sign_in_as user(contributor: true)
 
-    post capture_path, params: { card_id: "capture-row-abc-0", extraction_attempt_id: attempt.id,
+    post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: attempt.capture_token,
                                  candidate_index: "0", title: "Kept", date: "2026-09-01",
                                  locality: "Zorpwil", canton: "BE", time: "20:00",
                                  proposed_title: "Kept", proposed_date: "2026-09-01",
@@ -210,7 +210,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
     sign_in_as user(contributor: true)
 
-    post capture_path, params: { card_id: "capture-row-abc-0", extraction_attempt_id: attempt.id,
+    post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: attempt.capture_token,
                                  candidate_index: "0" }
 
     assert_response :unprocessable_entity
@@ -221,7 +221,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
     sign_in_as user(contributor: true)
 
-    post drop_capture_path, params: { extraction_attempt_id: attempt.id, candidate_index: "1",
+    post drop_capture_path, params: { attempt_token: attempt.capture_token, candidate_index: "1",
                                       proposed_title: "Zorp Fest", proposed_place: "Zorpsaal" }
 
     assert_response :no_content
@@ -234,7 +234,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
     sign_in_as user
 
-    post drop_capture_path, params: { extraction_attempt_id: attempt.id, candidate_index: "0" }
+    post drop_capture_path, params: { attempt_token: attempt.capture_token, candidate_index: "0" }
 
     assert_response :forbidden
     assert_empty attempt.field_outcomes
@@ -242,10 +242,10 @@ class CaptureTest < ActionDispatch::IntegrationTest
 
   # A forged or stale id is the client's to send, so it may cost the row and nothing
   # else — never the event.
-  test "an unknown attempt id costs the record, not the publish" do
+  test "a forged attempt token costs the record, not the publish" do
     sign_in_as user(contributor: true)
 
-    post capture_path, params: { card_id: "capture-row-abc-0", extraction_attempt_id: 999_999,
+    post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: "not-a-signed-id",
                                  candidate_index: "0", title: "Kept", date: "2026-09-01",
                                  locality: "Zorpwil", canton: "BE" }
 
@@ -257,13 +257,16 @@ class CaptureTest < ActionDispatch::IntegrationTest
     sign_in_as user(contributor: true)
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
 
-    stub_extraction(extraction(candidates: [candidate(locality: "Us")]).with(attempt_id: attempt.id)) do
+    stub_extraction(extraction(candidates: [candidate(locality: "Us")]).with(attempt_token: attempt.capture_token)) do
       post extract_capture_path, params: { row_id: "abc123" },
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
     assert_select "input[name=?][value=?]", "proposed_locality", "Us"
-    assert_select "input[name=?][value=?]", "extraction_attempt_id", attempt.id.to_s
+    # Compared by what it resolves to: the token carries its own expiry, so two of
+    # them for the same attempt are not the same string.
+    token = css_select("input[name=attempt_token]").first["value"]
+    assert_equal attempt, ExtractionAttempt.find_by_capture_token(token)
     assert_select "input[name=?][value=?]", "candidate_index", "0"
   end
 

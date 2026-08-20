@@ -329,12 +329,24 @@ adapter" below for why, so it does not get re-proposed.
     rule exists to prevent. `unchanged` and `absent` are the denominator the three
     rates are taken over.
 
+    **A suggestion tap is not a correction.** The card offers registry near-matches
+    as chips, and tapping one rewrites the place tuple — but "Dachstock Reitschule" →
+    "Dachstock" is the contributor taking the canonical spelling, not a report that
+    the model misread the poster. Counted as `corrected` it would inflate the one
+    number a prompt edit is judged on, so a suggestion-filled field records
+    `normalized` instead, and typing in the field by hand clears the flag. The place
+    tuple carried across sibling candidates needs no such treatment: it only ever
+    fills a field the model left empty, which is a `supplied` either way.
+
     **A drop is the fourth, and the most valuable.** Dropping a card is a decision
     about every field at once and it never reached the server: `capture#reject` is
     client-side. It now posts the card's proposals to `POST /capture/drop`,
     fire-and-forget — the card is already gone on screen, and a measurement may
     neither delay a drop nor undo one. A dropped card can be reopened and published,
-    so the last decision on a candidate replaces the earlier one.
+    so the last decision on a candidate replaces the earlier one — except a `discarded`
+    write arriving after a published one, which is that unawaited POST landing out of
+    order rather than a decision: publishing freezes the card, so nothing legitimately
+    follows it.
 
     **The proposals ride on the card, not in the database.** Each field's proposed
     value is a hidden input beside the editable one, diffed on submit. Persisting
@@ -342,8 +354,13 @@ adapter" below for why, so it does not get re-proposed.
     what must not happen: it would store the reading of a WhatsApp screenshot someone
     uploaded by mistake and discarded unread, which is the one case decision 9's
     checkpoint exists for. The hidden fields are client-tamperable, which does not
-    matter for a metric contributors report on their own work, and a forged or stale
-    attempt id costs the row and never the event.
+    matter for a metric contributors report on their own work.
+
+    The attempt itself is named by a **signed, day-scoped id**, not a raw one. Writing
+    a candidate's outcomes replaces what was there, so a raw id would let one
+    contributor erase another's rows by guessing a number — insertion of noise is
+    within the trust model, deletion of someone else's record is not. An expired or
+    forged token costs the row, never the event.
 
     **Values only for the shape-constrained fields** — `date`, `time`, `place`,
     `locality`, `canton`, `genres`. `title` records its outcome and neither value: it

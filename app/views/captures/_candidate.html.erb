@@ -2,7 +2,7 @@
     editable and nothing is trusted: a value the normalizer refused is null here with
     the model's raw text beside it (see EventCapture::Candidate). Accepting publishes
     immediately. %>
-<%# locals: (candidate:, key:, attempt_id: nil, index: nil) %>
+<%# locals: (candidate:, key:, attempt_token: nil, index: nil) %>
 <%= render layout: "shared/review_card",
       locals: { id: key, actions: render("captures/card_actions", key: key), frame_class: "capture-card",
                 source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } },
@@ -15,10 +15,15 @@
         can be diffed on accept — and on drop, where nothing else says what was
         thrown away (see ExtractionFieldOutcome). Client-tamperable, which is
         acceptable for a metric contributors report on their own work. %>
-    <%= hidden_field_tag :extraction_attempt_id, attempt_id %>
-    <%= hidden_field_tag :candidate_index, index %>
+    <%= hidden_field_tag :attempt_token, attempt_token, id: nil %>
+    <%= hidden_field_tag :candidate_index, index, id: nil %>
     <% proposed_fields(candidate).each do |field, value| %>
       <%= hidden_field_tag "proposed_#{field}", value, id: nil %>
+    <% end %>
+    <%# Set when a place suggestion filled the field, so picking the registry's
+        spelling is not counted as the model having misread the poster. %>
+    <% ExtractionFieldOutcome::PLACE_FIELDS.each do |field| %>
+      <%= hidden_field_tag "normalized_#{field}", nil, id: nil %>
     <% end %>
 
     <label class="flex flex-col gap-xsmall">

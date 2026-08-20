@@ -355,14 +355,25 @@ export default class extends Controller {
   applySuggestion(event) {
     const card = event.target.closest(".capture-card")
     const { name, locality, canton } = event.params
-    this.setField(card, "place", name)
-    if (locality) this.setField(card, "locality", locality)
-    if (canton) this.setField(card, "canton", canton)
+    this.setField(card, "place", name, { normalized: true })
+    if (locality) this.setField(card, "locality", locality, { normalized: true })
+    if (canton) this.setField(card, "canton", canton, { normalized: true })
     this.sharePlace(card)
   }
 
   carryPlace(event) {
+    // A field the contributor typed in themselves is their reading of the poster,
+    // whatever a suggestion put there before.
+    this.markNormalized(event.target.closest(".capture-card"), event.target.name, false)
     if (PLACE_FIELDS.includes(event.target.name)) this.sharePlace(event.target.closest(".capture-card"))
+  }
+
+  // Taking the registry's spelling is a normalisation, not a report that the model
+  // misread the poster, and the two must not land in the same number (see
+  // ExtractionFieldOutcome).
+  markNormalized(card, name, normalized) {
+    const flag = card?.querySelector(`[name="normalized_${name}"]`)
+    if (flag) flag.value = normalized ? "1" : ""
   }
 
   // Sticky on the controller rather than a sweep of the cards on screen, so the tuple
@@ -396,9 +407,10 @@ export default class extends Controller {
     return card.querySelector(`[name="${name}"]`)?.value ?? ""
   }
 
-  setField(card, name, value) {
+  setField(card, name, value, { normalized = false } = {}) {
     const field = card.querySelector(`[name="${name}"]`)
     if (field) field.value = value
+    if (normalized) this.markNormalized(card, name, true)
   }
 
   // Capped rather than all-at-once: Puma runs three threads, so eight parallel

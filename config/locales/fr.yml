@@ -623,7 +623,7 @@ fr:
         filtered: "Prompt %{prompt_sha} uniquement."
         clear_filter: Retirer le filtre
         fields_heading: Champs corrigés
-        fields_intro: "Ce qu'un humain a fait de la proposition sur l'écran de vérification. Complété veut dire que le modèle n'a rien renvoyé ; corrigé qu'il s'est trompé avec assurance ; retiré qu'il a inventé un champ. Écartés sont les candidats que personne n'a publiés — les pires lectures."
+        fields_intro: "Ce qu'un humain a fait de la proposition sur l'écran de vérification. Complété veut dire que le modèle n'a rien renvoyé ; corrigé qu'il s'est trompé avec assurance ; normalisé que quelqu'un a pris l'orthographe du registre, ce qu'aucun prompt n'aurait pu deviner ; retiré qu'il a inventé un champ. Écartés sont les candidats que personne n'a publiés — les pires lectures."
         of_decisions: "(%{pct}%)"
         col:
           when: Quand
@@ -641,6 +641,7 @@ fr:
           decisions: Décisions
           supplied: Complété
           corrected: Corrigé
+          normalized: Normalisé
           removed: Retiré
           discarded: Écarté
     locations:

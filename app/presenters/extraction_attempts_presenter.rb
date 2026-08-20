@@ -36,7 +36,7 @@ class ExtractionAttemptsPresenter
 
   def initialize(prompt_sha: nil, window: WINDOW)
     @prompt_sha = prompt_sha.presence
-    @attempts = ExtractionAttempt.recent.then { |scope| prompt_sha ? scope.where(prompt_sha: @prompt_sha) : scope }
+    @attempts = ExtractionAttempt.recent.then { |scope| @prompt_sha ? scope.where(prompt_sha: @prompt_sha) : scope }
                                  .limit(window).to_a
   end
 

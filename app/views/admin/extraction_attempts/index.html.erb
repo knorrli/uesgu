@@ -106,6 +106,7 @@
                 <th class="num"><%= t('.col.decisions') %></th>
                 <th class="num"><%= t('.col.supplied') %></th>
                 <th class="num"><%= t('.col.corrected') %></th>
+                <th class="num"><%= t('.col.normalized') %></th>
                 <th class="num"><%= t('.col.removed') %></th>
                 <th class="num"><%= t('.col.discarded') %></th>
               </tr>
@@ -115,7 +116,7 @@
                 <tr>
                   <td><%= t("capture.candidate.#{row.field}") %></td>
                   <td class="num"><%= row.published %></td>
-                  <% %w[supplied corrected removed].each do |outcome| %>
+                  <% %w[supplied corrected normalized removed].each do |outcome| %>
                     <td class="num">
                       <%= row.count(outcome) %>
                       <span class="muted"><%= t('.of_decisions', pct: row.rate(outcome)) %></span>

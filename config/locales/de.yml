@@ -623,7 +623,7 @@ de:
         filtered: "Nur Prompt %{prompt_sha}."
         clear_filter: Filter aufheben
         fields_heading: Korrigierte Felder
-        fields_intro: "Was ein Mensch auf dem Prüf-Screen mit dem Vorschlag gemacht hat. Ergänzt heisst, das Modell hat nichts geliefert; korrigiert heisst, es lag selbstsicher daneben; entfernt heisst, es hat ein Feld erfunden. Verworfen sind Kandidaten, die niemand publiziert hat — die schlechtesten Lesungen."
+        fields_intro: "Was ein Mensch auf dem Prüf-Screen mit dem Vorschlag gemacht hat. Ergänzt heisst, das Modell hat nichts geliefert; korrigiert heisst, es lag selbstsicher daneben; normalisiert heisst, jemand hat die Schreibweise aus der Registry genommen — kein Prompt-Fehler; entfernt heisst, es hat ein Feld erfunden. Verworfen sind Kandidaten, die niemand publiziert hat — die schlechtesten Lesungen."
         of_decisions: "(%{pct}%)"
         col:
           when: Zeitpunkt
@@ -641,6 +641,7 @@ de:
           decisions: Entscheide
           supplied: Ergänzt
           corrected: Korrigiert
+          normalized: Normalisiert
           removed: Entfernt
           discarded: Verworfen
     locations:

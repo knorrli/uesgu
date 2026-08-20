@@ -42,7 +42,7 @@ class AdminExtractionAttemptsTest < ActionDispatch::IntegrationTest
   test "the field leaderboard tells the three shapes apart" do
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image", candidates_count: 1)
     ExtractionFieldOutcome.record!(
-      attempt_id: attempt.id, candidate_index: 0,
+      attempt: attempt, candidate_index: 0,
       proposed: { "title" => "Zorpcore", "locality" => "Us", "time" => nil, "place" => "Zorpsaal" },
       accepted: { "title" => "Zorpcore", "locality" => "Zorpwil", "time" => "20:00", "place" => nil }
     )

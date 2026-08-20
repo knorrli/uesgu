@@ -45,12 +45,13 @@ class CapturesController < ApplicationController
 
   private
 
-  # Measuring the funnel may not break it, so a bad or forged attempt id costs the
-  # row and nothing else. Values ride in from the card (see captures/_candidate).
+  # Measuring the funnel may not break it, so an expired or forged token costs the row
+  # and nothing else. Values ride in from the card (see captures/_candidate).
   def record_outcomes(accepted: nil)
     ExtractionFieldOutcome.record!(
-      attempt_id: params[:extraction_attempt_id], candidate_index: candidate_index,
-      proposed: proposed_attributes, accepted: accepted
+      attempt: ExtractionAttempt.find_by_capture_token(params[:attempt_token]),
+      candidate_index: candidate_index, proposed: proposed_attributes,
+      accepted: accepted, normalized: normalized_fields
     )
   rescue StandardError => e
     Rails.logger.error("ExtractionFieldOutcome.record! failed: #{e.class}: #{e.message}")
@@ -64,6 +65,12 @@ class CapturesController < ApplicationController
 
   def accepted_attributes
     ExtractionFieldOutcome::FIELDS.index_with { |field| params[field.to_sym] }
+  end
+
+  # Fields the contributor filled from a place suggestion rather than by judging the
+  # model's reading (see capture_controller.js).
+  def normalized_fields
+    ExtractionFieldOutcome::FIELDS.select { |field| params[:"normalized_#{field}"].present? }
   end
 
   def render_status(partial, status: :ok, **locals)

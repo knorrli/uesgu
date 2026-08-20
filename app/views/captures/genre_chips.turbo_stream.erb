@@ -1,0 +1,8 @@
+<% @genres.each do |name| %>
+  <%= within_combobox_selection_chip do %>
+    <%= tag.div class: "hw-combobox__chip flex flex-row gap-small align-baseline" do %>
+      <%= tag.span name %>
+      <%= tag.span **combobox_chip_remover_attrs(display: name, value: name, class: 'ph ph-x') %>
+    <% end %>
+  <% end %>
+<% end %>

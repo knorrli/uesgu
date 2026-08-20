@@ -43,6 +43,24 @@ class CapturesController < ApplicationController
     head :no_content
   end
 
+  # Type-ahead over the genres already in use, so a contributor lands on the existing
+  # spelling instead of minting a fourth one. Dispositioned genres are left out: a
+  # genre we ignore, hide or block is not something to suggest, and an alias would
+  # tag the raw token rather than its canonical.
+  SUGGESTION_LIMIT = 20
+
+  def genre_options
+    @genres = Genre.in_use.where(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
+                   .where("name ILIKE ?", "%#{params[:q]}%")
+                   .by_usage.limit(SUGGESTION_LIMIT)
+  end
+
+  # The combobox asks for its selection's chips on every change. Names, not ids: a
+  # captured genre may not exist in the taxonomy at all yet.
+  def genre_chips
+    @genres = params[:combobox_values].to_s.split(",").filter_map { |name| name.strip.presence }.uniq
+  end
+
   private
 
   # Measuring the funnel may not break it, so an expired or forged token costs the row

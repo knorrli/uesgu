@@ -13,11 +13,13 @@ require_relative "../support/canned_extraction_client"
 class CaptureScreenTest < ApplicationSystemTestCase
   def setup
     @user = user(contributor: true, locale: "de")
+    @staged_paths = []
     sign_in_as @user
   end
 
   def teardown
     CannedExtractionClient.uninstall
+    @staged_paths.each { |path| File.delete(path) if File.exist?(path) }
   end
 
   test "a picked poster becomes an editable card and publishes the moment it is accepted" do
@@ -120,6 +122,66 @@ class CaptureScreenTest < ApplicationSystemTestCase
     type "locality", "Zorpwil"
     reject
     assert_equal "", field_value("locality")
+  end
+
+  test "the strip states the whole batch from the moment it is sent" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    stage "poster.png"
+    stage_text "Zorpcore Matinee, Zorpsaal"
+    commit
+
+    assert_selector ".capture-queue__group", count: 2
+    assert_selector ".capture-queue__tile", count: 2
+  end
+
+  test "candidates off one input are one group in the strip" do
+    CannedExtractionClient.install(events: [poster_event, matinee])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-queue__group", count: 1
+    assert_selector ".capture-queue__group .capture-queue__tile", count: 2
+    assert_no_selector ".capture-queue__tile[data-state=pending]"
+  end
+
+  test "an input that yields nothing still holds its place in the strip" do
+    CannedExtractionClient.install(events: [])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-row", text: copy("row.nothing_found")
+    assert_selector ".capture-queue__tile[data-state=failed]", count: 1
+    assert_no_selector ".capture-queue__tile[data-state=pending]"
+  end
+
+  test "a failed extraction reaches the strip rather than only the rows list" do
+    CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
+    visit capture_path
+    paste "Zorpcore Nacht, Zorpsaal"
+
+    assert_selector ".capture-row", text: copy("failures.provider_error")
+    assert_selector ".capture-queue__tile[data-state=failed]", count: 1
+  end
+
+  test "the card names no source: the poster beside it already is one" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".capture-card__label"
+    assert_no_selector ".capture-card", text: "poster.png"
+  end
+
+  test "a long source name stays on one line while its row is still reading" do
+    CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
+    visit capture_path
+    stage_as "Zorpcore-Nacht-im-Zorpsaal-Zorpwil-mit-Vorband-und-allem-Drum-und-Dran-final-v3.png"
+    commit
+
+    label = find(".capture-row__label")
+    assert_equal "nowrap", label.style("white-space")["white-space"]
+    assert_operator label.evaluate_script("this.scrollWidth"), :>, label.evaluate_script("this.clientWidth")
   end
 
   test "a picked poster is rendered beside the fields it produced" do
@@ -257,6 +319,16 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   def commit = find("button[data-action='capture#commit']").click
+
+  # A filename is the one source label that is not truncated on the way in, so the
+  # overflow case needs a real file carrying a real long name.
+  def stage_as(name)
+    path = Rails.root.join("tmp", name)
+    FileUtils.cp(file_fixture("poster.png"), path)
+    @staged_paths << path
+    find(".drop-zone__input", visible: :all).set([path])
+    assert_selector ".drop-zone__item", wait: 5
+  end
 
   def pick(*names)
     stage(*names)

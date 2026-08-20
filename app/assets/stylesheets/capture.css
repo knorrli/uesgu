@@ -43,10 +43,20 @@
   top: 0;
   z-index: 2;
   display: flex;
-  gap: var(--gap-xsmall);
+  gap: var(--gap-large);
   overflow-x: auto;
   padding-block: var(--gap-small);
   background: var(--theme-bg-color);
+}
+
+/* Keep the strip's gap between groups unmistakably larger than this one inside them:
+   the grouping is all that says two tiles came off one poster (see
+   app/javascript/controllers/capture_controller.js), and a reader who cannot see it
+   is back to two cards that look duplicated. */
+.capture-queue__group {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 1px;
 }
 
 /* Out-specifies the boxed <button> base rather than relying on stylesheet order. */
@@ -71,6 +81,13 @@ button.capture-queue__tile.is-current {
    thing still saying so. */
 button.capture-queue__tile[data-state="dropped"] {
   opacity: 0.45;
+}
+
+/* Standing in for cards that have not landed yet — it already carries the source, so
+   the strip is the full count from the moment the batch is sent. */
+button.capture-queue__tile[data-state="pending"] {
+  opacity: 0.5;
+  border-style: dashed;
 }
 
 .capture-queue__tile img {
@@ -101,10 +118,12 @@ button.capture-queue__tile[data-state="dropped"] {
   color: var(--theme-fg-muted);
 }
 
-.capture-card__label {
-  display: flex;
-  gap: var(--gap-small);
-  align-items: baseline;
+/* A pending row names the input it is still reading, and an uploaded filename runs
+   long enough to push that line ragged. */
+.capture-row__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .capture-card__status {

@@ -164,7 +164,6 @@ en:
       untitled: Text
       nothing_found: Nothing here looks like an event.
       source_alt: The image this was read from
-      nth: "%{index} of %{count}"
     candidate:
       title: Title
       date: Date

@@ -316,7 +316,8 @@ adapter" below for why, so it does not get re-proposed.
 
     Decision 11 counts values the Normalizer *refused*. It cannot see the failure
     that prompted all of this: `locality` filled from an artist's origin code. `"Us"`
-    is a well-formed string, nothing refuses it, no `issues` code fires, and the
+    is a well-formed string, and a model that quotes it back satisfies the evidence
+    rule too, so nothing refuses it, no `issues` code fires, and the
     attempt records as clean. The verify screen already makes someone look at every
     field before publishing, so the correction is a field-level error report authored
     by a person who saw the poster — and it was being thrown away.
@@ -1110,6 +1111,53 @@ could not quote is self-reported invention (the bake-off's "Café Liebig" was no
 the image), and the citation requirement is only worth its prompt space if
 something acts on it. The raw string survives, so nothing is lost — a human still
 sees the claim, it just no longer arrives pre-accepted.
+
+**Extended to `locality` (2026-08-20).** The rule covered `date` and `place`, which
+left the field that mints WHERE-tree nodes as the one the model could fill with
+anything: a locality read off an artist's origin code (`Us`, printed beside an act's
+name) is well-formed, unrefused, and indistinguishable from a right answer. It now
+carries `locality_evidence` and runs through the same path, so an uncited locality is
+nulled, kept in `raw`, and counted as `:locality_uncited`.
+
+**`canton` deliberately does not get one, and not because it matters less.** A wrong
+canton is not the harmless half of a wrong tuple: `Location.hierarchy` nests locality
+under canton, so it files the whole locality-and-venue subtree under a branch nobody
+browsing for it will open.
+
+It gets no evidence field because it is **derived, not transcribed**, and the evidence
+rule only polices transcription. Posters print addresses; they do not print canton
+codes. Across the 65 candidates these runs produced the model filled `canton` 8 times,
+every one inferred from a postcode or a printed town (`3007 BERN` → `BE`) and none of
+them quotable as itself. Requiring a citation would not catch a wrong canton — it
+would delete the field, because there is nothing to quote. The two fields fail
+differently: `locality` fails by transcribing the wrong text, which a quote exposes;
+`canton` fails by inferring badly from the right text, which a quote cannot.
+
+What it should get instead is the treatment `YearResolver` gave the date's year —
+computed from the resolved locality rather than asked of the model, since every
+locality the registry already knows carries a canton (`Creator#known_localities`).
+That leaves only a locality nobody has seen before needing a human, which is the
+select of 26 the verify screen already shows.
+
+**What the re-run measured — four runs each over the same six images, before and
+after.** No `:locality_uncited` ever fired: the model cited every locality it filled,
+and `place`, `date` and `locality` recall are unchanged. So the citation costs nothing
+and buys the detector, but it does **not** close the hole it was written for. The
+screenshot sample reads `TRAUMA GLOW (WIEN) & BIG RADIO (BERN)`; asked to cite, the
+model answered `"BERN"` and kept the locality. An origin code is quotable, so the
+evidence rule passes it. Citation makes that failure legible — the quote is visibly
+not an address — it does not refuse it. The field-level corrections are what measure
+the residue.
+
+**Rejected: naming the trap in rule 5.** The obvious follow-up — telling the model
+that a town printed beside an act says where the *act* is from — was written and
+measured, and it is a net loss. It did suppress the origin code (0 of 3 runs kept it,
+against 1 of 4 before). But teaching "a town beside a name means that name is an act"
+also taught it that the Bigote Verde poster, which prints `Bern` under the venue, is
+an act with an origin: `place` fell from 4 of 4 runs to 1 of 3, moving the venue into
+`title`. Buying a 1-in-4 locality leak with a 3-in-4 venue leak is the wrong trade —
+`place` is the field match-at-entry depends on. Do not re-propose it without a sample
+set that separates the two shapes.
 
 ## Residual risk
 

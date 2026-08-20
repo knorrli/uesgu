@@ -399,6 +399,8 @@ de:
       discard_rules: Filterregeln
       scraper_coverage: Datenabdeckung
       discovery_leads: Venue-Leads
+      capture_heading: Erfassung
+      extractions: Extraktionen
       accounts_heading: Konten & Einladungen
       users: Konten
       open_invitations: Offene Einladungen
@@ -602,6 +604,35 @@ de:
         title: Venue-Leads
         intro: Venues, die ein Aggregator gefunden hat, die aber noch nicht in der Registry stehen, sortiert nach anstehenden Events. Zum Aufnehmen in config/venues.yml ergänzen.
         empty: Keine Leads. Jeder von einem Aggregator gefundene Venue steht bereits in der Registry.
+    extraction_attempts:
+      index:
+        title: Extraktionen
+        intro: Ein Eintrag pro Modell-Aufruf im Erfassungs-Flow — nur Metadaten, keine Feldwerte. Zeigt, ob der Provider gerade Fehler wirft und welche Werte der Normalizer verwerfen musste.
+        empty: Noch keine Extraktionen erfasst.
+        tally: "%{total} Versuche · %{failed} fehlgeschlagen (%{failed_pct}%) · %{candidates} Kandidaten"
+        average_duration: "ø %{ms} ms"
+        tokens: "%{tokens} Tokens"
+        failures_heading: Fehler
+        no_failures: Kein Versuch ist fehlgeschlagen.
+        issues_heading: Verworfene Werte
+        issues_intro: "Werte, die das Modell geliefert hat und der Normalizer nicht akzeptiert hat — das Feld bleibt leer. Ein Code, der steigt, heisst: die Prompt-Regel dazu passt nicht."
+        no_issues: Nichts verworfen.
+        prompts_heading: Nach Prompt
+        prompts_intro: Dieselben Versuche, gruppiert nach Modell und Prompt-Version. So liest sich eine Prompt-Änderung als Vorher/Nachher — Prompt-Tuning überträgt sich nicht von Modell zu Modell.
+        attempts_heading: Versuche
+        status_ok: ok
+        col:
+          when: Zeitpunkt
+          medium: Medium
+          outcome: Ergebnis
+          candidates: Kandidaten
+          issues: Verworfen
+          tokens: Tokens
+          duration: ms
+          model: Modell
+          prompt_sha: Prompt
+          attempts: Versuche
+          failed: Fehlgeschlagen
     locations:
       index:
         title: Orte

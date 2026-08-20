@@ -62,4 +62,15 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
   test "an unknown medium raises rather than falling back" do
     assert_raises(KeyError) { EventCapture::Prompt.instructions(today: TODAY, medium: :pdf) }
   end
+
+  # The sha is what attributes a change in the recorded numbers to a prompt edit, so
+  # it must move only when the wording does — hashing the rendered prompt would
+  # remint it every night, because the date is interpolated into it.
+  test "the prompt sha ignores the date and separates the media" do
+    image = travel_to(Time.zone.local(2026, 1, 1)) { EventCapture::Prompt.sha }
+    a_year_later = travel_to(Time.zone.local(2027, 6, 30)) { EventCapture::Prompt.sha }
+
+    assert_equal image, a_year_later
+    refute_equal image, EventCapture::Prompt.sha(medium: :text)
+  end
 end

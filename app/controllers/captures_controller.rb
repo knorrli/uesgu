@@ -3,8 +3,9 @@
 # nothing here holds a request open for a batch and there is no partial-success state
 # to render (see EventCapture::Extractor for why there is no queue).
 #
-# Nothing is persisted until a card is accepted; until then the queue lives only in
-# the DOM (docs/user-event-capture-design.md).
+# No event data is persisted until a card is accepted; until then the queue lives
+# only in the DOM (docs/user-event-capture-design.md). Extraction writes one
+# ExtractionAttempt of metadata per input, which carries no field values.
 class CapturesController < ApplicationController
   before_action :require_contributor
   # Every extract is a paid third-party call. Keyed by user, not IP: on Render req.ip

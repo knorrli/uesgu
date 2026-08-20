@@ -156,6 +156,10 @@ Rails.application.routes.draw do
     # one is a config/venues.yml edit (a PR).
     resources :venue_leads, only: %i[index]
 
+    # Capture oversight: one row per model call (ExtractionAttempt) — provider
+    # failures, and the values the Normalizer refused. Read-only.
+    resources :extraction_attempts, only: %i[index]
+
     # Catalogue browsers reached from the dashboard stats: events (the scraped
     # table) and locations (derived from the location tags). Each mirrors the
     # genres index idiom — filter / sort / search / paginate. (Genres keep their

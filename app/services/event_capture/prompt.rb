@@ -58,6 +58,16 @@ module EventCapture
 
     def request(medium: :image) = MEDIA.fetch(medium)[:request]
 
+    # What an ExtractionAttempt's numbers are attributable to. Hashed against a
+    # fixed date, NOT today's: `instructions` interpolates the date, so hashing the
+    # rendered prompt would mint a new sha every night and the column would measure
+    # the calendar instead of the wording.
+    SHA_DATE = Date.new(2000, 1, 1)
+
+    def sha(medium: :image)
+      Digest::SHA256.hexdigest(instructions(today: SHA_DATE, medium: medium))[0, 12]
+    end
+
     def instructions(today:, medium: :image)
       m = MEDIA.fetch(medium)
 

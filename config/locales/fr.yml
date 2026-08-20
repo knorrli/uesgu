@@ -399,6 +399,8 @@ fr:
       discard_rules: Règles de filtrage
       scraper_coverage: Couverture des données
       discovery_leads: Pistes de lieux
+      capture_heading: Saisie
+      extractions: Extractions
       accounts_heading: Comptes et invitations
       users: Comptes
       open_invitations: Invitations ouvertes
@@ -602,6 +604,35 @@ fr:
         title: Pistes de lieux
         intro: Des lieux qu'un agrégateur a repérés mais qui ne sont pas encore dans le registre, triés par événements à venir. Pour en ajouter un, édite config/venues.yml.
         empty: Aucune piste. Chaque lieu repéré par un agrégateur est déjà dans le registre.
+    extraction_attempts:
+      index:
+        title: Extractions
+        intro: Une ligne par appel au modèle dans le flux de saisie — que des métadonnées, aucune valeur de champ. Dit si le fournisseur est en erreur en ce moment, et quelles valeurs le normalizer a dû refuser.
+        empty: Aucune extraction enregistrée pour l'instant.
+        tally: "%{total} tentatives · %{failed} en échec (%{failed_pct}%) · %{candidates} candidats"
+        average_duration: "moy. %{ms} ms"
+        tokens: "%{tokens} tokens"
+        failures_heading: Échecs
+        no_failures: Aucune tentative en échec.
+        issues_heading: Valeurs refusées
+        issues_intro: Des valeurs renvoyées par le modèle et refusées par le normalizer, donc le champ reste vide. Un code qui grimpe veut dire que sa règle de prompt ne colle pas.
+        no_issues: Rien de refusé.
+        prompts_heading: Par prompt
+        prompts_intro: Les mêmes tentatives, groupées par modèle et version de prompt, pour lire une modification comme un avant/après — le réglage ne se transfère pas d'un modèle à l'autre.
+        attempts_heading: Tentatives
+        status_ok: ok
+        col:
+          when: Quand
+          medium: Support
+          outcome: Résultat
+          candidates: Candidats
+          issues: Refusé
+          tokens: Tokens
+          duration: ms
+          model: Modèle
+          prompt_sha: Prompt
+          attempts: Tentatives
+          failed: Échecs
     locations:
       index:
         title: Lieux

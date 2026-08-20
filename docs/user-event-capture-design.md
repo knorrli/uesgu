@@ -267,6 +267,49 @@ adapter" below for why, so it does not get re-proposed.
     fires when the paste was the venue's own page, so social-sourced captures keep
     their link permanently; the badge is what keeps that honest.
 
+11. **Every extraction attempt is recorded — metadata only.** **Built:**
+    `app/models/extraction_attempt.rb`, written from `EventCapture::Extractor#call`,
+    read at `/admin/extraction_attempts`. One row per call, whatever the outcome:
+    the model and the prompt sha, the medium, tokens, duration, the candidate
+    count, the `issues` histogram the Normalizer produced, and on a failure its
+    code and message.
+
+    **Persisted, not logged.** Render's log retention is far shorter than the trend
+    this is meant to chase, and a signal nobody will grep is not a signal.
+    `ScrapeRun` / `ScrapeResult` + `/admin/scrape_runs` is the precedent, down to
+    `prune!`.
+
+    **The sha is hashed against a fixed date, not today's.** `Prompt.instructions`
+    interpolates the date, so hashing the rendered prompt would mint a new sha
+    every night and the column would measure the calendar instead of the wording.
+    Both halves are needed — model *and* sha — because prompt tuning was measured
+    not to transfer between models (see "Provider evaluation").
+
+    **This counts refusals, not errors.** A value the Normalizer refused is a null
+    field and an `issues` code; a value it accepted and a human then rewrote is
+    invisible here. The two call for opposite prompt fixes — a rising
+    `time_unparseable` means the format rule is too narrow, a field the human
+    always rewrites means the sourcing rule is too loose — so the per-field
+    correction record is a second measurement, hanging off these rows.
+
+    **Nothing here ages out**, because nothing here is a field value: no image, no
+    title, no place. `prune!` keeps a bounded number of rows as a size backstop
+    only, and runs from the nightly scraper cron, the app's one scheduled hook.
+
+    **Except the error message, which is why `ProviderError` has two halves.** The
+    obvious thing to store — the raised exception's own message — quotes up to 300
+    characters of raw model output, or of the HTTP response body wrapping it. For a
+    WhatsApp screenshot that output can carry the sender's name or phone number, so
+    persisting it verbatim would reintroduce exactly what discarding the image
+    prevents (decision 9). The message is therefore the neutral half — `HTTP 503`,
+    `no JSON object in response` — and that is what gets stored; whatever quotes
+    the provider goes in `detail`, which stays in memory and is printed by
+    `bin/rails event_capture:extract` for whoever is debugging their own upload.
+
+    Rejected an `error_class` column on `ScrapeResult`'s pattern: everything the
+    Extractor rescues is a `ProviderError`, so the column would hold one value
+    forever, and the class worth knowing is already in the message.
+
 ### The place model
 
 > **Built.** `app/models/place.rb`, `db/migrate/20260819160000_create_places.rb`,

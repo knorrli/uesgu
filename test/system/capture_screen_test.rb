@@ -82,6 +82,46 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpcore Nacht", field_value("title")
   end
 
+  test "the venue read off one act on a poster fills in the acts that did not print it" do
+    CannedExtractionClient.install(events: [poster_event, matinee(place: nil, place_evidence: nil,
+                                                                 locality: nil, canton: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    reject
+    assert_equal "Zorpcore Matinee", field_value("title")
+    assert_equal "Zorpsaal", field_value("place")
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "BE", field_value("canton")
+  end
+
+  test "a typed locality reaches the sibling cards without overwriting a venue of their own" do
+    CannedExtractionClient.install(events: [poster_event(locality: nil, canton: nil),
+                                            matinee(place: "Zorpwiler Rathaus", place_evidence: "Rathaus",
+                                                    locality: nil, canton: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    type "locality", "Zorpwil"
+    reject
+    assert_equal "Zorpcore Matinee", field_value("title")
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "Zorpwiler Rathaus", field_value("place")
+  end
+
+  test "a place typed on one input stays on it rather than reaching the next input's cards" do
+    CannedExtractionClient.install(events: [poster_event(locality: nil, canton: nil)])
+    visit capture_path
+    pick "poster.png"
+    assert_selector ".capture-card", count: 1, visible: :all
+    paste "Zorpcore Nacht, Zorpsaal"
+    assert_selector ".capture-card", count: 2, visible: :all
+
+    type "locality", "Zorpwil"
+    reject
+    assert_equal "", field_value("locality")
+  end
+
   test "a picked poster is rendered beside the fields it produced" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -142,6 +182,15 @@ class CaptureScreenTest < ApplicationSystemTestCase
     { title: "Zorpcore Nacht", date: show_date.to_s, date_evidence: "steht auf dem Plakat",
       time: "20 Uhr", place: "Zorpsaal", place_evidence: "Zorpsaal", locality: "Zorpwil",
       canton: "BE", genres: ["zorpcore"], source_url: nil }.merge(overrides)
+  end
+
+  def matinee(**overrides) = poster_event(title: "Zorpcore Matinee", **overrides)
+
+  # Blurred on purpose: the carry hangs off `change`, which a text field fires when it
+  # is left, not on every keystroke.
+  def type(field, value)
+    find(".capture-card [name='#{field}']").set(value)
+    find(".capture-card [name=title]").click
   end
 
   def pick(*names)

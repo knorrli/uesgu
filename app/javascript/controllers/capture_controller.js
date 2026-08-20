@@ -1,6 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
+// Several acts on one poster share a venue; the date and time are what differ, so
+// only this tuple carries between the candidates off one input.
+const PLACE_FIELDS = ["place", "locality", "canton"]
+
 // The extraction fan-out lives here rather than on the server: one request per input,
 // because a batch cannot be held open in one and there is no queue to reach for (see
 // EventCapture::Extractor). It also drives the review queue — one card on screen, the
@@ -24,6 +28,7 @@ export default class extends Controller {
   // has to outlive the turbo-stream that replaces the whole row.
   initialize() {
     this.sources = new Map()
+    this.places = new Map()
     this.currentId = null
   }
 
@@ -61,6 +66,7 @@ export default class extends Controller {
     this.stripTarget.hidden = false
     this.stripTarget.appendChild(this.tileFor(card))
     card.hidden = card.id !== this.currentId
+    this.sharePlace(card)
     if (!this.currentId) this.open(card.id)
   }
 
@@ -167,6 +173,42 @@ export default class extends Controller {
     this.setField(card, "place", name)
     if (locality) this.setField(card, "locality", locality)
     if (canton) this.setField(card, "canton", canton)
+    this.sharePlace(card)
+  }
+
+  carryPlace(event) {
+    if (PLACE_FIELDS.includes(event.target.name)) this.sharePlace(event.target.closest(".capture-card"))
+  }
+
+  // Sticky on the controller rather than a sweep of the cards on screen, so the tuple
+  // still reaches a card that connects after the field was filled.
+  sharePlace(card) {
+    const row = card?.closest(".capture-row")
+    if (!row) return
+
+    const shared = this.places.get(row.id) ?? {}
+    PLACE_FIELDS.forEach((name) => {
+      const value = this.fieldValue(card, name)
+      if (value) shared[name] = value
+    })
+    this.places.set(row.id, shared)
+
+    this.cardTargets.filter((sibling) => sibling.closest(".capture-row") === row)
+                    .forEach((sibling) => this.fillPlace(sibling, shared))
+  }
+
+  // Only ever completes, never corrects: card 3's venue can genuinely differ from the
+  // two above it, and a decided card is not up for editing at all.
+  fillPlace(card, shared) {
+    if (card.dataset.state !== "open") return
+
+    PLACE_FIELDS.forEach((name) => {
+      if (shared[name] && !this.fieldValue(card, name)) this.setField(card, name, shared[name])
+    })
+  }
+
+  fieldValue(card, name) {
+    return card.querySelector(`[name="${name}"]`)?.value ?? ""
   }
 
   setField(card, name, value) {

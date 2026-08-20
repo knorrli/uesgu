@@ -13,7 +13,6 @@
   margin-bottom: var(--gap-large);
 }
 
-/* Table of contents */
 .sg-toc {
   display: flex;
   flex-wrap: wrap;
@@ -57,6 +56,13 @@
   .sg-row {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   }
+}
+
+/* A specimen that is itself responsive (the review card switches to two columns at
+   900px) would render its wide layout inside a half-width cell — the one situation
+   the app never puts it in. */
+.sg-row--stack {
+  grid-template-columns: 1fr;
 }
 
 /* The neutral stage the element sits on. */

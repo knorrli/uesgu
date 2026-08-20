@@ -34,10 +34,10 @@
     <a href="#nav">Navigation</a>
     <a href="#pagination">Pagination</a>
     <a href="#page-header">Page header</a>
+    <a href="#review-card">Review card</a>
     <a href="#footer">Footer</a>
   </nav>
 
-  <%# ============================================================ COLOURS %>
   <section class="sg-section" id="colours">
     <h2>Colour intent</h2>
     <p class="sg-section__intro">
@@ -99,7 +99,6 @@
     </p>
   </section>
 
-  <%# ============================================================ BUTTONS %>
   <section class="sg-section" id="buttons">
     <h2>Buttons &amp; actions</h2>
     <p class="sg-section__intro"><b>Three weights:</b> primary → secondary → danger, plus the flat icon action and the text link. Weight is the role; size (full-width vs small pill) is just context, not a separate tier. <b>Per-page primary:</b> at most one filled button per page, so it's the thing that stands out — everything else is secondary (hollow) or danger.</p>
@@ -209,7 +208,6 @@
     </div>
   </section>
 
-  <%# ============================================================ PILLS %>
   <section class="sg-section" id="pills">
     <h2>Pills, badges &amp; chips</h2>
     <p class="sg-section__intro"><b>Governing rule: a box reads as clickable.</b> Buttons are the only bordered/filled boxes — so anything with a border or solid fill says "do something", and <b>information carries no border/fill</b> (a faint tint at most). That's how you tell a read-only channel pill from a ghost action button at a glance.</p>
@@ -311,7 +309,6 @@
     </div>
   </section>
 
-  <%# ============================================================ DROPDOWNS %>
   <section class="sg-section" id="dropdowns">
     <h2>Dropdowns &amp; selects</h2>
     <p class="sg-section__intro">Disclosure indicators currently use three different glyph systems (audit #3). Specimens shown with the real account-form treatment.</p>
@@ -350,7 +347,6 @@
     </div>
   </section>
 
-  <%# ============================================================ INPUTS %>
   <section class="sg-section" id="inputs">
     <h2>Form inputs</h2>
     <p class="sg-section__intro">Two intentional field skins — underline (forms) and borderless-grow (filter bar) — plus three checkbox implementations (audit #4).</p>
@@ -441,7 +437,6 @@
     </div>
   </section>
 
-  <%# ============================================================ ICONS %>
   <section class="sg-section" id="icons">
     <h2>Icons</h2>
     <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); the follow <b>star</b> and saved <b>heart</b> are masked SVGs (outline→fill for off/on state). Clickable icons use <code>.icon-button</code>; display-only icons use the <code>.icon</code> role (audit #9, resolved).</p>
@@ -504,7 +499,6 @@
     </div>
   </section>
 
-  <%# ============================================================ NAV %>
   <section class="sg-section" id="nav">
     <h2>Navigation</h2>
     <p class="sg-section__intro">Header/footer chrome and the responsive filter (inline ≥600px, full-screen sheets &lt;600px) are composed from the elements above; the live versions surround this page.</p>
@@ -535,7 +529,6 @@
     </div>
   </section>
 
-  <%# ======================================================= PAGINATION %>
   <section class="sg-section" id="pagination">
     <h2>Pagination</h2>
     <p class="sg-section__intro">Every long list (admin events/locations/users, genres, the public feed) closes with the same quiet pager: prev/next plus a <code>Seite X / Y</code> readout, <b>never</b> a number grid — so it stays one calm line at any width. Built from <code>shared/_pagination</code>; pass the Kaminari <code>collection</code>. It renders nothing for a single page, and the end you can't move past (first/last) shows as muted, inert text so the readout never shifts as you page.</p>
@@ -553,7 +546,6 @@
     </div>
   </section>
 
-  <%# ======================================================= PAGE HEADER %>
   <section class="sg-section" id="page-header">
     <h2>Page header &amp; back link</h2>
     <p class="sg-section__intro">Every page except the main events feed opens with the same block: an optional <b>back link</b> — the "up" navigation — above the title. Built from <code>shared/_page_header</code> + <code>shared/_back_link</code>; <b>reuse them</b> rather than hand-rolling a header, so admin and app pages stay identical. The ← is decorative and lives in the partial, never in the copy.</p>
@@ -573,7 +565,49 @@
     </div>
   </section>
 
-  <%# ============================================================== FOOTER %>
+  <section class="sg-section" id="review-card">
+    <h2>Review card</h2>
+    <p class="sg-section__intro">One thing being judged, with the evidence that settles it and the decision itself on screen at the same time — the shape the capture queue uses to review an extracted event. The source pane is pinned (above the fields on a phone, left of them from 900px) and the action bar is pinned to the bottom edge, because the job is a <b>comparison</b>: a source that scrolls away turns "does this poster really say 20:00" back into remembering.</p>
+
+    <div class="sg-row sg-row--stack">
+      <div class="sg-specimen">
+        <%# The real partials. The pane normally holds evidence the browser never
+            uploaded, so this specimen stands an app icon in its place. %>
+        <%= render layout: "shared/review_card",
+              locals: { id: "sg-review-card", source: image_tag("/icon.png", alt: ""),
+                        actions: render(layout: "shared/action_bar") {
+                          safe_join([tag.button("Veröffentlichen", class: "button-small primary", type: "button"),
+                                     tag.button("Verwerfen", class: "button-small", type: "button")])
+                        } } do %>
+          <p class="field-label">poster.png</p>
+          <div class="account-form flex flex-col gap-small">
+            <label class="flex flex-col gap-xsmall">
+              <span class="field-label">Titel</span>
+              <input type="text" value="Zorpcore Nacht">
+            </label>
+          </div>
+        <% end %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Review card</span> · <code>render layout: "shared/review_card", id:, actions:, source:</code>
+        <p class="sg-purpose">The block is the body. <code>actions</code> is pre-rendered markup rather than a second block because the bar sits outside the scrolling body; <code>source</code> is the evidence, or is left out and written into the pane by a client that holds it in memory only. Pass <code>frame_class</code>/<code>frame_attrs</code> for the caller's own hooks — never a second <code>class</code> attribute.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <%= render layout: "shared/action_bar" do %>
+          <button type="button" class="button-small primary">Veröffentlichen</button>
+          <button type="button" class="button-small">Verwerfen</button>
+        <% end %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Action bar</span> · <code>render layout: "shared/action_bar"</code>
+        <p class="sg-purpose">The decision row of a review card, pinned to its bottom edge so it stays in thumb reach however long the field list runs. The commit comes first (primary), anything asking for another go sits in the middle, and the quiet way out is <b>last</b> — pushed to the far end, because a dismissal next to the commit is one mis-tap away from being it. Unlike <code>form_actions</code> this closes a decision, not a form: there is no <b>Abbrechen</b>, since leaving decides nothing.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="sg-section" id="footer">
     <h2>Footer</h2>
     <p class="sg-section__intro">A quiet, in-flow row of secondary links (about + the privacy notice), rendered once at the bottom of every page by the layout. Deliberately <b>recessive</b> — small, foreground-muted text — so it never competes with the feed; it sits below <code>&lt;main&gt;</code> and pins to the bottom on short pages. The real partial, the real CSS:</p>

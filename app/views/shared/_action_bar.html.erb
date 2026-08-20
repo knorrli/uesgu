@@ -1,0 +1,5 @@
+<%# The decision row of a review card. The caller supplies the controls, in this
+    order: the commit first (primary), anything asking for another go in the middle,
+    and the quiet way out last — a dismissal must never be as loud as the thing it
+    dismisses, and CSS pushes that last one to the far end. %>
+<div class="action-bar"><%= yield %></div>

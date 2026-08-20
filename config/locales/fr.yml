@@ -135,27 +135,25 @@ fr:
     calendar_feed_link: à configurer dans les réglages
   capture:
     title: Saisir un événement
-    intro: Tu as pris une affiche en photo, copié un texte ? On le lit, tu vérifies — rien ne part en ligne avant.
+    intro: Une affiche photographiée ou un texte copié ? On le lit, tu vérifies carte par carte – ce que tu publies part en ligne aussitôt.
     images_label: Affiches
     images_hint: Plusieurs à la fois, pas de souci. Les images ne sont jamais stockées.
     text_label: Texte
     text_hint: D'un chat, d'une newsletter, peu importe.
     text_button: Lire le texte
     empty: Rien de lu pour l'instant.
-    publish: Publier les événements
-    published:
-      zero: Rien n'a été publié.
-      one: Un événement est en ligne.
-      other: "%{count} événements sont en ligne."
-    partly_published:
-      zero: "Rien publié — il manque quelque chose à %{failed}."
-      one: "Un événement est en ligne, il manque quelque chose à %{failed}."
-      other: "%{count} événements sont en ligne, il manque quelque chose à %{failed}."
+    queue:
+      label: File
+      done: Tout est décidé. Une autre affiche ? Ajoute-la en haut.
+    actions:
+      accept: Publier
+      reject: Écarter
+    card:
+      published: "%{title} est en ligne."
     errors:
       incomplete: Il faut un titre, une date, une localité et un canton.
       duplicate: Cet événement existe déjà.
       url_invalid: Le lien doit commencer par http:// ou https://.
-      duplicate_in_batch: Cet événement partage son lien avec un autre ici — vide le lien sur l'un des deux.
       place_invalid: Ce lieu n'a pas pu être créé.
       unknown: Ça n'a pas marché.
     row:
@@ -165,7 +163,6 @@ fr:
       source_alt: L'image lue
       nth: "%{index} sur %{count}"
     candidate:
-      accept: Garder
       title: Titre
       date: Date
       time: Heure

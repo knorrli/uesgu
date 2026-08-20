@@ -1,13 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
-// The extraction fan-out lives here rather than on the server: one request per
-// input, because a batch cannot be held open in one and there is no queue to reach
-// for (see EventCapture::Extractor).
+// The extraction fan-out lives here rather than on the server: one request per input,
+// because a batch cannot be held open in one and there is no queue to reach for (see
+// EventCapture::Extractor). It also drives the review queue — one card on screen, the
+// rest behind it in the strip.
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
-  static targets = ["files", "text", "rows", "empty", "actions", "accept", "source"]
+  static targets = ["files", "text", "rows", "empty", "done", "strip", "card", "source"]
   static values = {
     url: String,
     pending: String,
@@ -18,11 +19,12 @@ export default class extends Controller {
     concurrency: { type: Number, default: 3 }
   }
 
-  // What each row was read from, held only in the browser. Nothing is uploaded for
-  // storage, so this store is the only copy a contributor can check a field
-  // against, and it has to outlive the turbo-stream that replaces the whole row.
+  // What each row was read from, held only in the browser: nothing is uploaded for
+  // storage, so this is the only copy a contributor can check a field against, and it
+  // has to outlive the turbo-stream that replaces the whole row.
   initialize() {
     this.sources = new Map()
+    this.currentId = null
   }
 
   disconnect() {
@@ -53,46 +55,122 @@ export default class extends Controller {
       })])
   }
 
-  // Unchecking "keep" does not lift `required`, so one dropped row missing the
-  // canton no poster prints makes the whole form unsubmittable, pointing at a row
-  // the contributor does not want. The marker outlives the removal so re-checking
-  // restores it.
-  //
-  // Publish is revealed from here rather than once the last extraction settles: a
-  // stream lands a frame later than the request that fetched it (see #extract), so
-  // that check ran before the row existed and left Publish hidden on a batch that
-  // had extracted fine. A row carrying no candidate never reaches here, so a failed
-  // batch still cannot offer a button that submits nothing.
-  acceptTargetConnected(checkbox) {
-    const fieldset = checkbox.closest(".capture-candidate")
-    fieldset.querySelectorAll("[required]").forEach((field) => field.setAttribute("data-required-when-kept", ""))
-    this.applyRequired(checkbox)
-    this.actionsTarget.hidden = false
+  // The first card to land opens, so picking a single poster shows it rather than a
+  // queue of one.
+  cardTargetConnected(card) {
+    this.stripTarget.hidden = false
+    this.stripTarget.appendChild(this.tileFor(card))
+    card.hidden = card.id !== this.currentId
+    if (!this.currentId) this.open(card.id)
   }
 
-  syncRequired(event) {
-    this.applyRequired(event.target)
+  jump(event) {
+    this.open(event.currentTarget.dataset.card)
   }
 
-  applyRequired(checkbox) {
-    const fieldset = checkbox.closest(".capture-candidate")
-    fieldset.querySelectorAll("[data-required-when-kept]").forEach((field) => {
-      field.required = checkbox.checked
-    })
+  open(id) {
+    this.currentId = id
+    this.cardTargets.forEach((card) => { card.hidden = card.id !== id })
+    this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === id) })
+    this.doneTarget.hidden = true
+  }
+
+  // turbo:submit-end fires for a refusal too, and that response is the stream putting
+  // the reason on a card the contributor is still looking at — so only a landed
+  // publish decides one.
+  decided(event) {
+    if (!event.detail.success) return
+
+    this.settle(event.target.closest(".capture-card"), "published")
+  }
+
+  reject(event) {
+    this.settle(event.target.closest(".capture-card"), "dropped")
+  }
+
+  // Only publishing freezes a card: the event is live and the form behind it would
+  // publish a second one. Rejecting is the reversible half, so a dropped card can be
+  // reopened from its tile.
+  settle(card, state) {
+    card.dataset.state = state
+    this.markTile(this.tileFor(card), state)
+    if (state === "published") {
+      card.querySelectorAll("input, select, button").forEach((field) => { field.disabled = true })
+    }
+    this.advance()
+  }
+
+  // Wraps, so a card left behind by a jump backwards is picked up rather than
+  // stranded.
+  advance() {
+    const cards = this.cardTargets
+    const from = cards.findIndex((card) => card.id === this.currentId)
+    const next = cards.slice(from + 1).concat(cards.slice(0, from + 1))
+                      .find((card) => card.dataset.state === "open")
+    if (next) return this.open(next.id)
+
+    cards.forEach((card) => { card.hidden = true })
+    this.currentId = null
+    this.doneTarget.hidden = false
+  }
+
+  // Full-bleed for the reason in review_card.css: the small print is what a poster is
+  // being looked at for.
+  zoom(event) {
+    const pane = event.currentTarget
+    if (pane.querySelector("img")) pane.classList.toggle("review-card__source--zoomed")
+  }
+
+  get tiles() {
+    return Array.from(this.stripTarget.querySelectorAll("[data-card]"))
+  }
+
+  tileFor(card) {
+    const existing = this.stripTarget.querySelector(`[data-card="${card.id}"]`)
+    if (existing) return existing
+
+    const tile = document.createElement("button")
+    tile.type = "button"
+    tile.className = "capture-queue__tile"
+    tile.dataset.card = card.id
+    tile.dataset.state = "open"
+    tile.dataset.action = "capture#jump"
+    tile.setAttribute("aria-label", card.querySelector(".capture-card__label")?.textContent.trim() ?? "")
+    tile.appendChild(this.thumbnail(this.sources.get(card.closest(".capture-row")?.id)))
+    return tile
+  }
+
+  markTile(tile, state) {
+    tile.dataset.state = state
+    tile.querySelector(".ph")?.remove()
+    const mark = document.createElement("span")
+    mark.className = state === "published" ? "ph ph-check-circle" : "ph ph-x"
+    mark.setAttribute("aria-hidden", "true")
+    tile.appendChild(mark)
+  }
+
+  // A pasted text has no picture to shrink, so its tile carries the head of the text
+  // instead — the strip stays scannable when the queue mixes the two.
+  thumbnail(source) {
+    if (source?.objectUrl) return this.poster(source.objectUrl)
+
+    const snippet = document.createElement("span")
+    snippet.className = "capture-queue__snippet"
+    snippet.textContent = source?.text?.slice(0, 24) ?? ""
+    return snippet
   }
 
   // Fill the place tuple from a near-match instead of minting a variant spelling.
-  // Scoped to the fieldset the chip sits in — every candidate carries its own.
   applySuggestion(event) {
-    const fieldset = event.target.closest(".capture-candidate")
+    const card = event.target.closest(".capture-card")
     const { name, locality, canton } = event.params
-    this.setField(fieldset, "place", name)
-    if (locality) this.setField(fieldset, "locality", locality)
-    if (canton) this.setField(fieldset, "canton", canton)
+    this.setField(card, "place", name)
+    if (locality) this.setField(card, "locality", locality)
+    if (canton) this.setField(card, "canton", canton)
   }
 
-  setField(fieldset, suffix, value) {
-    const field = fieldset.querySelector(`[name$="[${suffix}]"]`)
+  setField(card, name, value) {
+    const field = card.querySelector(`[name="${name}"]`)
     if (field) field.value = value
   }
 
@@ -113,11 +191,10 @@ export default class extends Controller {
     await Promise.all(workers)
   }
 
-  // The row is appended BEFORE the decode, not after: createImageBitmap rejects on
-  // a HEIC picked from Finder (accept="image/*" allows it and no desktop browser
-  // decodes it) and on anything corrupt, and with the row created afterwards that
-  // threw before anything was on screen — the picker cleared, the Publish button
-  // appeared, and nothing else happened.
+  // The row is appended BEFORE the decode: createImageBitmap rejects on a HEIC picked
+  // from Finder (accept="image/*" allows it and no desktop browser decodes it) and on
+  // anything corrupt. Appending afterwards meant that throw happened with nothing yet
+  // on screen — the picker just cleared.
   async extractImage(file) {
     const id = crypto.randomUUID()
     this.appendPending(id, file.name)
@@ -152,21 +229,19 @@ export default class extends Controller {
         body,
         headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
       })
-      // renderStreamMessage is a silent no-op on any body without a <turbo-stream>,
-      // so an unchecked status leaves the row spinning forever on a 500, on a 403
-      // after the capability is revoked mid-session, and on an expired session
-      // (fetch follows the redirect and hands back the login page) — indistinguishable
-      // from a slow provider, which is the exact failure this rescue exists to prevent.
+      // renderStreamMessage is a silent no-op on any body without a <turbo-stream>, so
+      // an unchecked status leaves the row spinning forever on a 500, on a 403 after the
+      // capability is revoked mid-session, and on an expired session (fetch follows the
+      // redirect and hands back the login page).
       if (!response.ok) return this.failRow(id)
 
       const stream = await response.text()
       Turbo.renderStreamMessage(stream)
-      // A provider failure comes back as a turbo-stream with status 200 — the
-      // request succeeded, the extraction did not — so the row is the only honest
-      // signal of whether anything was read. It has to be read out of the markup:
-      // Turbo performs the action on the NEXT ANIMATION FRAME, so the page still
-      // holds the pending row here and every failure read as a success, which
-      // cleared the textarea out from under a paste the provider had just refused.
+      // A provider failure comes back as a turbo-stream with status 200 — the request
+      // succeeded, the extraction did not — so the response markup is the only honest
+      // signal. It cannot be read off the page: Turbo performs the action on the NEXT
+      // ANIMATION FRAME, so the pending row is still standing here, and reading that
+      // scored every failure a success and cleared the textarea under a refused paste.
       return this.failureIn(stream) === null
     } catch {
       return this.failRow(id)
@@ -180,7 +255,6 @@ export default class extends Controller {
     return template?.content.querySelector("[data-failed]") ?? null
   }
 
-  // Returns false so a caller can tell a landed extraction from a failed one.
   failRow(id, message = this.errorValue) {
     const row = document.getElementById(this.rowId(id))
     if (row) row.querySelector("[data-pending]").textContent = message
@@ -194,7 +268,7 @@ export default class extends Controller {
     const source = this.sources.get(slot.closest(".capture-row")?.id)
     // Emptied first because a Turbo-cached snapshot restores an <img> whose object
     // URL this controller revoked on the way out — left alone it paints a broken
-    // image, which is worse than the empty slot the restored row has earned.
+    // image, which is worse than the empty slot the restored card has earned.
     slot.replaceChildren()
     if (!source) return
 
@@ -229,19 +303,14 @@ export default class extends Controller {
     this.rowsTarget.appendChild(row)
   }
 
-  // The long edge is capped at 1568px, which is where the provider's accuracy was
-  // measured. It happens here because there is no image library in the bundle and
-  // none on the deployed box, so the server cannot resize. Re-encoding through the
-  // canvas also drops EXIF, so a poster photo's GPS never leaves the device — which
-  // the server could never have achieved, the metadata having already travelled.
+  // 1568px is where the provider's accuracy was measured. It happens on the client
+  // because there is no image library in the bundle and none on the deployed box — and
+  // the canvas re-encode drops EXIF, so a poster photo's GPS never leaves the device,
+  // which a server-side resize could never achieve.
   //
-  // Encoded BOTH ways and the smaller one wins, rather than picking by source
-  // type. Measured on a real poster sample already at 1568px: canvas PNG came out at
-  // 1.81MB — 32% LARGER than the 1.37MB source, because canvas PNG output is
-  // unoptimised — against 221KB as JPEG. Keeping PNG for PNG sources would have
-  // sent eight times the necessary bytes on exactly the input this feature is for.
-  // Flat-colour screenshots, where PNG genuinely wins, still get PNG; the rule
-  // decides per image instead of guessing from the file extension.
+  // Encoded BOTH ways because canvas PNG output is unoptimised: on a real poster
+  // sample it came out at 1.81MB against 221KB as JPEG, 32% larger than the 1.37MB
+  // source. Flat-colour screenshots, where PNG genuinely wins, still get PNG.
   async downscale(file) {
     const bitmap = await createImageBitmap(file)
     const scale = Math.min(1, this.maxEdgeValue / Math.max(bitmap.width, bitmap.height))

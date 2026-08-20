@@ -1,0 +1,105 @@
+/* One thing being judged, with the evidence that settles it on screen at the same
+   time. Specimen in /styleguide.
+
+   The source pane and the action bar are sticky because the job is a comparison: a
+   source that scrolls away turns "does this poster really say 20:00" back into
+   remembering. Both need an opaque ground — the body scrolls underneath them. */
+.review-card {
+  position: relative;
+  padding-bottom: var(--gap-small);
+  border-top: var(--border-width) solid var(--border-color);
+}
+
+.review-card__source {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  max-height: 38vh;
+  overflow: hidden;
+  background: var(--theme-bg-color);
+  padding-block: var(--gap-small);
+}
+
+.review-card__source:not(:empty) {
+  margin-bottom: var(--gap-small);
+}
+
+.review-card__source img {
+  width: auto;
+  max-height: calc(38vh - 2 * var(--gap-small));
+  border: var(--border-width) solid var(--border-color);
+}
+
+.review-card__source:has(img) {
+  cursor: zoom-in;
+}
+
+/* Full-bleed: the small print on a poster is the reason to look at it at all, and
+   a pane sized to sit beside the fields cannot show it. */
+.review-card__source--zoomed {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  max-height: none;
+  padding: var(--gap-small);
+  cursor: zoom-out;
+}
+
+.review-card__source--zoomed img {
+  max-height: 100%;
+  max-width: 100%;
+}
+
+/* Pinned to the bottom edge so it stays in thumb reach however long the field list
+   runs. The last action is pushed to the far end: a dismissal sitting next to the
+   commit is one mis-tap away from being it. */
+.action-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  padding-block: var(--gap-small);
+  background: var(--theme-bg-color);
+  border-top: var(--border-width) solid var(--rule-color);
+}
+
+.action-bar > :last-child {
+  margin-left: auto;
+}
+
+/* The same relationship rotated: source pinned left, fields scrolling right, the
+   decision across the bottom of both. */
+@media (min-width: 900px) {
+  .review-card {
+    display: grid;
+    grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    grid-template-areas:
+      "source body"
+      "actions actions";
+    column-gap: var(--gap-large);
+    align-items: start;
+  }
+
+  .review-card__source {
+    grid-area: source;
+    top: var(--gap-small);
+    max-height: none;
+    margin-bottom: 0;
+  }
+
+  .review-card__source img {
+    max-height: 70vh;
+  }
+
+  .review-card__body {
+    grid-area: body;
+  }
+
+  .action-bar {
+    grid-area: actions;
+  }
+}

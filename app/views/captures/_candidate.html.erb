@@ -1,99 +1,101 @@
-<%# One event the model claims it read. Everything is editable and nothing is
-    trusted: a value the normalizer refused is null here with the model's raw text
-    shown beside it, because a human completes a null in one tap but only if they
-    can still see what was claimed. Accepted by default — this is a list you prune,
-    not one you assemble. %>
-<%# locals: (candidate:, key:, error: nil) %>
-<fieldset class="capture-candidate flex flex-col gap-small">
-  <% if error.present? %>
-    <p class="capture-candidate__error"><%= t("capture.errors.#{error}", default: t('capture.errors.unknown')) %></p>
-  <% end %>
+<%# One event the model claims it read, as a card to decide on. Everything is
+    editable and nothing is trusted: a value the normalizer refused is null here with
+    the model's raw text beside it (see EventCapture::Candidate). Accepting publishes
+    immediately. %>
+<%# locals: (candidate:, key:, label:, nth: nil) %>
+<%= render layout: "shared/review_card",
+      locals: { id: key, actions: render("captures/card_actions", key: key), frame_class: "capture-card",
+                source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } },
+                frame_attrs: { data: { capture_target: "card", state: "open" } } } do %>
+  <p class="capture-card__label field-label">
+    <%= label %>
+    <%# Two candidates off one poster share its preview, and read as a duplicated card
+        without this count. %>
+    <% if nth %><span class="muted"><%= t('capture.row.nth', index: nth.first, count: nth.last) %></span><% end %>
+  </p>
 
-  <label class="capture-candidate__accept">
-    <%# A row that came back from a refused publish stays kept: the contributor
-        already chose it, and the fix is a field, not the decision. %>
-    <%= check_box_tag "candidates[#{key}][accept]", "1", error.present? || !candidate.past?,
-          data: { capture_target: "accept", action: "capture#syncRequired" } %>
-    <span><%= t('capture.candidate.accept') %></span>
-  </label>
+  <%= form_with url: capture_path, method: :post, id: "#{key}-form",
+        class: "capture-card__fields account-form flex flex-col gap-small",
+        data: { action: "turbo:submit-end->capture#decided" } do %>
+    <%= hidden_field_tag :card_id, key %>
 
-  <label class="flex flex-col gap-xsmall">
-    <span class="field-label"><%= t('capture.candidate.title') %></span>
-    <%= text_field_tag "candidates[#{key}][title]", candidate.title, required: true %>
-  </label>
-
-  <div class="capture-candidate__when flex gap-small wrap">
     <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.date') %></span>
-      <%= date_field_tag "candidates[#{key}][date]", candidate.date, required: true %>
+      <span class="field-label"><%= t('capture.candidate.title') %></span>
+      <%= text_field_tag :title, candidate.title, required: true %>
     </label>
-    <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.time') %></span>
-      <%= text_field_tag "candidates[#{key}][time]", candidate.time, placeholder: "20:00" %>
-    </label>
-  </div>
 
-  <% if candidate.past? %>
-    <p class="capture-candidate__warning"><%= t('capture.candidate.past') %></p>
-  <% end %>
-
-  <label class="flex flex-col gap-xsmall">
-    <span class="field-label"><%= t('capture.candidate.place') %></span>
-    <%= text_field_tag "candidates[#{key}][place]", candidate.place %>
-  </label>
-
-  <%# Match-at-entry: tapping one of these is what stops a fourth spelling of
-      "Quartierfest" from being minted, which is what keeps the place below the
-      VenueLead nomination threshold forever. A suggestion never auto-applies. %>
-  <% suggestions = place_suggestions(candidate) %>
-  <% if suggestions.any? %>
-    <div class="capture-candidate__suggestions flex gap-xsmall wrap">
-      <span class="muted"><%= t('capture.candidate.suggestions') %></span>
-      <% suggestions.each do |suggestion| %>
-        <button type="button" class="chip"
-                data-action="capture#applySuggestion"
-                data-capture-name-param="<%= suggestion.name %>"
-                data-capture-locality-param="<%= suggestion.locality %>"
-                data-capture-canton-param="<%= suggestion.canton %>">
-          <%= suggestion.name %>
-        </button>
-      <% end %>
+    <div class="capture-card__when flex gap-small wrap">
+      <label class="flex flex-col gap-xsmall">
+        <span class="field-label"><%= t('capture.candidate.date') %></span>
+        <%= date_field_tag :date, candidate.date, required: true %>
+      </label>
+      <label class="flex flex-col gap-xsmall">
+        <span class="field-label"><%= t('capture.candidate.time') %></span>
+        <%= text_field_tag :time, candidate.time, placeholder: "20:00" %>
+      </label>
     </div>
+
+    <% if candidate.past? %>
+      <p class="capture-card__warning"><%= t('capture.candidate.past') %></p>
+    <% end %>
+
+    <label class="flex flex-col gap-xsmall">
+      <span class="field-label"><%= t('capture.candidate.place') %></span>
+      <%= text_field_tag :place, candidate.place %>
+    </label>
+
+    <%# Tapping one is what stops a fourth spelling of "Quartierfest" being minted and
+        keeping the place below the VenueLead nomination threshold forever. A
+        suggestion never auto-applies. %>
+    <% suggestions = place_suggestions(candidate) %>
+    <% if suggestions.any? %>
+      <div class="capture-card__suggestions flex gap-xsmall wrap">
+        <span class="muted"><%= t('capture.candidate.suggestions') %></span>
+        <% suggestions.each do |suggestion| %>
+          <button type="button" class="chip"
+                  data-action="capture#applySuggestion"
+                  data-capture-name-param="<%= suggestion.name %>"
+                  data-capture-locality-param="<%= suggestion.locality %>"
+                  data-capture-canton-param="<%= suggestion.canton %>">
+            <%= suggestion.name %>
+          </button>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="capture-card__where flex gap-small wrap">
+      <label class="flex flex-col gap-xsmall">
+        <%# Required HERE and not at extraction: a poster never prints its own town,
+            but Location.add_to_tree drops any tuple missing the middle tier, so a
+            blank locality is an event nobody can browse to. %>
+        <span class="field-label"><%= t('capture.candidate.locality') %></span>
+        <%= text_field_tag :locality, candidate.locality, required: true, list: "capture-localities" %>
+      </label>
+      <label class="flex flex-col gap-xsmall">
+        <span class="field-label"><%= t('capture.candidate.canton') %></span>
+        <%= select_tag :canton, options_for_select(canton_options, candidate.canton),
+              include_blank: true, required: true %>
+      </label>
+    </div>
+
+    <label class="flex flex-col gap-xsmall">
+      <span class="field-label"><%= t('capture.candidate.url') %></span>
+      <%= url_field_tag :url, candidate.source_url, placeholder: "https://" %>
+    </label>
+
+    <label class="flex flex-col gap-xsmall">
+      <span class="field-label"><%= t('capture.candidate.genres') %></span>
+      <%= text_field_tag :genres, candidate.genres.join(", ") %>
+    </label>
   <% end %>
-
-  <div class="capture-candidate__where flex gap-small wrap">
-    <label class="flex flex-col gap-xsmall">
-      <%# Required HERE and not at extraction: a poster never prints its own town,
-          but Location.add_to_tree drops any tuple missing the middle tier, so a
-          blank locality is an event nobody can browse to. When the contributor
-          genuinely doesn't know, the nearest named settlement beats a blank. %>
-      <span class="field-label"><%= t('capture.candidate.locality') %></span>
-      <%= text_field_tag "candidates[#{key}][locality]", candidate.locality,
-            required: true, list: "capture-localities" %>
-    </label>
-    <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.canton') %></span>
-      <%= select_tag "candidates[#{key}][canton]",
-            options_for_select(canton_options, candidate.canton),
-            include_blank: true, required: true %>
-    </label>
-  </div>
-
-  <label class="flex flex-col gap-xsmall">
-    <span class="field-label"><%= t('capture.candidate.url') %></span>
-    <%= url_field_tag "candidates[#{key}][url]", candidate.source_url, placeholder: "https://" %>
-  </label>
-
-  <label class="flex flex-col gap-xsmall">
-    <span class="field-label"><%= t('capture.candidate.genres') %></span>
-    <%= text_field_tag "candidates[#{key}][genres]", candidate.genres.join(", ") %>
-  </label>
 
   <%# The interesting column: what the model claimed and we refused, and why. A
       rejected value is never silently dropped. %>
   <% if candidate.raw.any? %>
-    <p class="capture-candidate__issues muted">
+    <p class="capture-card__issues muted">
       <%= t('capture.candidate.refused', values: candidate.raw.values.join(", ")) %>
     </p>
   <% end %>
-</fieldset>
+
+  <div id="<%= key %>-status"></div>
+<% end %>

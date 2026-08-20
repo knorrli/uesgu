@@ -76,6 +76,9 @@ namespace :scrapers do
   desc "Run all scrapers once, recording a ScrapeRun and per-scraper summary (daily cron entrypoint)"
   task run_all: :environment do
     run = Scrapers::Sweep.run!
+    # This cron is the app's only scheduled hook — there is no queue and no
+    # scheduler — so the capture funnel's size backstop rides along with it.
+    ExtractionAttempt.prune!
 
     failed = run.scrape_results.failed.pluck(:scraper)
     dropped = run.dropped_to_zero

@@ -64,11 +64,14 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
     assert_equal 1200, result.input_tokens
   end
 
-  test "a non-200 becomes a ProviderError carrying the status" do
+  # The status is the message because that message is persisted on every failed
+  # attempt; the body it came with is a payload and stays in `detail`.
+  test "a non-200 becomes a ProviderError carrying the status, with the body kept out of the message" do
     result, = call_with(response("503", "upstream busy"))
 
     assert_kind_of EventCapture::ProviderError, result
-    assert_match(/HTTP 503/, result.message)
+    assert_equal "HTTP 503", result.message
+    assert_equal "upstream busy", result.detail
   end
 
   # The product id is interpolated into the request path, so a malformed one has to

@@ -82,11 +82,13 @@ module EventCapture
       request.body = JSON.generate(body)
 
       response = http.request(request)
-      raise ProviderError, "HTTP #{response.code}: #{response.body.to_s.truncate(300)}" unless response.is_a?(Net::HTTPOK)
+      unless response.is_a?(Net::HTTPOK)
+        raise ProviderError.new("HTTP #{response.code}", detail: response.body.to_s.truncate(300))
+      end
 
       JSON.parse(response.body)
     rescue JSON::ParserError => e
-      raise ProviderError, "unreadable response: #{e.message}"
+      raise ProviderError.new("unreadable response", detail: e.message)
     # URI::InvalidURIError belongs here too: the product id is interpolated into the
     # path, so a malformed one must fail like any other bad configuration rather
     # than escape Extractor's rescue as a 500 on the capture screen.

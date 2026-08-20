@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_19_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_20_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -60,6 +60,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_19_210000) do
     t.index ["start_date"], name: "index_events_on_start_date"
     t.index ["url"], name: "index_events_on_url", unique: true
     t.check_constraint "canonical_event_id IS NULL OR canonical_event_id <> id", name: "events_canonical_not_self"
+  end
+
+  create_table "extraction_attempts", force: :cascade do |t|
+    t.integer "candidates_count", default: 0, null: false
+    t.string "code"
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.text "error_message"
+    t.integer "input_tokens", default: 0, null: false
+    t.jsonb "issues", default: {}, null: false
+    t.string "medium"
+    t.string "model"
+    t.integer "output_tokens", default: 0, null: false
+    t.string "prompt_sha"
+    t.string "status", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_extraction_attempts_on_created_at"
+    t.index ["model", "prompt_sha"], name: "index_extraction_attempts_on_model_and_prompt_sha"
   end
 
   create_table "genres", force: :cascade do |t|

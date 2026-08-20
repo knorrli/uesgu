@@ -1,0 +1,135 @@
+<% content_for :title, t('.title') %>
+<div class="flex flex-col gap-large">
+  <%# Absolute i18n keys inside the page_header block: lazy `.keys` would resolve
+      against shared.page_header.* (see project memory). %>
+  <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>
+    <h1><%= t('admin.extraction_attempts.index.title') %></h1>
+  <% end %>
+
+  <p class="muted"><%= t('.intro') %></p>
+
+  <% if @presenter.any? %>
+    <p class="muted">
+      <%= t('.tally', total: @presenter.total, failed: @presenter.failed,
+            failed_pct: @presenter.percent(@presenter.failed, @presenter.total),
+            candidates: @presenter.candidates) %>
+      <% if @presenter.average_duration_ms %>
+        · <%= t('.average_duration', ms: @presenter.average_duration_ms) %>
+      <% end %>
+      · <%= t('.tokens', tokens: @presenter.tokens) %>
+    </p>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.failures_heading') %></h2>
+      <% if @presenter.failures_by_code.any? %>
+        <dl class="flex flex-col gap-small">
+          <% @presenter.failures_by_code.each do |code, count| %>
+            <div class="stat">
+              <dt><%= code %></dt>
+              <span class="stat__leader"></span>
+              <dd class="muted"><%= count %></dd>
+            </div>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="muted"><%= t('.no_failures') %></p>
+      <% end %>
+    </section>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.issues_heading') %></h2>
+      <p class="muted"><%= t('.issues_intro') %></p>
+      <% if @presenter.issue_counts.any? %>
+        <dl class="flex flex-col gap-small">
+          <% @presenter.issue_counts.each do |code, count| %>
+            <div class="stat">
+              <dt><%= code %></dt>
+              <span class="stat__leader"></span>
+              <dd class="muted"><%= count %></dd>
+            </div>
+          <% end %>
+        </dl>
+      <% else %>
+        <p class="muted"><%= t('.no_issues') %></p>
+      <% end %>
+    </section>
+
+    <% if @presenter.groups.any? %>
+      <section class="flex flex-col gap-small">
+        <h2><%= t('.prompts_heading') %></h2>
+        <p class="muted"><%= t('.prompts_intro') %></p>
+        <div class="scrape-table-wrap">
+          <table class="scrape-table">
+            <thead>
+              <tr>
+                <th><%= t('.col.model') %></th>
+                <th><%= t('.col.prompt_sha') %></th>
+                <th class="num"><%= t('.col.attempts') %></th>
+                <th class="num"><%= t('.col.failed') %></th>
+                <th class="num"><%= t('.col.candidates') %></th>
+                <th class="num"><%= t('.col.issues') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @presenter.groups.each do |group| %>
+                <tr>
+                  <td><%= group.model || '—' %></td>
+                  <td><%= group.prompt_sha %></td>
+                  <td class="num"><%= group.count %></td>
+                  <td class="num"><%= group.failed %></td>
+                  <td class="num"><%= group.candidates %></td>
+                  <td class="num"><%= group.issues %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.attempts_heading') %></h2>
+      <div class="scrape-table-wrap">
+        <table class="scrape-table">
+          <thead>
+            <tr>
+              <th><%= t('.col.when') %></th>
+              <th><%= t('.col.medium') %></th>
+              <th><%= t('.col.outcome') %></th>
+              <th class="num"><%= t('.col.candidates') %></th>
+              <th class="num"><%= t('.col.tokens') %></th>
+              <th class="num"><%= t('.col.duration') %></th>
+              <th><%= t('.col.prompt_sha') %></th>
+              <th><%= t('.col.issues') %></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @presenter.attempts.each do |attempt| %>
+              <tr>
+                <td><%= l(attempt.created_at) %></td>
+                <td><%= attempt.medium || '—' %></td>
+                <td>
+                  <% if attempt.failed? %>
+                    <span class="scrape-badge scrape-badge--failed"><%= attempt.code %></span>
+                    <% if attempt.error_message.present? %>
+                      <span class="muted"><%= attempt.error_message %></span>
+                    <% end %>
+                  <% else %>
+                    <span class="muted"><%= t('.status_ok') %></span>
+                  <% end %>
+                </td>
+                <td class="num"><%= attempt.candidates_count %></td>
+                <td class="num"><%= attempt.input_tokens + attempt.output_tokens %></td>
+                <td class="num"><%= attempt.duration_ms %></td>
+                <td><%= attempt.prompt_sha %></td>
+                <td><%= attempt.issues.map { |code, count| count > 1 ? "#{code}×#{count}" : code }.join(', ') %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

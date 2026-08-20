@@ -398,6 +398,8 @@ en:
       discard_rules: Discard rules
       scraper_coverage: Data coverage
       discovery_leads: Venue leads
+      capture_heading: Capture
+      extractions: Extractions
       accounts_heading: Accounts & invitations
       users: Accounts
       open_invitations: Open invitations
@@ -601,6 +603,35 @@ en:
         title: Venue leads
         intro: Venues an aggregator surfaced that aren't in the registry yet, ranked by upcoming events. To add one, edit config/venues.yml.
         empty: No leads. Every venue an aggregator surfaced is already in the registry.
+    extraction_attempts:
+      index:
+        title: Extractions
+        intro: One row per model call in the capture flow — metadata only, no field values. Says whether the provider is erroring right now, and which values the normalizer had to refuse.
+        empty: No extractions recorded yet.
+        tally: "%{total} attempts · %{failed} failed (%{failed_pct}%) · %{candidates} candidates"
+        average_duration: "avg %{ms} ms"
+        tokens: "%{tokens} tokens"
+        failures_heading: Failures
+        no_failures: No attempt failed.
+        issues_heading: Refused values
+        issues_intro: Values the model returned and the normalizer refused, leaving the field empty. A code that climbs means its prompt rule doesn't fit.
+        no_issues: Nothing refused.
+        prompts_heading: By prompt
+        prompts_intro: The same attempts grouped by model and prompt version, so a prompt edit reads as a before/after — tuning does not carry from one model to the next.
+        attempts_heading: Attempts
+        status_ok: ok
+        col:
+          when: When
+          medium: Medium
+          outcome: Outcome
+          candidates: Candidates
+          issues: Refused
+          tokens: Tokens
+          duration: ms
+          model: Model
+          prompt_sha: Prompt
+          attempts: Attempts
+          failed: Failed
     locations:
       index:
         title: Locations

@@ -1,7 +1,9 @@
 namespace :event_capture do
   # The console entry point for the capture funnel. Runs a target through its adapter
-  # and the extractor and prints what the capture screen would receive; writes nothing
-  # to the database and stores no image.
+  # and the extractor and prints what the capture screen would receive. Stores no
+  # image and creates no event; it does write the ExtractionAttempt row every
+  # extraction records, so a console probe counts in the admin numbers like any
+  # other attempt.
   #
   #   bin/rails "event_capture:extract[poster.jpg]"
   #   bin/rails "event_capture:extract[poster.jpg,screenshot.png]"
@@ -9,7 +11,7 @@ namespace :event_capture do
   #
   # Needs INFOMANIAK_API_TOKEN + INFOMANIAK_PRODUCT_ID (see
   # config/initializers/event_capture.rb).
-  desc "Extract event candidates from images or pasted text (- for stdin; read-only, persists nothing)"
+  desc "Extract event candidates from images or pasted text (- for stdin; creates no event)"
   task :extract, [:target] => :environment do |_task, args|
     targets = [args[:target], *args.extras].compact_blank
     abort 'usage: bin/rails "event_capture:extract[poster.jpg|-]"' if targets.empty?
@@ -39,6 +41,8 @@ namespace :event_capture do
 
     unless extraction.ok?
       puts "  FAILED (#{extraction.code}): #{extraction.error}"
+      # The provider's own words, kept out of the recorded row (see ProviderError).
+      puts "  #{extraction.detail}" if extraction.detail
       return true
     end
 

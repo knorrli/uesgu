@@ -1,9 +1,8 @@
 require "test_helper"
 
-# Year resolution is the clearest case of "the model transcribes, code computes":
-# the bake-off model read "Mi 19. August" correctly in all six runs and still
-# resolved it to 2025 in two of them. The nearest occurrence decides; a printed
-# weekday only ever checks that answer (see the conflict tests below).
+# Year resolution is the clearest case of "the model transcribes, code computes": the
+# model read "Mi 19. August" correctly in all six evaluation runs and still resolved it
+# to 2025 in two. The nearest occurrence decides; a printed weekday only checks it.
 class EventCapture::YearResolverTest < ActiveSupport::TestCase
   TODAY = Date.new(2026, 8, 19) # a Wednesday
 
@@ -52,7 +51,6 @@ class EventCapture::YearResolverTest < ActiveSupport::TestCase
     assert_equal Date.new(2026, 12, 5), resolve("Doors 19.30 Uhr, Konzert am 5.12.")
   end
 
-  # --- the weekday, as a check rather than a selector ------------------------
 
   test "a weekday agreeing with the resolved date raises nothing" do
     refute conflict?("Mi 19. August", Date.new(2026, 8, 19)) # a Wednesday
@@ -65,18 +63,17 @@ class EventCapture::YearResolverTest < ActiveSupport::TestCase
     assert conflict?("Di 19. August", Date.new(2026, 8, 19))     # ...and the Tuesday is surfaced
   end
 
-  # "die"/"mit" are a German article and preposition, "so" an adverb, and "mar" is
-  # both mardi and an abbreviation of März. Under a flag-only weekday these cost a
-  # false alarm rather than a year, but the flag is the signal #112 will read, so
-  # keep it clean.
+  # "die"/"mit" are a German article and preposition, "so" an adverb, and "mar" is both
+  # mardi and an abbreviation of März. A spurious token costs only a false alarm now
+  # that the weekday just raises a flag — but the flag is the signal, so keep it clean.
   test "ordinary prose raises no weekday conflict" do
     refute conflict?("Die Türen öffnen um 20 Uhr, 5. Mai", Date.new(2027, 5, 5))
     refute conflict?("3. Mar", Date.new(2027, 3, 3))
     refute conflict?("Mit dabei ... Sa 20.09.", Date.new(2025, 9, 20))
   end
 
-  # The list covered German and French abbreviations and English full names only —
-  # "mon" was there by coincidence, because it is also short for Montag.
+  # English abbreviations are easy to leave out: "mon" looks covered already, being
+  # short for Montag too.
   test "English abbreviations are recognised, like the German and French ones" do
     { "Sun 23 August" => 0, "Tue 25 August" => 2, "Wed 26 August" => 3,
       "Thu 27 August" => 4, "Fri 28 August" => 5, "Sat 29 August" => 6 }.each do |evidence, wday|

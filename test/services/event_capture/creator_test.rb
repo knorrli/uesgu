@@ -18,8 +18,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal %w[BE Zorpsaal Zorpwil], result.event.location_list.sort
   end
 
-  # The seam that keeps a captured event out of the scrapers' nightly
-  # re-derivation.
   test "stamps the capture data source" do
     assert_equal "capture", EventCapture::Creator.call(attrs).event.data_source
   end
@@ -50,8 +48,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   end
 
   # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
-  # second node in the WHERE tree forever. Identity modulo case/accents/punctuation
-  # is a normalisation, not the near-match the design forbids auto-applying.
+  # second node in the WHERE tree forever (see Creator#canonical_locality).
   test "a locality differing only in case or accents adopts the stored spelling" do
     venue = Venue.in_taxonomy.find { |v| v.locality.present? }
     skip "no placed venue" if venue.nil?
@@ -71,9 +68,8 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_includes result.event.location_list, "Zorpwil"
   end
 
-  # No string measure reaches Freiburg -> Fribourg or a Luzren -> Luzern
-  # transposition, so a genuine variant is left alone rather than guessed at. That
-  # class needs a curated alias list of known name pairs instead.
+  # The complement of the case above: a genuine variant is left alone rather than
+  # guessed at (see Creator#canonical_locality).
   test "a genuinely different spelling is left as typed" do
     place(name: "Zorpsaal", locality: "Zorpwil")
 
@@ -83,9 +79,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   end
 
   # Both lookups match on NAME alone, so the form's locality can disagree with where
-  # the place actually is — and Location.hierarchy nests the venue node under the
-  # STORED locality, leaving the venue chip and the canton chip describing one event
-  # differently.
+  # the place actually is — and the chips would then describe one event two ways.
   test "a matched place is tagged with its own locality and canton, not the form's" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
 
@@ -155,9 +149,8 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_predicate EventCapture::Creator.call(attrs(title: "Zorp Fest 2")), :ok?
   end
 
-  # events.url is rendered as a bare link_to href in the public feed, so a typed
-  # string reaching it would land in every user's browser. The url input's own
-  # validation is client-side only.
+  # This is the only server-side check: the url input's own validation is client-side
+  # only, and the value lands in every user's browser (see Creator::HTTP_SCHEMES).
   test "a link that is not http(s) is refused rather than published" do
     assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "mailto:x@example.com")).error
     assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "see poster")).error
@@ -165,8 +158,8 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_predicate EventCapture::Creator.call(attrs(url: "https://zorp.example/x")), :ok?
   end
 
-  # places.url exists to make a VenueLead actionable ("write a scraper"), and a
-  # scraper cannot be written against someone's Instagram post.
+  # places.url exists to make a VenueLead actionable, and no scraper can be written
+  # against someone's Instagram post.
   test "a social link lands on the event but never on the place" do
     result = EventCapture::Creator.call(attrs(url: "https://www.instagram.com/p/zorp"))
 
@@ -180,8 +173,8 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "https://zorpsaal.example/programm", result.place.url
   end
 
-  # Time.zone.parse RAISES on this, and a poster prints it for an after-midnight
-  # show. Unrescued it would 500 the publish and take the whole unpersisted batch.
+  # A poster prints "25:00" for an after-midnight show, and Time.zone.parse raises on
+  # it — a 500 that would take the whole unpersisted queue with it.
   test "an out-of-range clock is nulled, not raised" do
     result = EventCapture::Creator.call(attrs(time: "25:00"))
 
@@ -189,9 +182,8 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_nil result.event.start_time
   end
 
-  # The field is free text pre-filled from the model, so a contributor's correction
-  # must land where the model's own answer would — Time.zone.parse would read every
-  # one of these as midnight.
+  # A correction has to land where the model's own answer would; Time.zone.parse reads
+  # every one of these as midnight.
   test "a typed time is read by the same parser the model's answer went through" do
     assert_equal "20:00", EventCapture::Creator.call(attrs(time: "20 Uhr")).event.start_time.strftime("%H:%M")
     assert_equal "20:30", EventCapture::Creator.call(attrs(time: "20h30", title: "B")).event.start_time.strftime("%H:%M")
@@ -199,8 +191,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_nil EventCapture::Creator.call(attrs(time: "20.08.2026", title: "D")).event.start_time
   end
 
-  # add_to_tree bails on a blank canton exactly as it does on a blank locality, so
-  # the event would be one no node of the WHERE tree can reach.
+  # add_to_tree bails on a blank canton exactly as it does on a blank locality.
   test "refuses a candidate with no canton" do
     assert_equal :incomplete, EventCapture::Creator.call(attrs(canton: "")).error
   end

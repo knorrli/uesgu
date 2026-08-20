@@ -1,19 +1,16 @@
 module EventCapture
-  # Reading a printed time into HH:MM. Shared by Normalizer and by the verify screen,
-  # whose time field is free text pre-filled from the model — a contributor's
-  # correction has to land where the model's own answer would.
+  # Reading a printed time into HH:MM. Shared by Normalizer and by the capture screen,
+  # whose time field is free text pre-filled from the model.
   #
-  # Shape-based on purpose, NOT a list of hour words. The formats that motivated
-  # this were the German ones the sample images happened to carry (20 Uhr, 19:30h,
-  # 19.30h) — matching that vocabulary would bake an accident of six posters into
-  # the parser, and French "20h30", English "8pm" and a bare "21" are all just as
-  # likely in the long tail this feature exists to reach. So: read the leading
-  # numbers, treat any trailing marker as noise, and honour only a meridiem, which
-  # is the one marker that changes the value rather than decorating it.
+  # Shape-based on purpose, NOT a list of hour words: the formats that motivated it are
+  # the German ones a handful of sample posters happened to carry (20 Uhr, 19:30h,
+  # 19.30h), and matching that vocabulary would bake those six posters into the parser
+  # when "20h30", "8pm" and a bare "21" are just as likely. So read the leading numbers,
+  # treat a trailing marker as noise, and honour only a meridiem — the one marker that
+  # changes the value rather than decorating it.
   #
-  # Strict about the leading position ("Doors 19:00" is nulled, not salvaged): the
-  # model is asked for HH:MM, a null costs one tap, and a wrong time does not
-  # announce itself.
+  # Strict about the leading position ("Doors 19:00" is nulled, not salvaged): a null
+  # costs one tap, and a wrong time does not announce itself.
   module Clock
     PATTERN = /\A(\d{1,2})\s*(?:[:.h]\s*(\d{2}))?/i
     MERIDIEM = /(?:\d|\s)([ap])\.?m\.?/i

@@ -6,9 +6,9 @@ module EventCapture
   #
   # Swiss-hosted, and chosen on accuracy rather than price: 0/6 fabricated dates
   # against Mistral Small 4's 5/6, at ~6 cents a month either way (see "Provider
-  # evaluation" in docs/user-event-capture-design.md). Net::HTTP rather than
-  # Mechanize — that agent exists for scraping HTML with robots enforcement, and
-  # none of it applies to a JSON API we hold an account with.
+  # evaluation" in docs/user-event-capture-design.md). Net::HTTP rather than Mechanize,
+  # which exists for scraping HTML under robots enforcement — none of that applies to a
+  # JSON API we hold an account with.
   class Infomaniak
     Response = Data.define(:text, :model, :input_tokens, :output_tokens)
 
@@ -41,9 +41,8 @@ module EventCapture
       {
         model: EventCaptureConfig.model,
         max_tokens: MAX_TOKENS,
-        # Structured output, strict: Infomaniak rejects the older `json_object`
-        # mode outright, and strict mode forces every field to be present so an
-        # omitted `date` cannot read as a considered null.
+        # Strict mode, not the older `json_object`, which Infomaniak rejects outright
+        # (see Prompt::SCHEMA).
         response_format: { type: "json_schema", json_schema: Prompt::SCHEMA },
         messages: [
           { role: "system", content: Prompt.instructions(today: today, medium: input.kind) },
@@ -62,14 +61,10 @@ module EventCapture
 
     def request_part(input) = { type: "text", text: Prompt.request(medium: input.kind) }
 
-    # Fenced, because pasted text is third-party content sharing a channel with the
-    # instructions: the contributor vouches for pasting it, not for what it says — it
-    # is a venue's page, someone else's chat message, a programme listing. Not a
-    # security boundary, since nothing stops the text writing a fence of its own; it
-    # makes "everything after this is data" a claim the model can act on at all, with
-    # the rules it would have to overturn in the system message above. The verify
-    # screen, where a human reads every field before anything persists, is the actual
-    # check.
+    # Fenced because pasted text is third-party content sharing a channel with the
+    # instructions: the contributor vouches for pasting it, not for what it says. NOT a
+    # security boundary — nothing stops the text writing a fence of its own. The human
+    # reading every field on the capture screen is the actual check.
     def text_part(input)
       { type: "text", text: "<<<INPUT\n#{input.text}\nINPUT" }
     end
@@ -94,7 +89,7 @@ module EventCapture
       raise ProviderError, "unreadable response: #{e.message}"
     # URI::InvalidURIError belongs here too: the product id is interpolated into the
     # path, so a malformed one must fail like any other bad configuration rather
-    # than escape Extractor's rescue as a 500 on the verify screen.
+    # than escape Extractor's rescue as a 500 on the capture screen.
     rescue Timeout::Error, IOError, SystemCallError, SocketError, Net::HTTPBadResponse,
            OpenSSL::SSL::SSLError, URI::InvalidURIError => e
       raise ProviderError, "#{e.class}: #{e.message}"

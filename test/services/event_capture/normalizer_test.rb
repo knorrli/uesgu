@@ -1,8 +1,8 @@
 require "test_helper"
 
-# The validators the bake-off proved we need. Every case here is a shape the model
-# actually returned; the invariant under test is always the same one — a value we
-# cannot trust is nulled and kept, never coerced into something plausible.
+# Every case here is a shape the model actually returned during the provider
+# evaluation. The invariant under test is always the same one: a value we cannot trust
+# is nulled and kept, never coerced into something plausible.
 class EventCapture::NormalizerTest < ActiveSupport::TestCase
   TODAY = Date.new(2026, 8, 19)
 
@@ -82,8 +82,8 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     end
   end
 
-  # The bake-off samples were German, so a parser built from their vocabulary would
-  # encode an accident of six posters. These are the shapes the long tail carries.
+  # The sample posters were all German, so a parser built from their vocabulary would
+  # encode an accident of six inputs. These are the shapes the long tail carries.
   test "French, English and marker-less clock formats normalise too" do
     { "20h30" => "20:30", "20 h 30" => "20:30", "20h" => "20:00", "21 heures" => "21:00",
       "8pm" => "20:00", "8:30 PM" => "20:30", "12 am" => "00:00", "12pm" => "12:00",
@@ -151,9 +151,8 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.raw
   end
 
-  # A weekday that contradicts the date is surfaced, never obeyed: as a selector it
-  # moved the answer a whole year on one bad token, and it changed no answer at all
-  # across every evidence string the bake-off produced.
+  # A weekday that contradicts the date is surfaced, never obeyed (see
+  # YearResolver.weekday_conflict? for what it cost as a selector).
   test "a contradicting weekday is flagged and the date left alone" do
     candidate = normalize("date" => "2026-08-19", "date_evidence" => "Di 19. August")
 

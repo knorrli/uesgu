@@ -1,6 +1,6 @@
 module EventCapture
   # The publish half of the funnel, and the first thing in it that writes —
-  # everything here has already passed a human on the verify screen.
+  # everything here has already passed a human on the capture screen.
   class Creator
     # The seam that keeps a captured event out of the scrapers' nightly
     # re-derivation. Not a scraper source_key, and deliberately one value for the
@@ -48,10 +48,10 @@ module EventCapture
     # can reach. The form marks both required, but the form is not the only caller.
     def incomplete? = title.blank? || start_date.blank? || locality.blank? || canton.blank?
 
-    # events.url is rendered as a bare link_to href in the PUBLIC feed, so this is
-    # the first path by which a contributor-typed string could reach every user's
-    # browser. "mailto:" opens a mail client and a bare word becomes a same-origin
-    # relative link; the browser's own url-input validation is client-side only.
+    # events.url is rendered as a bare link_to href in the PUBLIC feed, so this is the
+    # first path by which a contributor-typed string reaches every user's browser.
+    # "mailto:" opens a mail client and a bare word becomes a same-origin relative
+    # link; the browser's own url-input validation is client-side only.
     HTTP_SCHEMES = %w[http https].freeze
 
     def title = attrs[:title].to_s.strip
@@ -69,16 +69,14 @@ module EventCapture
     def genres = Array(attrs[:genres]).map { |g| g.to_s.strip }.compact_blank
 
     # Identity modulo case, accents and punctuation is not a near-match: "bern" and
-    # "Bern" ARE the same name, so adopting the stored spelling is a normalisation,
-    # not the silent rewrite the design forbids — the same basis on which
-    # Place.matching already resolves a place name without asking. It matters because
-    # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
-    # second node in the WHERE tree forever.
+    # "Bern" ARE the same name, so adopting the stored spelling is a normalisation and
+    # not the silent rewrite the design forbids. It matters because Location.hierarchy
+    # groups on the literal string — an uncorrected "bern" is a second node in the
+    # WHERE tree forever.
     #
-    # A genuine variant is deliberately left alone. No string measure reaches
-    # Freiburg -> Fribourg (0.29) or Genf -> Genève (0.33), and even a plain
-    # transposition, Luzren -> Luzern, scores 0.27: trigrams are weak on names this
-    # short. That class needs a curated alias list, not arithmetic.
+    # A genuine variant is deliberately left alone: no string measure reaches Freiburg
+    # -> Fribourg (0.29) or Genf -> Genève (0.33), and even the transposition Luzren ->
+    # Luzern scores 0.27. That class needs a curated alias list, not arithmetic.
     def canonical_locality(typed)
       return typed if typed.blank?
 

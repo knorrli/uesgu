@@ -2,28 +2,18 @@ module EventCapture
   # What we send Gemma. Deliberately a copy of the prompt in
   # script/event_capture_bakeoff.rb rather than a shared constant: that script is a
   # frozen evaluation harness whose sessions record a `prompt_sha`, and editing it
-  # would silently break the comparability of the runs the provider decision rests
-  # on. It stays the tuning rig; this is production.
+  # would silently break the comparability of the runs the provider decision rests on.
+  # It stays the tuning rig; this is production.
   #
-  # Two substantive edits against the bake-off text, both from
-  # docs/user-event-capture-design.md: the field is `locality`, not `city` (ask for
-  # a city and the model nulls out on a hamlet — the exact field match-at-entry
-  # depends on), and locality is defined as the tier below canton rather than left
-  # to mean whatever "city" means.
+  # Treat the wording as measured, not as prose: the evidence rule below is most of
+  # the difference between 0/6 and 5/6 fabricated dates, and tuning was measured NOT
+  # to transfer between models, so an edit here means re-running the evaluation in
+  # docs/user-event-capture-design.md. The field is `locality` and not `city` because
+  # a model asked for a city nulls out on a hamlet — the exact field match-at-entry
+  # depends on.
   #
-  # Everything else is verbatim, and should stay that way. The evidence rule below
-  # is most of the difference between 0/6 and 5/6 fabricated dates, and prompt
-  # tuning was measured NOT to transfer between models — treat any edit here as
-  # something to re-run the bake-off over.
-  #
-  # The text medium (#105) is UNMEASURED: the bake-off scores six images against
-  # image ground truth and can say nothing about a text prompt. #112 is what will.
-  #
-  # Two things the split changed on the image side, neither of them wording.
-  # Interpolating a phrase moves where the heredoc's line breaks fall, so the
-  # rendering is word-identical to the pre-split version but NOT byte-identical, and
-  # the test below compares squished so it cannot see that. And SCHEMA is shared by
-  # both media, so its descriptions say "the input" where they said "the image".
+  # Only the image wording is measured. The evaluation scores six images against image
+  # ground truth and can say nothing about how the text variant below performs.
   module Prompt
     MEDIA = {
       image: {

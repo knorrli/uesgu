@@ -6,7 +6,7 @@ module EventCapture
   # An adapter's failure is already the shape this returns, so the funnel has one
   # error path: an unreadable upload and a provider outage look the same downstream.
   #
-  # One input per call, deliberately. The verify screen fires N of these — one per
+  # One input per call, deliberately. The capture screen fires N of these — one per
   # uploaded image, driven by the client — because 8 x 2.3s does not fit in one
   # request and there is no queue to reach for (the adapter is :inline and Solid
   # Queue was removed for competing with Puma for RAM). A failure is returned, not
@@ -70,7 +70,7 @@ module EventCapture
     # a markdown fence is not an error worth failing an upload over — take the
     # outermost object and move on. Anything less recoverable is a failed
     # extraction rather than zero events: "the poster had nothing on it" and "we
-    # could not read the answer" must not look the same on the verify screen.
+    # could not read the answer" must not look the same on the capture screen.
     def parse(text)
       body = text.to_s.sub(/\A\s*```(?:json)?/, "").sub(/```\s*\z/, "")
       first, last = body.index("{"), body.rindex("}")

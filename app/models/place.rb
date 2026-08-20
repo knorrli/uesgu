@@ -49,7 +49,7 @@ class Place < ApplicationRecord
   private
 
   # The unique index on the generated column is the real guard, but it surfaces as
-  # a RecordNotUnique — a 500 on a verify screen whose honest answer is "you
+  # a RecordNotUnique — a 500 on a capture screen whose honest answer is "you
   # already have this place". The column is null until the row is written, so the
   # duplicate has to be found by the Ruby fingerprint. Check-then-create is racy by
   # construction; the index stays the backstop.

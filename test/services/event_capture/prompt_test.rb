@@ -1,14 +1,11 @@
 require "test_helper"
 
-# Two properties of the prompt are load-bearing enough to pin. Everything else
-# about it is tuning, and tuning is measured by the bake-off script, not asserted
-# here.
+# Only the properties the extraction breaks without are pinned here. The rest of the
+# prompt is tuning, measured by script/event_capture_bakeoff.rb rather than asserted.
 class EventCapture::PromptTest < ActiveSupport::TestCase
   TODAY = Date.new(2026, 8, 19)
 
-  # #99 renamed city → locality precisely because the prompt is a consumer of the
-  # name: ask for a `city` and the model nulls out on a hamlet, which is the exact
-  # field match-at-entry depends on.
+  # See EventCapture::Prompt for why the field cannot be `city`.
   test "the contract asks for a locality and never for a city" do
     fields = EventCapture::Prompt::SCHEMA.dig(:schema, :properties, :events, :items, :required)
 
@@ -17,9 +14,8 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     refute_match(/`city`/, EventCapture::Prompt.instructions(today: Date.new(2026, 8, 19)))
   end
 
-  # Every date and place must be quotable, or null. This is most of the difference
-  # between 0/6 and 5/6 fabricated dates, and it is what makes an uncited value
-  # detectable as invention downstream.
+  # An uncited value is what Normalizer#cited later reads as invention, so the rule
+  # reaching the model is what makes that detection mean anything.
   test "the evidence rule and today's date reach the model" do
     instructions = EventCapture::Prompt.instructions(today: Date.new(2026, 8, 19))
 
@@ -43,8 +39,8 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     assert_match(/text below/, EventCapture::Prompt.request(medium: :text))
   end
 
-  # The sentences the bake-off measured — most of the difference between 0/6 and 5/6
-  # fabricated dates. Splitting the prompt by medium must not reword the tuned half.
+  # These exact sentences are the measured half of the prompt: reworded, the model
+  # fabricates dates again (see EventCapture::Prompt).
   test "the tuned rules survive the medium split" do
     image = EventCapture::Prompt.instructions(today: TODAY).squish
 

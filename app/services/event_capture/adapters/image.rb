@@ -4,7 +4,8 @@ module EventCapture
     # content-type: both are caller-controlled, and a wrong one goes into the data URL
     # and comes back as "unreadable image" instead of as an error anyone can act on.
     #
-    # Nothing here writes the bytes anywhere, and nothing should — decision 9.
+    # Nothing here writes the bytes anywhere, and nothing should: no captured image is
+    # ever stored (docs/user-event-capture-design.md).
     module Image
       # "RIFF" alone is also AVI and WAV, hence WebP's second probe.
       SIGNATURES = {

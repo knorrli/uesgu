@@ -1,6 +1,6 @@
 require "db_test_helper"
 
-# Match-at-entry: the near-name candidates the verify screen offers so a
+# Match-at-entry: the near-name candidates the capture screen offers so a
 # contributor taps an existing place instead of minting a fourth spelling of it.
 # Synthetic place names throughout; the registry side is read live, never
 # hardcoded.

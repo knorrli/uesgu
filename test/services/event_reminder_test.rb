@@ -21,8 +21,6 @@ class EventReminderTest < ActiveSupport::TestCase
     e
   end
 
-  # --- due? ------------------------------------------------------------------
-
   test "due only after the reminder time, and only once a day" do
     u = reminder_user
     refute EventReminder.new(u, at(11)).due?
@@ -35,8 +33,6 @@ class EventReminderTest < ActiveSupport::TestCase
   test "a disabled user is never due" do
     refute EventReminder.new(reminder_user(event_reminders: false), at(13)).due?
   end
-
-  # --- firing ----------------------------------------------------------------
 
   test "fires a digest of today saved shows and marks the day done" do
     u = reminder_user
@@ -95,8 +91,6 @@ class EventReminderTest < ActiveSupport::TestCase
     note = EventReminder.new(u, at(12, 30)).fire_if_due!
     assert_equal [tomorrow_show.id], note.event_ids
   end
-
-  # --- run_due! --------------------------------------------------------------
 
   test "run_due! fires enabled due users and is idempotent within the day" do
     u = reminder_user

@@ -19,8 +19,6 @@ class SavedFilterTest < ActiveSupport::TestCase
     r
   end
 
-  # --- inference -------------------------------------------------------------
-
   test "a relative date window infers happening; no date infers added" do
     u = user
     assert rule(u, filter: { d: ["this_week"] }).happening?
@@ -48,8 +46,6 @@ class SavedFilterTest < ActiveSupport::TestCase
     assert r.added?
   end
 
-  # --- matched_events: added -------------------------------------------------
-
   # Real-current dates here: the non-favorites path delegates to
   # Filter#ransack_query, whose future floor is the real Date.current.
   test "added matches events created since last fire that are not in the past" do
@@ -68,16 +64,12 @@ class SavedFilterTest < ActiveSupport::TestCase
     refute_includes matched, past  # already happened
   end
 
-  # --- matched_events: happening ---------------------------------------------
-
   test "happening matches by start_date in the window regardless of created_at" do
     u = user
     today_show = event(start_date: Date.current, created_at: 1.hour.ago)
     r = rule(u, filter: { d: ["today"] }, cadence: "daily", time_of_day: 1)
     assert_includes r.matched_events(Time.current).to_a, today_show
   end
-
-  # --- due? ------------------------------------------------------------------
 
   test "daily rule is due after its time and not before" do
     r = rule(user, filter: { q: ["x"] }, cadence: "daily", time_of_day: 18 * 60)
@@ -105,8 +97,6 @@ class SavedFilterTest < ActiveSupport::TestCase
     assert r.due?(at(12))
     refute r.due?(at(10))
   end
-
-  # --- fire! -----------------------------------------------------------------
 
   test "fire! snapshots matched events, advances the cursor, and skips empties" do
     u = user
@@ -139,14 +129,10 @@ class SavedFilterTest < ActiveSupport::TestCase
     assert_equal due.id, created.first.saved_filter_id
   end
 
-  # --- validations -----------------------------------------------------------
-
   test "an empty filter is allowed — it's the notify-on-everything rule" do
     assert rule(user, filter: {}).valid?, "empty filter => the all-events rule"
     assert rule(user, filter: { q: ["x"] }).valid?, "any filter is valid"
   end
-
-  # --- channels (in-app is the master) ---------------------------------------
 
   test "notifying? mirrors the in-app channel" do
     assert rule(user, filter: { q: ["x"] }, notify_in_app: true).notifying?
@@ -159,8 +145,6 @@ class SavedFilterTest < ActiveSupport::TestCase
     refute r.notify_push?, "push cannot ride a digest that never fires"
     refute r.notify_email?, "email cannot ride a digest that never fires"
   end
-
-  # --- dedupe (one rule per filter set) --------------------------------------
 
   test "fingerprint is order-independent and ignores absolute date ranges" do
     a = rule(user, filter: { q: ["Rock", "Jazz"], l: ["Bern"] })
@@ -210,8 +194,6 @@ class SavedFilterTest < ActiveSupport::TestCase
     assert_equal r, u.saved_filters.matching(fp)
     assert_nil u.saved_filters.matching(SavedFilter.fingerprint_for(Filter.build(queries: ["Jazz"])))
   end
-
-  # --- auto-naming -----------------------------------------------------------
 
   test "describe auto-names from the filter, localized" do
     r = rule(user, filter: { q: ["Rock"], l: ["Dachstock"], d: ["this_weekend"] })
@@ -264,8 +246,6 @@ class SavedFilterTest < ActiveSupport::TestCase
     note = r.fire!(Time.current)
     assert_equal r.describe, note.title
   end
-
-  # --- derive rhythm from window ---------------------------------------------
 
   test "a happening rule cadence is derived from its window, ignoring any chosen cadence" do
     u = user

@@ -4,11 +4,9 @@ class PagesController < ApplicationController
   # privacy stance first, without an account.
   allow_unauthenticated_access only: %i[ about privacy ]
 
-  # GET /about
   def about
   end
 
-  # GET /privacy
   def privacy
   end
 end

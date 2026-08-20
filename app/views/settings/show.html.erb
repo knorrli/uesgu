@@ -17,8 +17,7 @@
     </ul>
   <% end %>
 
-  <%# ── Account ─────────────────────────────────────────────────────────────
-      One form covers everything stored on the user: language, email and
+  <%# One form covers everything stored on the user: language, email and
       password. The controller permits all of these in a single update, so a
       single Save button keeps the page from sprouting a button per block. %>
   <section class="settings-section">
@@ -61,8 +60,7 @@
     <% end %>
   </section>
 
-  <%# ── Notifications on this device ─────────────────────────────────────────
-      Per-device web push opt-in + a self-test. Installing the app now lives in
+  <%# Per-device web push opt-in + a self-test. Installing the app now lives in
       the top nav (it targets logged-out users too), so it's no longer here. The
       whole section renders only when VAPID keys are configured; the push
       controller handles the unsupported / denied / needs-install states. %>
@@ -98,11 +96,10 @@
     </section>
   <% end %>
 
-  <%# ── Calendar subscription ─────────────────────────────────────────────
-      An ICS feed of the saved shows, subscribable in any calendar app. Opt-in:
+  <%# An ICS feed of the saved shows, subscribable in any calendar app. Opt-in:
       no link exists until the user creates one (the token is a URL-borne
       credential, so we don't mint it unasked). Rotating revokes the old URL. %>
-  <%# id: anchor target for the pointer on the saved-shows page (#64). %>
+  <%# The id is the anchor target for the pointer on the saved-shows page. %>
   <section class="settings-section" id="calendar-feed">
     <h2><%= t('settings.calendar_feed_heading') %></h2>
 
@@ -141,7 +138,6 @@
     <% end %>
   </section>
 
-  <%# ── Delete account ──────────────────────────────────────────────────── %>
   <section class="settings-section">
     <h2><%= t('settings.delete_account_heading') %></h2>
     <p class="muted"><%= t('settings.delete_account_hint') %></p>

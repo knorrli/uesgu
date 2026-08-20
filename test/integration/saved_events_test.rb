@@ -76,8 +76,6 @@ class SavedEventsTest < ActionDispatch::IntegrationTest
     assert_select "button.event-save"
   end
 
-  # --- list / calendar toggle ------------------------------------------------
-
   test "the view switcher only appears once something is saved" do
     u = sign_in_as user
     get saved_events_path

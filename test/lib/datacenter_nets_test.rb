@@ -9,8 +9,6 @@ require "test_helper"
 #     plus the two properties the whole design rests on: every provider really is
 #     covered, and nothing a real user could arrive from is.
 class DatacenterNetsTest < ActiveSupport::TestCase
-  ### The lookup ########################################################
-
   # Two ranges with a deliberate gap, so "just outside" is unambiguous.
   def table
     @table ||= DatacenterNets::Table.new([ [ 100, 200 ], [ 500, 600 ] ])
@@ -53,8 +51,6 @@ class DatacenterNetsTest < ActiveSupport::TestCase
     refute unsorted.include?(300)
   end
 
-  ### Address handling ##################################################
-
   test "an unparseable client address is never blocked" do
     # Rack::Attack::Request#true_ip_addr hands us nil when the forwarded address
     # did not parse. An unknown client gets served, never blocked.
@@ -78,8 +74,6 @@ class DatacenterNetsTest < ActiveSupport::TestCase
   test "leaves the IPv6 documentation range alone" do
     refute DatacenterNets.include?(IPAddr.new("2001:db8::1"))
   end
-
-  ### The generated list ################################################
 
   def list_lines
     @list_lines ||= DatacenterNets::LIST_PATH.readlines(chomp: true).
@@ -121,8 +115,6 @@ class DatacenterNetsTest < ActiveSupport::TestCase
     end
   end
 
-  ### Coverage ##########################################################
-
   # Generated alongside the list by `datacenter_nets:refresh` — one address per
   # source, derived from that source's own data rather than hand-picked. Hand-picked
   # addresses rot: a provider stops announcing the prefix and the test quietly
@@ -141,13 +133,11 @@ class DatacenterNetsTest < ActiveSupport::TestCase
   end
 
   test "blocks the Alibaba range the August 2026 crawl came from" do
-    # The original three CIDRs from #83, which this list has to keep covering.
+    # The addresses the crawl actually came from, which this list has to keep covering.
     %w[47.74.0.1 47.79.51.85 47.82.54.165 47.87.255.254].each do |address|
       assert DatacenterNets.include?(IPAddr.new(address)), "expected #{address} to stay blocked"
     end
   end
-
-  ### The thing that must never happen ##################################
 
   # The entire design rests on these addresses being servable. If a refresh ever
   # pulls a consumer ISP or a CDN egress pool into the list, this is what catches

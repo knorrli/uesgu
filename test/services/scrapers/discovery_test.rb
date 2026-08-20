@@ -6,8 +6,6 @@ require "test_helper"
 class Scrapers::DiscoveryTest < Minitest::Test
   D = Scrapers::Discovery
 
-  # --- domain normalization ---
-
   def test_domain_normalizes_to_etld_plus_one
     assert_equal "dachstock.ch", D.domain("https://www.dachstock.ch/events")
     assert_equal "dachstock.ch", D.domain("api.dachstock.ch")
@@ -19,8 +17,6 @@ class Scrapers::DiscoveryTest < Minitest::Test
     assert_nil D.domain("")
     assert_nil D.domain(nil)
   end
-
-  # --- OLE registry diff ---
 
   def test_ole_unknown_domains_subtracts_ledger_and_ignores_hinto
     ledger = ledger_with("dachstock.ch", "birdseye.ch")
@@ -34,8 +30,6 @@ class Scrapers::DiscoveryTest < Minitest::Test
     ]
     assert_equal %w[futurina.ch refbern.ch], D.ole_unknown_domains(sources, ledger)
   end
-
-  # --- PETZI clustering ---
 
   def test_petzi_clusters_unknown_venues_and_drops_known_slugs
     urls = [

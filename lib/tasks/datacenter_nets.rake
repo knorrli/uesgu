@@ -76,9 +76,6 @@ module DatacenterNetsRefresh
          "(#{DatacenterNets.v4.size} + #{DatacenterNets.v6.size} ranges after merge)"
     puts "wrote #{SAMPLES_PATH.relative_path_from(Rails.root)}"
   end
-
-  ### Sources ###########################################################
-
   def aws_prefixes
     data = get_json("https://ip-ranges.amazonaws.com/ip-ranges.json")
     all  = data["prefixes"].map { |p| p["ip_prefix"] } +
@@ -129,9 +126,6 @@ module DatacenterNetsRefresh
     sleep 0.3 # RIPEstat asks for a gentle pace
     prefixes
   end
-
-  ### Range arithmetic ##################################################
-
   def partition_ranges(prefixes)
     v4 = []
     v6 = []
@@ -171,9 +165,6 @@ module DatacenterNetsRefresh
     end
     out
   end
-
-  ### Output ############################################################
-
   def write_list(sources, cidrs4, cidrs6)
     header = [
       "# Datacenter / hosting-provider networks — GENERATED FILE, DO NOT EDIT BY HAND.",
@@ -219,9 +210,6 @@ module DatacenterNetsRefresh
     end
     SAMPLES_PATH.write("#{lines.join("\n")}\n")
   end
-
-  ### HTTP ##############################################################
-
   def report(name, prefixes, note)
     puts format("  %-18s %6d prefixes   (%s)", name, prefixes.size, note)
   end

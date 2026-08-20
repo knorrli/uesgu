@@ -383,7 +383,6 @@ module Scrapers
       @discarded += 1 if rule
     end
 
-    # Active discard rules, loaded once per run.
     def discard_rules
       @discard_rules ||= DiscardRule.active.by_recency.to_a
     end
@@ -444,7 +443,6 @@ module Scrapers
     # page (see Kiff), and as the seam for future health/cancellation hooks.
     attr_reader :current_row
 
-    # --- Hooks: required ---
     def event_rows
       raise NotImplementedError, "#{self.class} must implement #event_rows"
     end
@@ -452,8 +450,6 @@ module Scrapers
     def event_url(_row)
       raise NotImplementedError, "#{self.class} must implement #event_url"
     end
-
-    # --- Hooks: optional, with behaviour-preserving defaults ---
 
     # Skip a row before it becomes an event (e.g. non-concert entries).
     def skip_row?(_row) = false

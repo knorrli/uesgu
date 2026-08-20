@@ -146,7 +146,6 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_select "a.filter-link.active[href=?]", events_path(filtered: 1), text: "Quophop"
   end
 
-  # ── Filter persistence ──────────────────────────────────────────────────────
   # The active filter is remembered in a per-device cookie, but the URL stays the
   # single source of truth: a plain visit with a remembered filter redirects to that
   # filter's URL rather than rendering a bare /events that's secretly filtered.

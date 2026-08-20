@@ -3,7 +3,6 @@ class InstallController < ApplicationController
   # account — anyone can land here and add üsgu to their phone.
   allow_unauthenticated_access only: %i[ show ]
 
-  # GET /install
   def show
   end
 end

@@ -41,7 +41,7 @@ module Scrapers
     end
     private_class_method :host_of
 
-    # --- Discovery diff (pure; the rake fetches the upstreams and feeds them in) ---
+    # Pure: the rake task fetches the upstreams and feeds them in.
 
     # The venue slug + title tail of a PETZI event URL: the bit after "/events/{id}-"
     # up to the next slash. The venue is the (multi-token) leading prefix of this,
@@ -122,7 +122,6 @@ module Scrapers
         new("reasons" => REASONS, "venues" => Venue.all.map { |v| row_for(v) })
       end
 
-      # One ledger row from a Venue.
       def self.row_for(venue)
         {
           "domain" => venue.domain,

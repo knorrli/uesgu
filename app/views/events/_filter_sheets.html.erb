@@ -1,5 +1,4 @@
-<%# ─────────────────────────────────────────────────────────────────────────
-    The filter UI: a trigger bar + three sheets (What / Where / When). One markup
+<%# The filter UI: a trigger bar + three sheets (What / Where / When). One markup
     for both breakpoints — full-screen bottom sheets below 600px, and in-flow
     dropdown panels (push the results down, no float) at/above it. Same component
     drives the saved-filter editor (saved_filters/_form).
@@ -12,8 +11,7 @@
 
     Sheets own a full-screen search field instead of a floating dropdown, so the
     on-screen keyboard never collides with an options list — the field is only
-    focused when the user taps it, never on open.
-   ───────────────────────────────────────────────────────────────────────── %>
+    focused when the user taps it, never on open. %>
 
 <% what_terms  = @filter.queries + @filter.genres %>
 <% where_terms = @filter.location_list.map { |loc| location_display(loc) } %>

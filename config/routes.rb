@@ -97,10 +97,10 @@ Rails.application.routes.draw do
     collection do
       post :chips
       # The option tree behind a filter sheet ("what" = genres, "where" = places),
-      # fetched by that sheet's turbo-frame the first time it is opened. The two
-      # trees are ~360 checkbox rows and were about half the feed's compressed
-      # weight, so they are no longer rendered inline (#81). The field is a closed
-      # set — anything else 404s here rather than reaching the controller.
+      # fetched by that sheet's turbo-frame the first time it is opened rather than
+      # rendered inline: the two trees are ~360 checkbox rows, about half the feed's
+      # compressed weight. The field is a closed set — anything else 404s here rather
+      # than reaching the controller.
       get "filter_options/:field", action: :filter_options, as: :filter_options,
           constraints: { field: /what|where/ }
     end

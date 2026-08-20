@@ -25,11 +25,9 @@
   color: var(--theme-accent-color);
 }
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Mobile filter sheets (_filter_sheets.html.erb). Mobile-first: the sheet UI is
-   the default; the inline combobox filter (wrapped in .filter-desktop) takes over
-   at the tablet breakpoint — 600px, matching the calendar breakpoint above.
-   ───────────────────────────────────────────────────────────────────────── */
+/* Mobile filter sheets (_filter_sheets.html.erb). Mobile-first: the sheet UI is the
+   default; the inline combobox filter (wrapped in .filter-desktop) takes over at the
+   tablet breakpoint — 600px, matching the calendar breakpoint above. */
 
 /* Chips take the row and wrap within it; the notify bell stays pinned right. */
 .filter .chips {

@@ -165,7 +165,6 @@ module EventsHelper
     saved_event_ids.include?(event.id)
   end
 
-  # ── Interest highlighting (derived from saved filters) ─────────────────────
   # "Could interest me" = matches one of my saved filters, date window ignored.
   # Built once per request; see InterestProfile.
   def interest_profile

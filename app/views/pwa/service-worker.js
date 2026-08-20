@@ -66,7 +66,6 @@ self.addEventListener("install", () => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      // Drop caches from older versions of this worker.
       const names = await caches.keys()
       await Promise.all(
         names.filter((name) => name !== ASSET_CACHE).map((name) => caches.delete(name))

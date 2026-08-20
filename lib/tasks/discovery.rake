@@ -21,21 +21,18 @@ namespace :discovery do
       nil
     end
 
-    # --- OLE registry: an XML list of per-venue feed URLs (hinto.ch/oleexport) ---
     ole_doc = fetch.call("OLE registry", "https://www.hinto.ch/oleexport")
     ole_sources = ole_doc ? ole_doc.css("sources source").map(&:text) : []
     ole_new = Scrapers::Discovery.ole_unknown_domains(ole_sources, ledger)
 
-    # --- PETZI sitemap: event URLs whose venue slug we don't track ---
     petzi_doc  = fetch.call("PETZI sitemap", Scrapers::Petzi.url.to_s)
     petzi_urls = petzi_doc ? petzi_doc.css("loc").map(&:text).select { |u| u.include?("/events/") } : []
     known_slugs = ledger.alias_keys("petzi") | Scrapers::Petzi.venues.keys.to_set
     petzi_new = Scrapers::Discovery.petzi_unknown_clusters(petzi_urls, known_slugs)
 
-    # --- Re-check: blocked venues whose revisitable reason may have gone stale ---
     recheck = ledger.stale_revisitable(Date.current)
 
-    # --- Drift: ledger vs the live scraper registry (same check as the CI test) ---
+    # Same check as the drift test in CI: a new scraper without a ledger row fails there.
     consume = ledger.consume_domains
     covered = Scrapers::All.scrapers.values.flat_map(&:venue_domains).to_set
     orphans = (consume - covered).to_a.sort

@@ -50,8 +50,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  ### True client IP ####################################################
-
   # A plausible desktop browser UA — faceted requests need one, or they trip the
   # blank-UA blocklist below and 403 before any throttle is consulted.
   BROWSER = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " \
@@ -103,8 +101,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  ### Faceted-URL throttle ##############################################
-
   # The combinatorial filter space is the expensive surface (a full render behind
   # ~30 queries), so it gets a much tighter cap than the general 60/min.
   test "throttles faceted filter URLs well below the general limit" do
@@ -129,8 +125,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  ### User-Agent blocking ###############################################
-
   test "blocks self-identifying crawlers outright" do
     %w[GPTBot ClaudeBot AhrefsBot SemrushBot Bytespider python-requests/2.31].each do |ua|
       get root_path, headers: edge_request(client_ip: "198.51.100.12", edge_ip: "104.23.175.21", ua: ua)
@@ -149,8 +143,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     get root_path, headers: edge_request(client_ip: "198.51.100.14", edge_ip: "104.23.175.21", ua: "")
     assert_response :success
   end
-
-  ### Datacenter-network blocking #######################################
 
   # The list itself (boundaries, per-provider coverage, and the consumer ISPs it
   # must never contain) is tested in test/lib/datacenter_nets_test.rb. These cover
@@ -227,8 +219,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  ### The blocked response ##############################################
-
   test "tells a network-blocked client it was blocked, and which address to quote" do
     # A bare "Forbidden" is indistinguishable from an outage, so a false positive
     # would be read as "üsgu is down" and never reported.
@@ -270,8 +260,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     assert_equal "Forbidden\n", response.body
   end
 
-  ### Manual allowlist ##################################################
-
   # ALLOWED_IPS is parsed from DATACENTER_ALLOW_IPS once at boot, so exercising the
   # safelist means swapping the constant rather than the env var.
   def with_allowed_ips(*cidrs)
@@ -305,8 +293,6 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
       assert_response :forbidden
     end
   end
-
-  ### Measurement probe #################################################
 
   def with_probe_enabled
     ENV["PROBE_REQUESTS"] = "1"

@@ -181,12 +181,10 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes ole.reload.genre_list.map(&:downcase), "bespoke-genre", "genres union onto OLE"
   end
 
-  # The Köniz bug (#58): a venue double-posting one show on its aggregator —
-  # same Salsa night under two Bewegungsmelder post ids, so two distinct upsert
-  # keys land two events from ONE source. Same date + same start time +
-  # identical title = a double-post; it folds, and the NEWER copy wins the
-  # canonical (for a re-keyed strand — a scraper's URL scheme change, see
-  # Mokka #55 — the newer row is the one with the working link).
+  # A venue double-posting one show on its aggregator: the same Salsa night under two
+  # Bewegungsmelder post ids, so two distinct upsert keys land two events from ONE
+  # source. The NEWER copy wins the canonical, because for a re-keyed strand — a
+  # scraper whose URL scheme changed — the newer row is the one with the working link.
   test "a same-source double-post folds onto the newest copy" do
     showtime = Time.zone.local(FUTURE.year, FUTURE.month, FUTURE.day, 19, 0)
     older = make(title: "Tanzen im Schlosshof | Zorpsalsa", date: FUTURE, genres: [],
@@ -202,8 +200,8 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     refute_includes Event.visible, older
   end
 
-  # The ONO non-bug (#59): one title, one day, two HOURS — a 15:00 workshop and
-  # a 20:00 concert are two real happenings from one source, and must both stay.
+  # One title, one day, two HOURS: a 15:00 workshop and a 20:00 concert are two real
+  # happenings from one source, and must both stay.
   test "same-titled shows at different hours are distinct happenings, not duplicates" do
     workshop = make(title: "Tradition in Zorpbewegung", date: FUTURE, genres: [],
                     venue: "ONO", source: "Ono",

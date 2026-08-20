@@ -87,8 +87,6 @@ end
 def squish(str) = str.to_s.gsub(/\s+/, ' ').strip
 def future_ymd?(ymd) = ymd && ymd >= Date.today.strftime('%Y%m%d')
 
-# ---- classifiers: given a fetched body, is it a usable event feed? -------------
-
 def classify_ics(f)
   return nil unless f.ok? && f.body =~ /\ABEGIN:VCALENDAR/i
 
@@ -172,8 +170,6 @@ def detect_cms(body, headers)
   gen.empty? ? nil : squish(gen)[0, 30]
 end
 
-# ---- robots.txt: sitemaps + AI/bot opt-out intent --------------------------------
-
 def analyze_robots(base)
   f = fetch("#{base}/robots.txt")
   return { ok: false } unless f.ok?
@@ -227,14 +223,11 @@ def event_detail_urls(locs)
   end
 end
 
-# ---- per-domain recon ------------------------------------------------------------
-
 def recon(domain, label)
   base = "https://#{domain}"
   hits = [] # [tier, text] ; tier: :time (★) > :weak (✓)
   add  = ->(tier, text) { hits << [tier, text] if text }
 
-  # robots
   rob = analyze_robots(base)
   robits = if !rob[:ok]
              'no robots.txt'
@@ -373,8 +366,6 @@ def print_report(domain, label, robits, cms, home, hits)
   puts "    VERDICT: #{verdict}"
   puts
 end
-
-# ---- target selection ------------------------------------------------------------
 
 def ledger_rows
   YAML.load_file(LEDGER, permitted_classes: [Date])['venues']

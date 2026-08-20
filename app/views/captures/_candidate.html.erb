@@ -41,6 +41,7 @@
         <%= text_field_tag :time, candidate.time %>
       </label>
     </div>
+    <%= render "shared/cite", quote: cited_evidence(candidate, :date) %>
 
     <% if candidate.past? %>
       <p class="capture-card__warning"><%= t('capture.candidate.past') %></p>
@@ -50,6 +51,7 @@
       <span class="field-label"><%= t('capture.candidate.place') %></span>
       <%= text_field_tag :place, candidate.place %>
     </label>
+    <%= render "shared/cite", quote: cited_evidence(candidate, :place) %>
 
     <%# Tapping one is what stops a fourth spelling of "Quartierfest" being minted and
         keeping the place below the VenueLead nomination threshold forever. A
@@ -84,6 +86,7 @@
               include_blank: true, required: true %>
       </label>
     </div>
+    <%= render "shared/cite", quote: cited_evidence(candidate, :locality) %>
 
     <label class="flex flex-col gap-xsmall">
       <span class="field-label"><%= t('capture.candidate.url') %></span>

@@ -631,12 +631,31 @@
               <span class="field-label">Titel</span>
               <input type="text" value="Zorpcore Nacht">
             </label>
+            <label class="flex flex-col gap-xsmall">
+              <span class="field-label">Ortschaft</span>
+              <input type="text" value="Zorpwil">
+            </label>
+            <%= render "shared/cite", quote: "3007 ZORPWIL" %>
           </div>
         <% end %>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Review card</span> · <code>render layout: "shared/review_card", id:, actions:, source:</code>
         <p class="sg-purpose">The block is the body. <code>actions</code> is pre-rendered markup rather than a second block because the bar sits outside the scrolling body; <code>source</code> is the evidence, or is left out and written into the pane by a client that holds it in memory only. Pass <code>frame_class</code>/<code>frame_attrs</code> for the caller's own hooks — never a second <code>class</code> attribute.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <label class="flex flex-col gap-xsmall">
+          <span class="field-label">Ortschaft</span>
+          <input type="text" value="Zorpwil">
+        </label>
+        <%= render "shared/cite", quote: "3007 ZORPWIL" %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Cite</span> · <code>render "shared/cite", quote:</code>
+        <p class="sg-purpose">The verbatim text a model quoted as its source for the field <b>above</b> it — the opposite reading order from a <code>.field-label</code> hint, because it is provenance for a value already filled in rather than an instruction for filling one. Quotation marks come from the locale (<code>„…“</code> / <code>“…”</code> / <code>«&nbsp;…&nbsp;»</code>) and carry the whole meaning, so there is no repeated label: a card showing one per field has to read as a form, not as a transcript. Render nothing by passing a blank <code>quote</code>.</p>
       </div>
     </div>
 

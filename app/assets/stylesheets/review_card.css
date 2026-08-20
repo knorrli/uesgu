@@ -52,6 +52,17 @@
   max-width: 100%;
 }
 
+/* Provenance for the field above it. Recessed into the same channel as a hint,
+   because a card carrying one of these per field still has to read as a form and not
+   as a transcript. */
+.review-card__cite {
+  /* Bound to the field ABOVE: the form's own gap sits it exactly between two fields,
+     where it reads as a hint for the next one. Tightened above, opened below. */
+  margin: calc(var(--gap-xsmall) - var(--gap-small)) 0 var(--gap-xsmall);
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
 /* Pinned to the bottom edge so it stays in thumb reach however long the field list
    runs. The last action is pushed to the far end: a dismissal sitting next to the
    commit is one mis-tap away from being it. */

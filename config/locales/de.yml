@@ -790,6 +790,7 @@ de:
       loading: Lädt…
   shared:
     cancel: Abbrechen
+    cite: "„%{quote}“"
   helpers:
     page_entries_info:
       more_pages:

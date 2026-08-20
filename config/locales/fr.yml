@@ -790,6 +790,7 @@ fr:
       loading: Chargement…
   shared:
     cancel: Annuler
+    cite: "« %{quote} »"
   helpers:
     page_entries_info:
       more_pages:

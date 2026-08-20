@@ -69,7 +69,7 @@ module EventCapture
       value = cited(:date)
       return if value.nil?
 
-      # `raw` must show what the MODEL said, so a human on the verify screen judges
+      # `raw` must show what the MODEL said, so a human on the capture screen judges
       # its output rather than our half-transformed copy of it.
       claimed = value
 

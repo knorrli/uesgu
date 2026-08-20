@@ -73,7 +73,7 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
 
   # The product id is interpolated into the request path, so a malformed one has to
   # fail like any other bad configuration — Extractor rescues ProviderError only, and
-  # anything else reaches the verify screen as a 500 instead of one retryable row.
+  # anything else reaches the capture screen as a 500 instead of one retryable row.
   test "a malformed product id becomes a ProviderError, not a raw exception" do
     result = EventCaptureConfig.stub(:api_token, "tok-123") do
       EventCaptureConfig.stub(:product_id, "42 42") do

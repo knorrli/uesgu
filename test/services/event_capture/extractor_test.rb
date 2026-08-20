@@ -1,9 +1,8 @@
 require "test_helper"
 
-# The extraction path with the provider stubbed out. What matters here is the
-# contract the verify screen will be written against: 0..n candidates on success,
-# and a failure that is RETURNED rather than raised, so one bad image is one row
-# to retry.
+# The extraction path with the provider stubbed out. The contract: 0..n candidates on
+# success, and a failure RETURNED rather than raised, so one bad image is one row to
+# retry.
 class EventCapture::ExtractorTest < ActiveSupport::TestCase
   TODAY = Date.new(2026, 8, 19)
 

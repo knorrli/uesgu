@@ -1,19 +1,17 @@
 module EventCapture
-  # Resolves a printed date ("Mi 19. August") to a real Date. The model is not
-  # asked to: across the bake-off runs it transcribed that evidence correctly 6/6
-  # and still resolved it to 2025 in two of them, where 19 Aug 2025 is a Tuesday.
-  # It can read; it cannot reliably do calendar arithmetic.
+  # Resolves a printed date ("Mi 19. August") to a real Date. The model is not asked
+  # to: it transcribed that evidence correctly 6/6 across the provider evaluation and
+  # still resolved it to 2025 in two runs. It can read; it cannot reliably do calendar
+  # arithmetic.
   #
-  # Tractable in code because the candidate set is tiny: someone photographing a
-  # poster is looking at something happening soon, so the year is last, this or
-  # next, and the nearest occurrence decides it. A printed weekday is a CHECK on
-  # that answer, never the thing that picks it — see `weekday_conflict?`.
+  # Tractable in code because the candidate set is tiny: someone photographing a poster
+  # is looking at something happening soon, so the year is last, this or next and the
+  # nearest occurrence decides it. A printed weekday only CHECKS that answer — see
+  # `weekday_conflict?`.
   module YearResolver
-    # The three languages the prompt declares the input will be in, and standard
-    # abbreviations only. A token that is also an ordinary word ("die", "mit",
-    # "son") buys a check we rarely need and spends it on false alarms — and since
-    # the weekday now only raises a flag, a missing token costs one missed check
-    # while a spurious one pollutes the signal that flag exists to produce.
+    # Standard abbreviations only. A token that is also an ordinary word ("die",
+    # "mit", "son") spends a check we rarely need on false alarms: a missing token
+    # costs one skipped check, a spurious one pollutes the flag itself.
     WEEKDAY_TOKENS = {
       0 => %w[so sonntag sun sunday dim dimanche],
       1 => %w[mo montag mon monday lun lundi],
@@ -58,14 +56,11 @@ module EventCapture
     # Does a weekday printed beside the date contradict the date we resolved?
     #
     # A flag, deliberately not a selector. As a hard filter the weekday overrode the
-    # nearest-occurrence rule outright, so one bad token moved the answer a whole
-    # year in silence — and it caused three of the six defects found in review. It
-    # also earns less than it looks: across every date_evidence string the bake-off
-    # produced, filtering by weekday changed the answer 0 times out of 10, including
-    # the "Mi 19. August" case the design doc credits it for. So the distance rule
-    # decides, a disagreement is surfaced for the human already on the verify screen,
-    # and how often that fires — and who turns out to be right — becomes something
-    # measurable rather than something argued about.
+    # nearest-occurrence rule outright, so one bad token moved the answer a whole year
+    # in silence. It also earns less than it looks: over every date_evidence string the
+    # provider evaluation produced, filtering by weekday changed the answer 0 times out
+    # of 10. So the distance rule decides and a disagreement is shown to the human who
+    # is on the screen anyway.
     def weekday_conflict?(evidence, date)
       return false if date.nil?
 

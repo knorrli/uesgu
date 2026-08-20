@@ -16,7 +16,7 @@
 
   <%= form_with url: capture_path, method: :post, id: "#{key}-form",
         class: "capture-card__fields account-form flex flex-col gap-small",
-        data: { action: "turbo:submit-end->capture#decided" } do %>
+        data: { action: "turbo:submit-end->capture#decided change->capture#carryPlace" } do %>
     <%= hidden_field_tag :card_id, key %>
 
     <label class="flex flex-col gap-xsmall">

@@ -1119,9 +1119,25 @@ name) is well-formed, unrefused, and indistinguishable from a right answer. It n
 carries `locality_evidence` and runs through the same path, so an uncited locality is
 nulled, kept in `raw`, and counted as `:locality_uncited`.
 
-`canton` deliberately does not get one. It is a closed list of 26 the normalizer
-already checks, so a wrong value is bounded and visible; a wrong locality is a new
-node in the tree.
+**`canton` deliberately does not get one, and not because it matters less.** A wrong
+canton is not the harmless half of a wrong tuple: `Location.hierarchy` nests locality
+under canton, so it files the whole locality-and-venue subtree under a branch nobody
+browsing for it will open.
+
+It gets no evidence field because it is **derived, not transcribed**, and the evidence
+rule only polices transcription. Posters print addresses; they do not print canton
+codes. Across the 65 candidates these runs produced the model filled `canton` 8 times,
+every one inferred from a postcode or a printed town (`3007 BERN` → `BE`) and none of
+them quotable as itself. Requiring a citation would not catch a wrong canton — it
+would delete the field, because there is nothing to quote. The two fields fail
+differently: `locality` fails by transcribing the wrong text, which a quote exposes;
+`canton` fails by inferring badly from the right text, which a quote cannot.
+
+What it should get instead is the treatment `YearResolver` gave the date's year —
+computed from the resolved locality rather than asked of the model, since every
+locality the registry already knows carries a canton (`Creator#known_localities`).
+That leaves only a locality nobody has seen before needing a human, which is the
+select of 26 the verify screen already shows.
 
 **What the re-run measured — four runs each over the same six images, before and
 after.** No `:locality_uncited` ever fired: the model cited every locality it filled,

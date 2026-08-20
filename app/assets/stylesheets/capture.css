@@ -7,6 +7,12 @@
   border-bottom: var(--border-width) solid var(--rule-color);
 }
 
+/* Full width and below the rule under the picker: the one commit for everything
+   staged above it, not a button belonging to the text field it used to sit beside. */
+.capture-commit {
+  width: 100%;
+}
+
 /* One input's outcome that never became a card. Its label — a filename, or the head
    of the pasted text — is what ties it back to the input it came from while several
    are in flight. */

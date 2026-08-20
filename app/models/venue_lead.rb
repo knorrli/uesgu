@@ -6,12 +6,11 @@
 # a lead that's since been approved or aged out of the feed simply drops off. Each
 # carries the count of upcoming events it would bring, for ranking the inbox.
 #
-# (Was VenuePlace, which fed the location taxonomy until the venue registry took
-# that over — see PR #29 and docs/venue-registry-design.md.)
+# (Was VenuePlace, which fed the location taxonomy until the venue registry took that
+# over — see docs/venue-registry-design.md.)
 class VenueLead < ApplicationRecord
   validates :venue, :source, presence: true
 
-  # Highest-demand leads first — the inbox ranking.
   scope :by_demand, -> { order(event_count: :desc, venue: :asc) }
 
   # Replace this source's leads with the current run's set (idempotent per run).

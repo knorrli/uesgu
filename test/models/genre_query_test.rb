@@ -6,8 +6,6 @@ require "db_test_helper"
 # names only; genres are matched by fingerprint via the genre_for helper since
 # ingest canonicalizes casing/spelling.
 class GenreQueryTest < ActiveSupport::TestCase
-  # --- Genre.ensure! ---------------------------------------------------------
-
   test "ensure! creates a row per new name" do
     assert_difference -> { Genre.count }, 2 do
       Genre.ensure!(%w[zorptronic flarejazz])
@@ -29,8 +27,6 @@ class GenreQueryTest < ActiveSupport::TestCase
       Genre.ensure!(%w[glimmercore GLIMMERCORE])
     end
   end
-
-  # --- Genre.reconcile! ------------------------------------------------------
 
   test "reconcile! sets events_count from the live genre taggings" do
     event_with_genres("zorptronic")
@@ -71,8 +67,6 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_equal 0, stale.reload.events_count
   end
 
-  # --- Genre.blocked_fingerprints --------------------------------------------
-
   test "blocked_fingerprints returns the fingerprints of only blocked genres" do
     blocked = Genre.create!(name: "NoiseTag")
     blocked.block!
@@ -84,8 +78,6 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_includes fingerprints, Genre.fingerprint_for("NoiseTag")
     refute(fingerprints.any? { |fp| fp.start_with?("kept") })
   end
-
-  # --- scopes ----------------------------------------------------------------
 
   test "unplaced surfaces in-use genres with no parent and no disposition" do
     queued = genre(name: "queued", events_count: 5)
@@ -143,7 +135,6 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_includes names, aliased.name, "the alias stays listed via its own taggings"
   end
 
-  # --- Prose mining (names_in_prose / prose_mining_index) ---------------------
   # The ingest-time match-only miner: find KNOWN genre names in dropped
   # description prose, mint nothing. Synthetic taxonomy only.
 

@@ -59,7 +59,6 @@
     <%= tag.link rel: "preload", href: asset_path("Phosphor.woff2"), as: "font", type: "font/woff2", crossorigin: "anonymous" %>
 
     <%= combobox_style_tag %>
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>

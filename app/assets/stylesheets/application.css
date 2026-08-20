@@ -33,7 +33,6 @@ body:has(.cookie-notice:not([hidden])) .site-footer {
   padding-bottom: calc(var(--gap-large) + 3.5rem);
 }
 
-/* Base typography */
 h1 { font-size: var(--font-size-xl); }
 h2 { font-size: var(--font-size-lg); }
 h3 { font-size: var(--font-size-base); }
@@ -251,7 +250,6 @@ a {
   }
 }
 
-/* Form errors list */
 .form-errors {
   border: var(--border-width) solid var(--theme-warn-color);
   color: var(--theme-warn-color);

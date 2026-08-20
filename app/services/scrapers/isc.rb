@@ -13,7 +13,6 @@ module Scrapers
       page.css("a.event_preview")
     end
 
-    # Only concerts; other event types are skipped.
     def skip_row?(row)
       !row.css(".event_title_info").text.squish.include?("Konzert")
     end

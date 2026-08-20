@@ -49,7 +49,7 @@ def shoot(b, slug, full: false)
   puts slug
 end
 
-# ── Mobile (390×844): full-screen When sheet ───────────────────────────────────
+# Mobile: the When sheet goes full-screen below the 600px breakpoint.
 b = Ferrum::Browser.new(headless: true, window_size: [390, 844], timeout: 20, process_timeout: 30)
 b.resize(width: 390, height: 844)
 login(b)
@@ -60,7 +60,7 @@ pick_range(b)
 shoot(b, "02-mobile-range", full: true)
 b.quit
 
-# ── Desktop (1100×900): inline When dropdown panel ─────────────────────────────
+# Desktop: the same sheet renders as an in-flow dropdown panel.
 d = Ferrum::Browser.new(headless: true, window_size: [1100, 900], timeout: 20, process_timeout: 30)
 d.resize(width: 1100, height: 900)
 login(d)

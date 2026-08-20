@@ -118,7 +118,6 @@ class Genre < ApplicationRecord
     connection.select_values(sql).map(&:to_i)
   end
 
-  # This genre's descendants (excluding itself). Memoised per instance.
   def descendant_ids
     @descendant_ids ||= self.class.subtree_ids([id]) - [id]
   end

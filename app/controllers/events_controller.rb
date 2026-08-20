@@ -14,7 +14,6 @@ class EventsController < ApplicationController
   FILTER_KEYS = %i[q g l d].freeze
   FILTER_COOKIE = :events_filter
 
-  # GET /events
   def index
     return if redirect_to_canonical_filter
 

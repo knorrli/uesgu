@@ -95,7 +95,6 @@ label.tag:has(input:checked) {
   white-space: nowrap;
 }
 
-/* A quieter still (disabled/inactive) info chip. */
 .chip--muted {
   color: var(--theme-fg-muted);
   opacity: 0.75;

@@ -170,8 +170,8 @@
   width: 100%;
   max-width: var(--content-max-width);
   margin-inline: auto;
-  /* Wider inline inset than --content-padding on purpose: the footer's small
-     links sat too close to the viewport edge on phones (#63). */
+  /* Wider inline inset than --content-padding on purpose: the footer's small links
+     otherwise sit too close to the viewport edge on a phone. */
   padding: var(--gap-large);
   border-top: var(--border-width) solid var(--border-color);
   font-size: var(--font-size-small);
@@ -224,7 +224,6 @@
   text-align: center;
 }
 
-/* Unread-notifications dot on the account-menu trigger. */
 .unread-dot {
   display: inline-block;
   width: 0.5em;

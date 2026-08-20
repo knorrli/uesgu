@@ -27,7 +27,7 @@ require "ipaddr"
 #
 # Consumer ISPs are not a risk at all — Swisscom, Sunrise, Salt, Init7 and
 # Quickline announce their own allocations from their own ASNs, and no mechanism
-# hands a home line an EC2 address. See issue #85 for the full analysis.
+# hands a home line an EC2 address.
 module DatacenterNets
   LIST_PATH = Rails.root.join("config", "datacenter_nets.txt")
 

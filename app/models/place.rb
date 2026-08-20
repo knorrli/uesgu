@@ -1,9 +1,9 @@
 # A captured place: where a user-captured event happens, when the venue registry
 # (config/venues.yml via Venue) does not cover it. Deliberately the COMPLEMENT of
 # the registry, never a mirror of it — a venue we source from gets no Place row,
-# and Location resolves the registry first. Two sources of "what is a venue" is
-# what VenuePlace was, and why PR #29 retired it. The complement is drawn at
-# Venue.in_taxonomy, not at the whole file: a venue we decided not to scrape can
+# and Location resolves the registry first: two sources of "what is a venue" is the
+# mistake the retired VenuePlace model made. The complement is drawn at
+# Venue.in_taxonomy, not at the whole file — a venue we decided not to scrape can
 # still host a captured show. See docs/user-event-capture-design.md.
 #
 # Not an owner of events: a vocabulary with attributes, like Genre. Events carry

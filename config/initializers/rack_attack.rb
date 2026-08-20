@@ -21,8 +21,6 @@ class Rack::Attack
   # count independently and the effective limit becomes workers × limit.
   Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
 
-  ### Request helpers ###################################################
-
   # THE bug that made every throttle below useless until now: Render terminates TLS
   # at a Cloudflare edge (confirmed — even uesgu.onrender.com answers with
   # `server: cloudflare` + `cf-ray`), so `req.ip` is ALWAYS a CLOUDFLARENET address,
@@ -107,8 +105,6 @@ class Rack::Attack
     end
   end
 
-  ### Safelists — never throttled #######################################
-
   # Render's healthcheck. Throttling it would take the whole instance down.
   safelist("allow/healthcheck") { |req| req.path == "/up" }
 
@@ -142,8 +138,6 @@ class Rack::Attack
     ip = req.true_ip_addr
     ip && ALLOWED_IPS.any? { |allowed| allowed.include?(ip) }
   end
-
-  ### Blocklists — dropped outright, before routing #####################
 
   # Vulnerability scanners and script-kiddie bots constantly probe for software we
   # don't run (WordPress, phpMyAdmin, exposed .env/.git, …). None of these paths can
@@ -192,9 +186,9 @@ class Rack::Attack
   end
 
   # Cloud/datacenter networks with no plausible human audience here. Established by
-  # measurement rather than assumption (the [probe] instrumentation from #82): over a
-  # 7-minute window, ALL 431 faceted requests came from Alibaba Cloud, rotating across
-  # 118 client IPs, and zero came from anywhere else.
+  # measurement rather than assumption: over a 7-minute window, ALL 431 faceted
+  # requests came from Alibaba Cloud, rotating across 118 client IPs, and zero came
+  # from anywhere else.
   #
   # This rule exists because every cheaper discriminator was measured and found dead:
   # the crawler carries a session cookie on 100% of requests and a plausible
@@ -218,8 +212,8 @@ class Rack::Attack
   # It covers COMPUTE only and deliberately not CDN or consumer-proxy egress —
   # blocking Cloudflare/Fastly/Akamai/Apple would catch iCloud Private Relay users,
   # and blocking Google beyond GCP would catch Chrome's IP Protection. Real people
-  # do come through those. See lib/datacenter_nets.rb and issue #85 for the full
-  # reasoning, including why Swiss consumer ISPs cannot collide with any of this.
+  # do come through those. See lib/datacenter_nets.rb for the full reasoning, including
+  # why Swiss consumer ISPs cannot collide with any of this.
   #
   # The calendar exemption is load-bearing: /calendar/:token is polled by Google,
   # Apple and Microsoft SERVERS on the subscriber's behalf, from exactly the ranges
@@ -230,8 +224,6 @@ class Rack::Attack
   blocklist("block/datacenter-nets") do |req|
     !req.calendar_feed? && DatacenterNets.include?(req.true_ip_addr)
   end
-
-  ### Throttles #########################################################
 
   # The facet space is what actually costs money: each hit is a full ~18KB render
   # behind 25-30 SQL queries and 200-600ms of CPU. A human browsing makes ONE such
@@ -258,8 +250,6 @@ class Rack::Attack
     "global-facets" if req.faceted? && !req.asset?
   end
 
-  ### Measurement — matches, never blocks ###############################
-
   # Temporary diagnostic. The Aug 2026 crawl survived every rule above: it is spread
   # across a large pool of client IPs (so the per-IP caps never trip — measured at
   # ~39 faceted renders/min site-wide, with no single client near the 12/min limit)
@@ -271,8 +261,6 @@ class Rack::Attack
   # fires a notification WITHOUT blocking, throttling, or altering the response, so
   # this is pure observation. The subscriber below decides whether to log.
   track("measure/facets") { |req| req.faceted? && !req.asset? }
-
-  ### Responses #########################################################
 
   self.throttled_responder = lambda do |req|
     match_data = req.env["rack.attack.match_data"] || {}
@@ -311,8 +299,6 @@ class Rack::Attack
     end
   end
 end
-
-### Logging ###########################################################
 
 # Emit a clear WARN line whenever a request is throttled or blocked, so "rate
 # limiting is working" is obvious in the Render logs (the bare 429/403 status line

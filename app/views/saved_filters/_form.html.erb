@@ -130,11 +130,11 @@
       </div>
     </fieldset>
 
-    <%# ── FEED ── the third consequence of saving a filter (#66): mark matches in
-        the feed (row flag, sidebar accent, calendar dots). Default ON; someone with
-        a broad scope-filter (canton + date) unticks it once so highlighting stays
-        reserved for taste. Independent of the channels above — no notify-channels
-        wiring, a silent filter can still highlight. %>
+    <%# The third consequence of saving a filter: matches are marked in the feed (row
+        flag, sidebar accent, calendar dots). Default ON; someone with a broad
+        scope-filter (canton + date) unticks it once so highlighting stays reserved
+        for taste. Independent of the channels above — a silent filter can still
+        highlight. %>
     <fieldset class="saved-filter-fieldset flex flex-col gap-small">
       <legend><%= t('saved_filters.section_feed') %></legend>
       <label class="saved-filter-check flex gap-small">

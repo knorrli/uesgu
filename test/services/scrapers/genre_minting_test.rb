@@ -70,7 +70,6 @@ class Scrapers::GenreMintingTest < ActiveSupport::TestCase
     assert Genre.exists?(fingerprint: Genre.fingerprint_for("Salsa Namá"))
   end
 
-  # --- Prose mining wired through build_event --------------------------------
   # A genre-less scraper that opts into event_genre_prose gets known genre
   # names mined from the blurb attached at ingest — match-only, minting nothing.
 

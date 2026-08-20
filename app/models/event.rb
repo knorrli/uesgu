@@ -27,9 +27,9 @@ class Event < ApplicationRecord
                               dependent: :nullify, inverse_of: :canonical_event
 
   validates :title, :start_date, presence: true
-  # A user-captured event has no source page (docs/user-event-capture-design.md,
-  # decision 10). NULL only, never "": the unique index doesn't compare NULLs but
-  # does compare empty strings, so a second url-less event would collide.
+  # A user-captured event has no source page. NULL only, never "": the unique index
+  # doesn't compare NULLs but does compare empty strings, so a second url-less event
+  # would collide.
   validates :url, presence: true, allow_nil: true
 
   # Public-facing events: non-music events (carrying a hidden genre, with no

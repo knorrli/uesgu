@@ -34,7 +34,6 @@ class RegistrationsController < ApplicationController
     render :new, status: :unprocessable_entity
   end
 
-  # Delete own account.
   def destroy
     user = Current.user
     terminate_session

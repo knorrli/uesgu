@@ -6,7 +6,6 @@
 class CalendarFeedsController < ApplicationController
   allow_unauthenticated_access only: :show
 
-  # GET /calendar/:token.ics
   def show
     user = User.find_by(calendar_feed_token: params[:token]) if params[:token].present?
     return head :not_found if user.nil?

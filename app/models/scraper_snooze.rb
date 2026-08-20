@@ -32,7 +32,6 @@ class ScraperSnooze < ApplicationRecord
     find_or_initialize_by(scraper: scraper).update!(snoozed_until: Time.current + duration)
   end
 
-  # Wake a scraper immediately (admin clicked "Wake now").
   def self.wake!(scraper)
     where(scraper: scraper).delete_all
   end

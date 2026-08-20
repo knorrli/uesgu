@@ -1,5 +1,4 @@
 namespace :taxonomy do
-  # ---------------------------------------------------------------------------
   # Phase 0 — draft tree seed (tooling, no app change).
   #
   # Generate a *draft* genre tree (db/genres.yml) from today's flat taxonomy:
@@ -10,7 +9,6 @@ namespace :taxonomy do
   # than a blank page. Reads the source-of-truth seed JSON (lib/genres.json et al)
   # and folds names with Genre.fingerprint_for (the single matching key, so the
   # draft dedupes exactly as the loader will). See docs/taxonomy-and-saved-filters-redesign.md.
-  # ---------------------------------------------------------------------------
   desc "Generate a draft genre tree (db/genres.yml) from the current flat " \
        "Style→Genre seed. A starting point to cultivate by hand, not a finished seed."
   task draft_tree: :environment do
@@ -71,7 +69,6 @@ namespace :taxonomy do
          "#{tree['ignored'].size} ignored, #{aliases.size} alias groups"
   end
 
-  # ---------------------------------------------------------------------------
   # Phase 1 — tree seed loader.
   #
   # Load the cultivated genre tree (db/genres.yml) into the database: upsert a
@@ -81,7 +78,6 @@ namespace :taxonomy do
   # every deploy or by hand). Genres NOT in the seed (e.g. new scrapes) are left
   # untouched, so they stay unplaced in the admin curation queue. The seed is the
   # curated backbone; scrapers add leaves you then file.
-  # ---------------------------------------------------------------------------
   desc "Load the curated genre tree (db/genres.yml): upsert genres, set parents " \
        "from the nesting, apply dispositions + aliases. Idempotent."
   task import_tree: :environment do
@@ -98,7 +94,6 @@ namespace :taxonomy do
     end
   end
 
-  # ---------------------------------------------------------------------------
   # Phase 5 — prod taxonomy reset (run once in the Render shell after deploy).
   #
   # Wipe the genre MODEL rows (the tree + dispositions) and rebuild them from the
@@ -111,7 +106,6 @@ namespace :taxonomy do
   # Sequence: deploy (migrations run) → `bin/rails taxonomy:reset` in the Render
   # shell → re-scrape (or wait for the daily cron) so any scraped genres not in the
   # seed arrive as unplaced rows in the admin queue.
-  # ---------------------------------------------------------------------------
   desc "Reset the genre taxonomy: wipe the tree rows, reload db/genres.yml, and " \
        "recompute every event's visibility. Run once in prod after deploy."
   task reset: :environment do

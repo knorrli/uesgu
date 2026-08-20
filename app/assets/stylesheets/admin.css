@@ -170,7 +170,6 @@
   white-space: nowrap;
 }
 
-/* The redeemable code and its shareable signup link. */
 .invite__code {
   font-weight: bold;
   letter-spacing: 0.08em;

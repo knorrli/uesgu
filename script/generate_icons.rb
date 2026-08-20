@@ -27,8 +27,7 @@ SPLASH   = File.join(PUBLIC, "splash")
 PARTIAL  = File.join(ROOT, "app/views/layouts/_ios_splash_screens.html.erb")
 VERSION_RB = File.join(ROOT, "config/initializers/icon_version.rb")
 
-# ── THE MASTER ──────────────────────────────────────────────────────────────
-# 512×512 viewBox. The mark: a blocky lowercase "ü" whose two umlaut dots are
+# The master, 512×512 viewBox. The mark: a blocky lowercase "ü" whose two umlaut dots are
 # coloured stage-lights (rose left, green right) casting asymmetric "party
 # spotlight" cones — short stubby rose + long raking green — with rounded pool
 # ends (a quadratic-curved base, not a sliced straight line).
@@ -100,7 +99,6 @@ DEVICES = [
 ].freeze
 MARK_FRACTION = 0.62 # mark bounding box as fraction of the shorter screen edge
 
-# ── tooling guards ──────────────────────────────────────────────────────────
 abort "`rsvg-convert` not found on PATH" if `which rsvg-convert`.strip.empty?
 abort "`magick` (ImageMagick) not found on PATH" if `which magick`.strip.empty?
 

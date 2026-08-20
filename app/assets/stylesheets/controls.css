@@ -105,8 +105,7 @@ input[type=submit] {
   }
 }
 
-/* ── The button ladder ───────────────────────────────────────────────────────
-   Three weights, app-wide. "A box reads as clickable", so every one is a box
+/* The button ladder: three weights, app-wide. "A box reads as clickable", so every one is a box
    (except .text-link, a navigation link). Weight is the role; size is just
    context (full-width vs small pill), NOT a separate tier:
 
@@ -180,8 +179,7 @@ input[type=submit] {
   cursor: pointer;
 }
 
-/* ── Form actions row ────────────────────────────────────────────────────────
-   The standard closing row of a task-style form (shared/_form_actions): primary
+/* The standard closing row of a task-style form (shared/_form_actions): primary
    Save + secondary Abbrechen side by side, so backing out is as explicit as
    committing. A destructive extra (.danger/.delete, e.g. the saved-filter
    Löschen) is pushed to the far end — the safe pair and the dangerous one never
@@ -197,8 +195,7 @@ input[type=submit] {
   margin-inline-start: auto;
 }
 
-/* ── Checkbox ─────────────────────────────────────────────────────────────────
-   One custom box everywhere (forms, the favorites picker, …) so a native browser
+/* One custom checkbox everywhere (forms, the favorites picker, …) so a native browser
    checkbox never sneaks in beside it. appearance:none lets us draw the box on the
    input itself — no sibling element, so no markup changes — matching the
    filter-sheet .opt__box exactly. The full-row sheet option (.opt) and the

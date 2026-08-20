@@ -12,8 +12,8 @@ module Scrapers
   # distinct post ids → distinct upsert keys), or a scraper's URL scheme change
   # stranding the old-keyed copy next to the freshly-keyed one. Those fold too,
   # but only on the IDENTICAL start time: two same-titled events at different
-  # times on one day are genuinely distinct happenings (ONO lists a 15:00
-  # workshop and a 20:00 concert under one title — see #59), while cross-source
+  # times on one day are genuinely distinct happenings (ONO lists a 15:00 workshop
+  # and a 20:00 concert under one title), while cross-source
   # copies keep date-level matching because different sources routinely disagree
   # on doors-vs-show time for the same gig.
   #
@@ -63,8 +63,8 @@ module Scrapers
       return if events.size < 2
 
       # Within one rank the NEWEST copy is preferred as canonical: for a true
-      # double-post either copy would do, but for a re-keyed strand (a scraper's
-      # URL scheme changed — Mokka #55, Südpol #56) the newer row carries the
+      # double-post either copy would do, but for a re-keyed strand (a scraper whose
+      # URL scheme changed, as Mokka's and Südpol's did) the newer row carries the
       # working link while the stale one folds away beneath it.
       ranked     = events.sort_by { |e| [source_rank(e), -e.id] }
       canonicals = []

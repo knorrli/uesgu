@@ -1,6 +1,4 @@
 module SavedFiltersHelper
-  # --- form option lists (the schedule, on the new-alert page) ---------------
-
   def rule_cadence_options
     SavedFilter::CADENCES.map { |c| [t("saved_filters.cadences.#{c}"), c] }
   end
@@ -21,8 +19,6 @@ module SavedFiltersHelper
   def rule_time_hour_options = (0..23).map { |h| format("%02d", h) }
 
   def rule_time_minute_options = %w[00 15 30 45]
-
-  # --- alert descriptions (the read-only list + the new-alert preview) -------
 
   # "Weekly on Friday at 17:30"
   def rule_schedule_summary(rule)

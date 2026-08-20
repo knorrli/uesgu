@@ -41,7 +41,7 @@ module Scrapers
   # venue page), so an overlapping PETZI/bespoke copy folds onto the OLE event,
   # not the other way round. (See dedup_test.rb for the proof.)
   class Ole < Agent
-    # --- Source registry. OLE feeds live ON the venue rows in the registry
+    # OLE feeds live ON the venue rows in the registry
     # (config/venues.yml `sources: [{ via: ole, feed_url:, … }]`), not in a constant
     # here — a source is a URL in the registry, not code. The generation loop at the
     # bottom of this file builds one scraper per OLE feed on a CONSUME venue.
@@ -174,8 +174,6 @@ module Scrapers
       result
     end
 
-    # --- Template-method hooks -------------------------------------------------
-
     # process_events fetched page 1 (get(self.class.url)); we parse it, follow
     # <meta><next_url> pagination, and expand every <event> into one Row per
     # upcoming <show>. Returning the fully-resolved Rows keeps the field extractors
@@ -262,7 +260,6 @@ module Scrapers
 
     private
 
-    # Parse the current page body as namespaced-stripped XML.
     def current_doc
       doc = Nokogiri::XML(page.body)
       doc.remove_namespaces!

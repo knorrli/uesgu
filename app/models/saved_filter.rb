@@ -91,8 +91,6 @@ class SavedFilter < ApplicationRecord
     end
   end
 
-  # ── Filter (mirrors the landing-page params q/l/s/d) ───────────────────────
-
   def filter_attributes=(params)
     self.filter = {
       "queries" => clean(params[:q]),
@@ -123,8 +121,6 @@ class SavedFilter < ApplicationRecord
 
   def happening? = active_windows.any?
   def added? = !happening?
-
-  # ── Identity (dedupe) ──────────────────────────────────────────────────────
 
   # An order-independent fingerprint of a filter set: the lists as sets (so
   # "Rock · Bern" == "Bern · Rock"), date ranges narrowed to the presets a rule
@@ -165,8 +161,6 @@ class SavedFilter < ApplicationRecord
     WINDOW_RHYTHM[active_windows.first]
   end
 
-  # ── Scheduling ─────────────────────────────────────────────────────────────
-
   # Whether this saved filter actually delivers (vs. a silent saved scope). In-app
   # is the master, so notifying? == notify_in_app? — the single notify state.
   def notifying? = notify_in_app?
@@ -198,8 +192,6 @@ class SavedFilter < ApplicationRecord
     end
   end
 
-  # ── Matching ───────────────────────────────────────────────────────────────
-
   # Events this saved filter covers as of `now`: the exact landing-page query
   # (Filter#ransack_query, which also supplies the future floor when there's no
   # date window). "added" additionally bounds by created_at since the last fire.
@@ -208,8 +200,6 @@ class SavedFilter < ApplicationRecord
     rel = rel.where(created_at: coverage_floor...now) if added?
     rel.ransack(to_filter.ransack_query).result(distinct: true).order(:start_date, :start_time, :title)
   end
-
-  # ── Firing ─────────────────────────────────────────────────────────────────
 
   def fire!(now = Time.current)
     events = matched_events(now).to_a

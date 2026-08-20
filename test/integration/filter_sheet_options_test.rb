@@ -1,6 +1,6 @@
 require "db_test_helper"
 
-# The filter sheets' option trees are NOT part of the page (#81): the What genre
+# The filter sheets' option trees are NOT part of the page: the What genre
 # tree and the Where place tree are ~360 checkbox rows between them, about half the
 # feed's compressed weight, rendered on every request for a picker most visits never
 # open. The page ships a turbo-frame instead, and filter-sheets#open fetches the rows

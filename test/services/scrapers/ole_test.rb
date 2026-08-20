@@ -36,8 +36,6 @@ class Scrapers::OleTest < Minitest::Test
                         aggregator: true, link_via: :source, gate: :lenient)
   end
 
-  # --- single-venue: pagination + date filter + multi-show + URL rule ---------
-
   def test_single_venue_paginates_filters_and_expands
     events = run_offline(single_venue, "single_page1.xml", "single_page2.xml")
 
@@ -150,8 +148,6 @@ class Scrapers::OleTest < Minitest::Test
     assert_equal "OLE:Klangkeller", a.data_source
   end
 
-  # --- aggregator: per-event location + PLZ→canton ---------------------------
-
   def test_aggregator_resolves_location_and_canton_from_plz
     events = run_offline(aggregator, "aggregator.xml")
     by_title = events.index_by(&:title)
@@ -160,8 +156,6 @@ class Scrapers::OleTest < Minitest::Test
     assert_equal ["Marians Jazzroom", "Bern", "BE"], by_title["Snarftet plays Florp"].location_list
     assert_equal ["Vernissage Halle", "Zermatt", "VS"], by_title["Bergglorp Ensemble"].location_list
   end
-
-  # --- link_via: :source — key + link on <source_url>, not the venue homepage --
 
   # Two different events at the SAME venue homepage on the SAME night: keying on
   # <url>+date would collide them into one, so the per-event <source_url> is the
@@ -218,8 +212,6 @@ class Scrapers::OleTest < Minitest::Test
     assert_equal ["Heitere Fahne", "Wabern", "BE"], s.send(:locations_for, node)
   end
 
-  # --- unit-level guards on the cleanup helpers ------------------------------
-
   def test_clean_title_strips_trailing_colon_and_squishes
     s = single_venue.new
     assert_equal "Mardi Gras", s.send(:clean_title, "  Mardi   Gras :  ")
@@ -231,8 +223,6 @@ class Scrapers::OleTest < Minitest::Test
     url = s.send(:occurrence_url, "https://x.example/y", Time.zone.parse("2026-07-01T20:30:00+02:00"))
     assert_equal "https://x.example/y#show-2026-07-01", url
   end
-
-  # --- the closed-allowlist gate (#skip_row?) --------------------------------
 
   # gate defaults to :strict in Scrapers::Ole.build.
   def strict_aggregator
@@ -261,8 +251,6 @@ class Scrapers::OleTest < Minitest::Test
     s = single_venue.new
     refute s.send(:skip_row?, row_for("Totally Unknown Venue 9000"))
   end
-
-  # --- generated from the registry (config/venues.yml `sources:`) -------------
 
   def test_feeds_generate_from_the_registry_with_source_owning_venue_provenance
     d = Scrapers::OleDachstock

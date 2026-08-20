@@ -1,5 +1,4 @@
 :root {
-  /* colors */
   --color-white: white;
   --color-gray: #444444;
   --color-light-gray: #b9b9b9;
@@ -10,7 +9,6 @@
   --color-raspberry: #c2185b;
   --color-blue: blue;
   --color-black: black;
-  /* app styles */
   --border-radius: none;
   --gap-xsmall: 3px;
   --gap-small: 5px;
@@ -18,11 +16,9 @@
   --gap-large: 20px;
   --gap-xlarge: 50px;
 
-  /* layout */
   --content-max-width: 720px;
   --content-padding: var(--gap-medium);
 
-  /* type scale */
   --font-size-small: 0.8rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.25rem;

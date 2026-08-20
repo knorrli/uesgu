@@ -6,8 +6,6 @@ require "db_test_helper"
 # favorites), create from filter params, the read-only list, and
 # fire/toggle/destroy. Email channel stays off.
 class SavedFiltersTest < ActionDispatch::IntegrationTest
-  # --- landing-page button ---------------------------------------------------
-
   test "the save action shows for a signed-in user, empty filter included" do
     sign_in_as user
 
@@ -18,8 +16,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get events_path(g: ["Rock"])
     assert_select "a.filter-menu__save"
   end
-
-  # --- saved-filters menu (events feed chip row) -----------------------------
 
   test "the saved-filters menu lets you apply a saved filter via its full URL" do
     u = sign_in_as user
@@ -45,8 +41,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get events_path
     assert_select "details.filter-menu", false, "no menu for anonymous visitors"
   end
-
-  # --- new -------------------------------------------------------------------
 
   test "new requires authentication" do
     get new_saved_filter_path
@@ -93,8 +87,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     assert_select ".filter-trigger[data-filter-sheets-field-param='when'] .badge", text: "1"
   end
 
-  # --- create ----------------------------------------------------------------
-
   test "create saves the drafted filter and returns to the list" do
     u = sign_in_as user
 
@@ -140,8 +132,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     assert_empty r.queries + r.genres + r.location_list + r.date_ranges, "no criteria => all events"
   end
 
-  # --- one rule per filter set -----------------------------------------------
-
   test "create on a filter that already has a rule lands on the existing one, no duplicate" do
     u = sign_in_as user
     existing = u.saved_filters.new(name: "x", cadence: "daily", time_of_day: 540)
@@ -174,8 +164,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     # No separate notify control on the events page.
     assert_select "a.notify-bell-link", false
   end
-
-  # --- edit / update ---------------------------------------------------------
 
   test "edit shows the schedule + the saved filter pre-checked in the tree" do
     u = sign_in_as user
@@ -292,8 +280,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get edit_saved_filter_path(foreign)
     assert_response :not_found
   end
-
-  # --- list + management -----------------------------------------------------
 
   test "index lists alerts read-only with their summary and actions" do
     u = sign_in_as user

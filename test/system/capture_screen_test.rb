@@ -122,6 +122,56 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "", field_value("locality")
   end
 
+  test "the strip states the whole batch from the moment it is sent" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    stage "poster.png"
+    stage_text "Zorpcore Matinee, Zorpsaal"
+    commit
+
+    assert_selector ".capture-queue__group", count: 2
+    assert_selector ".capture-queue__tile", count: 2
+  end
+
+  test "candidates off one input are one group in the strip" do
+    CannedExtractionClient.install(events: [poster_event, matinee])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-queue__group", count: 1
+    assert_selector ".capture-queue__group .capture-queue__tile", count: 2
+    assert_no_selector ".capture-queue__tile[data-state=pending]"
+  end
+
+  test "an input that yields nothing still holds its place in the strip" do
+    CannedExtractionClient.install(events: [])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-row", text: copy("row.nothing_found")
+    assert_selector ".capture-queue__tile[data-state=failed]", count: 1
+    assert_no_selector ".capture-queue__tile[data-state=pending]"
+  end
+
+  test "a failed extraction reaches the strip rather than only the rows list" do
+    CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
+    visit capture_path
+    paste "Zorpcore Nacht, Zorpsaal"
+
+    assert_selector ".capture-row", text: copy("failures.provider_error")
+    assert_selector ".capture-queue__tile[data-state=failed]", count: 1
+  end
+
+  test "a long source name stays on one line in the card header" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    paste "Zorpcore Nacht im Zorpsaal, Zorpwil, mit Vorband und allem Drum und Dran"
+
+    label = find(".capture-card__label")
+    assert_equal "nowrap", label.style("white-space")["white-space"]
+    assert_operator label.evaluate_script("this.scrollWidth"), :>, label.evaluate_script("this.clientWidth")
+  end
+
   test "a picked poster is rendered beside the fields it produced" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path

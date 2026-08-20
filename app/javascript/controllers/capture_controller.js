@@ -195,7 +195,7 @@ export default class extends Controller {
   // queue of one.
   cardTargetConnected(card) {
     this.stripTarget.hidden = false
-    this.stripTarget.appendChild(this.tileFor(card))
+    this.placeCard(card)
     card.hidden = card.id !== this.currentId
     this.sharePlace(card)
     if (!this.currentId) this.open(card.id)
@@ -260,6 +260,45 @@ export default class extends Controller {
 
   get tiles() {
     return Array.from(this.stripTarget.querySelectorAll("[data-card]"))
+  }
+
+  // One group per input. Several candidates off one poster then read as one thing
+  // with parts, which is what lets the card header drop the "n of m" it used to need
+  // to explain why two cards look alike.
+  groupFor(rowId) {
+    const existing = this.stripTarget.querySelector(`[data-row="${rowId}"]`)
+    if (existing) return existing
+
+    const group = document.createElement("div")
+    group.className = "capture-queue__group"
+    group.dataset.row = rowId
+    this.stripTarget.appendChild(group)
+    return group
+  }
+
+  placeCard(card) {
+    const group = this.groupFor(card.closest(".capture-row")?.id)
+    group.querySelector('[data-state="pending"]')?.remove()
+    group.appendChild(this.tileFor(card))
+  }
+
+  // Stood up when the row is appended, not when a card lands, so the strip states the
+  // denominator from the start — and so an input that yields nothing still gets a tile
+  // saying so instead of vanishing from the queue entirely.
+  pendingTile(rowId, label) {
+    const tile = document.createElement("button")
+    tile.type = "button"
+    tile.className = "capture-queue__tile"
+    tile.dataset.state = "pending"
+    tile.disabled = true
+    tile.setAttribute("aria-label", label)
+    tile.appendChild(this.thumbnail(this.sources.get(rowId)))
+    return tile
+  }
+
+  settleEmpty(id) {
+    const pending = this.stripTarget.querySelector(`[data-row="${this.rowId(id)}"] [data-state="pending"]`)
+    if (pending) this.markTile(pending, "failed")
   }
 
   tileFor(card) {
@@ -385,6 +424,9 @@ export default class extends Controller {
 
       const stream = await response.text()
       Turbo.renderStreamMessage(stream)
+      // Counted off the stream rather than the page for the same reason the failure is:
+      // Turbo performs the action on the next animation frame, so no card exists yet.
+      if (this.cardsIn(stream) === 0) this.settleEmpty(id)
       // A provider failure comes back as a turbo-stream with status 200 — the request
       // succeeded, the extraction did not — so the response markup is the only honest
       // signal. It cannot be read off the page: Turbo performs the action on the NEXT
@@ -396,16 +438,25 @@ export default class extends Controller {
     }
   }
 
-  // The template of a <turbo-stream> is inert markup, so the row has to be reached
-  // through it rather than by querying the parsed document.
   failureIn(stream) {
+    return this.streamed(stream)?.querySelector("[data-failed]") ?? null
+  }
+
+  cardsIn(stream) {
+    return this.streamed(stream)?.querySelectorAll(".capture-card").length ?? 0
+  }
+
+  // The template of a <turbo-stream> is inert markup, so what it carries has to be
+  // reached through it rather than by querying the parsed document.
+  streamed(stream) {
     const template = new DOMParser().parseFromString(stream, "text/html").querySelector("turbo-stream template")
-    return template?.content.querySelector("[data-failed]") ?? null
+    return template?.content ?? null
   }
 
   failRow(id, message = this.errorValue) {
     const row = document.getElementById(this.rowId(id))
     if (row) row.querySelector("[data-pending]").textContent = message
+    this.settleEmpty(id)
     return false
   }
 
@@ -445,10 +496,13 @@ export default class extends Controller {
     const row = document.createElement("div")
     row.id = this.rowId(id)
     row.className = "capture-row"
-    row.innerHTML = `<p class="field-label"></p><p class="muted" data-pending></p>`
-    row.querySelector(".field-label").textContent = label
+    row.innerHTML = `<p class="capture-row__label field-label"></p><p class="muted" data-pending></p>`
+    row.querySelector(".capture-row__label").textContent = label
     row.querySelector("[data-pending]").textContent = this.pendingValue
     this.rowsTarget.appendChild(row)
+
+    this.stripTarget.hidden = false
+    this.groupFor(this.rowId(id)).appendChild(this.pendingTile(this.rowId(id), label))
   }
 
   // 1568px is where the provider's accuracy was measured. It happens on the client

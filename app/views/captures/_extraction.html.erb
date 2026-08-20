@@ -15,8 +15,7 @@
   <% else %>
     <% extraction.candidates.each_with_index do |candidate, index| %>
       <%= render "captures/candidate", candidate: candidate, key: "#{id}-#{index}",
-            label: label.presence || t('capture.row.untitled'),
-            nth: (extraction.candidates.size > 1 ? [index + 1, extraction.candidates.size] : nil) %>
+            label: label.presence || t('capture.row.untitled') %>
     <% end %>
   <% end %>
 </div>

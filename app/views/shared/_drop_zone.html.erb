@@ -1,0 +1,16 @@
+<%# A staging surface: drop files on it or tap it to open the picker, with what is
+    staged listed below as removable items the caller's client fills in.
+
+    The real <input type="file"> is kept and only visually hidden. The drop handler is
+    an enhancement — without the input, keyboard users and every iOS browser lose the
+    picker entirely. %>
+<%# locals: (id:, label:, hint: nil, items: nil, input_attrs: {}, zone_attrs: {}, items_attrs: {}) %>
+<%= tag.div class: "drop-zone", **zone_attrs do %>
+  <label class="drop-zone__target" for="<%= id %>">
+    <span class="ph ph-camera" aria-hidden="true"></span>
+    <span><%= label %></span>
+    <% if hint.present? %><span class="drop-zone__hint muted"><%= hint %></span><% end %>
+  </label>
+  <%= tag.input type: "file", id: id, class: "drop-zone__input", **input_attrs %>
+  <%= tag.ul items, class: "drop-zone__items", **items_attrs %>
+<% end %>

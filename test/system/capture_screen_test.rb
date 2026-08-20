@@ -112,9 +112,9 @@ class CaptureScreenTest < ApplicationSystemTestCase
   test "a place typed on one input stays on it rather than reaching the next input's cards" do
     CannedExtractionClient.install(events: [poster_event(locality: nil, canton: nil)])
     visit capture_path
-    pick "poster.png"
-    assert_selector ".capture-card", count: 1, visible: :all
-    paste "Zorpcore Nacht, Zorpsaal"
+    stage "poster.png"
+    stage_text "Zorpcore Nacht, Zorpsaal"
+    commit
     assert_selector ".capture-card", count: 2, visible: :all
 
     type "locality", "Zorpwil"
@@ -139,13 +139,64 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-row__excerpt", text: "Zorpcore Nacht, Zorpsaal, 20 Uhr"
   end
 
-  test "an unreadable file fails its own row while the rest of the batch lands" do
+  test "an unreadable file is caught at staging and never joins the committed batch" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
-    pick "broken.png", "poster.png"
+    stage "broken.png", "poster.png"
 
-    assert_selector ".capture-row", text: copy("failures.image_unsupported")
+    assert_selector ".drop-zone__item[data-state=undecodable]", text: "broken.png"
+    assert_selector ".drop-zone__item[data-state=undecodable]", text: copy("failures.image_unsupported")
+    commit
     assert_selector ".capture-card", count: 1, visible: :all
+    assert_no_selector ".capture-row", text: copy("failures.image_unsupported")
+  end
+
+  test "posters and a pasted text commit as one batch" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    stage "poster.png"
+    stage_text "Zorpcore Matinee, Zorpsaal"
+
+    assert_no_selector ".capture-row"
+    commit
+    assert_selector ".capture-card", count: 2, visible: :all
+  end
+
+  test "a staged item can be removed before the batch is sent" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    stage "poster.png"
+    stage_text "Zorpcore Matinee, Zorpsaal"
+
+    all(".drop-zone__remove").first.click
+    assert_selector ".drop-zone__item", count: 1
+    commit
+    assert_selector ".capture-card", count: 1, visible: :all
+    assert_selector ".capture-row__excerpt", text: "Zorpcore Matinee, Zorpsaal"
+  end
+
+  test "the input step is gone while cards are being decided, and start over brings it back" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".capture-picker"
+    reject
+    find("button[data-action='capture#startOver']").click
+
+    assert_selector ".capture-picker"
+    assert_no_selector ".capture-card", visible: :all
+    assert_no_selector ".drop-zone__item"
+    assert_no_selector ".capture-queue__tile"
+  end
+
+  test "nothing is sent until the batch is committed" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    stage "poster.png"
+
+    assert_no_selector ".capture-row", visible: :all
+    assert_no_selector ".capture-card", visible: :all
   end
 
   test "a refused request fails the row rather than leaving it pending forever" do
@@ -165,8 +216,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     paste "Zorpcore Nacht, Zorpsaal, 20 Uhr"
 
     assert_selector ".capture-row", text: copy("failures.provider_error")
-    # The paste is the one input that cannot be picked again from disk.
-    assert_equal "Zorpcore Nacht, Zorpsaal, 20 Uhr", find(".capture-picker textarea").value
     assert_no_selector ".capture-card", visible: :all
   end
 
@@ -193,13 +242,30 @@ class CaptureScreenTest < ApplicationSystemTestCase
     find(".capture-card [name=title]").click
   end
 
+  # Staging is silent, so every helper that stages waits for the item to appear before
+  # the next step: without it a commit can fire before an async downscale has landed.
+  def stage(*names)
+    find(".drop-zone__input", visible: :all).set(names.map { |name| file_fixture(name) })
+    assert_selector ".drop-zone__item", count: names.size, wait: 5
+  end
+
+  def stage_text(text)
+    staged = all(".drop-zone__item").size
+    find(".capture-picker textarea").set(text)
+    find("button[data-action='capture#stageText']").click
+    assert_selector ".drop-zone__item", count: staged + 1
+  end
+
+  def commit = find("button[data-action='capture#commit']").click
+
   def pick(*names)
-    find("input[type=file]").set(names.map { |name| file_fixture(name) })
+    stage(*names)
+    commit
   end
 
   def paste(text)
-    find(".capture-picker textarea").set(text)
-    find("button[data-action='capture#pickText']").click
+    stage_text(text)
+    commit
   end
 
   def accept = find(".capture-card .action-bar input[type=submit]").click

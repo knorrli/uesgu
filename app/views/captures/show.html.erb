@@ -7,30 +7,31 @@
      data-capture-pending-value="<%= t('capture.row.pending') %>"
      data-capture-error-value="<%= t('capture.failures.unreachable') %>"
      data-capture-undecodable-value="<%= t('capture.failures.image_unsupported') %>"
+     data-capture-remove-value="<%= t('capture.staging.remove') %>"
      data-capture-source-alt-value="<%= t('capture.row.source_alt') %>">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1><%= t('capture.title') %></h1>
     <p class="muted"><%= t('capture.intro') %></p>
   <% end %>
 
-  <%# Outside the publish form on purpose: picking an input fires its own request
-      per file, and a file field inside the form would re-upload every poster when
-      the verified events are finally submitted. %>
-  <div class="capture-picker account-form flex flex-col gap-medium">
-    <label class="flex flex-col gap-small">
-      <span class="field-label"><%= t('capture.images_label') %></span>
-      <p class="muted"><%= t('capture.images_hint') %></p>
-      <input type="file" accept="image/*" multiple data-capture-target="files"
-             data-action="change->capture#pickFiles">
-    </label>
+  <div class="capture-picker account-form flex flex-col gap-medium" data-capture-target="input">
+    <%= render "shared/drop_zone",
+          id: "capture-files", label: t('capture.staging.drop_label'), hint: t('capture.images_hint'),
+          input_attrs: { accept: "image/*", multiple: true,
+                         data: { capture_target: "files", action: "change->capture#stageFiles" } },
+          zone_attrs: { data: { capture_target: "zone",
+                                action: "dragover->capture#dragOver dragleave->capture#dragLeave drop->capture#dropFiles" } },
+          items_attrs: { data: { capture_target: "items" } } %>
 
     <label class="flex flex-col gap-small">
       <span class="field-label"><%= t('capture.text_label') %></span>
       <p class="muted"><%= t('capture.text_hint') %></p>
       <textarea rows="4" data-capture-target="text"></textarea>
     </label>
-    <div>
-      <button type="button" class="button-small" data-action="capture#pickText"><%= t('capture.text_button') %></button>
+    <div class="flex gap-medium wrap">
+      <button type="button" class="button-small" data-action="capture#stageText"><%= t('capture.staging.add_text') %></button>
+      <button type="button" class="button-small primary" data-capture-target="commit"
+              data-action="capture#commit" disabled><%= t('capture.staging.commit') %></button>
     </div>
   </div>
 
@@ -47,6 +48,9 @@
 
   <div id="capture-rows" class="flex flex-col gap-medium" data-capture-target="rows"></div>
 
-  <%= tag.p t('capture.empty'), class: "empty-state", data: { capture_target: "empty" } %>
   <%= tag.p t('capture.queue.done'), class: "empty-state", data: { capture_target: "done" }, hidden: true %>
+
+  <div data-capture-target="restart" hidden>
+    <button type="button" class="text-link" data-action="capture#startOver"><%= t('capture.staging.start_over') %></button>
+  </div>
 </div>

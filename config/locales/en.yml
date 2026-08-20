@@ -136,15 +136,18 @@ en:
   capture:
     title: Capture an event
     intro: Photographed a poster or copied some text? We read it, you check it card by card – whatever you publish goes live right away.
-    images_label: Posters
     images_hint: Several at once is fine. The images are never stored.
     text_label: Text
     text_hint: From a chat, a newsletter, wherever.
-    text_button: Read the text
-    empty: Nothing read yet.
+    staging:
+      drop_label: Drop posters here, or tap to pick
+      add_text: Add the text
+      commit: Read
+      remove: Remove
+      start_over: Start over
     queue:
       label: Queue
-      done: All decided. Another poster? Add it above.
+      done: All decided.
     actions:
       accept: Publish
       reject: Drop

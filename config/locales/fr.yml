@@ -136,15 +136,18 @@ fr:
   capture:
     title: Saisir un événement
     intro: Une affiche photographiée ou un texte copié ? On le lit, tu vérifies carte par carte – ce que tu publies part en ligne aussitôt.
-    images_label: Affiches
     images_hint: Plusieurs à la fois, pas de souci. Les images ne sont jamais stockées.
     text_label: Texte
     text_hint: D'un chat, d'une newsletter, peu importe.
-    text_button: Lire le texte
-    empty: Rien de lu pour l'instant.
+    staging:
+      drop_label: Dépose tes affiches ici, ou touche pour choisir
+      add_text: Ajouter le texte
+      commit: Lire
+      remove: Retirer
+      start_over: Recommencer
     queue:
       label: File
-      done: Tout est décidé. Une autre affiche ? Ajoute-la en haut.
+      done: Tout est décidé.
     actions:
       accept: Publier
       reject: Écarter

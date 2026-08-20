@@ -12,12 +12,14 @@ const PLACE_FIELDS = ["place", "locality", "canton"]
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
-  static targets = ["files", "text", "rows", "empty", "done", "strip", "card", "source"]
+  static targets = ["files", "text", "zone", "items", "commit", "input", "restart",
+                    "rows", "done", "strip", "card", "source"]
   static values = {
     url: String,
     pending: String,
     error: String,
     undecodable: String,
+    remove: String,
     sourceAlt: String,
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 }
@@ -28,36 +30,165 @@ export default class extends Controller {
   // has to outlive the turbo-stream that replaces the whole row.
   initialize() {
     this.sources = new Map()
+    this.staged = new Map()
     this.places = new Map()
     this.currentId = null
   }
 
   disconnect() {
-    this.sources.forEach(({ objectUrl }) => { if (objectUrl) URL.revokeObjectURL(objectUrl) })
-    this.sources.clear()
+    this.release(this.sources)
+    this.release(this.staged)
   }
 
-  pickFiles() {
-    const files = Array.from(this.filesTarget.files)
-    if (files.length === 0) return
+  release(held) {
+    held.forEach(({ objectUrl }) => { if (objectUrl) URL.revokeObjectURL(objectUrl) })
+    held.clear()
+  }
 
+  stageFiles() {
+    this.stageAll(Array.from(this.filesTarget.files))
+    // Cleared so that re-picking the same file after removing it still fires `change`.
     this.filesTarget.value = ""
-    this.run(files.map((file) => () => this.extractImage(file)))
   }
 
-  // The textarea is cleared only once the extraction has landed. A file can be
-  // re-picked from disk; a long paste from a newsletter cannot be, and the provider
-  // fails often enough that clearing first loses it for real.
-  pickText() {
+  dragOver(event) {
+    event.preventDefault()
+    this.zoneTarget.classList.add("is-over")
+  }
+
+  // dragleave also fires when the pointer crosses onto a CHILD of the zone, so the
+  // highlight flickers unless the element being entered is checked.
+  dragLeave(event) {
+    if (!this.zoneTarget.contains(event.relatedTarget)) this.zoneTarget.classList.remove("is-over")
+  }
+
+  dropFiles(event) {
+    event.preventDefault()
+    this.zoneTarget.classList.remove("is-over")
+    this.stageAll(Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/")))
+  }
+
+  async stageAll(files) {
+    for (const file of files) await this.stageImage(file)
+  }
+
+  // Downscaled here rather than at send time because the shrunk blob is what the
+  // thumbnail shows — and so a file no desktop browser can decode (a HEIC out of
+  // Finder, anything corrupt) is caught while the batch can still be edited, instead
+  // of landing as a dead row after it is sent.
+  async stageImage(file) {
+    const id = crypto.randomUUID()
+    try {
+      const image = await this.downscale(file)
+      this.staged.set(id, { name: file.name, blob: image, objectUrl: URL.createObjectURL(image) })
+    } catch {
+      this.staged.set(id, { name: file.name, error: this.undecodableValue })
+    }
+    this.appendStaged(id)
+  }
+
+  stageText() {
     const text = this.textTarget.value.trim()
     if (text === "") return
 
     const id = crypto.randomUUID()
-    this.sources.set(this.rowId(id), { text })
-    this.run([() => this.extract({ text }, text.slice(0, 40), id)
-      .then((landed) => {
-        if (landed && this.textTarget.value.trim() === text) this.textTarget.value = ""
-      })])
+    this.staged.set(id, { name: text.slice(0, 40), text })
+    this.textTarget.value = ""
+    this.appendStaged(id)
+  }
+
+  appendStaged(id) {
+    const staged = this.staged.get(id)
+    const item = document.createElement("li")
+    item.className = "drop-zone__item"
+    item.dataset.staged = id
+    if (staged.error) item.dataset.state = "undecodable"
+    item.appendChild(staged.objectUrl ? this.poster(staged.objectUrl, staged.name) : this.snippet(staged))
+    item.appendChild(this.removeButton(id, staged.name))
+    this.itemsTarget.appendChild(item)
+    this.refreshCommit()
+  }
+
+  unstage(event) {
+    const id = event.params.staged
+    const staged = this.staged.get(id)
+    if (staged?.objectUrl) URL.revokeObjectURL(staged.objectUrl)
+    this.staged.delete(id)
+    this.itemsTarget.querySelector(`[data-staged="${id}"]`)?.remove()
+    this.refreshCommit()
+  }
+
+  // The staged id becomes the row id, so the EXIF-stripped blob made at staging is
+  // also what the card's source pane shows: nothing is re-derived and nothing but
+  // that blob ever leaves the device.
+  commit() {
+    const batch = this.committable
+    if (batch.length === 0) return
+
+    this.inputTarget.hidden = true
+    this.restartTarget.hidden = false
+    batch.forEach((staged) => {
+      this.sources.set(this.rowId(staged.id), staged.text ? { text: staged.text } : { objectUrl: staged.objectUrl })
+    })
+    this.run(batch.map((staged) => () =>
+      this.extract(staged.text ? { text: staged.text } : { image: staged.blob, filename: staged.name },
+                   staged.name, staged.id)))
+  }
+
+  // Destructive on purpose: there is no way back to a queue of half-decided cards, so
+  // the honest offer is a clean second batch rather than a partial restore.
+  startOver() {
+    this.release(this.sources)
+    this.release(this.staged)
+    this.places.clear()
+    this.itemsTarget.replaceChildren()
+    this.rowsTarget.replaceChildren()
+    this.stripTarget.replaceChildren()
+    this.stripTarget.hidden = true
+    this.currentId = null
+    this.doneTarget.hidden = true
+    this.restartTarget.hidden = true
+    this.inputTarget.hidden = false
+    this.refreshCommit()
+  }
+
+  refreshCommit() {
+    this.commitTarget.disabled = this.committable.length === 0
+  }
+
+  get committable() {
+    return Array.from(this.staged, ([id, staged]) => ({ id, ...staged })).filter((staged) => !staged.error)
+  }
+
+  // A staged image is its own label; anything without a picture needs words. A failed
+  // file names itself, or a batch of five gives no clue which one to take back out.
+  snippet(staged) {
+    const box = document.createElement("span")
+    box.className = "drop-zone__snippet"
+    box.appendChild(this.line(staged.error ? staged.name : staged.text))
+    if (staged.error) box.appendChild(this.line(staged.error, "drop-zone__reason"))
+    return box
+  }
+
+  line(text, className) {
+    const span = document.createElement("span")
+    if (className) span.className = className
+    span.textContent = text
+    return span
+  }
+
+  removeButton(id, name) {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.className = "drop-zone__remove"
+    button.dataset.action = "capture#unstage"
+    button.dataset.captureStagedParam = id
+    button.setAttribute("aria-label", `${this.removeValue}: ${name}`)
+    const mark = document.createElement("span")
+    mark.className = "ph ph-x"
+    mark.setAttribute("aria-hidden", "true")
+    button.appendChild(mark)
+    return button
   }
 
   // The first card to land opens, so picking a single poster shows it rather than a
@@ -220,8 +351,6 @@ export default class extends Controller {
   // uploads would queue behind each other anyway while holding every byte of the
   // request in memory at the same time.
   async run(tasks) {
-    this.emptyTarget.hidden = true
-
     const queue = tasks.slice()
     const workers = Array.from({ length: Math.min(this.concurrencyValue, queue.length) }, async () => {
       while (queue.length > 0) {
@@ -231,29 +360,6 @@ export default class extends Controller {
       }
     })
     await Promise.all(workers)
-  }
-
-  // The row is appended BEFORE the decode: createImageBitmap rejects on a HEIC picked
-  // from Finder (accept="image/*" allows it and no desktop browser decodes it) and on
-  // anything corrupt. Appending afterwards meant that throw happened with nothing yet
-  // on screen — the picker just cleared.
-  async extractImage(file) {
-    const id = crypto.randomUUID()
-    this.appendPending(id, file.name)
-
-    let image
-    try {
-      image = await this.downscale(file)
-    } catch {
-      // Not a network problem — say the thing the contributor can act on, which is
-      // the same advice Adapters::Image gives for a file it cannot read.
-      return this.failRow(id, this.undecodableValue)
-    }
-
-    // The downscaled blob, never the picked File: the canvas re-encode has already
-    // dropped EXIF, so the preview inherits "the GPS never leaves the device".
-    this.sources.set(this.rowId(id), { objectUrl: URL.createObjectURL(image) })
-    return this.extract({ image, filename: file.name }, file.name, id)
   }
 
   async extract(payload, label, id = crypto.randomUUID()) {
@@ -317,10 +423,10 @@ export default class extends Controller {
     slot.appendChild(source.objectUrl ? this.poster(source.objectUrl) : this.excerpt(source.text))
   }
 
-  poster(objectUrl) {
+  poster(objectUrl, alt = this.sourceAltValue) {
     const image = document.createElement("img")
     image.src = objectUrl
-    image.alt = this.sourceAltValue
+    image.alt = alt
     return image
   }
 

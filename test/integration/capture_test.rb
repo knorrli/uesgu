@@ -112,8 +112,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("capture.card.published", title: "Kept", locale: :en), response.body
   end
 
-  # The card in front of the contributor is the only thing that can carry the
-  # reason, and it still holds their edits — so the response addresses the status
+  # The card still holds the contributor's edits, so the response addresses the status
   # region rather than re-rendering fields over the top of them.
   test "a refusal lands on the card that caused it and writes nothing" do
     sign_in_as user(contributor: true, locale: "en")
@@ -127,9 +126,9 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_empty Event.all
   end
 
-  # Two candidates off one poster carry the same source_url. Per card there is no
-  # batch to pre-check against: the second one accepted simply meets the unique
-  # index, which is the honest answer — by then the first one IS an existing event.
+  # Two candidates off one poster carry the same source_url, and nothing pre-checks
+  # for that: the second accepted simply meets the unique index, which is the honest
+  # answer — by then the first one IS an existing event.
   test "a link already published reads as an existing event" do
     sign_in_as user(contributor: true, locale: "en")
     event(url: "https://zorp.example/poster", title: "Scraped")
@@ -143,7 +142,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_equal ["Scraped"], Event.pluck(:title)
   end
 
-  # A DOM id is interpolated from it, so anything else must not reach the markup.
   test "create ignores a card id that is not a plain token" do
     sign_in_as user(contributor: true)
 

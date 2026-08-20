@@ -1,14 +1,10 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
-// The extraction fan-out lives here rather than on the server: one request per
-// input, because a batch cannot be held open in one and there is no queue to reach
-// for (see EventCapture::Extractor).
-//
-// It also drives the review queue. Only the card in front of the contributor is on
-// screen; the strip carries the rest, and — since accepting publishes immediately —
-// a decided tile is the only thing left saying what happened to a card that has
-// already moved on.
+// The extraction fan-out lives here rather than on the server: one request per input,
+// because a batch cannot be held open in one and there is no queue to reach for (see
+// EventCapture::Extractor). It also drives the review queue — one card on screen, the
+// rest behind it in the strip.
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
@@ -23,9 +19,9 @@ export default class extends Controller {
     concurrency: { type: Number, default: 3 }
   }
 
-  // What each row was read from, held only in the browser. Nothing is uploaded for
-  // storage, so this store is the only copy a contributor can check a field
-  // against, and it has to outlive the turbo-stream that replaces the whole row.
+  // What each row was read from, held only in the browser: nothing is uploaded for
+  // storage, so this is the only copy a contributor can check a field against, and it
+  // has to outlive the turbo-stream that replaces the whole row.
   initialize() {
     this.sources = new Map()
     this.currentId = null
@@ -59,9 +55,8 @@ export default class extends Controller {
       })])
   }
 
-  // A card takes its place in the strip as it lands and waits its turn off screen.
-  // The first one to arrive opens, so a contributor who picked one poster is looking
-  // at it rather than at a queue of one.
+  // The first card to land opens, so picking a single poster shows it rather than a
+  // queue of one.
   cardTargetConnected(card) {
     this.stripTarget.hidden = false
     this.stripTarget.appendChild(this.tileFor(card))
@@ -80,9 +75,9 @@ export default class extends Controller {
     this.doneTarget.hidden = true
   }
 
-  // Only a landed publish decides a card: turbo:submit-end fires for the refusal
-  // too, and that response is the stream putting the reason on the card the
-  // contributor is still looking at.
+  // turbo:submit-end fires for a refusal too, and that response is the stream putting
+  // the reason on a card the contributor is still looking at — so only a landed
+  // publish decides one.
   decided(event) {
     if (!event.detail.success) return
 
@@ -93,9 +88,9 @@ export default class extends Controller {
     this.settle(event.target.closest(".capture-card"), "dropped")
   }
 
-  // A published card is frozen — the event is live and the form behind it would
-  // publish a second one. A dropped card is not: rejecting is the reversible half of
-  // the decision, so tapping its tile brings it back to be accepted after all.
+  // Only publishing freezes a card: the event is live and the form behind it would
+  // publish a second one. Rejecting is the reversible half, so a dropped card can be
+  // reopened from its tile.
   settle(card, state) {
     card.dataset.state = state
     this.markTile(this.tileFor(card), state)
@@ -105,8 +100,8 @@ export default class extends Controller {
     this.advance()
   }
 
-  // Forward from the current card and then round to the front, so a card left
-  // behind by a jump backwards is picked up rather than stranded.
+  // Wraps, so a card left behind by a jump backwards is picked up rather than
+  // stranded.
   advance() {
     const cards = this.cardTargets
     const from = cards.findIndex((card) => card.id === this.currentId)
@@ -119,8 +114,8 @@ export default class extends Controller {
     this.doneTarget.hidden = false
   }
 
-  // Full-bleed, because the small print on a poster is the reason to look at it at
-  // all and a pane sized to sit beside the fields cannot show it.
+  // Full-bleed for the reason in review_card.css: the small print is what a poster is
+  // being looked at for.
   zoom(event) {
     const pane = event.currentTarget
     if (pane.querySelector("img")) pane.classList.toggle("review-card__source--zoomed")
@@ -155,7 +150,7 @@ export default class extends Controller {
   }
 
   // A pasted text has no picture to shrink, so its tile carries the head of the text
-  // instead — the strip has to stay scannable when the queue mixes the two.
+  // instead — the strip stays scannable when the queue mixes the two.
   thumbnail(source) {
     if (source?.objectUrl) return this.poster(source.objectUrl)
 
@@ -166,7 +161,6 @@ export default class extends Controller {
   }
 
   // Fill the place tuple from a near-match instead of minting a variant spelling.
-  // Scoped to the card the chip sits in — every candidate carries its own.
   applySuggestion(event) {
     const card = event.target.closest(".capture-card")
     const { name, locality, canton } = event.params
@@ -197,11 +191,10 @@ export default class extends Controller {
     await Promise.all(workers)
   }
 
-  // The row is appended BEFORE the decode, not after: createImageBitmap rejects on
-  // a HEIC picked from Finder (accept="image/*" allows it and no desktop browser
-  // decodes it) and on anything corrupt, and with the row created afterwards that
-  // threw before anything was on screen — the picker cleared and nothing else
-  // happened.
+  // The row is appended BEFORE the decode: createImageBitmap rejects on a HEIC picked
+  // from Finder (accept="image/*" allows it and no desktop browser decodes it) and on
+  // anything corrupt. Appending afterwards meant that throw happened with nothing yet
+  // on screen — the picker just cleared.
   async extractImage(file) {
     const id = crypto.randomUUID()
     this.appendPending(id, file.name)
@@ -236,21 +229,19 @@ export default class extends Controller {
         body,
         headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
       })
-      // renderStreamMessage is a silent no-op on any body without a <turbo-stream>,
-      // so an unchecked status leaves the row spinning forever on a 500, on a 403
-      // after the capability is revoked mid-session, and on an expired session
-      // (fetch follows the redirect and hands back the login page) — indistinguishable
-      // from a slow provider, which is the exact failure this rescue exists to prevent.
+      // renderStreamMessage is a silent no-op on any body without a <turbo-stream>, so
+      // an unchecked status leaves the row spinning forever on a 500, on a 403 after the
+      // capability is revoked mid-session, and on an expired session (fetch follows the
+      // redirect and hands back the login page).
       if (!response.ok) return this.failRow(id)
 
       const stream = await response.text()
       Turbo.renderStreamMessage(stream)
-      // A provider failure comes back as a turbo-stream with status 200 — the
-      // request succeeded, the extraction did not — so the row is the only honest
-      // signal of whether anything was read. It has to be read out of the markup:
-      // Turbo performs the action on the NEXT ANIMATION FRAME, so the page still
-      // holds the pending row here and every failure read as a success, which
-      // cleared the textarea out from under a paste the provider had just refused.
+      // A provider failure comes back as a turbo-stream with status 200 — the request
+      // succeeded, the extraction did not — so the response markup is the only honest
+      // signal. It cannot be read off the page: Turbo performs the action on the NEXT
+      // ANIMATION FRAME, so the pending row is still standing here, and reading that
+      // scored every failure a success and cleared the textarea under a refused paste.
       return this.failureIn(stream) === null
     } catch {
       return this.failRow(id)
@@ -264,7 +255,6 @@ export default class extends Controller {
     return template?.content.querySelector("[data-failed]") ?? null
   }
 
-  // Returns false so a caller can tell a landed extraction from a failed one.
   failRow(id, message = this.errorValue) {
     const row = document.getElementById(this.rowId(id))
     if (row) row.querySelector("[data-pending]").textContent = message
@@ -313,19 +303,14 @@ export default class extends Controller {
     this.rowsTarget.appendChild(row)
   }
 
-  // The long edge is capped at 1568px, which is where the provider's accuracy was
-  // measured. It happens here because there is no image library in the bundle and
-  // none on the deployed box, so the server cannot resize. Re-encoding through the
-  // canvas also drops EXIF, so a poster photo's GPS never leaves the device — which
-  // the server could never have achieved, the metadata having already travelled.
+  // 1568px is where the provider's accuracy was measured. It happens on the client
+  // because there is no image library in the bundle and none on the deployed box — and
+  // the canvas re-encode drops EXIF, so a poster photo's GPS never leaves the device,
+  // which a server-side resize could never achieve.
   //
-  // Encoded BOTH ways and the smaller one wins, rather than picking by source
-  // type. Measured on a real poster sample already at 1568px: canvas PNG came out at
-  // 1.81MB — 32% LARGER than the 1.37MB source, because canvas PNG output is
-  // unoptimised — against 221KB as JPEG. Keeping PNG for PNG sources would have
-  // sent eight times the necessary bytes on exactly the input this feature is for.
-  // Flat-colour screenshots, where PNG genuinely wins, still get PNG; the rule
-  // decides per image instead of guessing from the file extension.
+  // Encoded BOTH ways because canvas PNG output is unoptimised: on a real poster
+  // sample it came out at 1.81MB against 221KB as JPEG, 32% larger than the 1.37MB
+  // source. Flat-colour screenshots, where PNG genuinely wins, still get PNG.
   async downscale(file) {
     const bitmap = await createImageBitmap(file)
     const scale = Math.min(1, this.maxEdgeValue / Math.max(bitmap.width, bitmap.height))

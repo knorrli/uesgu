@@ -1,11 +1,9 @@
-/* The review card: one thing being judged, with the evidence that settles it and
-   the decision itself on screen at the same time. Used by the capture queue; the
-   specimen is in /styleguide.
+/* One thing being judged, with the evidence that settles it on screen at the same
+   time. Specimen in /styleguide.
 
-   The source pane and the action bar are sticky rather than laid out in flow,
-   because the job is a comparison — a source that scrolls away turns "does this
-   poster really say 20:00" back into remembering. Both need an opaque ground: the
-   body scrolls underneath them. */
+   The source pane and the action bar are sticky because the job is a comparison: a
+   source that scrolls away turns "does this poster really say 20:00" back into
+   remembering. Both need an opaque ground — the body scrolls underneath them. */
 .review-card {
   position: relative;
   padding-bottom: var(--gap-small);
@@ -54,9 +52,9 @@
   max-width: 100%;
 }
 
-/* The decision row, pinned to the bottom edge so it is in thumb reach on a phone
-   however long the field list runs. The last action is pushed to the far end: a
-   dismissal sitting next to the commit is one mis-tap away from being it. */
+/* Pinned to the bottom edge so it stays in thumb reach however long the field list
+   runs. The last action is pushed to the far end: a dismissal sitting next to the
+   commit is one mis-tap away from being it. */
 .action-bar {
   position: sticky;
   bottom: 0;
@@ -73,8 +71,8 @@
   margin-left: auto;
 }
 
-/* Wide enough for two columns: the same relationship rotated — source pinned left,
-   fields scrolling right, the decision across the bottom of both. */
+/* The same relationship rotated: source pinned left, fields scrolling right, the
+   decision across the bottom of both. */
 @media (min-width: 900px) {
   .review-card {
     display: grid;

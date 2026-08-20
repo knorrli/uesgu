@@ -1,9 +1,7 @@
-<%# One input's outcome, replacing its pending row in place — so a failed poster is
-    one row to retry rather than a dead batch. Three shapes: a failure, nothing
-    found, or 1..n review cards (a poster can advertise two concerts).
-
-    A failure or an empty result stays on screen instead of joining the queue: it
-    carries no decision, and the queue is what is left to decide. %>
+<%# One input's outcome, replacing its pending row in place, so a failed poster is
+    one row to retry rather than a dead batch. A failure or an empty read stays here
+    instead of joining the queue: it carries no decision, and the queue is what is
+    left to decide. %>
 <%# locals: (id:, label:, extraction:) %>
 <div id="<%= id %>" class="capture-row flex flex-col gap-medium">
   <% if !extraction.ok? %>

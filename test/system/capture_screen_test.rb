@@ -2,17 +2,14 @@ require "application_system_test_case"
 require_relative "../support/canned_extraction_client"
 
 # The capture screen in a real browser. Everything between picking a file and a
-# decision lives in app/javascript/controllers/capture_controller.js — the canvas
-# downscale, one extraction request per input, the review queue, and every error
-# path — and no other suite can reach it: test/integration/capture_test.rb starts at
-# the request the client fires.
+# decision lives in app/javascript/controllers/capture_controller.js, and no other
+# suite reaches it: test/integration/capture_test.rb starts at the request the client
+# fires.
 #
-# Capybara ignores hidden elements, so a bare `.capture-card` selector is the card
-# on screen; `visible: :all` is how the queue behind it is counted.
-#
-# The provider is canned; the extraction behind it is real (see
-# CannedExtractionClient). Copy assertions pin the user's locale because headless
-# Chrome asks for English and missing keys fall back to German.
+# Capybara ignores hidden elements, so a bare `.capture-card` selector is the card on
+# screen; `visible: :all` is how the queue behind it is counted. Copy assertions pin
+# the locale because headless Chrome asks for English and missing keys fall back to
+# German.
 class CaptureScreenTest < ApplicationSystemTestCase
   def setup
     @user = user(contributor: true, locale: "de")

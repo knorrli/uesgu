@@ -1,10 +1,7 @@
 <%# One event the model claims it read, as a card to decide on. Everything is
-    editable and nothing is trusted: a value the normalizer refused is null here
-    with the model's raw text shown beside it, because a human completes a null in
-    one tap but only if they can still see what was claimed.
-
-    Accepting publishes immediately, so the decision and its consequence are in the
-    same place — see CapturesController. %>
+    editable and nothing is trusted: a value the normalizer refused is null here with
+    the model's raw text beside it (see EventCapture::Candidate). Accepting publishes
+    immediately. %>
 <%# locals: (candidate:, key:, label:, nth: nil) %>
 <%= render layout: "shared/review_card",
       locals: { id: key, actions: render("captures/card_actions", key: key), frame_class: "capture-card",
@@ -12,8 +9,8 @@
                 frame_attrs: { data: { capture_target: "card", state: "open" } } } do %>
   <p class="capture-card__label field-label">
     <%= label %>
-    <%# Two candidates off one poster share its preview, which reads as a duplicated
-        card without the count saying otherwise. %>
+    <%# Two candidates off one poster share its preview, and read as a duplicated card
+        without this count. %>
     <% if nth %><span class="muted"><%= t('capture.row.nth', index: nth.first, count: nth.last) %></span><% end %>
   </p>
 
@@ -47,9 +44,9 @@
       <%= text_field_tag :place, candidate.place %>
     </label>
 
-    <%# Match-at-entry: tapping one of these is what stops a fourth spelling of
-        "Quartierfest" from being minted, which is what keeps the place below the
-        VenueLead nomination threshold forever. A suggestion never auto-applies. %>
+    <%# Tapping one is what stops a fourth spelling of "Quartierfest" being minted and
+        keeping the place below the VenueLead nomination threshold forever. A
+        suggestion never auto-applies. %>
     <% suggestions = place_suggestions(candidate) %>
     <% if suggestions.any? %>
       <div class="capture-card__suggestions flex gap-xsmall wrap">
@@ -70,8 +67,7 @@
       <label class="flex flex-col gap-xsmall">
         <%# Required HERE and not at extraction: a poster never prints its own town,
             but Location.add_to_tree drops any tuple missing the middle tier, so a
-            blank locality is an event nobody can browse to. When the contributor
-            genuinely doesn't know, the nearest named settlement beats a blank. %>
+            blank locality is an event nobody can browse to. %>
         <span class="field-label"><%= t('capture.candidate.locality') %></span>
         <%= text_field_tag :locality, candidate.locality, required: true, list: "capture-localities" %>
       </label>

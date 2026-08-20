@@ -1,17 +1,15 @@
-/* The capture screen: pick posters or paste text, then decide one card at a time
-   on what the model claims it read. Deliberately plain — every box on it is
-   something a human is about to correct. Follows the settings/filter aesthetic
-   (hairlines, no boxes-in-boxes, accent green for actions only). The card frame
-   itself is shared: see review_card.css. */
+/* The capture screen: pick posters or paste text, then decide one card at a time.
+   Deliberately plain — every box on it is something a human is about to correct.
+   The card frame itself is shared: see review_card.css. */
 
 .capture-picker {
   padding-bottom: var(--gap-medium);
   border-bottom: var(--border-width) solid var(--rule-color);
 }
 
-/* One input's outcome that never became a card: a failure or an empty read. The
-   label (a filename, or the head of the pasted text) is what ties it back to the
-   input it came from while several are in flight. */
+/* One input's outcome that never became a card. Its label — a filename, or the head
+   of the pasted text — is what ties it back to the input it came from while several
+   are in flight. */
 .capture-row {
   display: flex;
   flex-direction: column;
@@ -32,9 +30,8 @@
   white-space: pre-wrap;
 }
 
-/* The queue: progress, navigation and receipt in one strip. It stays put while a
-   card scrolls because it is the only place a decided card still exists — accepting
-   publishes and moves on, so the tile is the receipt. */
+/* Sticky because the tile is the receipt: accepting publishes and moves on, so the
+   strip is the only place a decided card still exists. */
 .capture-queue {
   position: sticky;
   top: 0;
@@ -64,8 +61,8 @@ button.capture-queue__tile.is-current {
   border-color: var(--theme-accent-color);
 }
 
-/* A dropped tile is dimmed, a published one is not: the published event is live and
-   the strip is the only thing still saying so. */
+/* Only the dropped tile dims: a published event is live, and the strip is the only
+   thing still saying so. */
 button.capture-queue__tile[data-state="dropped"] {
   opacity: 0.45;
 }
@@ -137,20 +134,18 @@ button.capture-queue__tile[data-state="dropped"] {
 }
 
 /* The shared .account-form skin sizes fields to their content; a review card wants
-   them filling the column instead, so a long title is not read through a
-   letterbox. Scoped to the field list, not the card: the accept button is an
-   <input> too, and full-width it reads as the batch submit this screen stopped
-   having. */
+   them filling the column, so a long title is not read through a letterbox. Scoped to
+   the field list and not the card because the accept button is an <input> too, and
+   full-width it reads as a batch submit this screen has no such thing as. */
 .capture-card__fields input,
 .capture-card__fields select,
 .capture-picker textarea {
   width: 100%;
 }
 
-/* Two fields to a row where they belong together (date + time, locality + canton),
-   each taking half. Without the grow the wrapped field keeps its content width and
-   its underline stops mid-column, which reads as a different kind of field rather
-   than the same one on a narrow screen. */
+/* Two fields to a row where they belong together (date + time, locality + canton).
+   Without the grow, a wrapped field keeps its content width and its underline stops
+   mid-column, reading as a different kind of field rather than a wrapped one. */
 .capture-card__when > label,
 .capture-card__where > label {
   flex: 1 1 8rem;

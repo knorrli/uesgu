@@ -1,14 +1,11 @@
 <%# One thing being judged, framed so the evidence and the verdict are on screen
-    together: the source pinned (left of the fields on a wide screen, above them on
-    a phone), the body scrolling beside it, the decision bar always in reach.
-    Render with `render layout:` — the block is the body.
+    together (see review_card.css). Render with `render layout:` — the block is the
+    body, and i18n inside it must use ABSOLUTE keys.
 
     `actions` is pre-rendered markup rather than a second block because the bar sits
-    OUTSIDE the scrolling body; i18n inside the block must use ABSOLUTE keys (see
-    the page_header gotcha). `source_attrs` lands on the source pane, which the
-    caller fills: evidence a client holds in memory only (a capture's poster, never
-    uploaded for storage) is written into the pane from the browser rather than
-    passed as `source`. %>
+    OUTSIDE the scrolling body. Leave `source` out and pass `source_attrs` instead
+    when the evidence exists only in the browser — a capture's poster is never
+    uploaded, so the client writes it into the pane itself. %>
 <%# locals: (id:, actions:, source: nil, frame_class: nil, frame_attrs: {}, source_attrs: {}) %>
 <%= tag.div id: id, class: ["review-card", frame_class], **frame_attrs do %>
   <%= tag.div source, class: "review-card__source", **source_attrs %>

@@ -8,7 +8,7 @@ module EventCapture
   # Treat the wording as measured, not as prose: the evidence rule below is most of
   # the difference between 0/6 and 5/6 fabricated dates, and tuning was measured NOT
   # to transfer between models, so an edit here means re-running the evaluation in
-  # docs/user-event-capture-design.md. The field is `locality` and not `city` because
+  # docs/user-event-capture-provider-evaluation.md. The field is `locality` and not `city` because
   # a model asked for a city nulls out on a hamlet — the exact field match-at-entry
   # depends on.
   #

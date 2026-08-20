@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Event-extraction bake-off for the user-event-capture funnel (docs/user-event-capture.md).
+# Event-extraction bake-off for the user-event-capture funnel. What it measured, and
+# the decision it settled: docs/user-event-capture-provider-evaluation.md.
 #
 # Runs ONE prompt over six real sample images through every provider you have a
 # key for, then scores the results against event_capture_bakeoff_truth.json.

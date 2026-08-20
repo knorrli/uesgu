@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_20_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_20_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -78,6 +78,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_100000) do
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_extraction_attempts_on_created_at"
     t.index ["model", "prompt_sha"], name: "index_extraction_attempts_on_model_and_prompt_sha"
+  end
+
+  create_table "extraction_field_outcomes", force: :cascade do |t|
+    t.text "accepted"
+    t.integer "candidate_index", null: false
+    t.datetime "created_at", null: false
+    t.bigint "extraction_attempt_id", null: false
+    t.string "field", null: false
+    t.string "outcome", null: false
+    t.text "proposed"
+    t.datetime "updated_at", null: false
+    t.index ["extraction_attempt_id", "candidate_index", "field"], name: "idx_on_extraction_attempt_id_candidate_index_field_3d754946ef", unique: true
+    t.index ["field", "outcome"], name: "index_extraction_field_outcomes_on_field_and_outcome"
   end
 
   create_table "genres", force: :cascade do |t|
@@ -299,6 +312,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_100000) do
   add_foreign_key "events", "discard_rules", column: "discarded_by_rule_id", on_delete: :nullify
   add_foreign_key "events", "events", column: "canonical_event_id", on_delete: :nullify
   add_foreign_key "events", "scrape_runs", column: "created_in_scrape_run_id", on_delete: :nullify
+  add_foreign_key "extraction_field_outcomes", "extraction_attempts", on_delete: :cascade
   add_foreign_key "genres", "genres", column: "canonical_id"
   add_foreign_key "genres", "genres", column: "parent_id"
   add_foreign_key "invitations", "users", column: "created_by_id"

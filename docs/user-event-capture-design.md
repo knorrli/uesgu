@@ -310,6 +310,79 @@ adapter" below for why, so it does not get re-proposed.
     Extractor rescues is a `ProviderError`, so the column would hold one value
     forever, and the class worth knowing is already in the message.
 
+12. **What a human corrects is recorded per field — the other half of the
+    measurement.** **Built:** `app/models/extraction_field_outcome.rb`, written from
+    `CapturesController`, read on the same admin page as the attempt it hangs off.
+
+    Decision 11 counts values the Normalizer *refused*. It cannot see the failure
+    that prompted all of this: `locality` filled from an artist's origin code. `"Us"`
+    is a well-formed string, nothing refuses it, no `issues` code fires, and the
+    attempt records as clean. The verify screen already makes someone look at every
+    field before publishing, so the correction is a field-level error report authored
+    by a person who saw the poster — and it was being thrown away.
+
+    **Three shapes, never one "changed" bucket**, because they call for opposite
+    prompt fixes. `supplied` (null → value) is the model abstaining: the rule is too
+    strict, or it cannot read that wording. `corrected` (value → different value) is
+    it being confidently wrong: the sourcing rule is too loose. `removed` (value →
+    null) is it inventing a field the input never carried, which is what the evidence
+    rule exists to prevent. `unchanged` and `absent` are the denominator the three
+    rates are taken over.
+
+    **A suggestion tap is not a correction.** The card offers registry near-matches
+    as chips, and tapping one rewrites the place tuple — but "Dachstock Reitschule" →
+    "Dachstock" is the contributor taking the canonical spelling, not a report that
+    the model misread the poster. Counted as `corrected` it would inflate the one
+    number a prompt edit is judged on, so a suggestion-filled field records
+    `normalized` instead, and typing in the field by hand clears the flag. The place
+    tuple carried across sibling candidates needs no such treatment: it only ever
+    fills a field the model left empty, which is a `supplied` either way.
+
+    **A drop is the fourth, and the most valuable.** Dropping a card is a decision
+    about every field at once and it never reached the server: `capture#reject` is
+    client-side. It now posts the card's proposals to `POST /capture/drop`,
+    fire-and-forget — the card is already gone on screen, and a measurement may
+    neither delay a drop nor undo one. A dropped card can be reopened and published,
+    so the last decision on a candidate replaces the earlier one — except a `discarded`
+    write arriving after a published one, which is that unawaited POST landing out of
+    order rather than a decision: publishing freezes the card, so nothing legitimately
+    follows it.
+
+    **The proposals ride on the card, not in the database.** Each field's proposed
+    value is a hidden input beside the editable one, diffed on submit. Persisting
+    proposals at extract time would have sidestepped the drop problem, and is exactly
+    what must not happen: it would store the reading of a WhatsApp screenshot someone
+    uploaded by mistake and discarded unread, which is the one case decision 9's
+    checkpoint exists for. The hidden fields are client-tamperable, which does not
+    matter for a metric contributors report on their own work.
+
+    The attempt itself is named by a **signed, day-scoped id**, not a raw one. Writing
+    a candidate's outcomes replaces what was there, so a raw id would let one
+    contributor erase another's rows by guessing a number — insertion of noise is
+    within the trust model, deletion of someone else's record is not. An expired or
+    forged token costs the row, never the event.
+
+    **Values only for the shape-constrained fields** — `date`, `time`, `place`,
+    `locality`, `canton`, `genres`. `title` records its outcome and neither value: it
+    is the free-text field a chat screenshot's sender name lands in, and the
+    locality-class bug this exists for lives entirely in the constrained set. The
+    accepted half of a published card is a public event anyway, so the only genuinely
+    new data is the discarded proposal. `url` is not recorded at all — it is a paste,
+    not a read the prompt can be tuned against.
+
+    **The free text left in that set is accepted, not overlooked.** `place`,
+    `locality` and `genres` are free text as much as `title` is, and dropping a card
+    is exactly the reflex for a chat screenshot uploaded by mistake — so the one path
+    that keeps a value on an unpublished read is also the path a sender's name could
+    take through `place`. Kept anyway (2026-08-20): the evidence rule means `place`
+    is only filled when the model could quote it, the contributor reads every value
+    on the card before dropping it, and the discarded proposal is the only record of
+    *how* a total failure failed — the rate alone says a card was thrown away, never
+    what was on it. Rejected: recording outcomes without values on the drop path, and
+    dropping `place` / `genres` from the stored set everywhere, which would blind the
+    venue rules that most of the prompt tuning goes into. The trigger for revisiting
+    is a real capture where this bites, not a better argument.
+
 ### The place model
 
 > **Built.** `app/models/place.rb`, `db/migrate/20260819160000_create_places.rb`,

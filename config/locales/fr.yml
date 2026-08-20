@@ -606,7 +606,7 @@ fr:
     extraction_attempts:
       index:
         title: Extractions
-        intro: Une ligne par appel au modèle dans le flux de saisie — que des métadonnées, aucune valeur de champ. Dit si le fournisseur est en erreur en ce moment, et quelles valeurs le normalizer a dû refuser.
+        intro: Une ligne par appel au modèle dans le flux de saisie, plus ce qu'un humain a ensuite changé à la proposition. Dit si le fournisseur est en erreur, quelles valeurs le normalizer a dû refuser, et sur quel champ le modèle se trompe.
         empty: Aucune extraction enregistrée pour l'instant.
         tally: "%{total} tentatives · %{failed} en échec (%{failed_pct}%) · %{candidates} candidats"
         average_duration: "moy. %{ms} ms"
@@ -620,6 +620,11 @@ fr:
         prompts_intro: Les mêmes tentatives, groupées par modèle et version de prompt, pour lire une modification comme un avant/après — le réglage ne se transfère pas d'un modèle à l'autre.
         attempts_heading: Tentatives
         status_ok: ok
+        filtered: "Prompt %{prompt_sha} uniquement."
+        clear_filter: Retirer le filtre
+        fields_heading: Champs corrigés
+        fields_intro: "Ce qu'un humain a fait de la proposition sur l'écran de vérification. Complété veut dire que le modèle n'a rien renvoyé ; corrigé qu'il s'est trompé avec assurance ; normalisé que quelqu'un a pris l'orthographe du registre, ce qu'aucun prompt n'aurait pu deviner ; retiré qu'il a inventé un champ. Écartés sont les candidats que personne n'a publiés — les pires lectures."
+        of_decisions: "(%{pct}%)"
         col:
           when: Quand
           medium: Support
@@ -632,6 +637,13 @@ fr:
           prompt_sha: Prompt
           attempts: Tentatives
           failed: Échecs
+          field: Champ
+          decisions: Décisions
+          supplied: Complété
+          corrected: Corrigé
+          normalized: Normalisé
+          removed: Retiré
+          discarded: Écarté
     locations:
       index:
         title: Lieux

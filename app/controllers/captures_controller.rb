@@ -3,9 +3,10 @@
 # nothing here holds a request open for a batch and there is no partial-success state
 # to render (see EventCapture::Extractor for why there is no queue).
 #
-# No event data is persisted until a card is accepted; until then the queue lives
-# only in the DOM (docs/user-event-capture-design.md). Extraction writes one
-# ExtractionAttempt of metadata per input, which carries no field values.
+# No event is persisted until a card is accepted; until then the queue lives only in
+# the DOM (docs/user-event-capture-design.md). What every decision does write is the
+# measurement: one ExtractionAttempt per input, and one ExtractionFieldOutcome per
+# field of every candidate a human published or dropped.
 class CapturesController < ApplicationController
   before_action :require_contributor
   # Every extract is a paid third-party call. Keyed by user, not IP: on Render req.ip
@@ -28,12 +29,49 @@ class CapturesController < ApplicationController
 
   def create
     result = EventCapture::Creator.call(candidate_attributes)
-    return render_status("captures/published", title: result.event.title) if result.ok?
+    return render_status("captures/refusal", error: result.error, status: :unprocessable_entity) unless result.ok?
 
-    render_status("captures/refusal", error: result.error, status: :unprocessable_entity)
+    record_outcomes(accepted: accepted_attributes)
+    render_status("captures/published", title: result.event.title)
+  end
+
+  # A dropped candidate is the worst read there is, and it is the one a publish-only
+  # record cannot see. Answers with no content: the card is already gone on screen,
+  # because dropping may not wait on — or be undone by — a metric.
+  def drop
+    record_outcomes
+    head :no_content
   end
 
   private
+
+  # Measuring the funnel may not break it, so an expired or forged token costs the row
+  # and nothing else. Values ride in from the card (see captures/_candidate).
+  def record_outcomes(accepted: nil)
+    ExtractionFieldOutcome.record!(
+      attempt: ExtractionAttempt.find_by_capture_token(params[:attempt_token]),
+      candidate_index: candidate_index, proposed: proposed_attributes,
+      accepted: accepted, normalized: normalized_fields
+    )
+  rescue StandardError => e
+    Rails.logger.error("ExtractionFieldOutcome.record! failed: #{e.class}: #{e.message}")
+  end
+
+  def candidate_index = params[:candidate_index].to_s[/\A\d+\z/]&.to_i
+
+  def proposed_attributes
+    ExtractionFieldOutcome::FIELDS.index_with { |field| params[:"proposed_#{field}"] }
+  end
+
+  def accepted_attributes
+    ExtractionFieldOutcome::FIELDS.index_with { |field| params[field.to_sym] }
+  end
+
+  # Fields the contributor filled from a place suggestion rather than by judging the
+  # model's reading (see capture_controller.js).
+  def normalized_fields
+    ExtractionFieldOutcome::PLACE_FIELDS.select { |field| params[:"normalized_#{field}"].present? }
+  end
 
   def render_status(partial, status: :ok, **locals)
     render turbo_stream: turbo_stream.replace(status_id, partial: partial,

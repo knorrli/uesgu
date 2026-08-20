@@ -112,11 +112,9 @@ button.capture-queue__tile[data-state="pending"] {
   color: var(--theme-fg-muted);
 }
 
-/* One line, one job. Both of these carry a source name — an uploaded filename runs
-   long enough to push the header ragged, and the strip tile's aria-label is read off
-   the card header, so whatever wraps here is also what a screen reader gets. */
-.capture-row__label,
-.capture-card__label {
+/* A pending row names the input it is still reading, and an uploaded filename runs
+   long enough to push that line ragged. */
+.capture-row__label {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

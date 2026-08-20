@@ -311,7 +311,8 @@ export default class extends Controller {
     tile.dataset.card = card.id
     tile.dataset.state = "open"
     tile.dataset.action = "capture#jump"
-    tile.setAttribute("aria-label", card.querySelector(".capture-card__label")?.textContent.trim() ?? "")
+    const title = card.querySelector('[name="title"]')?.value
+    if (title) tile.setAttribute("aria-label", title)
     tile.appendChild(this.thumbnail(this.sources.get(card.closest(".capture-row")?.id)))
     return tile
   }

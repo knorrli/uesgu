@@ -13,11 +13,13 @@ require_relative "../support/canned_extraction_client"
 class CaptureScreenTest < ApplicationSystemTestCase
   def setup
     @user = user(contributor: true, locale: "de")
+    @staged_paths = []
     sign_in_as @user
   end
 
   def teardown
     CannedExtractionClient.uninstall
+    @staged_paths.each { |path| File.delete(path) if File.exist?(path) }
   end
 
   test "a picked poster becomes an editable card and publishes the moment it is accepted" do
@@ -162,12 +164,22 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-queue__tile[data-state=failed]", count: 1
   end
 
-  test "a long source name stays on one line in the card header" do
+  test "the card names no source: the poster beside it already is one" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
-    paste "Zorpcore Nacht im Zorpsaal, Zorpwil, mit Vorband und allem Drum und Dran"
+    pick "poster.png"
 
-    label = find(".capture-card__label")
+    assert_no_selector ".capture-card__label"
+    assert_no_selector ".capture-card", text: "poster.png"
+  end
+
+  test "a long source name stays on one line while its row is still reading" do
+    CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
+    visit capture_path
+    stage_as "Zorpcore-Nacht-im-Zorpsaal-Zorpwil-mit-Vorband-und-allem-Drum-und-Dran-final-v3.png"
+    commit
+
+    label = find(".capture-row__label")
     assert_equal "nowrap", label.style("white-space")["white-space"]
     assert_operator label.evaluate_script("this.scrollWidth"), :>, label.evaluate_script("this.clientWidth")
   end
@@ -307,6 +319,16 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   def commit = find("button[data-action='capture#commit']").click
+
+  # A filename is the one source label that is not truncated on the way in, so the
+  # overflow case needs a real file carrying a real long name.
+  def stage_as(name)
+    path = Rails.root.join("tmp", name)
+    FileUtils.cp(file_fixture("poster.png"), path)
+    @staged_paths << path
+    find(".drop-zone__input", visible: :all).set([path])
+    assert_selector ".drop-zone__item", wait: 5
+  end
 
   def pick(*names)
     stage(*names)

@@ -14,8 +14,7 @@
     <p class="muted"><%= t('capture.row.nothing_found') %></p>
   <% else %>
     <% extraction.candidates.each_with_index do |candidate, index| %>
-      <%= render "captures/candidate", candidate: candidate, key: "#{id}-#{index}",
-            label: label.presence || t('capture.row.untitled') %>
+      <%= render "captures/candidate", candidate: candidate, key: "#{id}-#{index}" %>
     <% end %>
   <% end %>
 </div>

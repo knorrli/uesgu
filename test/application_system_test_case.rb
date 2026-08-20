@@ -9,11 +9,18 @@ require "capybara/cuprite"
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # headless by default; set HEADLESS=0 to watch a run, CHROME_PATH to override
   # the auto-detected browser binary.
+  # Chrome's first launch on a CI runner has been measured past the 20s that is
+  # generous on a warm laptop — it fails the whole suite with "Browser did not
+  # produce websocket url", before a single test runs. The wait bounds STARTUP
+  # only, so a roomy ceiling costs a healthy run nothing and turns a red build
+  # back into a slow one.
+  BOOT_TIMEOUT = ENV["CI"] ? 60 : 20
+
   driven_by :cuprite,
     screen_size: [1300, 900],
     options: {
       headless: ENV["HEADLESS"] != "0",
-      process_timeout: 20,
+      process_timeout: BOOT_TIMEOUT,
       timeout: 15,
       browser_path: ENV["CHROME_PATH"].presence
     }.compact

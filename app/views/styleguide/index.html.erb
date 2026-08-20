@@ -199,11 +199,13 @@
       <div class="sg-specimen">
         <input type="submit" value="Disabled" disabled>
         <button type="button" class="button-small" disabled>Disabled</button>
+        <button type="button" class="button primary" disabled>Disabled primary</button>
+        <button type="button" class="button-small primary" disabled>Disabled primary</button>
         <a href="#buttons" class="button-small">Focus me (Tab)</a>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">States</span> · <code>:disabled</code>, <code>:focus-visible</code>
-        <p class="sg-purpose">Disabled = 0.5 opacity + not-allowed cursor. Tab to any control to see the shared accent focus ring.</p>
+        <p class="sg-purpose">Disabled = 0.5 opacity + not-allowed cursor, and it un-fills — so a <b>primary</b> has to give up its <code>--theme-on-accent</code> text at the same time, or the label is left painted in the page background and the button reads as an empty box. Both primary weights are specimened here for that reason. Tab to any control to see the shared accent focus ring.</p>
         <span class="sg-ok"><b>Audit #12 — resolved.</b> Baseline <code>:focus-visible</code> ring on all interactive elements; <code>:disabled</code> on buttons and pills.</span>
       </div>
     </div>

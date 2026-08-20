@@ -56,6 +56,39 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpcore Matinee", field_value("title")
   end
 
+  # The locality read off an artist's origin code is well-formed, so nothing refuses
+  # it: the human's edit is the only evidence it was wrong (see ExtractionFieldOutcome).
+  test "an edited field is reported as a correction against what the model proposed" do
+    CannedExtractionClient.install(events: [poster_event(locality: "Us")])
+    visit capture_path
+    pick "poster.png"
+
+    type("locality", "Zorpwil")
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+
+    locality = ExtractionFieldOutcome.find_by(field: "locality")
+    assert_predicate locality, :corrected?
+    assert_equal "Us", locality.proposed
+    assert_equal "Zorpwil", locality.accepted
+  end
+
+  # A drop never reaches the server on its own, and it is the read worth the most:
+  # the contributor looked at the card and threw all of it away.
+  test "a dropped card reports what the model had proposed" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    reject
+    assert_selector ".capture-queue__tile[data-state=dropped]"
+
+    # The record is fire-and-forget, so it lands after the card is already gone.
+    page.document.synchronize(errors: [Minitest::Assertion]) do
+      assert_equal "Zorpsaal", ExtractionFieldOutcome.discarded.find_by(field: "place")&.proposed
+    end
+  end
+
   test "a refusal stays on its own card instead of taking the queue with it" do
     CannedExtractionClient.install(events: [poster_event(canton: nil)])
     visit capture_path

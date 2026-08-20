@@ -187,6 +187,86 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match ERB::Util.html_escape(I18n.t("capture.failures.image_too_large", locale: :en)), response.body
   end
 
+  # The corrections are the only evidence of a confidently wrong value: nothing
+  # refuses "Us" as a locality, so without the diff the read records as clean.
+  test "publishing records what the human changed against what the model proposed" do
+    attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
+    sign_in_as user(contributor: true)
+
+    post capture_path, params: { card_id: "capture-row-abc-0", extraction_attempt_id: attempt.id,
+                                 candidate_index: "0", title: "Kept", date: "2026-09-01",
+                                 locality: "Zorpwil", canton: "BE", time: "20:00",
+                                 proposed_title: "Kept", proposed_date: "2026-09-01",
+                                 proposed_locality: "Us", proposed_canton: "BE" }
+
+    outcomes = attempt.field_outcomes.index_by(&:field)
+    assert_predicate outcomes.fetch("locality"), :corrected?
+    assert_equal "Us", outcomes.fetch("locality").proposed
+    assert_predicate outcomes.fetch("time"), :supplied?
+    assert_predicate outcomes.fetch("date"), :unchanged?
+  end
+
+  test "a refused publish records no decision, because none was made" do
+    attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
+    sign_in_as user(contributor: true)
+
+    post capture_path, params: { card_id: "capture-row-abc-0", extraction_attempt_id: attempt.id,
+                                 candidate_index: "0" }
+
+    assert_response :unprocessable_entity
+    assert_empty attempt.field_outcomes
+  end
+
+  test "dropping a candidate records what it had proposed" do
+    attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
+    sign_in_as user(contributor: true)
+
+    post drop_capture_path, params: { extraction_attempt_id: attempt.id, candidate_index: "1",
+                                      proposed_title: "Zorp Fest", proposed_place: "Zorpsaal" }
+
+    assert_response :no_content
+    assert attempt.field_outcomes.all?(&:discarded?)
+    assert_equal "Zorpsaal", attempt.field_outcomes.find_by(field: "place").proposed
+    assert_equal [1], attempt.field_outcomes.pluck(:candidate_index).uniq
+  end
+
+  test "dropping is closed to accounts without the capability" do
+    attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
+    sign_in_as user
+
+    post drop_capture_path, params: { extraction_attempt_id: attempt.id, candidate_index: "0" }
+
+    assert_response :forbidden
+    assert_empty attempt.field_outcomes
+  end
+
+  # A forged or stale id is the client's to send, so it may cost the row and nothing
+  # else — never the event.
+  test "an unknown attempt id costs the record, not the publish" do
+    sign_in_as user(contributor: true)
+
+    post capture_path, params: { card_id: "capture-row-abc-0", extraction_attempt_id: 999_999,
+                                 candidate_index: "0", title: "Kept", date: "2026-09-01",
+                                 locality: "Zorpwil", canton: "BE" }
+
+    assert_equal "Kept", Event.sole.title
+    assert_empty ExtractionFieldOutcome.all
+  end
+
+  test "the card carries the model's proposal alongside the editable value" do
+    sign_in_as user(contributor: true)
+    attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
+
+    stub_extraction(extraction(candidates: [candidate(locality: "Us")]).with(attempt_id: attempt.id)) do
+      post extract_capture_path, params: { row_id: "abc123" },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_select "input[name=?][value=?]", "proposed_locality", "Us"
+    assert_select "input[name=?][value=?]", "extraction_attempt_id", attempt.id.to_s
+    assert_select "input[name=?][value=?]", "candidate_index", "0"
+  end
+
   test "publishing is closed to accounts without the capability" do
     sign_in_as user
 

@@ -16,6 +16,7 @@ export default class extends Controller {
                     "rows", "done", "strip", "card", "source"]
   static values = {
     url: String,
+    dropUrl: String,
     pending: String,
     error: String,
     undecodable: String,
@@ -222,7 +223,20 @@ export default class extends Controller {
   }
 
   reject(event) {
-    this.settle(event.target.closest(".capture-card"), "dropped")
+    const card = event.target.closest(".capture-card")
+    this.recordDrop(card)
+    this.settle(card, "dropped")
+  }
+
+  // A drop is the only decision that never reaches the server, and it is the one the
+  // field record most wants (see ExtractionFieldOutcome). Sent from the card's own
+  // form, so it carries the proposals and the CSRF token, and deliberately not
+  // awaited: the card is already gone, and a failed metric may not undo that.
+  recordDrop(card) {
+    const form = card?.querySelector("form")
+    if (!form || !this.hasDropUrlValue) return
+
+    fetch(this.dropUrlValue, { method: "POST", body: new FormData(form) }).catch(() => {})
   }
 
   // Only publishing freezes a card: the event is live and the form behind it would

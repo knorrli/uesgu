@@ -12,6 +12,21 @@
 class ExtractionAttemptsPresenter
   WINDOW = 100
 
+  # One field's report card. `discarded` rows carry no human value, so they are the
+  # denominator of nothing — the three rates that matter are taken over the decisions
+  # where a human actually published something.
+  FieldRow = Data.define(:field, :counts) do
+    def total = counts.values.sum
+    def count(outcome) = counts.fetch(outcome, 0)
+    def published = total - count("discarded")
+
+    def rate(outcome)
+      return 0 if published.zero?
+
+      (100.0 * count(outcome) / published).round
+    end
+  end
+
   Group = Data.define(:model, :prompt_sha, :attempts) do
     def count = attempts.size
     def failed = attempts.count(&:failed?)
@@ -19,11 +34,13 @@ class ExtractionAttemptsPresenter
     def issues = attempts.sum { |attempt| attempt.issues.values.sum }
   end
 
-  def initialize(window: WINDOW)
-    @attempts = ExtractionAttempt.recent.limit(window).to_a
+  def initialize(prompt_sha: nil, window: WINDOW)
+    @prompt_sha = prompt_sha.presence
+    @attempts = ExtractionAttempt.recent.then { |scope| prompt_sha ? scope.where(prompt_sha: @prompt_sha) : scope }
+                                 .limit(window).to_a
   end
 
-  attr_reader :attempts
+  attr_reader :attempts, :prompt_sha
 
   def any? = attempts.any?
   def total = attempts.size
@@ -58,6 +75,19 @@ class ExtractionAttemptsPresenter
     attempts.reject { |attempt| attempt.prompt_sha.nil? }
             .group_by { |attempt| [attempt.model, attempt.prompt_sha] }
             .map { |(model, sha), rows| Group.new(model: model, prompt_sha: sha, attempts: rows) }
+  end
+
+  # Per field, what the human did to the model's value on the verify screen. Fields
+  # nobody has decided on yet are left out rather than shown as a row of zeros.
+  def field_rows
+    @field_rows ||= begin
+      counts = ExtractionFieldOutcome.where(extraction_attempt_id: attempts.map(&:id))
+                                     .group(:field, :outcome).count
+      ExtractionFieldOutcome::FIELDS.filter_map do |field|
+        by_outcome = counts.filter_map { |(f, outcome), count| [outcome, count] if f == field }.to_h
+        FieldRow.new(field: field, counts: by_outcome) if by_outcome.any?
+      end
+    end
   end
 
   def percent(part, whole)

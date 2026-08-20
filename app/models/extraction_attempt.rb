@@ -1,14 +1,19 @@
 # One row per EventCapture::Extractor#call: what the provider was asked, what it
 # cost, and which values the Normalizer refused. Metadata only — no field values,
 # no image, and an error message with its payload stripped (see
-# EventCapture::ProviderError) — so nothing here ages out and `prune!` is only a
-# size backstop.
+# EventCapture::ProviderError) — so nothing in this table ages out and `prune!` is
+# only a size backstop. The field outcomes hanging off it do carry values, and go
+# when the row does.
 #
 # Two questions it answers that logs cannot: is the provider erroring right now,
 # and is a given `issues` code trending against a prompt edit. That second one is
 # why every row carries the model AND the prompt sha: prompt tuning was measured
 # not to transfer between models (docs/user-event-capture-design.md).
 class ExtractionAttempt < ApplicationRecord
+  # The FK cascades in the database, which is what keeps `prune!` a single statement.
+  has_many :field_outcomes, class_name: "ExtractionFieldOutcome", dependent: :delete_all,
+           inverse_of: :extraction_attempt
+
   enum :status, { ok: "ok", failed: "failed" }
 
   scope :recent, -> { order(created_at: :desc) }

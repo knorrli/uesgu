@@ -64,8 +64,11 @@ Rails.application.routes.draw do
   # came back); `extract` runs ONE input and streams its candidates back, fired
   # once per input by the client — 8 x 2.3s does not fit in one request and there
   # is no queue to reach for. `create` publishes the candidates a human accepted.
+  # `drop` records what a discarded candidate had proposed — nothing else does,
+  # since a drop otherwise never reaches the server.
   resource :capture, only: %i[show create] do
     post :extract
+    post :drop
   end
 
   # Saved filters (a saved landing-page filter, with notification delivery

@@ -606,7 +606,7 @@ de:
     extraction_attempts:
       index:
         title: Extraktionen
-        intro: Ein Eintrag pro Modell-Aufruf im Erfassungs-Flow — nur Metadaten, keine Feldwerte. Zeigt, ob der Provider gerade Fehler wirft und welche Werte der Normalizer verwerfen musste.
+        intro: Ein Eintrag pro Modell-Aufruf im Erfassungs-Flow, plus was ein Mensch danach am Vorschlag geändert hat. Zeigt, ob der Provider Fehler wirft, welche Werte der Normalizer verwerfen musste und bei welchem Feld das Modell danebenliegt.
         empty: Noch keine Extraktionen erfasst.
         tally: "%{total} Versuche · %{failed} fehlgeschlagen (%{failed_pct}%) · %{candidates} Kandidaten"
         average_duration: "ø %{ms} ms"
@@ -620,6 +620,11 @@ de:
         prompts_intro: Dieselben Versuche, gruppiert nach Modell und Prompt-Version. So liest sich eine Prompt-Änderung als Vorher/Nachher — Prompt-Tuning überträgt sich nicht von Modell zu Modell.
         attempts_heading: Versuche
         status_ok: ok
+        filtered: "Nur Prompt %{prompt_sha}."
+        clear_filter: Filter aufheben
+        fields_heading: Korrigierte Felder
+        fields_intro: "Was ein Mensch auf dem Prüf-Screen mit dem Vorschlag gemacht hat. Ergänzt heisst, das Modell hat nichts geliefert; korrigiert heisst, es lag selbstsicher daneben; entfernt heisst, es hat ein Feld erfunden. Verworfen sind Kandidaten, die niemand publiziert hat — die schlechtesten Lesungen."
+        of_decisions: "(%{pct}%)"
         col:
           when: Zeitpunkt
           medium: Medium
@@ -632,6 +637,12 @@ de:
           prompt_sha: Prompt
           attempts: Versuche
           failed: Fehlgeschlagen
+          field: Feld
+          decisions: Entscheide
+          supplied: Ergänzt
+          corrected: Korrigiert
+          removed: Entfernt
+          discarded: Verworfen
     locations:
       index:
         title: Orte

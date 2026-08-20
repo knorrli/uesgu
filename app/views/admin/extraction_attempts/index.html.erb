@@ -8,6 +8,13 @@
 
   <p class="muted"><%= t('.intro') %></p>
 
+  <% if @presenter.prompt_sha %>
+    <p class="muted">
+      <%= t('.filtered', prompt_sha: @presenter.prompt_sha) %>
+      <%= link_to t('.clear_filter'), admin_extraction_attempts_path %>
+    </p>
+  <% end %>
+
   <% if @presenter.any? %>
     <p class="muted">
       <%= t('.tally', total: @presenter.total, failed: @presenter.failed,
@@ -74,11 +81,47 @@
               <% @presenter.groups.each do |group| %>
                 <tr>
                   <td><%= group.model || '—' %></td>
-                  <td><%= group.prompt_sha %></td>
+                  <td><%= link_to group.prompt_sha, admin_extraction_attempts_path(prompt_sha: group.prompt_sha) %></td>
                   <td class="num"><%= group.count %></td>
                   <td class="num"><%= group.failed %></td>
                   <td class="num"><%= group.candidates %></td>
                   <td class="num"><%= group.issues %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    <% end %>
+
+    <% if @presenter.field_rows.any? %>
+      <section class="flex flex-col gap-small">
+        <h2><%= t('.fields_heading') %></h2>
+        <p class="muted"><%= t('.fields_intro') %></p>
+        <div class="scrape-table-wrap">
+          <table class="scrape-table">
+            <thead>
+              <tr>
+                <th><%= t('.col.field') %></th>
+                <th class="num"><%= t('.col.decisions') %></th>
+                <th class="num"><%= t('.col.supplied') %></th>
+                <th class="num"><%= t('.col.corrected') %></th>
+                <th class="num"><%= t('.col.removed') %></th>
+                <th class="num"><%= t('.col.discarded') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @presenter.field_rows.each do |row| %>
+                <tr>
+                  <td><%= t("capture.candidate.#{row.field}") %></td>
+                  <td class="num"><%= row.published %></td>
+                  <% %w[supplied corrected removed].each do |outcome| %>
+                    <td class="num">
+                      <%= row.count(outcome) %>
+                      <span class="muted"><%= t('.of_decisions', pct: row.rate(outcome)) %></span>
+                    </td>
+                  <% end %>
+                  <td class="num"><%= row.count('discarded') %></td>
                 </tr>
               <% end %>
             </tbody>

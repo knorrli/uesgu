@@ -15,9 +15,9 @@ module EventCapture
     # `detail` is the payload-bearing half of a failure (see ProviderError) — it is
     # printed by the rake task and never persisted.
     Extraction = Data.define(:candidates, :medium, :model, :prompt_sha, :input_tokens,
-                             :output_tokens, :elapsed, :code, :error, :detail) do
+                             :output_tokens, :elapsed, :code, :error, :detail, :attempt_id) do
       def initialize(candidates: [], medium: nil, model: nil, prompt_sha: nil, input_tokens: 0,
-                     output_tokens: 0, elapsed: 0.0, code: nil, error: nil, detail: nil)
+                     output_tokens: 0, elapsed: 0.0, code: nil, error: nil, detail: nil, attempt_id: nil)
         super
       end
 
@@ -49,10 +49,12 @@ module EventCapture
 
     UNCONFIGURED = "extraction is not configured — set INFOMANIAK_API_TOKEN and INFOMANIAK_PRODUCT_ID"
 
+    # The recorded row's id rides back out on the Extraction: the verify screen puts it
+    # on every card, so the corrections a human then makes attach to the read that
+    # proposed them (see ExtractionFieldOutcome).
     def call
       extraction = extract
-      record(extraction)
-      extraction
+      extraction.with(attempt_id: record(extraction)&.id)
     end
 
     private
@@ -87,6 +89,7 @@ module EventCapture
       ExtractionAttempt.record!(extraction)
     rescue StandardError => e
       Rails.logger.error("ExtractionAttempt.record! failed: #{e.class}: #{e.message}")
+      nil
     end
 
     def since(started) = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started

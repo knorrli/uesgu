@@ -79,10 +79,11 @@ module EventCapture
 
         THE EVIDENCE RULE — this governs everything below.
 
-        Every `date` and every `place` you return MUST be copied from #{m[:legible]},
-        and you must quote that text verbatim in
-        `date_evidence` / `place_evidence`. If you cannot quote it, the field is null
-        and the evidence field is null. Never supply a value you cannot cite.
+        Every `date`, every `place` and every `locality` you return MUST be copied from
+        #{m[:legible]}, and you must quote that text verbatim in
+        `date_evidence` / `place_evidence` / `locality_evidence`. If you cannot quote
+        it, the field is null and the evidence field is null. Never supply a value you
+        cannot cite.
 
         You are NOT being asked to identify the venue. You are being asked to
         transcribe #{m[:says]}. A plausible guess is worse than null: a wrong
@@ -119,7 +120,8 @@ module EventCapture
              against a venue database; one wrong letter means no match.
 
         5. `locality` / `canton` #{m[:only_from]}: a street address, a
-           postcode, a neighbourhood name, a URL. Otherwise null. Do not guess "Bern"
+           postcode, a neighbourhood name, a URL. Otherwise null. Quote the text you
+           read `locality` from in `locality_evidence`. Do not guess "Bern"
            #{m[:looks_swiss]}. `locality` is the next level of detail below
            the canton — a city, a town, a village, a hamlet or a quarter, whichever the
            #{m[:names_it]} actually names. A hamlet is a perfectly good answer; do not reach for
@@ -167,7 +169,8 @@ module EventCapture
             items: {
               type: "object",
               additionalProperties: false,
-              required: %w[title date date_evidence time place place_evidence locality canton genres source_url],
+              required: %w[title date date_evidence time place place_evidence locality locality_evidence
+                           canton genres source_url],
               properties: {
                 title:          { type: %w[string null] },
                 date:           { type: %w[string null], description: "YYYY-MM-DD, or null if not legible" },
@@ -179,6 +182,8 @@ module EventCapture
                                   description: "Verbatim text from the input the place was read from. null if the place is null." },
                 locality:       { type: %w[string null],
                                   description: "City, town, village, hamlet or quarter named in the input" },
+                locality_evidence: { type: %w[string null],
+                                     description: "Verbatim text from the input the locality was read from. null if the locality is null." },
                 canton:         { type: %w[string null], description: "2-letter Swiss canton code" },
                 genres:         { type: "array", items: { type: "string" } },
                 source_url:     { type: %w[string null] }

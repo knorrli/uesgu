@@ -22,6 +22,15 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     assert_match "Today is 2026-08-19", instructions
     assert_match "date_evidence", instructions
     assert_match "place_evidence", instructions
+    assert_match "locality_evidence", instructions
+  end
+
+  # Normalizer#cited reads a value whose evidence field is empty as invention, so a
+  # cited field missing its evidence property would null every value the model returns.
+  test "every field the evidence rule governs has an evidence field in the contract" do
+    fields = EventCapture::Prompt::SCHEMA.dig(:schema, :properties, :events, :items, :required)
+
+    %w[date place locality].each { |field| assert_includes fields, "#{field}_evidence" }
   end
 
   # A prompt telling the model to read an image it was never sent is how a tuned

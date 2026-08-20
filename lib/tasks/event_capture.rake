@@ -57,7 +57,8 @@ namespace :event_capture do
     puts "  [#{index}] #{candidate.title || '(no title)'}"
     puts "      when   #{candidate.date || '—'} #{candidate.time}#{' (past)' if candidate.past?}"
     puts "      where  #{candidate.place || '—'} · #{candidate.locality || '—'} · #{candidate.canton || '—'}"
-    puts "      cites  date: #{candidate.date_evidence.inspect}  place: #{candidate.place_evidence.inspect}"
+    puts "      cites  date: #{candidate.date_evidence.inspect}  place: #{candidate.place_evidence.inspect}" \
+         "  locality: #{candidate.locality_evidence.inspect}"
     puts "      genres #{candidate.genres.join(', ')}" if candidate.genres.any?
     puts "      url    #{candidate.source_url}" if candidate.source_url
     puts "      ⚠ #{candidate.issues.join(', ')} — model said #{candidate.raw.inspect}" if candidate.issues.any?

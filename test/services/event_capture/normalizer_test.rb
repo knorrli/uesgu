@@ -15,7 +15,8 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
   test "a well-formed event passes through" do
     candidate = normalize(dated(
       "title" => " Zorpcore Nacht ", "time" => "20:00", "place" => "Zorpsaal",
-      "place_evidence" => "Zorpsaal, Zorpwil", "locality" => "Zorpwil", "canton" => "BE",
+      "place_evidence" => "Zorpsaal, Zorpwil", "locality" => "Zorpwil",
+      "locality_evidence" => "3000 Zorpwil", "canton" => "BE",
       "genres" => ["Zorpcore", " ", nil], "source_url" => "https://zorp.test/gig"
     ))
 
@@ -43,6 +44,16 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_nil candidate.place
     assert_equal "Café Liebig", candidate.raw["place"]
     assert_includes candidate.issues, :place_uncited
+  end
+
+  # A two-letter origin code printed beside an act name is what filled this field
+  # before it had to be cited, and "Us" is a well-formed string nothing else refuses.
+  test "an uncited locality is dropped and kept" do
+    candidate = normalize("locality" => "Us", "locality_evidence" => nil)
+
+    assert_nil candidate.locality
+    assert_equal "Us", candidate.raw["locality"]
+    assert_includes candidate.issues, :locality_uncited
   end
 
   test "a datetime is a right answer in a wrong shape: split it, don't bin it" do

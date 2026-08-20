@@ -56,10 +56,11 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpcore Matinee", field_value("title")
   end
 
-  # The locality read off an artist's origin code is well-formed, so nothing refuses
-  # it: the human's edit is the only evidence it was wrong (see ExtractionFieldOutcome).
+  # An origin code the model can quote back survives the evidence rule and is
+  # well-formed, so nothing refuses it: the human's edit is the only record that it
+  # was wrong (see ExtractionFieldOutcome).
   test "an edited field is reported as a correction against what the model proposed" do
-    CannedExtractionClient.install(events: [poster_event(locality: "Us")])
+    CannedExtractionClient.install(events: [poster_event(locality: "Us", locality_evidence: "Us")])
     visit capture_path
     pick "poster.png"
 
@@ -398,7 +399,8 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def poster_event(**overrides)
     { title: "Zorpcore Nacht", date: show_date.to_s, date_evidence: "steht auf dem Plakat",
       time: "20 Uhr", place: "Zorpsaal", place_evidence: "Zorpsaal", locality: "Zorpwil",
-      canton: "BE", genres: ["zorpcore"], source_url: nil }.merge(overrides)
+      locality_evidence: "3000 Zorpwil", canton: "BE", genres: ["zorpcore"],
+      source_url: nil }.merge(overrides)
   end
 
   def matinee(**overrides) = poster_event(title: "Zorpcore Matinee", **overrides)

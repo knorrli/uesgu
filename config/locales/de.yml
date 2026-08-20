@@ -136,15 +136,18 @@ de:
   capture:
     title: Event erfassen
     intro: Poster fotografiert oder Text kopiert? Wir lesen aus, du prüfst Karte für Karte – was du übernimmst, geht sofort live.
-    images_label: Poster
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
-    text_button: Text auslesen
-    empty: Noch nichts ausgelesen.
+    staging:
+      drop_label: Poster hierhin ziehen oder antippen
+      add_text: Text hinzufügen
+      commit: Auslesen
+      remove: Entfernen
+      start_over: Von vorne
     queue:
       label: Warteschlange
-      done: Alles entschieden. Neues Poster? Oben weiter.
+      done: Alles entschieden.
     actions:
       accept: Veröffentlichen
       reject: Verwerfen

@@ -30,6 +30,7 @@
     <a href="#pills">Pills, badges &amp; chips</a>
     <a href="#dropdowns">Dropdowns &amp; selects</a>
     <a href="#inputs">Form inputs</a>
+    <a href="#drop-zone">Drop zone</a>
     <a href="#icons">Icons</a>
     <a href="#nav">Navigation</a>
     <a href="#pagination">Pagination</a>
@@ -433,6 +434,49 @@
         <span class="sg-spec__name">Sheet loading row</span> · <code>.sheet__loading</code>
         <p class="sg-purpose">Stands in for a sheet's option rows while they load. The What and Where trees are ~360 rows, so they're fetched the first time the sheet opens instead of riding along on every page (#81) — this is what fills the panel in the meantime.</p>
         <span class="sg-ok">Muted, one line, and it reserves a few rows' height, so the in-flow desktop panel doesn't jump when the tree lands.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section" id="drop-zone">
+    <h2>Drop zone</h2>
+    <p class="sg-section__intro">Where files are <b>staged</b> — put on a list the contributor can still edit — before anything is sent. Nothing fires on pick: the commit button beside the list is the step boundary, which is what lets a batch mix posters with a pasted text. A pasted text stages as a chip rather than a thumbnail, so one button covers both kinds.</p>
+
+    <div class="sg-row sg-row--stack">
+      <div class="sg-specimen">
+        <%# The real partial. Its item list is normally written by the page's own
+            client (a staged poster is never uploaded), so this specimen stands an app
+            icon in for the thumbnail and hand-writes the three item states. %>
+        <% staged = capture do %>
+          <li class="drop-zone__item">
+            <img src="/icon.png" alt="poster.png">
+            <button type="button" class="drop-zone__remove" aria-label="Entfernen: poster.png">
+              <span class="ph ph-x" aria-hidden="true"></span>
+            </button>
+          </li>
+          <li class="drop-zone__item">
+            <span class="drop-zone__snippet"><span>Zorpcore Nacht, Zorpsaal, 20 Uhr</span></span>
+            <button type="button" class="drop-zone__remove" aria-label="Entfernen: Zorpcore Nacht">
+              <span class="ph ph-x" aria-hidden="true"></span>
+            </button>
+          </li>
+          <li class="drop-zone__item" data-state="undecodable">
+            <span class="drop-zone__snippet">
+              <span>ferien.heic</span>
+              <span class="drop-zone__reason"><%= t('capture.failures.image_unsupported') %></span>
+            </span>
+            <button type="button" class="drop-zone__remove" aria-label="Entfernen: ferien.heic">
+              <span class="ph ph-x" aria-hidden="true"></span>
+            </button>
+          </li>
+        <% end %>
+        <%= render "shared/drop_zone", id: "sg-drop-zone", items: staged,
+              label: t('capture.staging.drop_label'), hint: t('capture.images_hint') %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Drop zone</span> · <code>render "shared/drop_zone", id:, label:, hint:, items:</code>
+        <p class="sg-purpose">A real <code>&lt;input type="file"&gt;</code> stays behind the dashed target, visually hidden and wrapped by a <code>&lt;label for&gt;</code>: the drop handler is an <b>enhancement</b>, and without the input keyboard users and every iOS browser lose the picker entirely. Pass <code>zone_attrs</code>/<code>input_attrs</code>/<code>items_attrs</code> for the caller's own hooks; <code>items</code> is pre-rendered markup, or is left out and written into the list by a client holding the files in memory only.</p>
+        <span class="sg-ok">A file no browser can decode is caught at staging and marked on its own item, so it never becomes a dead row after the batch is sent.</span>
       </div>
     </div>
   </section>

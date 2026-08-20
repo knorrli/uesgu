@@ -21,6 +21,15 @@ module CapturesHelper
       "genres" => candidate.genres.join(", ") }
   end
 
+  # The model's verbatim quote for a field, and only where that field HAS a value: a
+  # candidate can carry evidence for a value the normalizer nulled, and a quote under
+  # an empty field reads as a value being withheld rather than as one refused.
+  def cited_evidence(candidate, field)
+    return if candidate.public_send(field).blank?
+
+    candidate.public_send(:"#{field}_evidence")
+  end
+
   def canton_options
     Location::CANTON_CODES.map { |code| [canton_name(code), code] }.sort_by(&:first)
   end

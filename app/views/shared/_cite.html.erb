@@ -1,0 +1,8 @@
+<%# The text the model quoted as its source for the field above — see the evidence
+    rule in EventCapture::Prompt, which nulls anything it could not quote. Sits AFTER
+    the value rather than before it like a .field-label hint: this is provenance for
+    something already filled in, not an instruction for filling it. %>
+<%# locals: (quote:) %>
+<% if quote.present? %>
+  <p class="review-card__cite"><%= t('shared.cite', quote: quote) %></p>
+<% end %>

@@ -56,6 +56,31 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpcore Matinee", field_value("title")
   end
 
+  # The residual failure after the evidence rule is cited-but-wrong, and the quote is
+  # the only thing on the card that separates a locality read off a postcode from one
+  # read off an artist's origin code.
+  test "each field carries the text the model quoted as its source" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".review-card__cite", text: cite("3000 Zorpwil")
+    assert_selector ".review-card__cite", text: cite("Zorpsaal")
+    assert_selector ".review-card__cite", text: cite("steht auf dem Plakat")
+  end
+
+  # A quote under an empty field reads as a value being withheld. The model can cite a
+  # place it then returned as null, so the card keys the quote to the value, not to the
+  # evidence string.
+  test "a field the model left empty shows no quote" do
+    CannedExtractionClient.install(events: [poster_event(place: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".review-card__cite", text: cite("Zorpsaal")
+    assert_selector ".review-card__cite", text: cite("3000 Zorpwil")
+  end
+
   # An origin code the model can quote back survives the evidence rule and is
   # well-formed, so nothing refuses it: the human's edit is the only record that it
   # was wrong (see ExtractionFieldOutcome).
@@ -451,6 +476,8 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def accept = find(".capture-card .action-bar input[type=submit]").click
 
   def reject = find(".capture-card .action-bar button").click
+
+  def cite(quote) = I18n.t("shared.cite", locale: :de, quote: quote)
 
   def field_value(field) = find(".capture-card [name='#{field}']").value
 

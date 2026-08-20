@@ -65,7 +65,10 @@ a {
 }
 
 /* Account / auth form fields: underline inputs, matching the events filter bar.
- * Scoped so the events filter comboboxes keep their own treatment. */
+ * Scoped so the events filter comboboxes keep their own treatment.
+ * line-height is pinned because Firefox ignores it on a single-line <input> and uses
+ * the font's natural box regardless: `normal` is the only value an <input> and a
+ * <select> render at the same height. */
 .account-form input[type="text"],
 .account-form input[type="email"],
 .account-form input[type="password"],
@@ -80,6 +83,7 @@ a {
   background: var(--theme-bg-color);
   color: inherit;
   font: inherit;
+  line-height: normal;
   max-width: 100%;
 }
 

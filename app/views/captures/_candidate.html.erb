@@ -2,18 +2,11 @@
     editable and nothing is trusted: a value the normalizer refused is null here with
     the model's raw text beside it (see EventCapture::Candidate). Accepting publishes
     immediately. %>
-<%# locals: (candidate:, key:, label:, nth: nil) %>
+<%# locals: (candidate:, key:) %>
 <%= render layout: "shared/review_card",
       locals: { id: key, actions: render("captures/card_actions", key: key), frame_class: "capture-card",
                 source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } },
                 frame_attrs: { data: { capture_target: "card", state: "open" } } } do %>
-  <p class="capture-card__label field-label">
-    <%= label %>
-    <%# Two candidates off one poster share its preview, and read as a duplicated card
-        without this count. %>
-    <% if nth %><span class="muted"><%= t('capture.row.nth', index: nth.first, count: nth.last) %></span><% end %>
-  </p>
-
   <%= form_with url: capture_path, method: :post, id: "#{key}-form",
         class: "capture-card__fields account-form flex flex-col gap-small",
         data: { action: "turbo:submit-end->capture#decided change->capture#carryPlace" } do %>

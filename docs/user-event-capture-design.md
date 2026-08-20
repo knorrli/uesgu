@@ -1,16 +1,14 @@
-# User event capture — design decisions and model evaluation
+# User event capture — design decisions
 
-> Status: **decided; the schema prerequisites, the contributor flag and the
-> extraction service are built** (2026-08-19) — decisions 4–6 shipped as the
-> `places` table plus the location taxonomy reading it, decision 10 as the nullable
-> `events.url`, the `users.contributor` half of decision 7, and the extract half of
-> the funnel as `EventCapture` (see "Provider evaluation"), and the image and text
-> adapters in #105. The URL adapter is **rejected** — see "The URL adapter" below.
-> What is left as design only is the verify screen and VenueLead nomination.
-> Supersedes the framing in
-> [`user-event-capture.md`](user-event-capture.md), which stays as the original
-> idea note. This document records what we settled on and the evidence behind the
-> provider choice, so neither gets re-litigated.
+> What was settled and why, so none of it gets re-litigated — including the things
+> deliberately **not** built, which is most of what a reader comes here for. The
+> measurement behind the provider choice is in
+> [`user-event-capture-provider-evaluation.md`](user-event-capture-provider-evaluation.md);
+> the original framing is in [`user-event-capture.md`](user-event-capture.md), which
+> this supersedes.
+>
+> Deliberately no build status: what exists is in the code, and a doc that tracks it
+> is a doc that is wrong between merges.
 
 ## Why
 
@@ -66,7 +64,7 @@ adapter" below for why, so it does not get re-proposed.
      are ad-hoc (Marzili Quartierfest, "Konzert im Kocherpark") — but the
      distinction is *emergent*, never recorded at capture time. See "VenueLead
      promotion".
-   - `Location.type_for` must consult both. **Built.** It classified anything
+   - `Location.type_for` must consult both. It classified anything
      unknown as a **locality** (`app/models/location.rb`), so a captured "ZAR"
      read as a locality in the filter chips, the location combobox suffix, and the
      admin browser, and could not reach the WHERE *tree* at all
@@ -96,10 +94,6 @@ adapter" below for why, so it does not get re-proposed.
    currently carry, so a captured place drops out of the tree by itself once the
    show has passed. Nothing expires it manually.
 
-   **Built** — `Location.hierarchy` folds `Place.pluck(:canton, :locality, :name)`
-   onto the registry tree through the same `add_to_tree`, and it did land at
-   roughly the estimated size.
-
 5. **Place-name normalisation uses the genre fingerprint pattern** — the stored
    generated column that folds case, spacing, punctuation and umlauts, plus
    `canonical_id` for alias-merge. Its reach is limited: it collapses
@@ -115,9 +109,9 @@ adapter" below for why, so it does not get re-proposed.
    Match-at-entry itself is not built, and there is no admin merge UI. The *near*
    half is now decided — see "Matching at entry" below.
 
-6. **Canton and locality are both required.** The earlier version of this
-   decision made the middle tier optional, reasoning that a concert in a forest
-   between Bern and Luzern has no *city*. Decision 4 kills that: `add_to_tree`
+6. **Canton and locality are both required.** Making the middle tier optional was
+   the tempting answer, on the reasoning that a concert in a forest between Bern and
+   Luzern has no *city*. Decision 4 kills it: `add_to_tree`
    bails on a blank middle tier (`return if canton.blank? || locality.blank?`), so a
    place without one cannot be a tree node. Optional means the events most likely
    to need the tree — the forest, the field, the barn — are the ones silently
@@ -147,9 +141,7 @@ adapter" below for why, so it does not get re-proposed.
 
    The NOT NULL lands on the captured-place table only. `Venue` stays
    placeless-tolerant — the Bewegungsmelder aggregator row has no place and
-   `in_taxonomy` correctly excludes it. **Built** as written: both columns are
-   `NOT NULL` on `places`, canton is validated against the closed 26, and `Venue`
-   is untouched. A venue can be a sourcing record that is
+   `in_taxonomy` correctly excludes it. A venue can be a sourcing record that is
    not a location; a captured place exists *only* to be a location.
 
    **Prerequisite: rename `city` → `locality` first, everywhere, as its own
@@ -178,9 +170,6 @@ adapter" below for why, so it does not get re-proposed.
    flag sits beside `admin`; a role hierarchy would be machinery for a site whose
    users you personally invited.
 
-   **Built** — the column, `User#contributor?`, and a toggle on
-   `/admin/users/:id`. The report/quarantine half is still design only.
-
 8. **Captured events live outside the scraper's re-derivation domain.**
    `Scrapers::Agent#build_event` re-derives every field from source nightly and
    `find_or_initialize_by(url:)` resurrects deleted rows. A captured event has no
@@ -195,10 +184,7 @@ adapter" below for why, so it does not get re-proposed.
    exactly what will be persisted.
 
 10. **`events.url` becomes nullable, and a capture keeps ONE url column.**
-    **Built** as written — the column is nullable, `validates :url` is
-    `allow_nil`, the card branches, and `OFFSITE_SOURCES` carries the social
-    hosts. Nothing writes a NULL yet; this is the seam, opened ahead of the
-    funnel. The column is not the dedup key, which is what made this look hard.
+    The column is not the dedup key, which is what made this look hard.
     It is the *scraper's upsert key* — `find_or_initialize_by(url:)` (`agent.rb:269`) — so a
     nightly re-scrape updates last night's row instead of creating a second. Real
     dedup is `Scrapers::Dedup`, grouping on venue + date + fuzzy title and linking
@@ -267,9 +253,8 @@ adapter" below for why, so it does not get re-proposed.
     fires when the paste was the venue's own page, so social-sourced captures keep
     their link permanently; the badge is what keeps that honest.
 
-11. **Every extraction attempt is recorded — metadata only.** **Built:**
-    `app/models/extraction_attempt.rb`, written from `EventCapture::Extractor#call`,
-    read at `/admin/extraction_attempts`. One row per call, whatever the outcome:
+11. **Every extraction attempt is recorded — metadata only.** One row per call
+    (`app/models/extraction_attempt.rb`), whatever the outcome:
     the model and the prompt sha, the medium, tokens, duration, the candidate
     count, the `issues` histogram the Normalizer produced, and on a failure its
     code and message.
@@ -283,7 +268,7 @@ adapter" below for why, so it does not get re-proposed.
     interpolates the date, so hashing the rendered prompt would mint a new sha
     every night and the column would measure the calendar instead of the wording.
     Both halves are needed — model *and* sha — because prompt tuning was measured
-    not to transfer between models (see "Provider evaluation").
+    not to transfer between models (`user-event-capture-provider-evaluation.md`).
 
     **This counts refusals, not errors.** A value the Normalizer refused is a null
     field and an `issues` code; a value it accepted and a human then rewrote is
@@ -311,8 +296,7 @@ adapter" below for why, so it does not get re-proposed.
     forever, and the class worth knowing is already in the message.
 
 12. **What a human corrects is recorded per field — the other half of the
-    measurement.** **Built:** `app/models/extraction_field_outcome.rb`, written from
-    `CapturesController`, read on the same admin page as the attempt it hangs off.
+    measurement** (`app/models/extraction_field_outcome.rb`).
 
     Decision 11 counts values the Normalizer *refused*. It cannot see the failure
     that prompted all of this: `locality` filled from an artist's origin code. `"Us"`
@@ -385,10 +369,6 @@ adapter" below for why, so it does not get re-proposed.
     is a real capture where this bites, not a better argument.
 
 ### The place model
-
-> **Built.** `app/models/place.rb`, `db/migrate/20260819160000_create_places.rb`,
-> and the `Location` changes that read them. Nothing writes a `Place` yet outside
-> tests — the capture path that would is still design only.
 
 A new `places` table, scoped as the **complement** of `Venue` — not a superset and
 not a mirror. A registry venue never gets a `Place` row: if the extracted name
@@ -480,8 +460,7 @@ mode with no self-correcting path is the one a split name causes.
 
 #### Trigram similarity, not edit distance
 
-`pg_trgm`'s `strict_word_similarity`, scored in Postgres. **Built** as
-`PlaceSuggester`.
+`pg_trgm`'s `strict_word_similarity`, scored in Postgres, as `PlaceSuggester`.
 
 The case that decides it is a **subset, not a typo**: the extracted name is
 regularly a fragment of the stored one ("Quartierfest" against an existing "Marzili
@@ -556,9 +535,9 @@ the other or from the name they derive from.
 
 #### Locality does NOT get the same treatment — the measure is wrong for it
 
-The earlier version of this section said locality got the identical trigram
-scoring. **Reversed**, on measurement. Locality duplicates fall into three classes
-and trigram only reaches the smallest:
+Giving locality the identical trigram scoring is the obvious symmetry, and
+measurement rejects it: locality duplicates fall into three classes and trigram only
+reaches the smallest.
 
 | class | example | fingerprint | trigram |
 | --- | --- | --- | --- |
@@ -856,7 +835,7 @@ dependency on a 512MB starter instance whose memory we already trim arenas to
 protect.
 
 **So the resize moves to the client**, in the verify screen (#106): a canvas
-`drawImage` to a capped long edge before upload. **Built.** That is the better
+`drawImage` to a capped long edge before upload. That is the better
 place for it anyway — the browser already holds the decoded pixels, and it makes
 the upload smaller too, which the server-side version never could. The one thing it
 is not is a guarantee, since the adapter is reachable from the rake task and from
@@ -942,106 +921,11 @@ it unchanged and the funnel has one error path rather than two.
 
 ## Provider evaluation
 
-### The question
-
-Sending user images to a US provider sits badly with the privacy stance
-([`project-product-ethos`]). Cost turned out to be irrelevant: at ~5 captures/day
-every candidate lands between **$0.06 and $5.00 per month**, so the decision is
-sovereignty and accuracy only. That also kills the cost case for self-hosting — a
-GPU box costs more than $5/month in electricity alone, before ops.
-
-### Method
-
-`script/event_capture_bakeoff.rb` runs one identical prompt over six real samples,
-repeated N times, and scores against `script/event_capture_bakeoff_truth.json`.
-The samples were chosen to cover the failure modes, not the easy cases:
-
-| Sample | What it tests |
-|---|---|
-| ZAR poster | brush script over a photograph |
-| Bigote Verde | overlaid text, no address anywhere |
-| Punto de Partida | the only sample stating a year; place is a street festival |
-| Parterre | **two events on one poster**; no city; one date already past |
-| WhatsApp text | venue identifiable **only** from a URL |
-| WhatsApp screenshot-of-screenshot | cropped, **no date exists**, three acts |
-
-The decisive metric is **fabrication rate**: how often a confident date appears for
-the sample where no date is legible. A capture tool that invents dates is worse
-than no capture tool.
-
-Both WhatsApp screenshots are cropped and have sender names and phone numbers
-painted over before upload. `--prep-only` writes exactly what would be sent and
-opens it, making no network call — note that running with a bogus API key is *not*
-equivalent, since the request body is uploaded before the 401 comes back.
-
-### Results
-
-Six runs each, identical prompt (`prompt_sha` is recorded in every session's
-`manifest.json`, which is how we caught one early comparison mixing two prompts):
-
-| Model | Fabricated dates | Wrong event count | Unstable fields | $/month | Latency |
-|---|---|---|---|---|---|
-| **Gemma 4 31B** (Infomaniak) | **0/6** | 1/36 | 3 | **$0.063** | 2.3s |
-| Mistral Small 4 (Infomaniak) | 5/6 | 3/36 | 34 | $0.125 | 1.2s |
-
-Mistral Small 4 also produced four spellings of "Marzili" (including the typo
-`Quarterfest`), five of "parterre", and six variants of one URL — fatal for a field
-used to match against a venue database.
-
-**Decision: Gemma 4 31B on Infomaniak.** Swiss-hosted, an existing vendor
-(registrar + DNS are already moving there), ~6 cents/month, and nothing leaves
-Switzerland. No Anthropic/OpenAI account needed.
-
-**Built** as `EventCapture` (`app/services/event_capture/`): `Prompt` carries the
-tuned text and the strict JSON schema, `Infomaniak` makes the one call,
-`Normalizer` + `YearResolver` decide every deterministic field, and `Extractor`
-returns 0..n `Candidate`s or a failure. Credentials follow the `WebPushConfig` /
-`MailConfig` pattern — `INFOMANIAK_API_TOKEN` + `INFOMANIAK_PRODUCT_ID` via env or
-credentials, absent means inert rather than broken.
-
-The entry point is `bin/rails "event_capture:extract[poster.jpg,...]"`, deliberately
-ahead of any UI so the verify screen is written against a real contract. It takes
-an image; text input arrives with the adapters, which is also where image
-downscaling belongs (the bake-off capped the long edge at 1568px with `sips`,
-which is not a thing that exists on the deployed box).
-
-**Downscaling is a latency decision, not a cost one** — worth stating before the
-adapters are built, because the 1568px cap above reads like a cost measure and is
-not. Gemma bills a *fixed* image cost, so across the bake-off its input was ~1294
-tokens whatever the image: the 915x1568 sample came in at 1282, twelve tokens
-*under* the 723x1568 one. Mistral does scale with pixels on the same pair (2496 →
-2881), which is where the intuition comes from. The consequence is that the system
-prompt, not the image, is ~95% of what a request costs — one extraction is ~1350 in
-and 130–370 out, roughly $0.0005. So the only real cost lever is prompt length, and
-shortening the prompt is exactly what the fabrication numbers say not to do.
-
-The prompt is a **copy** of the bake-off script's, not a shared constant: that
-script's recorded `prompt_sha` is what makes its sessions comparable, so it stays
-frozen as the tuning rig. Two edits against it, both mandated above — `city`
-became `locality`, and locality is defined as the tier below canton rather than
-left to mean whatever "city" means.
-
-### Two findings worth keeping
-
-**Prompt tuning does not transfer between models.** The prompt revision that took
-Gemma from 17% to 0% fabrication pushed Mistral from 40% to 83% on identical
-inputs. Re-tune per model; never assume a prompt improvement is portable.
-
-**Confidence scores are worthless here.** The first prompt asked for a
-`confidence` field; it returned 0.90–1.00 on every output *including* an invented
-venue ("Café Liebig", not present in the image) and three fabricated dates. The
-field was removed. Do not gate anything on self-reported confidence.
-
-### What made the difference
-
-Requiring **verbatim citation** — every `date` and `place` must be accompanied by
-`date_evidence` / `place_evidence` quoting the image text it was read from, or be
-null. This is most of the gain, and it yields a free fabrication detector: a
-populated value with a null evidence field is self-reported invention.
-
-Naming the exact trap also mattered. The fabricated dates all came from the
-WhatsApp "Saturday" day-separator, so the prompt now says explicitly that a
-separator tells you when the *message* was sent, never when the event happens.
+Settled by measurement, and recorded whole in
+[`user-event-capture-provider-evaluation.md`](user-event-capture-provider-evaluation.md):
+Gemma 4 31B on Infomaniak, Swiss-hosted, 0 of 6 fabricated dates. Two findings from it
+govern every prompt edit made since — verbatim citation is most of what stops
+fabrication, and prompt tuning does **not** transfer between models.
 
 ## Architecture principle: the model transcribes, code computes
 
@@ -1094,14 +978,14 @@ fires, and which side turns out to be right,* becomes measurable (#112) rather t
 arguable. Revisit promoting it back once there is data.
 
 The token list covers the three languages the prompt declares — German, French,
-English — and standard abbreviations only. It previously carried German and French
-abbreviations but English full names alone (`mon` was present only because it is
-also short for *Montag*), and padded itself with `die` / `mit` / `son`, which are
-words before they are weekdays.
+English — and standard abbreviations only. Both halves are load-bearing: an English
+abbreviation missing makes the checksum silently blind, and padding the list with
+`die` / `mit` / `son` makes it fire on words that are words before they are
+weekdays.
 
 A value failing validation is **nulled** and kept under `*_raw`, never trusted. A
 null gets completed by a human in one tap; a malformed date silently corrupts the
-feed. Shipped as `Candidate#raw` (keyed by field) plus `#issues` saying why — one
+feed. That is `Candidate#raw` (keyed by field) plus `#issues` saying why — one
 rule for every field, so the verify screen can show what the model claimed
 alongside the null without a per-field special case.
 

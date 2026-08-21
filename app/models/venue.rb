@@ -2,7 +2,7 @@
 # DECIDED about it, and the discovery keys it answers to. The data lives in
 # config/venues.yml (one row per venue); this PORO wraps a row to give the computed
 # API, and `Venue.all` is the registry the ledger projection, the location
-# taxonomy, and discovery read from. See docs/venue-registry-design.md.
+# taxonomy, and discovery read from.
 #
 # Not an ActiveRecord model — a plain value object over YAML, like Location is a
 # plain class over the scraper registry. (VenueLead is the separate AR table that
@@ -15,7 +15,10 @@ class Venue
   CONFIG_PATH = Rails.root.join("config/venues.yml")
   STATUSES = %w[consume defer reject].freeze
 
-  # One declared, data-shaped source (see docs/venue-registry-design.md "End state").
+  # One declared, data-shaped source. The rule for what belongs in a row at all:
+  # redundant-with-code -> derive it; sole-definition -> store it. An OLE feed URL has
+  # no other home, so it lives here; a bespoke scraper already declares its domain, so
+  # naming it again would just be a second string to drift.
   # Bespoke/PETZI sourcing is derived from the live registry by domain and isn't
   # listed here. Two OLE shapes live here:
   #   - this venue HOSTS its own OLE feed: `via: ole, feed_url:` (plus `aggregator:

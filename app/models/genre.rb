@@ -15,7 +15,7 @@ class Genre < ApplicationRecord
   # a DAG — one primary parent only. Filtering by a genre matches it OR any
   # descendant (see subtree_ids). A root genre (no parent) is a top-level browse
   # bucket. Orphan, don't cascade, on delete — losing a parent shouldn't delete
-  # the subtree. See docs/taxonomy-and-saved-filters-redesign.md.
+  # the subtree.
   belongs_to :parent, class_name: "Genre", optional: true
   has_many :children, class_name: "Genre", foreign_key: :parent_id,
                       inverse_of: :parent, dependent: :nullify

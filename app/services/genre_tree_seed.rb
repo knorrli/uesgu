@@ -6,7 +6,7 @@
 #
 # The rake task taxonomy:import_tree is a thin wrapper that reads the YAML and
 # hands the hash here; this object holds the logic so it's unit-testable with
-# synthetic data. See docs/taxonomy-and-saved-filters-redesign.md.
+# synthetic data.
 class GenreTreeSeed
   Result = Struct.new(:placed, :tree_entries, :hidden, :blocked, :ignored, :alias_groups, :multi_home, keyword_init: true)
 

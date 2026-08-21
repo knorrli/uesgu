@@ -7,7 +7,7 @@
 # carries the count of upcoming events it would bring, for ranking the inbox.
 #
 # (Was VenuePlace, which fed the location taxonomy until the venue registry took that
-# over — see docs/venue-registry-design.md.)
+# over.)
 class VenueLead < ApplicationRecord
   validates :venue, :source, presence: true
 

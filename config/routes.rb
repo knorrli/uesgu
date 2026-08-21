@@ -99,7 +99,7 @@ Rails.application.routes.draw do
 
   # Living styleguide: a single admin-only page that renders every shared UI
   # element with the real bundled CSS, so it stays in sync as the styles change
-  # (rather than rotting like a static design doc). See docs/ui-audit.md.
+  # (rather than rotting like a static design doc).
   get "styleguide" => "styleguide#index", as: :styleguide
 
   resources :events, only: [:index, :destroy]

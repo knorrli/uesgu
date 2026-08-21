@@ -3,7 +3,7 @@ class AddParentToGenres < ActiveRecord::Migration[8.0]
   # tree (e.g. Rock > Punk > Crustpunk). This replaces the separate Style layer:
   # what were curated "styles" become root genres, and assigning a genre to a
   # style becomes setting its parent (see Genre#set_parent!). One primary parent
-  # only — a tree, not a DAG (see docs/taxonomy-and-saved-filters-redesign.md).
+  # only — a tree, not a DAG.
   # Schema only; tree expansion and curation live on the Genre model + the
   # taxonomy:import_tree seed loader.
   def change

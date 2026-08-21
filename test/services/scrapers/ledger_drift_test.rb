@@ -5,7 +5,7 @@ require "test_helper"
 # record; these rules keep it reconciled with the live scraper registry and
 # internally well-formed, so it can never silently diverge from what we actually
 # scrape. A failure here means the registry and the code disagree — the message
-# says exactly how. See docs/venue-registry-design.md and docs/discovery-design.md.
+# says exactly how.
 #
 # This is data hygiene, not behaviour: it reads the real registry + the real
 # scraper registry, no fixtures, no DB.

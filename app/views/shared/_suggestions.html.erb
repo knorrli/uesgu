@@ -1,0 +1,13 @@
+<%# Values the app already carries, offered as chips beside the field they fill. What
+    tapping one does is the caller's business — a place suggestion fills three fields,
+    a locality one fills two — so the action rides in on each chip's own attributes.
+    None of them ever auto-applies. %>
+<%# locals: (label:, chips:) %>
+<% if chips.any? %>
+  <div class="suggestions flex gap-xsmall wrap">
+    <span class="muted"><%= label %></span>
+    <% chips.each do |chip| %>
+      <%= tag.button chip[:label], type: "button", class: "chip", **chip[:attrs] %>
+    <% end %>
+  </div>
+<% end %>

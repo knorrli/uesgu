@@ -8,6 +8,33 @@ module CapturesHelper
     PlaceSuggester.for_name(candidate.place, url: candidate.source_url)
   end
 
+  # Tapping one is what stops a fourth spelling of "Quartierfest" being minted and
+  # keeping the place below the VenueLead nomination threshold forever.
+  def place_chips(suggestions)
+    suggestions.map do |suggestion|
+      suggestion_chip(suggestion.name, action: "capture#applySuggestion",
+                      capture_name_param: suggestion.name,
+                      capture_locality_param: suggestion.locality,
+                      capture_canton_param: suggestion.canton)
+    end
+  end
+
+  # The towns those same venues sit in, which is the only ranking the locality field
+  # has to offer. Every locality the app knows is far too many to render and
+  # alphabetical order ranks nothing; the places already being suggested are few, and
+  # they are about this poster. The long tail stays reachable through the datalist.
+  def locality_chips(suggestions)
+    suggestions.select { |suggestion| suggestion.locality.present? }
+               .uniq { |suggestion| Fingerprint.for(suggestion.locality) }
+               .map do |suggestion|
+                 suggestion_chip(suggestion.locality, action: "capture#applyLocality",
+                                 capture_locality_param: suggestion.locality,
+                                 capture_canton_param: suggestion.canton)
+               end
+  end
+
+  def suggestion_chip(label, **data) = { label: label, attrs: { data: data } }
+
   # Name => canton, off the same rows that compute the canton at extraction. The
   # datalist offers the names and the card fills the canton from the map when one is
   # picked, so both halves of the field answer from one place.

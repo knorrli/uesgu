@@ -128,6 +128,36 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal %w[Dubtronica], Event.sole.genre_list
   end
 
+  # Observed on a real poster: six genres came back as one string. The chips make the
+  # run visible as a single genre, and the taxonomy is what says it is several (see
+  # EventCapture::Genres).
+  test "a slash run the taxonomy vouches for arrives as one chip per genre" do
+    carried = genre(name: "zorpcore", events_count: 3)
+    CannedExtractionClient.install(events: [poster_event(genres: ["Loops/#{carried.name}/FX"])])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".hw-combobox__chip", text: "Loops"
+    assert_selector ".hw-combobox__chip", text: carried.name
+    assert_selector ".hw-combobox__chip", text: "FX"
+
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+    # "Fx", not "FX": a genre nobody carries is stored under the display spelling
+    # Genre.canonicalize_names gives it, exactly as a hand-typed one is.
+    assert_equal ["Fx", "Loops", carried.name].sort, Event.sole.genre_list.sort
+  end
+
+  # The other half of the rule, and the one that keeps a genre name with a slash in it
+  # from being minted as two that do not exist.
+  test "a slash run nothing vouches for stays the single genre the model returned" do
+    CannedExtractionClient.install(events: [poster_event(genres: ["Loops/FX"])])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".hw-combobox__chip", count: 1, text: "Loops/FX"
+  end
+
   # The suggestions are the point of the combobox: a genre we already carry should be
   # picked rather than respelt, which is what keeps the taxonomy from growing a fourth
   # spelling of the same thing.

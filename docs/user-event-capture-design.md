@@ -937,7 +937,7 @@ into code was then correct. This is the load-bearing lesson.
 | `is_past` | wrong every time | computed from `date` |
 | Date format | returned `"Mi 19. August"`, `"2026-08-19T19:30:00"` | validated; datetimes salvaged, junk nulled |
 | Time format | five formats: `20:00`, `20 Uhr`, `19:30h`, `19.30h`, `20:30 Uhr` | normalised to `HH:MM` |
-| Canton | free text | checked against the 26, upcased |
+| Canton | free text, inferred | checked against the 26, upcased, then computed from the locality |
 | **Year resolution** | evidence read correctly 6/6, year wrong 2/6 | computed from the evidence |
 
 Year resolution deserves its own note, because it is the clearest case. Given
@@ -1017,11 +1017,30 @@ would delete the field, because there is nothing to quote. The two fields fail
 differently: `locality` fails by transcribing the wrong text, which a quote exposes;
 `canton` fails by inferring badly from the right text, which a quote cannot.
 
-What it should get instead is the treatment `YearResolver` gave the date's year —
-computed from the resolved locality rather than asked of the model, since every
-locality the registry already knows carries a canton (`Creator#known_localities`).
-That leaves only a locality nobody has seen before needing a human, which is the
-select of 26 the verify screen already shows.
+**So it gets the treatment `YearResolver` gave the date's year instead: computed, not
+asked** (2026-08-21). Every locality the registry and `places` carry has a canton
+beside it, so a resolved locality answers the question without anyone inferring
+anything. `EventCapture::Localities` holds both halves of that lookup — the stored
+spelling a typed locality is, and the canton that puts it in — and `Normalizer` reads
+the second one.
+
+Three rules, all of them the year resolver's:
+
+- the computed canton **wins** over the model's, and the disagreement is kept in `raw`
+  and counted as `:canton_recomputed`, exactly as `:year_recomputed` records a year the
+  evidence overruled;
+- a name carried under **two** cantons computes nothing. Buchs is a locality in SG, AG,
+  ZH and LU alike, and answering with whichever row loaded first is the wrong-canton bug
+  this exists to prevent;
+- a locality **nobody has seen before** computes nothing either, which is the case the
+  human is already equipped for — the select of 26 the verify screen shows.
+
+`canton` **stays in `Prompt::SCHEMA`** rather than being dropped, which is the one part
+of this that is a judgement call. Dropping it is the cleaner reading of the principle,
+but it buys nothing and costs two things: the unknown locality loses its only default,
+and rule 5 and the `FORMATS` block would both have to change — and a prompt edit means
+re-running the provider evaluation, since tuning was measured not to transfer. Kept, it
+is a fallback that only ever applies where computation abstains.
 
 **What the re-run measured — four runs each over the same six images, before and
 after.** No `:locality_uncited` ever fired: the model cited every locality it filled,

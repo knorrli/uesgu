@@ -8,8 +8,24 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
 
   def normalize(event) = EventCapture::Normalizer.call(event, today: TODAY)
 
+  # Stands in for the taxonomy without a database: the canton half only ever asks
+  # this one question of it.
+  def known(**localities)
+    EventCapture::Localities.new(
+      localities.map { |name, canton| EventCapture::Localities::Entry.new(name: name.to_s, canton: canton) }
+    )
+  end
+
+  def normalize_in(event, **localities)
+    EventCapture::Normalizer.call(event, today: TODAY, localities: known(**localities))
+  end
+
   def dated(**overrides)
     { "date" => "2026-08-20", "date_evidence" => "Do 20. August" }.merge(overrides.stringify_keys)
+  end
+
+  def cited_locality(name, **overrides)
+    { "locality" => name, "locality_evidence" => "3000 #{name}" }.merge(overrides.stringify_keys)
   end
 
   test "a well-formed event passes through" do
@@ -136,6 +152,63 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_nil candidate.canton
     assert_equal "Bern", candidate.raw["canton"]
     assert_includes candidate.issues, :canton_invalid
+  end
+
+  test "a known locality supplies the canton the model left blank" do
+    candidate = normalize_in(cited_locality("Zorpwil", "canton" => nil), Zorpwil: "BE")
+
+    assert_equal "BE", candidate.canton
+    assert_empty candidate.issues
+    assert_empty candidate.raw
+  end
+
+  test "the computed canton beats the model's, and the disagreement is kept" do
+    candidate = normalize_in(cited_locality("Zorpwil", "canton" => "AG"), Zorpwil: "BE")
+
+    assert_equal "BE", candidate.canton
+    assert_equal "AG", candidate.raw["canton"]
+    assert_includes candidate.issues, :canton_recomputed
+  end
+
+  test "agreeing with the computed canton is not a disagreement" do
+    candidate = normalize_in(cited_locality("Zorpwil", "canton" => "be"), Zorpwil: "BE")
+
+    assert_equal "BE", candidate.canton
+    assert_empty candidate.issues
+    assert_empty candidate.raw
+  end
+
+  # The case computation cannot serve, and the reason the field stays in the schema.
+  test "a locality nobody carries leaves the model's canton standing" do
+    candidate = normalize_in(cited_locality("Flarnhausen", "canton" => "AG"), Zorpwil: "BE")
+
+    assert_equal "AG", candidate.canton
+    assert_empty candidate.issues
+  end
+
+  test "an uncited locality computes nothing — there is no locality to compute from" do
+    candidate = normalize_in({ "locality" => "Zorpwil", "locality_evidence" => nil, "canton" => "AG" },
+                             Zorpwil: "BE")
+
+    assert_nil candidate.locality
+    assert_equal "AG", candidate.canton
+    assert_includes candidate.issues, :locality_uncited
+  end
+
+  test "a canton the computation cannot replace is still refused" do
+    candidate = normalize_in(cited_locality("Flarnhausen", "canton" => "Bern"), Zorpwil: "BE")
+
+    assert_nil candidate.canton
+    assert_equal "Bern", candidate.raw["canton"]
+    assert_includes candidate.issues, :canton_invalid
+  end
+
+  test "a known locality replaces a junk canton without flagging it twice" do
+    candidate = normalize_in(cited_locality("Zorpwil", "canton" => "Bern"), Zorpwil: "BE")
+
+    assert_equal "BE", candidate.canton
+    assert_equal "Bern", candidate.raw["canton"]
+    assert_equal [:canton_invalid], candidate.issues
   end
 
   test "a null locality survives extraction — it is required at persist, not here" do

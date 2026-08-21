@@ -69,9 +69,12 @@ module EventCapture
 
       response = client.call(input: input, today: today)
       events = Array(parse(response.text)["events"])
+      # Once per response, not once per candidate: a poster advertising eight events
+      # would otherwise re-query the taxonomy eight times.
+      localities = Localities.known
 
       Extraction.new(
-        candidates: events.map { |event| Normalizer.call(event, today: today) },
+        candidates: events.map { |event| Normalizer.call(event, today: today, localities: localities) },
         medium: input.kind,
         model: response.model,
         prompt_sha: Prompt.sha(medium: input.kind),

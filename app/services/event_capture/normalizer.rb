@@ -13,9 +13,10 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(event, today:)
+    def initialize(event, today:, localities: Localities.none)
       @event = event.is_a?(Hash) ? event : {}
       @today = today
+      @localities = localities
       @raw = {}
       @issues = []
       @salvaged_time = nil
@@ -24,6 +25,9 @@ module EventCapture
     def call
       date = normalized_date
       time = normalized_time
+      # A local rather than a second `cited(:locality)` below: the canton is computed
+      # from it, and `cited` flags an issue on the way past — asking twice records it twice.
+      locality = cited(:locality)
 
       Candidate.new(
         title: string(event["title"]),
@@ -32,9 +36,9 @@ module EventCapture
         time: time,
         place: cited(:place),
         place_evidence: string(event["place_evidence"]),
-        locality: cited(:locality),
+        locality: locality,
         locality_evidence: string(event["locality_evidence"]),
-        canton: normalized_canton,
+        canton: normalized_canton(locality),
         genres: Array(event["genres"]).filter_map { |genre| string(genre) },
         source_url: string(event["source_url"]),
         raw: raw,
@@ -44,7 +48,7 @@ module EventCapture
 
     private
 
-    attr_reader :event, :today, :raw, :issues, :salvaged_time
+    attr_reader :event, :today, :localities, :raw, :issues, :salvaged_time
 
     def string(value) = value.to_s.strip.presence
 
@@ -130,7 +134,23 @@ module EventCapture
       normalized
     end
 
-    def normalized_canton
+    # Computed from the locality, never the model's answer, because a wrong canton
+    # files the locality and its venues under a branch of the WHERE tree nobody
+    # looking for the event will open. The model is still asked for one: where the
+    # locality is new the computation abstains, and its guess beats leaving a human
+    # to pick from 26 with no default.
+    def normalized_canton(locality)
+      claimed = claimed_canton
+      computed = localities.canton_for(locality)
+      return claimed if computed.nil?
+      return computed if claimed.nil? || claimed == computed
+
+      raw["canton"] = claimed
+      issues << :canton_recomputed
+      computed
+    end
+
+    def claimed_canton
       value = string(event["canton"])
       return if value.nil?
       return value.upcase if Location::CANTON_CODES.include?(value.upcase)

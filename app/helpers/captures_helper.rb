@@ -8,10 +8,10 @@ module CapturesHelper
     PlaceSuggester.for_name(candidate.place, url: candidate.source_url)
   end
 
-  # Name => canton, off the same lookup that computes the canton at extraction. The
+  # Name => canton, off the same rows that compute the canton at extraction. The
   # datalist offers the names and the card fills the canton from the map when one is
-  # picked, so both halves of the field answer from one set of rows.
-  def capture_localities = EventCapture::Localities.known.cantons_by_name.sort.to_h
+  # picked, so both halves of the field answer from one place.
+  def capture_localities = Locality.cantons_by_name
 
   # What the model proposed, keyed the way the form posts it, so the card can carry it
   # back for the diff. Mirrors the visible inputs exactly — a value that renders one

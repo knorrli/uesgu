@@ -1,4 +1,4 @@
-require "test_helper"
+require "db_test_helper"
 
 # Every case here is a shape the model actually returned during the provider
 # evaluation. The invariant under test is always the same one: a value we cannot trust
@@ -8,20 +8,15 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
 
   def normalize(event) = EventCapture::Normalizer.call(event, today: TODAY)
 
-  # Stands in for the taxonomy without a database: the canton half only ever asks
-  # this one question of it.
-  def known(**localities)
-    EventCapture::Localities.new(
-      localities.map { |name, canton| EventCapture::Localities::Entry.new(name: name.to_s, canton: canton) }
-    )
-  end
-
   def normalize_with_genres(event, *known)
     EventCapture::Normalizer.call(event, today: TODAY, genres: EventCapture::Genres.for_names(known))
   end
 
+  # The taxonomy the canton half reads. Synthetic town names; whether a canton is
+  # settled or abstained is Locality.reconcile!'s job, tested in LocalityTest.
   def normalize_in(event, **localities)
-    EventCapture::Normalizer.call(event, today: TODAY, localities: known(**localities))
+    localities.each { |name, canton| Locality.create!(name: name.to_s, canton: canton) }
+    EventCapture::Normalizer.call(event, today: TODAY)
   end
 
   def dated(**overrides)

@@ -12,10 +12,9 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(event, today:, localities: Localities.none, genres: Genres.none)
+    def initialize(event, today:, genres: Genres.none)
       @event = event.is_a?(Hash) ? event : {}
       @today = today
-      @localities = localities
       @genres = genres
       @raw = {}
       @issues = []
@@ -50,7 +49,7 @@ module EventCapture
 
     private
 
-    attr_reader :event, :today, :localities, :genres, :raw, :issues, :salvaged_time
+    attr_reader :event, :today, :genres, :raw, :issues, :salvaged_time
 
     def string(value) = value.to_s.strip.presence
 
@@ -154,7 +153,7 @@ module EventCapture
     # to pick from 26 with no default.
     def normalized_canton(locality)
       claimed = claimed_canton
-      computed = localities.canton_for(locality)
+      computed = Locality.canton_for(locality)
       return claimed if computed.nil?
       return computed if claimed.nil? || claimed == computed
 

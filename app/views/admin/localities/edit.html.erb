@@ -1,0 +1,57 @@
+<%# One town: what it is, and the one decision there is to make about it — whether
+    it is really another town under a second name. There is deliberately no "did you
+    mean" row like the genre editor's: the variants worth merging here are official
+    second names (Bienne for Biel, Genf for Genève) sharing barely a third of their
+    trigrams, so a spelling-distance suggestion would surface unrelated towns and
+    miss every real pair. %>
+<% content_for :title, @locality.name %>
+<div class="flex flex-col gap-large">
+  <%= render layout: "shared/page_header", locals: { back_path: admin_localities_path, back_label: t('admin.localities.index.title') } do %>
+    <h1><%= @locality.name %></h1>
+    <p class="muted">
+      <%= @locality.canton.presence || t('admin.localities.index.canton_unknown') %>
+      &middot; <%= t('admin.localities.edit.usage', count: @locality.events_count) %>
+    </p>
+  <% end %>
+
+  <% if @locality.alias? %>
+    <div class="flex gap-medium align-baseline wrap">
+      <span class="muted">
+        <%= t('admin.localities.index.merged_into', canonical: @locality.canonical.name) %>
+      </span>
+      <%= button_to t('.unmerge'), unmerge_admin_locality_path(@locality) %>
+    </div>
+    <p class="muted"><%= t('.unmerge_hint') %></p>
+  <% elsif @locality.registry? %>
+    <p class="muted"><%= t('.registry_hint') %></p>
+  <% else %>
+    <%= form_with url: merge_admin_locality_path(@locality), method: :post, scope: :locality,
+          class: 'flex justify-between gap-medium wrap align-end' do |f| %>
+      <div class="input-wrapper flex flex-grow">
+        <%= f.combobox :canonical_locality_id,
+              Locality.canonicals.where.not(id: @locality.id).by_name.map { |candidate| { display: candidate.name, value: candidate.id } },
+              placeholder: t('.merge_into') do |combobox| %>
+          <% combobox.customize_fieldset class: 'flex-grow' %>
+          <% combobox.customize_input class: 'flex-grow' %>
+        <% end %>
+      </div>
+      <%= f.button t('.merge'), type: :submit %>
+    <% end %>
+    <p class="muted"><%= t('.merge_hint') %></p>
+  <% end %>
+
+  <% if @locality.aliases.any? %>
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.also_known_as') %></h2>
+      <div class="flex gap-small wrap">
+        <% @locality.aliases.by_name.each do |other| %>
+          <%= link_to other.name, edit_admin_locality_path(other), class: 'tag' %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @locality.events_count.positive? %>
+    <%= link_to t('.browse_events'), events_path(l: [@locality.name]) %>
+  <% end %>
+</div>

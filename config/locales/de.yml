@@ -160,7 +160,7 @@ de:
       incomplete: Titel, Datum, Ort und Kanton braucht es.
       duplicate: Dieses Event gibt es schon.
       url_invalid: Der Link muss mit http:// oder https:// beginnen.
-      place_invalid: Diese Venue liess sich nicht anlegen.
+      place_invalid: Dieses Lokal liess sich nicht anlegen.
       unknown: Das hat nicht geklappt.
     row:
       pending: wird ausgelesen …
@@ -172,7 +172,7 @@ de:
       description: Beschreibung
       date: Datum
       time: Zeit
-      place: Venue
+      place: Lokal
       suggestions: "Gibt es schon:"
       locality: Ort
       locality_suggestions: "Bekannte Orte:"
@@ -669,31 +669,31 @@ de:
           other: "%{count} Events"
         merge: Zusammenlegen
         merge_into: Zusammenlegen mit…
-        merge_hint: Beim Zusammenlegen werden alle Events und Orte unter diesem Namen umgehängt. Die Verknüpfung bleibt, spätere Captures landen ebenfalls beim anderen Ort.
+        merge_hint: Beim Zusammenlegen werden alle Events und Lokale unter diesem Namen umgehängt. Die Verknüpfung bleibt, spätere Captures landen ebenfalls beim anderen Ort.
         unmerge: Trennen
-        unmerge_hint: Trennen löst nur die Verknüpfung. Events und Orte bleiben dort, wohin sie verschoben wurden.
+        unmerge_hint: Trennen löst nur die Verknüpfung. Events und Lokale bleiben dort, wohin sie verschoben wurden.
         registry_hint: Dieser Ort steht im Venue-Register, die Scraper setzen ihn jede Nacht neu — ein Zusammenlegen würde bis zum Morgen wieder verschwinden. Die Schreibweise gehört in config/venues.yml.
         also_known_as: Heisst auch
         browse_events: Events ansehen
     locations:
       index:
-        title: Orte
+        title: Locations
         type_all: Alle
-        type_venue: Venue
+        type_venue: Lokal
         type_locality: Ort
         type_canton: Kanton
-        search: Orte suchen…
+        search: Locations suchen…
         sort_by: Sortieren nach
         sort_name: Name
         sort_count: Nutzung
-        empty: Keine passenden Orte.
+        empty: Keine passenden Locations.
     discard_rules:
       index:
         title: Filterregeln
         intro: Filtere unerwünschte Veranstaltungen automatisch per Text. Eine gefilterte Veranstaltung verschwindet aus allen öffentlichen Listen und wird bei jedem Scrape neu geprüft – entferne die Regel und sie kommt zurück. Anders als das manuelle Entfernen einer einzelnen Veranstaltung.
         new_rule: Neue Regel
         inactive: inaktiv
-        all_venues: Alle Orte
+        all_venues: Alle Lokale
         catches:
           zero: trifft keine Veranstaltungen
           one: trifft 1 Veranstaltung
@@ -709,8 +709,8 @@ de:
       form:
         pattern_label: Textmuster
         pattern_hint: Gross-/Kleinschreibung egal. Trifft, wenn es irgendwo im Titel oder Untertitel vorkommt (z. B. „Tschütte“, „Grossleinwand“).
-        scraper_label: Ort
-        all_venues: Alle Orte
+        scraper_label: Lokal
+        all_venues: Alle Lokale
         note_label: Notiz (optional)
         active_label: Aktiv
         save: Regel speichern

@@ -160,7 +160,7 @@ fr:
       incomplete: Il faut un titre, une date, une localité et un canton.
       duplicate: Cet événement existe déjà.
       url_invalid: Le lien doit commencer par http:// ou https://.
-      place_invalid: Ce lieu n'a pas pu être créé.
+      place_invalid: Cette salle n'a pas pu être créée.
       unknown: Ça n'a pas marché.
     row:
       pending: lecture …
@@ -172,7 +172,7 @@ fr:
       description: Description
       date: Date
       time: Heure
-      place: Lieu
+      place: Salle
       suggestions: "Déjà connu :"
       locality: Localité
       locality_suggestions: "Localités connues :"
@@ -669,17 +669,17 @@ fr:
           other: "%{count} événements"
         merge: Fusionner
         merge_into: Fusionner avec…
-        merge_hint: "La fusion réétiquette tous les événements et lieux sous ce nom. Le lien reste : ce qui sera capturé sous ce nom ira aussi vers l'autre localité."
+        merge_hint: "La fusion réétiquette tous les événements et salles sous ce nom. Le lien reste : ce qui sera capturé sous ce nom ira aussi vers l'autre localité."
         unmerge: Séparer
-        unmerge_hint: Séparer ne défait que le lien. Les événements et lieux déplacés par la fusion restent où ils sont.
-        registry_hint: Cette localité figure dans le registre des lieux, les scrapers la réétiquettent chaque nuit — une fusion ne survivrait pas à la matinée. Change plutôt l'orthographe dans config/venues.yml.
+        unmerge_hint: Séparer ne défait que le lien. Les événements et salles déplacés par la fusion restent où ils sont.
+        registry_hint: Cette localité figure dans le registre des salles, les scrapers la réétiquettent chaque nuit — une fusion ne survivrait pas à la matinée. Change plutôt l'orthographe dans config/venues.yml.
         also_known_as: Aussi appelée
         browse_events: Voir les événements
     locations:
       index:
         title: Lieux
         type_all: Tous
-        type_venue: Lieu
+        type_venue: Salle
         type_locality: Localité
         type_canton: Canton
         search: Rechercher des lieux…
@@ -693,7 +693,7 @@ fr:
         intro: Filtre automatiquement les événements indésirables par texte. Un événement filtré disparaît de toutes les listes publiques et est revérifié à chaque scrape — supprime la règle et il revient. Différent du retrait manuel d'un événement isolé.
         new_rule: Nouvelle règle
         inactive: inactive
-        all_venues: Tous les lieux
+        all_venues: Toutes les salles
         catches:
           zero: ne touche aucun événement
           one: touche 1 événement
@@ -709,8 +709,8 @@ fr:
       form:
         pattern_label: Motif texte
         pattern_hint: Insensible à la casse. Correspond s'il apparaît n'importe où dans le titre ou le sous-titre (p. ex. « Tschütte », « Grossleinwand »).
-        scraper_label: Lieu
-        all_venues: Tous les lieux
+        scraper_label: Salle
+        all_venues: Toutes les salles
         note_label: Note (facultatif)
         active_label: Active
         save: Enregistrer la règle

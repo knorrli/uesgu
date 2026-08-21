@@ -3,12 +3,11 @@ require "public_suffix"
 module Scrapers
   # Source/venue discoverability. Finds venues/feeds we don't yet consume by
   # diffing upstream indices (OLE registry, Hinto ALL, PETZI sitemap) against the
-  # record of what we've already decided on. See docs/discovery-design.md.
+  # record of what we've already decided on.
   #
   # That record is the venue registry (config/venues.yml, wrapped by the Venue
   # model); the Ledger below is a thin read-only PROJECTION of it that keeps the existing
-  # consumers (drift test, discovery report) working unchanged. See
-  # docs/venue-registry-design.md.
+  # consumers (drift test, discovery report) working unchanged.
   #
   # This module holds the two pieces the rest of the system reconciles against:
   # the canonical-domain normalizer (#domain) and the ledger projection (Ledger).

@@ -2,7 +2,7 @@
 # decided on: its identity (domain, name, place), our decision (consume / defer /
 # reject + reason), and discovery aliases. Wrapped by the Venue model
 # (app/models/venue.rb), which exposes the computed API and the registry
-# (Venue.all). See docs/venue-registry-design.md.
+# (Venue.all).
 #
 # IDENTITY + DECISION live here; SOURCING (which bespoke scraper / OLE feed /
 # PETZI slug feeds a venue) is DERIVED from the live registry, not configured

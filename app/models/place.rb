@@ -4,7 +4,7 @@
 # and Location resolves the registry first: two sources of "what is a venue" is the
 # mistake the retired VenuePlace model made. The complement is drawn at
 # Venue.in_taxonomy, not at the whole file — a venue we decided not to scrape can
-# still host a captured show. See docs/user-event-capture-design.md.
+# still host a captured show.
 #
 # Not an owner of events: a vocabulary with attributes, like Genre. Events carry
 # [name, locality, canton] as flat location tags because that is what the WHERE

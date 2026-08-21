@@ -1,8 +1,7 @@
 module EventCapture
   # The "code computes" half of the extraction service. Every deterministic job the
   # model was given in the bake-off it got wrong, and every one moved in here was
-  # then right — see "the model transcribes, code computes" in
-  # docs/user-event-capture-design.md.
+  # then right: the model transcribes, code computes.
   #
   # The rule is uniform: a value that fails validation is NULLED, kept under `raw`,
   # and flagged in `issues`. Never coerced into something plausible. A null gets

@@ -1,7 +1,6 @@
 class CreatePlaces < ActiveRecord::Migration[8.1]
   # Captured places: the complement of the venue registry (config/venues.yml) —
-  # where a user-captured event happens when we don't source that venue. See
-  # docs/user-event-capture-design.md "The place model".
+  # where a user-captured event happens when we don't source that venue.
   #
   # `fingerprint` MUST stay character-identical to the genres column
   # (AddFingerprintToGenres) and to Fingerprint.for, which reproduces it in Ruby

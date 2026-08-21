@@ -20,7 +20,7 @@ module Scrapers
     # declares the place + domain). So its slug→place and slug→domain maps are
     # DERIVED from the registry (config/venues.yml), not duplicated here. (Was the
     # parallel VENUES/DOMAINS constants kept in sync by a drift test; the registry is
-    # now the single source — see docs/venue-registry-design.md.)
+    # now the single source.)
     #
     # slug (the leading venue segment of /events/{id}-{slug}-{title}) => the venue's
     # [venue, locality, canton], so a merged event keeps one consistent location.

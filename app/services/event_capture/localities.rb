@@ -5,8 +5,7 @@ module EventCapture
   #
   # The canton half is here because a poster prints addresses, never canton codes, so
   # a model asked for one can only infer it and the evidence rule has nothing to
-  # police — while these rows already know the answer (see
-  # docs/user-event-capture-design.md).
+  # police — while these rows already know the answer.
   class Localities
     Entry = Data.define(:name, :canton)
 

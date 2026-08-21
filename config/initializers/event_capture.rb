@@ -6,9 +6,8 @@
 # EventCapture::Extractor returns an unconfigured failure instead of raising, so
 # dev/CI/first deploy all boot fine.
 #
-# The provider is settled by the measurement in
-# docs/user-event-capture-provider-evaluation.md:
-# Gemma 4 31B on Infomaniak, Swiss-hosted, 0/6 fabricated dates, ~6 cents/month.
+# The provider is settled by measurement (script/event_capture_bakeoff.rb): Gemma 4
+# 31B on Infomaniak, Swiss-hosted, 0/6 fabricated dates, ~6 cents/month.
 # The token needs the `ai-tools` scope; the product id is the AI product it is
 # issued against (`ruby script/event_capture_bakeoff.rb --list-infomaniak` prints
 # both it and the model ids).
@@ -16,7 +15,7 @@ module EventCaptureConfig
   # Model ids are per-vendor strings with no discovery at boot, so this is a
   # constant with an env override rather than something we resolve at runtime —
   # swapping models is a deliberate act (a prompt tuned for one model does NOT
-  # transfer to another; see docs/user-event-capture-provider-evaluation.md).
+  # transfer to another).
   DEFAULT_MODEL = "google/gemma-4-31B-it"
 
   module_function

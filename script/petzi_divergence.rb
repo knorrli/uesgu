@@ -3,7 +3,7 @@
 # DIVERGENCE HARNESS — run with: bin/rails runner script/petzi_divergence.rb
 # Read-only: runs each bespoke scraper LIVE in capture mode (no DB writes) and
 # the PETZI extraction for the same venue, then diffs them to quantify how much
-# reconciliation a keep-both merge would cost. Writes docs/petzi-divergence-report.md.
+# reconciliation a keep-both merge would cost. Writes tmp/petzi-divergence-report.md.
 
 require 'minitest/mock' # gives Object#stub in a plain runner
 
@@ -265,7 +265,7 @@ summary.each do |l|
   end
 end
 
-path = Rails.root.join('docs/petzi-divergence-report.md')
+path = Rails.root.join('tmp/petzi-divergence-report.md')
 File.write(path, report)
 puts "\nWrote #{path}"
 puts "\n=== SUMMARY ==="

@@ -8,7 +8,7 @@
 # Two questions it answers that logs cannot: is the provider erroring right now,
 # and is a given `issues` code trending against a prompt edit. That second one is
 # why every row carries the model AND the prompt sha: prompt tuning was measured
-# not to transfer between models (docs/user-event-capture-provider-evaluation.md).
+# not to transfer between models.
 class ExtractionAttempt < ApplicationRecord
   # The FK cascades in the database, which is what keeps `prune!` a single statement.
   has_many :field_outcomes, class_name: "ExtractionFieldOutcome", dependent: :delete_all,

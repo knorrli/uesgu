@@ -4,7 +4,7 @@
 # to render (see EventCapture::Extractor for why there is no queue).
 #
 # No event is persisted until a card is accepted; until then the queue lives only in
-# the DOM (docs/user-event-capture-design.md). What every decision does write is the
+# the DOM. What every decision does write is the
 # measurement: one ExtractionAttempt per input, and one ExtractionFieldOutcome per
 # field of every candidate a human published or dropped.
 class CapturesController < ApplicationController

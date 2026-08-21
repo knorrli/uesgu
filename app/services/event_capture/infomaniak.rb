@@ -5,8 +5,8 @@ module EventCapture
   # text part.
   #
   # Swiss-hosted, and chosen on accuracy rather than price: 0/6 fabricated dates
-  # against Mistral Small 4's 5/6, at ~6 cents a month either way
-  # (docs/user-event-capture-provider-evaluation.md). Net::HTTP rather than Mechanize,
+  # against Mistral Small 4's 5/6, at ~6 cents a month either way. Net::HTTP rather
+  # than Mechanize,
   # which exists for scraping HTML under robots enforcement — none of that applies to a
   # JSON API we hold an account with.
   class Infomaniak

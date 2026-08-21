@@ -7,7 +7,7 @@ class AddFoldedColumnsToPlaces < ActiveRecord::Migration[8.1]
   # plain similarity. Hence a second generated column per compared field, folding
   # separators TO SPACES where the fingerprint folds them AWAY — one clause apart,
   # same IMMUTABLE-only rules (translate() over a fixed accent set, never
-  # unaccent()). See docs/user-event-capture-design.md "Two columns, two jobs".
+  # unaccent()).
   #
   # Both must stay character-identical to Fingerprint.folded, which reproduces them
   # in Ruby for the query string and for registry venues, which have no row here.

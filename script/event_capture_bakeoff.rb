@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Event-extraction bake-off for the user-event-capture funnel. What it measured, and
-# the decision it settled: docs/user-event-capture-provider-evaluation.md.
+# Event-extraction bake-off for the user-event-capture funnel. It settled the
+# provider: Gemma 4 31B on Infomaniak, Swiss-hosted, 0/6 fabricated dates.
 #
 # Runs ONE prompt over six real sample images through every provider you have a
 # key for, then scores the results against event_capture_bakeoff_truth.json.

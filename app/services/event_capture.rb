@@ -3,9 +3,6 @@
 # the prompt, the provider call, and the code-side validators that undo what a
 # language model reliably gets wrong. The only thing persisted is one
 # ExtractionAttempt per call: metadata, never a field value.
-#
-# Decisions: docs/user-event-capture-design.md. The measurement behind the provider
-# choice: docs/user-event-capture-provider-evaluation.md.
 module EventCapture
   # Anything that stopped us getting an answer out of the provider — transport,
   # HTTP status, or a body we could not read. Not raised past Extractor, which

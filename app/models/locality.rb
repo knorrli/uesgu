@@ -142,10 +142,11 @@ class Locality < ApplicationRecord
   # Fold this locality into the one it is a name for ("Bienne" -> "Biel"). This
   # REWRITES, and deliberately: every read path groups on the literal tag string, so a
   # link nothing repoints leaves the town split across two nodes of the WHERE tree.
-  # Every event carrying a name that folds onto this one is retagged and every
-  # captured place under it is moved, while `canonical_id` keeps a capture arriving
-  # under this spelling resolving to the canonical from here on — which is what makes
-  # the merge survive the nightly re-derivation instead of being undone by it.
+  # Every event carrying a name that folds onto this one is retagged, every captured
+  # place under it is moved and every saved filter holding it is repointed, while
+  # `canonical_id` keeps a capture arriving under this spelling resolving to the
+  # canonical from here on — which is what makes the merge survive the nightly
+  # re-derivation instead of being undone by it.
   def merge_into!(other)
     # Merging into an alias means merging into what that alias names — resolving here
     # is what keeps `canonical_id` one hop deep, which is all Locality.resolve follows.
@@ -158,14 +159,15 @@ class Locality < ApplicationRecord
       aliases.update_all(canonical_id: target.id)
       retag_events(target.name)
       move_places(target.name)
+      rewrite_saved_filters(target.name)
     end
     Locality.reconcile!
   end
 
-  # Split an alias back out. Only the LINK is undone: the taggings and places the
-  # merge moved stay moved, the same way restoring a blocked genre does not bring its
-  # stripped taggings back. What this restores is the future — a capture under this
-  # spelling files here again.
+  # Split an alias back out. Only the LINK is undone: the taggings, places and saved
+  # filters the merge moved stay moved, the same way restoring a blocked genre does
+  # not bring its stripped taggings back. What this restores is the future — a capture
+  # under this spelling files here again.
   def unmerge!
     update!(canonical_id: nil)
     Locality.reconcile!
@@ -203,5 +205,28 @@ class Locality < ApplicationRecord
     Place.where.not(locality: canonical_name).find_each do |place|
       place.update!(locality: canonical_name) if Fingerprint.for(place.locality) == fingerprint
     end
+  end
+
+  # A saved filter's location names are a jsonb snapshot frozen at save time and
+  # matched as literal strings (see SavedFilter), so one left on the old name matches
+  # nothing the moment the events move — silently, in the saved scope, the digest and
+  # the feed highlighting alike.
+  def rewrite_saved_filters(canonical_name)
+    SavedFilter.find_each do |saved|
+      locations = saved.location_list
+      rewritten = locations.map { |name| Fingerprint.for(name) == fingerprint ? canonical_name : name }.uniq
+      next if rewritten == locations
+
+      saved.filter = saved.filter.merge("location_list" => rewritten)
+      redundant?(saved) ? saved.destroy! : saved.save!
+    end
+  end
+
+  # The rewrite can land a filter on a scope its owner already saved under the
+  # canonical spelling, which the one-filter-per-fingerprint rule forbids — dropping
+  # the copy that carries the merged-away name keeps the merge from failing that
+  # validation, and leaves the older filter's schedule and firing history intact.
+  def redundant?(saved)
+    saved.user.saved_filters.where.not(id: saved.id).any? { |other| other.fingerprint == saved.fingerprint }
   end
 end

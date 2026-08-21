@@ -25,8 +25,10 @@ issues sidestep that and self-close from PRs (`Closes #N`). Conventions:
 - **Anything that could become actionable → an issue.** Use `feature` / `chore` /
   `bug` / `documentation`; tag not-yet-active ideas `maybe-later`.
 - **Durable decisions and "we rejected X because Y" rationale do _not_ go in
-  issues** — they never close. Those belong in design docs under `docs/` (or the
-  assistant memory). Don't reopen a settled decision as an issue.
+  issues** — they never close. There is no `docs/` directory: that rationale goes in
+  the PR description (reviewed once, then archived) and, when it must survive, in the
+  assistant memory. Don't reopen a settled decision as an issue, and don't start a
+  design doc for it.
 
 There is a living styleguide at `/styleguide` (source: `app/views/styleguide/index.html.erb`). Every specimen renders the **real** shared element/partial with the app's CSS, so it stays truthful.
 
@@ -76,8 +78,9 @@ of them. Concretely, never write:
 State the substance instead: *why* the field is free text, *what* the threat model
 is, *which* measurement produced the number. If the full reasoning is too long,
 give the one-line reason in the comment and cite a **file path** (`see
-EventCapture::Extractor`, `docs/user-event-capture-design.md`) — a path is
-something the reader can open; an ordinal or a ticket number is not. The comment
+EventCapture::Extractor`, `script/event_capture_bakeoff.rb`) — a path is something
+the reader can open; an ordinal or a ticket number is not. Cite only a path that
+exists *now*: a pointer to a deleted file is worse than no pointer. The comment
 still has to make sense if they never open it.
 
 Prefer one dense comment at the top of a construct over running commentary inside
@@ -96,5 +99,6 @@ what actually slips through here:
 - Density: comments are dense here by house style, but a hunk that is ~40%+ comment
   is a prompt to cut, not a target to hit.
 
-Design rationale belongs in `docs/`, not duplicated in prose above the code that
-implements it. Link to the doc instead.
+Design rationale belongs in the PR description, not duplicated in prose above the
+code that implements it. Keep in the file only the one line the reader cannot do
+without.

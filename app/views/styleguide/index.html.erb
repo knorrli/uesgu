@@ -244,6 +244,18 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
+        <%= render "shared/suggestions", label: "Known towns:", chips: [
+              { label: "Bern", attrs: {} }, { label: "Biel", attrs: {} },
+              { label: "Thun", attrs: {} }] %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Suggestion row</span> · <code>shared/_suggestions</code> · <code>.suggestions</code>
+        <p class="sg-purpose">Values the app already carries, offered beside the field they fill — the capture card uses one for venues and one for the towns those venues sit in. The one place a <code>.chip</code> is clickable: tapping fills the field rather than stating a fact, and nothing ever auto-applies. Use it wherever a field has a short, ranked set of known answers; a set with no ranking belongs in a datalist instead, because chips for a whole vocabulary rank nothing.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
         <span class="badge">3</span>
         <span class="badge">+2 more</span>
       </div>

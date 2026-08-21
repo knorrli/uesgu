@@ -181,7 +181,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     visit capture_path
     pick "poster.png"
 
-    find(".capture-card__suggestions button", text: "Zorpsaal").click
+    find(".suggestions button", text: "Zorpsaal").click
     accept
     assert_selector ".capture-queue__tile[data-state=published]"
 
@@ -194,12 +194,59 @@ class CaptureScreenTest < ApplicationSystemTestCase
     visit capture_path
     pick "poster.png"
 
-    find(".capture-card__suggestions button", text: "Zorpsaal").click
+    find(".suggestions button", text: "Zorpsaal").click
     type("place", "Zorpkeller")
     accept
     assert_selector ".capture-queue__tile[data-state=published]"
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :corrected?
+  end
+
+  # The datalist behind the field shows nothing until you type, so the towns of the
+  # venues being suggested are the only ranking the field has (see #154).
+  test "the towns of the suggested venues are chips beside the locality field" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    place(name: "Zorpkeller", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Zorpwil", locality: nil,
+                                                         locality_evidence: nil, canton: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    towns = all(".suggestions button", text: "Zorpwil")
+    assert_equal 1, towns.size
+
+    towns.first.click
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "BE", field_value("canton")
+  end
+
+  # Tapping a town is taking the app's spelling over the poster's, exactly as tapping a
+  # venue is — and counted as a correction it would inflate the one number a prompt
+  # edit is judged on.
+  test "taking a town is recorded as a normalisation, not a correction" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Zorpwil",
+                                                         locality: "zorpwil",
+                                                         locality_evidence: "3000 zorpwil")])
+    visit capture_path
+    pick "poster.png"
+
+    find(".suggestions button", text: "Zorpwil").click
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+
+    assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :normalized?
+  end
+
+  # A venue nobody knows is exactly the case that mints a fresh spelling, and it is the
+  # case with no ranking to render — so the words are what say the suggestions exist.
+  test "with no venue to suggest, the locality field says the suggestions are there" do
+    CannedExtractionClient.install(events: [poster_event(place: nil, place_evidence: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".suggestions"
+    assert_selector ".capture-card", text: copy("candidate.locality_hint")
   end
 
   # The canton is computed from the locality once, server-side, at extraction — so a

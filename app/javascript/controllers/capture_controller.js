@@ -373,6 +373,17 @@ export default class extends Controller {
     this.sharePlace(card)
   }
 
+  // Fills the town and nothing else. The reason to tap one of these is that the venue
+  // is NOT among the places being suggested, so writing a place here would replace the
+  // contributor's reading of the poster with one nobody offered.
+  applyLocality(event) {
+    const card = event.target.closest(".capture-card")
+    const { locality, canton } = event.params
+    this.setField(card, "locality", locality, { normalized: true })
+    if (canton) this.setField(card, "canton", canton, { normalized: true })
+    this.sharePlace(card)
+  }
+
   carryPlace(event) {
     const card = event.target.closest(".capture-card")
     // A field the contributor typed in themselves is their reading of the poster,

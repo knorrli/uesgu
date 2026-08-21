@@ -1,4 +1,5 @@
 <% content_for :title, t('capture.title') %>
+<% localities = capture_localities %>
 
 <div class="capture flex flex-col gap-large"
      data-controller="capture"
@@ -9,7 +10,8 @@
      data-capture-error-value="<%= t('capture.failures.unreachable') %>"
      data-capture-undecodable-value="<%= t('capture.failures.image_unsupported') %>"
      data-capture-remove-value="<%= t('capture.staging.remove') %>"
-     data-capture-source-alt-value="<%= t('capture.row.source_alt') %>">
+     data-capture-source-alt-value="<%= t('capture.row.source_alt') %>"
+     data-capture-localities-value="<%= localities.to_json %>">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1><%= t('capture.title') %></h1>
     <p class="muted"><%= t('capture.intro') %></p>
@@ -45,7 +47,7 @@
       while an unlisted one can still be typed: this field is free text, not a
       closed set. %>
   <datalist id="capture-localities">
-    <% capture_localities.each do |locality| %><option value="<%= locality %>"></option><% end %>
+    <% localities.each_key do |locality| %><option value="<%= locality %>"></option><% end %>
   </datalist>
 
   <%# Progress, navigation and receipts in one strip: a card publishes the moment it

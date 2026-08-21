@@ -48,6 +48,19 @@ class EventCapture::LocalitiesTest < ActiveSupport::TestCase
     assert_equal "BE", localities(["Zorpwil", "BE"], ["Zorp-wil", "BE"]).canton_for("Zorpwil")
   end
 
+  test "the offered names carry the canton picking them computes to" do
+    assert_equal({ "Zorpwil" => "BE", "Flarnhausen" => "AG" },
+                 localities(["Zorpwil", "BE"], ["Flarnhausen", "AG"]).cantons_by_name)
+  end
+
+  test "an ambiguous name is still offered, with nothing to fill from it" do
+    assert_equal({ "Zorpwil" => nil }, localities(["Zorpwil", "BE"], ["Zorpwil", "AG"]).cantons_by_name)
+  end
+
+  test "two spellings of one name are one option, under the registry's" do
+    assert_equal({ "Zorpwil" => "BE" }, localities(["Zorpwil", "BE"], ["ZORP-WIL", "BE"]).cantons_by_name)
+  end
+
   test "reads the registry and captured places, registry spelling first" do
     venue = Venue.in_taxonomy.find { |v| v.locality.present? }
     skip "no placed venue" if venue.nil?

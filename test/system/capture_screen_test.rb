@@ -172,6 +172,45 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :corrected?
   end
 
+  # The canton is computed from the locality once, server-side, at extraction — so a
+  # locality changed on the card has to bring its own (see EventCapture::Localities).
+  test "a locality the app already knows fills the canton beside it" do
+    place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal "BE", field_value("canton")
+    type "locality", "Flarnhausen"
+
+    assert_equal "AG", field_value("canton")
+  end
+
+  # Clearing it would throw away the model's own postcode reading, which is the reason
+  # the field is still asked for at all.
+  test "a locality nobody knows leaves the canton standing" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    type "locality", "Neuzorp"
+
+    assert_equal "BE", field_value("canton")
+  end
+
+  test "a canton filled from the locality is recorded as a normalisation, not a correction" do
+    place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    type "locality", "Flarnhausen"
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+
+    assert_predicate ExtractionFieldOutcome.find_by(field: "canton"), :normalized?
+  end
+
   # A drop never reaches the server on its own, and it is the read worth the most:
   # the contributor looked at the card and threw all of it away.
   test "a dropped card reports what the model had proposed" do

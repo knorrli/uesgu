@@ -126,12 +126,14 @@ label.tag:has(input:checked) {
 }
 
 /* Event markers — a quiet chip sub-family appended AFTER an event title to add
-   status/source info WITHOUT competing with it. Smaller than a base .chip and
+   status/provenance info WITHOUT competing with it. Smaller than a base .chip and
    still borderless (read-only info); colour = severity: cancelled (warn-red) →
-   rescheduled (sand heads-up) → source (the neutral base-.chip grey). They trail
-   the title link, so each takes a small leading gap. Used on the events list. */
+   rescheduled (sand heads-up) → community and source (the neutral base-.chip
+   grey). They trail the title link, so each takes a small leading gap. Used on
+   the events list. */
 .chip--cancelled,
 .chip--moved,
+.chip--community,
 .chip--source {
   margin-left: 0.5ch;
   vertical-align: middle;

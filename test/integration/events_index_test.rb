@@ -36,6 +36,19 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "a captured event is marked Community, a scraped one is not" do
+    captured = event(title: "CommunityShow", start_date: Date.current + 3, url: nil,
+                     data_source: EventCapture::Creator::DATA_SOURCE)
+    scraped = event(title: "ScrapedShow", start_date: Date.current + 3,
+                    url: "https://venue.test/show", data_source: "OLE:Klangkeller")
+
+    get events_path
+
+    assert_select "##{ActionView::RecordIdentifier.dom_id(captured)} .event-title .chip--community"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(scraped)} .event-title .chip--community", false,
+                  "a scraper re-derives its events nightly, so they carry no provenance caveat"
+  end
+
   # The empty-state message keys off "does the filter match anything at all", not
   # the current page's slice — otherwise paging past the last result falsely
   # claims the filter matched nothing.

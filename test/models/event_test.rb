@@ -37,6 +37,12 @@ class EventTest < ActiveSupport::TestCase
     assert_equal [called_off.id], Event.cancelled.map(&:id)
   end
 
+  test "captured? tracks the capture funnel's stamp, not any scraper source" do
+    assert event(data_source: EventCapture::Creator::DATA_SOURCE).captured?
+    refute event(data_source: "OLE:Klangkeller").captured?
+    refute event(data_source: nil).captured?
+  end
+
   test "visible scope excludes dismissed events (even when not hidden)" do
     shown = event(hidden: false)
     gone = event(hidden: false)

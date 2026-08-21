@@ -63,6 +63,12 @@ class Event < ApplicationRecord
     rescheduled_at.present?
   end
 
+  # Nothing re-derives a captured event nightly the way a scraper re-derives its
+  # own, so its details age in place — the reason the card marks it "Community".
+  def captured?
+    data_source == EventCapture::Creator::DATA_SOURCE
+  end
+
   def dismissed?
     dismissed_at.present?
   end

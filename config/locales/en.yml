@@ -781,6 +781,8 @@ en:
   events:
     cancelled: Cancelled
     rescheduled: New date
+    community: Community
+    community_hint: Added by someone from the community, not scraped from a venue's own site
     delete_event: Delete event
     edit_event: Edit event
     edit_tag: Edit tag

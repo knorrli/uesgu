@@ -19,6 +19,37 @@ class CaptureTest < ActionDispatch::IntegrationTest
     EventCapture::Extractor::Extraction.new(candidates: candidates, code: code, error: error)
   end
 
+  test "a blank card needs no model call, and carries no attempt to be judged on" do
+    sign_in_as user(contributor: true)
+
+    assert_no_difference -> { ExtractionAttempt.count } do
+      post blank_capture_path, params: { row_id: "abc" }, as: :turbo_stream
+    end
+
+    assert_response :success
+    assert_select "turbo-stream[target=capture-row-abc]"
+    assert_match(/capture-card/, response.body)
+  end
+
+  test "a blank card publishes through the same path as an extracted one" do
+    sign_in_as user(contributor: true)
+
+    assert_difference -> { Event.count } => 1 do
+      post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
+                                   canton: "BE" }, as: :turbo_stream
+    end
+
+    assert_equal "Zorp Fest", Event.last.title
+  end
+
+  test "entering by hand is closed to accounts without the capability" do
+    sign_in_as user
+
+    post blank_capture_path, params: { row_id: "abc" }, as: :turbo_stream
+
+    assert_response :forbidden
+  end
+
   test "the screen is closed to accounts without the capability" do
     sign_in_as user
     get capture_path

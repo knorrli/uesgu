@@ -142,6 +142,8 @@ de:
     staging:
       drop_label: Poster hierhin ziehen oder antippen
       add_text: Text hinzufügen
+      add_by_hand: Von Hand eingeben
+      by_hand: Von Hand eingegeben
       commit: Auslesen
       remove: Entfernen
       start_over: Von vorne

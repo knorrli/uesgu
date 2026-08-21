@@ -23,7 +23,8 @@ export default class extends Controller {
     remove: String,
     sourceAlt: String,
     maxEdge: { type: Number, default: 1568 },
-    concurrency: { type: Number, default: 3 }
+    concurrency: { type: Number, default: 3 },
+    localities: Object
   }
 
   // What each row was read from, held only in the browser: nothing is uploaded for
@@ -362,10 +363,24 @@ export default class extends Controller {
   }
 
   carryPlace(event) {
+    const card = event.target.closest(".capture-card")
     // A field the contributor typed in themselves is their reading of the poster,
     // whatever a suggestion put there before.
-    this.markNormalized(event.target.closest(".capture-card"), event.target.name, false)
-    if (PLACE_FIELDS.includes(event.target.name)) this.sharePlace(event.target.closest(".capture-card"))
+    this.markNormalized(card, event.target.name, false)
+    if (event.target.name === "locality") this.placeLocality(card, event.target.value)
+    if (PLACE_FIELDS.includes(event.target.name)) this.sharePlace(card)
+  }
+
+  // Extraction computes the canton from the locality once, server-side, so a locality
+  // changed here would otherwise keep the canton the one it replaced was placed in.
+  // A locality matching nothing leaves the canton ALONE rather than clearing it — it
+  // may hold the model's own postcode reading, which is why the field is still asked
+  // for at all, or a value a human picked by hand.
+  placeLocality(card, typed) {
+    const canton = this.localitiesValue[typed.trim()]
+    if (!canton || canton === this.fieldValue(card, "canton")) return
+
+    this.setField(card, "canton", canton, { normalized: true })
   }
 
   // Taking the registry's spelling is a normalisation, not a report that the model

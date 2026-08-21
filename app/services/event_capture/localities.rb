@@ -38,14 +38,23 @@ module EventCapture
     # nil rather than a guess where the same name sits in more than one canton: Buchs
     # is a locality in SG, AG, ZH and LU alike, and answering with whichever row
     # loaded first is the wrong-canton bug this exists to prevent.
-    def canton_for(typed)
-      cantons = matching(typed).filter_map { |entry| entry.canton.presence }.uniq
-      cantons.first if cantons.one?
+    def canton_for(typed) = canton_of(matching(typed))
+
+    # Every name worth offering, against the canton picking it computes to — nil where
+    # the name is one of the ambiguous ones and picking it settles nothing. One row per
+    # town rather than per source: two spellings of the same name are the same option.
+    def cantons_by_name
+      by_key.values.to_h { |entries| [entries.first.name, canton_of(entries)] }
     end
 
     private
 
     attr_reader :entries
+
+    def canton_of(entries)
+      cantons = entries.filter_map { |entry| entry.canton.presence }.uniq
+      cantons.first if cantons.one?
+    end
 
     # The FINGERPRINT, not the folded form: folded keeps word boundaries (by design —
     # the trigram measure needs them), so it reads "Zorp-wil" and "Zorpwil" as

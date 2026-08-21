@@ -41,9 +41,10 @@ module EventCapture
       def client_factory = @client_factory || -> { Infomaniak.new }
     end
 
-    def initialize(input:, today: Time.zone.today, client: self.class.client_factory.call)
+    def initialize(input:, today: Time.zone.today, correction: nil, client: self.class.client_factory.call)
       @input = input
       @today = today
+      @correction = correction
       @client = client
     end
 
@@ -60,14 +61,14 @@ module EventCapture
 
     private
 
-    attr_reader :input, :today, :client
+    attr_reader :input, :today, :correction, :client
 
     def extract
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       return Extraction.new(error: input.error, code: input.code) unless input.ok?
       return Extraction.new(medium: input.kind, error: UNCONFIGURED, code: :unconfigured) unless client.configured?
 
-      response = client.call(input: input, today: today)
+      response = client.call(input: input, today: today, correction: correction)
       events = Array(parse(response.text)["events"])
       # Once per response, not once per candidate: a poster advertising eight events
       # would otherwise re-query the taxonomy eight times.

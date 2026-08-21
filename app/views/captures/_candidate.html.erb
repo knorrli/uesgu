@@ -9,7 +9,8 @@
 <% pane = manual ? { source: tag.p(t('capture.staging.by_hand'), class: "muted") }
                  : { source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } } } %>
 <%= render layout: "shared/review_card",
-      locals: { id: key, actions: render("captures/card_actions", key: key), frame_class: "capture-card",
+      locals: { id: key, actions: render("captures/card_actions", key: key, rereadable: !manual),
+                frame_class: "capture-card",
                 frame_attrs: { data: { capture_target: "card", state: "open" } }, **pane } do %>
   <%= form_with url: capture_path, method: :post, id: "#{key}-form",
         class: "capture-card__fields account-form flex flex-col gap-small",
@@ -113,6 +114,30 @@
       </div>
       <span class="muted"><%= t('capture.candidate.genres_hint') %></span>
     </label>
+  <% end %>
+
+  <%# OUTSIDE the form, and deliberately: this is a report on the read, not a value of
+      the event, and posting it with the publish would file it as one.
+
+      Flagging beats re-sending the same request, because the provider is asked for no
+      `temperature` and a model sampling deterministically answers an identical
+      request identically (see EventCapture::Correction). %>
+  <%# A hand-entered card has no input to read again. %>
+  <% unless manual %>
+    <div class="capture-card__reread account-form flex flex-col gap-small">
+      <span class="muted"><%= t('capture.reread.label') %></span>
+      <div class="flex gap-xsmall wrap">
+        <% EventCapture::Correction::FIELDS.each do |field| %>
+          <label class="tag">
+            <%= check_box_tag "wrong", field, false, id: nil %>
+            <%= t("capture.candidate.#{field}") %>
+          </label>
+        <% end %>
+      </div>
+      <%= text_field_tag :note, nil, id: nil, class: "capture-card__note",
+            placeholder: t('capture.reread.note_placeholder') %>
+      <p class="muted" data-spent hidden><%= t('capture.reread.spent') %></p>
+    </div>
   <% end %>
 
   <%# The interesting column: what the model claimed and we refused, and why. A

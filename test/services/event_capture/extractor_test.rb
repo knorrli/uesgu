@@ -129,6 +129,26 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     assert_equal 2, attempt.issues["time_unparseable"]
   end
 
+  # A re-read is the same prompt with a report appended, so it is attributable to the
+  # same wording: a sha per contributor's sentence would measure contributors.
+  test "a report rides to the provider without moving the sha it is recorded under" do
+    client = FakeClient.new(text: payload)
+    correction = EventCapture::Correction.from(fields: "date", note: "it says 21 August")
+
+    EventCapture::Extractor.call(input: EventCapture::Input.image("PNG-ish", media_type: "image/png"),
+                                 today: TODAY, correction: correction, client: client)
+
+    assert_equal correction, client.calls.sole[:correction]
+    assert_equal EventCapture::Prompt.sha(medium: :image), ExtractionAttempt.sole.prompt_sha
+  end
+
+  test "a first read carries no report" do
+    client = FakeClient.new(text: payload)
+    extract(client)
+
+    assert_nil client.calls.sole[:correction]
+  end
+
   # The whole point of separating ProviderError's message from its detail: a
   # screenshot's model output can name the person who sent it.
   test "a failed attempt records the code and the neutral message, never the provider payload" do

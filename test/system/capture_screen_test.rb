@@ -248,6 +248,64 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-card", count: 2, visible: :all
   end
 
+  # The third option beside publish and drop. The flags are what make it more than a
+  # coin flip — see EventCapture::Correction for why an identical request is not one.
+  test "a re-read appends a fresh card instead of replacing the one being disputed" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    mark "date"
+    find(".capture-card__note").set("da steht der 21. August")
+    reread
+
+    assert_selector ".capture-card", count: 2, visible: :all
+    assert_selector ".capture-queue__group", count: 2
+
+    reported = CannedExtractionClient.corrections.compact.sole
+    assert_equal %w[date], reported.fields
+    assert_equal "da steht der 21. August", reported.note
+  end
+
+  test "a re-read with nothing marked is still a second look" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    reread
+    assert_selector ".capture-card", count: 2, visible: :all
+
+    assert_empty CannedExtractionClient.corrections.compact.sole.fields
+  end
+
+  # Every re-read is a paid third-party call, so the budget is per INPUT: the cards a
+  # re-read produces do not arrive with one of their own.
+  test "a poster gets two re-reads and then says why there are no more" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    reread
+    assert_selector ".capture-card", count: 2, visible: :all
+    reread
+    assert_selector ".capture-card", count: 3, visible: :all
+
+    assert_selector ".capture-card__reread", text: copy("reread.spent")
+    assert find(".capture-card .action-bar button[data-action='capture#reread']").disabled?
+  end
+
+  # There is no input to read again, so offering it would be a button that cannot work.
+  test "a hand-entered card is not offered a re-read" do
+    visit capture_path
+    find("button[data-action='capture#stageBlank']").click
+    assert_selector ".drop-zone__item"
+    commit
+
+    assert_selector ".capture-card"
+    assert_no_selector ".capture-card .action-bar button[data-action='capture#reread']"
+    assert_no_selector ".capture-card__reread"
+  end
+
   # A drop never reaches the server on its own, and it is the read worth the most:
   # the contributor looked at the card and threw all of it away.
   test "a dropped card reports what the model had proposed" do
@@ -551,7 +609,11 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def accept = find(".capture-card .action-bar input[type=submit]").click
 
-  def reject = find(".capture-card .action-bar button").click
+  def reject = find(".capture-card .action-bar button[data-action='capture#reject']").click
+
+  def reread = find(".capture-card .action-bar button[data-action='capture#reread']").click
+
+  def mark(field) = find(".capture-card__reread label.tag", text: copy("candidate.#{field}")).click
 
   def cite(quote) = I18n.t("shared.cite", locale: :de, quote: quote)
 

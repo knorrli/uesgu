@@ -72,6 +72,21 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     assert_raises(KeyError) { EventCapture::Prompt.instructions(today: TODAY, medium: :pdf) }
   end
 
+  # A re-read has to differ from the read it disputes: the provider is asked for no
+  # `temperature`, so an identical request may come back identically wrong.
+  test "a contributor's report joins the instructions ahead of the closing rule" do
+    correction = EventCapture::Correction.from(fields: "date", note: "it says 21 August")
+    instructions = EventCapture::Prompt.instructions(today: TODAY, correction: correction)
+
+    assert_match "THIS IS A SECOND READ", instructions
+    assert_match "These fields are wrong: `date`", instructions
+    assert_match(/filled from nothing\.\n\nReturn ONLY a JSON object/, instructions)
+  end
+
+  test "a first read is the prompt it always was" do
+    refute_match "SECOND READ", EventCapture::Prompt.instructions(today: TODAY)
+  end
+
   # The sha is what attributes a change in the recorded numbers to a prompt edit, so
   # it must move only when the wording does — hashing the rendered prompt would
   # remint it every night, because the date is interpolated into it.

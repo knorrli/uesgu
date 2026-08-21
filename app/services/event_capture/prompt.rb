@@ -68,7 +68,7 @@ module EventCapture
       Digest::SHA256.hexdigest(instructions(today: SHA_DATE, medium: medium))[0, 12]
     end
 
-    def instructions(today:, medium: :image)
+    def instructions(today:, medium: :image, correction: nil)
       m = MEDIA.fetch(medium)
 
       <<~TXT
@@ -147,6 +147,7 @@ module EventCapture
         A value in any other shape is discarded, so the work is wasted — emit null
         rather than a differently-formatted value.
 
+        #{correction&.to_prompt}
         Return ONLY a JSON object matching the provided schema. No prose, no markdown.
       TXT
     end

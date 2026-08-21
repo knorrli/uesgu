@@ -152,6 +152,7 @@ en:
       done: All decided.
     actions:
       accept: Publish
+      reread: Read again
       reject: Drop
     card:
       published: "%{title} is live."
@@ -180,6 +181,10 @@ en:
       genres_hint: Enter adds one. New genres are fine — if one already exists, take that instead.
       past: This date has passed.
       refused: "Not used: %{values}"
+    reread:
+      label: "Wrong? Mark what to read again:"
+      note_placeholder: What does it actually say?
+      spent: No more re-reads for this one.
     failures:
       image_empty: That image was empty.
       image_too_large: That image is too big (8 MB max).

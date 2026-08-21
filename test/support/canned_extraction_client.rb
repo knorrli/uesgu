@@ -8,9 +8,17 @@
 class CannedExtractionClient
   # `events` are hashes in the shape EventCapture::Prompt::SCHEMA asks the model
   # for; `raises` makes every call fail the way a provider outage does.
-  def self.install(...) = EventCapture::Extractor.client_factory = -> { new(...) }
+  def self.install(...)
+    corrections.clear
+    EventCapture::Extractor.client_factory = -> { new(...) }
+  end
 
   def self.uninstall = EventCapture::Extractor.client_factory = nil
+
+  # One entry per call, nil where there was nothing to correct. Class-level because
+  # the factory builds a fresh client per extraction, and a test driving the real
+  # screen has no hold on the instance the Puma thread made.
+  def self.corrections = @corrections ||= []
 
   def initialize(events: [], raises: nil)
     @events = events
@@ -19,7 +27,8 @@ class CannedExtractionClient
 
   def configured? = true
 
-  def call(**)
+  def call(**args)
+    self.class.corrections << args[:correction]
     raise EventCapture::ProviderError, raises if raises
 
     EventCapture::Infomaniak::Response.new(text: JSON.generate(events: events),

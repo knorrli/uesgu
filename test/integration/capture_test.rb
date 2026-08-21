@@ -94,6 +94,35 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match "Zorp Fest II", response.body
   end
 
+  # The card posts the report; the extractor is what has to receive it, because the
+  # prompt is the only thing that makes a second read differ from the first.
+  test "a re-read carries the marked fields and the note into the extraction" do
+    sign_in_as user(contributor: true)
+    seen = nil
+
+    EventCapture::Extractor.stub(:call, ->(**args) { seen = args[:correction]; extraction }) do
+      post extract_capture_path,
+           params: { row_id: "abc123", text: "...", reread: "1", wrong: "date,place",
+                     note: "the poster says 21 August" },
+           headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_equal %w[date place], seen.fields
+    assert_equal "the poster says 21 August", seen.note
+  end
+
+  test "a first read reaches the extractor with nothing to correct" do
+    sign_in_as user(contributor: true)
+    seen = :unset
+
+    EventCapture::Extractor.stub(:call, ->(**args) { seen = args[:correction]; extraction }) do
+      post extract_capture_path, params: { row_id: "abc123", text: "..." },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_nil seen
+  end
+
   # A DOM id is interpolated from it, so anything else must not reach the markup.
   test "extract ignores a row id that is not a plain token" do
     sign_in_as user(contributor: true)

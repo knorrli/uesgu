@@ -152,6 +152,7 @@ fr:
       done: Tout est décidé.
     actions:
       accept: Publier
+      reread: Relire
       reject: Écarter
     card:
       published: "%{title} est en ligne."
@@ -180,6 +181,10 @@ fr:
       genres_hint: Entrée pour ajouter. Les nouveaux genres sont permis — si un genre existe déjà, prends-le.
       past: Cette date est passée.
       refused: "Non retenu : %{values}"
+    reread:
+      label: "Faux ? Coche ce qu'il faut relire :"
+      note_placeholder: Qu'est-ce qui est vraiment écrit ?
+      spent: Plus de relecture pour celui-ci.
     failures:
       image_empty: Cette image était vide.
       image_too_large: Cette image est trop lourde (8 Mo max).

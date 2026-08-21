@@ -26,7 +26,8 @@ export default class extends Controller {
     concurrency: { type: Number, default: 3 },
     localities: Object,
     blankUrl: String,
-    byHand: String
+    byHand: String,
+    rereadLimit: { type: Number, default: 2 }
   }
 
   // What each row was read from, held only in the browser: nothing is uploaded for
@@ -36,6 +37,8 @@ export default class extends Controller {
     this.sources = new Map()
     this.staged = new Map()
     this.places = new Map()
+    this.inputs = new Map()
+    this.rereads = new Map()
     this.currentId = null
   }
 
@@ -140,12 +143,23 @@ export default class extends Controller {
     this.inputTarget.hidden = true
     this.restartTarget.hidden = false
     batch.filter((staged) => !staged.blank).forEach((staged) => {
-      this.sources.set(this.rowId(staged.id), staged.text ? { text: staged.text } : { objectUrl: staged.objectUrl })
+      this.remember(this.rowId(staged.id), staged.id, staged.text
+        ? { label: staged.name, text: staged.text }
+        : { label: staged.name, objectUrl: staged.objectUrl, blob: staged.blob })
     })
     this.run(batch.map((staged) => () => staged.blank
       ? this.addBlank(staged.id, staged.name)
       : this.extract(staged.text ? { text: staged.text } : { image: staged.blob, filename: staged.name },
                      staged.name, staged.id)))
+  }
+
+  // The downscaled blob is held beside the object URL the pane paints from: a re-read
+  // has to send the input a second time, and nothing was ever uploaded to fetch back.
+  // `inputs` is what ties a row to it — a re-read's row is a different row off the
+  // same input.
+  remember(rowId, inputId, source) {
+    this.sources.set(rowId, source)
+    this.inputs.set(rowId, inputId)
   }
 
   // Destructive on purpose: there is no way back to a queue of half-decided cards, so
@@ -154,6 +168,8 @@ export default class extends Controller {
     this.release(this.sources)
     this.release(this.staged)
     this.places.clear()
+    this.inputs.clear()
+    this.rereads.clear()
     this.itemsTarget.replaceChildren()
     this.rowsTarget.replaceChildren()
     this.stripTarget.replaceChildren()
@@ -211,7 +227,52 @@ export default class extends Controller {
     this.placeCard(card)
     card.hidden = card.id !== this.currentId
     this.sharePlace(card)
+    this.refreshRereads()
     if (!this.currentId) this.open(card.id)
+  }
+
+  // A new row at the END of the queue, never a replacement: the read being disputed
+  // stays on screen to compare against, and the strip's denominator grows.
+  async reread(event) {
+    const card = event.target.closest(".capture-card")
+    const rowId = card.closest(".capture-row")?.id
+    const input = this.inputs.get(rowId)
+    const source = this.sources.get(rowId)
+    const spent = this.rereads.get(input) ?? 0
+    if (!source || spent >= this.rereadLimitValue) return
+
+    this.rereads.set(input, spent + 1)
+    const id = `${input}-r${spent + 1}`
+    this.remember(this.rowId(id), input, source)
+    this.refreshRereads()
+
+    const sent = source.blob ? { image: source.blob, filename: source.label } : { text: source.text }
+    await this.extract({ ...sent, ...this.reportFrom(card) }, source.label, id)
+  }
+
+  reportFrom(card) {
+    const flags = Array.from(card.querySelectorAll(".capture-card__reread input:checked"))
+    return {
+      reread: true,
+      wrong: flags.map((flag) => flag.value).join(","),
+      note: card.querySelector(".capture-card__note")?.value ?? ""
+    }
+  }
+
+  // Counted per INPUT and not per card: the cards a re-read produces would otherwise
+  // arrive with a budget of their own, and every card off one poster spends the same
+  // one. A published card is frozen and stays that way.
+  refreshRereads() {
+    this.cardTargets.forEach((card) => {
+      const button = card.querySelector("[data-action~='capture#reread']")
+      if (!button || card.dataset.state === "published") return
+
+      const rowId = card.closest(".capture-row")?.id
+      const left = this.rereadLimitValue - (this.rereads.get(this.inputs.get(rowId)) ?? 0)
+      button.disabled = left <= 0 || !this.sources.has(rowId)
+      const spent = card.querySelector("[data-spent]")
+      if (spent) spent.hidden = left > 0
+    })
   }
 
   jump(event) {
@@ -462,6 +523,11 @@ export default class extends Controller {
     body.append("label", label)
     if (payload.text !== undefined) body.append("text", payload.text)
     if (payload.image !== undefined) body.append("image", payload.image, payload.filename)
+    if (payload.reread) {
+      body.append("reread", "1")
+      body.append("wrong", payload.wrong)
+      body.append("note", payload.note)
+    }
 
     try {
       const response = await fetch(this.urlValue, {

@@ -152,6 +152,7 @@ de:
       done: Alles entschieden.
     actions:
       accept: Veröffentlichen
+      reread: Nochmal lesen
       reject: Verwerfen
     card:
       published: "%{title} ist live."
@@ -180,6 +181,10 @@ de:
       genres_hint: Enter fügt eins hinzu. Neue Genres sind ok — wenn es eins schon gibt, lieber das nehmen.
       past: Dieses Datum ist vorbei.
       refused: "Nicht übernommen: %{values}"
+    reread:
+      label: "Falsch? Markier, was nochmal gelesen werden soll:"
+      note_placeholder: Was steht da wirklich?
+      spent: Für dieses hier gibt es kein Nochmal mehr.
     failures:
       image_empty: Das Bild war leer.
       image_too_large: Das Bild ist zu gross (max. 8 MB).

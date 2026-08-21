@@ -15,6 +15,11 @@
       <span class="stat__leader"></span>
       <dd class="muted"><%= @event_tag_stats.location_tags.count %></dd>
     </div>
+    <div class="stat">
+      <dt><%= link_to Locality.model_name.human(count: :many), admin_localities_path, class: 'stat-link' %></dt>
+      <span class="stat__leader"></span>
+      <dd class="muted"><%= Locality.canonicals.count %></dd>
+    </div>
   </dl>
 
   <section class="flex flex-col gap-small">

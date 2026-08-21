@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_20_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -127,6 +127,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_140000) do
     t.index ["code"], name: "index_invitations_on_code", unique: true
     t.index ["created_by_id"], name: "index_invitations_on_created_by_id"
     t.index ["redeemed_by_id"], name: "index_invitations_on_redeemed_by_id"
+  end
+
+  create_table "localities", force: :cascade do |t|
+    t.bigint "canonical_id"
+    t.string "canton"
+    t.datetime "created_at", null: false
+    t.integer "events_count", default: 0, null: false
+    t.virtual "fingerprint", type: :string, as: "regexp_replace(translate(replace(replace(lower((name)::text), '&'::text, 'and'::text), '''n'''::text, 'and'::text), 'äöüàâéèêëïîôûç'::text, 'aouaaeeeeiiouc'::text), '[^a-z0-9]'::text, ''::text, 'g'::text)", stored: true
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["canonical_id"], name: "index_localities_on_canonical_id"
+    t.index ["fingerprint"], name: "index_localities_on_fingerprint", unique: true
+    t.check_constraint "canonical_id IS NULL OR canonical_id <> id", name: "localities_canonical_not_self"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -317,6 +330,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_140000) do
   add_foreign_key "genres", "genres", column: "parent_id"
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
+  add_foreign_key "localities", "localities", column: "canonical_id"
   add_foreign_key "notifications", "saved_filters"
   add_foreign_key "notifications", "users"
   add_foreign_key "places", "places", column: "canonical_id"

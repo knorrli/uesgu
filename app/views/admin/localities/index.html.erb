@@ -1,0 +1,57 @@
+<%# The locality rows behind the locations browser. Same catalogue idiom as the
+    events / locations / genres indexes — filter, search, sort, paginate — with the
+    merge link as the one action, since combining two spellings of one town is the
+    only thing there is to decide about a locality. %>
+<% content_for :title, t('.title') %>
+<div class="flex flex-col gap-large">
+  <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>
+    <h1><%= t('admin.localities.index.title') %> <span class="muted"><%= @localities.total_count %></span></h1>
+  <% end %>
+
+  <div class="flex gap-small wrap align-baseline catalogue-filters">
+    <% %w[all aliased unsettled].each do |status| %>
+      <%= link_to t(".status_#{status}"),
+            admin_localities_path(status: (status == 'all' ? nil : status), q: params[:q].presence, sort: params[:sort].presence),
+            class: class_names(:tag, active: @status == status) %>
+    <% end %>
+  </div>
+
+  <%= form_with url: admin_localities_path, method: :get, data: { turbo_frame: '_top' } do %>
+    <%= hidden_field_tag :status, params[:status] if params[:status].present? %>
+    <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+    <div class="input-wrapper flex">
+      <%= text_field_tag :q, params[:q], placeholder: t('.search'), autocomplete: 'off' %>
+    </div>
+  <% end %>
+
+  <div class="flex gap-small align-baseline muted catalogue-sort">
+    <span><%= t('.sort_by') %></span>
+    <% %w[name count].each do |sort| %>
+      <%= link_to t(".sort_#{sort}"),
+            admin_localities_path(status: params[:status].presence, q: params[:q].presence, sort: sort),
+            class: class_names('catalogue-sort-option', active: @sort == sort) %>
+    <% end %>
+  </div>
+
+  <% if @localities.any? %>
+    <div class="flex flex-col gap-small">
+      <% @localities.each do |locality| %>
+        <div class="flex align-baseline gap-medium wrap catalogue-row">
+          <%= link_to locality.name, edit_admin_locality_path(locality) %>
+          <span class="muted catalogue-count"><%= locality.events_count %>&times;</span>
+          <% if locality.alias? %>
+            <span class="chip"><%= t('.merged_into', canonical: locality.canonical.name) %></span>
+          <% elsif locality.canton.present? %>
+            <span class="chip"><%= locality.canton %></span>
+          <% else %>
+            <span class="chip"><%= t('.canton_unknown') %></span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%= render 'shared/pagination', collection: @localities %>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

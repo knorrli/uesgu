@@ -203,7 +203,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   # The canton is computed from the locality once, server-side, at extraction — so a
-  # locality changed on the card has to bring its own (see EventCapture::Localities).
+  # locality changed on the card has to bring its own (see Locality).
   test "a locality the app already knows fills the canton beside it" do
     place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
     CannedExtractionClient.install(events: [poster_event])

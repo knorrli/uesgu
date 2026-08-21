@@ -56,7 +56,7 @@ module EventCapture
 
     def title = attrs[:title].to_s.strip
     def description = attrs[:description].to_s.strip.presence
-    def locality = @locality ||= localities.canonical(attrs[:locality].to_s.strip)
+    def locality = @locality ||= Locality.canonical_name(attrs[:locality].to_s.strip)
     def canton = attrs[:canton].to_s.strip
     def place_name = attrs[:place].to_s.strip
     def url
@@ -68,8 +68,6 @@ module EventCapture
       nil
     end
     def genres = Array(attrs[:genres]).map { |g| g.to_s.strip }.compact_blank
-
-    def localities = @localities ||= Localities.known
 
     # Strict ISO, not Date.parse: Date.parse("next Friday") does not raise, it
     # returns a date near today — the same silent-today footgun the scrapers hit
@@ -104,6 +102,10 @@ module EventCapture
       # scraped ones do — and a capture carrying only non-music genres is hidden by
       # the same rule rather than by a second one written here.
       event.recompute_visibility!
+      # The locality has no such hook of its own. Minting it here rather than waiting
+      # for the nightly reconcile is what puts a fresh spelling in front of an admin
+      # while the poster it came from is still the reason it is there.
+      Locality.ensure!(event.location_list.select { |tag| Location.type_for(tag) == :locality })
       event
     end
 

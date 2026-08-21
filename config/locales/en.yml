@@ -649,6 +649,32 @@ en:
           normalized: Normalised
           removed: Removed
           discarded: Discarded
+    localities:
+      index:
+        title: Localities
+        status_all: All
+        status_aliased: Merged
+        status_unsettled: No canton
+        search: Search localities…
+        sort_by: Sort by
+        sort_name: name
+        sort_count: usage
+        merged_into: "→ %{canonical}"
+        canton_unknown: no canton
+        empty: No localities match.
+      edit:
+        usage:
+          zero: no events
+          one: 1 event
+          other: "%{count} events"
+        merge: Merge
+        merge_into: Merge into…
+        merge_hint: Merging retags every event and place under this name. The link sticks, so anything captured under it later lands on the other town too.
+        unmerge: Split
+        unmerge_hint: Splitting only undoes the link. Events and places the merge moved stay where they were moved.
+        registry_hint: This town is named in the venue registry, so the scrapers re-tag it every night — merging it away would not survive until morning. Change the spelling in config/venues.yml instead.
+        also_known_as: Also known as
+        browse_events: See the events
     locations:
       index:
         title: Locations
@@ -722,6 +748,9 @@ en:
       genre:
         one: Genre
         other: Genres
+      locality:
+        one: Locality
+        other: Localities
       invitation:
         one: Invitation
         other: Invitations

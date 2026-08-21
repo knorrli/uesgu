@@ -649,6 +649,32 @@ de:
           normalized: Normalisiert
           removed: Entfernt
           discarded: Verworfen
+    localities:
+      index:
+        title: Orte
+        status_all: Alle
+        status_aliased: Zusammengelegt
+        status_unsettled: Ohne Kanton
+        search: Orte suchen…
+        sort_by: Sortieren nach
+        sort_name: Name
+        sort_count: Nutzung
+        merged_into: "→ %{canonical}"
+        canton_unknown: kein Kanton
+        empty: Keine Orte gefunden.
+      edit:
+        usage:
+          zero: keine Events
+          one: 1 Event
+          other: "%{count} Events"
+        merge: Zusammenlegen
+        merge_into: Zusammenlegen mit…
+        merge_hint: Beim Zusammenlegen werden alle Events und Orte unter diesem Namen umgehängt. Die Verknüpfung bleibt, spätere Captures landen ebenfalls beim anderen Ort.
+        unmerge: Trennen
+        unmerge_hint: Trennen löst nur die Verknüpfung. Events und Orte bleiben dort, wohin sie verschoben wurden.
+        registry_hint: Dieser Ort steht im Venue-Register, die Scraper setzen ihn jede Nacht neu — ein Zusammenlegen würde bis zum Morgen wieder verschwinden. Die Schreibweise gehört in config/venues.yml.
+        also_known_as: Heisst auch
+        browse_events: Events ansehen
     locations:
       index:
         title: Orte
@@ -722,6 +748,9 @@ de:
       genre:
         one: Genre
         other: Genres
+      locality:
+        one: Ort
+        other: Orte
       invitation:
         one: Einladung
         other: Einladungen

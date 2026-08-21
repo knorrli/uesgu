@@ -781,6 +781,8 @@ fr:
   events:
     cancelled: Annulé
     rescheduled: Nouvelle date
+    community: Communauté
+    community_hint: Ajouté par quelqu'un de la communauté, pas récupéré sur le site d'un lieu
     delete_event: Supprimer l'événement
     edit_event: Modifier l'événement
     edit_tag: Modifier le tag

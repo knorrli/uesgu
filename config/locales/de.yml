@@ -781,6 +781,8 @@ de:
   events:
     cancelled: Abgesagt
     rescheduled: Neues Datum
+    community: Community
+    community_hint: Von jemandem aus der Community erfasst, nicht von der Website eines Veranstaltungsorts
     delete_event: Veranstaltung löschen
     edit_event: Veranstaltung bearbeiten
     edit_tag: Tag bearbeiten

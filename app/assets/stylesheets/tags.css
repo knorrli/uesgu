@@ -126,12 +126,17 @@ label.tag:has(input:checked) {
 }
 
 /* Event markers — a quiet chip sub-family appended AFTER an event title to add
-   status/source info WITHOUT competing with it. Smaller than a base .chip and
-   still borderless (read-only info); colour = severity: cancelled (warn-red) →
-   rescheduled (sand heads-up) → source (the neutral base-.chip grey). They trail
-   the title link, so each takes a small leading gap. Used on the events list. */
+   status/provenance info WITHOUT competing with it. Smaller than a base .chip and
+   still borderless (read-only info). Colour separates the two things a marker can
+   say: STATUS runs warm by severity (cancelled warn-red → rescheduled sand), while
+   PROVENANCE is cool (community steel-blue) or neutral (the off-site source, base
+   .chip grey). Community and source regularly appear side by side on one title —
+   a hand-entered event linking to Instagram carries both — so they must not read
+   as the same kind of fact. They trail the title link, so each takes a small
+   leading gap. Used on the events list. */
 .chip--cancelled,
 .chip--moved,
+.chip--community,
 .chip--source {
   margin-left: 0.5ch;
   vertical-align: middle;
@@ -147,4 +152,9 @@ label.tag:has(input:checked) {
 .chip--moved {
   background: var(--theme-bg-emphasis);
   color: var(--theme-fg-color);
+}
+
+.chip--community {
+  background: color-mix(in srgb, var(--theme-community-color) 18%, transparent);
+  color: var(--theme-community-color);
 }

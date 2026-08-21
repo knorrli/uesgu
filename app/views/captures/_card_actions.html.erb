@@ -1,8 +1,15 @@
-<%# locals: (key:) %>
+<%# locals: (key:, rereadable: false) %>
 <%= render layout: "shared/action_bar" do %>
   <%# The bar is pinned outside the scrolling body, so the submit reaches its form by
       id rather than by containment. %>
   <%= submit_tag t('capture.actions.accept'), form: "#{key}-form", class: "button-small primary" %>
+  <% if rereadable %>
+    <%# The middle slot the bar reserves for asking for another go. Disabled by the
+        controller once the input's re-reads are spent — every one is a paid call. %>
+    <button type="button" class="button-small" data-action="capture#reread">
+      <%= t('capture.actions.reread') %>
+    </button>
+  <% end %>
   <button type="button" class="button-small" data-action="capture#reject">
     <%= t('capture.actions.reject') %>
   </button>

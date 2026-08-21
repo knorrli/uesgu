@@ -165,3 +165,16 @@ button.capture-queue__tile[data-state="pending"] {
 .capture-card__where > label {
   flex: 1 1 8rem;
 }
+
+/* The report a contributor files instead of correcting a bad read by hand: which
+   fields to look at again, and what the input actually says. Ruled off from the
+   fields above it because it is not part of them — it never posts with the publish
+   (see captures/_candidate). */
+.capture-card__reread {
+  padding-top: var(--gap-small);
+  border-top: var(--border-width) solid var(--rule-color);
+}
+
+.capture-card__note {
+  width: 100%;
+}

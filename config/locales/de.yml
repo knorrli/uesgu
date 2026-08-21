@@ -152,6 +152,7 @@ de:
       done: Alles entschieden.
     actions:
       accept: Veröffentlichen
+      reread: Nochmal auslesen
       reject: Verwerfen
     card:
       published: "%{title} ist live."
@@ -162,7 +163,7 @@ de:
       place_invalid: Diese Venue liess sich nicht anlegen.
       unknown: Das hat nicht geklappt.
     row:
-      pending: wird gelesen …
+      pending: wird ausgelesen …
       untitled: Text
       nothing_found: Nichts gefunden, was nach einem Event aussieht.
       source_alt: Das ausgelesene Bild
@@ -183,6 +184,10 @@ de:
       genres_hint: Enter fügt eins hinzu. Neue Genres sind ok — wenn es eins schon gibt, lieber das nehmen.
       past: Dieses Datum ist vorbei.
       refused: "Nicht übernommen: %{values}"
+    reread:
+      label: "Falsch? Markier, was nochmal ausgelesen werden soll:"
+      note_placeholder: Was steht da wirklich?
+      spent: Nochmal auslesen geht hier nicht mehr.
     failures:
       image_empty: Das Bild war leer.
       image_too_large: Das Bild ist zu gross (max. 8 MB).

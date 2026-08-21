@@ -19,7 +19,7 @@ class CapturesController < ApplicationController
   end
 
   def extract
-    extraction = EventCapture::Extractor.call(input: input_for(params))
+    extraction = EventCapture::Extractor.call(input: input_for(params), correction: correction_for(params))
 
     render turbo_stream: turbo_stream.replace(
       row_id, partial: "captures/extraction",
@@ -72,6 +72,17 @@ class CapturesController < ApplicationController
   end
 
   private
+
+  # A re-read carries what a human said was wrong with the read before it, and a first
+  # read carries nothing — the prompt then renders exactly as it always did. Which
+  # input this is a second look at is the client's business: the poster it re-sends
+  # never left the browser, so there is nothing here to match it against (see
+  # app/javascript/controllers/capture_controller.js, which caps the count).
+  def correction_for(params)
+    return if params[:reread].blank?
+
+    EventCapture::Correction.from(fields: params[:wrong], note: params[:note])
+  end
 
   # Measuring the funnel may not break it, so an expired or forged token costs the row
   # and nothing else. Values ride in from the card (see captures/_candidate).

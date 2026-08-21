@@ -8,8 +8,8 @@ module CapturesHelper
     PlaceSuggester.for_name(candidate.place, url: candidate.source_url)
   end
 
-  # Tapping one is what stops a fourth spelling of "Quartierfest" being minted and
-  # keeping the place below the VenueLead nomination threshold forever.
+  # Tapping one takes a spelling the app already has instead of minting a variant —
+  # see PlaceSuggester for what a split venue name costs.
   def place_chips(suggestions)
     suggestions.map do |suggestion|
       suggestion_chip(suggestion.name, action: "capture#applySuggestion",

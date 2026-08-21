@@ -27,12 +27,11 @@
   border-bottom: var(--border-width) solid var(--rule-color);
 }
 
-/* List view only: pin each date header to the top while scrolling through its
-   own day group, then let the next group push it away. Scoped to .event-list so
-   the calendar day panel's header (.day-detail-header .date) is unaffected. The
-   solid background keeps event rows from showing through the pinned header, and a
-   small top padding stops the text sitting flush against the viewport edge. The
-   live ♥ saved count rides inside the header, so it stays correct while pinned. */
+/* Pin each date header to the top while scrolling through its own day group,
+   then let the next group push it away. The solid background keeps event rows
+   from showing through the pinned header, and a small top padding stops the text
+   sitting flush against the viewport edge. The live ♥ saved count rides inside the
+   header, so it stays correct while pinned. */
 .event-list .date {
   position: sticky;
   top: 0;
@@ -42,7 +41,7 @@
 }
 
 /* Per-day saved (♥) count sitting just after a date header's date, hidden when
-   zero. Same glyph language as the calendar markers — raspberry heart = saved —
+   zero. Raspberry heart = saved, the app's glyph for it —
    just carried as a count. Normal weight + small so it supports the date rather
    than competes. Collapses entirely (no trailing gap) on a day with no saved
    shows, so the date keeps its flush-left place; :has lets a live save bring it
@@ -313,17 +312,6 @@
   text-decoration: line-through;
 }
 
-/* Toolbar row above the programme: the favorites/notify shortcuts and the empty
-   message on the left, the view switcher on the right. Allow it to wrap so a
-   visible "Meine Favoriten" shortcut (plus the view switcher) doesn't overflow on
-   narrow screens, and let the left cluster shrink so a long empty message flows
-   onto the next line instead of pushing the row past the viewport. */
-.events-toolbar {
-  flex-wrap: wrap;
-}
-
-/* Empty-result message: its own line under the toolbar so a long sentence can't
-   push the view switcher around. */
 .events-empty {
   margin: 0;
 }
@@ -334,31 +322,6 @@
   color: var(--theme-accent-color);
   text-decoration: underline;
   white-space: nowrap;
-}
-
-/* List / Calendar as a plain text toggle, not filled buttons: the active view
-   is bold accent, the other a muted link. Its own class (was the generic
-   .button, which now means a real boxed button). */
-.view-switcher {
-  gap: var(--gap-medium);
-
-  .view-switch__item {
-    border: 0;
-    padding: 0;
-    background: none;
-    color: var(--theme-fg-muted);
-    /* Persistent underline (not :hover-only) so the inactive option reads as a
-       tappable link on touch, where there is no hover. */
-    text-decoration: underline;
-  }
-
-  .view-switch__item.active {
-    color: var(--theme-accent-color);
-    font-weight: bold;
-    background: none;
-    /* The current view is state, not a link — drop the underline. */
-    text-decoration: none;
-  }
 }
 
 /* ── Pagination ── A quiet readout (shared/_pagination), never a number grid:

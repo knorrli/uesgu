@@ -1,8 +1,8 @@
 # Derives "what could interest me" from a user's saved filters, so the events
-# list/calendar can highlight matching shows WITHOUT the user applying each filter
-# in turn. A pure in-memory predicate over the user's handful of saved filters,
-# built once per request (see EventsHelper#interest_profile) and matched against
-# the already-loaded event genres/locations — no per-filter query, no N+1.
+# list can highlight matching shows WITHOUT the user applying each filter in
+# turn. A pure in-memory predicate over the user's handful of saved filters, built
+# once per request (see EventsHelper#interest_profile) and matched against the
+# already-loaded event genres/locations — no per-filter query, no N+1.
 #
 # Match semantics mirror the saved filter MINUS its date window (the window drives
 # notification cadence, not taste): a show is "of interest" when it satisfies some

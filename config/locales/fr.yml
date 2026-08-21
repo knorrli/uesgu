@@ -127,7 +127,7 @@ fr:
   saved_events:
     title: À voir
     empty: Rien d'enregistré — touche le cœur sur un événement.
-    none_upcoming: Rien à venir — tes enregistrements passés sont dans le calendrier.
+    none_upcoming: Rien à venir.
     toggle: Enregistrer l'événement
     reminders_label: Me rappeler mes événements enregistrés
     reminders_hint: Un rappel vers midi le jour de l'événement enregistré — dans tes notifications, et par push ou e-mail si tu les as configurés.
@@ -294,13 +294,6 @@ fr:
       cta: Voir dans l'app
       footer_reason: Tu reçois ceci à cause d'un filtre que tu as créé.
       footer_manage: Gérer tes filtres
-  simple_calendar:
-    previous: Précédent
-    today: Aujourd'hui
-    next: Suivant
-    more_venues:
-      one: "+ 1 autre"
-      other: "+ %{count} autres"
   settings:
     title: Paramètres
     saved: Paramètres enregistrés.
@@ -795,16 +788,9 @@ fr:
     index:
       empty: Aucun événement ne correspond aux filtres actuels.
       clear_filter: Réinitialiser le filtre
-      view:
-        label: Vue
-        list: Liste
-        calendar: Calendrier
       save_filter: Enregistrer le filtre
       save_filter_all: Me notifier de tout
       save_filter_saved: Enregistré — modifier
-    day:
-      empty: Aucun événement ce jour-là.
-      close: Fermer
     filter:
       what: "Rechercher : artistes, styles…"
       when: Quand ?
@@ -826,6 +812,8 @@ fr:
       search_for: 'Rechercher « %{query} »'
       search_anything: Tape pour tout rechercher
       custom_range: Période personnalisée
+      prev_month: Précédent
+      next_month: Suivant
       loading: Chargement…
   shared:
     cancel: Annuler

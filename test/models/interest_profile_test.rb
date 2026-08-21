@@ -1,7 +1,7 @@
 require "db_test_helper"
 
 # InterestProfile derives "what could interest me" from a user's saved filters:
-# a date-stripped, whole-filter match used to highlight the list/calendar.
+# a date-stripped, whole-filter match used to highlight the list.
 # Synthetic taxonomy only (see db_test_helper taxonomy rule).
 class InterestProfileTest < ActiveSupport::TestCase
   # Build + persist a saved filter from landing-page params (q/g/l/d).

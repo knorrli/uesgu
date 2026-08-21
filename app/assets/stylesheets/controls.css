@@ -280,3 +280,28 @@ input[type=text] {
     outline: none;
   }
 }
+
+/* Flat text toggle between sibling views of one page (the inbox's unread/read
+   tabs): the active option is bold accent, the others muted links. Its own class,
+   not .button — that means a real boxed button. */
+.view-switcher {
+  gap: var(--gap-medium);
+
+  .view-switch__item {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: var(--theme-fg-muted);
+    /* Persistent underline (not :hover-only) so the inactive option reads as a
+       tappable link on touch, where there is no hover. */
+    text-decoration: underline;
+  }
+
+  .view-switch__item.active {
+    color: var(--theme-accent-color);
+    font-weight: bold;
+    background: none;
+    /* The current view is state, not a link — drop the underline. */
+    text-decoration: none;
+  }
+}

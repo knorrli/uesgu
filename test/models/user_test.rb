@@ -47,11 +47,6 @@ class UserTest < ActiveSupport::TestCase
     refute User.new(username: "loc", password: "secret123", locale: "xx").valid?
   end
 
-  test "events_view must be list or calendar, or nil" do
-    assert user(events_view: "calendar").valid?
-    refute User.new(username: "ev", password: "secret123", events_view: "grid").valid?
-  end
-
   test "admin? reflects the admin flag" do
     refute user.admin?
     assert user(admin: true).admin?

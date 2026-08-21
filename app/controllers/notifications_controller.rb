@@ -1,8 +1,7 @@
 class NotificationsController < ApplicationController
   def index
-    # Two flat-text tabs — Ungelesen | Gelesen — mirroring the list/calendar view
-    # switcher: each is a distinct slice (unread vs read), not an append. Default
-    # is unread; ?read=1 is the read archive.
+    # Two flat-text tabs — Ungelesen | Gelesen: each is a distinct slice (unread vs
+    # read), not an append. Default is unread; ?read=1 is the read archive.
     @show_read = params[:read].present?
     # Preload saved_filter — the index renders each digest's filter name, an N+1
     # otherwise (see notifications/index).

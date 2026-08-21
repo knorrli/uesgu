@@ -91,16 +91,6 @@ class Filter
     }
   end
 
-  # Earliest concrete start date across the active date ranges (presets like
-  # "next weekend" resolved to real dates), or nil when no date filter is set.
-  # Lets the calendar jump to the month containing the filtered range.
-  def earliest_date
-    mapped = map_date_ranges(date_ranges).compact
-    return nil if mapped.blank?
-
-    mapped.map { |range| Date.iso8601(range.split(" - ").first) }.min
-  end
-
   private
 
   # Whether the date filter holds an explicitly-typed absolute range (vs. only

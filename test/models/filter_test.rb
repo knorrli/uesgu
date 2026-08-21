@@ -1,8 +1,7 @@
 require "db_test_helper"
 
 # Locks the Filter query object: how request params parse into tag lists, the
-# shape of the ransack query it builds, date-range preset ordering, and the
-# earliest-date resolution used to jump the calendar.
+# shape of the ransack query it builds, and date-range preset ordering.
 class FilterTest < ActiveSupport::TestCase
   test "list setters parse a comma string into a tag array" do
     f = Filter.new
@@ -71,16 +70,6 @@ class FilterTest < ActiveSupport::TestCase
               .find { |h| h.key?(:start_date_between_any) }
     refute custom.key?(:start_date_gteq),
            "an explicitly typed absolute range reveals past events"
-  end
-
-  test "earliest_date resolves the soonest concrete date across presets" do
-    f = Filter.new
-    f.date_ranges = ["today"]
-    assert_equal Date.current, f.earliest_date
-  end
-
-  test "earliest_date is nil when no date filter is active" do
-    assert_nil Filter.new.earliest_date
   end
 
   test "genres makes the filter active" do

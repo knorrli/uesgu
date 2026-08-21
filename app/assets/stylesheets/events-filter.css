@@ -27,23 +27,12 @@
 
 /* Mobile filter sheets (_filter_sheets.html.erb). Mobile-first: the sheet UI is the
    default; the inline combobox filter (wrapped in .filter-desktop) takes over at the
-   tablet breakpoint — 600px, matching the calendar breakpoint above. */
+   tablet breakpoint — 600px. */
 
 /* Chips take the row and wrap within it; the notify bell stays pinned right. */
 .filter .chips {
   flex: 1 1 auto;
   min-width: 0;
-}
-
-@media (min-width: 600px) {
-  /* Wider columns can carry the taller cell without looking squashed; restore the
-     roomier desktop calendar height (mobile keeps the compact 4.25rem above). */
-  .simple-calendar .day { height: 6.5rem; }
-  /* Room for the venue headline only at desktop width. */
-  .simple-calendar .day-headline,
-  .simple-calendar .day-headline-more { display: block; }
-  /* Wider cell: the marker rides up beside the date (no today-badge crowding here). */
-  .simple-calendar .day-markers { top: var(--gap-small); bottom: auto; }
 }
 
 /* ── Saved-filters menu (_saved_filters_menu) ── the single merged saved-filter
@@ -587,8 +576,8 @@
 
 .range-cal__day.is-other-month { color: var(--theme-fg-muted); opacity: 0.5; }
 
-/* today: the same sand pill the events calendar uses (green is reserved for the
-   selection below, which overrides this when today is the picked day). */
+/* today: a sand pill (green is reserved for the selection below, which overrides
+   this when today is the picked day). */
 .range-cal__day.is-today { background: var(--theme-bg-emphasis); }
 
 .range-cal__day.is-in-range {

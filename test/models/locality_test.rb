@@ -222,6 +222,34 @@ class LocalityTest < ActiveSupport::TestCase
     assert_equal [kept], owner.saved_filters.reload.to_a
   end
 
+  # Two owners holding the same pair of spellings: neither filter duplicates the
+  # other's, so both are repointed and both survive.
+  test "the duplicate check is per owner" do
+    zorpwil = locality("Zorpwil", canton: "BE")
+    zorpville = locality("Zorpville", canton: "BE")
+    mine = saved_filter(user, ["Zorpville"])
+    yours = saved_filter(user, ["Zorpwil"])
+
+    zorpville.merge_into!(zorpwil)
+
+    assert_equal ["Zorpwil"], mine.reload.location_list
+    assert_equal ["Zorpwil"], yours.reload.location_list
+  end
+
+  # Feed highlighting reads the stored filter at match time, so repointing the filter
+  # is the whole fix — there is no second place the merge has to follow.
+  test "feed highlighting follows a repointed saved filter" do
+    zorpwil = locality("Zorpwil", canton: "BE")
+    zorpville = locality("Zorpville", canton: "BE")
+    owner = user
+    saved_filter(owner, ["Zorpville"])
+    show = event(location_list: ["Zorpville", "BE"])
+
+    zorpville.merge_into!(zorpwil)
+
+    assert_includes InterestProfile.for(owner).why_locations(show.reload).map(&:name), "Zorpwil"
+  end
+
   # Like restoring a blocked genre, which does not bring its stripped taggings back.
   test "splitting undoes the link and leaves the moved data where it was moved" do
     zorpwil = locality("Zorpwil", canton: "BE")

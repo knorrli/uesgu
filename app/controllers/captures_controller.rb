@@ -35,6 +35,16 @@ class CapturesController < ApplicationController
     render_status("captures/published", title: result.event.title)
   end
 
+  # Records no ExtractionFieldOutcome, and correctly so: with no attempt token there
+  # is no proposal to compare against, and a hand-entered event is not a read anyone
+  # can be judged on.
+  def blank
+    render turbo_stream: turbo_stream.replace(
+      row_id, partial: "captures/manual",
+      locals: { id: row_id, candidate: EventCapture::Candidate.new }
+    )
+  end
+
   # A dropped candidate is the worst read there is, and it is the one a publish-only
   # record cannot see. Answers with no content: the card is already gone on screen,
   # because dropping may not wait on — or be undone by — a metric.

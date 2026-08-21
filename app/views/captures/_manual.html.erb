@@ -1,0 +1,7 @@
+<%# A hand-entered event: the same card the model's candidates get, with nothing in
+    it. The row wrapper matches captures/_extraction so the client's pending row is
+    replaced the same way. %>
+<%# locals: (id:, candidate:) %>
+<div id="<%= id %>" class="capture-row flex flex-col gap-medium">
+  <%= render "captures/candidate", candidate: candidate, key: "#{id}-0", manual: true %>
+</div>

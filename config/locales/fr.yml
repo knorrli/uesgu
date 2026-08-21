@@ -142,6 +142,8 @@ fr:
     staging:
       drop_label: Dépose tes affiches ici, ou touche pour choisir
       add_text: Ajouter le texte
+      add_by_hand: Saisir à la main
+      by_hand: Saisi à la main
       commit: Lire
       remove: Retirer
       start_over: Recommencer

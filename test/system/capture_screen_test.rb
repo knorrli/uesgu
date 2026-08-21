@@ -211,6 +211,43 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "canton"), :normalized?
   end
 
+  # No poster, no paste, no model call — and still the same card, the same queue and
+  # the same publish.
+  test "an event entered by hand becomes an empty card and publishes like any other" do
+    visit capture_path
+    find("button[data-action='capture#stageBlank']").click
+    assert_selector ".drop-zone__item"
+    commit
+
+    assert_selector ".capture-card"
+    assert_equal "", field_value("title")
+    assert_equal "", field_value("locality")
+    # No poster to show, so the pane says why it is empty rather than looking broken.
+    assert_selector ".review-card__source", text: I18n.t("capture.staging.by_hand", locale: :de)
+
+    type "title", "Zorp Fest"
+    type "date", show_date.to_s
+    type "locality", "Zorpwil"
+    find(".capture-card [name=canton]").select("Bern")
+
+    assert_difference -> { Event.count } => 1 do
+      accept
+      assert_selector ".capture-queue__tile[data-state=published]"
+    end
+    assert_equal "Zorp Fest", Event.last.title
+  end
+
+  test "a hand-entered event stages alongside a poster and commits with it" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    stage "poster.png"
+    find("button[data-action='capture#stageBlank']").click
+    assert_selector ".drop-zone__item", count: 2
+    commit
+
+    assert_selector ".capture-card", count: 2, visible: :all
+  end
+
   # A drop never reaches the server on its own, and it is the read worth the most:
   # the contributor looked at the card and threw all of it away.
   test "a dropped card reports what the model had proposed" do

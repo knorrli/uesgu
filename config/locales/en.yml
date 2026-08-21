@@ -142,6 +142,8 @@ en:
     staging:
       drop_label: Drop posters here, or tap to pick
       add_text: Add the text
+      add_by_hand: Enter by hand
+      by_hand: Entered by hand
       commit: Read
       remove: Remove
       start_over: Start over

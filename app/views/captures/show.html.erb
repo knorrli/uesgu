@@ -11,7 +11,9 @@
      data-capture-undecodable-value="<%= t('capture.failures.image_unsupported') %>"
      data-capture-remove-value="<%= t('capture.staging.remove') %>"
      data-capture-source-alt-value="<%= t('capture.row.source_alt') %>"
-     data-capture-localities-value="<%= localities.to_json %>">
+     data-capture-localities-value="<%= localities.to_json %>"
+     data-capture-blank-url-value="<%= blank_capture_path %>"
+     data-capture-by-hand-value="<%= t('capture.staging.by_hand') %>">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1><%= t('capture.title') %></h1>
     <p class="muted"><%= t('capture.intro') %></p>
@@ -32,8 +34,9 @@
         <p class="muted"><%= t('capture.text_hint') %></p>
         <textarea rows="4" data-capture-target="text"></textarea>
       </label>
-      <div>
+      <div class="flex gap-small wrap">
         <button type="button" class="button-small" data-action="capture#stageText"><%= t('capture.staging.add_text') %></button>
+        <button type="button" class="button-small button-ghost" data-action="capture#stageBlank"><%= t('capture.staging.add_by_hand') %></button>
       </div>
     </div>
 

@@ -24,7 +24,9 @@ export default class extends Controller {
     sourceAlt: String,
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 },
-    localities: Object
+    localities: Object,
+    blankUrl: String,
+    byHand: String
   }
 
   // What each row was read from, held only in the browser: nothing is uploaded for
@@ -99,6 +101,14 @@ export default class extends Controller {
     this.appendStaged(id)
   }
 
+  // A third input choice alongside images and pasted text. It stages like they do, so
+  // a hand-entered event rides the same commit and lands in the same queue.
+  stageBlank() {
+    const id = crypto.randomUUID()
+    this.staged.set(id, { name: this.byHandValue, blank: true })
+    this.appendStaged(id)
+  }
+
   appendStaged(id) {
     const staged = this.staged.get(id)
     const item = document.createElement("li")
@@ -129,12 +139,13 @@ export default class extends Controller {
 
     this.inputTarget.hidden = true
     this.restartTarget.hidden = false
-    batch.forEach((staged) => {
+    batch.filter((staged) => !staged.blank).forEach((staged) => {
       this.sources.set(this.rowId(staged.id), staged.text ? { text: staged.text } : { objectUrl: staged.objectUrl })
     })
-    this.run(batch.map((staged) => () =>
-      this.extract(staged.text ? { text: staged.text } : { image: staged.blob, filename: staged.name },
-                   staged.name, staged.id)))
+    this.run(batch.map((staged) => () => staged.blank
+      ? this.addBlank(staged.id, staged.name)
+      : this.extract(staged.text ? { text: staged.text } : { image: staged.blob, filename: staged.name },
+                     staged.name, staged.id)))
   }
 
   // Destructive on purpose: there is no way back to a queue of half-decided cards, so
@@ -167,7 +178,7 @@ export default class extends Controller {
   snippet(staged) {
     const box = document.createElement("span")
     box.className = "drop-zone__snippet"
-    box.appendChild(this.line(staged.error ? staged.name : staged.text))
+    box.appendChild(this.line(staged.text ?? staged.name))
     if (staged.error) box.appendChild(this.line(staged.error, "drop-zone__reason"))
     return box
   }
@@ -475,6 +486,30 @@ export default class extends Controller {
       // ANIMATION FRAME, so the pending row is still standing here, and reading that
       // scored every failure a success and cleared the textarea under a refused paste.
       return this.failureIn(stream) === null
+    } catch {
+      return this.failRow(id)
+    }
+  }
+
+  // Asks the server for an empty card rather than building one here: the card is a
+  // whole ERB form, and a second copy of it in JS would drift from the real one. The
+  // pending row still has to exist first — a turbo-stream replace needs its target.
+  async addBlank(id, label) {
+    if (!document.getElementById(this.rowId(id))) this.appendPending(id, label)
+
+    const body = new FormData()
+    body.append("row_id", id)
+
+    try {
+      const response = await fetch(this.blankUrlValue, {
+        method: "POST",
+        body,
+        headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
+      })
+      if (!response.ok) return this.failRow(id)
+
+      Turbo.renderStreamMessage(await response.text())
+      return true
     } catch {
       return this.failRow(id)
     }

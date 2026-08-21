@@ -69,6 +69,10 @@ Rails.application.routes.draw do
   resource :capture, only: %i[show create] do
     post :extract
     post :drop
+    # A contributor with no poster gets the same card as everyone else, empty. It is
+    # a render, not a read: no model call, no ExtractionAttempt, and it publishes
+    # through `create` like any other card.
+    post :blank
     # The genre combobox's two halves: `genre_options` searches the taxonomy as the
     # contributor types (async, so 300 genre names are not inlined into every card),
     # `genre_chips` renders the current selection. Both speak NAMES — the taxonomy

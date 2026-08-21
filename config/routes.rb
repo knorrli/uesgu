@@ -195,6 +195,16 @@ Rails.application.routes.draw do
     end
     resources :locations, only: %i[index]
 
+    # Locality curation: the rows behind the locality half of the locations browser.
+    # merge folds one spelling into another (repointing its taggings and places, see
+    # Locality#merge_into!); unmerge splits the link back out.
+    resources :localities, only: %i[index edit] do
+      member do
+        post :merge
+        post :unmerge
+      end
+    end
+
     # Per-scraper data-coverage matrix (fill-rates computed live from events).
     get "scraper_coverage", to: "scraper_coverage#index", as: :scraper_coverage
 

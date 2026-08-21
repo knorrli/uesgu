@@ -36,6 +36,12 @@
       <%= text_field_tag :title, candidate.title, required: true %>
     </label>
 
+    <label class="flex flex-col gap-xsmall">
+      <span class="field-label"><%= t('capture.candidate.description') %></span>
+      <%= text_field_tag :description, candidate.subtitle %>
+    </label>
+    <%= render "shared/cite", quote: cited_evidence(candidate, :subtitle) %>
+
     <div class="capture-card__when flex gap-small wrap">
       <label class="flex flex-col gap-xsmall">
         <span class="field-label"><%= t('capture.candidate.date') %></span>
@@ -58,24 +64,9 @@
     </label>
     <%= render "shared/cite", quote: cited_evidence(candidate, :place) %>
 
-    <%# Tapping one is what stops a fourth spelling of "Quartierfest" being minted and
-        keeping the place below the VenueLead nomination threshold forever. A
-        suggestion never auto-applies. %>
     <% suggestions = place_suggestions(candidate) %>
-    <% if suggestions.any? %>
-      <div class="capture-card__suggestions flex gap-xsmall wrap">
-        <span class="muted"><%= t('capture.candidate.suggestions') %></span>
-        <% suggestions.each do |suggestion| %>
-          <button type="button" class="chip"
-                  data-action="capture#applySuggestion"
-                  data-capture-name-param="<%= suggestion.name %>"
-                  data-capture-locality-param="<%= suggestion.locality %>"
-                  data-capture-canton-param="<%= suggestion.canton %>">
-            <%= suggestion.name %>
-          </button>
-        <% end %>
-      </div>
-    <% end %>
+    <%= render "shared/suggestions", label: t('capture.candidate.suggestions'),
+          chips: place_chips(suggestions) %>
 
     <div class="capture-card__where flex gap-small wrap">
       <label class="flex flex-col gap-xsmall">
@@ -92,6 +83,17 @@
       </label>
     </div>
     <%= render "shared/cite", quote: cited_evidence(candidate, :locality) %>
+
+    <%# The datalist behind the field offers every locality the app knows and shows
+        none of them until you type, so a contributor who never guessed it is there is
+        the one who mints "bern". These chips are the affordance where there is a
+        ranking to render; where there is none, the line below is. %>
+    <% towns = locality_chips(suggestions) %>
+    <%= render "shared/suggestions", label: t('capture.candidate.locality_suggestions'),
+          chips: towns %>
+    <% if towns.empty? %>
+      <span class="muted"><%= t('capture.candidate.locality_hint') %></span>
+    <% end %>
 
     <label class="flex flex-col gap-xsmall">
       <span class="field-label"><%= t('capture.candidate.url') %></span>

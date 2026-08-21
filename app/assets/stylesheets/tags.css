@@ -83,6 +83,18 @@ label.tag:has(input:checked) {
   color: var(--theme-bg-color);
 }
 
+/* A row of match-at-entry candidates beside the field they fill (shared/_suggestions).
+   Chips, so tapping one reads as picking from a vocabulary rather than as filling a
+   field — which is exactly what it is. The one place a .chip IS clickable, which is
+   why the pointer has to be stated here rather than inherited from the base rule. */
+.suggestions {
+  align-items: baseline;
+}
+
+.suggestions .chip {
+  cursor: pointer;
+}
+
 /* Read-only info badge. Borderless + faint tint so it never reads as a clickable
    tag/button — the counterpart to .tag. */
 .chip {

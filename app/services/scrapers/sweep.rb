@@ -54,6 +54,10 @@ module Scrapers
       # Refresh genre usage counts once after the full sweep so newly seen genres
       # surface in the assignment queue (the old per-scraper job did this each time).
       Genre.reconcile!
+      # Same, for the towns: a scraper minting a venue in a place we did not cover is
+      # the other way a locality enters, and an unreconciled one has no canton for the
+      # capture card to fill from.
+      Locality.reconcile!
       finalize(run)
       ScrapeRun.prune!
       run

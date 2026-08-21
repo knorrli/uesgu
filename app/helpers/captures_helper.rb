@@ -8,10 +8,37 @@ module CapturesHelper
     PlaceSuggester.for_name(candidate.place, url: candidate.source_url)
   end
 
-  # Name => canton, off the same lookup that computes the canton at extraction. The
+  # Tapping one takes a spelling the app already has instead of minting a variant —
+  # see PlaceSuggester for what a split venue name costs.
+  def place_chips(suggestions)
+    suggestions.map do |suggestion|
+      suggestion_chip(suggestion.name, action: "capture#applySuggestion",
+                      capture_name_param: suggestion.name,
+                      capture_locality_param: suggestion.locality,
+                      capture_canton_param: suggestion.canton)
+    end
+  end
+
+  # The towns those same venues sit in, which is the only ranking the locality field
+  # has to offer. Every locality the app knows is far too many to render and
+  # alphabetical order ranks nothing; the places already being suggested are few, and
+  # they are about this poster. The long tail stays reachable through the datalist.
+  def locality_chips(suggestions)
+    suggestions.select { |suggestion| suggestion.locality.present? }
+               .uniq { |suggestion| Fingerprint.for(suggestion.locality) }
+               .map do |suggestion|
+                 suggestion_chip(suggestion.locality, action: "capture#applyLocality",
+                                 capture_locality_param: suggestion.locality,
+                                 capture_canton_param: suggestion.canton)
+               end
+  end
+
+  def suggestion_chip(label, **data) = { label: label, attrs: { data: data } }
+
+  # Name => canton, off the same rows that compute the canton at extraction. The
   # datalist offers the names and the card fills the canton from the map when one is
-  # picked, so both halves of the field answer from one set of rows.
-  def capture_localities = EventCapture::Localities.known.cantons_by_name.sort.to_h
+  # picked, so both halves of the field answer from one place.
+  def capture_localities = Locality.cantons_by_name
 
   # What the model proposed, keyed the way the form posts it, so the card can carry it
   # back for the diff. Mirrors the visible inputs exactly — a value that renders one

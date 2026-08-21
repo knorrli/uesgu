@@ -42,6 +42,26 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_equal "Zorp Fest", Event.last.title
   end
 
+  test "the subtitle the model read is offered as the event's description" do
+    sign_in_as user(contributor: true)
+
+    stub_extraction(extraction(candidates: [candidate(subtitle: "message: incomplete",
+                                                      subtitle_evidence: "message: incomplete")])) do
+      post extract_capture_path, params: { text: "Zorp Fest", row_id: "abc" }, as: :turbo_stream
+    end
+
+    assert_select "input[name=description][value=?]", "message: incomplete"
+  end
+
+  test "a published card carries the description through" do
+    sign_in_as user(contributor: true)
+
+    post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
+                                 canton: "BE", description: "message: incomplete" }, as: :turbo_stream
+
+    assert_equal "message: incomplete", Event.last.description
+  end
+
   test "entering by hand is closed to accounts without the capability" do
     sign_in_as user
 

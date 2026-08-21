@@ -128,6 +128,36 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal %w[Dubtronica], Event.sole.genre_list
   end
 
+  # Observed on a real poster: six genres came back as one string. The chips make the
+  # run visible as a single genre, and the taxonomy is what says it is several (see
+  # EventCapture::Genres).
+  test "a slash run the taxonomy vouches for arrives as one chip per genre" do
+    carried = genre(name: "zorpcore", events_count: 3)
+    CannedExtractionClient.install(events: [poster_event(genres: ["Loops/#{carried.name}/FX"])])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".hw-combobox__chip", text: "Loops"
+    assert_selector ".hw-combobox__chip", text: carried.name
+    assert_selector ".hw-combobox__chip", text: "FX"
+
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+    # "Fx", not "FX": a genre nobody carries is stored under the display spelling
+    # Genre.canonicalize_names gives it, exactly as a hand-typed one is.
+    assert_equal ["Fx", "Loops", carried.name].sort, Event.sole.genre_list.sort
+  end
+
+  # The other half of the rule, and the one that keeps a genre name with a slash in it
+  # from being minted as two that do not exist.
+  test "a slash run nothing vouches for stays the single genre the model returned" do
+    CannedExtractionClient.install(events: [poster_event(genres: ["Loops/FX"])])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".hw-combobox__chip", count: 1, text: "Loops/FX"
+  end
+
   # The suggestions are the point of the combobox: a genre we already carry should be
   # picked rather than respelt, which is what keeps the taxonomy from growing a fourth
   # spelling of the same thing.
@@ -151,7 +181,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     visit capture_path
     pick "poster.png"
 
-    find(".capture-card__suggestions button", text: "Zorpsaal").click
+    find(".suggestions button", text: "Zorpsaal").click
     accept
     assert_selector ".capture-queue__tile[data-state=published]"
 
@@ -164,7 +194,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     visit capture_path
     pick "poster.png"
 
-    find(".capture-card__suggestions button", text: "Zorpsaal").click
+    find(".suggestions button", text: "Zorpsaal").click
     type("place", "Zorpkeller")
     accept
     assert_selector ".capture-queue__tile[data-state=published]"
@@ -172,8 +202,55 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :corrected?
   end
 
+  # The datalist behind the field shows nothing until you type, so the towns of the
+  # venues being suggested are the only ranking the field has (see #154).
+  test "the towns of the suggested venues are chips beside the locality field" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    place(name: "Zorpkeller", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Zorpwil", locality: nil,
+                                                         locality_evidence: nil, canton: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    towns = all(".suggestions button", text: "Zorpwil")
+    assert_equal 1, towns.size
+
+    towns.first.click
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "BE", field_value("canton")
+  end
+
+  # Tapping a town is taking the app's spelling over the poster's, exactly as tapping a
+  # venue is — and counted as a correction it would inflate the one number a prompt
+  # edit is judged on.
+  test "taking a town is recorded as a normalisation, not a correction" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Zorpwil",
+                                                         locality: "zorpwil",
+                                                         locality_evidence: "3000 zorpwil")])
+    visit capture_path
+    pick "poster.png"
+
+    find(".suggestions button", text: "Zorpwil").click
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+
+    assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :normalized?
+  end
+
+  # A venue nobody knows is exactly the case that mints a fresh spelling, and it is the
+  # case with no ranking to render — so the words are what say the suggestions exist.
+  test "with no venue to suggest, the locality field says the suggestions are there" do
+    CannedExtractionClient.install(events: [poster_event(place: nil, place_evidence: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".suggestions"
+    assert_selector ".capture-card", text: copy("candidate.locality_hint")
+  end
+
   # The canton is computed from the locality once, server-side, at extraction — so a
-  # locality changed on the card has to bring its own (see EventCapture::Localities).
+  # locality changed on the card has to bring its own (see Locality).
   test "a locality the app already knows fills the canton beside it" do
     place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
     CannedExtractionClient.install(events: [poster_event])

@@ -1,4 +1,4 @@
-require "test_helper"
+require "db_test_helper"
 
 # Every case here is a shape the model actually returned during the provider
 # evaluation. The invariant under test is always the same one: a value we cannot trust
@@ -8,16 +8,15 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
 
   def normalize(event) = EventCapture::Normalizer.call(event, today: TODAY)
 
-  # Stands in for the taxonomy without a database: the canton half only ever asks
-  # this one question of it.
-  def known(**localities)
-    EventCapture::Localities.new(
-      localities.map { |name, canton| EventCapture::Localities::Entry.new(name: name.to_s, canton: canton) }
-    )
+  def normalize_with_genres(event, *known)
+    EventCapture::Normalizer.call(event, today: TODAY, genres: EventCapture::Genres.for_names(known))
   end
 
+  # The taxonomy the canton half reads. Synthetic town names; whether a canton is
+  # settled or abstained is Locality.reconcile!'s job, tested in LocalityTest.
   def normalize_in(event, **localities)
-    EventCapture::Normalizer.call(event, today: TODAY, localities: known(**localities))
+    localities.each { |name, canton| Locality.create!(name: name.to_s, canton: canton) }
+    EventCapture::Normalizer.call(event, today: TODAY)
   end
 
   def dated(**overrides)
@@ -44,6 +43,23 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_equal ["Zorpcore"], candidate.genres
     assert_empty candidate.issues
     assert_empty candidate.raw
+  end
+
+  test "a cited subtitle survives with the line it was read from" do
+    candidate = normalize(dated("subtitle" => " message: incomplete ",
+                                "subtitle_evidence" => "message: incomplete"))
+
+    assert_equal "message: incomplete", candidate.subtitle
+    assert_equal "message: incomplete", candidate.subtitle_evidence
+    assert_empty candidate.issues
+  end
+
+  test "an uncited subtitle is dropped and kept" do
+    candidate = normalize("subtitle" => "Zorpwils feinste Nacht", "subtitle_evidence" => nil)
+
+    assert_nil candidate.subtitle
+    assert_equal "Zorpwils feinste Nacht", candidate.raw["subtitle"]
+    assert_includes candidate.issues, :subtitle_uncited
   end
 
   test "a date the model could not quote is invention, so it is dropped and kept" do
@@ -253,6 +269,29 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
 
     assert_nil candidate.date
     assert_equal "2026-02-30T20:00:00", candidate.raw["date"]
+  end
+
+  # Observed on a real poster: six genres arrived as one string. The taxonomy is what
+  # says the slash is a separator (see EventCapture::Genres).
+  test "a slash run the taxonomy vouches for becomes several genres" do
+    candidate = normalize_with_genres({ "genres" => ["Loops/Zorpcore/FX"] }, "Zorpcore")
+
+    assert_equal %w[Loops Zorpcore FX], candidate.genres
+    assert_includes candidate.issues, :genres_split
+  end
+
+  # Splitting refuses nothing, so there is no refused value to keep — the flag is the
+  # whole record that the rule fired.
+  test "a run nothing vouches for stays one genre and raises nothing" do
+    candidate = normalize_with_genres({ "genres" => ["Loops/FX"] }, "Zorpcore")
+
+    assert_equal ["Loops/FX"], candidate.genres
+    assert_empty candidate.issues
+    assert_empty candidate.raw
+  end
+
+  test "genres reach the card unsplit where the taxonomy is not there to ask" do
+    assert_equal ["Loops/FX"], normalize("genres" => ["Loops/FX"]).genres
   end
 
   test "past is computed, never asked of the model" do

@@ -12,10 +12,10 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(event, today:, localities: Localities.none)
+    def initialize(event, today:, genres: Genres.none)
       @event = event.is_a?(Hash) ? event : {}
       @today = today
-      @localities = localities
+      @genres = genres
       @raw = {}
       @issues = []
       @salvaged_time = nil
@@ -30,6 +30,8 @@ module EventCapture
 
       Candidate.new(
         title: string(event["title"]),
+        subtitle: cited(:subtitle),
+        subtitle_evidence: string(event["subtitle_evidence"]),
         date: date,
         date_evidence: string(event["date_evidence"]),
         time: time,
@@ -38,7 +40,7 @@ module EventCapture
         locality: locality,
         locality_evidence: string(event["locality_evidence"]),
         canton: normalized_canton(locality),
-        genres: Array(event["genres"]).filter_map { |genre| string(genre) },
+        genres: normalized_genres,
         source_url: string(event["source_url"]),
         raw: raw,
         issues: issues
@@ -47,7 +49,7 @@ module EventCapture
 
     private
 
-    attr_reader :event, :today, :localities, :raw, :issues, :salvaged_time
+    attr_reader :event, :today, :genres, :raw, :issues, :salvaged_time
 
     def string(value) = value.to_s.strip.presence
 
@@ -119,6 +121,17 @@ module EventCapture
       computed
     end
 
+    # The one field where the model's answer is expanded rather than trimmed: a
+    # punctuated run is several genres in one string, and only the taxonomy can say so
+    # (see EventCapture::Genres). Nothing is refused, so nothing goes to `raw` — the
+    # flag is what says the rule fired.
+    def normalized_genres
+      named = Array(event["genres"]).filter_map { |genre| string(genre) }
+      split = named.flat_map { |genre| genres.split(genre) }
+      issues << :genres_split unless split == named
+      split
+    end
+
     def normalized_time
       value = string(event["time"]) || salvaged_time
       return if value.nil?
@@ -140,7 +153,7 @@ module EventCapture
     # to pick from 26 with no default.
     def normalized_canton(locality)
       claimed = claimed_canton
-      computed = localities.canton_for(locality)
+      computed = Locality.canton_for(locality)
       return claimed if computed.nil?
       return computed if claimed.nil? || claimed == computed
 

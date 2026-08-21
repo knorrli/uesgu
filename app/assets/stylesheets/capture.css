@@ -144,16 +144,6 @@ button.capture-queue__tile[data-state="pending"] {
   color: var(--theme-interest-color);
 }
 
-/* Match-at-entry candidates. Chips, so tapping one reads as picking from a
-   vocabulary rather than as filling a field — which is exactly what it is. */
-.capture-card__suggestions {
-  align-items: baseline;
-}
-
-.capture-card__suggestions .chip {
-  cursor: pointer;
-}
-
 .capture-card__issues {
   font-size: var(--font-size-small);
 }

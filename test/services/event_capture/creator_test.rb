@@ -18,6 +18,16 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal %w[BE Zorpsaal Zorpwil], result.event.location_list.sort
   end
 
+  test "the subtitle the contributor kept publishes as the event's description" do
+    result = EventCapture::Creator.call(attrs(description: "message: incomplete"))
+
+    assert_equal "message: incomplete", result.event.description
+  end
+
+  test "a description nobody filled is nothing, not a blank string" do
+    assert_nil EventCapture::Creator.call(attrs(description: "  ")).event.description
+  end
+
   test "stamps the capture data source" do
     assert_equal "capture", EventCapture::Creator.call(attrs).event.data_source
   end
@@ -48,10 +58,11 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   end
 
   # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
-  # second node in the WHERE tree forever (see EventCapture::Localities).
+  # second node in the WHERE tree forever (see Locality).
   test "a locality differing only in case or accents adopts the stored spelling" do
     venue = Venue.in_taxonomy.find { |v| v.locality.present? }
     skip "no placed venue" if venue.nil?
+    Locality.reconcile!
 
     result = EventCapture::Creator.call(attrs(place: "", locality: venue.locality.downcase,
                                               canton: venue.canton))
@@ -69,7 +80,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   end
 
   # The complement of the case above: a genuine variant is left alone rather than
-  # guessed at (see EventCapture::Localities).
+  # guessed at (see Locality).
   test "a genuinely different spelling is left as typed" do
     place(name: "Zorpsaal", locality: "Zorpwil")
 

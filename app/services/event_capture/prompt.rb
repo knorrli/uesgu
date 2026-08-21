@@ -30,6 +30,7 @@ module EventCapture
         looks_swiss: "because the image looks Swiss",
         elsewhere: "on the poster",
         names_it: "image",
+        headline: "set with the title on the poster",
         genre_src: "the image",
         own_wording: "the poster's",
         request: "Extract every event advertised in this image. JSON only."
@@ -48,6 +49,7 @@ module EventCapture
         looks_swiss: "because the text looks Swiss",
         elsewhere: "in the text",
         names_it: "input",
+        headline: "running with the title in the input",
         genre_src: "the text",
         own_wording: "the input's",
         request: "Extract every event advertised in the text below. JSON only."
@@ -137,6 +139,13 @@ module EventCapture
            character — these are small local acts you will not recognise, so do not
            "correct" a name toward one that sounds more familiar.
 
+        9. `subtitle` is the second line #{m[:headline]} — the tagline
+           saying what kind of evening it is. It obeys the evidence rule: quote it in
+           `subtitle_evidence` or return null. It is NOT the venue, NOT the series or
+           brand printed at the top, and NOT the lineup. Where the #{m[:names_it]}
+           advertises several events, a line naming one act belongs to that event
+           alone — never repeat one #{m[:names_it]}-wide line onto all of them.
+
         FORMATS — these are strict:
           date  exactly YYYY-MM-DD, e.g. "2026-08-20". Never a datetime, never
                 "20.08.2026", never #{m[:own_wording]} own wording. The evidence field is
@@ -170,10 +179,14 @@ module EventCapture
             items: {
               type: "object",
               additionalProperties: false,
-              required: %w[title date date_evidence time place place_evidence locality locality_evidence
-                           canton genres source_url],
+              required: %w[title subtitle subtitle_evidence date date_evidence time place place_evidence
+                           locality locality_evidence canton genres source_url],
               properties: {
                 title:          { type: %w[string null] },
+                subtitle:       { type: %w[string null],
+                                  description: "The tagline printed with the title, or null" },
+                subtitle_evidence: { type: %w[string null],
+                                     description: "Verbatim text from the input the subtitle was read from. null if the subtitle is null." },
                 date:           { type: %w[string null], description: "YYYY-MM-DD, or null if not legible" },
                 date_evidence:  { type: %w[string null],
                                   description: "Verbatim text from the input the date was read from. null if the date is null." },

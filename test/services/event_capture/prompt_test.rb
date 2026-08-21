@@ -30,7 +30,17 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
   test "every field the evidence rule governs has an evidence field in the contract" do
     fields = EventCapture::Prompt::SCHEMA.dig(:schema, :properties, :events, :items, :required)
 
-    %w[date place locality].each { |field| assert_includes fields, "#{field}_evidence" }
+    %w[date place locality subtitle].each { |field| assert_includes fields, "#{field}_evidence" }
+  end
+
+  # A poster's brand line and its lineup are the two things that look like a subtitle
+  # and are not — the brand repeats onto every event the poster advertises, the lineup
+  # belongs to one of them.
+  test "the subtitle rule rules out the brand line and the lineup" do
+    instructions = EventCapture::Prompt.instructions(today: TODAY).squish
+
+    assert_match "It is NOT the venue, NOT the series or brand printed at the top, and NOT the lineup",
+                 instructions
   end
 
   # A prompt telling the model to read an image it was never sent is how a tuned

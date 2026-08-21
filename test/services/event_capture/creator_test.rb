@@ -47,6 +47,19 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_includes result.event.location_list, venue.name
   end
 
+  # The half no string measure reaches: Freiburg and Fribourg share 0.29 of their
+  # trigrams, so only the curated list keeps the town from becoming two nodes of the
+  # WHERE tree with half the events each (see config/locality_aliases.yml).
+  test "a curated name variant publishes under the spelling the registry carries" do
+    venue = Venue.in_taxonomy.find { |v| v.locality == "Fribourg" }
+    skip "Fribourg is no longer in the registry" if venue.nil?
+
+    result = EventCapture::Creator.call(attrs(place: "", locality: "Freiburg", canton: venue.canton))
+
+    assert_includes result.event.location_list, "Fribourg"
+    refute_includes result.event.location_list, "Freiburg"
+  end
+
   # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
   # second node in the WHERE tree forever (see EventCapture::Localities).
   test "a locality differing only in case or accents adopts the stored spelling" do

@@ -17,8 +17,9 @@ module EventCapture
 
     def self.none = new([])
 
-    def initialize(entries)
+    def initialize(entries, aliases: LocalityAliases.curated)
       @entries = entries.select { |entry| entry.name.present? }
+      @aliases = aliases
     end
 
     # Identity modulo case, accents and punctuation is not a near-match: "bern" and
@@ -27,17 +28,21 @@ module EventCapture
     # groups on the literal string — an uncorrected "bern" is a second node in the
     # WHERE tree forever.
     #
-    # A genuine variant is deliberately left alone: no string measure reaches Freiburg
-    # -> Fribourg (0.29) or Genf -> Genève (0.33), and even the transposition Luzren ->
-    # Luzern scores 0.27. That class needs a curated alias list, not arithmetic.
+    # A genuine variant — Bienne for Biel, Genf for Genève — is reached only by the
+    # curated list, because no string measure gets near it: Freiburg -> Fribourg
+    # scores 0.29 on trigrams and Genf -> Genève 0.33 (see LocalityAliases). The
+    # alias names the spelling; the stored rows still say how it is written and which
+    # canton it sits in, so an alias pointing at a locality nobody carries yet steers
+    # the new spelling and settles nothing else.
     def canonical(typed)
-      matching(typed).first&.name || typed
+      name = aliased(typed)
+      matching(name).first&.name || name
     end
 
     # nil rather than a guess where the same name sits in more than one canton: Buchs
     # is a locality in SG, AG, ZH and LU alike, and answering with whichever row
     # loaded first is the wrong-canton bug this exists to prevent.
-    def canton_for(typed) = canton_of(matching(typed))
+    def canton_for(typed) = canton_of(matching(aliased(typed)))
 
     # Every name worth offering, against the canton picking it computes to — nil where
     # the name is one of the ambiguous ones and picking it settles nothing. One row per
@@ -48,7 +53,9 @@ module EventCapture
 
     private
 
-    attr_reader :entries
+    attr_reader :entries, :aliases
+
+    def aliased(typed) = aliases.canonical_for(typed) || typed
 
     def canton_of(entries)
       cantons = entries.filter_map { |entry| entry.canton.presence }.uniq

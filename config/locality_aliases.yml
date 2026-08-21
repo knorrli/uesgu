@@ -1,0 +1,35 @@
+# LOCALITY ALIASES — the curated name variants no string measure can reach.
+# Switzerland gives a large share of its localities an official second (and third)
+# name, and those names share almost no letters: Genf/Genève scores 0.33 on
+# trigrams, Freiburg/Fribourg 0.29, which is inside the noise floor of unrelated
+# towns. So the pairs are listed here rather than computed. Read by
+# EventCapture::LocalityAliases; applied when a capture is published.
+#
+# Each key is the spelling an event is filed under; every name below it is a
+# spelling a contributor may type for that same place. A variant that already folds
+# onto its canonical (Zurich -> Zürich, Neuchatel -> Neuchâtel) is NOT listed —
+# EventCapture::Localities already matches those on the fingerprint, and a row here
+# would do nothing.
+#
+# Typos are deliberately out of scope. "Luzren" is a transposition, not a name, and
+# the set of them is unbounded; this file is a short list of names that are real.
+
+localities:
+  Basel: [Bâle, Basilea]
+  Bern: [Berne, Berna]
+  Biel: [Bienne, Biel/Bienne, Bienne/Biel]
+  Burgdorf: [Berthoud]
+  Chur: [Coire, Coira, Cuira]
+  Delémont: [Delsberg]
+  Düdingen: [Guin, Duedingen]
+  Fribourg: [Freiburg, Friburgo, Fribourg/Freiburg, Freiburg/Fribourg]
+  Genève: [Genf, Ginevra, Geneva]
+  Köniz: [Koeniz]
+  Lausanne: [Losanna]
+  Luzern: [Lucerne, Lucerna]
+  Murten: [Morat]
+  Neuchâtel: [Neuenburg]
+  Sion: [Sitten]
+  Solothurn: [Soleure, Soletta]
+  Thun: [Thoune]
+  Zürich: [Zuerich, Zurigo]

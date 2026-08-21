@@ -134,6 +134,7 @@
 .sg-swatch__chip--favorite   { background: var(--theme-saved-color); }
 .sg-swatch__chip--warn       { background: var(--theme-warn-color); }
 .sg-swatch__chip--amber      { background: var(--color-amber); }
+.sg-swatch__chip--community  { background: var(--theme-community-color); }
 .sg-swatch__chip--bg         { background: var(--theme-bg-color); }
 .sg-swatch__chip--bg-mut     { background: var(--theme-bg-muted); }
 .sg-swatch__chip--fg         { background: var(--theme-fg-color); }

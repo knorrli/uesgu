@@ -70,6 +70,10 @@
         <p class="sg-swatch__label"><b>Amber</b> · <code>--color-amber</code><br>Neutral "empty / nothing here" status</p>
       </li>
       <li class="sg-swatch">
+        <div class="sg-swatch__chip sg-swatch__chip--community"></div>
+        <p class="sg-swatch__label"><b>Community</b> · <code>--theme-community-color</code><br>Steel blue — provenance only: a human entered this event and no scraper re-derives it. The one cool hue in the palette, so it separates from the neutral grey of the off-site source chip beside it.</p>
+      </li>
+      <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--bg"></div>
         <p class="sg-swatch__label"><b>Background</b> · <code>--theme-bg-color</code></p>
       </li>
@@ -232,13 +236,13 @@
         <div style="display:flex; flex-direction:column; gap:6px;">
           <span><span style="text-decoration: line-through underline;">Called-off show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--cancelled">Cancelled</span></span>
           <span><span style="text-decoration: underline;">Moved show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--moved">New date</span></span>
-          <span><span style="text-decoration: underline;">Community show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--community">Community</span></span>
+          <span><span style="text-decoration: underline;">Community show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--community">Community</span><span class="chip chip--source">Instagram</span></span>
           <span><span style="text-decoration: underline;">Off-site show <span class="event-link-marker" aria-hidden="true">&#8599;</span></span><span class="chip chip--source">Bewegungsmelder</span></span>
         </div>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Event markers</span> · <code>.chip--cancelled</code>, <code>.chip--moved</code>, <code>.chip--community</code>, <code>.chip--source</code>
-        <p class="sg-purpose">A quiet <code>.chip</code> sub-family that trails an event title with secondary info, sized down so it never competes with the title. One shape, <b>colour = severity</b>: cancelled (warn-red, + struck title) → rescheduled (sand heads-up) → community and off-site source (neutral grey). The last two are provenance and independent of each other: <b>community</b> marks an event a contributor entered by hand, which no scraper re-derives nightly, while <b>source</b> names where the link leaves you and shows only on links that aren't the venue's own page (detected by host — most Petzi / deep-linked OLE carry none). A community event linking to Instagram carries both.</p>
+        <p class="sg-purpose">A quiet <code>.chip</code> sub-family that trails an event title with secondary info, sized down so it never competes with the title. One shape, and colour separates the two things a marker can say. <b>Status</b> runs warm by severity: cancelled (warn-red, + struck title) → rescheduled (sand heads-up). <b>Provenance</b> runs cool or neutral: <b>community</b> (steel blue) marks an event a contributor entered by hand, which no scraper re-derives nightly, while <b>source</b> (grey) names where the link leaves you and shows only on links that aren't the venue's own page (detected by host — most Petzi / deep-linked OLE carry none). The two are independent and regularly land on the same title, as above — which is why they don't share a colour.</p>
       </div>
     </div>
 

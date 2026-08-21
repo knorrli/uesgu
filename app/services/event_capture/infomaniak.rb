@@ -20,8 +20,8 @@ module EventCapture
 
     def configured? = EventCaptureConfig.configured?
 
-    def call(input:, today:)
-      response = post(request_body(input, today))
+    def call(input:, today:, correction: nil)
+      response = post(request_body(input, today, correction))
 
       Response.new(
         text: response.dig("choices", 0, "message", "content"),
@@ -37,7 +37,7 @@ module EventCapture
       URI("https://api.infomaniak.com/2/ai/#{EventCaptureConfig.product_id}/openai/v1/chat/completions")
     end
 
-    def request_body(input, today)
+    def request_body(input, today, correction)
       {
         model: EventCaptureConfig.model,
         max_tokens: MAX_TOKENS,
@@ -45,7 +45,8 @@ module EventCapture
         # (see Prompt::SCHEMA).
         response_format: { type: "json_schema", json_schema: Prompt::SCHEMA },
         messages: [
-          { role: "system", content: Prompt.instructions(today: today, medium: input.kind) },
+          { role: "system",
+            content: Prompt.instructions(today: today, medium: input.kind, correction: correction) },
           { role: "user", content: content_for(input) }
         ]
       }

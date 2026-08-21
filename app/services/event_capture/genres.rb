@@ -3,21 +3,15 @@ module EventCapture
   # genre raises: is this a name we know?
   #
   # It exists for the slash run — a poster printing "Loops/Groove/FX/Electronic/Jazz/Dub"
-  # comes back from the model as ONE genre. A blind split on the slash is not
-  # available: a genre name can carry one itself, and splitting such a name mints two
-  # genres that do not exist. So the taxonomy decides. A run stays whole where it is
-  # punctuation away from a name we carry, and splits only where at least one part is
-  # one — a slash sitting between a genre name and anything else is a list, and one
-  # vouched part is the cheapest evidence of that there is.
-  #
-  # Nothing is dropped and nothing is respelt here. An unvouched part rides along and
-  # is minted at publish exactly as a hand-typed genre is, and the card shows every
-  # part as its own chip, so an over-eager split is one tap to undo.
+  # comes back from the model as ONE genre. A blind split is not available: a genre
+  # name can carry a slash itself, and splitting such a name mints two genres that do
+  # not exist. So the taxonomy decides — a run splits where it vouches for a part, and
+  # stays whole where it vouches for the whole.
   class Genres
     SEPARATOR = "/".freeze
 
-    # Blocked genres vouch for nothing — they are scraper noise, never a real name.
-    # Everything else counts, aliases and dormant seed rows included: recognising
+    # Blocked genres vouch for nothing — scraper noise, never a real name. Everything
+    # else counts, aliases and dormant seed rows included: recognising
     # "Elektronik" says the run is a list exactly as well as recognising "Electronic".
     def self.known = new(Genre.where(blocked_at: nil).pluck(:name))
 

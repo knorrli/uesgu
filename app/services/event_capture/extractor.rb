@@ -70,7 +70,7 @@ module EventCapture
       response = client.call(input: input, today: today)
       events = Array(parse(response.text)["events"])
       # Once per response, not once per candidate: a poster advertising eight events
-      # would otherwise re-query the taxonomy eight times over.
+      # would otherwise re-query the taxonomy eight times.
       localities = Localities.known
       genres = Genres.known
 

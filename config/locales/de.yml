@@ -168,6 +168,7 @@ de:
       source_alt: Das ausgelesene Bild
     candidate:
       title: Titel
+      subtitle: Untertitel
       date: Datum
       time: Zeit
       place: Venue

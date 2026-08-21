@@ -35,6 +35,12 @@
       <%= text_field_tag :title, candidate.title, required: true %>
     </label>
 
+    <label class="flex flex-col gap-xsmall">
+      <span class="field-label"><%= t('capture.candidate.subtitle') %></span>
+      <%= text_field_tag :subtitle, candidate.subtitle %>
+    </label>
+    <%= render "shared/cite", quote: cited_evidence(candidate, :subtitle) %>
+
     <div class="capture-card__when flex gap-small wrap">
       <label class="flex flex-col gap-xsmall">
         <span class="field-label"><%= t('capture.candidate.date') %></span>

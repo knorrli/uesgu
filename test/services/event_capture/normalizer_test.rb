@@ -255,6 +255,25 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_equal "2026-02-30T20:00:00", candidate.raw["date"]
   end
 
+  test "a cited subtitle passes through with its quote" do
+    candidate = normalize("subtitle" => " message: incomplete ",
+                          "subtitle_evidence" => "message: incomplete")
+
+    assert_equal "message: incomplete", candidate.subtitle
+    assert_equal "message: incomplete", candidate.subtitle_evidence
+    assert_empty candidate.issues
+  end
+
+  # A subtitle is the field a model most easily writes from the shape of the poster
+  # rather than from its text, so it answers to the evidence rule like the rest.
+  test "an uncited subtitle is dropped and kept" do
+    candidate = normalize("subtitle" => "Ein Abend voller Zorp", "subtitle_evidence" => nil)
+
+    assert_nil candidate.subtitle
+    assert_equal "Ein Abend voller Zorp", candidate.raw["subtitle"]
+    assert_includes candidate.issues, :subtitle_uncited
+  end
+
   test "past is computed, never asked of the model" do
     assert normalize(dated("date" => "2026-08-01", "date_evidence" => "1. August")).past?(today: TODAY)
     refute normalize(dated).past?(today: TODAY)

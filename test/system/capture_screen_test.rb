@@ -41,6 +41,21 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector "[data-capture-target=done]"
   end
 
+  # The second line a poster prints is most of what says what the evening is, and
+  # `description` is where the app already keeps that.
+  test "the poster's second line is published as the event description" do
+    CannedExtractionClient.install(events: [poster_event(subtitle: "message: incomplete",
+                                                        subtitle_evidence: "message: incomplete")])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal "message: incomplete", field_value("subtitle")
+
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_equal "message: incomplete", Event.sole.description
+  end
+
   test "a rejected card publishes nothing and hands over to the next one" do
     CannedExtractionClient.install(events: [poster_event, poster_event(title: "Zorpcore Matinee")])
     visit capture_path
@@ -498,10 +513,10 @@ class CaptureScreenTest < ApplicationSystemTestCase
   # no date on purpose: YearResolver would otherwise recompute the year from it and
   # move the date this test asserts on.
   def poster_event(**overrides)
-    { title: "Zorpcore Nacht", date: show_date.to_s, date_evidence: "steht auf dem Plakat",
-      time: "20 Uhr", place: "Zorpsaal", place_evidence: "Zorpsaal", locality: "Zorpwil",
-      locality_evidence: "3000 Zorpwil", canton: "BE", genres: ["zorpcore"],
-      source_url: nil }.merge(overrides)
+    { title: "Zorpcore Nacht", subtitle: nil, subtitle_evidence: nil, date: show_date.to_s,
+      date_evidence: "steht auf dem Plakat", time: "20 Uhr", place: "Zorpsaal",
+      place_evidence: "Zorpsaal", locality: "Zorpwil", locality_evidence: "3000 Zorpwil",
+      canton: "BE", genres: ["zorpcore"], source_url: nil }.merge(overrides)
   end
 
   def matinee(**overrides) = poster_event(title: "Zorpcore Matinee", **overrides)

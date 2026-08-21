@@ -23,6 +23,16 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
     assert_match "date_evidence", instructions
     assert_match "place_evidence", instructions
     assert_match "locality_evidence", instructions
+    assert_match "subtitle_evidence", instructions
+  end
+
+  # The letterhead and the lineup are the two lines a poster offers that are NOT the
+  # subtitle, and telling them apart is the whole judgement being asked for (see #140).
+  test "the subtitle rule names what it is not" do
+    instructions = EventCapture::Prompt.instructions(today: TODAY)
+
+    assert_match(/is NOT the venue or the\s+series name/, instructions)
+    assert_match(/is NOT the\s+lineup/, instructions)
   end
 
   # Normalizer#cited reads a value whose evidence field is empty as invention, so a
@@ -30,7 +40,7 @@ class EventCapture::PromptTest < ActiveSupport::TestCase
   test "every field the evidence rule governs has an evidence field in the contract" do
     fields = EventCapture::Prompt::SCHEMA.dig(:schema, :properties, :events, :items, :required)
 
-    %w[date place locality].each { |field| assert_includes fields, "#{field}_evidence" }
+    %w[date place locality subtitle].each { |field| assert_includes fields, "#{field}_evidence" }
   end
 
   # A prompt telling the model to read an image it was never sent is how a tuned

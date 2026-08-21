@@ -30,6 +30,8 @@ module EventCapture
 
       Candidate.new(
         title: string(event["title"]),
+        subtitle: cited(:subtitle),
+        subtitle_evidence: string(event["subtitle_evidence"]),
         date: date,
         date_evidence: string(event["date_evidence"]),
         time: time,

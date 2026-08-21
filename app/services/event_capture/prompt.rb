@@ -79,11 +79,11 @@ module EventCapture
 
         THE EVIDENCE RULE — this governs everything below.
 
-        Every `date`, every `place` and every `locality` you return MUST be copied from
-        #{m[:legible]}, and you must quote that text verbatim in
-        `date_evidence` / `place_evidence` / `locality_evidence`. If you cannot quote
-        it, the field is null and the evidence field is null. Never supply a value you
-        cannot cite.
+        Every `date`, every `place`, every `locality` and every `subtitle` you return
+        MUST be copied from #{m[:legible]}, and you must quote that text verbatim in
+        `date_evidence` / `place_evidence` / `locality_evidence` / `subtitle_evidence`.
+        If you cannot quote it, the field is null and the evidence field is null. Never
+        supply a value you cannot cite.
 
         You are NOT being asked to identify the venue. You are being asked to
         transcribe #{m[:says]}. A plausible guess is worse than null: a wrong
@@ -137,6 +137,14 @@ module EventCapture
            character — these are small local acts you will not recognise, so do not
            "correct" a name toward one that sounds more familiar.
 
+        9. `subtitle` is the line printed WITH the title — the tagline, the strapline,
+           the second line that says what the evening is. It is NOT the venue or the
+           series name printed as #{m[:own_wording]} letterhead, and it is NOT the
+           lineup or the instrumentation listed beside an act. Where one
+           #{m[:names_it]} advertises several events, each event gets the subtitle
+           printed with ITS title and none of them gets the letterhead. Null if the
+           title stands alone.
+
         FORMATS — these are strict:
           date  exactly YYYY-MM-DD, e.g. "2026-08-20". Never a datetime, never
                 "20.08.2026", never #{m[:own_wording]} own wording. The evidence field is
@@ -169,10 +177,14 @@ module EventCapture
             items: {
               type: "object",
               additionalProperties: false,
-              required: %w[title date date_evidence time place place_evidence locality locality_evidence
-                           canton genres source_url],
+              required: %w[title subtitle subtitle_evidence date date_evidence time place place_evidence
+                           locality locality_evidence canton genres source_url],
               properties: {
                 title:          { type: %w[string null] },
+                subtitle:       { type: %w[string null],
+                                  description: "The line printed with the title, or null" },
+                subtitle_evidence: { type: %w[string null],
+                                     description: "Verbatim text from the input the subtitle was read from. null if the subtitle is null." },
                 date:           { type: %w[string null], description: "YYYY-MM-DD, or null if not legible" },
                 date_evidence:  { type: %w[string null],
                                   description: "Verbatim text from the input the date was read from. null if the date is null." },

@@ -206,6 +206,14 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_empty Place.all
   end
 
+  # `description` is the curated secondary-text field the scrapers already fill, so a
+  # poster's second line needs no column of its own.
+  test "the subtitle is published as the event description" do
+    assert_equal "message: incomplete",
+                 EventCapture::Creator.call(attrs(subtitle: " message: incomplete ")).event.description
+    assert_nil EventCapture::Creator.call(attrs(subtitle: "  ", title: "Blank")).event.description
+  end
+
   # Captured genres join the taxonomy exactly like scraped ones, and a capture
   # carrying only non-music genres is hidden by the same rule.
   test "genres are ensured in the taxonomy and visibility is recomputed" do

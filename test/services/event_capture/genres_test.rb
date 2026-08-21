@@ -1,13 +1,42 @@
 require "db_test_helper"
 
-# The rule that decides whether a slash in a captured genre is a list or part of a
-# name. Synthetic genre names throughout; only the last test reads the table.
+# The rule that decides whether punctuation in a captured genre separates a list or
+# sits inside a name. Synthetic genre names throughout; only the last test reads the
+# table.
 class EventCapture::GenresTest < ActiveSupport::TestCase
-  def taxonomy(*names) = EventCapture::Genres.new(names)
+  # Every separator a poster reaches for, decided by the same rule: the fingerprint
+  # discards all of them, so only the tokenizer ever knows which one was printed.
+  SEPARATORS = %w[/ · |].freeze
 
-  test "a run whose parts the taxonomy knows is a list" do
-    assert_equal %w[Zorpcore Flarnwave],
-                 taxonomy("Zorpcore", "Flarnwave").split("Zorpcore/Flarnwave")
+  def taxonomy(*names) = EventCapture::Genres.for_names(names)
+
+  test "a run whose parts the taxonomy knows is a list, whatever separates them" do
+    SEPARATORS.each do |separator|
+      assert_equal %w[Zorpcore Flarnwave],
+                   taxonomy("Zorpcore", "Flarnwave").split("Zorpcore#{separator}Flarnwave"),
+                   "separator #{separator.inspect}"
+    end
+  end
+
+  test "a name the taxonomy carries stays whole whatever separates its words" do
+    SEPARATORS.each do |separator|
+      run = "Zorp#{separator}Flarn"
+
+      assert_equal [run], taxonomy("Zorp & Flarn", "Zorp", "Flarn").split(run),
+                   "separator #{separator.inspect}"
+    end
+  end
+
+  # A poster that punctuates one line two ways is still printing one list.
+  test "separators mix inside a single run" do
+    assert_equal %w[Loops Zorpcore FX],
+                 taxonomy("Zorpcore").split("Loops/Zorpcore·FX")
+  end
+
+  # A hyphen sits inside names we carry, so it is not a separator and a run built on
+  # one is left for the contributor to split by hand.
+  test "a hyphen never separates" do
+    assert_equal ["Zorpcore-Flarnwave"], taxonomy("Zorpcore").split("Zorpcore-Flarnwave")
   end
 
   # The motivating poster: six genres in one string, half of them names nobody
@@ -21,17 +50,11 @@ class EventCapture::GenresTest < ActiveSupport::TestCase
     assert_equal ["Loops/FX"], taxonomy("Zorpcore").split("Loops/FX")
   end
 
-  test "a name the taxonomy carries with a slash in it is never split" do
+  test "a name the taxonomy carries with a separator in it is never split" do
     assert_equal ["Zorp/Flarn"], taxonomy("Zorp/Flarn", "Zorp").split("Zorp/Flarn")
   end
 
-  # The fingerprint discards the slash and reads "&" as "and", so the stored spelling
-  # and the poster's are only the same key once the run is rejoined with the ampersand.
-  test "a slash standing in for the ampersand of a stored name is not a separator" do
-    assert_equal ["Zorp/Flarn"], taxonomy("Zorp & Flarn", "Zorp", "Flarn").split("Zorp/Flarn")
-  end
-
-  test "a genre with no slash in it comes back untouched" do
+  test "a genre with no separator in it comes back untouched" do
     assert_equal ["Zorpcore"], taxonomy("Zorpcore").split("Zorpcore")
   end
 

@@ -17,7 +17,7 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
   end
 
   def normalize_with_genres(event, *known)
-    EventCapture::Normalizer.call(event, today: TODAY, genres: EventCapture::Genres.new(known))
+    EventCapture::Normalizer.call(event, today: TODAY, genres: EventCapture::Genres.for_names(known))
   end
 
   def normalize_in(event, **localities)

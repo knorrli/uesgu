@@ -122,10 +122,10 @@ module EventCapture
       computed
     end
 
-    # The one field where the model's answer is expanded rather than trimmed: a slash
-    # run is several genres in one string, and only the taxonomy can say so (see
-    # EventCapture::Genres). Nothing is refused, so nothing goes to `raw` — the flag is
-    # what says the rule fired.
+    # The one field where the model's answer is expanded rather than trimmed: a
+    # punctuated run is several genres in one string, and only the taxonomy can say so
+    # (see EventCapture::Genres). Nothing is refused, so nothing goes to `raw` — the
+    # flag is what says the rule fired.
     def normalized_genres
       named = Array(event["genres"]).filter_map { |genre| string(genre) }
       split = named.flat_map { |genre| genres.split(genre) }

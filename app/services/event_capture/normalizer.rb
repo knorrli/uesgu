@@ -12,10 +12,11 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(event, today:, localities: Localities.none)
+    def initialize(event, today:, localities: Localities.none, genres: Genres.none)
       @event = event.is_a?(Hash) ? event : {}
       @today = today
       @localities = localities
+      @genres = genres
       @raw = {}
       @issues = []
       @salvaged_time = nil
@@ -40,7 +41,7 @@ module EventCapture
         locality: locality,
         locality_evidence: string(event["locality_evidence"]),
         canton: normalized_canton(locality),
-        genres: Array(event["genres"]).filter_map { |genre| string(genre) },
+        genres: normalized_genres,
         source_url: string(event["source_url"]),
         raw: raw,
         issues: issues
@@ -49,7 +50,7 @@ module EventCapture
 
     private
 
-    attr_reader :event, :today, :localities, :raw, :issues, :salvaged_time
+    attr_reader :event, :today, :localities, :genres, :raw, :issues, :salvaged_time
 
     def string(value) = value.to_s.strip.presence
 
@@ -119,6 +120,17 @@ module EventCapture
       raw["date"] = date.to_s
       issues << :year_recomputed
       computed
+    end
+
+    # The one field where the model's answer is expanded rather than trimmed: a
+    # punctuated run is several genres in one string, and only the taxonomy can say so
+    # (see EventCapture::Genres). Nothing is refused, so nothing goes to `raw` — the
+    # flag is what says the rule fired.
+    def normalized_genres
+      named = Array(event["genres"]).filter_map { |genre| string(genre) }
+      split = named.flat_map { |genre| genres.split(genre) }
+      issues << :genres_split unless split == named
+      split
     end
 
     def normalized_time

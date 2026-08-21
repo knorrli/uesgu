@@ -16,6 +16,10 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     )
   end
 
+  def normalize_with_genres(event, *known)
+    EventCapture::Normalizer.call(event, today: TODAY, genres: EventCapture::Genres.for_names(known))
+  end
+
   def normalize_in(event, **localities)
     EventCapture::Normalizer.call(event, today: TODAY, localities: known(**localities))
   end
@@ -270,6 +274,29 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
 
     assert_nil candidate.date
     assert_equal "2026-02-30T20:00:00", candidate.raw["date"]
+  end
+
+  # Observed on a real poster: six genres arrived as one string. The taxonomy is what
+  # says the slash is a separator (see EventCapture::Genres).
+  test "a slash run the taxonomy vouches for becomes several genres" do
+    candidate = normalize_with_genres({ "genres" => ["Loops/Zorpcore/FX"] }, "Zorpcore")
+
+    assert_equal %w[Loops Zorpcore FX], candidate.genres
+    assert_includes candidate.issues, :genres_split
+  end
+
+  # Splitting refuses nothing, so there is no refused value to keep — the flag is the
+  # whole record that the rule fired.
+  test "a run nothing vouches for stays one genre and raises nothing" do
+    candidate = normalize_with_genres({ "genres" => ["Loops/FX"] }, "Zorpcore")
+
+    assert_equal ["Loops/FX"], candidate.genres
+    assert_empty candidate.issues
+    assert_empty candidate.raw
+  end
+
+  test "genres reach the card unsplit where the taxonomy is not there to ask" do
+    assert_equal ["Loops/FX"], normalize("genres" => ["Loops/FX"]).genres
   end
 
   test "past is computed, never asked of the model" do

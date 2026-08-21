@@ -131,7 +131,7 @@ class CapturesController < ApplicationController
   end
 
   def candidate_attributes
-    params.permit(:title, :date, :time, :place, :locality, :canton, :url, :genres)
+    params.permit(:title, :description, :date, :time, :place, :locality, :canton, :url, :genres)
           .to_h.symbolize_keys
           .then { |attrs| attrs.merge(genres: attrs[:genres].to_s.split(",").map(&:strip)) }
   end

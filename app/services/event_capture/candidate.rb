@@ -5,12 +5,12 @@ module EventCapture
   # `raw` keeps every value the normalizer refused, keyed by field, and `issues` says
   # why. A rejected value is never silently dropped: a human completes a null in one
   # tap, but only if they can still see what the model claimed.
-  Candidate = Data.define(:title, :date, :date_evidence, :time, :place, :place_evidence,
-                          :locality, :locality_evidence, :canton, :genres, :source_url,
-                          :raw, :issues) do
-    def initialize(title: nil, date: nil, date_evidence: nil, time: nil, place: nil,
-                   place_evidence: nil, locality: nil, locality_evidence: nil, canton: nil,
-                   genres: [], source_url: nil, raw: {}, issues: [])
+  Candidate = Data.define(:title, :subtitle, :subtitle_evidence, :date, :date_evidence, :time,
+                          :place, :place_evidence, :locality, :locality_evidence, :canton,
+                          :genres, :source_url, :raw, :issues) do
+    def initialize(title: nil, subtitle: nil, subtitle_evidence: nil, date: nil, date_evidence: nil,
+                   time: nil, place: nil, place_evidence: nil, locality: nil, locality_evidence: nil,
+                   canton: nil, genres: [], source_url: nil, raw: {}, issues: [])
       super
     end
 

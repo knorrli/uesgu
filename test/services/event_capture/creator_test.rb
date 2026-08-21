@@ -48,7 +48,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   end
 
   # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
-  # second node in the WHERE tree forever (see Creator#canonical_locality).
+  # second node in the WHERE tree forever (see EventCapture::Localities).
   test "a locality differing only in case or accents adopts the stored spelling" do
     venue = Venue.in_taxonomy.find { |v| v.locality.present? }
     skip "no placed venue" if venue.nil?
@@ -69,7 +69,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   end
 
   # The complement of the case above: a genuine variant is left alone rather than
-  # guessed at (see Creator#canonical_locality).
+  # guessed at (see EventCapture::Localities).
   test "a genuinely different spelling is left as typed" do
     place(name: "Zorpsaal", locality: "Zorpwil")
 

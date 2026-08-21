@@ -50,6 +50,18 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     assert_equal 1200, extraction.input_tokens
   end
 
+  # The Extractor is the only thing that hands the Normalizer the taxonomy to read,
+  # so it is the only place the wiring can break.
+  test "candidates are placed against the localities the taxonomy already carries" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+
+    extraction = extract(FakeClient.new(text: payload(
+      { title: "Zorpcore Nacht", locality: "zorpwil", locality_evidence: "3000 Zorpwil", canton: nil }
+    )))
+
+    assert_equal "BE", extraction.candidates.sole.canton
+  end
+
   test "an image advertising nothing is zero candidates, not a failure" do
     extraction = extract(FakeClient.new(text: payload))
 

@@ -168,6 +168,7 @@ en:
       source_alt: The image this was read from
     candidate:
       title: Title
+      description: Description
       date: Date
       time: Time
       place: Venue

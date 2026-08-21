@@ -55,6 +55,7 @@ module EventCapture
     HTTP_SCHEMES = %w[http https].freeze
 
     def title = attrs[:title].to_s.strip
+    def description = attrs[:description].to_s.strip.presence
     def locality = @locality ||= localities.canonical(attrs[:locality].to_s.strip)
     def canton = attrs[:canton].to_s.strip
     def place_name = attrs[:place].to_s.strip
@@ -93,8 +94,8 @@ module EventCapture
 
     def publish(place)
       event = Event.new(
-        title: title, start_date: start_date, start_time: start_time, url: url,
-        data_source: DATA_SOURCE,
+        title: title, description: description, start_date: start_date,
+        start_time: start_time, url: url, data_source: DATA_SOURCE,
         location_list: located(place),
         genre_list: genres
       )

@@ -50,6 +50,23 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.raw
   end
 
+  test "a cited subtitle survives with the line it was read from" do
+    candidate = normalize(dated("subtitle" => " message: incomplete ",
+                                "subtitle_evidence" => "message: incomplete"))
+
+    assert_equal "message: incomplete", candidate.subtitle
+    assert_equal "message: incomplete", candidate.subtitle_evidence
+    assert_empty candidate.issues
+  end
+
+  test "an uncited subtitle is dropped and kept" do
+    candidate = normalize("subtitle" => "Zorpwils feinste Nacht", "subtitle_evidence" => nil)
+
+    assert_nil candidate.subtitle
+    assert_equal "Zorpwils feinste Nacht", candidate.raw["subtitle"]
+    assert_includes candidate.issues, :subtitle_uncited
+  end
+
   test "a date the model could not quote is invention, so it is dropped and kept" do
     candidate = normalize("date" => "2026-08-20", "date_evidence" => nil)
 

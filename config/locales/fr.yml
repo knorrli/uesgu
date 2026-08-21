@@ -168,6 +168,7 @@ fr:
       source_alt: L'image lue
     candidate:
       title: Titre
+      description: Description
       date: Date
       time: Heure
       place: Lieu

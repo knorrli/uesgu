@@ -6,6 +6,13 @@ require "db_test_helper"
 class LocalityTest < ActiveSupport::TestCase
   def locality(name, canton: nil) = Locality.create!(name: name, canton: canton)
 
+  def saved_filter(owner, locations)
+    rule = owner.saved_filters.new(cadence: "daily", time_of_day: 18 * 60)
+    rule.filter_attributes = { l: locations }
+    rule.save!
+    rule
+  end
+
   # The Ruby fingerprint is used at ingest on strings that have no row to read the
   # generated column off, so the two halves must agree byte for byte or a name
   # matches at entry and not in the database.
@@ -176,11 +183,51 @@ class LocalityTest < ActiveSupport::TestCase
     assert_equal venue.locality, Locality.canonical_name("zorpville")
   end
 
+  # A saved filter is a literal-string snapshot, so one left on the merged-away name
+  # matches nothing the moment the merge moves its events — the digest just goes quiet.
+  test "a merge repoints the saved filters holding the old name" do
+    zorpwil = locality("Zorpwil", canton: "BE")
+    zorpville = locality("Zorpville", canton: "BE")
+    rule = saved_filter(user, ["ZORP-VILLE", "Flarnhausen"])
+    show = event(location_list: ["Zorpville", "BE"])
+
+    zorpville.merge_into!(zorpwil)
+
+    assert_equal ["Zorpwil", "Flarnhausen"], rule.reload.location_list
+    assert_includes rule.name, "Zorpwil"
+    assert_includes rule.matched_events, show
+  end
+
+  test "a filter holding both spellings is left with one" do
+    zorpwil = locality("Zorpwil", canton: "BE")
+    zorpville = locality("Zorpville", canton: "BE")
+    rule = saved_filter(user, ["Zorpville", "Zorpwil"])
+
+    zorpville.merge_into!(zorpwil)
+
+    assert_equal ["Zorpwil"], rule.reload.location_list
+  end
+
+  # One saved filter per fingerprint is what the model promises everywhere else, and a
+  # merge that tripped that validation would fail the whole retagging.
+  test "a repointed filter that duplicates another of the user's filters is dropped" do
+    zorpwil = locality("Zorpwil", canton: "BE")
+    zorpville = locality("Zorpville", canton: "BE")
+    owner = user
+    kept = saved_filter(owner, ["Zorpwil"])
+    saved_filter(owner, ["Zorpville"])
+
+    zorpville.merge_into!(zorpwil)
+
+    assert_equal [kept], owner.saved_filters.reload.to_a
+  end
+
   # Like restoring a blocked genre, which does not bring its stripped taggings back.
   test "splitting undoes the link and leaves the moved data where it was moved" do
     zorpwil = locality("Zorpwil", canton: "BE")
     zorpville = locality("Zorpville")
     show = event(location_list: ["Zorpville", "BE"])
+    rule = saved_filter(user, ["Zorpville"])
     zorpville.merge_into!(zorpwil)
 
     zorpville.reload.unmerge!
@@ -188,5 +235,6 @@ class LocalityTest < ActiveSupport::TestCase
     refute_predicate zorpville.reload, :alias?
     assert_equal "Zorpville", Locality.canonical_name("zorpville")
     assert_includes show.reload.location_list, "Zorpwil"
+    assert_equal ["Zorpwil"], rule.reload.location_list
   end
 end

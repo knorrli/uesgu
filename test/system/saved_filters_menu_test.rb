@@ -1,11 +1,10 @@
 require "application_system_test_case"
 
-# The events toolbar (the list/calendar view switcher) and the chip-row
-# saved-filters menu — a funnel <details> dropdown that SAVES the current filter and
-# APPLIES a saved one. The toggle sits by the applied-filter chips for any signed-in
-# user (an empty filter saves as the all-events rule); its items live in the dropdown
-# panel. Desktop + phone.
-class EventsToolbarTest < ApplicationSystemTestCase
+# The chip-row saved-filters menu — a funnel <details> dropdown that SAVES the
+# current filter and APPLIES a saved one. The toggle sits by the applied-filter
+# chips for any signed-in user (an empty filter saves as the all-events rule); its
+# items live in the dropdown panel. Desktop + phone.
+class SavedFiltersMenuTest < ApplicationSystemTestCase
   test "the saved-filters menu shows by the chips at all widths when a filter is active" do
     event(start_date: Date.current + 3, genre_list: ["Rock"])
     sign_in_as user

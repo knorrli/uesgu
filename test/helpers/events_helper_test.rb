@@ -1,7 +1,7 @@
 require "db_test_helper"
 
 # Locks EventsHelper's predicate/URL logic (the fiddly bits that break silently):
-# calendar nav URL surgery and the genre-subtree descendant highlight.
+# offsite-link badging and the genre-subtree descendant highlight.
 class EventsHelperTest < ActionView::TestCase
   # The helper resolves current_user via the controller; provide it for the test.
   attr_writer :current_user
@@ -16,20 +16,6 @@ class EventsHelperTest < ActionView::TestCase
 
   test "event_offsite_source is nil for a captured event with no url" do
     assert_nil event_offsite_source(event(url: nil))
-  end
-
-  test "calendar_nav_path drops the open day but preserves the filter" do
-    result = calendar_nav_path("http://test.host/events?view=calendar&day=2030-01-01&l%5B%5D=Venue")
-    query = Rack::Utils.parse_nested_query(URI.parse(result).query)
-
-    refute query.key?("day"), "changing months collapses the open day"
-    assert_equal "calendar", query["view"]
-    assert_equal ["Venue"], query["l"]
-  end
-
-  test "calendar_nav_path clears the query entirely when only the day was set" do
-    result = calendar_nav_path("http://test.host/events?day=2030-01-01")
-    assert_nil URI.parse(result).query
   end
 
   test "genre_subtree_names returns the genre plus every descendant" do

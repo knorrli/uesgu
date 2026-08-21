@@ -36,62 +36,18 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "calendar view renders" do
-    sign_in_as user
-    get events_path(view: "calendar")
-    assert_response :success
-  end
-
-  test "the calendar flags days holding a saved show with a bookmark marker" do
-    u = sign_in_as user
-    saved = event(start_date: Date.current + 3, title: "SavedShow")
-    event(start_date: Date.current + 5, title: "UnsavedShow") # different day, not saved
-    u.event_saves.create!(event: saved)
-
-    get events_path(view: "calendar")
-
-    assert_response :success
-    # Only the day with the saved show is flagged — not every day with events.
-    assert_select "section.event-calendar .day-saved-marker", count: 1
-  end
-
-  test "guests never see the calendar bookmark marker" do
-    event(start_date: Date.current + 3)
-
-    get events_path(view: "calendar")
-
-    assert_response :success
-    assert_select ".day-saved-marker", count: 0
-  end
-
-  # The calendar's month nav reloads only the turbo frame, so the empty-state
-  # message (which sits outside it) must key off "does the filter match anything
-  # at all", not the currently-focused month's slice — otherwise it goes stale
-  # and falsely claims "keine Veranstaltungen" on a month that does have results.
-  test "the calendar empty-state reflects whole-filter matches, not the focused month" do
+  # The empty-state message keys off "does the filter match anything at all", not
+  # the current page's slice — otherwise paging past the last result falsely
+  # claims the filter matched nothing.
+  test "the empty-state reflects whole-filter matches, not the current page" do
     event(title: "DarksideShow", start_date: Date.current + 2.months)
 
-    # Focus a month with no matching events while the filter still matches an
-    # event two months out: no empty-state message.
-    get events_path(view: "calendar", q: ["DarksideShow"], start_date: Date.current.iso8601)
+    get events_path(q: ["DarksideShow"], page: 2)
     assert_response :success
     assert_select "p.events-empty", false
 
-    # A filter that genuinely matches nothing still shows the message.
-    get events_path(view: "calendar", q: ["NoSuchEventAnywhere"])
+    get events_path(q: ["NoSuchEventAnywhere"])
     assert_select "p.events-empty"
-  end
-
-  # With no explicit month nav and no date filter, the calendar opens on the
-  # month holding the first matching event — so a search lands on its results
-  # rather than a (possibly empty) current month the user must page past.
-  test "the calendar focuses the first matching event when no month is requested" do
-    event(title: "DarksideShow", start_date: Date.current + 2.months)
-
-    get events_path(view: "calendar", q: ["DarksideShow"])
-
-    assert_response :success
-    assert_select "time.calendar-title[datetime=?]", (Date.current + 2.months).strftime("%Y-%m")
   end
 
   test "a location filter narrows the listing" do
@@ -202,18 +158,6 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
 
     assert_includes response.body, "FutureShow"
     refute_includes response.body, "PastShow"
-  end
-
-  # The favorites shortcut is rendered for any logged-in user but hidden until
-  # they follow something, so the favorite Stimulus controller can reveal it on
-  # the first favorite without a reload (it can only toggle a node that exists).
-  test "the chosen view is mirrored onto the logged-in users account" do
-    u = sign_in_as user
-    get events_path(view: "calendar")
-    assert_equal "calendar", u.reload.events_view
-
-    get events_path(view: "nonsense") # invalid falls back to list
-    assert_equal "list", u.reload.events_view
   end
 
   test "the admin delete button dismisses (soft-delete): gone from public, kept in DB" do

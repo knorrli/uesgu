@@ -127,7 +127,7 @@ de:
   saved_events:
     title: Merkliste
     empty: Noch nichts gespeichert — tippe das Herz bei einer Veranstaltung.
-    none_upcoming: Nichts Anstehendes — vergangene Einträge findest du im Kalender.
+    none_upcoming: Nichts Anstehendes.
     toggle: Veranstaltung speichern
     reminders_label: An gespeicherte Veranstaltungen erinnern
     reminders_hint: Ein Hinweis um die Mittagszeit am Tag der gespeicherten Veranstaltung — in deinen Benachrichtigungen, und per Push oder E-Mail, falls eingerichtet.
@@ -289,13 +289,6 @@ de:
       cta: In der App ansehen
       footer_reason: Du bekommst das wegen eines Filters, den du erstellt hast.
       footer_manage: Deine Filter verwalten
-  simple_calendar:
-    previous: Zurück
-    today: Heute
-    next: Weiter
-    more_venues:
-      one: "+ 1 weitere"
-      other: "+ %{count} weitere"
   settings:
     title: Einstellungen
     saved: Einstellungen gespeichert.
@@ -790,16 +783,9 @@ de:
     index:
       empty: Keine Veranstaltungen für die aktuellen Filter.
       clear_filter: Filter zurücksetzen
-      view:
-        label: Ansicht
-        list: Liste
-        calendar: Kalender
       save_filter: Filter speichern
       save_filter_all: Über alles benachrichtigen
       save_filter_saved: Gespeichert — bearbeiten
-    day:
-      empty: Keine Events an diesem Tag.
-      close: Schliessen
     filter:
       what: "Acts, Stile, alles suchen…"
       when: Wann?
@@ -821,6 +807,8 @@ de:
       search_for: 'Suchen nach „%{query}“'
       search_anything: Tippe, um nach allem zu suchen
       custom_range: Eigener Zeitraum
+      prev_month: Zurück
+      next_month: Weiter
       loading: Lädt…
   shared:
     cancel: Abbrechen

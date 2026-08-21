@@ -15,11 +15,11 @@
               class: 'button-small' %>
       <% end %>
     </div>
-    <%# Ungelesen | Gelesen — the shared flat-text toggle (.view-switch__item),
-        same component as the list/calendar switcher. On its own row below the
-        title (not inline beside it) so the long monospace heading can't shove it
-        off the right edge on narrow screens. Hidden until the user has at least
-        one notification (no point offering a read archive on a never-used inbox). %>
+    <%# Ungelesen | Gelesen — the shared flat-text toggle (.view-switch__item).
+        On its own row below the title (not inline beside it) so the long monospace
+        heading can't shove it off the right edge on narrow screens. Hidden until
+        the user has at least one notification (no point offering a read archive on
+        a never-used inbox). %>
     <% if @read_count.positive? || @unread_count.positive? %>
       <nav class="view-switcher flex" aria-label="<%= t('notifications.index.view_label') %>">
         <%= link_to t('notifications.index.tab_unread'), notifications_path,

@@ -49,8 +49,7 @@
 }
 
 /* The inbox's Ungelesen | Gelesen toggle reuses the shared .view-switcher /
-   .view-switch__item component (see events-list.css) — one home for the
-   flat-text toggle, so a fix to one is a fix to both. No bespoke styles here. */
+   .view-switch__item component (see controls.css). No bespoke styles here. */
 
 .empty-state {
   color: var(--theme-fg-muted);

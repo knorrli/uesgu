@@ -4,7 +4,7 @@ body {
      bright near-white) so the light theme is easy on the eyes. The green reads
      clearly as green for links/text on it, AND is dark enough that the cream
      on-accent text punches out of the button fill. --theme-bg-muted (this minus
-     10% L) is the sand highlight reused by both the dropdown and calendar hover. */
+     10% L) is the sand highlight reused for hover/active fills. */
   --color-background: #e8e1cd;
   --color-accent: #0e7a4a;
   --color-warn: var(--color-red);
@@ -16,15 +16,14 @@ body {
 
   --border-width: 2px;
   --tag-border-width: 1px;
-  --calendar-border-width: 1px;
   /* Structural rules / hairlines are NEUTRAL, not green. Green is reserved for
      interaction (links, focus, active, primary actions), state (today, selected),
      and follows — so it reads as a signal, not as the default border colour.
      A foreground-derived tint adapts to both themes automatically. */
   --border-color: color-mix(in srgb, var(--theme-fg-color) 22%, transparent);
-  /* A more emphatic neutral for prominent CONTENT dividers (date headings, the
-     calendar weekday rule, the day drawer frame) — visible as structure without
-     reaching for the interactive green. */
+  /* A more emphatic neutral for prominent CONTENT dividers (date headings, sheet
+     and panel rules) — visible as structure without reaching for the interactive
+     green. */
   --rule-color: color-mix(in srgb, var(--theme-fg-color) 45%, transparent);
   /* The focus indicator: the one place we deliberately spend green on chrome. */
   --focus-ring: var(--theme-accent-color);
@@ -56,9 +55,6 @@ body {
      than blending into the ground — the login/settings fields were near-invisible
      at 22% on the saturated grounds. Derived from fg so it adapts to both themes. */
   --field-border-color: color-mix(in srgb, var(--theme-fg-color) 40%, transparent);
-  /* The calendar grid: visible enough to read as a grid on the saturated pink,
-     still lighter than a content rule. (22% washed out against the rose ground.) */
-  --calendar-border-color: color-mix(in srgb, var(--theme-fg-color) 30%, transparent);
 
   color-scheme: light;
   background-color: var(--theme-bg-color);

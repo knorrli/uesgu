@@ -57,9 +57,6 @@ gem "discard"
 # Web Scraping
 gem "mechanize"
 
-# Calendar View
-gem "simple_calendar"
-
 # Rate limiting / abuse throttling at the Rack layer (sheds scraper floods
 # before they reach the controller — see config/initializers/rack_attack.rb)
 gem "rack-attack"

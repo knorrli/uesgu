@@ -127,7 +127,7 @@ en:
   saved_events:
     title: Watchlist
     empty: Nothing saved yet — tap the heart on any show.
-    none_upcoming: Nothing coming up — your past saves are on the calendar.
+    none_upcoming: Nothing coming up.
     toggle: Save show
     reminders_label: Remind me about my saved shows
     reminders_hint: A nudge around midday on the day of each saved show — in your notifications, and by push or email if you've set those up.
@@ -289,13 +289,6 @@ en:
       cta: View in the app
       footer_reason: You're getting this from a filter you set up.
       footer_manage: Manage your filters
-  simple_calendar:
-    previous: Previous
-    today: Today
-    next: Next
-    more_venues:
-      one: "+ 1 more"
-      other: "+ %{count} more"
   settings:
     title: Settings
     saved: Settings saved.
@@ -790,16 +783,9 @@ en:
     index:
       empty: No events match your current filters.
       clear_filter: Clear filter
-      view:
-        label: View
-        list: List
-        calendar: Calendar
       save_filter: Save this filter
       save_filter_all: Notify me about everything
       save_filter_saved: Saved — edit
-    day:
-      empty: No events on this day.
-      close: Close
     filter:
       what: "Search acts, styles, anything…"
       when: When?
@@ -821,6 +807,8 @@ en:
       search_for: 'Search for “%{query}”'
       search_anything: Type to search for anything
       custom_range: Custom range
+      prev_month: Previous
+      next_month: Next
       loading: Loading…
   shared:
     cancel: Cancel

@@ -75,7 +75,7 @@
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--bg-mut"></div>
-        <p class="sg-swatch__label"><b>Background muted</b> · <code>--theme-bg-muted</code><br>Neutral fills + the sand highlight wash shared by dropdown options and the calendar day hover/selected</p>
+        <p class="sg-swatch__label"><b>Background muted</b> · <code>--theme-bg-muted</code><br>Neutral fills + the sand highlight wash behind a dropdown option or date-picker day at hover/selected</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--fg"></div>
@@ -91,11 +91,10 @@
       raw <code>input</code> text, and the filter-handle icon are neutral
       (<code>--border-color</code> / <code>--rule-color</code> /
       <code>--theme-fg-muted</code>). Field underlines use a more present neutral
-      (<code>--field-border-color</code>) so an empty input reads as fillable, and
-      the calendar grid its own (<code>--calendar-border-color</code>) so it reads
-      as a grid on the saturated ground — both still neutral, derived from the
-      foreground. Green appears on a field only on focus, and otherwise only for
-      links, active state, primary actions, and follows.
+      (<code>--field-border-color</code>) so an empty input reads as fillable —
+      still neutral, derived from the foreground. Green appears on a field only on
+      focus, and otherwise only for links, active state, primary actions, and
+      follows.
     </p>
   </section>
 
@@ -184,13 +183,13 @@
     <div class="sg-row">
       <div class="sg-specimen">
         <span class="view-switcher inline-flex">
-          <a href="#buttons" class="view-switch__item">List</a>
-          <a href="#buttons" class="view-switch__item active"><b>Calendar</b></a>
+          <a href="#buttons" class="view-switch__item active"><b>Unread</b></a>
+          <a href="#buttons" class="view-switch__item">Read</a>
         </span>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">View switcher</span> · <code>.view-switch__item</code>
-        <p class="sg-purpose">The shared flat text toggle (not a button); active = bold accent, others = muted underlined links. Used for list ↔ calendar <em>and</em> the inbox's Ungelesen ↔ Gelesen tabs — one component, so reach for this rather than forking a lookalike. The flat-text controls use their own domain classes rather than borrowing <code>.button</code>.</p>
+        <p class="sg-purpose">The shared flat text toggle (not a button); active = bold accent, others = muted underlined links. Used for the inbox's Ungelesen ↔ Gelesen tabs — one component, so reach for this rather than forking a lookalike for the next pair of sibling views. The flat-text controls use their own domain classes rather than borrowing <code>.button</code>.</p>
       </div>
     </div>
 
@@ -563,13 +562,13 @@
     <div class="sg-row">
       <div class="sg-specimen">
         <span class="view-switcher inline-flex">
-          <a href="#nav" class="view-switch__item">List</a>
-          <a href="#nav" class="view-switch__item active"><b>Calendar</b></a>
+          <a href="#nav" class="view-switch__item active"><b>Unread</b></a>
+          <a href="#nav" class="view-switch__item">Read</a>
         </span>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">View switcher</span> · <code>.view-switcher</code> / <code>.view-switch__item</code>
-        <p class="sg-purpose">Flat text toggle between the list and calendar views; active = bold accent.</p>
+        <p class="sg-purpose">Flat text toggle between sibling views of one page; active = bold accent.</p>
       </div>
     </div>
 

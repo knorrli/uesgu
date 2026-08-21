@@ -18,6 +18,16 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal %w[BE Zorpsaal Zorpwil], result.event.location_list.sort
   end
 
+  test "the subtitle the contributor kept publishes as the event's description" do
+    result = EventCapture::Creator.call(attrs(description: "message: incomplete"))
+
+    assert_equal "message: incomplete", result.event.description
+  end
+
+  test "a description nobody filled is nothing, not a blank string" do
+    assert_nil EventCapture::Creator.call(attrs(description: "  ")).event.description
+  end
+
   test "stamps the capture data source" do
     assert_equal "capture", EventCapture::Creator.call(attrs).event.data_source
   end

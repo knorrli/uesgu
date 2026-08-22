@@ -21,6 +21,10 @@ class Genre < ApplicationRecord
                       inverse_of: :parent, dependent: :nullify
 
   scope :in_use, -> { where("events_count > 0") }
+  # What a picker may offer: in active use and carrying no disposition or alias. A
+  # genre we ignore, hide or block is not something to suggest, and an alias would tag
+  # the raw token rather than its canonical.
+  scope :offerable, -> { in_use.where(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil) }
   # Tree curation queue: in active use, sitting under no parent, carrying no
   # disposition or alias, AND not itself a parent of other genres — the genres
   # still waiting to be filed into the tree. Excluding parents is what separates

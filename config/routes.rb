@@ -73,12 +73,9 @@ Rails.application.routes.draw do
     # a render, not a read: no model call, no ExtractionAttempt, and it publishes
     # through `create` like any other card.
     post :blank
-    # The genre combobox's two halves: `genre_options` searches the taxonomy as the
-    # contributor types (async, so 300 genre names are not inlined into every card),
-    # `genre_chips` renders the current selection. Both speak NAMES — the taxonomy
-    # endpoints elsewhere answer with ids and only know genres already tagged on an
-    # event, and a capture routinely proposes a name nothing carries yet.
-    get :genre_options
+    # `genre_chips` renders the combobox's current selection. It speaks NAMES — the
+    # taxonomy endpoints elsewhere answer with ids and only know genres already tagged
+    # on an event, and a capture routinely proposes a name nothing carries yet.
     post :genre_chips
   end
 

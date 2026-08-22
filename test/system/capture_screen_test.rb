@@ -128,6 +128,39 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-card dialog.hw-combobox__dialog[open]"
   end
 
+  # The vocabulary is a few hundred options and a batch is N posters x M events, so a
+  # copy inside every card grows with both — and with the taxonomy. One copy lives in
+  # the page and is lent to whichever card is open.
+  test "the genre options sit in one card at a time" do
+    2.times { |i| genre(name: "zorpwave#{i}", events_count: 3) }
+    CannedExtractionClient.install(events: [poster_event(genres: []), matinee(genres: [])])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal 2, all(".capture-card [role=option]", visible: :all).size
+
+    jump_to 1
+    assert_equal 2, all(".capture-card [role=option]", visible: :all).size
+
+    find(".capture-card [role=combobox]").send_keys("zorpwave0")
+    assert_selector ".capture-card .hw-combobox__listbox [role=option]", count: 1
+  end
+
+  # The combobox hides an option it already holds in the field, and a card is lent a
+  # list that knows nothing of what it has picked.
+  test "a genre already on the card is not offered again" do
+    picked = genre(name: "zorpwave", events_count: 3)
+    genre(name: "zorpstep", events_count: 3)
+    CannedExtractionClient.install(events: [poster_event(genres: [picked.name])])
+    visit capture_path
+    pick "poster.png"
+
+    find(".capture-card [role=combobox]").send_keys("zorp")
+
+    assert_selector ".capture-card .hw-combobox__listbox [role=option]", text: "zorpstep"
+    assert_no_selector ".capture-card .hw-combobox__listbox [role=option]", text: picked.name
+  end
+
   # A tap on a chip targets the chip, and inside a wrapping <label> that is a click on
   # the label — which the browser forwards to the input, defeating the remover. What
   # the markup has to do instead: app/views/captures/_candidate.html.erb.

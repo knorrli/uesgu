@@ -127,12 +127,18 @@
             carry is picked rather than respelt. Submits the same comma-joined string
             the text input did. %>
         <div class="input-wrapper flex capture-card__genres">
-          <%# `mobile_at` is the width at or below which the gem swaps its inline listbox
+          <%# Empty on purpose: the options are cloned in from the page's one copy when
+              this card opens (see capture_controller.js). Sync and not a src, so typing
+              filters what is already here — a request per keystroke answers a query the
+              contributor has usually typed past by the time it lands, and on mobile data
+              the late answer overwrites the current list.
+
+              `mobile_at` is the width at or below which the gem swaps its inline listbox
               for a modal <dialog>; a width no viewport can be under keeps the listbox
               everywhere. On a phone the dialog covers the card from mid-screen down and
               still shows fewer options than the dropdown it replaces, because the
               software keyboard eats the bottom of it. %>
-          <%= combobox_tag :genres, genre_options_capture_path, value: candidate.genres.join(","),
+          <%= combobox_tag :genres, [], value: candidate.genres.join(","),
                 id: "#{key}-genres", mobile_at: "0px",
                 free_text: true, multiselect_chip_src: genre_chips_capture_path,
                 placeholder: t('capture.candidate.genres_placeholder') do |combobox| %>

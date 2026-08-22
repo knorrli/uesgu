@@ -109,7 +109,8 @@
       <div class="input-wrapper flex capture-card__genres">
         <%= combobox_tag :genres, genre_options_capture_path, value: candidate.genres.join(","),
               free_text: true, multiselect_chip_src: genre_chips_capture_path,
-              placeholder: t('capture.candidate.genres_placeholder') do |combobox| %>
+              placeholder: t('capture.candidate.genres_placeholder'),
+              dialog_label: t('capture.candidate.genres') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>
         <% end %>

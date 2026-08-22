@@ -30,7 +30,8 @@
               Place.canonicals.where.not(id: @place.id).by_name.map { |candidate|
                 { display: "#{candidate.name} — #{candidate.locality}, #{candidate.canton}", value: candidate.id }
               },
-              placeholder: t('.merge_into') do |combobox| %>
+              placeholder: t('.merge_into'),
+              dialog_label: t('.merge_into') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>
         <% end %>

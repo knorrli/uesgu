@@ -16,7 +16,8 @@
      data-capture-blank-url-value="<%= blank_capture_path %>"
      data-capture-by-hand-value="<%= t('capture.staging.by_hand') %>"
      data-capture-found-one-value="<%= found[:one] %>"
-     data-capture-found-other-value="<%= found[:other] %>">
+     data-capture-found-other-value="<%= found[:other] %>"
+     data-capture-done-value="<%= capture_done_flashes.to_json %>">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1 data-capture-target="stagingTitle"><%= t('capture.title') %></h1>
     <h1 data-capture-target="reviewTitle" hidden></h1>
@@ -62,13 +63,12 @@
     <% combobox_options(capture_genres, value: :name, display: :name).each do |option| %><%= render option %><% end %>
   </template>
 
-  <%# Progress, navigation and receipts in one strip: a card publishes the moment it
-      is accepted and moves on, so its tile is the only thing left saying so. %>
+  <%# Progress, navigation and receipts in one strip: a card publishes the moment it is
+      accepted and moves on, so for as long as the batch lasts its tile is the only
+      thing saying so. %>
   <nav class="capture-queue" data-capture-target="strip" aria-label="<%= t('capture.queue.label') %>" hidden></nav>
 
   <div id="capture-rows" class="flex flex-col gap-medium" data-capture-target="rows"></div>
-
-  <%= tag.p t('capture.queue.done'), class: "empty-state", data: { capture_target: "done" }, hidden: true %>
 
   <div data-capture-target="restart" hidden>
     <button type="button" class="text-link" data-action="capture#startOver"><%= t('capture.staging.start_over') %></button>

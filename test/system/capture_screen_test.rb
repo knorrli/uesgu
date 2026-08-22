@@ -35,10 +35,10 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     assert_difference -> { Event.count } => 1, -> { Place.count } => 1 do
       accept
-      assert_selector ".capture-queue__tile[data-state=published]"
+      assert_published
     end
     assert_equal "Zorpwil", Place.last.locality
-    assert_selector "[data-capture-target=done]"
+    assert_selector ".capture-picker"
   end
 
   test "a rejected card publishes nothing and hands over to the next one" do
@@ -91,7 +91,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     type("locality", "Zorpwil")
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
 
     locality = ExtractionFieldOutcome.find_by(field: "locality")
     assert_predicate locality, :corrected?
@@ -128,7 +128,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".hw-combobox__chip", text: "flarncore"
 
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
     assert_equal %w[Flarncore Zorpcore], Event.sole.genre_list.sort
   end
 
@@ -208,7 +208,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     assert_selector ".hw-combobox__chip", text: "dubtronica"
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
     assert_equal %w[Dubtronica], Event.sole.genre_list
   end
 
@@ -226,7 +226,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".hw-combobox__chip", text: "FX"
 
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
     # "Fx", not "FX": a genre nobody carries is stored under the display spelling
     # Genre.canonicalize_names gives it, exactly as a hand-typed one is.
     assert_equal ["Fx", "Loops", carried.name].sort, Event.sole.genre_list.sort
@@ -267,7 +267,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     find(".suggestions button", text: "Zorpsaal").click
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :normalized?
   end
@@ -281,7 +281,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     find(".suggestions button", text: "Zorpsaal").click
     type("place", "Zorpkeller")
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :corrected?
   end
@@ -343,7 +343,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     find(".suggestions button", text: "Flarnhausen").click
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :normalized?
   end
@@ -364,7 +364,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "BE", field_value("canton")
 
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
 
     assert_no_difference -> { Place.count } do
       assert_equal %w[BE Zorpsaal Zorpwil], Event.last.location_list.to_a.sort
@@ -389,7 +389,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-card", text: "3000 ZORPWIL"
 
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :unchanged?
     assert_equal ["Zorpwil"], Event.last.location_list.grep_v(/\A(BE|Zorpsaal)\z/)
@@ -440,7 +440,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     type "locality", "Flarnhausen"
     accept
-    assert_selector ".capture-queue__tile[data-state=published]"
+    assert_published
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "canton"), :normalized?
   end
@@ -466,7 +466,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     assert_difference -> { Event.count } => 1 do
       accept
-      assert_selector ".capture-queue__tile[data-state=published]"
+      assert_published
     end
     assert_equal "Zorp Fest", Event.last.title
   end
@@ -560,7 +560,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     pick "poster.png"
 
     reject
-    assert_selector ".capture-queue__tile[data-state=dropped]"
+    assert_published 0
 
     # The record is fire-and-forget, so it lands after the card is already gone.
     page.document.synchronize(errors: [Minitest::Assertion]) do
@@ -581,7 +581,23 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     assert_selector ".capture-card__status--refused", text: copy("errors.incomplete")
     assert_empty Event.all
-    assert_no_selector "[data-capture-target=done]"
+    assert_no_selector ".flash"
+  end
+
+  # The strip is the only receipt for what published, and going back to the picker
+  # throws it away — so what replaces it has to say how much went live.
+  test "the last decision hands the screen back to the picker" do
+    CannedExtractionClient.install(events: [poster_event, matinee])
+    visit capture_path
+    pick "poster.png"
+
+    reject
+    accept
+
+    assert_published
+    assert_selector ".capture-picker"
+    assert_no_selector ".capture-card", visible: :all
+    assert_no_selector ".capture-queue__tile"
   end
 
   test "a decided card is still reachable from its tile" do
@@ -792,7 +808,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   test "the input step is gone while cards are being decided, and start over brings it back" do
-    CannedExtractionClient.install(events: [poster_event])
+    CannedExtractionClient.install(events: [poster_event, matinee])
     visit capture_path
     pick "poster.png"
 
@@ -801,6 +817,8 @@ class CaptureScreenTest < ApplicationSystemTestCase
     find("button[data-action='capture#startOver']").click
 
     assert_selector ".capture-picker"
+    assert_selector "h1", text: copy("title")
+    assert_no_selector ".page-header", text: copy("review.hint")
     assert_no_selector ".capture-card", visible: :all
     assert_no_selector ".drop-zone__item"
     assert_no_selector ".capture-queue__tile"
@@ -923,6 +941,12 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def cite(quote) = I18n.t("shared.cite", locale: :de, quote: quote)
 
   def field_value(field) = find(".capture-card [name='#{field}']").value
+
+  # Accepting the last card in a queue hands the screen straight back to the picker, so
+  # the tile that said it published is gone before an assertion could look for it. The
+  # flash is what outlives that, and waiting on it is also what holds a test back until
+  # the publish has landed.
+  def assert_published(count = 1) = assert_selector(".flash", text: copy("queue.done", count: count))
 
   # The strip is the only way onto a card that has not been decided yet.
   def jump_to(index) = all(".capture-queue__tile")[index].click

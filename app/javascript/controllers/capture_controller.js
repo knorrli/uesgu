@@ -18,7 +18,7 @@ const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{
 // Connects to data-controller="capture".
 export default class extends Controller {
   static targets = ["files", "text", "zone", "items", "commit", "input", "restart",
-                    "rows", "done", "strip", "card", "source", "stagingTitle", "reviewTitle",
+                    "rows", "strip", "card", "source", "stagingTitle", "reviewTitle",
                     "reviewHint", "genreOptions"]
   static values = {
     url: String,
@@ -35,6 +35,7 @@ export default class extends Controller {
     byHand: String,
     foundOne: String,
     foundOther: String,
+    done: Object,
     rereadLimit: { type: Number, default: 2 }
   }
 
@@ -183,10 +184,10 @@ export default class extends Controller {
     this.stripTarget.replaceChildren()
     this.stripTarget.hidden = true
     this.currentId = null
-    this.doneTarget.hidden = true
     this.restartTarget.hidden = true
     this.inputTarget.hidden = false
     this.reviewTitleTarget.hidden = true
+    this.reviewHintTarget.hidden = true
     this.stagingTitleTarget.hidden = false
     this.refreshCommit()
   }
@@ -309,7 +310,6 @@ export default class extends Controller {
       this.stockGenres(card, card.id === id)
     })
     this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === id) })
-    this.doneTarget.hidden = true
   }
 
   // The genre vocabulary lives once in the page and is lent to whichever card is open.
@@ -386,9 +386,34 @@ export default class extends Controller {
                       .find((card) => card.dataset.state === "open")
     if (next) return this.open(next.id)
 
-    cards.forEach((card) => { card.hidden = true })
-    this.currentId = null
-    this.doneTarget.hidden = false
+    this.finish()
+  }
+
+  // A queue with nothing left to decide is a screen with nothing to do on it, so the
+  // batch ends where it began. That throws the tiles away with it, and they are what
+  // said which events went live — hence the count in the flash, the only receipt to
+  // outlive the reset.
+  finish() {
+    const published = this.cardTargets.filter((card) => card.dataset.state === "published").length
+    this.flash(this.doneMessage(published).replace("%{count}", published))
+    this.startOver()
+  }
+
+  doneMessage(count) {
+    if (count === 0) return this.doneValue.zero
+
+    return count === 1 ? this.doneValue.one : this.doneValue.other
+  }
+
+  // Dropped once it has faded rather than left hidden in the region: this screen never
+  // navigates, so nothing else would ever clear it and a second batch would announce
+  // itself under the first one's ghost. The fade is .flash in application.css.
+  flash(message) {
+    const note = document.createElement("p")
+    note.className = "flash notice"
+    note.textContent = message
+    note.addEventListener("animationend", () => note.remove())
+    document.querySelector(".flashes")?.append(note)
   }
 
   // Full-bleed for the reason in review_card.css: the small print is what a poster is

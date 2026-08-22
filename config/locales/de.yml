@@ -135,11 +135,10 @@ de:
     calendar_feed_link: in den Einstellungen einrichten
   capture:
     title: Event erfassen
-    intro: Was du übernimmst, geht sofort live.
     review:
       title:
-        one: 1 Veranstaltung gefunden — bestätige sie
-        other: "%{count} Veranstaltungen gefunden — bestätige jede"
+        one: 1 Veranstaltung gefunden
+        other: "%{count} Veranstaltungen gefunden"
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
@@ -150,7 +149,7 @@ de:
       by_hand: Von Hand eingegeben
       commit: Auslesen
       remove: Entfernen
-      start_over: Von vorne
+      start_over: Abbrechen und neu starten
     queue:
       label: Warteschlange
       done: Alles entschieden.

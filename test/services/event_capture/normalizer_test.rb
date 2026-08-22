@@ -227,6 +227,42 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_equal [:canton_invalid], candidate.issues
   end
 
+  test "a town the app already carries is filed under its spelling, not the poster's" do
+    candidate = normalize_in(cited_locality("ZORPWIL"), Zorpwil: "BE")
+
+    assert_equal "Zorpwil", candidate.locality
+    assert_equal "ZORPWIL", candidate.raw["locality"]
+    assert_equal [:locality_normalized], candidate.issues
+    assert_equal "BE", candidate.canton
+  end
+
+  test "a merged-away spelling resolves to the town it names" do
+    zorpwil = Locality.create!(name: "Zorpwil", canton: "BE")
+    Locality.create!(name: "Zorpville", canton: "BE", canonical: zorpwil)
+
+    candidate = normalize(cited_locality("Zorpville"))
+
+    assert_equal "Zorpwil", candidate.locality
+    assert_equal "Zorpville", candidate.raw["locality"]
+    assert_includes candidate.issues, :locality_normalized
+  end
+
+  test "the spelling the app already uses is not a normalization" do
+    candidate = normalize_in(cited_locality("Zorpwil"), Zorpwil: "BE")
+
+    assert_equal "Zorpwil", candidate.locality
+    assert_empty candidate.issues
+    assert_empty candidate.raw
+  end
+
+  test "a town nobody carries keeps the spelling it arrived with" do
+    candidate = normalize_in(cited_locality("FLARNHAUSEN"), Zorpwil: "BE")
+
+    assert_equal "FLARNHAUSEN", candidate.locality
+    assert_empty candidate.issues
+    assert_empty candidate.raw
+  end
+
   test "a null locality survives extraction — it is required at persist, not here" do
     candidate = normalize(dated("locality" => nil))
 

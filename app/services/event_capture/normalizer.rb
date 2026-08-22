@@ -24,9 +24,9 @@ module EventCapture
     def call
       date = normalized_date
       time = normalized_time
-      # A local rather than a second `cited(:locality)` below: the canton is computed
-      # from it, and `cited` flags an issue on the way past — asking twice records it twice.
-      locality = cited(:locality)
+      # A local rather than a second call below: the canton is computed from it, and
+      # `cited` flags an issue on the way past — asking twice records it twice.
+      locality = normalized_locality
 
       Candidate.new(
         title: string(event["title"]),
@@ -144,6 +144,22 @@ module EventCapture
         issues << :time_normalized
       end
       normalized
+    end
+
+    # The spelling the app already files this town under, not the poster's shouting.
+    # EventCapture::Creator folds it on publish either way, so leaving the card on
+    # "THUN" has the contributor confirm a town that is not the one saved — and the
+    # card is the last place a human sees it before it is filed.
+    def normalized_locality
+      typed = cited(:locality)
+      return if typed.nil?
+
+      canonical = Locality.canonical_name(typed)
+      return typed if canonical == typed
+
+      raw["locality"] = typed
+      issues << :locality_normalized
+      canonical
     end
 
     # Computed from the locality, never the model's answer, because a wrong canton

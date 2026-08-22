@@ -13,6 +13,14 @@
         chrome; matched to the manifest's theme/background colour so the installed
         PWA launches as ours rather than a blank white frame. %>
     <meta name="theme-color" content="#17131a">
+
+    <%# Turbo treats a 100ms hover as a real credentialed GET, then serves that
+        response to the click. EventsController#index stores the filter cookie on
+        any GET carrying q/g/l/d, so with prefetch on, merely resting the cursor on
+        a genre chip commits that filter. Guarding the cookie write on the prefetch
+        header does NOT fix it: the click reuses the prefetched response and never
+        reaches the server, so the filter would stick only when NOT hovered first. %>
+    <meta name="turbo-prefetch" content="false">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 

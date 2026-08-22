@@ -58,6 +58,13 @@ body {
   }
   .hw-combobox__handle {
     position: unset;
+    /* The gem gives the handle `height: 100%` and takes it out of flow, so the
+       percentage has a resolved wrapper height to read. In flow it is instead a
+       flex item of a wrapping row, and WebKit resolves the percentage against the
+       wrapper height it is still computing: the wrapper freezes at one chip row
+       and every wrapped row spills out over the underline and the text below the
+       field. Square, off its own width, is a height no engine has to guess at. */
+    height: var(--hw-handle-width);
 
     &::before {
       background-image: none;

@@ -114,14 +114,12 @@
     <%= render layout: "shared/field_group",
           locals: { attached: tag.span(t('capture.candidate.genres_hint'), class: "muted") } do %>
       <%# The label names the field with `for` and must NOT wrap it, unlike every other
-          field on this card. Below the combobox's 640px breakpoint the gem renders a
-          modal <dialog> inside the field; a tap on that dialog's backdrop targets the
-          dialog element, and a tap on a selection chip targets the chip. Inside a
-          wrapping label both are clicks on the label, so the browser forwards
-          activation to the labelled input as a second click at the same coordinates —
-          reopening the field the tap was meant to close, and defeating the chip's
-          remover. The gem ids the input with a random uuid unless given one, so the
-          label needs an id the card can build. %>
+          field on this card. The gem draws a selection as a chip inside the field, and
+          a tap on one targets the chip — inside a wrapping label that is a click on the
+          label, so the browser forwards activation to the labelled input as a second
+          click at the same coordinates, defeating the chip's remover. The gem ids the
+          input with a random uuid unless given one, so the label needs an id the card
+          can build. %>
       <div class="flex flex-col gap-xsmall">
         <label class="field-label" for="<%= key %>-genres"><%= t('capture.candidate.genres') %></label>
         <%# Free text on purpose: a poster names genres the taxonomy has never seen, and
@@ -129,11 +127,15 @@
             carry is picked rather than respelt. Submits the same comma-joined string
             the text input did. %>
         <div class="input-wrapper flex capture-card__genres">
+          <%# `mobile_at` is the width at or below which the gem swaps its inline listbox
+              for a modal <dialog>; a width no viewport can be under keeps the listbox
+              everywhere. On a phone the dialog covers the card from mid-screen down and
+              still shows fewer options than the dropdown it replaces, because the
+              software keyboard eats the bottom of it. %>
           <%= combobox_tag :genres, genre_options_capture_path, value: candidate.genres.join(","),
-                id: "#{key}-genres",
+                id: "#{key}-genres", mobile_at: "0px",
                 free_text: true, multiselect_chip_src: genre_chips_capture_path,
-                placeholder: t('capture.candidate.genres_placeholder'),
-                dialog_label: t('capture.candidate.genres') do |combobox| %>
+                placeholder: t('capture.candidate.genres_placeholder') do |combobox| %>
             <% combobox.customize_fieldset class: 'flex-grow' %>
             <% combobox.customize_input class: 'flex-grow' %>
           <% end %>

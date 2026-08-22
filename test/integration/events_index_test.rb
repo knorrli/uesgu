@@ -163,6 +163,24 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # Link prefetching must stay off while the filter is stored by a GET. Turbo turns
+  # a 100ms hover into a real credentialed request, so a prefetched genre chip would
+  # store its filter without a click and a later plain visit would replay it.
+  test "the feed ships the prefetch opt-out, and a chip's href would otherwise store a filter" do
+    event(title: "JazzNightShow", genre_list: ["Jazzy"], start_date: Date.current + 2.days)
+
+    get events_path
+
+    assert_select "head meta[name=turbo-prefetch][content=?]", "false"
+    assert_select "a.filter-link[href=?]", events_path(g: ["Jazzy"], filtered: 1), text: "Jazzy"
+
+    # That href is exactly what a hover would fetch — and it does store the filter.
+    get events_path(g: ["Jazzy"], filtered: 1)
+    follow_redirect!
+    get events_path
+    assert_redirected_to events_path(g: ["Jazzy"])
+  end
+
   test "the default date floor hides past events" do
     event(title: "PastShow", start_date: Date.current - 10.days)
     event(title: "FutureShow", start_date: Date.current + 10.days)

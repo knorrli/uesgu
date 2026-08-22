@@ -135,7 +135,11 @@ de:
     calendar_feed_link: in den Einstellungen einrichten
   capture:
     title: Event erfassen
-    intro: Poster fotografiert oder Text kopiert? Wir lesen aus, du prüfst Karte für Karte – was du übernimmst, geht sofort live.
+    intro: Was du übernimmst, geht sofort live.
+    review:
+      title:
+        one: 1 Veranstaltung gefunden — bestätige sie
+        other: "%{count} Veranstaltungen gefunden — bestätige jede"
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
@@ -158,8 +162,6 @@ de:
       published: "%{title} ist live."
     errors:
       incomplete: Titel, Datum, Ort und Kanton braucht es.
-      duplicate: Dieses Event gibt es schon.
-      url_invalid: Der Link muss mit http:// oder https:// beginnen.
       place_invalid: Dieses Lokal liess sich nicht anlegen.
       unknown: Das hat nicht geklappt.
     row:
@@ -178,7 +180,6 @@ de:
       locality_suggestions: "Bekannte Orte:"
       locality_hint: Tipp ein, zwei Buchstaben – bekannte Orte tauchen auf.
       canton: Kanton
-      url: Link
       genres: Genres
       genres_placeholder: Genre eingeben oder wählen
       genres_hint: Enter fügt eins hinzu. Neue Genres sind ok — wenn es eins schon gibt, lieber das nehmen.

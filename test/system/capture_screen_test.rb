@@ -643,6 +643,23 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue__tile"
   end
 
+  test "the review step heads with how many events were found" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    assert_selector "h1", text: copy("title")
+
+    pick "poster.png"
+    assert_selector "h1", text: copy("review.title", count: 1)
+    assert_no_selector "h1", text: copy("title")
+
+    find("button[data-action='capture#startOver']").click
+    assert_selector "h1", text: copy("title")
+
+    CannedExtractionClient.install(events: [poster_event, matinee])
+    pick "poster.png"
+    assert_selector "h1", text: copy("review.title", count: 2)
+  end
+
   test "nothing is sent until the batch is committed" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path

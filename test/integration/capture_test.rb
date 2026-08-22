@@ -206,20 +206,17 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_empty Event.all
   end
 
-  # Two candidates off one poster carry the same source_url, and nothing pre-checks
-  # for that: the second accepted simply meets the unique index, which is the honest
-  # answer — by then the first one IS an existing event.
-  test "a link already published reads as an existing event" do
+  # The card posts no link and this endpoint is reachable directly, so a url arriving
+  # anyway is not a value of the event.
+  test "a url posted past the card is ignored, not published" do
     sign_in_as user(contributor: true, locale: "en")
-    event(url: "https://zorp.example/poster", title: "Scraped")
 
-    post capture_path, params: { card_id: "capture-row-abc-1", title: "Clashes",
+    post capture_path, params: { card_id: "capture-row-abc-1", title: "Unlinked",
                                  date: "2026-09-02", locality: "Zorpwil", canton: "BE",
                                  url: "https://zorp.example/poster" }
 
-    assert_response :unprocessable_entity
-    assert_match I18n.t("capture.errors.duplicate", locale: :en), response.body
-    assert_equal ["Scraped"], Event.pluck(:title)
+    assert_response :success
+    assert_nil Event.sole.url
   end
 
   test "create ignores a card id that is not a plain token" do

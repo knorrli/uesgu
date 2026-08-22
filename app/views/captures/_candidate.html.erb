@@ -96,11 +96,6 @@
     <% end %>
 
     <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.url') %></span>
-      <%= url_field_tag :url, candidate.source_url, placeholder: "https://" %>
-    </label>
-
-    <label class="flex flex-col gap-xsmall">
       <span class="field-label"><%= t('capture.candidate.genres') %></span>
       <%# Free text on purpose: a poster names genres the taxonomy has never seen, and
           minting one is expected here. The suggestions exist so a genre we already

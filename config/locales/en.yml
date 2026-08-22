@@ -158,8 +158,6 @@ en:
       published: "%{title} is live."
     errors:
       incomplete: Title, date, locality and canton are needed.
-      duplicate: This event already exists.
-      url_invalid: The link has to start with http:// or https://.
       place_invalid: That venue couldn't be created.
       unknown: That didn't work.
     row:
@@ -178,7 +176,6 @@ en:
       locality_suggestions: "Known towns:"
       locality_hint: Type a letter or two — the towns we know come up.
       canton: Canton
-      url: Link
       genres: Genres
       genres_placeholder: Type or pick a genre
       genres_hint: Enter adds one. New genres are fine — if one already exists, take that instead.

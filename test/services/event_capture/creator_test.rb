@@ -145,43 +145,21 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "2026-09-01 20:00", event.start_time.strftime("%Y-%m-%d %H:%M")
   end
 
-  # The collision is wanted: a scraper upserts on the url, so pasting a page we
-  # already hold means the event exists rather than that something went wrong.
-  test "a url the scraper already holds is a duplicate, not a 500" do
-    event(url: "https://zorp.example/show", title: "Scraped")
+  # events.url is unique and every captured event leaves it null, which Postgres
+  # counts as distinct — the constraint the scrapers upsert on cannot collide two
+  # captures.
+  test "a captured event carries no url, and several of them publish" do
+    first = EventCapture::Creator.call(attrs)
+    second = EventCapture::Creator.call(attrs(title: "Zorp Fest 2"))
 
-    result = EventCapture::Creator.call(attrs(url: "https://zorp.example/show"))
-
-    assert_equal :duplicate, result.error
+    assert_predicate first, :ok?
+    assert_predicate second, :ok?
+    assert_nil first.event.url
+    assert_nil second.event.url
   end
 
-  test "two url-less captures both publish" do
-    assert_predicate EventCapture::Creator.call(attrs), :ok?
-    assert_predicate EventCapture::Creator.call(attrs(title: "Zorp Fest 2")), :ok?
-  end
-
-  # This is the only server-side check: the url input's own validation is client-side
-  # only, and the value lands in every user's browser (see Creator::HTTP_SCHEMES).
-  test "a link that is not http(s) is refused rather than published" do
-    assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "mailto:x@example.com")).error
-    assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "see poster")).error
-    assert_equal :url_invalid, EventCapture::Creator.call(attrs(url: "javascript:alert(1)")).error
-    assert_predicate EventCapture::Creator.call(attrs(url: "https://zorp.example/x")), :ok?
-  end
-
-  # places.url exists to make a VenueLead actionable, and no scraper can be written
-  # against someone's Instagram post.
-  test "a social link lands on the event but never on the place" do
-    result = EventCapture::Creator.call(attrs(url: "https://www.instagram.com/p/zorp"))
-
-    assert_equal "https://www.instagram.com/p/zorp", result.event.url
-    assert_nil result.place.url
-  end
-
-  test "a venue's own link is kept on the place" do
-    result = EventCapture::Creator.call(attrs(url: "https://zorpsaal.example/programm"))
-
-    assert_equal "https://zorpsaal.example/programm", result.place.url
+  test "a captured place carries no url either" do
+    assert_nil EventCapture::Creator.call(attrs).place.url
   end
 
   # A poster prints "25:00" for an after-midnight show, and Time.zone.parse raises on
@@ -207,14 +185,20 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal :incomplete, EventCapture::Creator.call(attrs(canton: "")).error
   end
 
-  # The duplicate path raises AFTER the place is written.
-  test "a refused publish leaves no orphan place behind" do
-    event(url: "https://zorp.example/show", title: "Scraped")
+  test "a publish that raises leaves no orphan place behind" do
+    Locality.stub(:ensure!, ->(*) { raise "publish blew up" }) do
+      assert_raises(RuntimeError) { EventCapture::Creator.call(attrs) }
+    end
 
-    result = EventCapture::Creator.call(attrs(url: "https://zorp.example/show"))
-
-    assert_equal :duplicate, result.error
     assert_empty Place.all
+  end
+
+  # Racy by construction: Place#fingerprint_available checks before it writes, so a
+  # concurrent capture of the same new venue really does reach the index.
+  test "a venue another capture minted first is a refusal, not a 500" do
+    Place.stub(:create, ->(*, **) { raise ActiveRecord::RecordNotUnique }) do
+      assert_equal :place_invalid, EventCapture::Creator.call(attrs).error
+    end
   end
 
   # Captured genres join the taxonomy exactly like scraped ones, and a capture

@@ -44,11 +44,9 @@
       </label>
     <% end %>
 
-    <% past_warning = tag.p(t('capture.candidate.past'), class: "capture-card__warning") if candidate.past? %>
     <div class="capture-card__when flex gap-small wrap">
       <%= render layout: "shared/field_group",
-            locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :date)),
-                                 past_warning] } do %>
+            locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :date)) } do %>
         <label class="flex flex-col gap-xsmall">
           <span class="field-label"><%= t('capture.candidate.date') %></span>
           <%= date_field_tag :date, candidate.date, required: true %>
@@ -60,6 +58,12 @@
           <span class="field-label"><%= t('capture.candidate.time') %></span>
           <%= text_field_tag :time, candidate.time %>
         </label>
+      <% end %>
+      <%# In the row rather than in the date group's `attached`, where every other remark
+          on this card hangs off the field it concerns: half a row is too narrow for the
+          sentence, and the row is the narrowest thing that is not. %>
+      <% if candidate.past? %>
+        <p class="capture-card__warning"><%= t('capture.candidate.past') %></p>
       <% end %>
     </div>
 

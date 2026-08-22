@@ -69,8 +69,8 @@ class Locality < ApplicationRecord
     # the moment it is published rather than after the next sweep. Mirrors
     # Genre.ensure!.
     def ensure!(names)
-      # First spelling wins, so a caller that passes its sources in priority order
-      # (see reconcile!) gets the row minted under the one it meant.
+      # First spelling wins, so a caller that passes its sources in priority order gets
+      # the row minted under the one it meant.
       representative = Array(names).filter_map { |name| [Fingerprint.for(name), name.to_s.strip] if name.present? }
                                    .reject { |key, _| key.blank? }.reverse.to_h
       return if representative.empty?
@@ -94,6 +94,10 @@ class Locality < ApplicationRecord
         source = seen[locality.fingerprint]
         locality.update!(name: source[:name], canton: settled_canton(source[:cantons]),
                          events_count: source[:count])
+        # The guard is for cost, not correctness — the fold is already a no-op on a row
+        # whose tags all read the canonical way, but it is three table scans, and in
+        # the steady state every row is clean.
+        locality.normalize_spellings! unless source[:spellings].subset?(Set[locality.name])
       end
       where.not(fingerprint: seen.keys).update_all(events_count: 0)
     end
@@ -107,22 +111,27 @@ class Locality < ApplicationRecord
       Location.usage.each do |tag|
         next unless tag[:type] == :locality
 
-        source = record(seen, tag[:name], nil, TAGGED)
-        source[:count] += tag[:count] if source
+        source = record(seen, tag[:name], nil, TAGGED, tag[:count])
+        source[:spellings] << tag[:name] if source
       end
+      seen.each_value { |source| source[:name] = source[:candidates].min.last }
       seen
     end
 
-    def record(seen, name, canton, priority)
+    # The name is picked by sorting the candidates, never by which source arrived
+    # first: Location.usage groups in whatever order Postgres hands back, so choosing
+    # by arrival lets a town's canonical spelling FLIP between reconciles — and a flip
+    # onto the rarer spelling re-splits the town the run before it folded. Hence
+    # [priority, -count, spelling]: the most-used spelling within a tier, alphabetical
+    # so equal counts cannot flip either. Only a location tag carries a count.
+    def record(seen, name, canton, priority, count = 0)
       key = Fingerprint.for(name)
       return if key.blank?
 
-      source = seen[key] ||= { name: nil, priority: nil, cantons: Set.new, count: 0 }
-      if source[:priority].nil? || priority < source[:priority]
-        source[:name] = name.to_s.strip
-        source[:priority] = priority
-      end
+      source = seen[key] ||= { candidates: [], spellings: Set.new, cantons: Set.new, count: 0 }
+      source[:candidates] << [priority, -count, name.to_s.strip]
       source[:cantons] << canton if canton.present?
+      source[:count] += count
       source
     end
 
@@ -141,14 +150,11 @@ class Locality < ApplicationRecord
   # says — it is the one thing here that cannot be merged away.
   def registry? = Venue.in_taxonomy.any? { |venue| Fingerprint.for(venue.locality) == fingerprint }
 
-  # Fold this locality into the one it is a name for ("Bienne" -> "Biel"). This
-  # REWRITES, and deliberately: every read path groups on the literal tag string, so a
-  # link nothing repoints leaves the town split across two nodes of the WHERE tree.
-  # Every event carrying a name that folds onto this one is retagged, every captured
-  # place under it is moved and every saved filter holding it is repointed, while
-  # `canonical_id` keeps a capture arriving under this spelling resolving to the
-  # canonical from here on — which is what makes the merge survive the nightly
-  # re-derivation instead of being undone by it.
+  # Fold this locality into the one it is a name for ("Bienne" -> "Biel"): link, then
+  # normalize onto the target's spelling. `canonical_id` keeps a capture arriving under
+  # this spelling resolving to the canonical from here on — which is what makes the
+  # merge survive the nightly re-derivation instead of being undone by it — and
+  # #normalize_spellings! moves everything already filed under the old name.
   def merge_into!(other)
     # Merging into an alias means merging into what that alias names — resolving here
     # is what keeps `canonical_id` one hop deep, which is all Locality.resolve follows.
@@ -159,11 +165,21 @@ class Locality < ApplicationRecord
     transaction do
       update!(canonical_id: target.id)
       aliases.update_all(canonical_id: target.id)
-      retag_events(add: [target.name])
-      move_places(target.name)
-      rewrite_saved_filters(target.name)
+      normalize_spellings!(target.name)
     end
     Locality.reconcile!
+  end
+
+  # File everything carrying a spelling that folds onto this row under one name. Same
+  # fingerprint means one row already ("THUN" beside "Thun"), so there is no second
+  # locality to merge into and nothing in the localities browser looks wrong — which
+  # is why reconcile! runs this unattended rather than an admin clicking it.
+  def normalize_spellings!(canonical_name = name)
+    transaction do
+      retag_events(add: [canonical_name])
+      move_places(canonical_name)
+      rewrite_saved_filters(canonical_name)
+    end
   end
 
   # Split an alias back out. Only the LINK is undone: the taggings, places and saved

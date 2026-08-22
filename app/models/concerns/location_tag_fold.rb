@@ -1,12 +1,12 @@
-# The rewrite half of a location merge, shared by the two vocabularies that own a
+# The rewrite half of a location fold, shared by the two vocabularies that own a
 # location tag: Locality (the town) and Place (the captured venue).
 #
-# Folding one row into another REWRITES the taggings rather than resolving the alias
-# at query time, and deliberately: Location.hierarchy, Location.usage, the filter-tree
-# pruning in TagsHelper#location_filter_tree and Filter#location_list all group on the
-# literal tag string. A link that repoints nothing leaves the town or the venue split
-# across two nodes of the WHERE tree holding half the events each — the thing the
-# merge is asked to fix.
+# Filing everything under one spelling REWRITES the taggings rather than resolving the
+# alias at query time, and deliberately: Location.hierarchy, Location.usage, the
+# filter-tree pruning in TagsHelper#location_filter_tree and Filter#location_list all
+# group on the literal tag string. A link that repoints nothing leaves the town or the
+# venue split across two nodes of the WHERE tree holding half the events each — the
+# thing the fold is asked to fix.
 #
 # Requires the including model to expose `fingerprint` (the stored generated column
 # both tables carry).
@@ -59,10 +59,14 @@ module LocationTagFold
     end
   end
 
-  # The rewrite can land a filter on a scope its owner already saved under the
-  # canonical spelling, which the one-filter-per-fingerprint rule forbids — dropping
-  # the copy that carries the merged-away name keeps the merge from failing that
-  # validation, and leaves the older filter's schedule and firing history intact.
+  # DESTRUCTIVE, and reachable only from an admin merge across two fingerprints
+  # (Bienne -> Biel): there the rewrite genuinely changes a filter's identity and can
+  # land it on a scope its owner already saved, which the one-filter-per-fingerprint
+  # rule forbids. Dropping the copy carrying the merged-away name keeps the merge from
+  # failing that validation and leaves the older filter's schedule and firing history
+  # intact. A same-fingerprint fold cannot get here — SavedFilter.fingerprint compares
+  # locations by fingerprint, so rewriting one spelling to another leaves it unchanged
+  # — which is what lets Locality.reconcile! fold unattended.
   def redundant?(saved)
     saved.user.saved_filters.where.not(id: saved.id).any? { |other| other.fingerprint == saved.fingerprint }
   end

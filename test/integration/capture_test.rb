@@ -347,6 +347,30 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?][value=?]", "candidate_index", "0"
   end
 
+  # Neither pair has a quote per field: the model is asked for no time evidence, so what
+  # it quoted for the date is all Zeit has (see EventCapture::Prompt), and the canton is
+  # computed from the locality rather than read off the poster (see
+  # EventCapture::Normalizer). A town chip fills both fields too, so confining either
+  # line to one column would claim less than the card knows.
+  test "a quote that settled a pair of fields is attached to the whole row" do
+    place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
+    sign_in_as user(contributor: true)
+
+    stub_extraction(extraction(candidates: [candidate(place: "Zorpsaal Halle",
+                                                      date_evidence: "SA 12. SEPT",
+                                                      locality_evidence: "3000 Zorpwil")])) do
+      post extract_capture_path, params: { row_id: "abc123" },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_select ".capture-card__when + .field-group__attached .review-card__cite"
+    assert_select ".capture-card__where + .field-group__attached .review-card__cite"
+    assert_select ".capture-card__where + .field-group__attached .suggestions .chip",
+                  text: "Flarnhausen"
+    assert_select ".capture-card__where .field-group", false
+    assert_select ".capture-card__when .field-group", false
+  end
+
   # The taxonomy is offered so an existing genre is picked rather than respelt, but a
   # genre we ignore, hide or block is not something to put in front of a contributor.
   test "genre suggestions cover what is in use and leave the dispositioned out" do

@@ -52,15 +52,15 @@
   max-width: 100%;
 }
 
-/* Provenance for the field above it. Recessed into the same channel as a hint,
-   because a card carrying one of these per field still has to read as a form and not
-   as a transcript. */
+/* Provenance for what it is attached to: the text quoted off the source. Shares
+   the quiet muted channel with a field's hint and is set apart from it by slant alone
+   — transcription against instruction — because a card carrying one per field has to
+   read as a form and not as a transcript. Rhythm comes from .field-group__attached. */
 .review-card__cite {
-  /* Bound to the field ABOVE: the form's own gap sits it exactly between two fields,
-     where it reads as a hint for the next one. Tightened above, opened below. */
-  margin: calc(var(--gap-xsmall) - var(--gap-small)) 0 var(--gap-xsmall);
+  margin: 0;
   color: var(--theme-fg-muted);
   font-size: var(--font-size-small);
+  font-style: italic;
 }
 
 /* Pinned to the bottom edge so it stays in thumb reach however long the field list

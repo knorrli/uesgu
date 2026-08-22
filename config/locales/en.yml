@@ -135,11 +135,10 @@ en:
     calendar_feed_link: set it up in settings
   capture:
     title: Capture an event
-    intro: Whatever you publish goes live right away.
     review:
       title:
-        one: 1 event found — confirm it
-        other: "%{count} events found — confirm each one"
+        one: 1 event found
+        other: "%{count} events found"
     images_hint: Several at once is fine. The images are never stored.
     text_label: Text
     text_hint: From a chat, a newsletter, wherever.
@@ -150,7 +149,7 @@ en:
       by_hand: Entered by hand
       commit: Read
       remove: Remove
-      start_over: Start over
+      start_over: Cancel and start over
     queue:
       label: Queue
       done: All decided.

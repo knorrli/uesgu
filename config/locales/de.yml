@@ -675,6 +675,32 @@ de:
         registry_hint: Dieser Ort steht im Venue-Register, die Scraper setzen ihn jede Nacht neu — ein Zusammenlegen würde bis zum Morgen wieder verschwinden. Die Schreibweise gehört in config/venues.yml.
         also_known_as: Heisst auch
         browse_events: Events ansehen
+    places:
+      index:
+        title: Lokale
+        status_all: Alle
+        status_aliased: Zusammengelegt
+        search: Lokale suchen…
+        sort_by: Sortieren nach
+        sort_name: Name
+        sort_count: Nutzung
+        merged_into: "→ %{canonical}"
+        placed: "%{locality}, %{canton}"
+        empty: Keine Lokale gefunden.
+      edit:
+        usage:
+          zero: keine Events
+          one: 1 Event
+          other: "%{count} Events"
+        merge: Zusammenlegen
+        merge_into: Zusammenlegen mit…
+        merge_hint: Beim Zusammenlegen werden alle Events unter diesem Namen umgehängt, samt Ort und Kanton des anderen Lokals. Die Verknüpfung bleibt, spätere Captures landen ebenfalls beim anderen Lokal.
+        registry_hint: Lokale, die wir scrapen, stehen nicht in dieser Liste — ihre Schreibweise gehört in config/venues.yml.
+        shadowed_hint: Dieses Lokal steht inzwischen im Venue-Register, die Zeile ist also ein Duplikat und kein eigenes Lokal. Statt zusammenlegen besser löschen — bin/rails places:drift listet sie auf.
+        unmerge: Trennen
+        unmerge_hint: Trennen löst nur die Verknüpfung. Events bleiben dort, wohin sie verschoben wurden.
+        also_known_as: Heisst auch
+        browse_events: Events ansehen
     locations:
       index:
         title: Locations
@@ -751,6 +777,9 @@ de:
       locality:
         one: Ort
         other: Orte
+      place:
+        one: Lokal
+        other: Lokale
       invitation:
         one: Einladung
         other: Einladungen

@@ -16,6 +16,8 @@
 # and Bienne as two nodes of the tree holding half the events each — the thing the
 # merge is asked to fix. See #merge_into!.
 class Locality < ApplicationRecord
+  include LocationTagFold
+
   belongs_to :canonical, class_name: "Locality", optional: true
   has_many :aliases, class_name: "Locality", foreign_key: :canonical_id,
                      inverse_of: :canonical, dependent: :nullify
@@ -157,7 +159,7 @@ class Locality < ApplicationRecord
     transaction do
       update!(canonical_id: target.id)
       aliases.update_all(canonical_id: target.id)
-      retag_events(target.name)
+      retag_events(add: [target.name])
       move_places(target.name)
       rewrite_saved_filters(target.name)
     end
@@ -175,58 +177,11 @@ class Locality < ApplicationRecord
 
   private
 
-  # Every location tag that folds onto this locality, not just its own spelling: a
-  # tag minted before entry-time normalisation existed ("bern") shares this row and
-  # has to travel with it.
-  def variant_tag_names
-    ActsAsTaggableOn::Tag.joins(:taggings)
-                         .where(taggings: { context: "locations", taggable_type: Event.name })
-                         .distinct.pluck(:name)
-                         .select { |tag| Fingerprint.for(tag) == fingerprint }
-  end
-
-  # Snapshot the ids first: removing the tag shrinks the tagged_with set find_each
-  # would page over, which would skip events and leave them on the old name.
-  def retag_events(canonical_name)
-    variant_tag_names.each do |variant|
-      next if variant == canonical_name
-
-      Event.where(id: Event.tagged_with(variant, on: :locations).pluck(:id)).find_each do |event|
-        event.location_list.remove(variant)
-        event.location_list.add(canonical_name)
-        event.save!
-      end
-    end
-  end
-
   # places.locality carries no fingerprint column of its own, so the fold happens in
   # Ruby. The table holds captured places only and stays small.
   def move_places(canonical_name)
     Place.where.not(locality: canonical_name).find_each do |place|
       place.update!(locality: canonical_name) if Fingerprint.for(place.locality) == fingerprint
     end
-  end
-
-  # A saved filter's location names are a jsonb snapshot frozen at save time and
-  # matched as literal strings (see SavedFilter), so one left on the old name matches
-  # nothing the moment the events move — silently, in the saved scope, the digest and
-  # the feed highlighting alike.
-  def rewrite_saved_filters(canonical_name)
-    SavedFilter.find_each do |saved|
-      locations = saved.location_list
-      rewritten = locations.map { |name| Fingerprint.for(name) == fingerprint ? canonical_name : name }.uniq
-      next if rewritten == locations
-
-      saved.filter = saved.filter.merge("location_list" => rewritten)
-      redundant?(saved) ? saved.destroy! : saved.save!
-    end
-  end
-
-  # The rewrite can land a filter on a scope its owner already saved under the
-  # canonical spelling, which the one-filter-per-fingerprint rule forbids — dropping
-  # the copy that carries the merged-away name keeps the merge from failing that
-  # validation, and leaves the older filter's schedule and firing history intact.
-  def redundant?(saved)
-    saved.user.saved_filters.where.not(id: saved.id).any? { |other| other.fingerprint == saved.fingerprint }
   end
 end

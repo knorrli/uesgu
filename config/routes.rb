@@ -205,6 +205,16 @@ Rails.application.routes.draw do
       end
     end
 
+    # The same pair for the captured venues behind the venue half of that browser
+    # (see Place#merge_into!). A registry venue has no row here and is not mergeable:
+    # its spelling is a config/venues.yml edit.
+    resources :places, only: %i[index edit] do
+      member do
+        post :merge
+        post :unmerge
+      end
+    end
+
     # Per-scraper data-coverage matrix (fill-rates computed live from events).
     get "scraper_coverage", to: "scraper_coverage#index", as: :scraper_coverage
 

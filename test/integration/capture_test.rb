@@ -386,8 +386,9 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   # A date already gone is a remark about the date, and a line of its own between two
-  # fields belongs to neither of them.
-  test "the warning about a past date hangs off the date it is about" do
+  # fields belongs to neither of them. It sits in the row rather than in the date
+  # field's own group, which is half a row wide and wrapped the sentence.
+  test "the warning about a past date is the last line of the date and time row" do
     sign_in_as user(contributor: true)
 
     stub_extraction(extraction(candidates: [candidate(date: Date.current - 1)])) do
@@ -396,11 +397,9 @@ class CaptureTest < ActionDispatch::IntegrationTest
     end
 
     assert_select ".capture-card__when > .field-group", 2
-    assert_select ".capture-card__when > .field-group:first-child" do
-      assert_select "[name=date]"
-      assert_select ".field-group__attached .capture-card__warning",
-                    text: I18n.t("capture.candidate.past")
-    end
+    assert_select ".capture-card__when > :last-child.capture-card__warning",
+                  text: I18n.t("capture.candidate.past")
+    assert_select ".field-group .capture-card__warning", false
   end
 
   # The `for`/id wiring the phone behaviour rests on — a label that wraps the field

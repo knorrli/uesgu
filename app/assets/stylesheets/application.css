@@ -100,6 +100,16 @@ a {
   color-scheme: light dark;
 }
 
+/* Safari lays the value out in the field's shadow DOM, where it right-aligns it and
+   adds vertical margins of its own: a full-width date or time field renders its value
+   flushed right and sitting lower than the field beside it. Engines that do not know
+   the pseudo-element drop the rule, which is what the other two want. */
+.account-form input[type="date"]::-webkit-date-and-time-value,
+.account-form input[type="time"]::-webkit-date-and-time-value {
+  text-align: left;
+  margin: 0;
+}
+
 /* Neutral at rest, accent underline on focus — green now signals "this field is
    active", rather than decorating every passive field. The outline is suppressed
    in favour of the underline (the field's own focus affordance). Scoped to the

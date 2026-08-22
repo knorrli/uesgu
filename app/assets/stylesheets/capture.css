@@ -182,6 +182,10 @@ button.capture-queue__tile[data-state="pending"] {
   flex: 1 1 8rem;
 }
 
+.capture-card__when > .capture-card__warning {
+  flex-basis: 100%;
+}
+
 .capture-card__note {
   width: 100%;
 }

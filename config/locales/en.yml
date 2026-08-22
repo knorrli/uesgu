@@ -675,6 +675,32 @@ en:
         registry_hint: This town is named in the venue registry, so the scrapers re-tag it every night — merging it away would not survive until morning. Change the spelling in config/venues.yml instead.
         also_known_as: Also known as
         browse_events: See the events
+    places:
+      index:
+        title: Venues
+        status_all: All
+        status_aliased: Merged
+        search: Search venues…
+        sort_by: Sort by
+        sort_name: name
+        sort_count: usage
+        merged_into: "→ %{canonical}"
+        placed: "%{locality}, %{canton}"
+        empty: No venues match.
+      edit:
+        usage:
+          zero: no events
+          one: 1 event
+          other: "%{count} events"
+        merge: Merge
+        merge_into: Merge into…
+        merge_hint: Merging retags every event under this name, and moves them to the other venue's town and canton. The link sticks, so anything captured under this name later resolves to the other venue too.
+        registry_hint: A venue we scrape is not in this list — its spelling lives in config/venues.yml.
+        shadowed_hint: The venue registry has since taken this venue over, so the row is a duplicate rather than a place of its own. Delete it instead of merging it — bin/rails places:drift lists them.
+        unmerge: Split
+        unmerge_hint: Splitting only undoes the link. Events the merge moved stay where they were moved.
+        also_known_as: Also known as
+        browse_events: See the events
     locations:
       index:
         title: Locations
@@ -751,6 +777,9 @@ en:
       locality:
         one: Locality
         other: Localities
+      place:
+        one: Venue
+        other: Venues
       invitation:
         one: Invitation
         other: Invitations

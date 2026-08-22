@@ -1,0 +1,58 @@
+<%# One captured venue, and the one decision there is to make about it — whether it is
+    really another venue under a second name. Each candidate is labelled with its town
+    so the choice that moves the events is visible before it is made: the canonical's
+    town and canton win whole. %>
+<% content_for :title, @place.name %>
+<div class="flex flex-col gap-large">
+  <%= render layout: "shared/page_header", locals: { back_path: admin_places_path, back_label: t('admin.places.index.title') } do %>
+    <h1><%= @place.name %></h1>
+    <p class="muted">
+      <%= t('admin.places.index.placed', locality: @place.locality, canton: @place.canton) %>
+      &middot; <%= t('admin.places.edit.usage', count: @count) %>
+    </p>
+  <% end %>
+
+  <% if @place.alias? %>
+    <div class="flex gap-medium align-baseline wrap">
+      <span class="muted">
+        <%= t('admin.places.index.merged_into', canonical: @place.canonical.name) %>
+      </span>
+      <%= button_to t('.unmerge'), unmerge_admin_place_path(@place) %>
+    </div>
+    <p class="muted"><%= t('.unmerge_hint') %></p>
+  <% elsif @place.shadowed? %>
+    <p class="muted"><%= t('.shadowed_hint') %></p>
+  <% else %>
+    <%= form_with url: merge_admin_place_path(@place), method: :post, scope: :place,
+          class: 'flex justify-between gap-medium wrap align-end' do |f| %>
+      <div class="input-wrapper flex flex-grow">
+        <%= f.combobox :canonical_place_id,
+              Place.canonicals.where.not(id: @place.id).by_name.map { |candidate|
+                { display: "#{candidate.name} — #{candidate.locality}, #{candidate.canton}", value: candidate.id }
+              },
+              placeholder: t('.merge_into') do |combobox| %>
+          <% combobox.customize_fieldset class: 'flex-grow' %>
+          <% combobox.customize_input class: 'flex-grow' %>
+        <% end %>
+      </div>
+      <%= f.button t('.merge'), type: :submit %>
+    <% end %>
+    <p class="muted"><%= t('.merge_hint') %></p>
+    <p class="muted"><%= t('.registry_hint') %></p>
+  <% end %>
+
+  <% if @place.aliases.any? %>
+    <section class="flex flex-col gap-small">
+      <h2><%= t('.also_known_as') %></h2>
+      <div class="flex gap-small wrap">
+        <% @place.aliases.by_name.each do |other| %>
+          <%= link_to other.name, edit_admin_place_path(other), class: 'tag' %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+
+  <% if @count.positive? %>
+    <%= link_to t('.browse_events'), events_path(l: [@place.name]) %>
+  <% end %>
+</div>

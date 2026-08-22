@@ -675,6 +675,32 @@ fr:
         registry_hint: Cette localité figure dans le registre des salles, les scrapers la réétiquettent chaque nuit — une fusion ne survivrait pas à la matinée. Change plutôt l'orthographe dans config/venues.yml.
         also_known_as: Aussi appelée
         browse_events: Voir les événements
+    places:
+      index:
+        title: Salles
+        status_all: Toutes
+        status_aliased: Fusionnées
+        search: Chercher une salle…
+        sort_by: Trier par
+        sort_name: nom
+        sort_count: usage
+        merged_into: "→ %{canonical}"
+        placed: "%{locality}, %{canton}"
+        empty: Aucune salle trouvée.
+      edit:
+        usage:
+          zero: aucun événement
+          one: 1 événement
+          other: "%{count} événements"
+        merge: Fusionner
+        merge_into: Fusionner avec…
+        merge_hint: "La fusion réétiquette tous les événements sous ce nom et les déplace vers la localité et le canton de l'autre salle. Le lien reste : ce qui sera capturé sous ce nom ira aussi vers l'autre salle."
+        registry_hint: Les salles qu'on scrape ne figurent pas dans cette liste — leur orthographe vit dans config/venues.yml.
+        shadowed_hint: Le registre des salles a depuis repris cette salle, donc cette ligne est un doublon et pas une salle à part. Supprime-la plutôt que de la fusionner — bin/rails places:drift les liste.
+        unmerge: Séparer
+        unmerge_hint: Séparer ne défait que le lien. Les événements déplacés par la fusion restent où ils sont.
+        also_known_as: Aussi appelée
+        browse_events: Voir les événements
     locations:
       index:
         title: Lieux
@@ -751,6 +777,9 @@ fr:
       locality:
         one: Localité
         other: Localités
+      place:
+        one: Salle
+        other: Salles
       invitation:
         one: Invitation
         other: Invitations

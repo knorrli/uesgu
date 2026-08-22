@@ -114,4 +114,122 @@ class PlaceTest < ActiveSupport::TestCase
 
     assert_equal zorpsaal.name, captured.venue.name
   end
+
+  def saved_filter(owner, locations)
+    rule = owner.saved_filters.new(cadence: "daily", time_of_day: 18 * 60)
+    rule.filter_attributes = { l: locations }
+    rule.save!
+    rule
+  end
+
+  # Location.hierarchy and the filter tree group on the literal tag, so a link that
+  # repoints nothing leaves the venue holding half its shows under each spelling.
+  test "a merge retags the events carrying the old name" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    show = event(location_list: ["AKUT Zorpwil", "Zorpwil", "BE"])
+
+    variant.merge_into!(akut)
+
+    assert_includes show.reload.location_list, "AKuT"
+    refute_includes show.location_list, "AKUT Zorpwil"
+  end
+
+  # An event cannot be nested under one venue in the WHERE tree and filed in another
+  # venue's town, so the canonical's tuple wins whole.
+  test "a merge moves the events onto the canonical's town and canton" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
+    show = event(location_list: ["Flarnhalle", "Flarnhausen", "AG"])
+
+    variant.merge_into!(akut)
+
+    assert_equal %w[AKuT BE Zorpwil], show.reload.location_list.to_a.sort
+  end
+
+  test "a merged name keeps resolving to the canonical for everything new" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+
+    variant.merge_into!(akut)
+
+    assert_equal akut, Place.matching("AKUT Zorpwil")
+    assert_predicate variant.reload, :alias?
+  end
+
+  test "merging into an alias lands on what that alias names" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    first = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    second = place(name: "Akut Halle", locality: "Zorpwil", canton: "BE")
+
+    first.merge_into!(akut)
+    second.merge_into!(first)
+
+    assert_equal akut, second.reload.canonical
+  end
+
+  test "merging a place that already has aliases takes them along" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    middle = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    leaf = place(name: "Akut Halle", locality: "Zorpwil", canton: "BE")
+
+    leaf.merge_into!(middle)
+    middle.merge_into!(akut)
+
+    assert_equal akut, leaf.reload.canonical
+  end
+
+  test "a place cannot be merged into itself, directly or through its own alias" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    variant.merge_into!(akut)
+
+    assert_raises(ArgumentError) { akut.merge_into!(akut) }
+    assert_raises(ArgumentError) { akut.merge_into!(variant.reload) }
+  end
+
+  test "a place the registry has absorbed cannot be merged away" do
+    venue = Venue.in_taxonomy.first
+    skip "no venues in the taxonomy" if venue.nil?
+
+    graduated = Place.new(name: venue.name, locality: venue.locality, canton: venue.canton)
+    graduated.save!(validate: false)
+
+    assert_raises(ArgumentError) { graduated.merge_into!(place(name: "Zorpsaal")) }
+  end
+
+  test "a merge repoints the saved filters holding the old name" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    watcher = saved_filter(user, ["AKUT Zorpwil"])
+
+    variant.merge_into!(akut)
+
+    assert_equal ["AKuT"], watcher.reload.location_list
+  end
+
+  test "a repointed filter that duplicates another of the user's filters is dropped" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    owner = user
+    kept = saved_filter(owner, ["AKuT"])
+    dropped = saved_filter(owner, ["AKUT Zorpwil"])
+
+    variant.merge_into!(akut)
+
+    assert_predicate SavedFilter.where(id: dropped.id), :empty?
+    assert_equal ["AKuT"], kept.reload.location_list
+  end
+
+  test "splitting undoes the link and leaves the moved events where they were moved" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    show = event(location_list: ["AKUT Zorpwil", "Zorpwil", "BE"])
+    variant.merge_into!(akut)
+
+    variant.unmerge!
+
+    refute_predicate variant.reload, :alias?
+    assert_includes show.reload.location_list, "AKuT"
+  end
 end

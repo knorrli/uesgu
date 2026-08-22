@@ -11,6 +11,8 @@
 # filter matches on (Filter#ransack_query → locations_name_in), so there is no
 # place_id, and counts come from the taggings (Location.usage).
 class Place < ApplicationRecord
+  include LocationTagFold
+
   # An alias for a spelling the fingerprint cannot collapse ("Quarterfest" →
   # "Quartierfest"), kept so a future capture of the bad spelling still resolves.
   # Nullify rather than cascade: losing a canonical must not delete the alias.
@@ -24,6 +26,8 @@ class Place < ApplicationRecord
   validate :not_a_taxonomy_venue
 
   scope :by_name, -> { order(name: :asc) }
+  scope :canonicals, -> { where(canonical_id: nil) }
+  scope :aliased, -> { where.not(canonical_id: nil) }
 
   def to_s = name
 
@@ -37,14 +41,45 @@ class Place < ApplicationRecord
 
   def self.names = pluck(:name).to_set
 
-  # Places the taxonomy has since absorbed: a captured venue that graduated to a
-  # consume row with a place. Registry-first precedence makes them inert rather
-  # than wrong, but they are duplicate identity and the graduating PR should
-  # delete them — `bin/rails places:drift` is what makes that mechanical.
+  # Every place the taxonomy has since absorbed, for the drift report. Takes the
+  # registry read out of the loop, which the per-row predicate cannot.
   def self.shadowed
     registry = Location.taxonomy_venue_fingerprints
-    all.to_a.select { |place| registry.include?(place.fingerprint) }
+    all.to_a.select { |place| place.shadowed?(registry) }
   end
+
+  def alias? = canonical_id.present?
+
+  # A captured venue that graduated to a consume row with a place, so this row is
+  # duplicate identity rather than a place of its own. Registry-first precedence makes
+  # it inert rather than wrong, but the graduating PR should delete it — `bin/rails
+  # places:drift` is what makes that mechanical. Merging is not the fix: it would file
+  # the events under a captured venue instead of the one we source from.
+  def shadowed?(registry = Location.taxonomy_venue_fingerprints) = registry.include?(fingerprint)
+
+  # Fold this place into the one it is a name for ("AKUT Thun" -> "AKuT"). The
+  # canonical's town and canton win where the two rows disagree: an event cannot be
+  # nested under one venue in the WHERE tree and filed in another venue's locality.
+  def merge_into!(other)
+    # Merging into an alias means merging into what that alias names — resolving here
+    # is what keeps `canonical_id` one hop deep, which is all Place.matching follows.
+    target = other.canonical || other
+    raise ArgumentError, "a place cannot be merged into itself" if target.id == id
+    raise ArgumentError, "a place the registry covers cannot be merged away" if shadowed?
+
+    transaction do
+      update!(canonical_id: target.id)
+      aliases.update_all(canonical_id: target.id)
+      retag_events(add: [target.name, target.locality, target.canton].compact_blank,
+                   strip: [locality, canton])
+      rewrite_saved_filters(target.name)
+    end
+  end
+
+  # Split an alias back out. Only the LINK is undone: the taggings and saved filters
+  # the merge moved stay moved, exactly as splitting a locality does. What this
+  # restores is the future — a capture under this spelling mints its own row again.
+  def unmerge! = update!(canonical_id: nil)
 
   private
 

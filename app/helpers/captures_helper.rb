@@ -58,6 +58,14 @@ module CapturesHelper
     candidate.public_send(:"#{field}_evidence")
   end
 
+  # Passing the placeholder itself as the count picks the `other` form and leaves
+  # %{count} standing: how many events came back is only known in the browser, so the
+  # plural form ships to capture_controller.js as a template it fills in.
+  def capture_found_titles
+    { one: t("capture.review.title", count: 1),
+      other: t("capture.review.title", count: "%{count}") }
+  end
+
   def canton_options
     Location::CANTON_CODES.map { |code| [canton_name(code), code] }.sort_by(&:first)
   end

@@ -270,10 +270,88 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.issues
   end
 
-  test "a place is passed through verbatim, since match-at-entry scores what was printed" do
+  test "a venue nobody carries is passed through verbatim, for the suggester to score" do
     candidate = normalize("place" => "  Marzili Quartierfest ", "place_evidence" => "Marzili Quartierfest")
 
     assert_equal "Marzili Quartierfest", candidate.place
+    assert_empty candidate.issues
+  end
+
+  def cited_place(name, **overrides)
+    { "place" => name, "place_evidence" => name }.merge(overrides.stringify_keys)
+  end
+
+  test "a venue the app already carries reaches the card in its own spelling" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+
+    candidate = normalize(cited_place("ZORPSAAL"))
+
+    assert_equal "Zorpsaal", candidate.place
+    assert_includes candidate.issues, :place_normalized
+    assert_empty candidate.raw
+  end
+
+  test "a merged-away venue spelling resolves to the venue it names" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE", canonical: akut)
+
+    candidate = normalize(cited_place("AKUT Zorpwil"))
+
+    assert_equal "AKuT", candidate.place
+    assert_includes candidate.issues, :place_normalized
+  end
+
+  test "a registry venue wins over a captured place of the same name" do
+    venue = Venue.in_taxonomy.first
+    skip "no venues in the taxonomy" if venue.nil?
+
+    candidate = normalize(cited_place(venue.name.upcase))
+
+    assert_equal venue.name, candidate.place
+    assert_equal venue.locality, candidate.locality
+    assert_equal venue.canton, candidate.canton
+  end
+
+  # Creator#located files the event under the venue's tuple whatever the card said, so
+  # a card left on the poster's town would show one the publish overrules.
+  test "a resolved venue supplies the town and canton the model left blank" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+
+    candidate = normalize(cited_place("Zorpsaal").merge("locality" => nil, "canton" => nil))
+
+    assert_equal %w[Zorpwil BE], [candidate.locality, candidate.canton]
+    assert_empty candidate.raw
+  end
+
+  test "a town the venue contradicts is replaced, and kept" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+
+    candidate = normalize(cited_place("Zorpsaal").merge(cited_locality("Flarnhausen")))
+
+    assert_equal "Zorpwil", candidate.locality
+    assert_equal "Flarnhausen", candidate.raw["locality"]
+    assert_includes candidate.issues, :locality_from_place
+  end
+
+  test "a town the venue only spells differently is not a contradiction" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+
+    candidate = normalize(cited_place("Zorpsaal").merge(cited_locality("ZORP-WIL")))
+
+    assert_equal "Zorpwil", candidate.locality
+    assert_empty candidate.raw
+    assert_empty candidate.issues
+  end
+
+  # The chips exist because "AKUT Thun" and "AKUT Bern" score alike and can be two
+  # real venues; taking one here would file a show at the wrong address.
+  test "a near-match is left alone — only an exact fingerprint folds" do
+    place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+
+    candidate = normalize(cited_place("AKUT Zorpwil"))
+
+    assert_equal "AKUT Zorpwil", candidate.place
+    assert_empty candidate.issues
   end
 
   # A quote can legitimately span more than one date ("Fr 20. & Sa 21. Februar" on a

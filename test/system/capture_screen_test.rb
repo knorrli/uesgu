@@ -222,11 +222,13 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   # Tapping a town is taking the app's spelling over the poster's, exactly as tapping a
   # venue is — and counted as a correction it would inflate the one number a prompt
-  # edit is judged on. The town the venue actually sits in, because a spelling the
-  # fingerprint reaches is folded before the card renders and leaves nothing to tap.
+  # edit is judged on. A venue the fingerprint reaches is folded before the card
+  # renders and brings its own town with it, so the case left for a human is the
+  # NEAR-match: suggested, scored, and nothing applied until someone taps.
   test "taking a town is recorded as a normalisation, not a correction" do
     place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
-    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal")])
+    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Halle",
+                                                         place_evidence: "Zorpsaal Halle")])
     visit capture_path
     pick "poster.png"
 
@@ -235,6 +237,29 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-queue__tile[data-state=published]"
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :normalized?
+  end
+
+  # The venue half of the same rule as the town below: the app's spelling reaches the
+  # card, so a contributor confirms the name the publish will actually file under.
+  test "a venue the app already carries reaches the card in its own spelling" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(place: "ZORPSAAL",
+                                                         place_evidence: "ZORPSAAL",
+                                                         locality: nil, locality_evidence: nil,
+                                                         canton: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal "Zorpsaal", field_value("place")
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "BE", field_value("canton")
+
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+
+    assert_no_difference -> { Place.count } do
+      assert_equal %w[BE Zorpsaal Zorpwil], Event.last.location_list.to_a.sort
+    end
   end
 
   # The spelling half of the same thing, and the reason the test above had to move off

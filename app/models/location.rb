@@ -31,6 +31,22 @@ class Location
     taxonomy_venues.to_set { |venue| Fingerprint.for(venue.name) }
   end
 
+  # The venue a typed name IS: the registry first, then the captured places, resolved
+  # through a merge. Answers the Venue or the Place itself — both carry name, locality
+  # and canton, which is the tuple an event is tagged with — or nil, which is the
+  # normal answer for the one-off this funnel exists to catch.
+  #
+  # An EXACT fingerprint match and nothing looser. A near-match is what the suggestion
+  # chips are for (see PlaceSuggester): "AKUT Thun" and "AKUT Bern" score alike and
+  # can be two real venues, so taking one without a human would file a show at the
+  # wrong address.
+  def self.resolve_venue(typed)
+    key = Fingerprint.for(typed)
+    return if key.blank?
+
+    taxonomy_venues.find { |venue| Fingerprint.for(venue.name) == key } || Place.matching(typed)
+  end
+
   # The Place read lands on the per-event path (Event#venue). Inside a request the
   # query cache collapses it to one SELECT; a rake loop over events has no such
   # cache and should hoist this call out, the way usage below does.

@@ -24,9 +24,12 @@ module EventCapture
     def call
       date = normalized_date
       time = normalized_time
-      # A local rather than a second call below: the canton is computed from it, and
-      # `cited` flags an issue on the way past — asking twice records it twice.
-      locality = normalized_locality
+      # Locals rather than a second call each below: `cited` flags an issue on the way
+      # past, so asking twice records it twice, and the venue decides both other
+      # fields of the WHERE tuple.
+      typed_place = cited(:place)
+      venue = Location.resolve_venue(typed_place)
+      locality = normalized_locality(venue)
 
       Candidate.new(
         title: string(event["title"]),
@@ -35,11 +38,11 @@ module EventCapture
         date: date,
         date_evidence: string(event["date_evidence"]),
         time: time,
-        place: cited(:place),
+        place: normalized_place(typed_place, venue),
         place_evidence: string(event["place_evidence"]),
         locality: locality,
         locality_evidence: string(event["locality_evidence"]),
-        canton: normalized_canton(locality),
+        canton: normalized_canton(locality, venue),
         genres: normalized_genres,
         source_url: string(event["source_url"]),
         raw: raw,
@@ -146,14 +149,41 @@ module EventCapture
       normalized
     end
 
-    # The spelling the app already files this town under, not the poster's. Nothing is
-    # refused, so nothing goes to `raw` and the variant never reaches the card: a
-    # fingerprint match IS identity — "THUN" and "Thun" are one town, see
+    # The name the app already files this venue under. Nothing goes to `raw`, for the
+    # reason the town's fold gives below: a fingerprint match is identity and an alias
+    # match is an admin's ruling that two names are one, so there is no rejected
+    # reading here for a human to judge.
+    def normalized_place(typed, venue)
+      return typed if venue.nil? || venue.name == typed
+
+      issues << :place_normalized
+      venue.name
+    end
+
+    # A resolved venue's own town beats the poster's, because EventCapture::Creator
+    # files the event under the venue's tuple whatever the card said — a card left on
+    # the poster's town shows one the publish would overrule. A town the model cited
+    # and the venue contradicts is the one cited reading this class discards, so it is
+    # kept under `raw` where the card shows it.
+    #
+    # Otherwise the town's own spelling, not the poster's, and nothing goes to `raw`:
+    # a fingerprint match IS identity — "THUN" and "Thun" are one town, see
     # Locality.matching — and an alias match is an admin's ruling that two names are
     # one. Neither is a reading for a human to second-guess; the flag is what says the
     # rule fired.
-    def normalized_locality
+    def normalized_locality(venue)
       typed = cited(:locality)
+      town = venue&.locality.presence
+      return folded_locality(typed) if town.nil?
+
+      if typed.present? && Fingerprint.for(typed) != Fingerprint.for(town)
+        raw["locality"] = typed
+        issues << :locality_from_place
+      end
+      town
+    end
+
+    def folded_locality(typed)
       return if typed.nil?
 
       canonical = Locality.canonical_name(typed)
@@ -163,14 +193,14 @@ module EventCapture
       canonical
     end
 
-    # Computed from the locality, never the model's answer, because a wrong canton
-    # files the locality and its venues under a branch of the WHERE tree nobody
-    # looking for the event will open. The model is still asked for one: where the
-    # locality is new the computation abstains, and its guess beats leaving a human
-    # to pick from 26 with no default.
-    def normalized_canton(locality)
+    # Computed from the venue or the locality, never the model's answer, because a
+    # wrong canton files the locality and its venues under a branch of the WHERE tree
+    # nobody looking for the event will open. The model is still asked for one: where
+    # both are new the computation abstains, and its guess beats leaving a human to
+    # pick from 26 with no default.
+    def normalized_canton(locality, venue)
       claimed = claimed_canton
-      computed = Locality.canton_for(locality)
+      computed = venue&.canton.presence || Locality.canton_for(locality)
       return claimed if computed.nil?
       return computed if claimed.nil? || claimed == computed
 

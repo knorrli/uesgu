@@ -454,7 +454,19 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-card", count: 3, visible: :all
 
     assert_selector ".capture-card__reread", text: copy("reread.spent")
-    assert find(".capture-card .action-bar button[data-action='capture#reread']").disabled?
+    assert find(".capture-card .card-aside button[data-action='capture#reread']").disabled?
+  end
+
+  # The bar carries the two decisions that END the card. Asking for another go leaves
+  # it in play, so the button belongs with the checkboxes and the note it sends.
+  test "the re-read button sits with the controls it acts on, not in the action bar" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-card .card-aside button[data-action='capture#reread']"
+    assert_no_selector ".capture-card .action-bar button[data-action='capture#reread']"
+    assert_selector ".capture-card .action-bar > *", count: 2
   end
 
   # There is no input to read again, so offering it would be a button that cannot work.
@@ -465,7 +477,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     commit
 
     assert_selector ".capture-card"
-    assert_no_selector ".capture-card .action-bar button[data-action='capture#reread']"
+    assert_no_selector ".capture-card .card-aside button[data-action='capture#reread']"
     assert_no_selector ".capture-card__reread"
   end
 
@@ -833,7 +845,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def reject = find(".capture-card .action-bar button[data-action='capture#reject']").click
 
-  def reread = find(".capture-card .action-bar button[data-action='capture#reread']").click
+  def reread = find(".capture-card .card-aside button[data-action='capture#reread']").click
 
   def mark(field) = find(".capture-card__reread label.tag", text: copy("candidate.#{field}")).click
 

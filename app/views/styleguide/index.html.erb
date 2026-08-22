@@ -713,6 +713,26 @@
       </div>
     </div>
 
+    <div class="sg-row sg-row--stack">
+      <div class="sg-specimen">
+        <%= render layout: "shared/card_aside",
+              locals: { title: "Falsch? Markier, was nochmal ausgelesen werden soll:",
+                        action: tag.button("Nochmal auslesen", type: "button", class: "button-small") } do %>
+          <div class="account-form flex flex-col gap-small">
+            <div class="flex gap-xsmall wrap">
+              <label class="tag"><input type="checkbox"> Datum</label>
+              <label class="tag"><input type="checkbox"> Lokal</label>
+            </div>
+            <input type="text" placeholder="Was steht da wirklich?">
+          </div>
+        <% end %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Card aside</span> · <code>render layout: "shared/card_aside", title:, action:</code>
+        <p class="sg-purpose">A block inside a review card that is <b>not</b> part of what the card is deciding — a report on the read, a note, anything that does not post with the card's form. It has to separate itself by <b>kind</b> rather than by weight: the card body is borderless by design, so every input already draws a horizontal rule and one more hairline reads as one more field, not as a boundary. A recessed ground and a heading do read. <code>action</code> is the button that acts on what is in here, kept beside its own controls rather than sent down to the <a href="#review-card">action bar</a>, which holds only the decisions that end the card.</p>
+      </div>
+    </div>
+
     <div class="sg-row">
       <div class="sg-specimen">
         <%= render layout: "shared/action_bar" do %>
@@ -722,7 +742,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Action bar</span> · <code>render layout: "shared/action_bar"</code>
-        <p class="sg-purpose">The decision row of a review card, pinned to its bottom edge so it stays in thumb reach however long the field list runs. The commit comes first (primary), anything asking for another go sits in the middle, and the quiet way out is <b>last</b> — pushed to the far end, because a dismissal next to the commit is one mis-tap away from being it. Unlike <code>form_actions</code> this closes a decision, not a form: there is no <b>Abbrechen</b>, since leaving decides nothing.</p>
+        <p class="sg-purpose">The decision row of a review card, pinned to its bottom edge so it stays in thumb reach however long the field list runs. It holds only the decisions that <b>end</b> the card: the commit first (primary), the quiet way out <b>last</b> — pushed to the far end, because a dismissal next to the commit is one mis-tap away from being it. A control that leaves the card in play goes in a <a href="#review-card">card aside</a> instead, with the controls it acts on. Unlike <code>form_actions</code> this closes a decision, not a form: there is no <b>Abbrechen</b>, since leaving decides nothing.</p>
       </div>
     </div>
   </section>

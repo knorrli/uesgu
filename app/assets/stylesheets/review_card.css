@@ -63,6 +63,33 @@
   font-style: italic;
 }
 
+/* Set apart from the fields above it by KIND, not by weight: the card body is
+   borderless, so every input already draws a horizontal rule and one more cannot be
+   read as a boundary. A recessed ground and a heading can. */
+.card-aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+  margin-top: var(--gap-large);
+  padding: var(--gap-medium);
+  background: var(--theme-bg-muted);
+}
+
+.card-aside__title {
+  margin: 0;
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+  font-weight: normal;
+}
+
+/* A row of its own so the button keeps its own width — a direct child of the column
+   stretches to the block, which reads as one more full-width field. */
+.card-aside__actions {
+  display: flex;
+  align-items: start;
+  gap: var(--gap-small);
+}
+
 /* Pinned to the bottom edge so it stays in thumb reach however long the field list
    runs. The last action is pushed to the far end: a dismissal sitting next to the
    commit is one mis-tap away from being it. */

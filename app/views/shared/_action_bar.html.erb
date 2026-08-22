@@ -1,5 +1,6 @@
-<%# The decision row of a review card. The caller supplies the controls, in this
-    order: the commit first (primary), anything asking for another go in the middle,
-    and the quiet way out last — a dismissal must never be as loud as the thing it
-    dismisses, and CSS pushes that last one to the far end. %>
+<%# The decision row of a review card, holding only the decisions that END it: the
+    caller supplies the commit first (primary) and the quiet way out last — a
+    dismissal must never be as loud as the thing it dismisses, and CSS pushes that
+    last one to the far end. A control that asks for another go leaves the card in
+    play, so it belongs with the controls it acts on (see shared/_card_aside). %>
 <div class="action-bar"><%= yield %></div>

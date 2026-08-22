@@ -1,0 +1,14 @@
+<%# A block inside a review card that is NOT part of what the card is deciding — a
+    report on the read, a note, anything that does not post with the card's form.
+
+    It sets itself apart by KIND rather than by weight, because the card body is
+    borderless by design: every input draws its own underline, so a rule between them
+    is indistinguishable from one more field. Hence a recessed ground and a heading.
+    `action` is the button that acts on what is in here, kept with its own controls
+    rather than in the card's action bar, which holds only the terminal decisions. %>
+<%# locals: (title:, action: nil) %>
+<aside class="card-aside">
+  <h2 class="card-aside__title"><%= title %></h2>
+  <%= yield %>
+  <%= tag.div(action, class: "card-aside__actions") if action.present? %>
+</aside>

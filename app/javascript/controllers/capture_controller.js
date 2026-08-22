@@ -4,6 +4,11 @@ import { Turbo } from "@hotwired/turbo-rails"
 // Several acts on one poster share a venue; the date and time are what differ, so
 // only this tuple carries between the candidates off one input.
 const PLACE_FIELDS = ["place", "locality", "canton"]
+const LOCALITY_MATCHES = 6
+
+// Compare towns the way a contributor types them rather than the way they are spelt,
+// so "zur" reaches "Zürich" and "neuch" reaches "Neuchâtel".
+const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
 
 // The extraction fan-out lives here rather than on the server: one request per input,
 // because a batch cannot be held open in one and there is no queue to reach for (see
@@ -460,6 +465,57 @@ export default class extends Controller {
     if (canton) this.setField(card, "canton", canton, { normalized: true })
     this.pin(card, "locality")
     this.sharePlace(card)
+    this.showLocalityMatches(card, [])
+  }
+
+  // The town list is drawn here rather than left to the browser: iOS Safari renders an
+  // <input list> datalist in the keyboard's form-assistant bar, and hands that bar to
+  // its own address autofill instead — so on the device most posters are captured on,
+  // the towns never appear at all. Every locality the app knows is already in the page
+  // for the canton, so matching costs no request.
+  suggestLocalities(event) {
+    const card = event.target.closest(".capture-card")
+    this.showLocalityMatches(card, this.matchingLocalities(event.target.value))
+  }
+
+  // Matches take the row over while they stand: a ranked chip that also matches is in
+  // the matches already, and one that does not is an answer to a question nobody is
+  // asking any more. The hint goes with them — it promises the towns will come up, and
+  // they have.
+  showLocalityMatches(card, matches) {
+    const row = card?.querySelector("[data-suggestions=locality]")
+    if (!row) return
+
+    row.querySelectorAll("[data-typed]").forEach((chip) => chip.remove())
+    row.querySelectorAll(".chip").forEach((chip) => { chip.hidden = matches.length > 0 })
+    matches.forEach((name) => row.appendChild(this.localityChip(name)))
+    const hint = card.querySelector("[data-locality-hint]")
+    if (hint) hint.hidden = matches.length > 0
+  }
+
+  // Two letters before anything is offered, because one letter ranks nothing: the cap
+  // would just take the first few of an alphabet.
+  matchingLocalities(typed) {
+    const needle = fold(typed)
+    if (needle.length < 2) return []
+
+    const trailing = (name) => (fold(name).startsWith(needle) ? 0 : 1)
+    return Object.keys(this.localitiesValue)
+                 .filter((name) => fold(name).includes(needle))
+                 .sort((a, b) => trailing(a) - trailing(b) || a.localeCompare(b))
+                 .slice(0, LOCALITY_MATCHES)
+  }
+
+  localityChip(name) {
+    const chip = document.createElement("button")
+    chip.type = "button"
+    chip.className = "chip"
+    chip.textContent = name
+    chip.dataset.typed = "true"
+    chip.dataset.action = "capture#applyLocality"
+    chip.dataset.captureLocalityParam = name
+    chip.dataset.captureCantonParam = this.localitiesValue[name] ?? ""
+    return chip
   }
 
   carryPlace(event) {

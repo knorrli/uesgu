@@ -75,19 +75,21 @@
       </label>
     <% end %>
 
-    <%# The datalist behind the locality field offers every locality the app knows and
-        shows none of them until you type, so a contributor who never guessed it is
-        there is the one who mints "bern". These chips are the affordance where there is
-        a ranking to render; where there is none, the hint that takes their slot is.
+    <%# Chips are the affordance where there is a ranking to render; where there is
+        none, the hint that takes their slot is. The same row also holds the towns
+        matching what is being typed, appended in the browser (see
+        capture_controller.js), which is how the long tail stays reachable at all.
         Both hang off the PAIR: a chip fills the canton as well as the town (see
         CapturesHelper#locality_chips), and the canton is computed from the locality
         rather than read off the poster (see EventCapture::Normalizer). %>
     <% towns = locality_chips(suggestions) %>
-    <% unranked_hint = tag.span(t('capture.candidate.locality_hint'), class: "muted") if towns.empty? %>
+    <% unranked_hint = tag.span(t('capture.candidate.locality_hint'), class: "muted",
+                                data: { locality_hint: true }) if towns.empty? %>
     <%= render layout: "shared/field_group",
           locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :locality)),
                                render("shared/suggestions", label: t('capture.candidate.locality_suggestions'),
-                                      chips: towns),
+                                      chips: towns, attrs: { data: { suggestions: "locality" },
+                                                             aria: { live: "polite" } }),
                                unranked_hint] } do %>
       <div class="capture-card__where flex gap-small wrap">
         <label class="flex flex-col gap-xsmall">
@@ -95,7 +97,11 @@
               but Location.add_to_tree drops any tuple missing the middle tier, so a
               blank locality is an event nobody can browse to. %>
           <span class="field-label"><%= t('capture.candidate.locality') %></span>
-          <%= text_field_tag :locality, candidate.locality, required: true, list: "capture-localities" %>
+          <%# autocomplete off because `name="locality"` is an address autofill token and
+              the field sits beside a canton: iOS otherwise offers to fill it with a whole
+              postal address ("Bern 3008 Switzerland"), which mints that as a town. %>
+          <%= text_field_tag :locality, candidate.locality, required: true, autocomplete: "off",
+                data: { action: "input->capture#suggestLocalities" } %>
         </label>
         <label class="flex flex-col gap-xsmall">
           <span class="field-label"><%= t('capture.candidate.canton') %></span>

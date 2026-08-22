@@ -95,6 +95,12 @@ label.tag:has(input:checked) {
   cursor: pointer;
 }
 
+/* A row down to its label alone is a label for nothing — and the locality row is
+   rendered empty on purpose, to be filled as the contributor types. */
+.suggestions:not(:has(.chip)) {
+  display: none;
+}
+
 /* Read-only info badge. Borderless + faint tint so it never reads as a clickable
    tag/button — the counterpart to .tag. */
 .chip {

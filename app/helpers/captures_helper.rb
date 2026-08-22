@@ -22,7 +22,8 @@ module CapturesHelper
   # The towns those same venues sit in, which is the only ranking the locality field
   # has to offer. Every locality the app knows is far too many to render and
   # alphabetical order ranks nothing; the places already being suggested are few, and
-  # they are about this poster. The long tail stays reachable through the datalist.
+  # they are about this poster. The long tail stays reachable by typing, which fills
+  # the same row from the map below.
   def locality_chips(suggestions)
     suggestions.select { |suggestion| suggestion.locality.present? }
                .uniq { |suggestion| Fingerprint.for(suggestion.locality) }
@@ -35,9 +36,9 @@ module CapturesHelper
 
   def suggestion_chip(label, **data) = { label: label, attrs: { data: data } }
 
-  # Name => canton, off the same rows that compute the canton at extraction. The
-  # datalist offers the names and the card fills the canton from the map when one is
-  # picked, so both halves of the field answer from one place.
+  # Name => canton, off the same rows that compute the canton at extraction. The card
+  # matches the names as they are typed and fills the canton from the same map once one
+  # is picked, so both halves of the field answer from one place.
   def capture_localities = Locality.cantons_by_name
 
   # What the model proposed, keyed the way the form posts it, so the card can carry it

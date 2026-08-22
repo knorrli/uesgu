@@ -195,6 +195,7 @@ en:
       image_unsupported: We can't read that image format — save it as JPEG or PNG.
       text_empty: There was no text.
       provider_error: Reading it didn't work. Try again?
+      truncated: The read broke off halfway. Try again?
       unconfigured: Reading isn't set up right now.
       unreachable: No connection. Try again?
       unknown: That didn't work.

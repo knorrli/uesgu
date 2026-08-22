@@ -22,4 +22,9 @@ module EventCapture
       @detail = detail
     end
   end
+
+  # Its own class because the answer itself may have been fine: the model kept
+  # generating, hit the request's `max_tokens`, and the body arrives cut off
+  # mid-JSON. That makes it the one provider failure a retry is expected to clear.
+  class TruncatedResponse < ProviderError; end
 end

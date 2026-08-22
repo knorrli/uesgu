@@ -16,22 +16,36 @@ module EventCapture
     # day but still bounded, because the caller is a person watching a spinner.
     OPEN_TIMEOUT = 5
     READ_TIMEOUT = 60
+
+    # Eight times the largest answer measured over the bake-off corpus — 530
+    # completion tokens, for a poster advertising four events (see
+    # script/event_capture_bakeoff.rb). A response that reaches this ceiling is a
+    # model looping, not a long poster: raising it buys a slower, dearer failure.
     MAX_TOKENS = 4000
+
+    TOKEN_CEILING_REACHED = "length"
 
     def configured? = EventCaptureConfig.configured?
 
     def call(input:, today:, correction: nil)
       response = post(request_body(input, today, correction))
+      completion_tokens = response.dig("usage", "completion_tokens").to_i
+      raise_truncated(completion_tokens) if response.dig("choices", 0, "finish_reason") == TOKEN_CEILING_REACHED
 
       Response.new(
         text: response.dig("choices", 0, "message", "content"),
         model: response["model"] || EventCaptureConfig.model,
         input_tokens: response.dig("usage", "prompt_tokens").to_i,
-        output_tokens: response.dig("usage", "completion_tokens").to_i
+        output_tokens: completion_tokens
       )
     end
 
     private
+
+    def raise_truncated(completion_tokens)
+      raise TruncatedResponse.new("truncated at max_tokens (#{MAX_TOKENS})",
+                                  detail: "completion_tokens=#{completion_tokens}")
+    end
 
     def endpoint
       URI("https://api.infomaniak.com/2/ai/#{EventCaptureConfig.product_id}/openai/v1/chat/completions")

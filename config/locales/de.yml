@@ -195,6 +195,7 @@ de:
       image_unsupported: Dieses Bildformat können wir nicht lesen – speichere es als JPEG oder PNG.
       text_empty: Da war kein Text.
       provider_error: Das Auslesen hat nicht geklappt. Nochmal versuchen?
+      truncated: Das Auslesen ist mittendrin abgebrochen. Nochmal versuchen?
       unconfigured: Das Auslesen ist gerade nicht eingerichtet.
       unreachable: Keine Verbindung. Nochmal versuchen?
       unknown: Das hat nicht geklappt.

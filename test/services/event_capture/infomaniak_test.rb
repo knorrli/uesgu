@@ -87,6 +87,29 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
     assert_kind_of EventCapture::ProviderError, result
   end
 
+  # A body arriving with finish_reason "length" is a cut-off answer, not a bad one:
+  # read it first and it fails as unparseable JSON, naming neither cause nor fix.
+  test "a response stopped at the token ceiling fails as truncated, before its body is read" do
+    result, = call_with(response("200", JSON.generate(
+      choices: [{ message: { content: '{"events":[{"title":"Zorpcore' }, finish_reason: "length" }],
+      model: "google/gemma-4-31B-it", usage: { prompt_tokens: 1501, completion_tokens: 4000 }
+    )))
+
+    assert_kind_of EventCapture::TruncatedResponse, result
+    assert_equal "truncated at max_tokens (4000)", result.message
+    assert_equal "completion_tokens=4000", result.detail
+  end
+
+  test "a response that stopped on its own is returned" do
+    result, = call_with(response("200", JSON.generate(
+      choices: [{ message: { content: '{"events":[]}' }, finish_reason: "stop" }],
+      model: "google/gemma-4-31B-it", usage: { prompt_tokens: 1200, completion_tokens: 90 }
+    )))
+
+    assert_equal '{"events":[]}', result.text
+    assert_equal 90, result.output_tokens
+  end
+
   test "a transport failure becomes a ProviderError too" do
     result, = call_with(Net::OpenTimeout.new("execution expired"))
 

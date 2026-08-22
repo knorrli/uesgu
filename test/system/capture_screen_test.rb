@@ -99,6 +99,26 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpwil", locality.accepted
   end
 
+  # Two candidates off one poster are the same picture twice, so without a number the
+  # strip reads as one thumbnail rendered twice rather than as two events to decide on.
+  test "the strip numbers what it found and says the tiles can be tapped" do
+    CannedExtractionClient.install(events: [poster_event, matinee])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal %w[1 2], all(".capture-queue__tile[data-card]").map { |tile| tile["data-index"] }
+    assert_selector ".page-header", text: copy("review.hint")
+  end
+
+  test "a queue of one is already open, so it is not told to tap anything" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-queue__tile[data-card]"
+    assert_no_selector ".page-header", text: copy("review.hint")
+  end
+
   test "the genres the model read arrive as chips and publish as they are" do
     CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore])])
     visit capture_path
@@ -907,9 +927,8 @@ class CaptureScreenTest < ApplicationSystemTestCase
   # The strip is the only way onto a card that has not been decided yet.
   def jump_to(index) = all(".capture-queue__tile")[index].click
 
-  # The genre combobox fetches its options as you type, and a name nothing matches
-  # empties the list — waiting for that is what makes the Enter land after the
-  # response rather than before it, without a sleep.
+  # A name nothing matches empties the list, and waiting for that is what makes the
+  # Enter land after the filter has run rather than before it, without a sleep.
   def add_genre(name)
     input = find(".capture-card [role=combobox]")
     input.send_keys(name)

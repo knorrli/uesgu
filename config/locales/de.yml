@@ -139,6 +139,7 @@ de:
       title:
         one: 1 Veranstaltung gefunden
         other: "%{count} Veranstaltungen gefunden"
+      hint: Tipp auf ein Bild, um die Veranstaltung anzusehen.
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.

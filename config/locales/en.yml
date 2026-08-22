@@ -139,6 +139,7 @@ en:
       title:
         one: 1 event found
         other: "%{count} events found"
+      hint: Tap an image to see that event.
     images_hint: Several at once is fine. The images are never stored.
     text_label: Text
     text_hint: From a chat, a newsletter, wherever.

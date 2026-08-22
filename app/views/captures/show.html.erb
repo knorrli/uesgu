@@ -20,6 +20,9 @@
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <h1 data-capture-target="stagingTitle"><%= t('capture.title') %></h1>
     <h1 data-capture-target="reviewTitle" hidden></h1>
+    <%# Absolute key: this block is yielded into shared/page_header, where a relative
+        one resolves against that partial. %>
+    <p class="muted" data-capture-target="reviewHint" hidden><%= t('capture.review.hint') %></p>
   <% end %>
 
   <div class="flex flex-col gap-medium" data-capture-target="input">

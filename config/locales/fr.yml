@@ -162,8 +162,6 @@ fr:
       published: "%{title} est en ligne."
     errors:
       incomplete: Il faut un titre, une date, une localité et un canton.
-      duplicate: Cet événement existe déjà.
-      url_invalid: Le lien doit commencer par http:// ou https://.
       place_invalid: Cette salle n'a pas pu être créée.
       unknown: Ça n'a pas marché.
     row:
@@ -182,7 +180,6 @@ fr:
       locality_suggestions: "Localités connues :"
       locality_hint: Tape une lettre ou deux — les localités connues apparaissent.
       canton: Canton
-      url: Lien
       genres: Genres
       genres_placeholder: Tape ou choisis un genre
       genres_hint: Entrée pour ajouter. Les nouveaux genres sont permis — si un genre existe déjà, prends-le.

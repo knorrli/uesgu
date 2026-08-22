@@ -371,6 +371,20 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select ".capture-card__when .field-group", false
   end
 
+  # A date already gone is a remark about the date, and a line of its own between two
+  # fields belongs to neither of them.
+  test "the warning about a past date hangs off the date it is about" do
+    sign_in_as user(contributor: true)
+
+    stub_extraction(extraction(candidates: [candidate(date: Date.current - 1)])) do
+      post extract_capture_path, params: { row_id: "abc123" },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_select ".capture-card__when + .field-group__attached .capture-card__warning",
+                  text: I18n.t("capture.candidate.past")
+  end
+
   # The `for`/id wiring the phone behaviour rests on — a label that wraps the field
   # instead reopens it on every tap (app/views/captures/_candidate.html.erb). The id is
   # asserted literally because the gem's fallback is a random uuid, which would satisfy

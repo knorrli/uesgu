@@ -135,7 +135,11 @@ en:
     calendar_feed_link: set it up in settings
   capture:
     title: Capture an event
-    intro: Photographed a poster or copied some text? We read it, you check it card by card – whatever you publish goes live right away.
+    intro: Whatever you publish goes live right away.
+    review:
+      title:
+        one: 1 event found — confirm it
+        other: "%{count} events found — confirm each one"
     images_hint: Several at once is fine. The images are never stored.
     text_label: Text
     text_hint: From a chat, a newsletter, wherever.

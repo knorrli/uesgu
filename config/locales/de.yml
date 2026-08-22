@@ -135,7 +135,11 @@ de:
     calendar_feed_link: in den Einstellungen einrichten
   capture:
     title: Event erfassen
-    intro: Poster fotografiert oder Text kopiert? Wir lesen aus, du prüfst Karte für Karte – was du übernimmst, geht sofort live.
+    intro: Was du übernimmst, geht sofort live.
+    review:
+      title:
+        one: 1 Veranstaltung gefunden — bestätige sie
+        other: "%{count} Veranstaltungen gefunden — bestätige jede"
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.

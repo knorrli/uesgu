@@ -146,10 +146,12 @@ module EventCapture
       normalized
     end
 
-    # The spelling the app already files this town under, not the poster's shouting.
-    # EventCapture::Creator folds it on publish either way, so leaving the card on
-    # "THUN" has the contributor confirm a town that is not the one saved — and the
-    # card is the last place a human sees it before it is filed.
+    # The spelling the app already files this town under, not the poster's. Nothing is
+    # refused, so nothing goes to `raw` and the variant never reaches the card: a
+    # fingerprint match IS identity — "THUN" and "Thun" are one town, see
+    # Locality.matching — and an alias match is an admin's ruling that two names are
+    # one. Neither is a reading for a human to second-guess; the flag is what says the
+    # rule fired.
     def normalized_locality
       typed = cited(:locality)
       return if typed.nil?
@@ -157,7 +159,6 @@ module EventCapture
       canonical = Locality.canonical_name(typed)
       return typed if canonical == typed
 
-      raw["locality"] = typed
       issues << :locality_normalized
       canonical
     end

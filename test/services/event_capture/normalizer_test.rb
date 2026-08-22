@@ -231,9 +231,9 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     candidate = normalize_in(cited_locality("ZORPWIL"), Zorpwil: "BE")
 
     assert_equal "Zorpwil", candidate.locality
-    assert_equal "ZORPWIL", candidate.raw["locality"]
     assert_equal [:locality_normalized], candidate.issues
     assert_equal "BE", candidate.canton
+    assert_empty candidate.raw, "the variant is not a refused reading — it is the same town"
   end
 
   test "a merged-away spelling resolves to the town it names" do
@@ -243,8 +243,8 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     candidate = normalize(cited_locality("Zorpville"))
 
     assert_equal "Zorpwil", candidate.locality
-    assert_equal "Zorpville", candidate.raw["locality"]
     assert_includes candidate.issues, :locality_normalized
+    assert_empty candidate.raw
   end
 
   test "the spelling the app already uses is not a normalization" do

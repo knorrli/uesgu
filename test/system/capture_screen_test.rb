@@ -123,6 +123,33 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".hw-combobox__dialog__label", text: copy("candidate.genres"), visible: :all
   end
 
+  # The two taps a wrapping <label> turns into a reopen of the field. What the markup
+  # has to do instead, and why: app/views/captures/_candidate.html.erb.
+  test "tapping outside the genre dialog on a phone dismisses it" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+    page.current_window.resize_to(390, 844)
+
+    find(".capture-card [role=combobox]").click
+    assert_selector ".capture-card dialog.hw-combobox__dialog[open]"
+
+    tap_above_dialog
+    assert_no_selector ".capture-card dialog.hw-combobox__dialog[open]"
+  end
+
+  test "tapping a genre chip on a phone removes it without reopening the field" do
+    CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore])])
+    visit capture_path
+    pick "poster.png"
+    page.current_window.resize_to(390, 844)
+
+    find(".hw-combobox__chip", text: "zorpcore").find(".hw-combobox__chip__remover").click
+
+    assert_no_selector ".hw-combobox__chip", text: "zorpcore"
+    assert_no_selector ".capture-card dialog.hw-combobox__dialog[open]"
+  end
+
   # The field used to be a comma-joined text input, so a poster naming its genres with
   # any other separator became one genre. A chip per genre is what makes that visible.
   test "a genre the taxonomy has never seen can still be typed in" do
@@ -783,6 +810,20 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   def copy(key, **args) = I18n.t("capture.#{key}", locale: :de, **args)
+
+  # Chrome targets a click on a modal dialog's backdrop at the dialog element itself,
+  # which is what `closeOnClickOutside` reads — but only a real pointer at real
+  # coordinates produces it, so this goes through the driver's mouse rather than
+  # Capybara's element click. The strip above the dialog is the backdrop the gem
+  # leaves reachable; a dialog flush with the viewport top would have none.
+  def tap_above_dialog
+    top = evaluate_script(
+      "document.querySelector('.capture-card dialog.hw-combobox__dialog')" \
+      ".getBoundingClientRect().top"
+    )
+    assert_operator top, :>, 10, "the dialog leaves no backdrop strip to tap"
+    page.driver.browser.mouse.move(x: 195, y: (top / 2).to_i).down.up
+  end
 
   # A src attribute only proves the slot was filled. naturalWidth is the one signal
   # Chrome gives that the blob: URL was actually allowed to load — a CSP without

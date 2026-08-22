@@ -52,7 +52,7 @@
   max-width: 100%;
 }
 
-/* Provenance for the field it is attached to: the text quoted off the source. Shares
+/* Provenance for what it is attached to: the text quoted off the source. Shares
    the quiet muted channel with a field's hint and is set apart from it by slant alone
    — transcription against instruction — because a card carrying one per field has to
    read as a form and not as a transcript. Rhythm comes from .field-group__attached. */

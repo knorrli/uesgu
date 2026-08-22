@@ -159,20 +159,10 @@ button.capture-queue__tile[data-state="pending"] {
 }
 
 /* Two fields to a row where they belong together (date + time, locality + canton).
-   Either column may be a bare label or a .field-group wrapping one, since the quote a
-   field was read off has to sit under that field and not across both. Top-aligned:
-   stretched to a taller neighbour, the `input[type=text] { flex-grow: 1 }` in
-   controls.css that fills a flex ROW grows the input VERTICALLY instead — the same
-   edge _hotwire_combobox_overrides.css hits. Without the grow, a wrapped field keeps
-   its content width and its underline stops mid-column, reading as a different kind
-   of field rather than a wrapped one. */
-.capture-card__when,
-.capture-card__where {
-  align-items: flex-start;
-}
-
-.capture-card__when > *,
-.capture-card__where > * {
+   Without the grow, a wrapped field keeps its content width and its underline stops
+   mid-column, reading as a different kind of field rather than a wrapped one. */
+.capture-card__when > label,
+.capture-card__where > label {
   flex: 1 1 8rem;
 }
 

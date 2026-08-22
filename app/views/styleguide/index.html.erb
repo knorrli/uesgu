@@ -385,16 +385,22 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <div class="account-form flex flex-col gap-medium">
+        <div class="account-form flex flex-col gap-large">
           <%= render layout: "shared/field_group", locals: {
                 attached: [render("shared/cite", quote: "3007 ZORPWIL"),
                            render("shared/suggestions", label: "Known towns:",
                                   chips: [{ label: "Zorpwil", attrs: {} },
                                           { label: "Flarnhausen", attrs: {} }])] } do %>
-            <label class="flex flex-col gap-xsmall">
-              <span class="field-label">Ortschaft</span>
-              <input type="text" value="Zorpwil">
-            </label>
+            <div class="flex gap-small wrap">
+              <label class="flex flex-col gap-xsmall flex-grow">
+                <span class="field-label">Ortschaft</span>
+                <input type="text" value="Zorpwil">
+              </label>
+              <label class="flex flex-col gap-xsmall flex-grow">
+                <span class="field-label">Kanton</span>
+                <select><option>Bern</option></select>
+              </label>
+            </div>
           <% end %>
           <%= render layout: "shared/field_group", locals: {
                 attached: tag.span("Enter adds one.", class: "muted") } do %>
@@ -407,7 +413,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Field group</span> · <code>render layout: "shared/field_group", attached:</code>
-        <p class="sg-purpose">A field plus everything that belongs to <b>that field alone</b>: the block holds the label and input, and <code>attached</code> takes the lines under it — a <code>cite</code>, a suggestion row, a hint — as one renderable or a list of them, blanks dropping out. They are indented one step, and the column holding the groups has to gap them (<code>gap-medium</code>) comfortably wider than a group gaps its own lines — proximity plus indent is the whole grouping, since a rule or a tint would fight the borderless field skin. Reach for it the moment a field carries more than a label and an input: subordinate lines at the same indent as the next field's label read as an intro to the field <em>underneath</em>. A field in a two-column row gets its own group <b>inside its column</b>, so its lines sit under it and not across its neighbour. Note the reading order flips against the ladder above — on a card whose fields arrive already filled there is nothing to read before typing, so everything subordinate hangs below the value it is about.</p>
+        <p class="sg-purpose">A field — or a pair of fields settled from <b>one source</b>, as Ortschaft and Kanton are here — plus what hangs off it: the block holds the label and input (or the row), and <code>attached</code> takes the lines under it — a <code>cite</code>, a suggestion row, a hint — as one renderable or a list of them, blanks dropping out. No rule, no box, no tint, no indent: the lines inside a group sit at <code>gap-xsmall</code> and the column holding the groups gaps them at <code>gap-large</code>, and that difference is the only thing saying which field a line belongs to — a caller that gaps its column tighter has no grouping left. Reach for it the moment a field carries more than a label and an input: on the form's ordinary gap a subordinate line sits equidistant between the field above and the next field's label, and the heaviest of them (a chip row) wins that tie, so the block reads as an intro to the field <em>underneath</em>. Attach to the pair rather than to one column wherever both fields come from that one source — a town chip fills the canton as well as the town. Note the reading order flips against the ladder above: on a card whose fields arrive already filled there is nothing to read before typing, so everything subordinate hangs below the value it is about.</p>
       </div>
     </div>
 
@@ -668,7 +674,7 @@
                                      tag.button("Verwerfen", class: "button-small", type: "button")])
                         } } do %>
           <p class="field-label">poster.png</p>
-          <div class="account-form flex flex-col gap-medium">
+          <div class="account-form flex flex-col gap-large">
             <label class="flex flex-col gap-xsmall">
               <span class="field-label">Titel</span>
               <input type="text" value="Zorpcore Nacht">
@@ -691,7 +697,7 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <div class="account-form flex flex-col gap-medium">
+        <div class="account-form flex flex-col gap-large">
           <%= render layout: "shared/field_group",
                 locals: { attached: render("shared/cite", quote: "3007 ZORPWIL") } do %>
             <label class="flex flex-col gap-xsmall">
@@ -703,7 +709,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Cite</span> · <code>render "shared/cite", quote:</code>
-        <p class="sg-purpose">The verbatim text a model quoted as its source for the field <b>above</b> it — the opposite reading order from a <code>.field-label</code> hint, because it is provenance for a value already filled in rather than an instruction for filling one. Goes in a <a href="#inputs">field group</a>'s <code>attached</code> slot, which is where the indent tying it to its field comes from. It shares the quiet muted channel with a hint and is set apart by <b>slant</b>: italic is the transcribed line, upright the instruction. Quotation marks come from the locale (<code>„…“</code> / <code>“…”</code> / <code>«&nbsp;…&nbsp;»</code>) and carry the whole meaning, so there is no repeated label: a card showing one per field has to read as a form, not as a transcript. Render nothing by passing a blank <code>quote</code>.</p>
+        <p class="sg-purpose">The verbatim text a model quoted as its source for the field <b>above</b> it — the opposite reading order from a <code>.field-label</code> hint, because it is provenance for a value already filled in rather than an instruction for filling one. Goes in a <a href="#inputs">field group</a>'s <code>attached</code> slot, which is what keeps it nearer the field it came off than the next field's label. It shares the quiet muted channel with a hint and is set apart by <b>slant</b>: italic is the transcribed line, upright the instruction. Quotation marks come from the locale (<code>„…“</code> / <code>“…”</code> / <code>«&nbsp;…&nbsp;»</code>) and carry the whole meaning, so there is no repeated label: a card showing one per field has to read as a form, not as a transcript. Render nothing by passing a blank <code>quote</code>.</p>
       </div>
     </div>
 

@@ -41,6 +41,10 @@ module CapturesHelper
   # is picked, so both halves of the field answer from one place.
   def capture_localities = Locality.cantons_by_name
 
+  # Most-used first, because a dropdown's top is the only part read without scrolling
+  # and the head of this list is where a poster's genre almost always is.
+  def capture_genres = Genre.offerable.by_usage
+
   # What the model proposed, keyed the way the form posts it, so the card can carry it
   # back for the diff. Mirrors the visible inputs exactly — a value that renders one
   # way and is proposed another reads as a correction nobody made.

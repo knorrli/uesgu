@@ -49,6 +49,16 @@
             data-action="capture#commit" disabled><%= t('capture.staging.commit') %></button>
   </div>
 
+  <%# Every genre the picker offers, once for the whole page. A card clones this into
+      its own listbox when it opens and empties it when it does not (see
+      capture_controller.js): a batch is N posters x M events, and shipping ~300 options
+      into every card would grow with both, and with the taxonomy. Inert here — a
+      template's contents are not in the document, so the option ids it carries only
+      ever exist once in the live DOM. %>
+  <template data-capture-target="genreOptions">
+    <% combobox_options(capture_genres, value: :name, display: :name).each do |option| %><%= render option %><% end %>
+  </template>
+
   <%# Progress, navigation and receipts in one strip: a card publishes the moment it
       is accepted and moves on, so its tile is the only thing left saying so. %>
   <nav class="capture-queue" data-capture-target="strip" aria-label="<%= t('capture.queue.label') %>" hidden></nav>

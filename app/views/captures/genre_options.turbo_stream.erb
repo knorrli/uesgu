@@ -1,4 +1,0 @@
-<%# formats: [:html] pins the option partial to its HTML template — without it Rails
-    inherits this request's :turbo_stream format and cannot find it, 500ing the
-    search (see admin/events/search.turbo_stream.erb, where this first bit). %>
-<%= async_combobox_options @genres, value: :name, display: :name %>

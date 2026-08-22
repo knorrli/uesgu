@@ -18,7 +18,8 @@ const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{
 // Connects to data-controller="capture".
 export default class extends Controller {
   static targets = ["files", "text", "zone", "items", "commit", "input", "restart",
-                    "rows", "done", "strip", "card", "source", "stagingTitle", "reviewTitle"]
+                    "rows", "done", "strip", "card", "source", "stagingTitle", "reviewTitle",
+                    "genreOptions"]
   static values = {
     url: String,
     dropUrl: String,
@@ -301,9 +302,39 @@ export default class extends Controller {
 
   open(id) {
     this.currentId = id
-    this.cardTargets.forEach((card) => { card.hidden = card.id !== id })
+    this.cardTargets.forEach((card) => {
+      card.hidden = card.id !== id
+      this.stockGenres(card, card.id === id)
+    })
     this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === id) })
     this.doneTarget.hidden = true
+  }
+
+  // The genre vocabulary lives once in the page and is lent to whichever card is open.
+  // Only one card is ever on screen, so one copy is all the live DOM needs — and the
+  // combobox reads its options off the listbox as it filters rather than caching them
+  // when it connects, which is what makes lending them work at all.
+  stockGenres(card, wanted) {
+    const listbox = card.querySelector(".hw-combobox__listbox")
+    if (!listbox || !this.hasGenreOptionsTarget) return
+    if (!wanted) return listbox.replaceChildren()
+    if (listbox.firstElementChild) return
+
+    listbox.replaceChildren(this.genreOptionsTarget.content.cloneNode(true))
+    this.markPickedGenres(card, listbox)
+  }
+
+  // A genre already on the card is spent: the combobox hides an option it holds in the
+  // field, and a fresh clone knows nothing of what this card has picked.
+  markPickedGenres(card, listbox) {
+    const field = card.querySelector("[data-hw-combobox-target='hiddenField']")
+    field?.value.split(",").map((name) => name.trim()).filter(Boolean).forEach((name) => {
+      const option = listbox.querySelector(`[data-value="${CSS.escape(name)}"]`)
+      if (!option) return
+
+      option.setAttribute("data-multiselected", "")
+      option.hidden = true
+    })
   }
 
   // turbo:submit-end fires for a refusal too, and that response is the stream putting

@@ -127,11 +127,18 @@ class SavedFilter < ApplicationRecord
   # keeps. Two rules with the same fingerprint are the same saved filter — the
   # basis for "you already have this" both at save (no duplicate is made) and on
   # the events page (the ★ lights up).
+  #
+  # Locations compare by fingerprint (case, accents and punctuation folded, exactly
+  # as the locality and place tables key themselves) so "THUN" and "Thun" are one
+  # filter from the moment they are saved. Two rules holding two spellings of one
+  # town would collide the instant Locality#normalize_spellings! rewrote them, and
+  # resolving that collision means destroying one of them. Canton codes fold too
+  # (BE -> "be"), which is harmless: they are a closed 26-item list (Location).
   def self.fingerprint(queries:, location_list:, date_ranges:, genres: [])
     {
       queries: Set.new(Array(queries).map { |q| q.to_s.strip }.reject(&:blank?)),
       genres: Set.new(Array(genres)),
-      location_list: Set.new(Array(location_list)),
+      location_list: Set.new(Array(location_list).map { |name| Fingerprint.for(name) }),
       date_ranges: Set.new(Array(date_ranges).select { |range| Datepicker.preset.key?(range) })
     }
   end

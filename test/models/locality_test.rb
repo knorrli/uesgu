@@ -70,6 +70,72 @@ class LocalityTest < ActiveSupport::TestCase
     assert_nil Locality.canton_for("Zorpwil")
   end
 
+  # Location.usage hands its rows back in whatever order Postgres groups them, so a
+  # name picked by arrival can flip between runs — and a flip onto the rarer spelling
+  # re-splits the town the run before it folded.
+  test "reconcile! names a town for the spelling the most events carry" do
+    2.times { event(location_list: ["Zorpwil"]) }
+    event(location_list: ["ZORPWIL"])
+
+    3.times { Locality.reconcile! }
+
+    assert_equal "Zorpwil", Locality.matching("zorpwil").name
+  end
+
+  test "spellings the same number of events carry break alphabetically" do
+    event(location_list: ["Zorpwil"])
+    event(location_list: ["ZORPWIL"])
+
+    Locality.reconcile!
+
+    assert_equal "ZORPWIL", Locality.matching("zorpwil").name
+  end
+
+  # Same fingerprint is one row already, so there is no second locality to merge into
+  # and the localities browser shows nothing wrong — the split is only visible one
+  # screen over, in the tags. Hence unattended rather than an admin button.
+  test "reconcile! files a stranded spelling under the town's own name" do
+    rule = saved_filter(user, ["ZORPWIL"])
+    2.times { event(location_list: ["Zorpwil", "BE"]) }
+    stranded = event(location_list: ["ZORPWIL", "BE"])
+
+    Locality.reconcile!
+
+    assert_equal "Zorpwil", Locality.matching("zorpwil").name
+    assert_includes stranded.reload.location_list, "Zorpwil"
+    refute_includes stranded.location_list, "ZORPWIL"
+    assert_equal ["Zorpwil"], rule.reload.location_list
+    assert_includes rule.matched_events, stranded
+  end
+
+  test "reconcile! moves a captured place off a stranded spelling" do
+    place(name: "Flarnhalle", locality: "Zorpwil", canton: "BE")
+    stray = place(name: "Zorphalle", locality: "zorpwil", canton: "BE")
+    event(location_list: ["Zorphalle", "zorpwil", "BE"])
+
+    Locality.reconcile!
+
+    assert_equal "Zorpwil", stray.reload.locality
+  end
+
+  # The fold is three table scans and reconcile! runs after every nightly sweep, so a
+  # town whose tags already agree must not pay for them.
+  test "reconcile! does not fold a locality whose tags all read the canonical way" do
+    saved_filter(user, ["Zorpwil"])
+    event(location_list: ["Zorpwil", "BE"])
+    Locality.reconcile!
+
+    statements = []
+    subscriber = ActiveSupport::Notifications.subscribe("sql.active_record") do |*, payload|
+      statements << payload[:sql]
+    end
+    Locality.reconcile!
+    ActiveSupport::Notifications.unsubscribe(subscriber)
+
+    refute statements.any? { |sql| sql.include?("saved_filters") },
+           "the fold ran on a locality with nothing to fold"
+  end
+
   test "reconcile! zeroes a locality nothing carries any more" do
     stale = locality("Zorpville")
     stale.update!(events_count: 7)

@@ -171,6 +171,20 @@ class SavedFilterTest < ActiveSupport::TestCase
     assert rule(u, filter: { q: ["Rock"] }).valid?, "a different filter is fine"
   end
 
+  # Two spellings of one town are one filter, so Locality#normalize_spellings! can
+  # rewrite either without landing its owner on a duplicate — the collision whose only
+  # resolution is destroying one of them.
+  test "two spellings of one location are the same filter" do
+    u = user
+    rule(u, filter: { l: ["Zorpwil"] }).save!
+
+    dup = rule(u, filter: { l: ["ZORP-WIL"] })
+    refute dup.valid?
+    assert_includes dup.errors[:base], I18n.t("saved_filters.errors.duplicate")
+
+    assert rule(u, filter: { l: ["BE"] }).valid?, "a canton code is still its own filter"
+  end
+
   test "editing a filter to collide with another rule is invalid; schedule-only edits are fine" do
     u = user
     a = rule(u, filter: { q: ["Rock"] }).tap(&:save!)

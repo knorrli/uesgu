@@ -19,7 +19,7 @@ const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{
 export default class extends Controller {
   static targets = ["files", "text", "zone", "items", "commit", "input", "restart",
                     "rows", "done", "strip", "card", "source", "stagingTitle", "reviewTitle",
-                    "genreOptions"]
+                    "reviewHint", "genreOptions"]
   static values = {
     url: String,
     dropUrl: String,
@@ -250,6 +250,8 @@ export default class extends Controller {
     this.reviewTitleTarget.textContent = title.replace("%{count}", count)
     this.stagingTitleTarget.hidden = true
     this.reviewTitleTarget.hidden = false
+    // A queue of one is already open: there is nowhere to tap to.
+    this.reviewHintTarget.hidden = count < 2
   }
 
   // A new row at the END of the queue, never a replacement: the read being disputed
@@ -418,6 +420,15 @@ export default class extends Controller {
     const group = this.groupFor(card.closest(".capture-row")?.id)
     group.querySelector('[data-state="pending"]')?.remove()
     group.appendChild(this.tileFor(card))
+    this.numberTiles()
+  }
+
+  // Renumbered on every arrival rather than assigned once: a poster yielding a second
+  // event lands its tile inside its own group, which pushes every tile after it along.
+  // Pending tiles are left out — one input can become two cards, so a number given
+  // before the read lands is a number that moves.
+  numberTiles() {
+    this.tiles.forEach((tile, index) => { tile.dataset.index = index + 1 })
   }
 
   // Stood up when the row is appended, not when a card lands, so the strip states the

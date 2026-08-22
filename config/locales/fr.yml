@@ -139,6 +139,7 @@ fr:
       title:
         one: 1 événement trouvé
         other: "%{count} événements trouvés"
+      hint: Touche une image pour voir cet événement.
     images_hint: Plusieurs à la fois, pas de souci. Les images ne sont jamais stockées.
     text_label: Texte
     text_hint: D'un chat, d'une newsletter, peu importe.

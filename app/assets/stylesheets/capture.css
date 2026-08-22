@@ -105,6 +105,22 @@ button.capture-queue__tile[data-state="pending"] {
   overflow: hidden;
 }
 
+/* Two candidates off one poster are the same picture twice, so the number is the only
+   thing on a tile that tells them apart — and the only thing tying the strip to the
+   count in the heading. Its own ground because a poster is arbitrary underneath, and
+   the opposite corner from the decided mark. */
+.capture-queue__tile::before {
+  content: attr(data-index);
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 3px;
+  background: var(--theme-bg-color);
+  color: var(--theme-fg-color);
+  font-size: var(--font-size-small);
+  line-height: 1.3;
+}
+
 .capture-queue__tile .ph {
   position: absolute;
   right: 0;

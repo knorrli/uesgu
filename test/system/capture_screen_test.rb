@@ -112,33 +112,26 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal %w[Flarncore Zorpcore], Event.sole.genre_list.sort
   end
 
-  # Below the gem's 640px mobile breakpoint the field opens as a modal dialog whose
-  # only text is the search input, so without an explicit dialog_label nothing in it
-  # says which field is being searched.
-  test "the genre field names itself in the dialog it opens on a phone" do
-    CannedExtractionClient.install(events: [poster_event])
-    visit capture_path
-    pick "poster.png"
-
-    assert_selector ".hw-combobox__dialog__label", text: copy("candidate.genres"), visible: :all
-  end
-
-  # The two taps a wrapping <label> turns into a reopen of the field. What the markup
-  # has to do instead, and why: app/views/captures/_candidate.html.erb.
-  test "tapping outside the genre dialog on a phone dismisses it" do
-    CannedExtractionClient.install(events: [poster_event])
+  # A phone is where posters are captured, and the gem's alternative to the dropdown is
+  # a modal dialog that covers the card from mid-screen down and — once the software
+  # keyboard takes the bottom of it — shows fewer options than the dropdown does.
+  test "the genre field opens a list, not a dialog, on a phone" do
+    genre(name: "zorpwave", events_count: 3)
+    CannedExtractionClient.install(events: [poster_event(genres: [])])
     visit capture_path
     pick "poster.png"
     page.current_window.resize_to(390, 844)
 
-    find(".capture-card [role=combobox]").click
-    assert_selector ".capture-card dialog.hw-combobox__dialog[open]"
+    find(".capture-card [role=combobox]").send_keys("zorpw")
 
-    tap_above_dialog
+    assert_selector ".capture-card .hw-combobox__listbox [role=option]", text: "zorpwave"
     assert_no_selector ".capture-card dialog.hw-combobox__dialog[open]"
   end
 
-  test "tapping a genre chip on a phone removes it without reopening the field" do
+  # A tap on a chip targets the chip, and inside a wrapping <label> that is a click on
+  # the label — which the browser forwards to the input, defeating the remover. What
+  # the markup has to do instead: app/views/captures/_candidate.html.erb.
+  test "tapping a genre chip's remover on a phone takes the genre off" do
     CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore])])
     visit capture_path
     pick "poster.png"
@@ -147,7 +140,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     find(".hw-combobox__chip", text: "zorpcore").find(".hw-combobox__chip__remover").click
 
     assert_no_selector ".hw-combobox__chip", text: "zorpcore"
-    assert_no_selector ".capture-card dialog.hw-combobox__dialog[open]"
+    assert_selector ".hw-combobox__chip", text: "flarncore"
   end
 
   # The field used to be a comma-joined text input, so a poster naming its genres with
@@ -892,20 +885,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   def copy(key, **args) = I18n.t("capture.#{key}", locale: :de, **args)
-
-  # Chrome targets a click on a modal dialog's backdrop at the dialog element itself,
-  # which is what `closeOnClickOutside` reads — but only a real pointer at real
-  # coordinates produces it, so this goes through the driver's mouse rather than
-  # Capybara's element click. The strip above the dialog is the backdrop the gem
-  # leaves reachable; a dialog flush with the viewport top would have none.
-  def tap_above_dialog
-    top = evaluate_script(
-      "document.querySelector('.capture-card dialog.hw-combobox__dialog')" \
-      ".getBoundingClientRect().top"
-    )
-    assert_operator top, :>, 10, "the dialog leaves no backdrop strip to tap"
-    page.driver.browser.mouse.move(x: 195, y: (top / 2).to_i).down.up
-  end
 
   # A src attribute only proves the slot was filled. naturalWidth is the one signal
   # Chrome gives that the blob: URL was actually allowed to load — a CSP without

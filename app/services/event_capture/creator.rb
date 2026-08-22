@@ -126,10 +126,7 @@ module EventCapture
     def resolve_place
       return if place_name.blank?
 
-      registry = Venue.in_taxonomy.find { |venue| Fingerprint.for(venue.name) == Fingerprint.for(place_name) }
-      return registry if registry
-
-      Place.matching(place_name) ||
+      Location.resolve_venue(place_name) ||
         Place.create(name: place_name, locality: locality, canton: canton, url: place_url)
     end
 

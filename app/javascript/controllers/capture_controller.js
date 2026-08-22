@@ -446,6 +446,7 @@ export default class extends Controller {
     this.setField(card, "place", name, { normalized: true })
     if (locality) this.setField(card, "locality", locality, { normalized: true })
     if (canton) this.setField(card, "canton", canton, { normalized: true })
+    this.pin(card, "place", locality && "locality", canton && "canton")
     this.sharePlace(card)
   }
 
@@ -457,6 +458,7 @@ export default class extends Controller {
     const { locality, canton } = event.params
     this.setField(card, "locality", locality, { normalized: true })
     if (canton) this.setField(card, "canton", canton, { normalized: true })
+    this.pin(card, "locality")
     this.sharePlace(card)
   }
 
@@ -466,7 +468,10 @@ export default class extends Controller {
     // whatever a suggestion put there before.
     this.markNormalized(card, event.target.name, false)
     if (event.target.name === "locality") this.placeLocality(card, event.target.value)
-    if (PLACE_FIELDS.includes(event.target.name)) this.sharePlace(card)
+    if (!PLACE_FIELDS.includes(event.target.name)) return
+
+    this.pin(card, event.target.name)
+    this.sharePlace(card)
   }
 
   // Extraction computes the canton from the locality once, server-side, so a locality
@@ -489,16 +494,35 @@ export default class extends Controller {
     if (flag) flag.value = normalized ? "1" : ""
   }
 
+  // The canton is computed from the locality and never asked for on its own, so an
+  // answer for the town claims it too (see CapturesHelper#locality_chips).
+  pin(card, ...names) {
+    const claimed = names.includes("locality") ? [...names, "canton"] : names
+    claimed.filter(Boolean).forEach((name) => {
+      const field = this.field(card, name)
+      if (field) field.dataset.pinned = "true"
+    })
+  }
+
+  pinned(card, name) {
+    return this.field(card, name)?.dataset.pinned === "true"
+  }
+
   // Sticky on the controller rather than a sweep of the cards on screen, so the tuple
-  // still reaches a card that connects after the field was filled.
+  // still reaches a card that connects after the field was filled. An answer outranks
+  // a reading: once the contributor has ruled on a field, a card landing later cannot
+  // put the model back in charge of it.
   sharePlace(card) {
     const row = card?.closest(".capture-row")
     if (!row) return
 
-    const shared = this.places.get(row.id) ?? {}
+    const shared = this.places.get(row.id) ?? { values: {}, answered: new Set() }
     PLACE_FIELDS.forEach((name) => {
       const value = this.fieldValue(card, name)
-      if (value) shared[name] = value
+      if (!value || (shared.answered.has(name) && !this.pinned(card, name))) return
+
+      shared.values[name] = value
+      if (this.pinned(card, name)) shared.answered.add(name)
     })
     this.places.set(row.id, shared)
 
@@ -506,22 +530,32 @@ export default class extends Controller {
                     .forEach((sibling) => this.fillPlace(sibling, shared))
   }
 
-  // Only ever completes, never corrects: card 3's venue can genuinely differ from the
-  // two above it, and a decided card is not up for editing at all.
+  // Completes what a card never printed, and carries a correction across the ones that
+  // did: one poster is one venue in one town, so a value the model read wrong is wrong
+  // on every card off it. Only an answer corrects — one model reading must not
+  // overwrite another, which is what a bill across two halls comes down to.
   fillPlace(card, shared) {
     if (card.dataset.state !== "open") return
 
     PLACE_FIELDS.forEach((name) => {
-      if (shared[name] && !this.fieldValue(card, name)) this.setField(card, name, shared[name])
+      const value = shared.values[name]
+      if (!value || this.pinned(card, name)) return
+      if (this.fieldValue(card, name) && !shared.answered.has(name)) return
+
+      this.setField(card, name, value)
     })
   }
 
+  field(card, name) {
+    return card?.querySelector(`[name="${name}"]`)
+  }
+
   fieldValue(card, name) {
-    return card.querySelector(`[name="${name}"]`)?.value ?? ""
+    return this.field(card, name)?.value ?? ""
   }
 
   setField(card, name, value, { normalized = false } = {}) {
-    const field = card.querySelector(`[name="${name}"]`)
+    const field = this.field(card, name)
     if (field) field.value = value
     if (normalized) this.markNormalized(card, name, true)
   }

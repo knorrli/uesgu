@@ -540,6 +540,48 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpwiler Rathaus", field_value("place")
   end
 
+  test "a locality corrected on one card reaches the siblings that read one of their own" do
+    place(name: "Zorpwiler Rathaus", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(locality: "Us", locality_evidence: "Us", canton: "ZH"),
+                                            matinee(locality: "Us", locality_evidence: "Us", canton: "ZH")])
+    visit capture_path
+    pick "poster.png"
+
+    type "locality", "Zorpwil"
+    reject
+    assert_equal "Zorpcore Matinee", field_value("title")
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "BE", field_value("canton")
+  end
+
+  test "a venue corrected on one card reaches the siblings that read one of their own" do
+    CannedExtractionClient.install(events: [poster_event, matinee(place: "Zorpkeller", place_evidence: "Zorpkeller")])
+    visit capture_path
+    pick "poster.png"
+
+    type "place", "Zorpwiler Rathaus"
+    reject
+    assert_equal "Zorpcore Matinee", field_value("title")
+    assert_equal "Zorpwiler Rathaus", field_value("place")
+  end
+
+  test "a sibling the contributor answered first keeps its town when another is corrected" do
+    CannedExtractionClient.install(events: [poster_event(locality: "Us", locality_evidence: "Us"),
+                                            matinee(locality: "Us", locality_evidence: "Us")])
+    visit capture_path
+    pick "poster.png"
+
+    jump_to 1
+    type "locality", "Flarnhausen"
+    jump_to 0
+    type "locality", "Zorpwil"
+    assert_equal "Zorpwil", field_value("locality")
+
+    jump_to 1
+    assert_equal "Zorpcore Matinee", field_value("title")
+    assert_equal "Flarnhausen", field_value("locality")
+  end
+
   test "a place typed on one input stays on it rather than reaching the next input's cards" do
     CannedExtractionClient.install(events: [poster_event(locality: nil, canton: nil)])
     visit capture_path
@@ -798,6 +840,9 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def cite(quote) = I18n.t("shared.cite", locale: :de, quote: quote)
 
   def field_value(field) = find(".capture-card [name='#{field}']").value
+
+  # The strip is the only way onto a card that has not been decided yet.
+  def jump_to(index) = all(".capture-queue__tile")[index].click
 
   # The genre combobox fetches its options as you type, and a name nothing matches
   # empties the list — waiting for that is what makes the Enter land after the

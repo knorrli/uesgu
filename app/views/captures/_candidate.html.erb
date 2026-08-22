@@ -107,14 +107,24 @@
 
     <%= render layout: "shared/field_group",
           locals: { attached: tag.span(t('capture.candidate.genres_hint'), class: "muted") } do %>
-      <label class="flex flex-col gap-xsmall">
-        <span class="field-label"><%= t('capture.candidate.genres') %></span>
+      <%# The label names the field with `for` and must NOT wrap it, unlike every other
+          field on this card. Below the combobox's 640px breakpoint the gem renders a
+          modal <dialog> inside the field; a tap on that dialog's backdrop targets the
+          dialog element, and a tap on a selection chip targets the chip. Inside a
+          wrapping label both are clicks on the label, so the browser forwards
+          activation to the labelled input as a second click at the same coordinates —
+          reopening the field the tap was meant to close, and defeating the chip's
+          remover. The gem ids the input with a random uuid unless given one, so the
+          label needs an id the card can build. %>
+      <div class="flex flex-col gap-xsmall">
+        <label class="field-label" for="<%= key %>-genres"><%= t('capture.candidate.genres') %></label>
         <%# Free text on purpose: a poster names genres the taxonomy has never seen, and
             minting one is expected here. The suggestions exist so a genre we already
             carry is picked rather than respelt. Submits the same comma-joined string
             the text input did. %>
         <div class="input-wrapper flex capture-card__genres">
           <%= combobox_tag :genres, genre_options_capture_path, value: candidate.genres.join(","),
+                id: "#{key}-genres",
                 free_text: true, multiselect_chip_src: genre_chips_capture_path,
                 placeholder: t('capture.candidate.genres_placeholder'),
                 dialog_label: t('capture.candidate.genres') do |combobox| %>
@@ -122,7 +132,7 @@
             <% combobox.customize_input class: 'flex-grow' %>
           <% end %>
         </div>
-      </label>
+      </div>
     <% end %>
   <% end %>
 

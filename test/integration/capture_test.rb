@@ -371,6 +371,25 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select ".capture-card__when .field-group", false
   end
 
+  # The `for`/id wiring the phone behaviour rests on — a label that wraps the field
+  # instead reopens it on every tap (app/views/captures/_candidate.html.erb). The id is
+  # asserted literally because the gem's fallback is a random uuid, which would satisfy
+  # a `for`-matches-id check while changing on every render.
+  test "the genre field is named by a label that does not wrap it" do
+    sign_in_as user(contributor: true)
+
+    stub_extraction(extraction(candidates: [candidate])) do
+      post extract_capture_path, params: { row_id: "abc123" },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    input = css_select(".capture-card__genres input.hw-combobox__input").sole
+    assert_equal "capture-row-abc123-0-genres", input["id"]
+    assert_select "label[for=?]", input["id"], text: I18n.t("capture.candidate.genres")
+    assert_select ".capture-card__genres dialog.hw-combobox__dialog"
+    assert_select "label .capture-card__genres", count: 0
+  end
+
   # The taxonomy is offered so an existing genre is picked rather than respelt, but a
   # genre we ignore, hide or block is not something to put in front of a contributor.
   test "genre suggestions cover what is in use and leave the dispositioned out" do

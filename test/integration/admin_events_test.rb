@@ -65,6 +65,22 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", revert_admin_event_path(e, field: "title")
   end
 
+  # The same markup rule as the capture card's genre field, for the same reason
+  # (app/views/captures/_candidate.html.erb). Structural rather than behavioural: no
+  # system test drives this page, and the phone behaviour is pinned on the other field
+  # built this way, in test/system/capture_screen_test.rb.
+  test "the genre field is named by a label that does not wrap it" do
+    e = event(title: "Editable Show")
+    sign_in_as user(admin: true)
+
+    get admin_event_path(e)
+    assert_select "input#event_override_genre_ids[role=combobox]"
+    assert_select "label[for=?]", "event_override_genre_ids",
+                  text: I18n.t("admin.events.show.genres_label")
+    assert_select "dialog.hw-combobox__dialog"
+    assert_select "label dialog.hw-combobox__dialog", count: 0
+  end
+
   test "editing an event locks only the fields the admin changed" do
     e = event(title: "Wrong Title", description: "Keep Me")
     sign_in_as user(admin: true)

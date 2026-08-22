@@ -177,7 +177,7 @@ button.capture-queue__tile[data-state="pending"] {
 /* Two fields to a row where they belong together (date + time, locality + canton).
    Without the grow, a wrapped field keeps its content width and its underline stops
    mid-column, reading as a different kind of field rather than a wrapped one. */
-.capture-card__when > label,
+.capture-card__when > .field-group,
 .capture-card__where > label {
   flex: 1 1 8rem;
 }

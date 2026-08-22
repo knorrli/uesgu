@@ -3,14 +3,15 @@ module EventCapture
   # script/event_capture_bakeoff.rb rather than a shared constant: that script is a
   # frozen evaluation harness whose sessions record a `prompt_sha`, and editing it
   # would silently break the comparability of the runs the provider decision rests on.
-  # It stays the tuning rig; this is production.
+  # Its copy has since diverged — `city` rather than `locality`, no `subtitle`, another
+  # default model — so it cannot measure this wording. It settled the provider and it
+  # preps the sample images; it does not evaluate a change made here.
   #
-  # Treat the wording as measured, not as prose: the evidence rule below is most of
-  # the difference between 0/6 and 5/6 fabricated dates, and tuning was measured NOT
-  # to transfer between models, so an edit here means re-running
-  # script/event_capture_bakeoff.rb. The field is `locality` and not `city` because
-  # a model asked for a city nulls out on a hamlet — the exact field match-at-entry
-  # depends on.
+  # Treat the wording as measured, not as prose: the evidence rule below is most of the
+  # difference between 0/6 and 5/6 fabricated dates, and tuning was measured NOT to
+  # transfer between models, so an edit here means measuring this prompt against the
+  # configured model first. The field is `locality` and not `city` because a model asked
+  # for a city nulls out on a hamlet — the exact field match-at-entry depends on.
   #
   # Only the image wording is measured. The evaluation scores six images against image
   # ground truth and can say nothing about how the text variant below performs.
@@ -81,9 +82,9 @@ module EventCapture
 
         THE EVIDENCE RULE — this governs everything below.
 
-        Every `date`, every `place` and every `locality` you return MUST be copied from
+        Every `date`, every `time`, every `place` and every `locality` you return MUST be copied from
         #{m[:legible]}, and you must quote that text verbatim in
-        `date_evidence` / `place_evidence` / `locality_evidence`. If you cannot quote
+        `date_evidence` / `time_evidence` / `place_evidence` / `locality_evidence`. If you cannot quote
         it, the field is null and the evidence field is null. Never supply a value you
         cannot cite.
 
@@ -179,8 +180,8 @@ module EventCapture
             items: {
               type: "object",
               additionalProperties: false,
-              required: %w[title subtitle subtitle_evidence date date_evidence time place place_evidence
-                           locality locality_evidence canton genres source_url],
+              required: %w[title subtitle subtitle_evidence date date_evidence time time_evidence
+                           place place_evidence locality locality_evidence canton genres source_url],
               properties: {
                 title:          { type: %w[string null] },
                 subtitle:       { type: %w[string null],
@@ -191,6 +192,8 @@ module EventCapture
                 date_evidence:  { type: %w[string null],
                                   description: "Verbatim text from the input the date was read from. null if the date is null." },
                 time:           { type: %w[string null], description: "HH:MM 24h, or null" },
+                time_evidence:  { type: %w[string null],
+                                  description: "Verbatim text from the input the time was read from. null if the time is null." },
                 place:          { type: %w[string null] },
                 place_evidence: { type: %w[string null],
                                   description: "Verbatim text from the input the place was read from. null if the place is null." },

@@ -20,11 +20,10 @@ module EventCapture
 
     def call
       return Result.new(error: :incomplete) if incomplete?
-      return Result.new(error: :url_invalid) if attrs[:url].present? && url.nil?
 
       # resolve_place WRITES and publish can raise after it: without the transaction
-      # the duplicate-url path leaves an orphan place behind, with no events and no
-      # UI to remove it, still feeding PlaceSuggester and the locality datalist.
+      # a failed publish leaves an orphan place behind, with no events and no UI to
+      # remove it, still feeding PlaceSuggester and the locality datalist.
       ActiveRecord::Base.transaction do
         place = resolve_place
         next Result.new(error: :place_invalid) if place.is_a?(Place) && !place.persisted?
@@ -32,11 +31,10 @@ module EventCapture
         Result.new(event: publish(place), place: place.is_a?(Place) ? place : nil)
       end
     rescue ActiveRecord::RecordNotUnique
-      # The unique index on events.url. Not a 500: a contributor pasting a link a
-      # scraper already holds should be told "this event already exists", and that
-      # collision is wanted — a second column for the pasted link would let the
-      # duplicate through instead of catching it.
-      Result.new(error: :duplicate)
+      # The unique index on places.fingerprint, which Place#fingerprint_available
+      # cannot close: it checks before it writes, so two contributors capturing the
+      # same new venue name at once both pass it and the index refuses the second.
+      Result.new(error: :place_invalid)
     end
 
     private
@@ -48,25 +46,11 @@ module EventCapture
     # can reach. The form marks both required, but the form is not the only caller.
     def incomplete? = title.blank? || start_date.blank? || locality.blank? || canton.blank?
 
-    # events.url is rendered as a bare link_to href in the PUBLIC feed, so this is the
-    # first path by which a contributor-typed string reaches every user's browser.
-    # "mailto:" opens a mail client and a bare word becomes a same-origin relative
-    # link; the browser's own url-input validation is client-side only.
-    HTTP_SCHEMES = %w[http https].freeze
-
     def title = attrs[:title].to_s.strip
     def description = attrs[:description].to_s.strip.presence
     def locality = @locality ||= Locality.canonical_name(attrs[:locality].to_s.strip)
     def canton = attrs[:canton].to_s.strip
     def place_name = attrs[:place].to_s.strip
-    def url
-      raw = attrs[:url].presence
-      return if raw.blank?
-
-      HTTP_SCHEMES.include?(URI.parse(raw).scheme) ? raw : nil
-    rescue URI::InvalidURIError
-      nil
-    end
     def genres = Array(attrs[:genres]).map { |g| g.to_s.strip }.compact_blank
 
     # Strict ISO, not Date.parse: Date.parse("next Friday") does not raise, it
@@ -93,7 +77,7 @@ module EventCapture
     def publish(place)
       event = Event.new(
         title: title, description: description, start_date: start_date,
-        start_time: start_time, url: url, data_source: DATA_SOURCE,
+        start_time: start_time, data_source: DATA_SOURCE,
         location_list: located(place),
         genre_list: genres
       )
@@ -127,24 +111,7 @@ module EventCapture
       return if place_name.blank?
 
       Location.resolve_venue(place_name) ||
-        Place.create(name: place_name, locality: locality, canton: canton, url: place_url)
-    end
-
-    # A capture's link is regularly an Instagram post or a ticketing page — for the
-    # ad-hoc events this feature exists to catch it is often the only page there is.
-    # That link belongs on the event, never on the place: places.url exists to make
-    # a VenueLead ACTIONABLE ("write a scraper"), and a scraper cannot be written
-    # against someone's Instagram.
-    def place_url
-      return if url.blank? || EventsHelper::OFFSITE_SOURCES.keys.any? { |d| host == d || host&.end_with?(".#{d}") }
-
-      url
-    end
-
-    def host
-      @host ||= URI.parse(url.to_s).host&.downcase&.delete_prefix("www.")
-    rescue URI::InvalidURIError
-      nil
+        Place.create(name: place_name, locality: locality, canton: canton)
     end
   end
 end

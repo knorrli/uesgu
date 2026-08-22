@@ -135,7 +135,11 @@ en:
     calendar_feed_link: set it up in settings
   capture:
     title: Capture an event
-    intro: Photographed a poster or copied some text? We read it, you check it card by card – whatever you publish goes live right away.
+    intro: Whatever you publish goes live right away.
+    review:
+      title:
+        one: 1 event found — confirm it
+        other: "%{count} events found — confirm each one"
     images_hint: Several at once is fine. The images are never stored.
     text_label: Text
     text_hint: From a chat, a newsletter, wherever.
@@ -158,8 +162,6 @@ en:
       published: "%{title} is live."
     errors:
       incomplete: Title, date, locality and canton are needed.
-      duplicate: This event already exists.
-      url_invalid: The link has to start with http:// or https://.
       place_invalid: That venue couldn't be created.
       unknown: That didn't work.
     row:
@@ -178,7 +180,6 @@ en:
       locality_suggestions: "Known towns:"
       locality_hint: Type a letter or two — the towns we know come up.
       canton: Canton
-      url: Link
       genres: Genres
       genres_placeholder: Type or pick a genre
       genres_hint: Enter adds one. New genres are fine — if one already exists, take that instead.

@@ -14,7 +14,8 @@ module EventCapture
   class Correction < Data.define(:fields, :note)
     # The model's own field names, because the block below is read BY the model.
     # `canton` is absent because code computes it from the locality and no re-read can
-    # move it; `source_url` because a wrong link is a paste, not a misreading.
+    # move it; `source_url` because the card never renders it — it only feeds
+    # PlaceSuggester's registry match, so nobody sees a link to call wrong.
     FIELDS = %w[title date time place locality genres].freeze
     NOTE_LIMIT = 200
 

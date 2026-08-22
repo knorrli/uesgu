@@ -44,23 +44,24 @@
       </label>
     <% end %>
 
-    <%# One quote for the pair: the model is asked for no time evidence, so what it
-        quoted for the date is the source behind both (see EventCapture::Prompt). %>
     <% past_warning = tag.p(t('capture.candidate.past'), class: "capture-card__warning") if candidate.past? %>
-    <%= render layout: "shared/field_group",
-          locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :date)),
-                               past_warning] } do %>
-      <div class="capture-card__when flex gap-small wrap">
+    <div class="capture-card__when flex gap-small wrap">
+      <%= render layout: "shared/field_group",
+            locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :date)),
+                                 past_warning] } do %>
         <label class="flex flex-col gap-xsmall">
           <span class="field-label"><%= t('capture.candidate.date') %></span>
           <%= date_field_tag :date, candidate.date, required: true %>
         </label>
+      <% end %>
+      <%= render layout: "shared/field_group",
+            locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :time)) } do %>
         <label class="flex flex-col gap-xsmall">
           <span class="field-label"><%= t('capture.candidate.time') %></span>
           <%= text_field_tag :time, candidate.time %>
         </label>
-      </div>
-    <% end %>
+      <% end %>
+    </div>
 
     <% suggestions = place_suggestions(candidate) %>
     <%= render layout: "shared/field_group",

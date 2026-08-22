@@ -862,9 +862,9 @@ class CaptureScreenTest < ApplicationSystemTestCase
   # move the date this test asserts on.
   def poster_event(**overrides)
     { title: "Zorpcore Nacht", date: show_date.to_s, date_evidence: "steht auf dem Plakat",
-      time: "20 Uhr", place: "Zorpsaal", place_evidence: "Zorpsaal", locality: "Zorpwil",
-      locality_evidence: "3000 Zorpwil", canton: "BE", genres: ["zorpcore"],
-      source_url: nil }.merge(overrides)
+      time: "20 Uhr", time_evidence: "20 Uhr", place: "Zorpsaal", place_evidence: "Zorpsaal",
+      locality: "Zorpwil", locality_evidence: "3000 Zorpwil", canton: "BE",
+      genres: ["zorpcore"], source_url: nil }.merge(overrides)
   end
 
   def matinee(**overrides) = poster_event(title: "Zorpcore Matinee", **overrides)

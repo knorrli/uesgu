@@ -41,7 +41,8 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
 
   test "one image can yield several events, each normalised" do
     extraction = extract(FakeClient.new(text: payload(
-      { title: "Zorpcore Nacht", date: "2026-08-20", date_evidence: "Do 20. August", time: "20 Uhr" },
+      { title: "Zorpcore Nacht", date: "2026-08-20", date_evidence: "Do 20. August",
+        time: "20 Uhr", time_evidence: "20 Uhr" },
       { title: "Zorpwave Matinee", date: "2026-08-21", date_evidence: "Fr 21. August" }
     )))
 
@@ -128,8 +129,10 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
 
   test "a successful extraction is recorded with its cost and everything the Normalizer refused" do
     extract(FakeClient.new(text: payload(
-      { title: "Zorpcore Nacht", date: "2026-08-20", date_evidence: "20. August", time: "kurz nach acht" },
-      { title: "Zorpwave Matinee", date: "2026-08-21", date_evidence: "21. August", time: "am Abend" }
+      { title: "Zorpcore Nacht", date: "2026-08-20", date_evidence: "20. August",
+        time: "kurz nach acht", time_evidence: "kurz nach acht" },
+      { title: "Zorpwave Matinee", date: "2026-08-21", date_evidence: "21. August",
+        time: "am Abend", time_evidence: "am Abend" }
     )))
 
     attempt = ExtractionAttempt.sole

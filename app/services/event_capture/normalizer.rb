@@ -19,6 +19,7 @@ module EventCapture
       @raw = {}
       @issues = []
       @salvaged_time = nil
+      @time_evidence = nil
     end
 
     def call
@@ -38,6 +39,7 @@ module EventCapture
         date: date,
         date_evidence: string(event["date_evidence"]),
         time: time,
+        time_evidence: time_evidence,
         place: normalized_place(typed_place, venue),
         place_evidence: string(event["place_evidence"]),
         locality: locality,
@@ -52,7 +54,7 @@ module EventCapture
 
     private
 
-    attr_reader :event, :today, :genres, :raw, :issues, :salvaged_time
+    attr_reader :event, :today, :genres, :raw, :issues, :salvaged_time, :time_evidence
 
     def string(value) = value.to_s.strip.presence
 
@@ -136,7 +138,7 @@ module EventCapture
     end
 
     def normalized_time
-      value = string(event["time"]) || salvaged_time
+      value, evidence = time_and_evidence
       return if value.nil?
 
       normalized = Clock.parse(value)
@@ -146,7 +148,19 @@ module EventCapture
         raw["time"] = value
         issues << :time_normalized
       end
+      @time_evidence = evidence
       normalized
+    end
+
+    # A time lifted out of a datetime-shaped `date` has no quote of its own and cites
+    # the date's: that IS the text it was read from, and the evidence rule would
+    # otherwise null a value the model transcribed correctly.
+    def time_and_evidence
+      value = cited(:time)
+      return [value, string(event["time_evidence"])] unless value.nil?
+      return [nil, nil] if salvaged_time.nil?
+
+      [salvaged_time, string(event["date_evidence"])]
     end
 
     # The name the app already files this venue under. Nothing goes to `raw`, for the

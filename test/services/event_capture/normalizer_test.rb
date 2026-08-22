@@ -23,17 +23,21 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     { "date" => "2026-08-20", "date_evidence" => "Do 20. August" }.merge(overrides.stringify_keys)
   end
 
+  def timed(printed, **overrides)
+    { "time" => printed, "time_evidence" => printed }.merge(overrides.stringify_keys)
+  end
+
   def cited_locality(name, **overrides)
     { "locality" => name, "locality_evidence" => "3000 #{name}" }.merge(overrides.stringify_keys)
   end
 
   test "a well-formed event passes through" do
     candidate = normalize(dated(
-      "title" => " Zorpcore Nacht ", "time" => "20:00", "place" => "Zorpsaal",
+      "title" => " Zorpcore Nacht ", "place" => "Zorpsaal",
       "place_evidence" => "Zorpsaal, Zorpwil", "locality" => "Zorpwil",
       "locality_evidence" => "3000 Zorpwil", "canton" => "BE",
       "genres" => ["Zorpcore", " ", nil], "source_url" => "https://zorp.test/gig"
-    ))
+    ).merge(timed("20:00")))
 
     assert_equal "Zorpcore Nacht", candidate.title
     assert_equal Date.new(2026, 8, 20), candidate.date
@@ -60,6 +64,37 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_nil candidate.subtitle
     assert_equal "Zorpwils feinste Nacht", candidate.raw["subtitle"]
     assert_includes candidate.issues, :subtitle_uncited
+  end
+
+  test "a cited time survives with the wording it was read from" do
+    candidate = normalize(dated("time" => "20 Uhr", "time_evidence" => "Beginn 20 Uhr"))
+
+    assert_equal "20:00", candidate.time
+    assert_equal "Beginn 20 Uhr", candidate.time_evidence
+  end
+
+  test "an uncited time is dropped and kept" do
+    candidate = normalize("time" => "20:00", "time_evidence" => nil)
+
+    assert_nil candidate.time
+    assert_nil candidate.time_evidence
+    assert_equal "20:00", candidate.raw["time"]
+    assert_includes candidate.issues, :time_uncited
+  end
+
+  test "a time salvaged from a datetime cites the date it was split out of" do
+    candidate = normalize(dated("date" => "2026-08-20T19:30:00"))
+
+    assert_equal "19:30", candidate.time
+    assert_equal "Do 20. August", candidate.time_evidence
+  end
+
+  test "a time the model could not quote loses to one salvaged from the date" do
+    candidate = normalize(dated("date" => "2026-08-20T19:30:00", "time" => "21:00"))
+
+    assert_equal "19:30", candidate.time
+    assert_equal "21:00", candidate.raw["time"]
+    assert_includes candidate.issues, :time_uncited
   end
 
   test "a date the model could not quote is invention, so it is dropped and kept" do
@@ -97,7 +132,7 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
   end
 
   test "a salvaged datetime never overwrites a time the model stated" do
-    candidate = normalize(dated("date" => "2026-08-20T19:30:00", "time" => "21:00"))
+    candidate = normalize(dated("date" => "2026-08-20T19:30:00").merge(timed("21:00")))
 
     assert_equal "21:00", candidate.time
   end
@@ -121,7 +156,7 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
   test "every time format the bake-off returned normalises to HH:MM" do
     { "20:00" => "20:00", "20 Uhr" => "20:00", "19:30h" => "19:30",
       "19.30h" => "19:30", "20:30 Uhr" => "20:30", "9" => "09:00" }.each do |printed, expected|
-      assert_equal expected, normalize("time" => printed).time, printed
+      assert_equal expected, normalize(timed(printed)).time, printed
     end
   end
 
@@ -131,13 +166,13 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     { "20h30" => "20:30", "20 h 30" => "20:30", "20h" => "20:00", "21 heures" => "21:00",
       "8pm" => "20:00", "8:30 PM" => "20:30", "12 am" => "00:00", "12pm" => "12:00",
       "9 o'clock" => "09:00", "20.00" => "20:00", "20:00-23:00" => "20:00" }.each do |printed, expected|
-      assert_equal expected, normalize("time" => printed).time, printed
+      assert_equal expected, normalize(timed(printed)).time, printed
     end
   end
 
   test "a date in the time field is not read as a time" do
     ["20.08.", "20.08.2026", "31.12."].each do |printed|
-      candidate = normalize("time" => printed)
+      candidate = normalize(timed(printed))
 
       assert_nil candidate.time, printed
       assert_equal printed, candidate.raw["time"]
@@ -145,12 +180,12 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
   end
 
   test "a time that does not lead with the clock is nulled rather than guessed" do
-    assert_nil normalize("time" => "Doors 19:00").time
-    assert_nil normalize("time" => "halb acht").time
+    assert_nil normalize(timed("Doors 19:00")).time
+    assert_nil normalize(timed("halb acht")).time
   end
 
   test "a time that is neither a clock nor a number is dropped and kept" do
-    candidate = normalize("time" => "doors at dusk")
+    candidate = normalize(timed("doors at dusk"))
 
     assert_nil candidate.time
     assert_equal "doors at dusk", candidate.raw["time"]
@@ -158,7 +193,7 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
   end
 
   test "an impossible clock time is not a time" do
-    assert_nil normalize("time" => "25:70").time
+    assert_nil normalize(timed("25:70")).time
   end
 
   test "a canton is checked against the 26 and upcased" do

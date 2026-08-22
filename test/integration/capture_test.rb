@@ -347,28 +347,42 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?][value=?]", "candidate_index", "0"
   end
 
-  # Neither pair has a quote per field: the model is asked for no time evidence, so what
-  # it quoted for the date is all Zeit has (see EventCapture::Prompt), and the canton is
-  # computed from the locality rather than read off the poster (see
-  # EventCapture::Normalizer). A town chip fills both fields too, so confining either
-  # line to one column would claim less than the card knows.
+  # The Ort/Kanton pair shares one quote because the canton is computed from the
+  # locality rather than read off the poster (see EventCapture::Normalizer), and a town
+  # chip fills both fields too — confining either line to one column would claim less
+  # than the card knows.
   test "a quote that settled a pair of fields is attached to the whole row" do
     place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
     sign_in_as user(contributor: true)
 
     stub_extraction(extraction(candidates: [candidate(place: "Zorpsaal Halle",
-                                                      date_evidence: "SA 12. SEPT",
                                                       locality_evidence: "3000 Zorpwil")])) do
       post extract_capture_path, params: { row_id: "abc123" },
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
-    assert_select ".capture-card__when + .field-group__attached .review-card__cite"
     assert_select ".capture-card__where + .field-group__attached .review-card__cite"
     assert_select ".capture-card__where + .field-group__attached .suggestions .chip",
                   text: "Flarnhausen"
     assert_select ".capture-card__where .field-group", false
-    assert_select ".capture-card__when .field-group", false
+  end
+
+  # Datum and Zeit are read off separate lines of a poster — "Türöffnung 20:00" beside
+  # a date is a different source from the date's own — so each carries its own quote
+  # rather than sharing the row's.
+  test "date and time each carry the line they were read from" do
+    sign_in_as user(contributor: true)
+
+    stub_extraction(extraction(candidates: [candidate(date_evidence: "SA 12. SEPT",
+                                                      time_evidence: "Türöffnung 20:00")])) do
+      post extract_capture_path, params: { row_id: "abc123" },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    cites = css_select ".capture-card__when > .field-group .review-card__cite"
+    assert_equal 2, cites.size
+    assert_match "SA 12. SEPT", cites.first.text
+    assert_match "Türöffnung 20:00", cites.last.text
   end
 
   # A date already gone is a remark about the date, and a line of its own between two
@@ -381,8 +395,12 @@ class CaptureTest < ActionDispatch::IntegrationTest
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
-    assert_select ".capture-card__when + .field-group__attached .capture-card__warning",
-                  text: I18n.t("capture.candidate.past")
+    assert_select ".capture-card__when > .field-group", 2
+    assert_select ".capture-card__when > .field-group:first-child" do
+      assert_select "[name=date]"
+      assert_select ".field-group__attached .capture-card__warning",
+                    text: I18n.t("capture.candidate.past")
+    end
   end
 
   # The `for`/id wiring the phone behaviour rests on — a label that wraps the field

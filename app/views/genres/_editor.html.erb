@@ -47,7 +47,8 @@
       <div class="input-wrapper flex flex-grow">
         <%= f.combobox :parent_genre_id, parent_options,
               value: genre.parent_id,
-              placeholder: t('genres.editor.set_parent_into') do |combobox| %>
+              placeholder: t('genres.editor.set_parent_into'),
+              dialog_label: t('genres.editor.set_parent_into') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>
         <% end %>
@@ -129,7 +130,8 @@
       <%= hidden_field_tag :return_to, return_to %>
       <div class="input-wrapper flex flex-grow">
         <%= f.combobox :canonical_genre_id, genre_tree_options(merge_candidates),
-              placeholder: t('genres.editor.merge_into') do |combobox| %>
+              placeholder: t('genres.editor.merge_into'),
+              dialog_label: t('genres.editor.merge_into') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>
         <% end %>

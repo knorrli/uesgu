@@ -63,7 +63,8 @@
         <%= f.combobox :override_genre_ids, genre_combobox_options(Genre.listable),
               value: @event.override_genre_ids.join(','),
               multiselect_chip_src: chips_genres_path,
-              placeholder: t('.genres_label') do |combobox| %>
+              placeholder: t('.genres_label'),
+              dialog_label: t('.genres_label') do |combobox| %>
           <% combobox.customize_fieldset class: 'flex-grow' %>
           <% combobox.customize_input class: 'flex-grow' %>
         <% end %>
@@ -122,7 +123,8 @@
             a raw database id. %>
         <div class="input-wrapper flex flex-grow merge-combobox">
           <%= combobox_tag :canonical_id, search_admin_events_path(exclude: @event.id),
-                placeholder: t('.merge_placeholder'), autocomplete: 'off' do |combobox| %>
+                placeholder: t('.merge_placeholder'), autocomplete: 'off',
+                dialog_label: t('.merge_placeholder') do |combobox| %>
             <% combobox.customize_fieldset class: 'flex-grow' %>
             <% combobox.customize_input class: 'flex-grow' %>
           <% end %>

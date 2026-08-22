@@ -34,9 +34,29 @@ body {
   --hw-focus-color: var(--theme-accent-color);
   --hw-handle-width: var(--filter-icon-size);
   --hw-line-height: var(--filter-input-line-height);
+  /* The gem hardcodes this as #1D1D1D, and the dialog label is the only thing in
+     the mobile dialog that names what is being searched — a near-black literal
+     leaves it unreadable on the dark theme's ground. */
+  --hw-dialog-label-color: var(--theme-fg-color);
 
   .hw-combobox__dialog {
     background-color: var(--theme-bg-color);
+    /* The gem draws the dialog edgeless, which on the dark theme leaves nothing
+       separating the panel from the dimmed page behind it. Same hairline as the
+       inline listbox. */
+    border: var(--tag-border-width) solid var(--border-color);
+
+    /* The gem's scrim is `linear-gradient(to bottom, rgba(0,0,0,.6) 50%, white 50%)`.
+       Its bottom half is a slab of literal white, so whatever the dialog does not
+       cover down there — most of it, once the software keyboard shrinks the dialog
+       against the visual viewport — reads as blank page rather than as backdrop,
+       and nothing outside the dialog looks tappable. One tone throughout reads as
+       "behind the panel" in both themes; a literal colour rather than a token
+       because ::backdrop only inherits from its dialog in newer engines. */
+    &::backdrop {
+      background-image: none;
+      background-color: rgb(0 0 0 / 0.6);
+    }
   }
 
   .hw-combobox__main__wrapper {

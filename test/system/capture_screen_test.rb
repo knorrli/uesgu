@@ -112,6 +112,17 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal %w[Flarncore Zorpcore], Event.sole.genre_list.sort
   end
 
+  # Below the gem's 640px mobile breakpoint the field opens as a modal dialog whose
+  # only text is the search input, so without an explicit dialog_label nothing in it
+  # says which field is being searched.
+  test "the genre field names itself in the dialog it opens on a phone" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".hw-combobox__dialog__label", text: copy("candidate.genres"), visible: :all
+  end
+
   # The field used to be a comma-joined text input, so a poster naming its genres with
   # any other separator became one genre. A chip per genre is what makes that visible.
   test "a genre the taxonomy has never seen can still be typed in" do

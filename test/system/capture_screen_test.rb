@@ -222,20 +222,43 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   # Tapping a town is taking the app's spelling over the poster's, exactly as tapping a
   # venue is — and counted as a correction it would inflate the one number a prompt
-  # edit is judged on.
+  # edit is judged on. The town the venue actually sits in, because a spelling the
+  # fingerprint reaches is folded before the card renders and leaves nothing to tap.
   test "taking a town is recorded as a normalisation, not a correction" do
-    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
-    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Zorpwil",
-                                                         locality: "zorpwil",
-                                                         locality_evidence: "3000 zorpwil")])
+    place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal")])
     visit capture_path
     pick "poster.png"
 
-    find(".suggestions button", text: "Zorpwil").click
+    find(".suggestions button", text: "Flarnhausen").click
     accept
     assert_selector ".capture-queue__tile[data-state=published]"
 
     assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :normalized?
+  end
+
+  # The spelling half of the same thing, and the reason the test above had to move off
+  # it: the card is handed the town's own spelling, so there is no correction for a
+  # contributor to make and none to record. That the model shouted is an extraction
+  # issue (see EventCapture::Normalizer), not a human's edit.
+  test "a town the app already carries reaches the card in its own spelling" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(locality: "ZORPWIL",
+                                                         locality_evidence: "3000 ZORPWIL")])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "Zorpwil", find(".capture-card [name=proposed_locality]", visible: :all).value
+    # The citation is the one thing that stays verbatim: it is a quote of the poster,
+    # and one edited to match our spelling could no longer be checked against it.
+    assert_selector ".capture-card", text: "3000 ZORPWIL"
+
+    accept
+    assert_selector ".capture-queue__tile[data-state=published]"
+
+    assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :unchanged?
+    assert_equal ["Zorpwil"], Event.last.location_list.grep_v(/\A(BE|Zorpsaal)\z/)
   end
 
   # A venue nobody knows is exactly the case that mints a fresh spelling, and it is the

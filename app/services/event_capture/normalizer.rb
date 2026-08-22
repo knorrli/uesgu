@@ -24,9 +24,9 @@ module EventCapture
     def call
       date = normalized_date
       time = normalized_time
-      # A local rather than a second `cited(:locality)` below: the canton is computed
-      # from it, and `cited` flags an issue on the way past — asking twice records it twice.
-      locality = cited(:locality)
+      # A local rather than a second call below: the canton is computed from it, and
+      # `cited` flags an issue on the way past — asking twice records it twice.
+      locality = normalized_locality
 
       Candidate.new(
         title: string(event["title"]),
@@ -144,6 +144,23 @@ module EventCapture
         issues << :time_normalized
       end
       normalized
+    end
+
+    # The spelling the app already files this town under, not the poster's. Nothing is
+    # refused, so nothing goes to `raw` and the variant never reaches the card: a
+    # fingerprint match IS identity — "THUN" and "Thun" are one town, see
+    # Locality.matching — and an alias match is an admin's ruling that two names are
+    # one. Neither is a reading for a human to second-guess; the flag is what says the
+    # rule fired.
+    def normalized_locality
+      typed = cited(:locality)
+      return if typed.nil?
+
+      canonical = Locality.canonical_name(typed)
+      return typed if canonical == typed
+
+      issues << :locality_normalized
+      canonical
     end
 
     # Computed from the locality, never the model's answer, because a wrong canton

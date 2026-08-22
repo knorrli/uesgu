@@ -195,6 +195,7 @@ fr:
       image_unsupported: On ne sait pas lire ce format — enregistre-la en JPEG ou PNG.
       text_empty: Il n'y avait pas de texte.
       provider_error: La lecture n'a pas marché. Tu réessaies ?
+      truncated: La lecture s'est arrêtée en cours de route. Tu réessaies ?
       unconfigured: La lecture n'est pas configurée pour le moment.
       unreachable: Pas de connexion. Tu réessaies ?
       unknown: Ça n'a pas marché.

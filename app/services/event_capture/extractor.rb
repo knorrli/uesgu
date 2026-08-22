@@ -83,9 +83,15 @@ module EventCapture
         output_tokens: response.output_tokens,
         elapsed: since(started)
       )
+    rescue TruncatedResponse => e
+      failed(e, code: :truncated, started: started)
     rescue ProviderError => e
-      Extraction.new(medium: input.kind, prompt_sha: Prompt.sha(medium: input.kind), error: e.message,
-                     detail: e.detail, code: :provider_error, elapsed: since(started))
+      failed(e, code: :provider_error, started: started)
+    end
+
+    def failed(error, code:, started:)
+      Extraction.new(medium: input.kind, prompt_sha: Prompt.sha(medium: input.kind), error: error.message,
+                     detail: error.detail, code: code, elapsed: since(started))
     end
 
     # Measuring the funnel may not break it: a contributor's upload is worth more

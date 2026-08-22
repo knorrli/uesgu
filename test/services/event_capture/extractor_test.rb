@@ -11,11 +11,13 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
   class FakeClient
     attr_reader :calls
 
-    def initialize(text: nil, raises: nil, detail: nil, configured: true)
+    def initialize(text: nil, raises: nil, detail: nil, configured: true,
+                   error_class: EventCapture::ProviderError)
       @text = text
       @raises = raises
       @detail = detail
       @configured = configured
+      @error_class = error_class
       @calls = []
     end
 
@@ -23,7 +25,7 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
 
     def call(**args)
       @calls << args
-      raise EventCapture::ProviderError.new(@raises, detail: @detail) if @raises
+      raise @error_class.new(@raises, detail: @detail) if @raises
 
       EventCapture::Infomaniak::Response.new(text: @text, model: "google/gemma-4-31B-it",
                                              input_tokens: 1200, output_tokens: 90)
@@ -88,6 +90,18 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
 
     refute_predicate extraction, :ok?
     assert_equal "HTTP 503: upstream busy", extraction.error
+  end
+
+  # The code is what makes the rate visible in the admin funnel, which is the whole
+  # point of separating this from a provider that is simply erroring.
+  test "a truncated response is its own code, not a generic provider error" do
+    extraction = extract(FakeClient.new(raises: "truncated at max_tokens (4000)",
+                                        error_class: EventCapture::TruncatedResponse))
+
+    refute_predicate extraction, :ok?
+    assert_equal :truncated, extraction.code
+    assert_equal "truncated at max_tokens (4000)", extraction.error
+    assert_equal "truncated", ExtractionAttempt.sole.code
   end
 
   test "without credentials nothing is sent and the reason says which ones" do

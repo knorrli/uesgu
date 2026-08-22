@@ -240,8 +240,8 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :corrected?
   end
 
-  # The datalist behind the field shows nothing until you type, so the towns of the
-  # venues being suggested are the only ranking the field has (see #154).
+  # Nothing is offered until a contributor types, so the towns of the venues being
+  # suggested are the only ranking the field has before they do.
   test "the towns of the suggested venues are chips beside the locality field" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     place(name: "Zorpkeller", locality: "Zorpwil", canton: "BE")
@@ -256,6 +256,31 @@ class CaptureScreenTest < ApplicationSystemTestCase
     towns.first.click
     assert_equal "Zorpwil", field_value("locality")
     assert_equal "BE", field_value("canton")
+  end
+
+  # Typing is the only way to the towns no venue on this poster points at, and the
+  # matching is the app's own: iOS Safari draws an <input list> in the strip above the
+  # keyboard and gives that strip to its own address autofill, so a datalist is offered
+  # to nobody there.
+  test "typing a town offers the ones the app already knows" do
+    place(locality: "Zorpwil", canton: "BE")
+    place(locality: "Zorpheim", canton: "LU")
+    place(locality: "Flarnhausen", canton: "ZH")
+    CannedExtractionClient.install(events: [poster_event(place: nil, place_evidence: nil,
+                                                         locality: nil, locality_evidence: nil,
+                                                         canton: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".suggestions"
+    type("locality", "zorp")
+
+    assert_selector ".suggestions button", text: "Zorpheim"
+    assert_no_selector ".suggestions button", text: "Flarnhausen"
+
+    find(".suggestions button", text: "Zorpheim").click
+    assert_equal "Zorpheim", field_value("locality")
+    assert_equal "LU", field_value("canton")
   end
 
   # Tapping a town is taking the app's spelling over the poster's, exactly as tapping a

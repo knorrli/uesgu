@@ -347,6 +347,26 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?][value=?]", "candidate_index", "0"
   end
 
+  # Rendered as siblings of the Ortschaft/Kanton row, the quote and the chips spanned
+  # both fields and read as offering a canton as much as a town.
+  test "the locality's quote and town chips render inside the locality's own column" do
+    place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
+    sign_in_as user(contributor: true)
+
+    stub_extraction(extraction(candidates: [candidate(place: "Zorpsaal Halle",
+                                                      locality_evidence: "3000 Zorpwil")])) do
+      post extract_capture_path, params: { row_id: "abc123" },
+                                 headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    assert_select ".capture-card__where > .field-group" do
+      assert_select "input[name=locality]"
+      assert_select ".field-group__attached .review-card__cite"
+      assert_select ".field-group__attached .suggestions .chip", text: "Flarnhausen"
+    end
+    assert_select ".capture-card__where > .field-group select[name=canton]", false
+  end
+
   # The taxonomy is offered so an existing genre is picked rather than respelt, but a
   # genre we ignore, hide or block is not something to put in front of a contributor.
   test "genre suggestions cover what is in use and leave the dispositioned out" do

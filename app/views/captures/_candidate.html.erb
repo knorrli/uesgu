@@ -13,7 +13,7 @@
                 frame_class: "capture-card",
                 frame_attrs: { data: { capture_target: "card", state: "open" } }, **pane } do %>
   <%= form_with url: capture_path, method: :post, id: "#{key}-form",
-        class: "capture-card__fields account-form flex flex-col gap-small",
+        class: "capture-card__fields account-form flex flex-col gap-medium",
         data: { action: "turbo:submit-end->capture#decided change->capture#carryPlace" } do %>
     <%= hidden_field_tag :card_id, key, id: nil %>
     <%# What the model proposed, carried alongside what the human submits so the two
@@ -36,82 +36,89 @@
       <%= text_field_tag :title, candidate.title, required: true %>
     </label>
 
-    <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.description') %></span>
-      <%= text_field_tag :description, candidate.subtitle %>
-    </label>
-    <%= render "shared/cite", quote: cited_evidence(candidate, :subtitle) %>
+    <%= render layout: "shared/field_group",
+          locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :subtitle)) } do %>
+      <label class="flex flex-col gap-xsmall">
+        <span class="field-label"><%= t('capture.candidate.description') %></span>
+        <%= text_field_tag :description, candidate.subtitle %>
+      </label>
+    <% end %>
 
     <div class="capture-card__when flex gap-small wrap">
-      <label class="flex flex-col gap-xsmall">
-        <span class="field-label"><%= t('capture.candidate.date') %></span>
-        <%= date_field_tag :date, candidate.date, required: true %>
-      </label>
+      <%= render layout: "shared/field_group",
+            locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :date)) } do %>
+        <label class="flex flex-col gap-xsmall">
+          <span class="field-label"><%= t('capture.candidate.date') %></span>
+          <%= date_field_tag :date, candidate.date, required: true %>
+        </label>
+      <% end %>
       <label class="flex flex-col gap-xsmall">
         <span class="field-label"><%= t('capture.candidate.time') %></span>
         <%= text_field_tag :time, candidate.time %>
       </label>
     </div>
-    <%= render "shared/cite", quote: cited_evidence(candidate, :date) %>
 
     <% if candidate.past? %>
       <p class="capture-card__warning"><%= t('capture.candidate.past') %></p>
     <% end %>
 
-    <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.place') %></span>
-      <%= text_field_tag :place, candidate.place %>
-    </label>
-    <%= render "shared/cite", quote: cited_evidence(candidate, :place) %>
-
     <% suggestions = place_suggestions(candidate) %>
-    <%= render "shared/suggestions", label: t('capture.candidate.suggestions'),
-          chips: place_chips(suggestions) %>
-
-    <div class="capture-card__where flex gap-small wrap">
+    <%= render layout: "shared/field_group",
+          locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :place)),
+                               render("shared/suggestions", label: t('capture.candidate.suggestions'),
+                                      chips: place_chips(suggestions))] } do %>
       <label class="flex flex-col gap-xsmall">
-        <%# Required HERE and not at extraction: a poster never prints its own town,
-            but Location.add_to_tree drops any tuple missing the middle tier, so a
-            blank locality is an event nobody can browse to. %>
-        <span class="field-label"><%= t('capture.candidate.locality') %></span>
-        <%= text_field_tag :locality, candidate.locality, required: true, list: "capture-localities" %>
+        <span class="field-label"><%= t('capture.candidate.place') %></span>
+        <%= text_field_tag :place, candidate.place %>
       </label>
+    <% end %>
+
+    <%# The datalist behind the field offers every locality the app knows and shows
+        none of them until you type, so a contributor who never guessed it is there is
+        the one who mints "bern". These chips are the affordance where there is a
+        ranking to render; where there is none, the hint that takes their slot is. %>
+    <% towns = locality_chips(suggestions) %>
+    <% unranked_hint = tag.span(t('capture.candidate.locality_hint'), class: "muted") if towns.empty? %>
+    <div class="capture-card__where flex gap-small wrap">
+      <%= render layout: "shared/field_group",
+            locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :locality)),
+                                 render("shared/suggestions", label: t('capture.candidate.locality_suggestions'),
+                                        chips: towns),
+                                 unranked_hint] } do %>
+        <label class="flex flex-col gap-xsmall">
+          <%# Required HERE and not at extraction: a poster never prints its own town,
+              but Location.add_to_tree drops any tuple missing the middle tier, so a
+              blank locality is an event nobody can browse to. %>
+          <span class="field-label"><%= t('capture.candidate.locality') %></span>
+          <%= text_field_tag :locality, candidate.locality, required: true, list: "capture-localities" %>
+        </label>
+      <% end %>
       <label class="flex flex-col gap-xsmall">
         <span class="field-label"><%= t('capture.candidate.canton') %></span>
         <%= select_tag :canton, options_for_select(canton_options, candidate.canton),
               include_blank: true, required: true %>
       </label>
     </div>
-    <%= render "shared/cite", quote: cited_evidence(candidate, :locality) %>
 
-    <%# The datalist behind the field offers every locality the app knows and shows
-        none of them until you type, so a contributor who never guessed it is there is
-        the one who mints "bern". These chips are the affordance where there is a
-        ranking to render; where there is none, the line below is. %>
-    <% towns = locality_chips(suggestions) %>
-    <%= render "shared/suggestions", label: t('capture.candidate.locality_suggestions'),
-          chips: towns %>
-    <% if towns.empty? %>
-      <span class="muted"><%= t('capture.candidate.locality_hint') %></span>
+    <%= render layout: "shared/field_group",
+          locals: { attached: tag.span(t('capture.candidate.genres_hint'), class: "muted") } do %>
+      <label class="flex flex-col gap-xsmall">
+        <span class="field-label"><%= t('capture.candidate.genres') %></span>
+        <%# Free text on purpose: a poster names genres the taxonomy has never seen, and
+            minting one is expected here. The suggestions exist so a genre we already
+            carry is picked rather than respelt. Submits the same comma-joined string
+            the text input did. %>
+        <div class="input-wrapper flex capture-card__genres">
+          <%= combobox_tag :genres, genre_options_capture_path, value: candidate.genres.join(","),
+                free_text: true, multiselect_chip_src: genre_chips_capture_path,
+                placeholder: t('capture.candidate.genres_placeholder'),
+                dialog_label: t('capture.candidate.genres') do |combobox| %>
+            <% combobox.customize_fieldset class: 'flex-grow' %>
+            <% combobox.customize_input class: 'flex-grow' %>
+          <% end %>
+        </div>
+      </label>
     <% end %>
-
-    <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.genres') %></span>
-      <%# Free text on purpose: a poster names genres the taxonomy has never seen, and
-          minting one is expected here. The suggestions exist so a genre we already
-          carry is picked rather than respelt. Submits the same comma-joined string
-          the text input did. %>
-      <div class="input-wrapper flex capture-card__genres">
-        <%= combobox_tag :genres, genre_options_capture_path, value: candidate.genres.join(","),
-              free_text: true, multiselect_chip_src: genre_chips_capture_path,
-              placeholder: t('capture.candidate.genres_placeholder'),
-              dialog_label: t('capture.candidate.genres') do |combobox| %>
-          <% combobox.customize_fieldset class: 'flex-grow' %>
-          <% combobox.customize_input class: 'flex-grow' %>
-        <% end %>
-      </div>
-      <span class="muted"><%= t('capture.candidate.genres_hint') %></span>
-    </label>
   <% end %>
 
   <%# OUTSIDE the form, and deliberately: this is a report on the read, not a value of

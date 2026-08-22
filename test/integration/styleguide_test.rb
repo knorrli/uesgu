@@ -30,6 +30,7 @@ class StyleguideTest < ActionDispatch::IntegrationTest
     assert_select ".scrape-badge--ok"
     assert_select ".funnel-fill"
     assert_select ".suggestions .chip"
+    assert_select ".field-group__attached"
     assert_select ".drop-zone__target"
   end
 end

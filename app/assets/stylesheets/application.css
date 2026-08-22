@@ -181,6 +181,24 @@ a {
   padding: 0;
 }
 
+/* One form field as a unit (shared/_field_group): the label and input, then whatever
+   belongs to that field alone — the source a value was read off, chips that fill it,
+   its hint. Attachments bind upward by the indent and by the column that holds the
+   groups gapping them wider than a group gaps its own lines; a rule or a tint would
+   fight the borderless field skin. Specimen in /styleguide. */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+}
+
+.field-group__attached {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-xsmall);
+  padding-left: var(--gap-large);
+}
+
 .settings-actions {
   display: flex;
   flex-wrap: wrap;

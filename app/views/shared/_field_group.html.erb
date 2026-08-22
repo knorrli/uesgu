@@ -1,0 +1,13 @@
+<%# A field and everything that belongs to that field alone: label and input in the
+    block, and what hangs off it — the text a model quoted as its source, chips that
+    fill it, a hint for typing it — as `attached`, one renderable or a list of them.
+    Blank entries drop out, so a caller may pass a render that produced nothing. The
+    indent and the rhythm that bind them upward are .field-group in application.css. %>
+<%# locals: (attached: nil) %>
+<% attachments = Array(attached).select(&:present?) %>
+<div class="field-group">
+  <%= yield %>
+  <% if attachments.any? %>
+    <div class="field-group__attached"><%= safe_join(attachments) %></div>
+  <% end %>
+</div>

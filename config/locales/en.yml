@@ -606,8 +606,8 @@ en:
     venue_leads:
       index:
         title: Venue leads
-        intro: Venues an aggregator surfaced that aren't in the registry yet, ranked by upcoming events. To add one, edit config/venues.yml.
-        empty: No leads. Every venue an aggregator surfaced is already in the registry.
+        intro: Venues worth adding to the registry, ranked by demand. An aggregator surfaced them, or people kept capturing shows at them. To take one on — or to turn it down for good — edit config/venues.yml.
+        empty: No leads. Nothing an aggregator found or anyone captured is missing from the registry.
     extraction_attempts:
       index:
         title: Extractions

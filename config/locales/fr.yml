@@ -606,8 +606,8 @@ fr:
     venue_leads:
       index:
         title: Pistes de lieux
-        intro: Des lieux qu'un agrégateur a repérés mais qui ne sont pas encore dans le registre, triés par événements à venir. Pour en ajouter un, édite config/venues.yml.
-        empty: Aucune piste. Chaque lieu repéré par un agrégateur est déjà dans le registre.
+        intro: Des lieux qui mériteraient d'entrer au registre, triés par demande. Soit un agrégateur les a repérés, soit on y a saisi des concerts encore et encore. Pour en prendre un — ou le refuser définitivement — édite config/venues.yml.
+        empty: Aucune piste. Rien de ce qu'un agrégateur a trouvé ou que quelqu'un a saisi ne manque au registre.
     extraction_attempts:
       index:
         title: Extractions

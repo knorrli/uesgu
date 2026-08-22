@@ -606,8 +606,8 @@ de:
     venue_leads:
       index:
         title: Venue-Leads
-        intro: Venues, die ein Aggregator gefunden hat, die aber noch nicht in der Registry stehen, sortiert nach anstehenden Events. Zum Aufnehmen in config/venues.yml ergänzen.
-        empty: Keine Leads. Jeder von einem Aggregator gefundene Venue steht bereits in der Registry.
+        intro: Venues, die in die Registry gehören könnten, sortiert nach Nachfrage. Entweder hat sie ein Aggregator gefunden, oder es wurden immer wieder Shows dort erfasst. Zum Aufnehmen — oder endgültig Ablehnen — config/venues.yml ergänzen.
+        empty: Keine Leads. Was Aggregatoren gefunden und Leute erfasst haben, steht bereits in der Registry.
     extraction_attempts:
       index:
         title: Extraktionen

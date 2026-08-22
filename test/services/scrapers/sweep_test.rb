@@ -32,6 +32,18 @@ class Scrapers::SweepTest < ActiveSupport::TestCase
     assert(run.created_events.all? { |e| e.created_in_scrape_run_id == run.id })
   end
 
+  # The nightly re-derivations ride on the sweep, and a capture lead only ever
+  # appears if this one is still wired in.
+  test "the sweep nominates the captured places that keep hosting shows" do
+    zorpsaal = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    2.times { event(location_list: [zorpsaal.name, zorpsaal.locality, zorpsaal.canton]) }
+    CountingScraperHarness.next_rows = []
+
+    sweep("CountingScraperHarness" => CountingScraperHarness)
+
+    assert_equal "Zorpsaal", VenueLead.find_by(source: CapturedVenueLeads::SOURCE).venue
+  end
+
   test "records how many events a run filtered via discard rules" do
     DiscardRule.create!(pattern: "zorp")
     CountingScraperHarness.next_rows = [

@@ -58,6 +58,11 @@ module Scrapers
       # the other way a locality enters, and an unreconciled one has no canton for the
       # capture card to fill from.
       Locality.reconcile!
+      # The capture funnel's leads, refreshed in the same pass that refreshes the
+      # aggregator's: both halves of the discovery inbox are then as of one moment.
+      # Nightly rather than per publish — the count is a group-by over every location
+      # tagging, and nothing is urgent about a place that needs a second show anyway.
+      CapturedVenueLeads.refresh!
       finalize(run)
       ScrapeRun.prune!
       run

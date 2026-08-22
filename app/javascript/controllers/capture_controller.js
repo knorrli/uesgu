@@ -13,7 +13,7 @@ const PLACE_FIELDS = ["place", "locality", "canton"]
 // Connects to data-controller="capture".
 export default class extends Controller {
   static targets = ["files", "text", "zone", "items", "commit", "input", "restart",
-                    "rows", "done", "strip", "card", "source"]
+                    "rows", "done", "strip", "card", "source", "stagingTitle", "reviewTitle"]
   static values = {
     url: String,
     dropUrl: String,
@@ -27,6 +27,8 @@ export default class extends Controller {
     localities: Object,
     blankUrl: String,
     byHand: String,
+    foundOne: String,
+    foundOther: String,
     rereadLimit: { type: Number, default: 2 }
   }
 
@@ -178,6 +180,8 @@ export default class extends Controller {
     this.doneTarget.hidden = true
     this.restartTarget.hidden = true
     this.inputTarget.hidden = false
+    this.reviewTitleTarget.hidden = true
+    this.stagingTitleTarget.hidden = false
     this.refreshCommit()
   }
 
@@ -224,11 +228,22 @@ export default class extends Controller {
   // queue of one.
   cardTargetConnected(card) {
     this.stripTarget.hidden = false
+    this.announceFound()
     this.placeCard(card)
     card.hidden = card.id !== this.currentId
     this.sharePlace(card)
     this.refreshRereads()
     if (!this.currentId) this.open(card.id)
+  }
+
+  // Held back until a card exists rather than swapped at commit time, so the heading
+  // never states a count of zero while the reads are still in flight.
+  announceFound() {
+    const count = this.cardTargets.length
+    const title = count === 1 ? this.foundOneValue : this.foundOtherValue
+    this.reviewTitleTarget.textContent = title.replace("%{count}", count)
+    this.stagingTitleTarget.hidden = true
+    this.reviewTitleTarget.hidden = false
   }
 
   // A new row at the END of the queue, never a replacement: the read being disputed

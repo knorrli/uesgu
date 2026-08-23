@@ -2,10 +2,19 @@ module CapturesHelper
   # Computed once from what the model extracted rather than live as they type: the
   # extracted name is the one that needs matching, and a debounced lookup would add
   # an endpoint to fix a problem nobody has.
+  #
+  # A name the app already carries verbatim empties the row rather than heading it: an
+  # exact hit settles "did you mean one of these?", so the near-misses beside it answer
+  # a question nobody is asking any more. The towns go with them — locality_chips reads
+  # this same list, and the town in the field is that venue's own.
   def place_suggestions(candidate)
     return [] if candidate.place.blank?
 
-    PlaceSuggester.for_name(candidate.place, url: candidate.source_url)
+    named = Fingerprint.for(candidate.place)
+    suggestions = PlaceSuggester.for_name(candidate.place, url: candidate.source_url)
+    return [] if suggestions.any? { |suggestion| Fingerprint.for(suggestion.name) == named }
+
+    suggestions
   end
 
   # Tapping one takes a spelling the app already has instead of minting a variant —
@@ -24,14 +33,23 @@ module CapturesHelper
   # alphabetical order ranks nothing; the places already being suggested are few, and
   # they are about this poster. The long tail stays reachable by typing, which fills
   # the same row from the map below.
-  def locality_chips(suggestions)
+  def locality_chips(suggestions, candidate)
     suggestions.select { |suggestion| suggestion.locality.present? }
                .uniq { |suggestion| Fingerprint.for(suggestion.locality) }
+               .reject { |suggestion| changes_nothing?(suggestion, candidate) }
                .map do |suggestion|
                  suggestion_chip(suggestion.locality, action: "capture#applyLocality",
                                  capture_locality_param: suggestion.locality,
                                  capture_canton_param: suggestion.canton)
                end
+  end
+
+  # The pair, not the town alone: a chip whose town already matches is still worth a tap
+  # while the canton beside it is blank, which is what a town the app does not carry
+  # leaves behind (see EventCapture::Normalizer#normalized_canton).
+  def changes_nothing?(suggestion, candidate)
+    Fingerprint.for(suggestion.locality) == Fingerprint.for(candidate.locality) &&
+      suggestion.canton == candidate.canton
   end
 
   def suggestion_chip(label, **data) = { label: label, attrs: { data: data } }

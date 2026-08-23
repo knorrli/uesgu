@@ -371,6 +371,22 @@ class CaptureScreenTest < ApplicationSystemTestCase
     end
   end
 
+  # Typing at the end is not incidental: the row it fills is one of the two that just
+  # went empty, and dropping that row outright would take the long tail of towns with it.
+  test "a venue the app already carries is not suggested back to the card" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    place(name: "Zorpsaal Keller", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal "Zorpsaal", field_value("place")
+    assert_no_selector ".suggestions"
+
+    type("locality", "zorpw")
+    assert_selector ".suggestions button", text: "Zorpwil"
+  end
+
   # The spelling half of the same thing, and the reason the test above had to move off
   # it: the card is handed the town's own spelling, so there is no correction for a
   # contributor to make and none to record. That the model shouted is an extraction

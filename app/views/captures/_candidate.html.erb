@@ -85,7 +85,7 @@
         Both hang off the PAIR: a chip fills the canton as well as the town (see
         CapturesHelper#locality_chips), and the canton is computed from the locality
         rather than read off the poster (see EventCapture::Normalizer). %>
-    <% towns = locality_chips(suggestions) %>
+    <% towns = locality_chips(suggestions, candidate) %>
     <% unranked_hint = tag.span(t('capture.candidate.locality_hint'), class: "muted",
                                 data: { locality_hint: true }) if towns.empty? %>
     <%= render layout: "shared/field_group",

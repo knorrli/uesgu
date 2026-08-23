@@ -24,10 +24,13 @@ module Scrapers
   #   bespoke HTML scrapers — also link to the venue's own event page, so they
   #          beat PETZI; fragile, but a successfully-parsed event is venue-direct.
   #   PETZI — shared ticketing aggregator; links to its own ticket page unless the
-  #          venue exposes an official-website link, so it's the copy of LAST resort.
-  # So an OLE show absorbs the matching bespoke / PETZI copies, and a bespoke show
-  # absorbs the matching PETZI copy, each staying the lone visible listing. Genres
-  # always accumulate onto the canonical regardless of who won it.
+  #          venue exposes an official-website link.
+  #   capture — a contributor's read of a poster (EventCapture::Creator), the copy
+  #          of LAST resort: it carries no url at all, and it is a one-off human
+  #          read rather than something re-derived from the venue each night.
+  # So an OLE show absorbs the matching bespoke / PETZI / captured copies, each
+  # staying the lone visible listing. Genres always accumulate onto the canonical
+  # regardless of who won it.
   #
   # Idempotent: each run re-derives every link from scratch, so a show a source
   # drops (or whose title drifts) re-surfaces. Genre accumulation self-heals
@@ -44,14 +47,25 @@ module Scrapers
 
     private
 
-    # Every venue we consume, plus the PETZI members — all from the registry, no
-    # list to maintain. (Was only the venues where a SECOND source could land an
-    # event, but same-source double-posts happen at any venue — the Köniz case —
-    # so every venue gets the pass; one small query per venue, nightly.) A
+    # Every venue we consume and every PETZI member — all from the registry, no
+    # list to maintain — plus the captured places, which is where a captured event
+    # lands when the registry does not cover its venue (Place is the registry's
+    # complement). Without those, the copies most in need of folding are the ones
+    # never looked at. (The venue list was once only where a SECOND source could
+    # land an event, but same-source double-posts happen at any venue — the Köniz
+    # case — so every venue gets the pass; one small query per venue, nightly.) A
     # registry row that never becomes a location tag (an aggregator's own row,
     # e.g. Bewegungsmelder) simply matches no events and is a no-op.
+    #
+    # Canonical places only: Location.resolve_venue folds an alias to its canonical
+    # before tagging, so an alias name is on no event.
+    #
+    # A capture with no venue at all (a show in a park) is reachable by no name here
+    # and is deliberately left alone: locality is far too wide a net for a fuzzy
+    # title match to auto-merge on.
     def dedup_venues
-      (Petzi.venues.values.map(&:first) + Venue.consuming.map(&:name)).uniq
+      (Petzi.venues.values.map(&:first) + Venue.consuming.map(&:name) +
+        Place.canonicals.pluck(:name)).uniq
     end
 
     # All future, non-dismissed events for this venue, processed in descending
@@ -90,14 +104,16 @@ module Scrapers
       end
     end
 
-    # 0 = OLE feed (preferred), 1 = bespoke HTML scraper, 2 = PETZI (last resort).
-    # Drives which copy of an overlapping show stays visible (see class comment) —
-    # we rank by which links most directly to the venue. data_source is the
-    # scraper's provenance stamp ("OLE:Dachstock", "Petzi", "Dachstock", …).
+    # 0 = OLE feed (preferred), 1 = bespoke HTML scraper, 2 = PETZI, 3 = capture
+    # (last resort). Drives which copy of an overlapping show stays visible (see
+    # class comment) — we rank by which links most directly to the venue.
+    # data_source is the provenance stamp ("OLE:Dachstock", "Petzi", "Dachstock",
+    # "capture", …).
     def source_rank(event)
       case event.data_source
       when /\AOLE:/ then 0
       when "Petzi"  then 2
+      when EventCapture::Creator::DATA_SOURCE then 3
       else 1
       end
     end

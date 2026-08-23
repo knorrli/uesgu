@@ -23,6 +23,18 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     make(title:, date:, genres:, venue:, source: "OLE:#{venue}")
   end
 
+  # A contributor's capture. No url — which is half of why it ranks below even PETZI
+  # — so it cannot go through `make`, whose url is the scrapers' upsert key.
+  def captured_event(title:, date: FUTURE, genres: [], venue: "Kofmehl",
+                     locality: "Solothurn", canton: "SO", time: nil)
+    e = Event.new(title:, start_date: date, start_time: time,
+                  data_source: EventCapture::Creator::DATA_SOURCE,
+                  location_list: [venue, locality, canton])
+    e.genre_list = genres if genres.any?
+    e.save!
+    e
+  end
+
   def make(title:, date:, genres:, venue:, source:, time: nil)
     n = TaxonomyFixtures.next_seq
     e = event(title:, start_date: date, url: "https://example.test/#{n}",
@@ -216,6 +228,63 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_nil concert.reload.canonical_event_id
     assert_includes Event.visible, workshop
     assert_includes Event.visible, concert
+  end
+
+  # A capture is always NEWER than the scraped copy it duplicates, and within one
+  # rank the newest wins — so ranking it explicitly is the whole point: unranked it
+  # falls in beside the bespoke scrapers and takes the canonical off a copy that
+  # links to the venue's own page.
+  test "a captured event folds onto the scraped copy, newer though it is" do
+    b = bespoke_event(title: "Zorpcore Allstars")
+    c = captured_event(title: "Zorpcore Allstars")
+
+    Scrapers::Dedup.run
+
+    assert_equal b.id, c.reload.canonical_event_id, "the capture folds onto the scraped copy"
+    assert_nil b.reload.canonical_event_id, "the scraped copy stays canonical"
+    assert_includes Event.visible, b
+    refute_includes Event.visible, c
+    assert_equal b.url, Event.visible.find(b.id).url, "the visible copy keeps its link"
+  end
+
+  test "a captured event ranks below even PETZI" do
+    p = petzi_event(title: "Zorpwave Nacht")
+    c = captured_event(title: "Zorpwave Nacht")
+
+    Scrapers::Dedup.run
+
+    assert_equal p.id, c.reload.canonical_event_id
+    assert_nil p.reload.canonical_event_id
+  end
+
+  # What a capture is FOR: the description and genres a contributor read off the
+  # poster reaching the listing that lacks them. Genres already ride the existing
+  # union; nothing else does yet.
+  test "a captured duplicate's genres accumulate onto the scraped canonical" do
+    b = bespoke_event(title: "Zorpjazz Sextet", genres: ["scraped-genre"])
+    captured_event(title: "Zorpjazz Sextet", genres: ["captured-genre"])
+
+    Scrapers::Dedup.run
+
+    assert_includes b.reload.genre_list.map(&:downcase), "captured-genre"
+    assert_includes b.genre_list.map(&:downcase), "scraped-genre"
+  end
+
+  # A captured place is the registry's complement, so it appears in no venue list
+  # the sweep walked before — and two contributors shooting the same poster is
+  # exactly where a duplicate lands. Neither carries a time, which is what a
+  # same-source pair needs to be one double-post rather than two happenings.
+  test "captures at a captured place are deduped at all" do
+    venue = place.name
+    first  = captured_event(title: "Zorpfolk im Hof", venue: venue, locality: "Zorpwil", canton: "BE")
+    second = captured_event(title: "Zorpfolk im Hof", venue: venue, locality: "Zorpwil", canton: "BE")
+
+    Scrapers::Dedup.run
+
+    assert_equal second.id, first.reload.canonical_event_id, "the older capture folds onto the newer"
+    assert_nil second.reload.canonical_event_id
+    refute_includes Event.visible, first
+    assert_includes Event.visible, second
   end
 
   test "past events are left untouched" do

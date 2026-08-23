@@ -29,10 +29,12 @@ class CapturesController < ApplicationController
 
   def create
     result = EventCapture::Creator.call(candidate_attributes)
+    return render_matches(result.matches) if result.error == :duplicate
     return render_status("captures/refusal", error: result.error, status: :unprocessable_entity) unless result.ok?
 
     record_outcomes(accepted: accepted_attributes)
-    render_status("captures/published", title: result.event.title)
+    render_status("captures/published", title: result.canonical&.title || result.event.title,
+                  merged: result.canonical.present?)
   end
 
   # Records no ExtractionFieldOutcome, and correctly so: with no attempt token there
@@ -124,13 +126,23 @@ class CapturesController < ApplicationController
     id ? "capture-row-#{id}" : "capture-row"
   end
 
-  def status_id
-    id = params[:card_id].to_s[/\A[a-zA-Z0-9-]{1,80}\z/]
-    "#{id || 'capture-card'}-status"
+  # Constrained for the same reason row_id is: both are client-generated and both are
+  # interpolated into a DOM id — form_id into one the match buttons then submit by.
+  def card_key = params[:card_id].to_s[/\A[a-zA-Z0-9-]{1,80}\z/] || "capture-card"
+
+  def status_id = "#{card_key}-status"
+  def form_id = "#{card_key}-form"
+
+  # 422 so Turbo leaves the card open and capture#decided does not settle it: nothing
+  # was published, and the card is being asked a question rather than told it failed.
+  def render_matches(matches)
+    render_status("captures/matches", status: :unprocessable_entity, form_id: form_id,
+                  matches: helpers.capture_matches(matches, candidate_attributes))
   end
 
   def candidate_attributes
-    params.permit(:title, :description, :date, :time, :place, :locality, :canton, :genres)
+    params.permit(:title, :description, :date, :time, :place, :locality, :canton, :genres,
+                  :matched_event_id, :acknowledged)
           .to_h.symbolize_keys
           .then { |attrs| attrs.merge(genres: attrs[:genres].to_s.split(",").map(&:strip)) }
   end

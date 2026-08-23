@@ -733,6 +733,24 @@
       </div>
     </div>
 
+    <div class="sg-row sg-row--stack">
+      <div class="sg-specimen">
+        <%# The real partial. Its buttons submit a card's form by id; here there is no
+            such form, so they do nothing. %>
+        <%= render "captures/matches", form_id: "sg-no-form",
+              matches: [{ id: 1, title: "Zorpcore Nacht", meta: "21:00 · Zorpsaal",
+                          adds: t('capture.matches.adds',
+                                  fields: [t('capture.matches.fields.description'),
+                                           t('capture.matches.fields.genres', count: 2)].join(", ")) },
+                        { id: 2, title: "Zorpcore Nacht — Afterparty", meta: "23:00 · Zorpsaal",
+                          adds: t('capture.matches.nothing') }] %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Match block</span> · <code>render "captures/matches", matches:, form_id:</code>
+        <p class="sg-purpose">Shows we may already carry, shown at the <b>top</b> of a capture card because they ask about the whole card rather than about one field — and because the answer decides what publishing even means. It is the one block in the body that is neither a field nor a <a href="#review-card">card aside</a>: it does post with the card's form, but it is not something to fill in, so it takes the recessed ground and adds the amber <a href="#colours">attention</a> edge. Each row names what this read would <b>add</b> to that show, so the offer never promises an enrichment it has nothing to make. Every button is a submitter carrying its own <code>name</code>/<code>value</code> into the card's form by id, which is how one form posts three different answers with no client code.</p>
+      </div>
+    </div>
+
     <div class="sg-row">
       <div class="sg-specimen">
         <%= render layout: "shared/action_bar" do %>

@@ -163,6 +163,19 @@ de:
       reject: Verwerfen
     card:
       published: "%{title} ist live."
+      merged: "Zu %{title} dazugenommen."
+    matches:
+      heading: "Das haben wir vielleicht schon:"
+      adds: "Deins bringt dazu: %{fields}"
+      nothing: Das haben wir alles schon.
+      fields:
+        description: eine Beschreibung
+        time: eine Startzeit
+        genres:
+          one: 1 Genre
+          other: "%{count} Genres"
+      take: Das ist es
+      distinct: Das ist ein anderes Event
     errors:
       incomplete: Titel, Datum, Ort und Kanton braucht es.
       place_invalid: Dieses Lokal liess sich nicht anlegen.

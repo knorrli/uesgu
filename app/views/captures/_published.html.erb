@@ -1,4 +1,4 @@
-<%# locals: (id:, title:) %>
+<%# locals: (id:, title:, merged: false) %>
 <p id="<%= id %>" class="capture-card__status capture-card__status--published">
-  <%= t('capture.card.published', title: title) %>
+  <%= merged ? t('capture.card.merged', title: title) : t('capture.card.published', title: title) %>
 </p>

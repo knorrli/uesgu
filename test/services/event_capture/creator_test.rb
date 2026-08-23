@@ -32,9 +32,13 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "capture", EventCapture::Creator.call(attrs).event.data_source
   end
 
+  # acknowledged, because the two titles are one show to TitleSimilarity ("2" is too
+  # short to be a token) and the second publish would otherwise stop to ask about the
+  # first. What is under test is the place, not the question.
   test "mints the captured place, once, and reuses it for a variant spelling" do
     EventCapture::Creator.call(attrs)
-    second = EventCapture::Creator.call(attrs(place: "ZORP-SAAL", title: "Zorp Fest 2"))
+    second = EventCapture::Creator.call(attrs(place: "ZORP-SAAL", title: "Zorp Fest 2",
+                                              acknowledged: "1"))
 
     assert_equal 1, Place.where(name: "Zorpsaal").count
     assert_equal "Zorpsaal", second.place.name
@@ -150,7 +154,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   # captures.
   test "a captured event carries no url, and several of them publish" do
     first = EventCapture::Creator.call(attrs)
-    second = EventCapture::Creator.call(attrs(title: "Zorp Fest 2"))
+    second = EventCapture::Creator.call(attrs(title: "Zorp Fest 2", acknowledged: "1"))
 
     assert_predicate first, :ok?
     assert_predicate second, :ok?
@@ -209,5 +213,100 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal %w[Flarncore Zorpwave], result.event.genre_list.sort
     assert_equal %w[Flarncore Zorpwave], Genre.where(name: %w[Zorpwave Flarncore]).pluck(:name).sort
     refute_predicate result.event, :hidden?
+  end
+  # The three answers a card can post, and the one thing none of them may do: publish a
+  # second copy of a show we already carry without anyone having looked at the pair.
+  class MatchTest < ActiveSupport::TestCase
+    def attrs(**overrides)
+      { title: "Zorp Fest", date: (Date.current + 20).to_s, time: "20:00", place: "Zorpsaal",
+        locality: "Zorpwil", canton: "BE" }.merge(overrides)
+    end
+
+    def listed(**overrides)
+      event(**{ title: "Zorp Fest", start_date: Date.current + 20,
+                location_list: %w[Zorpsaal Zorpwil BE] }.merge(overrides))
+    end
+
+    test "a match stops the publish and comes back to be answered" do
+      match = listed
+
+      result = EventCapture::Creator.call(attrs)
+
+      refute_predicate result, :ok?
+      assert_equal :duplicate, result.error
+      assert_equal [match.id], result.matches.map(&:id)
+      assert_equal 1, Event.count, "nothing was published"
+    end
+
+    # The card ran the same lookup against what the model read; this is the look that
+    # sees the values actually being published.
+    test "the check runs on the EDITED values, not the ones the card was rendered with" do
+      listed(start_date: Date.current + 21)
+
+      assert_predicate EventCapture::Creator.call(attrs), :ok?
+      assert_equal :duplicate, EventCapture::Creator.call(attrs(date: (Date.current + 21).to_s)).error
+    end
+
+    test "naming the match keeps the capture and folds it onto that show" do
+      match = listed
+
+      result = EventCapture::Creator.call(attrs(matched_event_id: match.id))
+
+      assert_predicate result, :ok?
+      assert_equal match, result.canonical
+      assert_equal match.id, result.event.canonical_event_id
+      refute_includes Event.visible, result.event
+      assert_includes Event.visible, match
+    end
+
+    test "what the capture read reaches the show it was folded onto" do
+      match = listed(description: nil)
+
+      EventCapture::Creator.call(attrs(matched_event_id: match.id, description: "Support: Zorpband",
+                                       genres: ["zorpcore"]))
+
+      assert_equal "Support: Zorpband", match.reload.description
+      assert_includes match.genre_list.map(&:downcase), "zorpcore"
+    end
+
+    # Pinned because a human compared the two rows, which the sweep's fuzzy matcher
+    # cannot — so it may not re-derive the link away that night.
+    test "an answered merge is pinned against the next sweep" do
+      match = listed
+      result = EventCapture::Creator.call(attrs(matched_event_id: match.id))
+
+      assert result.event.overridden?("canonical_event")
+    end
+
+    test "declining the match publishes a second event, pinned standalone" do
+      listed
+
+      result = EventCapture::Creator.call(attrs(acknowledged: "1"))
+
+      assert_predicate result, :ok?
+      assert_nil result.canonical
+      assert_nil result.event.canonical_event_id
+      assert result.event.overridden?("canonical_event")
+      assert_equal 2, Event.count
+    end
+
+    # A capture nobody was asked about stays the sweep's to fold, which is how a show
+    # we only start scraping later still collapses.
+    test "a capture with no match to answer pins nothing" do
+      result = EventCapture::Creator.call(attrs)
+
+      assert_predicate result, :ok?
+      refute result.event.overridden?("canonical_event")
+    end
+
+    test "a matched_event_id naming a dismissed event is not merged onto" do
+      match = listed
+      match.dismiss!
+
+      result = EventCapture::Creator.call(attrs(matched_event_id: match.id, acknowledged: "1"))
+
+      assert_predicate result, :ok?
+      assert_nil result.event.canonical_event_id
+    end
   end
 end

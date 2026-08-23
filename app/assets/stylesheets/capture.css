@@ -189,3 +189,59 @@ button.capture-queue__tile[data-state="pending"] {
 .capture-card__note {
   width: 100%;
 }
+
+/* A recessed block, the same set-apart-by-KIND treatment .card-aside uses, for the
+   same reason: the card body is borderless by design, so one more hairline reads as
+   one more field rather than as a boundary. It sits at the TOP of the body and keeps
+   the amber attention channel, because unlike a card aside this is not a side note —
+   it is a question the card cannot be published without answering. */
+.capture-card__matches {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+  margin-bottom: var(--gap-large);
+  padding: var(--gap-medium);
+  border-left: 2px solid var(--theme-interest-color);
+  background: var(--theme-bg-muted);
+}
+
+.capture-card__matches-heading {
+  margin: 0;
+  color: var(--theme-fg-muted);
+  font-size: var(--font-size-small);
+}
+
+.capture-card__matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-medium);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The button beside the show rather than under it, so a list of three reads as three
+   choices; it wraps under on a narrow phone, where side-by-side would squeeze the
+   title to two words. */
+.capture-card__matches-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-small);
+  align-items: start;
+  justify-content: space-between;
+}
+
+/* A basis rather than plain shrink, so a narrow phone WRAPS the button under the show
+   instead of squeezing the title down to two words per line. */
+.capture-card__matches-show {
+  flex: 1 1 12rem;
+}
+
+.capture-card__matches-list .muted {
+  font-size: var(--font-size-small);
+}
+
+.capture-card__matches-actions {
+  display: flex;
+  align-items: start;
+}

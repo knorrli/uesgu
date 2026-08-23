@@ -163,6 +163,19 @@ en:
       reject: Drop
     card:
       published: "%{title} is live."
+      merged: "Added to %{title}."
+    matches:
+      heading: "We might already have this:"
+      adds: "Yours adds: %{fields}"
+      nothing: We already have all of this.
+      fields:
+        description: a description
+        time: a start time
+        genres:
+          one: 1 genre
+          other: "%{count} genres"
+      take: It's this one
+      distinct: It's a different event
     errors:
       incomplete: Title, date, locality and canton are needed.
       place_invalid: That venue couldn't be created.

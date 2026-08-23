@@ -342,7 +342,7 @@
 }
 
 .sheet__footer {
-  padding: var(--gap-medium) var(--content-padding);
+  padding: var(--gap-medium) var(--content-padding) calc(var(--gap-medium) + var(--safe-bottom));
   border-top: var(--tag-border-width) solid var(--border-color);
 }
 

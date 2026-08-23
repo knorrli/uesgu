@@ -145,7 +145,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--gap-small) var(--gap-large);
-  padding: var(--gap-medium) var(--content-padding);
+  padding: var(--gap-medium) var(--content-padding) calc(var(--gap-medium) + var(--safe-bottom));
   background: var(--theme-bg-color);
   border-top: var(--border-width) solid var(--border-color);
   color: var(--theme-fg-color);
@@ -172,7 +172,7 @@
   margin-inline: auto;
   /* Wider inline inset than --content-padding on purpose: the footer's small links
      otherwise sit too close to the viewport edge on a phone. */
-  padding: var(--gap-large);
+  padding: var(--gap-large) var(--gap-large) calc(var(--gap-large) + var(--safe-bottom));
   border-top: var(--border-width) solid var(--border-color);
   font-size: var(--font-size-small);
 }

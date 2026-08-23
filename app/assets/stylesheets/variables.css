@@ -19,6 +19,13 @@
   --content-max-width: 720px;
   --content-padding: var(--gap-medium);
 
+  /* An installed iOS app is handed the screen, not the safe area: iOS reserves the
+     status bar and the landscape notch for us, but the home indicator and the rounded
+     display corners sit ON TOP of the page. Anything pinned to the bottom edge adds
+     this, or the phone crops it. Zero everywhere else, so it costs those layouts
+     nothing. */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
   --font-size-small: 0.8rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.25rem;

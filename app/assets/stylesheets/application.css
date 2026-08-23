@@ -98,16 +98,24 @@ a {
 .account-form input[type="date"] {
   background: none;
   color-scheme: light dark;
+  /* A date/time control takes its height from the value box the engine lays out in
+     its shadow DOM, which comes out taller than the line box a text input gets from
+     the same font — so a date and a text field sharing a row (Datum beside Zeit)
+     draw their underlines at different heights. Pin the box to what the text field
+     measures: one line, plus this skin's own padding and underline. */
+  height: calc(1lh + 2 * var(--gap-small) + var(--border-width));
 }
 
 /* Safari lays the value out in the field's shadow DOM, where it right-aligns it and
    adds vertical margins of its own: a full-width date or time field renders its value
-   flushed right and sitting lower than the field beside it. Engines that do not know
-   the pseudo-element drop the rule, which is what the other two want. */
+   flushed right and sitting lower than the field beside it. Sizing it to one line keeps
+   it inside the height pinned above instead of overflowing and clipping. Engines that
+   do not know the pseudo-element drop the rule, which is what the other two want. */
 .account-form input[type="date"]::-webkit-date-and-time-value,
 .account-form input[type="time"]::-webkit-date-and-time-value {
   text-align: left;
   margin: 0;
+  height: 1lh;
 }
 
 /* Neutral at rest, accent underline on focus — green now signals "this field is

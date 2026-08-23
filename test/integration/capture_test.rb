@@ -464,4 +464,79 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     assert_empty Event.all
   end
+  # A show we already carry, put in front of the contributor while they are still
+  # looking at the poster — and the same question again at publish, because everything
+  # on the card is editable after it renders.
+  def already_listed(**overrides)
+    event(**{ title: "Zorp Fest", start_date: Date.new(2026, 9, 1),
+              location_list: %w[Zorpsaal Zorpwil BE] }.merge(overrides))
+  end
+
+  def publish(**params)
+    post capture_path, params: { card_id: "capture-row-abc-0", title: "Zorp Fest",
+                                 date: "2026-09-01", locality: "Zorpwil", canton: "BE",
+                                 place: "Zorpsaal" }.merge(params), as: :turbo_stream
+  end
+
+  test "a card whose show we already carry offers it on the card" do
+    sign_in_as user(contributor: true)
+    match = already_listed
+
+    stub_extraction(extraction(candidates: [candidate])) do
+      post extract_capture_path, params: { text: "Zorp Fest", row_id: "abc" }, as: :turbo_stream
+    end
+
+    assert_select ".capture-card__matches" do
+      assert_select "button[name=matched_event_id][value=?]", match.id.to_s
+      assert_select "button[name=acknowledged]"
+    end
+  end
+
+  test "publishing over a match writes nothing and asks instead" do
+    sign_in_as user(contributor: true)
+    already_listed
+
+    assert_no_difference -> { Event.count } do
+      publish
+    end
+
+    assert_response :unprocessable_entity
+    assert_select ".capture-card__matches"
+  end
+
+  # The buttons sit in the status slot, which is OUTSIDE the card's form — they reach
+  # it by id, so the id has to be the one the card actually rendered.
+  test "the question posts back to the card's own form" do
+    sign_in_as user(contributor: true)
+    already_listed
+    publish
+
+    assert_select "button[form=?]", "capture-row-abc-0-form", minimum: 2
+  end
+
+  test "answering with the match folds the capture onto it and hands over what it read" do
+    sign_in_as user(contributor: true)
+    match = already_listed(description: nil)
+
+    assert_difference -> { Event.count } => 1 do
+      publish(matched_event_id: match.id, description: "Support: Zorpband", genres: "zorpcore")
+    end
+
+    assert_response :success
+    assert_equal match.id, Event.last.canonical_event_id
+    assert_equal "Support: Zorpband", match.reload.description
+    assert_includes match.genre_list.map(&:downcase), "zorpcore"
+  end
+
+  test "answering that it is a different event publishes it" do
+    sign_in_as user(contributor: true)
+    already_listed
+
+    assert_difference -> { Event.count } => 1 do
+      publish(acknowledged: "1")
+    end
+
+    assert_response :success
+    assert_nil Event.last.canonical_event_id
+  end
 end

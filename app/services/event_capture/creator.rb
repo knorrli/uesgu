@@ -7,8 +7,10 @@ module EventCapture
     # whole funnel: which door it came through is not a property of the event.
     DATA_SOURCE = "capture".freeze
 
-    Result = Data.define(:event, :place, :error) do
-      def initialize(event: nil, place: nil, error: nil) = super
+    # `canonical` is the event this capture was merged into, `matches` the ones it
+    # has to be answered against before anything is published (error: :duplicate).
+    Result = Data.define(:event, :place, :canonical, :matches, :error) do
+      def initialize(event: nil, place: nil, canonical: nil, matches: [], error: nil) = super
       def ok? = error.nil?
     end
 
@@ -21,6 +23,16 @@ module EventCapture
     def call
       return Result.new(error: :incomplete) if incomplete?
 
+      # The last look for a show we already carry, and the only one that sees the
+      # values actually being published: the card ran this too, but against what the
+      # model read, and everything on it is editable afterwards. It is also the only
+      # look a hand-entered card gets, having never been through an extraction.
+      matched = matched_event
+      if matched.nil? && !acknowledged?
+        found = duplicates
+        return Result.new(error: :duplicate, matches: found) if found.any?
+      end
+
       # resolve_place WRITES and publish can raise after it: without the transaction
       # a failed publish leaves an orphan place behind, with no events and no UI to
       # remove it, still feeding PlaceSuggester and the locality datalist.
@@ -28,7 +40,9 @@ module EventCapture
         place = resolve_place
         next Result.new(error: :place_invalid) if place.is_a?(Place) && !place.persisted?
 
-        Result.new(event: publish(place), place: place.is_a?(Place) ? place : nil)
+        event = publish(place)
+        settle(event, matched)
+        Result.new(event: event, canonical: matched, place: place.is_a?(Place) ? place : nil)
       end
     rescue ActiveRecord::RecordNotUnique
       # The unique index on places.fingerprint, which Place#fingerprint_available
@@ -45,6 +59,39 @@ module EventCapture
     # on a blank canton too, so an event missing it is one no node of the WHERE tree
     # can reach. The form marks both required, but the form is not the only caller.
     def incomplete? = title.blank? || start_date.blank? || locality.blank? || canton.blank?
+
+    # The show this capture was answered against, if the contributor named one. Read
+    # back rather than trusted: the id rides in from the card, and a duplicate or a
+    # dismissed event is no canonical to merge onto.
+    def matched_event
+      id = attrs[:matched_event_id].presence
+      id && Event.kept.canonical.find_by(id: id)
+    end
+
+    # Set only by the contributor answering "it is a different event" to matches they
+    # were shown — never a default, or the check below would be unreachable.
+    def acknowledged? = attrs[:acknowledged].present?
+
+    def duplicates
+      DuplicateFinder.for(title: title, date: start_date, place: place_name, locality: locality)
+    end
+
+    # A capture that names the show it duplicates is KEPT and merged, never dropped:
+    # the canonical takes what it was missing while the whole read stays legible
+    # behind it, so a wrong answer is an un-merge rather than a loss.
+    #
+    # Either ANSWER pins the link, because a contributor who compared the two rows did
+    # something the sweep's fuzzy matcher cannot, and it may not be re-derived away
+    # that night. A capture nobody was asked about pins nothing and stays the sweep's
+    # to fold, which is how a show we only start scraping later still collapses.
+    def settle(event, matched)
+      if matched
+        event.merge_into!(matched)
+        CanonicalEnrichment.call(matched, Event.where(canonical_event_id: matched.id).to_a)
+      elsif acknowledged?
+        event.mark_standalone!
+      end
+    end
 
     def title = attrs[:title].to_s.strip
     def description = attrs[:description].to_s.strip.presence

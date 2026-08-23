@@ -29,16 +29,14 @@ module Scrapers
   #          of LAST resort: it carries no url at all, and it is a one-off human
   #          read rather than something re-derived from the venue each night.
   # So an OLE show absorbs the matching bespoke / PETZI / captured copies, each
-  # staying the lone visible listing. Genres always accumulate onto the canonical
-  # regardless of who won it.
+  # staying the lone visible listing. Whoever wins, the canonical then takes the
+  # duplicates' genres and whatever it is itself missing (see CanonicalEnrichment).
   #
   # Idempotent: each run re-derives every link from scratch, so a show a source
-  # drops (or whose title drifts) re-surfaces. Genre accumulation self-heals
-  # because each scraper resets its own event's genres each sweep before this
-  # re-unions the duplicates.
+  # drops (or whose title drifts) re-surfaces. The enrichment self-heals for the
+  # same reason — each scraper resets its own event from source each sweep, before
+  # this re-derives what the duplicates add on top.
   class Dedup
-    MATCH_THRESHOLD = 0.4
-
     def self.run = new.run
 
     def run
@@ -97,10 +95,10 @@ module Scrapers
         canonicals << e if canonical.nil?
       end
 
-      # Re-derive each canonical's genres as its own ∪ its duplicates' (auto-matched
-      # AND admin-pinned), so a manual merge still enriches the canonical's genres.
+      # Re-derive what each canonical takes from its duplicates (auto-matched AND
+      # admin-pinned), so a manual merge enriches it too.
       canonicals.each do |c|
-        merge_genres(c, ranked.select { |e| e.canonical_event_id == c.id })
+        CanonicalEnrichment.call(c, ranked.select { |e| e.canonical_event_id == c.id })
       end
     end
 
@@ -118,20 +116,6 @@ module Scrapers
       end
     end
 
-    # Union the duplicates' genres onto the canonical (the canonical's own scraper
-    # re-set its genres this sweep, so the result is canonical ∪ duplicates), then
-    # re-derive visibility.
-    def merge_genres(canonical, dups)
-      return if dups.empty?
-
-      merged = (canonical.genre_list + dups.flat_map(&:genre_list)).uniq
-      return if merged.sort == canonical.genre_list.sort
-
-      canonical.genre_list = merged
-      canonical.save!
-      canonical.recompute_visibility!
-    end
-
     # Best canonical for an event: same date, highest title similarity, accepting a
     # subset relationship (our club scrapers truncate "Darkside" where the feed
     # lists the full DJ lineup) or Jaccard >= threshold. A same-source candidate
@@ -139,18 +123,18 @@ module Scrapers
     # double-post is identical; a same-titled show at another hour is a second,
     # real happening).
     def best_match(event, candidates)
-      bt = tokens(event.title)
+      bt = TitleSimilarity.tokens(event.title)
       scored = candidates
                .select { |c| c.start_date == event.start_date && time_compatible?(event, c) }
                .map do |c|
-                 ct = tokens(c.title)
-                 subset = !bt.empty? && !ct.empty? && (bt.subset?(ct) || ct.subset?(bt))
-                 { event: c, jaccard: jaccard(bt, ct), subset: subset }
+                 ct = TitleSimilarity.tokens(c.title)
+                 { event: c, jaccard: TitleSimilarity.jaccard(bt, ct),
+                   subset: TitleSimilarity.subset?(bt, ct) }
                end
       best = scored.max_by { |s| [s[:subset] ? 1 : 0, s[:jaccard]] }
       return nil unless best
 
-      (best[:jaccard] >= MATCH_THRESHOLD || best[:subset]) ? best[:event] : nil
+      (best[:jaccard] >= TitleSimilarity::THRESHOLD || best[:subset]) ? best[:event] : nil
     end
 
     # Cross-source copies match on the date alone (sources disagree on doors vs
@@ -160,25 +144,6 @@ module Scrapers
       return true if candidate.data_source != event.data_source
 
       candidate.start_time == event.start_time
-    end
-
-    def jaccard(a, b)
-      return 0.0 if a.empty? || b.empty?
-
-      (a & b).size.to_f / (a | b).size
-    end
-
-    STOP = %w[the a le la les der die das und and feat featuring with vs b2b support
-              live concert show tour ch us uk fr de present presents].freeze
-
-    def tokens(title)
-      title.to_s.downcase
-           .tr("äöüàâéèêëïîçáí", "aouaaeeeeiicai")
-           .gsub(/\(.*?\)/, " ")
-           .gsub(/[^a-z0-9 ]/, " ")
-           .split
-           .reject { |t| STOP.include?(t) || t.length < 2 }
-           .to_set
     end
   end
 end

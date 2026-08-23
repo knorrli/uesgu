@@ -163,6 +163,19 @@ fr:
       reject: Écarter
     card:
       published: "%{title} est en ligne."
+      merged: "Ajouté à %{title}."
+    matches:
+      heading: "On a peut-être déjà ça :"
+      adds: "Le tien ajoute : %{fields}"
+      nothing: On a déjà tout ça.
+      fields:
+        description: une description
+        time: une heure de début
+        genres:
+          one: 1 genre
+          other: "%{count} genres"
+      take: C'est celui-là
+      distinct: C'est un autre événement
     errors:
       incomplete: Il faut un titre, une date, une localité et un canton.
       place_invalid: Cette salle n'a pas pu être créée.

@@ -54,6 +54,50 @@ module CapturesHelper
 
   def suggestion_chip(label, **data) = { label: label, attrs: { data: data } }
 
+  # Shows we may already carry, looked up from what the model read. Computed here for
+  # the same reason place_suggestions is: the extracted values are the ones that need
+  # matching, and Creator runs the identical lookup against the EDITED values on the
+  # way to publishing, so a card whose date or venue is corrected is still caught.
+  def capture_duplicates(candidate)
+    EventCapture::DuplicateFinder.for(title: candidate.title, date: candidate.date,
+                                      place: candidate.place, locality: candidate.locality)
+  end
+
+  # Each match as the card renders it. `read` is what this capture holds, keyed as the
+  # card's own fields are — the candidate calls its description a subtitle.
+  def capture_matches(events, read)
+    events.map do |event|
+      { id: event.id, title: event.title, meta: capture_match_meta(event),
+        adds: capture_match_adds(event, read) }
+    end
+  end
+
+  # Enough to tell two shows at one venue apart, which is the whole job here.
+  def capture_match_meta(event)
+    [event.start_time&.strftime("%H:%M"), event.venue&.name].compact_blank.join(" · ")
+  end
+
+  # What answering "it is this one" would actually contribute — named, because
+  # otherwise the offer promises an enrichment it may have nothing to make. Only
+  # fields the match is MISSING count: CanonicalEnrichment fills blanks and never
+  # overwrites, so anything else would be a promise it does not keep.
+  def capture_match_adds(event, read)
+    parts = []
+    parts << t("capture.matches.fields.description") if read[:description].present? && event.description.blank?
+    parts << t("capture.matches.fields.time") if read[:time].present? && event.start_time.blank?
+    genres = capture_new_genres(event, read[:genres])
+    parts << t("capture.matches.fields.genres", count: genres.size) if genres.any?
+
+    parts.any? ? t("capture.matches.adds", fields: parts.join(", ")) : t("capture.matches.nothing")
+  end
+
+  # By fingerprint: "Drum & Bass" and "drum and bass" are one tag, so neither counts
+  # as something this read would add (see Genre).
+  def capture_new_genres(event, genres)
+    known = event.genre_list.map { |name| Genre.fingerprint_for(name) }.to_set
+    Array(genres).compact_blank.reject { |name| known.include?(Genre.fingerprint_for(name)) }
+  end
+
   # Name => canton, off the same rows that compute the canton at extraction. The card
   # matches the names as they are typed and fills the canton from the same map once one
   # is picked, so both halves of the field answer from one place.

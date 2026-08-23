@@ -12,6 +12,14 @@
       locals: { id: key, actions: render("captures/card_actions", key: key),
                 frame_class: "capture-card",
                 frame_attrs: { data: { capture_target: "card", state: "open" } }, **pane } do %>
+  <%# Above the fields, not beside one: it asks about the whole card, and the answer
+      it wants decides what publishing even means. %>
+  <% matches = capture_duplicates(candidate) %>
+  <% if matches.any? %>
+    <%= render "captures/matches", form_id: "#{key}-form",
+          matches: capture_matches(matches, description: candidate.subtitle,
+                                   time: candidate.time, genres: candidate.genres) %>
+  <% end %>
   <%= form_with url: capture_path, method: :post, id: "#{key}-form",
         class: "capture-card__fields account-form flex flex-col gap-large",
         data: { action: "turbo:submit-end->capture#decided change->capture#carryPlace" } do %>

@@ -72,12 +72,14 @@
   </head>
 
   <body class="<%= class_names(yield(:body_class)) %>">
-    <% if notice.present? || alert.present? %>
-      <div class="flashes" role="status" aria-live="polite">
-        <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>
-        <% if alert.present? %><p class="flash alert"><%= alert %></p><% end %>
-      </div>
-    <% end %>
+    <%# The region is always here, empty or not: a live region announces what is put
+        INTO it, so one added to the page with its message already inside is read out
+        by some screen readers and not others. It also gives a flash raised in the
+        browser somewhere to land (see capture_controller.js). %>
+    <div class="flashes" role="status" aria-live="polite">
+      <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>
+      <% if alert.present? %><p class="flash alert"><%= alert %></p><% end %>
+    </div>
 
     <header class="site-header">
       <div class="site-header__inner">

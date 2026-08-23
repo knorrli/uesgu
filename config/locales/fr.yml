@@ -153,7 +153,10 @@ fr:
       start_over: Annuler et recommencer
     queue:
       label: File
-      done: Tout est décidé.
+      done:
+        zero: Tout est traité. Rien de publié.
+        one: Tout est traité. 1 événement est en ligne.
+        other: Tout est traité. %{count} événements sont en ligne.
     actions:
       accept: Publier
       reread: Relire

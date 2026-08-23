@@ -153,7 +153,10 @@ de:
       start_over: Abbrechen und neu starten
     queue:
       label: Warteschlange
-      done: Alles entschieden.
+      done:
+        zero: Alles bearbeitet. Nichts veröffentlicht.
+        one: Alles bearbeitet. 1 Veranstaltung ist live.
+        other: Alles bearbeitet. %{count} Veranstaltungen sind live.
     actions:
       accept: Veröffentlichen
       reread: Nochmal auslesen

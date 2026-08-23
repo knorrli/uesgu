@@ -153,7 +153,10 @@ en:
       start_over: Cancel and start over
     queue:
       label: Queue
-      done: All decided.
+      done:
+        zero: All done. Nothing published.
+        one: All done. 1 event is live.
+        other: All done. %{count} events are live.
     actions:
       accept: Publish
       reread: Read again

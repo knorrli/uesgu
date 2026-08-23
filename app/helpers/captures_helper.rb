@@ -64,11 +64,18 @@ module CapturesHelper
   end
 
   # Passing the placeholder itself as the count picks the `other` form and leaves
-  # %{count} standing: how many events came back is only known in the browser, so the
-  # plural form ships to capture_controller.js as a template it fills in.
+  # %{count} standing: how many events a batch found, and how many of them went live,
+  # is only known in the browser — so every plural form ships to capture_controller.js
+  # as a template it fills in.
   def capture_found_titles
     { one: t("capture.review.title", count: 1),
       other: t("capture.review.title", count: "%{count}") }
+  end
+
+  def capture_done_flashes
+    { zero: t("capture.queue.done", count: 0),
+      one: t("capture.queue.done", count: 1),
+      other: t("capture.queue.done", count: "%{count}") }
   end
 
   def canton_options

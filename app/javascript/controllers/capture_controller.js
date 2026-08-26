@@ -363,20 +363,10 @@ export default class extends Controller {
   // turbo:submit-end fires for a refusal too, and that response is the stream putting
   // the reason on a card the contributor is still looking at — so only a landed
   // publish decides one.
-  async decided(event) {
+  decided(event) {
     if (!event.detail.success) return
 
-    // Read off the RESPONSE rather than the card, for the reason `extract` does: Turbo
-    // applies the stream on the next animation frame, so the receipt is not on the card
-    // yet — and by the time it is, the next card has taken the slot and hidden it. The
-    // flash is the only place a decision that is already gone still shows.
-    const receipt = this.receiptIn(await event.detail.fetchResponse.responseText)
-    if (receipt) this.flash(receipt)
     this.settle(event.target.closest(".capture-card"), "published")
-  }
-
-  receiptIn(stream) {
-    return this.streamed(stream)?.querySelector(".capture-card__status--published")?.textContent.trim() ?? null
   }
 
   reject(event) {

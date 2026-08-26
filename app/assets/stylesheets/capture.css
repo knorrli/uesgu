@@ -101,10 +101,15 @@
   color: var(--theme-warn-color);
 }
 
+/* Capped by the pane it sits in, not by the viewport: the source pane is a share of
+   the CARD (see review_card.css), which on a phone is shorter than 38vh ever was — so
+   a viewport-measured cap left the box overflowing a pane that clips, cutting off its
+   own bottom border and the scroll that would have reached the rest of the text. */
 .capture-row__excerpt {
   margin: 0;
-  max-height: 38vh;
+  max-height: 100%;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: var(--gap-small);
   border: var(--border-width) solid var(--border-color);
   font-size: var(--font-size-small);

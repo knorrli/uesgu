@@ -731,6 +731,40 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue__tile[data-state=pending]"
   end
 
+  # The strip outlives the cards, and the only thing it is scanned for is what has
+  # already been answered — so each answer has to be its own mark, not a shared one.
+  test "each decided tile carries the mark for its own outcome" do
+    CannedExtractionClient.install(events: [poster_event, matinee, poster_event(title: "Zorpcore Spaet")])
+    visit capture_path
+    pick "poster.png"
+
+    accept
+    assert_selector ".capture-queue__tile[data-state=published] .ph-check-circle"
+    reject
+    assert_selector ".capture-queue__tile[data-state=dropped] .ph-x"
+  end
+
+  # An input nothing came back from was judged by nobody, so it may not wear the mark
+  # of a card someone threw away.
+  test "an input that came back with nothing does not wear a dropped card's mark" do
+    CannedExtractionClient.install(events: [])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-queue__tile[data-state=failed] .ph-warning-circle"
+    assert_no_selector ".capture-queue__tile .ph-x"
+  end
+
+  # The tile is stood up before the downscale that gives it a picture, so it is the one
+  # place the poster can go missing; a card's own tile is built once the blob is held.
+  test "a tile stood up before its read carries the poster all the same" do
+    CannedExtractionClient.install(events: [])
+    visit capture_path
+    pick "poster.png"
+
+    assert_decoded ".capture-queue__tile img"
+  end
+
   test "a failed extraction reaches the strip rather than only the rows list" do
     CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
     visit capture_path

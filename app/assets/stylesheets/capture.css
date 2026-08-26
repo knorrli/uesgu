@@ -158,12 +158,6 @@ button.capture-queue__tile.is-current {
   border-color: var(--theme-accent-color);
 }
 
-/* Only the dropped tile dims: a published event is live, and the strip is the only
-   thing still saying so. */
-button.capture-queue__tile[data-state="dropped"] {
-  opacity: 0.45;
-}
-
 /* Standing in for cards that have not landed yet — it already carries the source, so
    the strip is the full count from the moment the batch is sent. */
 button.capture-queue__tile[data-state="pending"] {
@@ -189,10 +183,11 @@ button.capture-queue__tile[data-state="pending"] {
 /* Two candidates off one poster are the same picture twice, so the number is the only
    thing on a tile that tells them apart — and the only thing tying the strip to the
    count in the heading. Its own ground because a poster is arbitrary underneath, and
-   the opposite corner from the decided mark. */
+   above the decided mark and in the opposite corner, that mark covering the tile. */
 .capture-queue__tile::before {
   content: attr(data-index);
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
   padding: 0 3px;
@@ -202,16 +197,31 @@ button.capture-queue__tile[data-state="pending"] {
   line-height: 1.3;
 }
 
+/* The verdict covers the whole tile rather than tucking into a corner. At 3.25rem
+   square a corner mark is a squint, and scanning for what is already decided is the
+   only reason the strip outlives the cards. Covering the poster is the point: a tile
+   still worth looking at is one that has not been decided. */
 .capture-queue__tile .ph {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  padding: 1px;
-  background: var(--theme-bg-color);
-  color: var(--theme-accent-color);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.75rem;
+  background: var(--theme-accent-color);
+  color: var(--theme-on-accent);
 }
 
+/* Warn, because a drop is the destructive half of the pair — and one of the few
+   places the palette's rare red is earned. */
 .capture-queue__tile[data-state="dropped"] .ph {
+  background: var(--theme-warn-color);
+  color: var(--theme-bg-color);
+}
+
+/* Off the verdict colours entirely: an input that came back with nothing was not
+   judged by anyone, and green/red are for the two answers a contributor gave. */
+.capture-queue__tile[data-state="failed"] .ph {
+  background: var(--theme-bg-muted);
   color: var(--theme-fg-muted);
 }
 

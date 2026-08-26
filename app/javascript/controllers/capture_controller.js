@@ -6,6 +6,10 @@ import { Turbo } from "@hotwired/turbo-rails"
 const PLACE_FIELDS = ["place", "locality", "canton"]
 const LOCALITY_MATCHES = 6
 
+// `failed` carries its own mark rather than the ×: nothing came back is not a decision
+// anybody made, and sharing the drop's glyph filed it as one.
+const TILE_MARKS = { published: "ph-check-circle", dropped: "ph-x", failed: "ph-warning-circle" }
+
 // Compare towns the way a contributor types them rather than the way they are spelt,
 // so "zur" reaches "Zürich" and "neuch" reaches "Neuchâtel".
 const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
@@ -113,6 +117,7 @@ export default class extends Controller {
       }
 
       this.remember(this.rowId(id), id, { label: file.name, objectUrl: URL.createObjectURL(image), blob: image })
+      this.dressTile(this.rowId(id))
       reads.push(() => this.extract({ image, filename: file.name }, file.name, id))
     }
     this.run(reads)
@@ -433,6 +438,13 @@ export default class extends Controller {
     return tile
   }
 
+  // The tile is stood up before the downscale that gives it a picture to show, so the
+  // thumbnail lands when there is one rather than by holding the whole strip back for it.
+  dressTile(rowId) {
+    const tile = this.stripTarget.querySelector(`[data-row="${rowId}"] [data-state="pending"]`)
+    tile?.replaceChildren(this.thumbnail(this.sources.get(rowId)))
+  }
+
   settleEmpty(id) {
     const pending = this.stripTarget.querySelector(`[data-row="${this.rowId(id)}"] [data-state="pending"]`)
     if (pending) this.markTile(pending, "failed")
@@ -458,7 +470,7 @@ export default class extends Controller {
     tile.dataset.state = state
     tile.querySelector(".ph")?.remove()
     const mark = document.createElement("span")
-    mark.className = state === "published" ? "ph ph-check-circle" : "ph ph-x"
+    mark.className = `ph ${TILE_MARKS[state]}`
     mark.setAttribute("aria-hidden", "true")
     tile.appendChild(mark)
   }

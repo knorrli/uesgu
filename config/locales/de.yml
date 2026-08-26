@@ -145,7 +145,7 @@ de:
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
     staging:
       drop_label: Poster hierhin ziehen oder antippen
-      add_text: Text hinzufügen
+      add_text: Noch einen Text hinzufügen
       add_by_hand: Von Hand eingeben
       by_hand: Von Hand eingegeben
       commit: Auslesen

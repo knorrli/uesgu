@@ -145,7 +145,7 @@ fr:
     text_hint: D'un chat, d'une newsletter, peu importe.
     staging:
       drop_label: Dépose tes affiches ici, ou touche pour choisir
-      add_text: Ajouter le texte
+      add_text: Ajouter un autre texte
       add_by_hand: Saisir à la main
       by_hand: Saisi à la main
       commit: Lire

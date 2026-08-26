@@ -465,9 +465,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   # the same publish.
   test "an event entered by hand becomes an empty card and publishes like any other" do
     visit capture_path
-    find("button[data-action='capture#stageBlank']").click
-    assert_selector ".drop-zone__item"
-    commit
+    by_hand
 
     assert_selector ".capture-card"
     assert_equal "", field_value("title")
@@ -487,15 +485,26 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorp Fest", Event.last.title
   end
 
-  test "a hand-entered event stages alongside a poster and commits with it" do
+  # Entering by hand is a way OFF the picker, so it takes the batch with it rather than
+  # stranding staged posters behind a screen that is about to be hidden. The blank goes
+  # first because it lands at once and a read does not — it is the card being waited for.
+  test "entering by hand sends what was already staged and opens the blank card first" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
     stage "poster.png"
-    find("button[data-action='capture#stageBlank']").click
-    assert_selector ".drop-zone__item", count: 2
-    commit
+    by_hand
 
     assert_selector ".capture-card", count: 2, visible: :all
+    assert_equal "", field_value("title")
+  end
+
+  # The whole point of the button: no chip, no second press, no batch to commit.
+  test "entering by hand opens the form without staging anything" do
+    visit capture_path
+    by_hand
+
+    assert_selector ".capture-card"
+    assert_no_selector ".drop-zone__item"
   end
 
   # The third option beside publish and drop. The flags are what make it more than a
@@ -559,9 +568,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   # There is no input to read again, so offering it would be a button that cannot work.
   test "a hand-entered card is not offered a re-read" do
     visit capture_path
-    find("button[data-action='capture#stageBlank']").click
-    assert_selector ".drop-zone__item"
-    commit
+    by_hand
 
     assert_selector ".capture-card"
     assert_no_selector ".capture-card .card-aside button[data-action='capture#reread']"
@@ -787,6 +794,40 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-row__excerpt", text: "Zorpcore Nacht, Zorpsaal, 20 Uhr"
   end
 
+  # A single paste is the whole batch often enough that the chip in between was a step
+  # with nothing to show for it — the box itself says a text is about to be read.
+  test "text in the box arms the commit without being staged" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    assert commit_disabled?
+
+    type_text "Zorpcore Nacht, Zorpsaal, 20 Uhr"
+
+    assert_not commit_disabled?
+    assert_no_selector ".drop-zone__item"
+  end
+
+  test "emptying the box disarms the commit again" do
+    visit capture_path
+    type_text "Z"
+    assert_not commit_disabled?
+
+    find(".capture-picker textarea").send_keys(:backspace)
+    assert commit_disabled?
+  end
+
+  # The commit stages the box on the way out, so a text that is already a chip and a
+  # second one still being typed are two inputs — not the same one sent twice.
+  test "a staged text and one left in the box commit as one batch of two" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    stage_text "Zorpcore Matinee, Zorpsaal"
+    type_text "Zorpcore Nacht, Zorpsaal, 20 Uhr"
+    commit
+
+    assert_selector ".capture-card", count: 2, visible: :all
+  end
+
   test "an unreadable file is caught at staging and never joins the committed batch" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -926,6 +967,10 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def commit = find("button[data-action='capture#commit']").click
 
+  def by_hand = find("button[data-action='capture#byHand']").click
+
+  def commit_disabled? = find("button[data-action='capture#commit']").disabled?
+
   # A filename is the one source label that is not truncated on the way in, so the
   # overflow case needs a real file carrying a real long name.
   def stage_as(name)
@@ -941,10 +986,13 @@ class CaptureScreenTest < ApplicationSystemTestCase
     commit
   end
 
+  # The one-paste flow: text in the box arms the commit by itself, no chip in between.
   def paste(text)
-    stage_text(text)
+    type_text(text)
     commit
   end
+
+  def type_text(text) = find(".capture-picker textarea").set(text)
 
   def accept = find(".capture-card .action-bar input[type=submit]").click
 

@@ -82,9 +82,15 @@
   border-bottom: var(--border-width) solid var(--rule-color);
 }
 
-/* Full width and below the rule under the picker: the one commit for everything
-   staged above it, not a button belonging to the text field it used to sit beside. */
-.capture-commit {
+/* The two ways off the picker, stacked and both full width so neither reads as a
+   button belonging to the field above it. */
+.capture-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
+}
+
+.capture-actions > button {
   width: 100%;
 }
 

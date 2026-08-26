@@ -45,18 +45,25 @@
       <label class="flex flex-col gap-small">
         <span class="field-label"><%= t('capture.text_label') %></span>
         <p class="muted"><%= t('capture.text_hint') %></p>
-        <textarea rows="4" data-capture-target="text"></textarea>
+        <textarea rows="4" data-capture-target="text"
+                  data-action="input->capture#refreshCommit"></textarea>
       </label>
-      <div class="flex gap-small wrap">
+      <%# Only for building a batch of several. One paste needs no button — text in the
+          box arms the commit by itself (see capture_controller.js). %>
+      <div class="flex">
         <button type="button" class="button-small" data-action="capture#stageText"><%= t('capture.staging.add_text') %></button>
-        <button type="button" class="button-small button-ghost" data-action="capture#stageBlank"><%= t('capture.staging.add_by_hand') %></button>
       </div>
     </div>
 
-    <%# Below the picker and full width, so it reads as the one commit for everything
-        above it rather than as a second button belonging to the text field. %>
-    <button type="button" class="button primary capture-commit" data-capture-target="commit"
-            data-action="capture#commit" disabled><%= t('capture.staging.commit') %></button>
+    <%# Below the picker and full width: the one commit for everything staged above it,
+        and under it the alternative to having a source to read at all. Stacked and both
+        the same width because they are the two ways off this screen — hollow against
+        filled is what says which one is the commit. %>
+    <div class="capture-actions">
+      <button type="button" class="button primary" data-capture-target="commit"
+              data-action="capture#commit" disabled><%= t('capture.staging.commit') %></button>
+      <button type="button" class="button" data-action="capture#byHand"><%= t('capture.staging.add_by_hand') %></button>
+    </div>
   </div>
 
   <%# Every genre the picker offers, once for the whole page. A card clones this into

@@ -894,11 +894,16 @@ class CaptureScreenTest < ApplicationSystemTestCase
     find(".capture-card [name=title]").click
   end
 
-  # Picking sends: the picker is gone by the time the input has taken the files, so
-  # every helper waits on the screen having changed rather than on a staged item.
+  # The picker is hidden synchronously in the change handler — leavePicker() is the
+  # first statement of readImages, before the first await — so waiting on it being gone
+  # waits for nothing, and the line after would inherit the whole read inside one
+  # default_max_wait_time. Waiting on the pending copy clearing absorbs the canvas
+  # encode, the upload and the extraction here instead. The TEXT, not the element: an
+  # undecodable file keeps its row and overwrites that copy with the reason.
   def pick(*names)
     find(".drop-zone__input", visible: :all).set(names.map { |name| file_fixture(name) })
-    assert_no_selector ".capture-picker", wait: 5
+    assert_selector ".capture-row", count: names.size, wait: 5
+    assert_no_selector "[data-pending]", text: copy("row.pending"), wait: 5
   end
 
   # A filename is the one source label that is not truncated on the way in, so the
@@ -908,7 +913,8 @@ class CaptureScreenTest < ApplicationSystemTestCase
     FileUtils.cp(file_fixture("poster.png"), path)
     @staged_paths << path
     find(".drop-zone__input", visible: :all).set([path])
-    assert_no_selector ".capture-picker", wait: 5
+    assert_selector ".capture-row", count: 1, wait: 5
+    assert_no_selector "[data-pending]", text: copy("row.pending"), wait: 5
   end
 
   def paste(text)

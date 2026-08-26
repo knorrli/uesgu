@@ -76,16 +76,6 @@
   padding-bottom: calc(var(--gap-small) + var(--safe-bottom) + 3.5rem);
 }
 
-/* Flashes come from the top while a card is open: a publish raises one, and the
-   region's usual bottom anchor drops it straight onto the action bar — where it covers
-   the two buttons the next card needs and, being pointer-events:auto, eats taps on them
-   for the length of the animation. */
-.capture-reviewing .flashes {
-  top: 0;
-  bottom: auto;
-  padding-top: var(--gap-small);
-}
-
 
 .capture-picker {
   padding-bottom: var(--gap-medium);

@@ -77,6 +77,18 @@
 /* Larger specimen text (e.g. icon-size demos). */
 .sg-specimen--lg { font-size: 1.4rem; }
 
+/* A review card divides the height it is handed between its panes, so the stage has to
+   both carry a height and make the card take it. Left to size itself the specimen would
+   show the fallback arrangement instead of the one the app renders. */
+.sg-specimen--review-card {
+  display: block;
+  height: 32rem;
+}
+
+.sg-specimen--review-card > .review-card {
+  height: 100%;
+}
+
 .sg-spec {
   font-size: var(--font-size-small);
 }

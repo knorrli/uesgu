@@ -731,6 +731,16 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue__tile[data-state=pending]"
   end
 
+  # The row stops repeating it while the read is in flight, so the strip is where a
+  # contributor still finds out which input a tile stands for.
+  test "the tile names the input the row no longer does" do
+    CannedExtractionClient.install(events: [])
+    visit capture_path
+    pick "poster.png"
+
+    assert_selector ".capture-queue__tile[aria-label='poster.png']"
+  end
+
   test "a failed extraction reaches the strip rather than only the rows list" do
     CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
     visit capture_path
@@ -749,7 +759,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-card", text: "poster.png"
   end
 
-  test "a long source name stays on one line while its row is still reading" do
+  test "a long source name stays on one line on the row that failed to read it" do
     CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
     visit capture_path
     pick_as "Zorpcore-Nacht-im-Zorpsaal-Zorpwil-mit-Vorband-und-allem-Drum-und-Dran-final-v3.png"

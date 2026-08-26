@@ -52,8 +52,17 @@ export default class extends Controller {
   }
 
   disconnect() {
+    this.reviewing(false)
     this.release(this.sources)
     this.release(this.staged)
+  }
+
+  // Bounding the screen to the viewport is what gives the open card a height to divide
+  // between its poster and its fields (see capture.css). On <html> because that is where
+  // the rule that stops the scroll has to land — from <body> it only propagates, and the
+  // propagated form still scrolls when something calls scrollIntoView.
+  reviewing(on) {
+    document.documentElement.classList.toggle("capture-reviewing", on)
   }
 
   release(held) {
@@ -183,6 +192,7 @@ export default class extends Controller {
     this.rowsTarget.replaceChildren()
     this.stripTarget.replaceChildren()
     this.stripTarget.hidden = true
+    this.reviewing(false)
     this.currentId = null
     this.restartTarget.hidden = true
     this.inputTarget.hidden = false
@@ -235,6 +245,7 @@ export default class extends Controller {
   // queue of one.
   cardTargetConnected(card) {
     this.stripTarget.hidden = false
+    this.reviewing(true)
     this.announceFound()
     this.placeCard(card)
     card.hidden = card.id !== this.currentId
@@ -306,10 +317,20 @@ export default class extends Controller {
   open(id) {
     this.currentId = id
     this.cardTargets.forEach((card) => {
-      card.hidden = card.id !== id
-      this.stockGenres(card, card.id === id)
+      const current = card.id === id
+      card.hidden = !current
+      this.stockGenres(card, current)
+      if (current) this.rewind(card)
     })
     this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === id) })
+  }
+
+  // Cards share one slot, so an arriving card inherits wherever the last one was left
+  // — which after a decision is the bottom of a form, putting this card's title and the
+  // shows it may duplicate above the top of the pane.
+  rewind(card) {
+    const body = card.querySelector(".review-card__body")
+    if (body) body.scrollTop = 0
   }
 
   // The genre vocabulary lives once in the page and is lent to whichever card is open.
@@ -342,10 +363,20 @@ export default class extends Controller {
   // turbo:submit-end fires for a refusal too, and that response is the stream putting
   // the reason on a card the contributor is still looking at — so only a landed
   // publish decides one.
-  decided(event) {
+  async decided(event) {
     if (!event.detail.success) return
 
+    // Read off the RESPONSE rather than the card, for the reason `extract` does: Turbo
+    // applies the stream on the next animation frame, so the receipt is not on the card
+    // yet — and by the time it is, the next card has taken the slot and hidden it. The
+    // flash is the only place a decision that is already gone still shows.
+    const receipt = this.receiptIn(await event.detail.fetchResponse.responseText)
+    if (receipt) this.flash(receipt)
     this.settle(event.target.closest(".capture-card"), "published")
+  }
+
+  receiptIn(stream) {
+    return this.streamed(stream)?.querySelector(".capture-card__status--published")?.textContent.trim() ?? null
   }
 
   reject(event) {

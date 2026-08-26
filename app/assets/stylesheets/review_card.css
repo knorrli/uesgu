@@ -1,22 +1,27 @@
 /* One thing being judged, with the evidence that settles it on screen at the same
    time. Specimen in /styleguide.
 
-   The source pane and the action bar are sticky because the job is a comparison: a
-   source that scrolls away turns "does this poster really say 20:00" back into
-   remembering. Both need an opaque ground — the body scrolls underneath them. */
+   The card DIVIDES its height rather than stacking: the source pane and the action bar
+   hold still and only the fields move, because the job is a comparison and a source
+   that scrolls away turns "does this poster really say 20:00" back into remembering.
+   It has to be given a definite height to divide — the capture screen bounds itself to
+   the viewport to supply one (see capture.css). Without one the panes fall back to their
+   natural heights and nothing scrolls. */
 .review-card {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   padding-bottom: var(--gap-small);
   border-top: var(--border-width) solid var(--border-color);
 }
 
+/* A share of the CARD, not of the viewport: by the time the header, the queue and the
+   decision bar have taken theirs, a poster measured against the whole screen leaves the
+   fields a slot too short to fill in. Shrinks before the fields do. */
 .review-card__source {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  max-height: 38vh;
+  flex: 0 1 38%;
   overflow: hidden;
-  background: var(--theme-bg-color);
   padding-block: var(--gap-small);
 }
 
@@ -26,7 +31,8 @@
 
 .review-card__source img {
   width: auto;
-  max-height: calc(38vh - 2 * var(--gap-small));
+  max-width: 100%;
+  max-height: 100%;
   border: var(--border-width) solid var(--border-color);
 }
 
@@ -34,8 +40,18 @@
   cursor: zoom-in;
 }
 
+/* min-height because a flex item's floor is its own content: without it the fields
+   push the action bar off the bottom of a bounded card instead of scrolling. */
+.review-card__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 /* Full-bleed: the small print on a poster is the reason to look at it at all, and
-   a pane sized to sit beside the fields cannot show it. */
+   a pane sized to sit beside the fields cannot show it. Opaque because it covers the
+   card rather than replacing it. */
 .review-card__source--zoomed {
   position: fixed;
   inset: 0;
@@ -43,6 +59,7 @@
   display: grid;
   place-items: center;
   max-height: none;
+  background: var(--theme-bg-color);
   padding: var(--gap-small) var(--gap-small) calc(var(--gap-small) + var(--safe-bottom));
   cursor: zoom-out;
 }
@@ -90,18 +107,15 @@
   gap: var(--gap-small);
 }
 
-/* Pinned to the bottom edge so it stays in thumb reach however long the field list
-   runs. The last action is pushed to the far end: a dismissal sitting next to the
-   commit is one mis-tap away from being it. */
+/* The card's last row, so it stays in thumb reach however long the field list runs.
+   The last action is pushed to the far end: a dismissal sitting next to the commit is
+   one mis-tap away from being it. */
 .action-bar {
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: var(--gap-small);
   padding-block: var(--gap-small) calc(var(--gap-small) + var(--safe-bottom));
-  background: var(--theme-bg-color);
   border-top: var(--border-width) solid var(--rule-color);
 }
 
@@ -109,28 +123,23 @@
   margin-left: auto;
 }
 
-/* The same relationship rotated: source pinned left, fields scrolling right, the
-   decision across the bottom of both. */
+/* The same relationship rotated: source left, fields scrolling right, the decision
+   across the bottom of both. The body's row is bounded so it, and not the card, is
+   what grows a scrollbar. */
 @media (min-width: 900px) {
   .review-card {
     display: grid;
     grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas:
       "source body"
       "actions actions";
     column-gap: var(--gap-large);
-    align-items: start;
   }
 
   .review-card__source {
     grid-area: source;
-    top: var(--gap-small);
-    max-height: none;
     margin-bottom: 0;
-  }
-
-  .review-card__source img {
-    max-height: 70vh;
   }
 
   .review-card__body {

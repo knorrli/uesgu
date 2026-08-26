@@ -2,6 +2,91 @@
    Deliberately plain — every box on it is something a human is about to correct.
    The card frame itself is shared: see review_card.css. */
 
+/* Reviewing bounds the screen to the viewport instead of letting it run on as a
+   document. That is what gives the open card a definite height to divide, so the
+   poster can hold still ABOVE the fields rather than being pinned over them with the
+   fields passing behind it (see review_card.css). Set on <html> by
+   app/javascript/controllers/capture_controller.js.
+
+   On <html> and not <body>, and `clip` rather than `hidden`, because both weaker forms
+   leave the surface shovable: a hidden viewport still scrolls programmatically, so one
+   scrollIntoView — which is what a phone does when the keyboard covers a focused field
+   — slides the whole screen up with no user scroll left to bring it back.
+
+   dvh, and min-height as well as height, because the base rule's `min-height: 100vh` is
+   the LARGE viewport on a phone, taller than the visible one, and a min-height beats a
+   height: left alone it holds the screen open behind the browser chrome. */
+.capture-reviewing {
+  height: 100dvh;
+  overflow: clip;
+}
+
+.capture-reviewing body {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: clip;
+}
+
+/* `flex: 1` overrides the shrink the base rule refuses (`flex: 1 0 auto`), which would
+   otherwise hold main open at its content height and hand the overflow straight back.
+   The padding goes for the reason the column's gap below does: every pixel the frame
+   keeps is one the fields lose, and at 393x844 the page's usual rhythm costs ~100px of
+   a pane that has ~280 to give. */
+.capture-reviewing main.content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding-block: 0;
+}
+
+/* Unreachable once the page has no scroll of its own. */
+.capture-reviewing .site-footer {
+  display: none;
+}
+
+.capture-reviewing .capture {
+  flex: 1;
+  min-height: 0;
+  gap: var(--gap-medium);
+}
+
+.capture-reviewing .capture-rows {
+  flex: 1;
+  min-height: 0;
+}
+
+/* The rows stop being boxes so the open card is a direct child of the column. A row
+   whose cards have all been decided is empty but still a flex item, and the column's
+   gap for each one adds up to a card pushed off the bottom of the screen. A row that
+   never produced a card keeps its own contents — it is the only place its failure is
+   written. */
+.capture-reviewing .capture-row {
+  display: contents;
+}
+
+.capture-reviewing .capture-card {
+  flex: 1;
+  min-height: 0;
+}
+
+/* The cookie notice is fixed to the bottom edge, and reviewing leaves no page scroll to
+   carry the decision bar clear of it — unreserved, it sits on top of the two buttons the
+   card exists for. The same 3.5rem the footer reserves on a scrolling page. */
+.capture-reviewing:has(.cookie-notice:not([hidden])) .action-bar {
+  padding-bottom: calc(var(--gap-small) + var(--safe-bottom) + 3.5rem);
+}
+
+/* Flashes come from the top while a card is open: a publish raises one, and the
+   region's usual bottom anchor drops it straight onto the action bar — where it covers
+   the two buttons the next card needs and, being pointer-events:auto, eats taps on them
+   for the length of the animation. */
+.capture-reviewing .flashes {
+  top: 0;
+  bottom: auto;
+  padding-top: var(--gap-small);
+}
+
+
 .capture-picker {
   padding-bottom: var(--gap-medium);
   border-bottom: var(--border-width) solid var(--rule-color);

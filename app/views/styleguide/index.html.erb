@@ -661,12 +661,14 @@
 
   <section class="sg-section" id="review-card">
     <h2>Review card</h2>
-    <p class="sg-section__intro">One thing being judged, with the evidence that settles it and the decision itself on screen at the same time — the shape the capture queue uses to review an extracted event. The source pane is pinned (above the fields on a phone, left of them from 900px) and the action bar is pinned to the bottom edge, because the job is a <b>comparison</b>: a source that scrolls away turns "does this poster really say 20:00" back into remembering.</p>
+    <p class="sg-section__intro">One thing being judged, with the evidence that settles it and the decision itself on screen at the same time — the shape the capture queue uses to review an extracted event. The card <b>divides</b> the height it is given: the source holds still (above the fields on a phone, left of them from 900px), the decision sits across the bottom, and only the fields scroll — in a pane of their own, so nothing ever passes behind the source. The job is a <b>comparison</b>, and a source that scrolls away turns "does this poster really say 20:00" back into remembering.</p>
 
     <div class="sg-row sg-row--stack">
-      <div class="sg-specimen">
+      <div class="sg-specimen sg-specimen--review-card">
         <%# The real partials. The pane normally holds evidence the browser never
-            uploaded, so this specimen stands an app icon in its place. %>
+            uploaded, so this specimen stands an app icon in its place. The stage is
+            given a height because the card divides one — the app only ever renders it
+            inside something that has one. %>
         <%= render layout: "shared/review_card",
               locals: { id: "sg-review-card", source: image_tag("/icon.png", alt: ""),
                         actions: render(layout: "shared/action_bar") {

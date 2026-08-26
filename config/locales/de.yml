@@ -143,13 +143,11 @@ de:
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
-    staging:
+    picker:
       drop_label: Poster hierhin ziehen oder antippen
-      add_text: Noch einen Text hinzufügen
       add_by_hand: Von Hand eingeben
       by_hand: Von Hand eingegeben
-      commit: Auslesen
-      remove: Entfernen
+      read_text: Auslesen
       start_over: Abbrechen und neu starten
     queue:
       label: Warteschlange

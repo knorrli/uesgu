@@ -1,6 +1,5 @@
-/* Staging surface for files and pasted text: what is about to be read, before
-   anything is sent. The dashed edge is the one place on the site that draws a
-   drop target, so it is not shared with the field skin in controls.css. */
+/* The file picker, drawn as a drop target. The dashed edge is the one place on the
+   site that draws one, so it is not shared with the field skin in controls.css. */
 
 .drop-zone {
   position: relative;
@@ -51,75 +50,4 @@
 .drop-zone:has(.drop-zone__input:focus-visible) .drop-zone__target {
   outline: var(--border-width) solid var(--focus-ring);
   outline-offset: 2px;
-}
-
-.drop-zone__items {
-  display: flex;
-  flex-wrap: wrap;
-  /* Natural heights: an undecodable item runs two lines, and stretching would pull
-     the fixed-size thumbnails beside it out of shape. */
-  align-items: flex-start;
-  gap: var(--gap-small);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.drop-zone__item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--gap-xsmall);
-  max-width: 100%;
-  border: var(--border-width) solid var(--border-color);
-  background: var(--theme-bg-muted);
-}
-
-/* A staged image is its own label; a pasted text has no picture, so it stages as a
-   chip carrying the head of the text instead. */
-.drop-zone__item img {
-  width: 3.25rem;
-  height: 3.25rem;
-  object-fit: cover;
-}
-
-.drop-zone__snippet {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  padding: var(--gap-xsmall) var(--gap-small);
-  max-width: 14rem;
-  font-size: var(--font-size-small);
-}
-
-.drop-zone__snippet > span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.drop-zone__item[data-state="undecodable"] {
-  border-color: var(--theme-warn-color);
-}
-
-/* The one line here worth wrapping: truncated, the reason stops saying what to do
-   about the file. */
-.drop-zone__snippet > .drop-zone__reason {
-  white-space: normal;
-  color: var(--theme-warn-color);
-}
-
-/* Out-specifies the boxed <button> base rather than relying on stylesheet order. */
-button.drop-zone__remove {
-  flex: 0 0 auto;
-  align-self: stretch;
-  padding: 0 var(--gap-xsmall);
-  border: none;
-  border-radius: 0;
-  background: none;
-  color: var(--theme-fg-muted);
-}
-
-button.drop-zone__remove:hover {
-  color: var(--theme-warn-color);
 }

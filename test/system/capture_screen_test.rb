@@ -471,7 +471,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "", field_value("title")
     assert_equal "", field_value("locality")
     # No poster to show, so the pane says why it is empty rather than looking broken.
-    assert_selector ".review-card__source", text: I18n.t("capture.staging.by_hand", locale: :de)
+    assert_selector ".review-card__source", text: I18n.t("capture.picker.by_hand", locale: :de)
 
     type "title", "Zorp Fest"
     type "date", show_date.to_s
@@ -483,19 +483,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
       assert_published
     end
     assert_equal "Zorp Fest", Event.last.title
-  end
-
-  # Entering by hand is a way OFF the picker, so it takes the batch with it rather than
-  # stranding staged posters behind a screen that is about to be hidden. The blank goes
-  # first because it lands at once and a read does not — it is the card being waited for.
-  test "entering by hand sends what was already staged and opens the blank card first" do
-    CannedExtractionClient.install(events: [poster_event])
-    visit capture_path
-    stage "poster.png"
-    by_hand
-
-    assert_selector ".capture-card", count: 2, visible: :all
-    assert_equal "", field_value("title")
   end
 
   # The whole point of the button: no chip, no second press, no batch to commit.
@@ -707,9 +694,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   test "a place typed on one input stays on it rather than reaching the next input's cards" do
     CannedExtractionClient.install(events: [poster_event(locality: nil, canton: nil)])
     visit capture_path
-    stage "poster.png"
-    stage_text "Zorpcore Nacht, Zorpsaal"
-    commit
+    pick "poster.png", "flyer.png"
     assert_selector ".capture-card", count: 2, visible: :all
 
     type "locality", "Zorpwil"
@@ -720,9 +705,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   test "the strip states the whole batch from the moment it is sent" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
-    stage "poster.png"
-    stage_text "Zorpcore Matinee, Zorpsaal"
-    commit
+    pick "poster.png", "flyer.png"
 
     assert_selector ".capture-queue__group", count: 2
     assert_selector ".capture-queue__tile", count: 2
@@ -769,8 +752,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   test "a long source name stays on one line while its row is still reading" do
     CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
     visit capture_path
-    stage_as "Zorpcore-Nacht-im-Zorpsaal-Zorpwil-mit-Vorband-und-allem-Drum-und-Dran-final-v3.png"
-    commit
+    pick_as "Zorpcore-Nacht-im-Zorpsaal-Zorpwil-mit-Vorband-und-allem-Drum-und-Dran-final-v3.png"
 
     label = find(".capture-row__label")
     assert_equal "nowrap", label.style("white-space")["white-space"]
@@ -794,74 +776,29 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-row__excerpt", text: "Zorpcore Nacht, Zorpsaal, 20 Uhr"
   end
 
-  # A single paste is the whole batch often enough that the chip in between was a step
-  # with nothing to show for it — the box itself says a text is about to be read.
-  test "text in the box arms the commit without being staged" do
-    CannedExtractionClient.install(events: [poster_event])
+  # Picking files ends on a dialog closing and dropping them ends on a drag; typing ends
+  # on nothing, which is why the text field is the only entry point with a button.
+  test "the read button is dead until there is text to read" do
     visit capture_path
-    assert commit_disabled?
+    assert read_disabled?
 
-    type_text "Zorpcore Nacht, Zorpsaal, 20 Uhr"
-
-    assert_not commit_disabled?
-    assert_no_selector ".drop-zone__item"
-  end
-
-  test "emptying the box disarms the commit again" do
-    visit capture_path
     type_text "Z"
-    assert_not commit_disabled?
+    assert_not read_disabled?
 
     find(".capture-picker textarea").send_keys(:backspace)
-    assert commit_disabled?
+    assert read_disabled?
   end
 
-  # The commit stages the box on the way out, so a text that is already a chip and a
-  # second one still being typed are two inputs — not the same one sent twice.
-  test "a staged text and one left in the box commit as one batch of two" do
+  # Nothing is held back to be sent later, so a file no browser can decode has to fail
+  # where it lands — on its own row, named — rather than as a chip that never went.
+  test "a file no browser can decode fails its own row and lets the rest of the pick land" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
-    stage_text "Zorpcore Matinee, Zorpsaal"
-    type_text "Zorpcore Nacht, Zorpsaal, 20 Uhr"
-    commit
+    pick "broken.png", "poster.png"
 
-    assert_selector ".capture-card", count: 2, visible: :all
-  end
-
-  test "an unreadable file is caught at staging and never joins the committed batch" do
-    CannedExtractionClient.install(events: [poster_event])
-    visit capture_path
-    stage "broken.png", "poster.png"
-
-    assert_selector ".drop-zone__item[data-state=undecodable]", text: "broken.png"
-    assert_selector ".drop-zone__item[data-state=undecodable]", text: copy("failures.image_unsupported")
-    commit
+    assert_selector ".capture-row", text: "broken.png"
+    assert_selector ".capture-row", text: copy("failures.image_unsupported")
     assert_selector ".capture-card", count: 1, visible: :all
-    assert_no_selector ".capture-row", text: copy("failures.image_unsupported")
-  end
-
-  test "posters and a pasted text commit as one batch" do
-    CannedExtractionClient.install(events: [poster_event])
-    visit capture_path
-    stage "poster.png"
-    stage_text "Zorpcore Matinee, Zorpsaal"
-
-    assert_no_selector ".capture-row"
-    commit
-    assert_selector ".capture-card", count: 2, visible: :all
-  end
-
-  test "a staged item can be removed before the batch is sent" do
-    CannedExtractionClient.install(events: [poster_event])
-    visit capture_path
-    stage "poster.png"
-    stage_text "Zorpcore Matinee, Zorpsaal"
-
-    all(".drop-zone__remove").first.click
-    assert_selector ".drop-zone__item", count: 1
-    commit
-    assert_selector ".capture-card", count: 1, visible: :all
-    assert_selector ".capture-row__excerpt", text: "Zorpcore Matinee, Zorpsaal"
   end
 
   test "the input step is gone while cards are being decided, and start over brings it back" do
@@ -898,13 +835,19 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector "h1", text: copy("review.title", count: 2)
   end
 
-  test "nothing is sent until the batch is committed" do
+  # The whole reason nothing is staged: there is no need to assemble a batch when
+  # deciding one hands the picker straight back for the next.
+  test "a finished batch hands back a picker that reads another input" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
-    stage "poster.png"
+    pick "poster.png"
+    reject
+    assert_selector ".capture-picker"
 
-    assert_no_selector ".capture-row", visible: :all
-    assert_no_selector ".capture-card", visible: :all
+    paste "Zorpcore Matinee, Zorpsaal"
+
+    assert_selector ".capture-card"
+    assert_selector ".capture-row__excerpt", text: "Zorpcore Matinee, Zorpsaal"
   end
 
   test "a refused request fails the row rather than leaving it pending forever" do
@@ -951,48 +894,35 @@ class CaptureScreenTest < ApplicationSystemTestCase
     find(".capture-card [name=title]").click
   end
 
-  # Staging is silent, so every helper that stages waits for the item to appear before
-  # the next step: without it a commit can fire before an async downscale has landed.
-  def stage(*names)
+  # Picking sends: the picker is gone by the time the input has taken the files, so
+  # every helper waits on the screen having changed rather than on a staged item.
+  def pick(*names)
     find(".drop-zone__input", visible: :all).set(names.map { |name| file_fixture(name) })
-    assert_selector ".drop-zone__item", count: names.size, wait: 5
+    assert_no_selector ".capture-picker", wait: 5
   end
-
-  def stage_text(text)
-    staged = all(".drop-zone__item").size
-    find(".capture-picker textarea").set(text)
-    find("button[data-action='capture#stageText']").click
-    assert_selector ".drop-zone__item", count: staged + 1
-  end
-
-  def commit = find("button[data-action='capture#commit']").click
-
-  def by_hand = find("button[data-action='capture#byHand']").click
-
-  def commit_disabled? = find("button[data-action='capture#commit']").disabled?
 
   # A filename is the one source label that is not truncated on the way in, so the
   # overflow case needs a real file carrying a real long name.
-  def stage_as(name)
+  def pick_as(name)
     path = Rails.root.join("tmp", name)
     FileUtils.cp(file_fixture("poster.png"), path)
     @staged_paths << path
     find(".drop-zone__input", visible: :all).set([path])
-    assert_selector ".drop-zone__item", wait: 5
+    assert_no_selector ".capture-picker", wait: 5
   end
 
-  def pick(*names)
-    stage(*names)
-    commit
-  end
-
-  # The one-paste flow: text in the box arms the commit by itself, no chip in between.
   def paste(text)
     type_text(text)
-    commit
+    read_text
   end
 
   def type_text(text) = find(".capture-picker textarea").set(text)
+
+  def read_text = find("button[data-action='capture#readText']").click
+
+  def by_hand = find("button[data-action='capture#byHand']").click
+
+  def read_disabled? = find("button[data-action='capture#readText']").disabled?
 
   def accept = find(".capture-card .action-bar input[type=submit]").click
 
@@ -1012,8 +942,12 @@ class CaptureScreenTest < ApplicationSystemTestCase
   # the publish has landed.
   def assert_published(count = 1) = assert_selector(".flash", text: copy("queue.done", count: count))
 
-  # The strip is the only way onto a card that has not been decided yet.
-  def jump_to(index) = all(".capture-queue__tile")[index].click
+  # The strip is the only way onto a card that has not been decided yet. Waits for the
+  # tile to exist: reads land one at a time, and `all` does not wait for a count.
+  def jump_to(index)
+    assert_selector ".capture-queue__tile", minimum: index + 1
+    all(".capture-queue__tile")[index].click
+  end
 
   # A name nothing matches empties the list, and waiting for that is what makes the
   # Enter land after the filter has run rather than before it, without a sleep.

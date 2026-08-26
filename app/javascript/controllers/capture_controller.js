@@ -17,7 +17,7 @@ const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
-  static targets = ["files", "text", "zone", "items", "commit", "input", "restart",
+  static targets = ["files", "text", "zone", "read", "input", "restart",
                     "rows", "strip", "card", "source", "stagingTitle", "reviewTitle",
                     "reviewHint", "genreOptions"]
   static values = {
@@ -26,7 +26,6 @@ export default class extends Controller {
     pending: String,
     error: String,
     undecodable: String,
-    remove: String,
     sourceAlt: String,
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 },
@@ -44,7 +43,6 @@ export default class extends Controller {
   // has to outlive the turbo-stream that replaces the whole row.
   initialize() {
     this.sources = new Map()
-    this.staged = new Map()
     this.places = new Map()
     this.inputs = new Map()
     this.rereads = new Map()
@@ -54,7 +52,6 @@ export default class extends Controller {
   disconnect() {
     this.reviewing(false)
     this.release(this.sources)
-    this.release(this.staged)
   }
 
   // Bounding the screen to the viewport is what gives the open card a height to divide
@@ -70,9 +67,9 @@ export default class extends Controller {
     held.clear()
   }
 
-  stageFiles() {
-    this.stageAll(Array.from(this.filesTarget.files))
-    // Cleared so that re-picking the same file after removing it still fires `change`.
+  readFiles() {
+    this.readImages(Array.from(this.filesTarget.files))
+    // Cleared so that re-picking the same file still fires `change`.
     this.filesTarget.value = ""
   }
 
@@ -90,86 +87,63 @@ export default class extends Controller {
   dropFiles(event) {
     event.preventDefault()
     this.zoneTarget.classList.remove("is-over")
-    this.stageAll(Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/")))
+    this.readImages(Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/")))
   }
 
-  async stageAll(files) {
-    for (const file of files) await this.stageImage(file)
-  }
+  // Every row is stood up before the first read starts, so the strip states the whole
+  // count from the moment the picker closes rather than growing as slots free up. A file
+  // no browser can decode (a HEIC out of Finder, anything corrupt) fails its own row
+  // here, while the filename is still what identifies it.
+  //
+  // The blob the request carries is the same one the card's source pane paints from:
+  // nothing is re-derived, and nothing but that EXIF-stripped copy ever leaves the
+  // device (see downscale).
+  async readImages(files) {
+    if (files.length === 0) return
 
-  // Downscaled here rather than at send time because the shrunk blob is what the
-  // thumbnail shows — and so a file no desktop browser can decode (a HEIC out of
-  // Finder, anything corrupt) is caught while the batch can still be edited, instead
-  // of landing as a dead row after it is sent.
-  async stageImage(file) {
-    const id = crypto.randomUUID()
-    try {
-      const image = await this.downscale(file)
-      this.staged.set(id, { name: file.name, blob: image, objectUrl: URL.createObjectURL(image) })
-    } catch {
-      this.staged.set(id, { name: file.name, error: this.undecodableValue })
+    this.leavePicker()
+    const reads = []
+    for (const file of files) {
+      const id = crypto.randomUUID()
+      this.appendPending(id, file.name)
+      const image = await this.downscale(file).catch(() => null)
+      if (!image) {
+        this.failRow(id, this.undecodableValue)
+        continue
+      }
+
+      this.remember(this.rowId(id), id, { label: file.name, objectUrl: URL.createObjectURL(image), blob: image })
+      reads.push(() => this.extract({ image, filename: file.name }, file.name, id))
     }
-    this.appendStaged(id)
+    this.run(reads)
   }
 
-  stageText() {
+  // Picking files closes a dialog and dropping them ends a drag; typing ends in nothing,
+  // so the one press on this screen belongs to the text field alone.
+  readText() {
     const text = this.pendingText
     if (text === "") return
 
     const id = crypto.randomUUID()
-    this.staged.set(id, { name: text.slice(0, 40), text })
+    const label = text.slice(0, 40)
     this.textTarget.value = ""
-    this.appendStaged(id)
+    this.refreshRead()
+    this.leavePicker()
+    this.remember(this.rowId(id), id, { label, text })
+    this.extract({ text }, label, id)
   }
 
-  // A hand-entered event has no source to read, so there is nothing for it to wait in a
-  // batch for: pressing the button IS the commit. Anything already staged rides along
-  // rather than being stranded in a picker that is about to be hidden.
+  // Nothing to read, so nothing to send: the press is for the form.
   byHand() {
-    this.staged.set(crypto.randomUUID(), { name: this.byHandValue, blank: true })
-    this.commit()
+    this.leavePicker()
+    this.addBlank(crypto.randomUUID(), this.byHandValue)
   }
 
-  appendStaged(id) {
-    const staged = this.staged.get(id)
-    const item = document.createElement("li")
-    item.className = "drop-zone__item"
-    item.dataset.staged = id
-    if (staged.error) item.dataset.state = "undecodable"
-    item.appendChild(staged.objectUrl ? this.poster(staged.objectUrl, staged.name) : this.snippet(staged))
-    item.appendChild(this.removeButton(id, staged.name))
-    this.itemsTarget.appendChild(item)
-    this.refreshCommit()
-  }
-
-  unstage(event) {
-    const id = event.params.staged
-    const staged = this.staged.get(id)
-    if (staged?.objectUrl) URL.revokeObjectURL(staged.objectUrl)
-    this.staged.delete(id)
-    this.itemsTarget.querySelector(`[data-staged="${id}"]`)?.remove()
-    this.refreshCommit()
-  }
-
-  // The staged id becomes the row id, so the EXIF-stripped blob made at staging is
-  // also what the card's source pane shows: nothing is re-derived and nothing but
-  // that blob ever leaves the device.
-  commit() {
-    this.stageText()
-    const batch = this.committable
-    if (batch.length === 0) return
-
+  // Sending IS leaving the picker, there being nothing to assemble on it first. Someone
+  // who wants more decides these and comes back — which is what finish() hands them.
+  leavePicker() {
     this.inputTarget.hidden = true
     this.restartTarget.hidden = false
-    batch.filter((staged) => !staged.blank).forEach((staged) => {
-      this.remember(this.rowId(staged.id), staged.id, staged.text
-        ? { label: staged.name, text: staged.text }
-        : { label: staged.name, objectUrl: staged.objectUrl, blob: staged.blob })
-    })
-    this.run(batch.map((staged) => () => staged.blank
-      ? this.addBlank(staged.id, staged.name)
-      : this.extract(staged.text ? { text: staged.text } : { image: staged.blob, filename: staged.name },
-                     staged.name, staged.id)))
   }
 
   // The downscaled blob is held beside the object URL the pane paints from: a re-read
@@ -185,11 +159,9 @@ export default class extends Controller {
   // the honest offer is a clean second batch rather than a partial restore.
   startOver() {
     this.release(this.sources)
-    this.release(this.staged)
     this.places.clear()
     this.inputs.clear()
     this.rereads.clear()
-    this.itemsTarget.replaceChildren()
     this.rowsTarget.replaceChildren()
     this.stripTarget.replaceChildren()
     this.stripTarget.hidden = true
@@ -200,56 +172,15 @@ export default class extends Controller {
     this.reviewTitleTarget.hidden = true
     this.reviewHintTarget.hidden = true
     this.stagingTitleTarget.hidden = false
-    this.refreshCommit()
+    this.refreshRead()
   }
 
-  // Text in the box arms the commit without being staged first: one paste is the whole
-  // batch often enough that the chip in between is a step with nothing to show for it.
-  // commit() stages the box on its way out, so no text is ever sent twice.
-  refreshCommit() {
-    this.commitTarget.disabled = this.committable.length === 0 && this.pendingText === ""
+  refreshRead() {
+    this.readTarget.disabled = this.pendingText === ""
   }
 
   get pendingText() {
     return this.textTarget.value.trim()
-  }
-
-  // Blanks first: a hand-entered card is what the contributor is waiting to type into,
-  // and it lands in milliseconds where a read takes seconds.
-  get committable() {
-    const batch = Array.from(this.staged, ([id, staged]) => ({ id, ...staged })).filter((staged) => !staged.error)
-    return batch.filter((staged) => staged.blank).concat(batch.filter((staged) => !staged.blank))
-  }
-
-  // A staged image is its own label; anything without a picture needs words. A failed
-  // file names itself, or a batch of five gives no clue which one to take back out.
-  snippet(staged) {
-    const box = document.createElement("span")
-    box.className = "drop-zone__snippet"
-    box.appendChild(this.line(staged.text ?? staged.name))
-    if (staged.error) box.appendChild(this.line(staged.error, "drop-zone__reason"))
-    return box
-  }
-
-  line(text, className) {
-    const span = document.createElement("span")
-    if (className) span.className = className
-    span.textContent = text
-    return span
-  }
-
-  removeButton(id, name) {
-    const button = document.createElement("button")
-    button.type = "button"
-    button.className = "drop-zone__remove"
-    button.dataset.action = "capture#unstage"
-    button.dataset.captureStagedParam = id
-    button.setAttribute("aria-label", `${this.removeValue}: ${name}`)
-    const mark = document.createElement("span")
-    mark.className = "ph ph-x"
-    mark.setAttribute("aria-hidden", "true")
-    button.appendChild(mark)
-    return button
   }
 
   // The first card to land opens, so picking a single poster shows it rather than a

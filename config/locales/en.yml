@@ -143,13 +143,11 @@ en:
     images_hint: Several at once is fine. The images are never stored.
     text_label: Text
     text_hint: From a chat, a newsletter, wherever.
-    staging:
+    picker:
       drop_label: Drop posters here, or tap to pick
-      add_text: Add another text
       add_by_hand: Enter by hand
       by_hand: Entered by hand
-      commit: Read
-      remove: Remove
+      read_text: Read
       start_over: Cancel and start over
     queue:
       label: Queue

@@ -6,7 +6,7 @@
 <%# A hand-entered card has no poster, and must NOT be given the source target: the
     controller empties that pane on connect to fill it from the browser-held blob, so
     the target would wipe the note (see capture_controller.js). %>
-<% pane = manual ? { source: tag.p(t('capture.staging.by_hand'), class: "muted") }
+<% pane = manual ? { source: tag.p(t('capture.picker.by_hand'), class: "muted") }
                  : { source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } } } %>
 <%= render layout: "shared/review_card",
       locals: { id: key, actions: render("captures/card_actions", key: key),

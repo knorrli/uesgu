@@ -77,20 +77,15 @@
 }
 
 
-.capture-picker {
-  padding-bottom: var(--gap-medium);
-  border-bottom: var(--border-width) solid var(--rule-color);
+/* Set below the rule, and full width where the other two ways in are a drop target and
+   a field: entering by hand is the alternative to having a source to read at all, not
+   one more thing to hand the reader. */
+.capture-by-hand {
+  padding-top: var(--gap-medium);
+  border-top: var(--border-width) solid var(--rule-color);
 }
 
-/* The two ways off the picker, stacked and both full width so neither reads as a
-   button belonging to the field above it. */
-.capture-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-small);
-}
-
-.capture-actions > button {
+.capture-by-hand > button {
   width: 100%;
 }
 

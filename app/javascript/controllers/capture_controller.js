@@ -754,11 +754,29 @@ export default class extends Controller {
     return template?.content ?? null
   }
 
+  // Named, unlike the row it replaces: while a read is in flight the filename is one
+  // more thing to read and nothing to act on, but a row that failed is the only place
+  // its input is still identified. Same two parts as a failure the server rendered
+  // (see captures/_extraction).
   failRow(id, message = this.errorValue) {
     const row = document.getElementById(this.rowId(id))
-    if (row) row.querySelector("[data-pending]").textContent = message
+    if (row) row.replaceChildren(this.rowLabel(row.dataset.label), this.rowFailure(message))
     this.settleEmpty(id)
     return false
+  }
+
+  rowLabel(label) {
+    const line = document.createElement("p")
+    line.className = "capture-row__label field-label"
+    line.textContent = label
+    return line
+  }
+
+  rowFailure(message) {
+    const line = document.createElement("p")
+    line.className = "capture-row__failure"
+    line.textContent = message
+    return line
   }
 
   // Filled on connect rather than straight after renderStreamMessage: Turbo performs
@@ -793,13 +811,18 @@ export default class extends Controller {
     return `capture-row-${id}`
   }
 
+  // Says one thing: a contributor picked these files seconds ago and there is nothing
+  // to do about the one in flight, so the filename is carried by the tile's label and
+  // by whatever replaces this row, not by a second quiet line here.
   appendPending(id, label) {
     const row = document.createElement("div")
     row.id = this.rowId(id)
     row.className = "capture-row"
-    row.innerHTML = `<p class="capture-row__label field-label"></p><p class="muted" data-pending></p>`
-    row.querySelector(".capture-row__label").textContent = label
-    row.querySelector("[data-pending]").textContent = this.pendingValue
+    row.dataset.label = label
+    const pending = document.createElement("p")
+    pending.dataset.pending = ""
+    pending.textContent = this.pendingValue
+    row.appendChild(pending)
     this.rowsTarget.appendChild(row)
 
     this.stripTarget.hidden = false

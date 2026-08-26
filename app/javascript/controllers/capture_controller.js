@@ -113,7 +113,7 @@ export default class extends Controller {
   }
 
   stageText() {
-    const text = this.textTarget.value.trim()
+    const text = this.pendingText
     if (text === "") return
 
     const id = crypto.randomUUID()
@@ -122,12 +122,12 @@ export default class extends Controller {
     this.appendStaged(id)
   }
 
-  // A third input choice alongside images and pasted text. It stages like they do, so
-  // a hand-entered event rides the same commit and lands in the same queue.
-  stageBlank() {
-    const id = crypto.randomUUID()
-    this.staged.set(id, { name: this.byHandValue, blank: true })
-    this.appendStaged(id)
+  // A hand-entered event has no source to read, so there is nothing for it to wait in a
+  // batch for: pressing the button IS the commit. Anything already staged rides along
+  // rather than being stranded in a picker that is about to be hidden.
+  byHand() {
+    this.staged.set(crypto.randomUUID(), { name: this.byHandValue, blank: true })
+    this.commit()
   }
 
   appendStaged(id) {
@@ -155,6 +155,7 @@ export default class extends Controller {
   // also what the card's source pane shows: nothing is re-derived and nothing but
   // that blob ever leaves the device.
   commit() {
+    this.stageText()
     const batch = this.committable
     if (batch.length === 0) return
 
@@ -202,12 +203,22 @@ export default class extends Controller {
     this.refreshCommit()
   }
 
+  // Text in the box arms the commit without being staged first: one paste is the whole
+  // batch often enough that the chip in between is a step with nothing to show for it.
+  // commit() stages the box on its way out, so no text is ever sent twice.
   refreshCommit() {
-    this.commitTarget.disabled = this.committable.length === 0
+    this.commitTarget.disabled = this.committable.length === 0 && this.pendingText === ""
   }
 
+  get pendingText() {
+    return this.textTarget.value.trim()
+  }
+
+  // Blanks first: a hand-entered card is what the contributor is waiting to type into,
+  // and it lands in milliseconds where a read takes seconds.
   get committable() {
-    return Array.from(this.staged, ([id, staged]) => ({ id, ...staged })).filter((staged) => !staged.error)
+    const batch = Array.from(this.staged, ([id, staged]) => ({ id, ...staged })).filter((staged) => !staged.error)
+    return batch.filter((staged) => staged.blank).concat(batch.filter((staged) => !staged.blank))
   }
 
   // A staged image is its own label; anything without a picture needs words. A failed

@@ -59,11 +59,15 @@ body {
     }
   }
 
+  /* Deliberately not justified. The gem gives this same row `flex-wrap: wrap` for a
+     multiselect (.hw-combobox--multiple), and the selection chips are its flex items,
+     so anything but flex-start spreads a wrapped chip row across the full width with a
+     hole in the middle. The handle still lands at the right end, carried there by the
+     input's flex-grow. */
   .hw-combobox__main__wrapper {
     padding: 0;
     border: none;
     display: flex;
-    justify-content: space-between;
     height: 100%;
     background-color: inherit;
 

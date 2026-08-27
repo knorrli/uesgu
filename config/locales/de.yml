@@ -869,6 +869,8 @@ de:
   shared:
     cancel: Abbrechen
     cite: "„%{quote}“"
+    time_field:
+      clear: Zeit löschen
   helpers:
     page_entries_info:
       more_pages:

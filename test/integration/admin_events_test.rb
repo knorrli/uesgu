@@ -100,6 +100,22 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert e.overridden?(:start_date)
   end
 
+  test "clearing the time drops it and locks the schedule against the scraper" do
+    day = Date.current + 3
+    e = event(start_date: day, start_time: Time.zone.local(day.year, day.month, day.day, 20, 30))
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: e.title, description: "", date: day.iso8601, time: ""
+    } }
+
+    e.reload
+    assert_nil e.start_time
+    assert_equal day, e.start_date
+    assert e.overridden?(:start_time)
+    assert e.overridden?(:start_date)
+  end
+
   test "update ignores params outside the editable set" do
     e = event(title: "T")
     original_url = e.url

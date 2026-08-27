@@ -46,7 +46,7 @@
       </label>
       <label class="flex flex-col gap-small flex-grow">
         <span class="field-label"><%= t('.time_label') %></span>
-        <%= time_field_tag 'event[time]', @event.start_time&.strftime('%H:%M') %>
+        <%= render "shared/time_field", name: 'event[time]', value: @event.start_time&.strftime('%H:%M') %>
       </label>
     </div>
 

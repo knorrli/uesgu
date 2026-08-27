@@ -125,6 +125,38 @@ a {
   height: 1lh;
 }
 
+/* A time field's clear button (shared/_time_field), overlaid at the right end of the
+   control: the value is laid out at the left by the rule above, so nothing sits under
+   it. Overlaid rather than a sibling because the field shares its row with the date
+   and the pair spans that row — a button beside it would stop the underline short. */
+.time-field {
+  position: relative;
+  display: flex;
+}
+
+.time-field input[type="time"] {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Chrome parks its own picker indicator in the same corner, so the two draw on top
+   of each other — an ✕ inside a clock face. Dropping it costs the field nothing the
+   value cannot be typed or arrowed into, and a tap on a touch device opens the
+   picker from the field itself. */
+.time-field input[type="time"]::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+.time-field__clear {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--gap-xsmall);
+  line-height: 1;
+}
+
 /* Neutral at rest, accent underline on focus — green now signals "this field is
    active", rather than decorating every passive field. The outline is suppressed
    in favour of the underline (the field's own focus affordance). Scoped to the

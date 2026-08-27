@@ -8,18 +8,20 @@ module Admin
   # Counts come from the taggings rather than a column — a place has no reconcile pass
   # to maintain one — so the sort happens in Ruby over a table that stays small.
   class PlacesController < BaseController
+    include CatalogueBrowsing
+
     STATUS_SCOPES = { "aliased" => :aliased }.freeze
     SORTS = %w[name count].freeze
 
     def index
-      @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : "all"
-      @sort = SORTS.include?(params[:sort]) ? params[:sort] : "name"
+      @status = catalogue_param(:status, STATUS_SCOPES, default: "all")
+      @sort = catalogue_param(:sort, SORTS, default: "name")
       @counts = Location.usage.to_h { |row| [row[:name], row[:count]] }
 
       scope = @status == "all" ? Place.all : Place.public_send(STATUS_SCOPES[@status])
       scope = scope.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @places = Kaminari.paginate_array(sorted(scope.includes(:canonical).to_a))
-                        .page(params[:page]).per(50)
+                        .page(params[:page]).per(PAGE_SIZE)
     end
 
     def edit

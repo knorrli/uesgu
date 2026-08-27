@@ -123,6 +123,20 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     assert_select ".catalogue-sort-option[href=?]", genres_path(status: "unplaced", sort: "count")
   end
 
+  # A status or sort off the whitelist has to land on the default rather than reach
+  # public_send (see CatalogueBrowsing). This pins the Hash-shaped whitelist;
+  # admin_locations_test pins the Array-shaped one.
+  test "an unknown status or sort falls back to the defaults" do
+    genre(events_count: 1)
+
+    get genres_path(status: "bogus", sort: "bogus")
+    assert_response :success
+    # The controls echo the raw params back, so the junk stays in the hrefs — the
+    # fallback shows in which link renders active.
+    assert_select "a.tag.active[href=?]", genres_path(sort: "bogus")
+    assert_select ".catalogue-sort-option.active[href=?]", genres_path(status: "bogus", sort: "name")
+  end
+
   test "return_to honors an internal path" do
     g = genre(events_count: 1)
     post ignore_genre_path(g), params: { return_to: queue_genres_path }

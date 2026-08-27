@@ -4,16 +4,18 @@ module Admin
   # themselves, because combining two spellings needs something with an id to point
   # at. Mirrors the genres index idiom: filter by status, sort, search, paginate.
   class LocalitiesController < BaseController
+    include CatalogueBrowsing
+
     STATUS_SCOPES = { "aliased" => :aliased, "unsettled" => :unsettled }.freeze
     SORT_SCOPES = { "name" => :by_name, "count" => :by_usage }.freeze
 
     def index
-      @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : "all"
-      @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : "name"
+      @status = catalogue_param(:status, STATUS_SCOPES, default: "all")
+      @sort = catalogue_param(:sort, SORT_SCOPES, default: "name")
 
       scope = @status == "all" ? Locality.all : Locality.public_send(STATUS_SCOPES[@status])
       scope = scope.where("name ILIKE ?", "%#{params[:q]}%") if params[:q].present?
-      @localities = scope.public_send(SORT_SCOPES[@sort]).includes(:canonical).page(params[:page]).per(50)
+      @localities = scope.public_send(SORT_SCOPES[@sort]).includes(:canonical).page(params[:page]).per(PAGE_SIZE)
     end
 
     def edit

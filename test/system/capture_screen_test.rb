@@ -474,37 +474,41 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "canton"), :normalized?
   end
 
-  # No poster, no paste, no model call — and still the same card, the same queue and
-  # the same publish.
-  test "an event entered by hand becomes an empty card and publishes like any other" do
+  # No poster, no paste, no model call — a page of its own, and the same publish.
+  test "an event entered by hand publishes and lands back on the picker" do
     visit capture_path
     by_hand
 
-    assert_selector ".capture-card"
-    assert_equal "", field_value("title")
-    assert_equal "", field_value("locality")
-    # No poster to show, so the pane says why it is empty rather than looking broken.
-    assert_selector ".review-card__source", text: I18n.t("capture.picker.by_hand", locale: :de)
+    assert_selector "h1", text: copy("manual.title")
+    assert_equal "", manual_value("title")
 
-    type "title", "Zorp Fest"
-    type "date", show_date.to_s
-    type "locality", "Zorpwil"
-    find(".capture-card [name=canton]").select("Bern")
+    manual_field("title").set("Zorp Fest")
+    manual_field("date").set(show_date.to_s)
+    manual_field("locality").set("Zorpwil")
+    manual_field("canton").select("Bern")
 
     assert_difference -> { Event.count } => 1 do
-      accept
-      assert_published
+      find("#manual-event-form input[type=submit]").click
+      assert_selector ".flash", text: I18n.t("capture.card.published", title: "Zorp Fest", locale: :de)
     end
+    assert_selector ".capture-picker"
     assert_equal "Zorp Fest", Event.last.title
   end
 
-  # The whole point of the button: no chip, no second press, no batch to commit.
-  test "entering by hand opens the form without staging anything" do
+  # An absence test on purpose: the card's frame is shared markup one caller away, and
+  # this is the only thing standing between it and creeping back onto a screen with no
+  # source to compare against.
+  test "the hand-entry page carries none of the review screen's furniture" do
     visit capture_path
     by_hand
 
-    assert_selector ".capture-card"
+    assert_no_selector ".review-card"
+    assert_no_selector ".review-card__source"
+    assert_no_selector ".capture-queue"
+    assert_no_selector ".capture-card__reread"
     assert_no_selector ".drop-zone__item"
+    # The viewport is bounded only so a poster can hold still above the fields.
+    assert_no_selector "html.capture-reviewing", visible: :all
   end
 
   # The third option beside publish and drop. The flags are what make it more than a
@@ -563,16 +567,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-card .card-aside button[data-action='capture#reread']"
     assert_no_selector ".capture-card .action-bar button[data-action='capture#reread']"
     assert_selector ".capture-card .action-bar > *", count: 2
-  end
-
-  # There is no input to read again, so offering it would be a button that cannot work.
-  test "a hand-entered card is not offered a re-read" do
-    visit capture_path
-    by_hand
-
-    assert_selector ".capture-card"
-    assert_no_selector ".capture-card .card-aside button[data-action='capture#reread']"
-    assert_no_selector ".capture-card__reread"
   end
 
   # A drop never reaches the server on its own, and it is the read worth the most:
@@ -983,7 +977,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def read_text = find("button[data-action='capture#readText']").click
 
-  def by_hand = find("button[data-action='capture#byHand']").click
+  def by_hand = find(".capture-by-hand a").click
 
   def read_disabled? = find("button[data-action='capture#readText']").disabled?
 
@@ -999,6 +993,9 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def field_value(field) = find(".capture-card [name='#{field}']").value
   def field_type(field) = find(".capture-card [name='#{field}']")[:type]
+
+  def manual_field(field) = find("#manual-event-form [name='#{field}']")
+  def manual_value(field) = manual_field(field).value
 
   # Accepting the last card in a queue hands the screen straight back to the picker, so
   # the tile that said it published is gone before an assertion could look for it. The

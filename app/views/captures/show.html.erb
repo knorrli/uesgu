@@ -12,8 +12,6 @@
      data-capture-undecodable-value="<%= t('capture.failures.image_unsupported') %>"
      data-capture-source-alt-value="<%= t('capture.row.source_alt') %>"
      data-capture-localities-value="<%= localities.to_json %>"
-     data-capture-blank-url-value="<%= blank_capture_path %>"
-     data-capture-by-hand-value="<%= t('capture.picker.by_hand') %>"
      data-capture-found-one-value="<%= found[:one] %>"
      data-capture-found-other-value="<%= found[:other] %>"
      data-capture-done-value="<%= capture_done_flashes.to_json %>">
@@ -55,8 +53,10 @@
               data-action="capture#readText" disabled><%= t('capture.picker.read_text') %></button>
     </div>
 
+    <%# A link, not a send: there is nothing to read, so this way in leaves the funnel's
+        one screen for a page of its own (see captures/manual). %>
     <div class="capture-by-hand">
-      <button type="button" class="button" data-action="capture#byHand"><%= t('capture.picker.add_by_hand') %></button>
+      <%= link_to t('capture.picker.add_by_hand'), manual_capture_path, class: "button" %>
     </div>
   </div>
 
@@ -67,7 +67,7 @@
       template's contents are not in the document, so the option ids it carries only
       ever exist once in the live DOM. %>
   <template data-capture-target="genreOptions">
-    <% combobox_options(capture_genres, value: :name, display: :name).each do |option| %><%= render option %><% end %>
+    <% combobox_options(capture_genre_options).each do |option| %><%= render option %><% end %>
   </template>
 
   <%# Progress, navigation and receipts in one strip: a card publishes the moment it is

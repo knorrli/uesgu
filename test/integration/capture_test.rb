@@ -19,27 +19,66 @@ class CaptureTest < ActionDispatch::IntegrationTest
     EventCapture::Extractor::Extraction.new(candidates: candidates, code: code, error: error)
   end
 
-  test "a blank card needs no model call, and carries no attempt to be judged on" do
+  test "the hand-entry page needs no model call, and carries no attempt to be judged on" do
     sign_in_as user(contributor: true)
 
     assert_no_difference -> { ExtractionAttempt.count } do
-      post blank_capture_path, params: { row_id: "abc" }, as: :turbo_stream
+      get manual_capture_path
     end
 
     assert_response :success
-    assert_select "turbo-stream[target=capture-row-abc]"
-    assert_match(/capture-card/, response.body)
+    assert_select "form#manual-event-form input[name=title]"
   end
 
-  test "a blank card publishes through the same path as an extracted one" do
-    sign_in_as user(contributor: true)
+  # The page asks for HTML where a card asks for a turbo-stream, which is the whole of
+  # what tells the two apart (see CapturesController#create).
+  test "the hand-entry page publishes through the same path as a card and lands back on the picker" do
+    sign_in_as user(contributor: true, locale: "en")
 
     assert_difference -> { Event.count } => 1 do
       post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
-                                   canton: "BE" }, as: :turbo_stream
+                                   canton: "BE" }
     end
 
+    assert_redirected_to capture_path
+    assert_equal I18n.t("capture.card.published", title: "Zorp Fest", locale: :en), flash[:notice]
     assert_equal "Zorp Fest", Event.last.title
+  end
+
+  test "a refusal comes back as the page with what was typed still in it" do
+    sign_in_as user(contributor: true, locale: "en")
+
+    post capture_path, params: { title: "No canton", date: "2026-09-01",
+                                 locality: "Zorpwil", canton: "" }
+
+    assert_response :unprocessable_entity
+    assert_match I18n.t("capture.errors.incomplete", locale: :en), response.body
+    assert_select "input[name=title][value=?]", "No canton"
+    assert_select "input[name=locality][value=?]", "Zorpwil"
+    assert_empty Event.all
+  end
+
+  test "a duplicate comes back as the page with the matches to answer" do
+    sign_in_as user(contributor: true, locale: "en")
+    already_listed
+
+    assert_no_difference -> { Event.count } do
+      post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
+                                   canton: "BE", place: "Zorpsaal" }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "button[form=manual-event-form][name=matched_event_id]"
+    assert_select "input[name=title][value=?]", "Zorp Fest"
+  end
+
+  test "publishing from the page records no field outcome" do
+    sign_in_as user(contributor: true)
+
+    assert_no_difference -> { ExtractionFieldOutcome.count } do
+      post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
+                                   canton: "BE" }
+    end
   end
 
   test "the subtitle the model read is offered as the event's description" do
@@ -65,7 +104,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   test "entering by hand is closed to accounts without the capability" do
     sign_in_as user
 
-    post blank_capture_path, params: { row_id: "abc" }, as: :turbo_stream
+    get manual_capture_path
 
     assert_response :forbidden
   end
@@ -184,7 +223,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     sign_in_as user(contributor: true, locale: "en")
 
     post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
-                                 locality: "Zorpwil", canton: "BE", place: "Zorpsaal" }
+                                 locality: "Zorpwil", canton: "BE", place: "Zorpsaal" }, as: :turbo_stream
 
     assert_response :success
     assert_equal ["Kept"], Event.pluck(:title)
@@ -198,7 +237,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     sign_in_as user(contributor: true, locale: "en")
 
     post capture_path, params: { card_id: "capture-row-abc-0", title: "No canton",
-                                 date: "2026-09-01", locality: "Zorpwil", canton: "" }
+                                 date: "2026-09-01", locality: "Zorpwil", canton: "" }, as: :turbo_stream
 
     assert_response :unprocessable_entity
     assert_match 'target="capture-row-abc-0-status"', response.body
@@ -213,7 +252,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
 
     post capture_path, params: { card_id: "capture-row-abc-1", title: "Unlinked",
                                  date: "2026-09-02", locality: "Zorpwil", canton: "BE",
-                                 url: "https://zorp.example/poster" }
+                                 url: "https://zorp.example/poster" }, as: :turbo_stream
 
     assert_response :success
     assert_nil Event.sole.url
@@ -223,7 +262,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     sign_in_as user(contributor: true)
 
     post capture_path, params: { card_id: '"><script>x</script>', title: "Kept",
-                                 date: "2026-09-01", locality: "Zorpwil", canton: "BE" }
+                                 date: "2026-09-01", locality: "Zorpwil", canton: "BE" }, as: :turbo_stream
 
     assert_no_match "<script>x</script>", response.body
   end
@@ -231,7 +270,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   test "a candidate with no fields at all is a refusal, not a 500" do
     sign_in_as user(contributor: true)
 
-    post capture_path
+    post capture_path, as: :turbo_stream
     assert_response :unprocessable_entity
     assert_empty Event.all
   end
@@ -240,7 +279,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     sign_in_as user(contributor: true)
 
     post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
-                                 locality: "Zorpwil", canton: "BE", genres: "Zorpwave, Flarncore" }
+                                 locality: "Zorpwil", canton: "BE", genres: "Zorpwave, Flarncore" }, as: :turbo_stream
 
     assert_equal %w[Flarncore Zorpwave], Event.sole.genre_list.sort
   end
@@ -274,7 +313,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
                                  candidate_index: "0", title: "Kept", date: "2026-09-01",
                                  locality: "Zorpwil", canton: "BE", time: "20:00",
                                  proposed_title: "Kept", proposed_date: "2026-09-01",
-                                 proposed_locality: "Us", proposed_canton: "BE" }
+                                 proposed_locality: "Us", proposed_canton: "BE" }, as: :turbo_stream
 
     outcomes = attempt.field_outcomes.index_by(&:field)
     assert_predicate outcomes.fetch("locality"), :corrected?
@@ -288,7 +327,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     sign_in_as user(contributor: true)
 
     post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: attempt.capture_token,
-                                 candidate_index: "0" }
+                                 candidate_index: "0" }, as: :turbo_stream
 
     assert_response :unprocessable_entity
     assert_empty attempt.field_outcomes
@@ -324,7 +363,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
 
     post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: "not-a-signed-id",
                                  candidate_index: "0", title: "Kept", date: "2026-09-01",
-                                 locality: "Zorpwil", canton: "BE" }
+                                 locality: "Zorpwil", canton: "BE" }, as: :turbo_stream
 
     assert_equal "Kept", Event.sole.title
     assert_empty ExtractionFieldOutcome.all
@@ -361,10 +400,10 @@ class CaptureTest < ActionDispatch::IntegrationTest
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
-    assert_select ".capture-card__where + .field-group__attached .review-card__cite"
-    assert_select ".capture-card__where + .field-group__attached .suggestions .chip",
+    assert_select ".capture-fields__where + .field-group__attached .review-card__cite"
+    assert_select ".capture-fields__where + .field-group__attached .suggestions .chip",
                   text: "Flarnhausen"
-    assert_select ".capture-card__where .field-group", false
+    assert_select ".capture-fields__where .field-group", false
   end
 
   # Datum and Zeit are read off separate lines of a poster — "Türöffnung 20:00" beside
@@ -379,7 +418,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
-    cites = css_select ".capture-card__when > .field-group .review-card__cite"
+    cites = css_select ".capture-fields__when > .field-group .review-card__cite"
     assert_equal 2, cites.size
     assert_match "SA 12. SEPT", cites.first.text
     assert_match "Türöffnung 20:00", cites.last.text
@@ -396,10 +435,10 @@ class CaptureTest < ActionDispatch::IntegrationTest
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
-    assert_select ".capture-card__when > .field-group", 2
-    assert_select ".capture-card__when > :last-child.capture-card__warning",
+    assert_select ".capture-fields__when > .field-group", 2
+    assert_select ".capture-fields__when > :last-child.capture-fields__warning",
                   text: I18n.t("capture.candidate.past")
-    assert_select ".field-group .capture-card__warning", false
+    assert_select ".field-group .capture-fields__warning", false
   end
 
   # The `for`/id wiring the phone behaviour rests on — a label that wraps the field
@@ -414,11 +453,11 @@ class CaptureTest < ActionDispatch::IntegrationTest
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
-    input = css_select(".capture-card__genres input.hw-combobox__input").sole
+    input = css_select(".capture-fields__genres input.hw-combobox__input").sole
     assert_equal "capture-row-abc123-0-genres", input["id"]
     assert_select "label[for=?]", input["id"], text: I18n.t("capture.candidate.genres")
-    assert_select ".capture-card__genres dialog.hw-combobox__dialog"
-    assert_select "label .capture-card__genres", count: 0
+    assert_select ".capture-fields__genres dialog.hw-combobox__dialog"
+    assert_select "label .capture-fields__genres", count: 0
   end
 
   # The taxonomy is offered so an existing genre is picked rather than respelt, but a
@@ -459,7 +498,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     sign_in_as user
 
     post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
-                                 locality: "Zorpwil", canton: "BE" }
+                                 locality: "Zorpwil", canton: "BE" }, as: :turbo_stream
 
     assert_response :forbidden
     assert_empty Event.all

@@ -1,12 +1,13 @@
-# The capture funnel's one screen. Both actions work on ONE thing at a time —
-# `extract` on one input, `create` on the one card in front of the contributor — so
-# nothing here holds a request open for a batch and there is no partial-success state
-# to render (see EventCapture::Extractor for why there is no queue).
+# The capture funnel: `show` is where posters and pasted text are read, `manual` is the
+# same event typed in by hand. Every action works on ONE thing at a time — `extract` on
+# one input, `create` on the one card or page in front of the contributor — so nothing
+# here holds a request open for a batch and there is no partial-success state to render
+# (see EventCapture::Extractor for why there is no queue).
 #
 # No event is persisted until a card is accepted; until then the queue lives only in
-# the DOM. What every decision does write is the
-# measurement: one ExtractionAttempt per input, and one ExtractionFieldOutcome per
-# field of every candidate a human published or dropped.
+# the DOM. What every decision does write is the measurement: one ExtractionAttempt per
+# input, and one ExtractionFieldOutcome per field of every candidate a human published
+# or dropped — a hand-entered event has neither, having been read by nobody.
 class CapturesController < ApplicationController
   before_action :require_contributor
   # Every extract is a paid third-party call. Keyed by user, not IP: on Render req.ip
@@ -27,24 +28,19 @@ class CapturesController < ApplicationController
     )
   end
 
+  # One publish, two screens to answer. A card is one of a queue and decides in place;
+  # the hand-entry page is alone and ends in a navigation.
   def create
     result = EventCapture::Creator.call(candidate_attributes)
-    return render_matches(result.matches) if result.error == :duplicate
-    return render_status("captures/refusal", error: result.error, status: :unprocessable_entity) unless result.ok?
 
-    record_outcomes(accepted: accepted_attributes)
-    render_status("captures/published", title: result.canonical&.title || result.event.title,
-                  merged: result.canonical.present?)
+    respond_to do |format|
+      format.turbo_stream { decide_card(result) }
+      format.html { decide_page(result) }
+    end
   end
 
-  # Records no ExtractionFieldOutcome, and correctly so: with no attempt token there
-  # is no proposal to compare against, and a hand-entered event is not a read anyone
-  # can be judged on.
-  def blank
-    render turbo_stream: turbo_stream.replace(
-      row_id, partial: "captures/manual",
-      locals: { id: row_id, candidate: EventCapture::Candidate.new }
-    )
+  def manual
+    @candidate = EventCapture::Candidate.new
   end
 
   # A dropped candidate is the worst read there is, and it is the one a publish-only
@@ -132,6 +128,58 @@ class CapturesController < ApplicationController
 
   def status_id = "#{card_key}-status"
   def form_id = "#{card_key}-form"
+
+  # Every outcome replaces the card's status slot; the queue behind it carries on.
+  def decide_card(result)
+    return render_matches(result.matches) if result.error == :duplicate
+    return render_status("captures/refusal", error: result.error, status: :unprocessable_entity) unless result.ok?
+
+    record_outcomes(accepted: accepted_attributes)
+    render_status("captures/published", title: result.canonical&.title || result.event.title,
+                  merged: result.canonical.present?)
+  end
+
+  # Records no ExtractionFieldOutcome, and correctly so: with no attempt token there is
+  # no proposal to compare against, and a hand-entered event is not a read anyone can be
+  # judged on. A question comes back as the page again with what was typed still in it,
+  # since there is no status slot to answer into and nothing left on screen otherwise.
+  def decide_page(result)
+    return redraw_manual(matches: result.matches) if result.error == :duplicate
+    return redraw_manual(error: result.error) unless result.ok?
+
+    redirect_to capture_path, notice: published_notice(result)
+  end
+
+  def redraw_manual(matches: nil, error: nil)
+    @candidate = submitted_candidate
+    @matches = matches && helpers.capture_matches(matches, candidate_attributes)
+    @error = error
+    render :manual, status: :unprocessable_entity
+  end
+
+  def published_notice(result)
+    return t("capture.card.merged", title: result.canonical.title) if result.canonical
+
+    t("capture.card.published", title: result.event.title)
+  end
+
+  # What was typed, back in the shape the fields render from. Only ever used to redraw a
+  # page that was refused, so a date the form could not have produced is simply dropped
+  # rather than defended against.
+  def submitted_candidate
+    attrs = candidate_attributes
+    EventCapture::Candidate.new(
+      title: attrs[:title], subtitle: attrs[:description], date: parsed_date(attrs[:date]),
+      time: attrs[:time], place: attrs[:place], locality: attrs[:locality],
+      canton: attrs[:canton], genres: attrs[:genres]
+    )
+  end
+
+  def parsed_date(value)
+    Date.parse(value.to_s)
+  rescue Date::Error
+    nil
+  end
 
   # 422 so Turbo leaves the card open and capture#decided does not settle it: nothing
   # was published, and the card is being asked a question rather than told it failed.

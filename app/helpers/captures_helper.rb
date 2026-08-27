@@ -107,6 +107,13 @@ module CapturesHelper
   # and the head of this list is where a poster's genre almost always is.
   def capture_genres = Genre.offerable.by_usage
 
+  # Keyed by NAME where every other combobox in the app is keyed by id: a capture
+  # routinely proposes a genre the taxonomy does not carry yet, so the field submits the
+  # names it was given and Creator matches them by fingerprint.
+  def capture_genre_options
+    capture_genres.map { |genre| { display: genre.name, value: genre.name } }
+  end
+
   # What the model proposed, keyed the way the form posts it, so the card can carry it
   # back for the diff. Mirrors the visible inputs exactly — a value that renders one
   # way and is proposed another reads as a correction nobody made.

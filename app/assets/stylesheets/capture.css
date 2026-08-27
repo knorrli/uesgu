@@ -255,7 +255,7 @@ button.capture-queue__tile[data-state="pending"] {
 
 /* Amber, not red: a past date is a thing to look at, not a thing that failed —
    the same channel the feed already uses for a passive "this concerns you" hint. */
-.capture-card__warning {
+.capture-fields__warning {
   color: var(--theme-interest-color);
 }
 
@@ -263,12 +263,15 @@ button.capture-queue__tile[data-state="pending"] {
   font-size: var(--font-size-small);
 }
 
-/* The shared .account-form skin sizes fields to their content; a review card wants
-   them filling the column, so a long title is not read through a letterbox. Scoped to
-   the field list and not the card because the accept button is an <input> too, and
-   full-width it reads as a batch submit this screen has no such thing as. */
-.capture-card__fields input,
-.capture-card__fields select,
+/* The shared .account-form skin sizes fields to their content; a capture screen wants
+   them filling the column, so a long title is not read through a letterbox. The canton
+   needs it for a second reason: a flex item's floor is its own content, and a <select>
+   with no width set measures its widest option ("Appenzell Ausserrhoden"), which is
+   wide enough to push the town off the row the two share. The submit is an <input> too
+   and is left out on purpose — full-width it reads as a batch commit, which neither
+   screen has such a thing as. */
+.capture-fields input:not([type=submit]),
+.capture-fields select,
 .capture-picker textarea {
   width: 100%;
 }
@@ -276,12 +279,12 @@ button.capture-queue__tile[data-state="pending"] {
 /* Two fields to a row where they belong together (date + time, locality + canton).
    Without the grow, a wrapped field keeps its content width and its underline stops
    mid-column, reading as a different kind of field rather than a wrapped one. */
-.capture-card__when > .field-group,
-.capture-card__where > label {
+.capture-fields__when > .field-group,
+.capture-fields__where > label {
   flex: 1 1 8rem;
 }
 
-.capture-card__when > .capture-card__warning {
+.capture-fields__when > .capture-fields__warning {
   flex-basis: 100%;
 }
 

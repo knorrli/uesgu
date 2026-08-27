@@ -208,7 +208,7 @@
 
 /* The count pill: a small accent-filled number attached to something else —
    unread notifications in the menu, the applied-filter count on a mobile filter
-   trigger. One definition for both (was duplicated as .filter-trigger__badge).
+   trigger. One definition for both.
    min-width + centring keep a single- and double-digit count the same shape;
    flex-shrink:0 stops it collapsing inside the flex filter-trigger row. */
 .badge {

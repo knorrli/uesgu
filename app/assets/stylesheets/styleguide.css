@@ -106,20 +106,6 @@
   margin: var(--gap-xsmall) 0 0;
 }
 
-/* Resolved-on-this-branch note: green left rule for a resolved audit item. */
-.sg-ok {
-  display: block;
-  margin-top: var(--gap-xsmall);
-  padding-left: var(--gap-small);
-  border-left: var(--border-width) solid var(--theme-accent-color);
-  color: var(--theme-fg-muted);
-  font-size: var(--font-size-small);
-}
-
-.sg-ok b {
-  color: var(--theme-accent-color);
-}
-
 /* Colour token swatches — driven by the live tokens, so recolouring the theme
  * recolours these automatically. */
 .sg-swatches {

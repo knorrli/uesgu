@@ -2,7 +2,7 @@
 de:
   nav:
     capture: Erfassen
-    events: Veranstaltungen
+    events: Events
     admin: Admin
     notifications: Benachrichtigungen
     unread_notifications: Ungelesene Benachrichtigungen
@@ -28,7 +28,7 @@ de:
     steps_safari_desktop: 'In Safari: „Ablage“ → „Zum Dock hinzufügen“ (ab Safari 17). Sonst läuft üsgu einfach im Browser.'
     steps_generic: 'Öffne das Browser-Menü und wähle „App installieren“ bzw. „Zum Startbildschirm hinzufügen“.'
     benefit_quick: Mit einem Tipp geöffnet, ohne den Browser
-    benefit_notify: Benachrichtigungen zu neuen Veranstaltungen aus deinen gespeicherten Filtern
+    benefit_notify: Benachrichtigungen zu neuen Events aus deinen gespeicherten Filtern
     benefit_home: Eigenes Symbol auf deinem Startbildschirm
   footer:
     label: Fusszeile
@@ -38,7 +38,7 @@ de:
   about:
     title: Über üsgu
     heading: Über üsgu
-    intro: üsgu.ch sammelt Konzerte und Veranstaltungen aus der Region an einem Ort, direkt von den Seiten der Veranstalter und aus Veranstaltungslisten. Kein Abklappern von zehn Websites mehr, um zu sehen, wer wann wo spielt.
+    intro: üsgu.ch sammelt Konzerte und Events aus der Region an einem Ort, direkt von den Seiten der Veranstalter und aus Eventlisten. Kein Abklappern von zehn Websites mehr, um zu sehen, wer wann wo spielt.
     why: Ich hab üsgu gebaut, weil ich selber dauernd den Überblick verlor und Konzerte verpasste, die ich gern gesehen hätte. Es ist ein privates Projekt für Freunde, kein Startup und kein Geschäft. Keine Werbung, nichts zu verkaufen.
     privacy: Hier gibts mehr zum Datenschutz →
   privacy:
@@ -48,14 +48,14 @@ de:
     collect_heading: Was wir speichern
     collect_account: Deinen Benutzernamen und dein Passwort (verschlüsselt), damit du ein Konto hast.
     collect_email: Deine E-Mail-Adresse, nur wenn du eine angibst, und nur um dir die Benachrichtigungen zu schicken, die du eingestellt hast.
-    collect_content: 'Was du selber anlegst: gespeicherte Filter und gemerkte Veranstaltungen.'
+    collect_content: 'Was du selber anlegst: gespeicherte Filter und gemerkte Events.'
     collect_cookies: 'Drei Cookies: einer hält dich eingeloggt, einer merkt sich dein Theme (hell/dunkel), einer den zuletzt angewendeten Filter. Sonst keine.'
     services_heading: Externe Dienste
     services_hosting: 'Hosting: Render (render.com). Alles läuft in deren Frankfurt-Region, deine Daten bleiben also in der EU.'
     services_email: 'E-Mail: Resend (resend.com) verschickt die optionalen Benachrichtigungs-Mails. Keine E-Mail, kein Resend.'
     services_push: 'Push: Wenn du Push-Benachrichtigungen einschaltest, laufen sie über den Push-Dienst deines Browsers oder Handys (Google, Mozilla oder Apple).'
     calendar_heading: Kalender-Link
-    calendar_body: Wenn du ein Kalender-Abo erstellst, enthält der Link einen geheimen Token. Jeder, dem du den Link gibst, sieht deine gemerkten Veranstaltungen, also behalt ihn für dich. Du kannst ihn jederzeit in den Einstellungen deaktivieren.
+    calendar_body: Wenn du ein Kalender-Abo erstellst, enthält der Link einen geheimen Token. Jeder, dem du den Link gibst, sieht deine gemerkten Events, also behalt ihn für dich. Du kannst ihn jederzeit in den Einstellungen deaktivieren.
     logs_heading: Server-Logs
     logs_body: Der Server führt kurzlebige Logs, die deine IP-Adresse enthalten, wie jede Website. Sie helfen bei Fehlern und Missbrauch, und wir nutzen sie nicht, um dich zu verfolgen oder zu profilieren.
     nothing_heading: Was wir nicht tun
@@ -118,7 +118,7 @@ de:
     invalid_invite: Dieser Einladungscode ist ungültig oder schon benutzt.
   push:
     digest:
-      title: Neue Veranstaltungen auf üsgu
+      title: Neue Events auf üsgu
     test:
       title: üsgu
       body: Dies ist eine Test-Benachrichtigung — Push funktioniert. 🎉
@@ -126,25 +126,25 @@ de:
     title: Benachrichtigungen
   saved_events:
     title: Merkliste
-    empty: Noch nichts gespeichert — tippe das Herz bei einer Veranstaltung.
+    empty: Noch nichts gespeichert — tippe das Herz bei einem Event.
     none_upcoming: Nichts Anstehendes.
-    toggle: Veranstaltung speichern
-    reminders_label: An gespeicherte Veranstaltungen erinnern
-    reminders_hint: Ein Hinweis um die Mittagszeit am Tag der gespeicherten Veranstaltung — in deinen Benachrichtigungen, und per Push oder E-Mail, falls eingerichtet.
+    toggle: Event speichern
+    reminders_label: An gespeicherte Events erinnern
+    reminders_hint: Ein Hinweis um die Mittagszeit am Tag des gespeicherten Events — in deinen Benachrichtigungen, und per Push oder E-Mail, falls eingerichtet.
     calendar_feed_hint_html: Die Merkliste gibts auch als Abo für deine Kalender-App — %{link}.
     calendar_feed_link: in den Einstellungen einrichten
   capture:
-    title: Event erfassen
+    title: Poster auslesen
     review:
       title:
-        one: 1 Veranstaltung gefunden
-        other: "%{count} Veranstaltungen gefunden"
-      hint: Tipp auf ein Bild, um die Veranstaltung anzusehen.
+        one: 1 Event gefunden
+        other: "%{count} Events gefunden"
+      hint: Tipp auf ein Bild, um das Event anzusehen.
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
     manual:
-      title: Veranstaltung erfassen
+      title: Event erfassen
     picker:
       drop_label: Poster hierhin ziehen oder antippen
       add_by_hand: Von Hand erfassen
@@ -154,8 +154,8 @@ de:
       label: Warteschlange
       done:
         zero: Alles bearbeitet. Nichts veröffentlicht.
-        one: Alles bearbeitet. 1 Veranstaltung ist live.
-        other: Alles bearbeitet. %{count} Veranstaltungen sind live.
+        one: Alles bearbeitet. 1 Event ist live.
+        other: Alles bearbeitet. %{count} Events sind live.
     actions:
       accept: Veröffentlichen
       reread: Nochmal auslesen
@@ -228,11 +228,11 @@ de:
     removed: Kalender deaktiviert.
   event_reminder:
     title:
-      one: 1 gespeicherte Veranstaltung steht an
-      other: "%{count} gespeicherte Veranstaltungen stehen an"
+      one: 1 gespeichertes Event steht an
+      other: "%{count} gespeicherte Events stehen an"
     push_body:
-      one: 1 gespeicherte Veranstaltung steht an
-      other: "%{count} gespeicherte Veranstaltungen stehen an"
+      one: 1 gespeichertes Event steht an
+      other: "%{count} gespeicherte Events stehen an"
   saved_filters:
     title: Gespeicherte Filter
     new_button: Neuer Filter
@@ -245,13 +245,13 @@ de:
     already_exists: Diesen gespeicherten Filter gibt es schon — hier kannst du ihn anpassen.
     duplicate_edit: "Du hast noch einen gespeicherten Filter dafür:"
     fired:
-      one: Filter ausgeführt — 1 Veranstaltung in der Benachrichtigung.
-      other: "Filter ausgeführt — %{count} Veranstaltungen in der Benachrichtigung."
-    fired_empty: Filter ausgeführt — derzeit keine passenden Veranstaltungen.
+      one: Filter ausgeführt — 1 Event in der Benachrichtigung.
+      other: "Filter ausgeführt — %{count} Events in der Benachrichtigung."
+    fired_empty: Filter ausgeführt — derzeit keine passenden Events.
     fire_now: Jetzt testen
     delete: Löschen
     delete_confirm: Diesen gespeicherten Filter wirklich löschen?
-    empty_link: Filtere die Veranstaltungen
+    empty_link: Filtere die Events
     empty_html: Noch keine Filter. „Neuer Filter“ oben, oder %{link} auf der Startseite.
     type:
       added: Neue Events
@@ -277,8 +277,8 @@ de:
       monthly: Monatlich
     monthday_option: "Am %{day}."
     push_body:
-      one: "%{name}: 1 neue Veranstaltung."
-      other: "%{name}: %{count} neue Veranstaltungen."
+      one: "%{name}: 1 neues Event."
+      other: "%{name}: %{count} neue Events."
     channels:
       in_app: App
       push: Push
@@ -303,11 +303,11 @@ de:
   notification_mailer:
     digest:
       subject:
-        one: üsgu · 1 neue Veranstaltung
-        other: "üsgu · %{count} neue Veranstaltungen"
+        one: üsgu · 1 neues Event
+        other: "üsgu · %{count} neue Events"
       intro:
-        one: Eine Veranstaltung für dich.
-        other: "%{count} Veranstaltungen für dich."
+        one: Ein Event für dich.
+        other: "%{count} Events für dich."
       cta: In der App ansehen
       footer_reason: Du bekommst das wegen eines Filters, den du erstellt hast.
       footer_manage: Deine Filter verwalten
@@ -335,8 +335,8 @@ de:
     push_install_first: Um auf iPhone oder iPad Benachrichtigungen zu erhalten, füge üsgu zuerst zum Home-Bildschirm hinzu.
     signout_button: Abmelden
     calendar_feed_heading: Kalender
-    calendar_feed_hint_off: Hol dir deine gespeicherten Veranstaltungen in jede Kalender-App — erstelle dafür einen privaten Link.
-    calendar_feed_hint_on: Aktualisiert sich von selbst; Veranstaltungen verschwinden einen Tag nach dem Termin.
+    calendar_feed_hint_off: Hol dir deine gespeicherten Events in jede Kalender-App — erstelle dafür einen privaten Link.
+    calendar_feed_hint_on: Aktualisiert sich von selbst; Events verschwinden einen Tag nach dem Termin.
     calendar_feed_url_label: Kalender-Link
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
@@ -344,7 +344,7 @@ de:
     delete_account_confirm: Konto endgültig löschen? Das kann nicht rückgängig gemacht werden.
   notifications:
     index:
-      empty: Noch nichts da — neue Veranstaltungen landen hier.
+      empty: Noch nichts da — neue Events landen hier.
       all_read: Alles gelesen — neue Benachrichtigungen landen hier.
       unread_badge: Neu
       fallback_name: Benachrichtigung
@@ -355,12 +355,12 @@ de:
       mark_all_read: Alles gelesen
       all_marked_read: Alles als gelesen markiert.
       event_count:
-        one: 1 Veranstaltung
-        other: "%{count} Veranstaltungen"
+        one: 1 Event
+        other: "%{count} Events"
     show:
       back: Alle Benachrichtigungen
-      title: Neue Veranstaltungen
-      empty_all: Keine neuen Veranstaltungen in diesem Zeitraum.
+      title: Neue Events
+      empty_all: Keine neuen Events in diesem Zeitraum.
   genres:
     index:
       title: Genres
@@ -551,7 +551,7 @@ de:
         empty: Noch keine Einladungen.
     events:
       index:
-        title: Veranstaltungen
+        title: Events
         status_all: Alle
         status_visible: Sichtbar
         status_hidden: Ausgeblendet
@@ -559,14 +559,14 @@ de:
         status_discarded: Gefiltert
         status_duplicates: Duplikate
         status_dismissed: Entfernt
-        search: Veranstaltungen suchen…
+        search: Events suchen…
         sort_by: Sortieren nach
         sort_date: Datum
         sort_title: Titel
         cancelled_badge: abgesagt
         hidden_badge: ausgeblendet
         discarded_badge: "gefiltert: %{pattern}"
-        empty: Keine passenden Veranstaltungen.
+        empty: Keine passenden Events.
         overridden_badge: bearbeitet
         duplicate_of: "Duplikat von %{title}"
         merged_badge:
@@ -574,7 +574,7 @@ de:
           other: "%{count} zusammengeführte Quellen"
         restore: Wiederherstellen
       show:
-        back: Zurück zu Veranstaltungen
+        back: Zurück zu Events
         source_link: Quelle ansehen
         intro: Korrigiere fehlerhafte Quelldaten unten. Ein geändertes Feld wird gesperrt und beim nächsten Scrape nicht überschrieben.
         title_label: Titel
@@ -594,32 +594,32 @@ de:
         field_start_date: Datum & Zeit
         field_genres: Genres
         dismiss_heading: Sichtbarkeit
-        dismiss_intro: Entferne die Veranstaltung dauerhaft aus allen öffentlichen Listen. Sie bleibt in der Datenbank und wird von keinem Scrape wieder hervorgeholt – jederzeit rückgängig machbar.
-        dismiss: Veranstaltung entfernen
-        dismissed_intro: Diese Veranstaltung ist entfernt – aus allen öffentlichen Listen ausgeblendet und vom Scraper übersprungen. Stelle sie wieder her, um sie zurückzuholen.
-        restore: Veranstaltung wiederherstellen
+        dismiss_intro: Entferne das Event dauerhaft aus allen öffentlichen Listen. Es bleibt in der Datenbank und wird von keinem Scrape wieder hervorgeholt – jederzeit rückgängig machbar.
+        dismiss: Event entfernen
+        dismissed_intro: Dieses Event ist entfernt – aus allen öffentlichen Listen ausgeblendet und vom Scraper übersprungen. Stelle es wieder her, um es zurückzuholen.
+        restore: Event wiederherstellen
         source_label: "via %{source}"
         field_canonical_event: Duplikat-Verknüpfung
         dedup_heading: Duplikate
-        is_duplicate_html: Diese Veranstaltung ist ein Duplikat von %{link} – zu deren Gunsten aus den Listen ausgeblendet.
+        is_duplicate_html: Dieses Event ist ein Duplikat von %{link} – zu dessen Gunsten aus den Listen ausgeblendet.
         unmerge: Als eigenständig markieren
-        has_duplicates: "In diese Veranstaltung zusammengeführt:"
-        merge_intro: Führe diese Veranstaltung in eine andere zusammen (nach Titel suchen), um ein durchgerutschtes Duplikat zusammenzuführen.
-        merge_placeholder: Kanonische Veranstaltung suchen…
+        has_duplicates: "In dieses Event zusammengeführt:"
+        merge_intro: Führe dieses Event in ein anderes zusammen (nach Titel suchen), um ein durchgerutschtes Duplikat zusammenzuführen.
+        merge_placeholder: Kanonisches Event suchen…
         merge: Zusammenführen
       update:
-        saved: Veranstaltung aktualisiert.
+        saved: Event aktualisiert.
       revert:
         reverted: Feld auf Quelle zurückgesetzt.
       destroy:
-        dismissed: Veranstaltung entfernt.
+        dismissed: Event entfernt.
       undismiss:
-        restored: Veranstaltung wiederhergestellt.
+        restored: Event wiederhergestellt.
       merge:
-        merged: Veranstaltungen zusammengeführt.
-        merge_missing: Wähle zuerst eine Veranstaltung aus.
+        merged: Events zusammengeführt.
+        merge_missing: Wähle zuerst ein Event aus.
       unmerge:
-        unmerged: Veranstaltung als eigenständig getrennt.
+        unmerged: Event als eigenständig getrennt.
     venue_leads:
       index:
         title: Venue-Leads
@@ -733,17 +733,17 @@ de:
     discard_rules:
       index:
         title: Filterregeln
-        intro: Filtere unerwünschte Veranstaltungen automatisch per Text. Eine gefilterte Veranstaltung verschwindet aus allen öffentlichen Listen und wird bei jedem Scrape neu geprüft – entferne die Regel und sie kommt zurück. Anders als das manuelle Entfernen einer einzelnen Veranstaltung.
+        intro: Filtere unerwünschte Events automatisch per Text. Ein gefiltertes Event verschwindet aus allen öffentlichen Listen und wird bei jedem Scrape neu geprüft – entferne die Regel und sie kommt zurück. Anders als das manuelle Entfernen eines einzelnen Events.
         new_rule: Neue Regel
         inactive: inaktiv
         all_venues: Alle Lokale
         catches:
-          zero: trifft keine Veranstaltungen
-          one: trifft 1 Veranstaltung
-          other: trifft %{count} Veranstaltungen
+          zero: trifft keine Events
+          one: trifft 1 Event
+          other: trifft %{count} Events
         edit: Bearbeiten
         delete: Löschen
-        delete_confirm: Diese Regel löschen? Gefilterte Veranstaltungen erscheinen beim nächsten Scrape wieder.
+        delete_confirm: Diese Regel löschen? Gefilterte Events erscheinen beim nächsten Scrape wieder.
         empty: Noch keine Filterregeln.
       new:
         title: Neue Filterregel
@@ -758,12 +758,12 @@ de:
         active_label: Aktiv
         save: Regel speichern
         preview_heading: Vorschau
-        preview_intro: Veranstaltungen, die diese Regel gerade trifft. Prüfe auf fälschlich erfasste Veranstaltungen, bevor du speicherst.
+        preview_intro: Events, die diese Regel gerade trifft. Prüfe auf fälschlich erfasste Events, bevor du speicherst.
       preview:
         summary:
-          zero: Trifft keine Veranstaltungen.
-          one: Trifft 1 Veranstaltung.
-          other: Trifft %{count} Veranstaltungen.
+          zero: Trifft keine Events.
+          one: Trifft 1 Event.
+          other: Trifft %{count} Events.
         saved:
           one: 1 gemerkt
           other: "%{count} gemerkt"
@@ -828,13 +828,13 @@ de:
     cancelled: Abgesagt
     rescheduled: Neues Datum
     community: Community
-    community_hint: Von jemandem aus der Community erfasst, nicht von der Website eines Veranstaltungsorts
-    delete_event: Veranstaltung löschen
-    edit_event: Veranstaltung bearbeiten
+    community_hint: Von jemandem aus der Community erfasst, nicht von der Website eines Lokals
+    delete_event: Event löschen
+    edit_event: Event bearbeiten
     edit_tag: Tag bearbeiten
-    offsite_link: Öffnet auf %{source}, nicht der Website des Veranstaltungsorts
+    offsite_link: Öffnet auf %{source}, nicht der Website des Lokals
     index:
-      empty: Keine Veranstaltungen für die aktuellen Filter.
+      empty: Keine Events für die aktuellen Filter.
       clear_filter: Filter zurücksetzen
       save_filter: Filter speichern
       save_filter_all: Über alles benachrichtigen

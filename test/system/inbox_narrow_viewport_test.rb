@@ -4,11 +4,10 @@ require "application_system_test_case"
 # Galaxy Fold cover screen).
 class InboxNarrowViewportTest < ApplicationSystemTestCase
   # .notification__meta is nowrap so the date range stays flush right, and it used to
-  # shove the whole page ~29px wider than the viewport. Locale matters: the overflow
-  # only shows in German ("3 Veranstaltungen" is far wider than "3 events"), which is
-  # the default locale but NOT what a headless browser's Accept-Language asks for.
+  # shove the whole page wider than the viewport. Locale matters, and French is the
+  # widest of the three ("3 événements"), so it is the one that has to fit.
   test "the inbox does not scroll horizontally at 320px" do
-    u = user(locale: "de")
+    u = user(locale: "fr")
     events = 3.times.map { event(start_date: Date.new(2026, 8, 8)) }
     Notification.create!(user: u, title: "Rock in Bern",
       period_start: Date.new(2026, 8, 6), period_end: Date.new(2026, 8, 13),
@@ -18,7 +17,7 @@ class InboxNarrowViewportTest < ApplicationSystemTestCase
     sign_in_as(u)
     visit notifications_path
 
-    assert_selector ".notification__meta", text: "3 Veranstaltungen"
+    assert_selector ".notification__meta", text: "3 événements"
     assert_equal evaluate_script("window.innerWidth"),
       evaluate_script("document.documentElement.scrollWidth")
   end

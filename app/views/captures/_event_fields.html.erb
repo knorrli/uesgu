@@ -98,34 +98,7 @@
 
 <%= render layout: "shared/field_group",
       locals: { attached: tag.span(t('capture.candidate.genres_hint'), class: "muted") } do %>
-  <%# The label names the field with `for` and must NOT wrap it, unlike every other
-      field here. The gem draws a selection as a chip inside the field, and a tap on
-      one targets the chip — inside a wrapping label that is a click on the label, so
-      the browser forwards activation to the labelled input as a second click at the
-      same coordinates, defeating the chip's remover. The gem ids the input with a
-      random uuid unless given one, so the label needs an id the caller can build. %>
-  <div class="flex flex-col gap-xsmall">
-    <label class="field-label" for="<%= key %>-genres"><%= t('capture.candidate.genres') %></label>
-    <%# Free text on purpose: a poster names genres the taxonomy has never seen, and
-        minting one is expected here. The suggestions exist so a genre we already
-        carry is picked rather than respelt. Submits a comma-joined string. %>
-    <div class="input-wrapper flex capture-fields__genres">
-      <%# `mobile_at` is the width at or below which the gem swaps its inline listbox
-          for a modal <dialog>; a width no viewport can be under keeps the listbox
-          everywhere. On a phone the dialog covers the screen from the middle down and
-          still shows fewer options than the dropdown it replaces, because the software
-          keyboard eats the bottom of it.
-
-          Sync options and not a src, so typing filters what is already here: a request
-          per keystroke answers a query the contributor has usually typed past by the
-          time it lands, and on mobile data the late answer overwrites the current list. %>
-      <%= combobox_tag :genres, genre_options, value: candidate.genres.join(","),
-            id: "#{key}-genres", mobile_at: "0px",
-            free_text: true, multiselect_chip_src: genre_chips_capture_path,
-            placeholder: t('capture.candidate.genres_placeholder') do |combobox| %>
-        <% combobox.customize_fieldset class: 'flex-grow' %>
-        <% combobox.customize_input class: 'flex-grow' %>
-      <% end %>
-    </div>
-  </div>
+  <%= render "shared/genre_combobox", name: :genres, id: "#{key}-genres",
+        value: candidate.genres.join(","), chip_src: genre_chips_capture_path,
+        label: t('capture.candidate.genres'), options: genre_options %>
 <% end %>

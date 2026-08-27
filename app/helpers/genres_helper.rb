@@ -62,12 +62,10 @@ module GenresHelper
   # sub-genres). Umbrellas sort to the top, so the broad buckets you reach for
   # most (Rock, Electronic …) lead the list instead of being scattered
   # alphabetically; the count is render-only, so typing still filters on the name.
-  # Shared by the genre editor's "set parent" picker and the admin event editor's
-  # genre assignment, so both surface the tree's umbrellas the same way.
-  def genre_combobox_options(genres, counts: Genre.descendant_counts, preserve_order: false)
-    list = genres.to_a
-    list = list.sort_by { |genre| [-counts[genre.id], genre.name.downcase] } unless preserve_order
-    list.map do |genre|
+  # Keyed by NAME rather than id, because every picker built on these lets you type
+  # a genre that isn't in the list — see shared/_genre_combobox.
+  def genre_combobox_options(genres, counts: Genre.descendant_counts)
+    genres.to_a.sort_by { |genre| [-counts[genre.id], genre.name.downcase] }.map do |genre|
       # name [· ancestor › path] .......... descendant-count. The path shows where
       # a candidate sits so you can tell a precise child ("Grind · Metal") from a
       # broad root; both are render-only, so typing still filters on the name.
@@ -76,7 +74,7 @@ module GenresHelper
       main << tag.span("· #{path}", class: "genre-option-path") if path.present?
       parts = [tag.span(safe_join(main), class: "genre-option-main")]
       parts << tag.span(counts[genre.id], class: "genre-option-count") if counts[genre.id].positive?
-      { display: genre.name, value: genre.id, content: safe_join(parts) }
+      { display: genre.name, value: genre.name, content: safe_join(parts) }
     end
   end
 

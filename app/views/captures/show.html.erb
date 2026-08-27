@@ -67,7 +67,7 @@
       template's contents are not in the document, so the option ids it carries only
       ever exist once in the live DOM. %>
   <template data-capture-target="genreOptions">
-    <% combobox_options(capture_genre_options).each do |option| %><%= render option %><% end %>
+    <% combobox_options(genre_combobox_options(Genre.offerable)).each do |option| %><%= render option %><% end %>
   </template>
 
   <%# Progress, navigation and receipts in one strip: a card publishes the moment it is

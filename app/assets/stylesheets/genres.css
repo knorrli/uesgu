@@ -99,11 +99,11 @@
   font-weight: bold;
 }
 
-/* The admin event editor's genre-assignment picker lays each option out as name +
-   its tree path (left) and descendant count (right), so you can read where a
-   candidate sits and how broad it is at a glance. Scoped to this picker so other
-   comboboxes are untouched. (The genre editor's own "set parent" / "merge" pickers
-   use the indented .genre-tree-option layout below instead.) */
+/* The genre picker (shared/_genre_combobox) lays each option out as name + its tree
+   path (left) and descendant count (right), so you can read where a candidate sits
+   and how broad it is at a glance. Scoped to this picker so other comboboxes are
+   untouched. (The genre editor's own "set parent" / "merge" pickers use the indented
+   .genre-tree-option layout below instead.) */
 .genre-combobox .hw-combobox__option {
   display: flex;
   justify-content: space-between;

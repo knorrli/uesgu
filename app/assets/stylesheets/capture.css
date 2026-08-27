@@ -213,8 +213,10 @@ button.capture-queue__tile[data-state="pending"] {
    with no width set measures its widest option ("Appenzell Ausserrhoden"), which is
    wide enough to push the town off the row the two share. The submit is an <input> too
    and is left out on purpose — full-width it reads as a batch commit, which neither
-   screen has such a thing as. */
-.capture-fields input:not([type=submit]),
+   screen has such a thing as. The genre picker's inner input is left out because it is
+   not the field: it is one flex item on a wrapping row it shares with the selection
+   chips, and at 100% it takes a row of its own and pushes the handle onto a third. */
+.capture-fields input:not([type=submit], .hw-combobox__input),
 .capture-fields select,
 .capture-picker textarea {
   width: 100%;

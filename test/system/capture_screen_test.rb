@@ -209,6 +209,25 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".hw-combobox__chip", text: "flarncore"
   end
 
+  # Two things go wrong on a narrow card once the chips fill the row. The card's "fields
+  # fill the column" rule catches the picker's inner input, which is not the field but a
+  # flex item on that row, so it takes a row of its own and leaves the handle a third;
+  # and the gem's own floor for that input is written in a variable we unset, so without
+  # a replacement it shrinks to the 1rem it also sets — too narrow to type a genre into.
+  test "a genre row full of chips keeps a typable box beside the handle" do
+    CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore dubtronica])])
+    visit capture_path
+    pick "poster.png"
+    page.current_window.resize_to(390, 844)
+
+    input = rect(".capture-card .hw-combobox__input")
+    chip = all(".capture-card .hw-combobox__chip").first.evaluate_script("this.getBoundingClientRect().toJSON()")
+    assert_operator input["top"], :>=, chip["bottom"],
+      "the chips do not fill the row, so this is not the wrapped case"
+    assert_in_delta input["top"], rect(".capture-card .hw-combobox__handle")["top"], 1
+    assert_operator input["width"], :>=, 96
+  end
+
   # The field used to be a comma-joined text input, so a poster naming its genres with
   # any other separator became one genre. A chip per genre is what makes that visible.
   test "a genre the taxonomy has never seen can still be typed in" do

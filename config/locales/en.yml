@@ -199,7 +199,6 @@ en:
       locality_hint: Type a letter or two — the towns we know come up.
       canton: Canton
       genres: Genres
-      genres_placeholder: Type or pick a genre
       genres_hint: Enter adds one. New genres are fine — if one already exists, take that instead.
       past: This date has passed.
       refused: "Not used: %{values}"
@@ -365,6 +364,8 @@ en:
       title: New events
       empty_all: No new events this period.
   genres:
+    combobox:
+      placeholder: Type or pick a genre
     index:
       title: Genres
       search: Search genres
@@ -536,6 +537,7 @@ en:
         title: Invitations
         intro: Single-use invitation codes. Share the link with one person — once they sign up, the code is spent.
         new_heading: New invitation
+        note_label: Note (optional)
         note_placeholder: e.g. for Anna
         expires_label: Valid until
         expires_never: Unlimited
@@ -585,7 +587,7 @@ en:
         date_label: Date
         time_label: Time
         genres_label: Genres
-        genres_hint: Pick from the genre list. Editing locks the list — the scraper won't touch it, and visibility is re-built from it.
+        genres_hint: Enter adds one. New genres are fine — if one already exists, take that instead. Editing locks the list — the scraper won't touch it, and visibility is re-built from it.
         dismissed_badge: dismissed
         overridden_badge: manually edited
         save: Save

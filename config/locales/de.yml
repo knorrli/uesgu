@@ -199,7 +199,6 @@ de:
       locality_hint: Tipp ein, zwei Buchstaben – bekannte Orte tauchen auf.
       canton: Kanton
       genres: Genres
-      genres_placeholder: Genre eingeben oder wählen
       genres_hint: Enter fügt eins hinzu. Neue Genres sind ok — wenn es eins schon gibt, lieber das nehmen.
       past: Dieses Datum ist vorbei.
       refused: "Nicht übernommen: %{values}"
@@ -365,6 +364,8 @@ de:
       title: Neue Events
       empty_all: Keine neuen Events in diesem Zeitraum.
   genres:
+    combobox:
+      placeholder: Genre eingeben oder wählen
     index:
       title: Genres
       search: Genres suchen
@@ -536,6 +537,7 @@ de:
         title: Einladungen
         intro: Einmal verwendbare Einladungscodes. Teile den Link mit einer Person – nach der Registrierung ist der Code verbraucht.
         new_heading: Neue Einladung
+        note_label: Notiz (optional)
         note_placeholder: z. B. für Anna
         expires_label: Gültig bis
         expires_never: Unbegrenzt
@@ -585,7 +587,7 @@ de:
         date_label: Datum
         time_label: Zeit
         genres_label: Genres
-        genres_hint: Aus der Genre-Liste wählen. Beim Bearbeiten wird die Liste gesperrt – der Scraper lässt sie in Ruhe, und die Sichtbarkeit wird daraus neu aufgebaut.
+        genres_hint: Enter fügt eins hinzu. Neue Genres sind ok — wenn es eins schon gibt, lieber das nehmen. Beim Bearbeiten wird die Liste gesperrt – der Scraper lässt sie in Ruhe, und die Sichtbarkeit wird daraus neu aufgebaut.
         dismissed_badge: entfernt
         overridden_badge: manuell bearbeitet
         save: Speichern

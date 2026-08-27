@@ -1,0 +1,45 @@
+<%# The genre picker, wherever an event's genres are chosen — the capture card, the
+    hand-entry page, the admin event editor. One partial because the configuration below
+    is what makes it work and every option of it has to match on all three.
+
+    `options` is empty by default so the capture card can render an EMPTY listbox and
+    have the browser clone the page's one copy into it (see captures/show +
+    capture_controller.js); every other caller passes the list. %>
+<%# locals: (name:, id:, value:, chip_src:, label:, badge: nil, options: []) %>
+<div class="flex flex-col gap-xsmall">
+  <%# The label names the field with `for` and must NOT wrap it, unlike an ordinary
+      field. The gem draws a selection as a chip inside the field, and a tap on one
+      targets the chip — inside a wrapping label that is a click on the label, so the
+      browser forwards activation to the labelled input as a second click at the same
+      coordinates, defeating the chip's remover. The gem ids the input with a random
+      uuid unless given one, so the label needs an id the caller can build. %>
+  <label class="field-label flex gap-small align-baseline" for="<%= id %>">
+    <%= label %>
+    <%= badge %>
+  </label>
+  <div class="input-wrapper flex genre-combobox">
+    <%# Free text on purpose, and the reason the field submits NAMES where every other
+        combobox in the app submits ids: a poster names genres the taxonomy has never
+        seen, and the gem sends a newly-typed one under the same field name as the
+        picked ones — so ids would arrive mixed in with raw text, with a genre called
+        "12" indistinguishable from Genre#12. The options exist so a genre we already
+        carry is picked rather than respelt.
+
+        `mobile_at` is the width at or below which the gem swaps its inline listbox for
+        a modal <dialog>; a width no viewport can be under keeps the listbox everywhere.
+        On a phone the dialog covers the screen from the middle down and still shows
+        fewer options than the dropdown it replaces, because the software keyboard eats
+        the bottom of it.
+
+        Sync options and not a src, so typing filters what is already here: a request
+        per keystroke answers a query the user has usually typed past by the time it
+        lands, and on mobile data the late answer overwrites the current list. %>
+    <%= combobox_tag name, options, value: value, id: id,
+          mobile_at: "0px", free_text: true, multiselect_chip_src: chip_src,
+          placeholder: t("genres.combobox.placeholder"),
+          dialog_label: t("genres.combobox.placeholder") do |combobox| %>
+      <% combobox.customize_fieldset class: 'flex-grow' %>
+      <% combobox.customize_input class: 'flex-grow' %>
+    <% end %>
+  </div>
+</div>

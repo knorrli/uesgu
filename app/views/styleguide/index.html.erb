@@ -29,6 +29,7 @@
     <a href="#pills">Pills, badges &amp; chips</a>
     <a href="#dropdowns">Dropdowns &amp; selects</a>
     <a href="#inputs">Form inputs</a>
+    <a href="#genre-combobox">Genre picker</a>
     <a href="#drop-zone">Drop zone</a>
     <a href="#icons">Icons</a>
     <a href="#nav">Navigation</a>
@@ -505,6 +506,29 @@
         <span class="sg-spec__name">Sheet loading row</span> · <code>.sheet__loading</code>
         <p class="sg-purpose">Stands in for a sheet's option rows while they load. The What and Where trees are ~360 rows, so they're fetched the first time the sheet opens instead of riding along on every page (#81) — this is what fills the panel in the meantime.</p>
         <span class="sg-ok">Muted, one line, and it reserves a few rows' height, so the in-flow desktop panel doesn't jump when the tree lands.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section" id="genre-combobox">
+    <h2>Genre picker</h2>
+    <p class="sg-section__intro">The one field for choosing an event's genres, wherever that happens: the capture card, the hand-entry page, the admin event editor. Built from <code>shared/_genre_combobox</code> &mdash; <b>reuse it</b> rather than configuring a combobox by hand, because three of its options are load-bearing and silently break the field if they drift apart.</p>
+    <p class="sg-section__intro"><b>Free text, and therefore names.</b> A poster names genres the taxonomy has never seen, so typing a new one is expected; the gem submits a newly-typed genre under the same field name as the picked ones, which is why every option is keyed by its <b>name</b> and not by a <code>Genre</code> id. <code>mobile_at: "0px"</code> keeps the inline listbox on every width &mdash; the gem's modal <code>&lt;dialog&gt;</code> covers a phone from the middle down and then loses its lower half to the software keyboard. Options ride along in the page rather than behind a <code>src</code>, so typing filters what is already there.</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <div class="account-form flex flex-col gap-small">
+          <%= render "shared/genre_combobox", name: :styleguide_genres, id: "sg-genres",
+                value: "", chip_src: chips_genres_path, label: t('capture.candidate.genres'),
+                options: genre_combobox_options(Genre.offerable) %>
+          <span class="muted"><%= t('capture.candidate.genres_hint') %></span>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Genre picker</span> &middot; <code>render "shared/genre_combobox", name:, id:, value:, chip_src:, label:</code>
+        <p class="sg-purpose">Each option reads <b>name &middot; where it sits</b> on the left and a descendant count on the right, with the umbrella genres sorted to the top &mdash; so the broad buckets you reach for most lead the list, and you can tell a precise child (&ldquo;Grind &middot; Metal&rdquo;) from a root at a glance. Both are render-only: typing still filters on the name alone.</p>
+        <p class="sg-purpose">Pass <code>badge:</code> to hang a chip off the label (the admin editor marks a pinned list that way), and <code>options: []</code> to render an empty listbox for a client that clones the page's one copy into it &mdash; which is how the capture queue avoids shipping the whole taxonomy per card.</p>
+        <span class="sg-ok">The label carries <code>for</code> and must <b>never</b> wrap the field: a tap on a selection chip inside a wrapping label is forwarded to the input as a second click, which defeats the chip's own remover.</span>
       </div>
     </div>
   </section>

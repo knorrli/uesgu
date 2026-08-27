@@ -65,18 +65,18 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", revert_admin_event_path(e, field: "title")
   end
 
-  # The same markup rule as the capture card's genre field, for the same reason
-  # (app/views/captures/_candidate.html.erb). Structural rather than behavioural: no
-  # system test drives this page, and the phone behaviour is pinned on the other field
-  # built this way, in test/system/capture_screen_test.rb.
+  # The same field the capture screens render (app/views/shared/_genre_combobox).
+  # Structural rather than behavioural: no system test drives this page, and the phone
+  # behaviour is pinned on the other screen built from it, in
+  # test/system/capture_screen_test.rb.
   test "the genre field is named by a label that does not wrap it" do
     e = event(title: "Editable Show")
     sign_in_as user(admin: true)
 
     get admin_event_path(e)
-    assert_select "input#event_override_genre_ids[role=combobox]"
-    assert_select "label[for=?]", "event_override_genre_ids",
-                  text: I18n.t("admin.events.show.genres_label")
+    assert_select "input#event_genres[role=combobox]"
+    assert_select "label[for=?]", "event_genres",
+                  text: /#{I18n.t("admin.events.show.genres_label")}/
     assert_select "dialog.hw-combobox__dialog"
     assert_select "label dialog.hw-combobox__dialog", count: 0
   end
@@ -147,7 +147,7 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
 
     patch admin_event_path(e), params: { event: {
       title: "Genre Show", description: "", date: e.start_date.iso8601, time: "",
-      override_genre_ids: "#{g1.id},#{g2.id}"
+      genres: "#{g1.name},#{g2.name}"
     } }
     assert_redirected_to admin_event_path(e)
 
@@ -161,6 +161,20 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
 
     patch revert_admin_event_path(e, field: "genres")
     refute e.reload.overridden?(:genres)
+  end
+
+  test "an admin can type a genre the taxonomy has never carried" do
+    e = event(title: "Genre Show")
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: "Genre Show", description: "", date: e.start_date.iso8601, time: "",
+      genres: "zorpcore"
+    } }
+
+    assert_equal %w[Zorpcore], e.reload.genre_list
+    # ensure! files it the way a scraped or captured genre is, so it reaches curation.
+    assert Genre.exists?(fingerprint: Genre.fingerprint_for("zorpcore"))
   end
 
   test "an admin can dismiss an event and restore it" do

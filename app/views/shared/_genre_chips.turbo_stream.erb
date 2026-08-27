@@ -1,0 +1,12 @@
+<%# The selection chips behind every genre combobox (shared/_genre_combobox), which asks
+    for them on each change. Names, not ids: the field is free text, so a selection
+    routinely holds a genre the taxonomy does not carry yet. %>
+<%# locals: (names:) %>
+<% names.each do |genre_name| %>
+  <%= within_combobox_selection_chip do %>
+    <%= tag.div class: "hw-combobox__chip flex flex-row gap-small align-baseline" do %>
+      <%= tag.span genre_name %>
+      <%= tag.span **combobox_chip_remover_attrs(display: genre_name, value: genre_name, class: 'ph ph-x') %>
+    <% end %>
+  <% end %>
+<% end %>

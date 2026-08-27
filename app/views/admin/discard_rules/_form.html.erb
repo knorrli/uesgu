@@ -9,20 +9,20 @@
     <% end %>
 
     <label class="flex flex-col gap-small">
-      <span><%= t('.pattern_label') %></span>
+      <span class="field-label"><%= t('.pattern_label') %></span>
+      <span class="muted"><%= t('.pattern_hint') %></span>
       <%= f.text_field :pattern, autocomplete: 'off',
             data: { preview_target: 'field', preview_param: 'pattern', action: 'input->preview#schedule' } %>
-      <span class="muted"><%= t('.pattern_hint') %></span>
     </label>
 
     <label class="flex flex-col gap-small">
-      <span><%= t('.scraper_label') %></span>
+      <span class="field-label"><%= t('.scraper_label') %></span>
       <%= f.select :scraper, DiscardRule.venue_options, { include_blank: t('.all_venues') },
             data: { preview_target: 'field', preview_param: 'scraper', action: 'change->preview#schedule' } %>
     </label>
 
     <label class="flex flex-col gap-small">
-      <span><%= t('.note_label') %></span>
+      <span class="field-label"><%= t('.note_label') %></span>
       <%= f.text_field :note, autocomplete: 'off' %>
     </label>
 

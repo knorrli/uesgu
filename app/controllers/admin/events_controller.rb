@@ -63,7 +63,7 @@ module Admin
     # that hang off the genres.
     def update
       @event = Event.find(params.expect(:id))
-      attrs = params.expect(event: %i[title description date time override_genre_ids])
+      attrs = params.expect(event: %i[title description date time genres])
       assign_scalars(@event, attrs)
       locked = @event.changed & Event::OVERRIDABLE_FIELDS
       locked |= SCHEDULE_FIELDS if locked.intersect?(SCHEDULE_FIELDS)
@@ -139,16 +139,16 @@ module Admin
         end
     end
 
-    # Pin the genre list to the admin's combobox selection (comma-joined Genre
-    # ids; mapped back to names, which Event's genre_list= setter canonicalizes
-    # and de-blocks). A missing field is left alone; an empty selection clears the
-    # list. Returns whether it actually changed, so the caller knows to lock it.
+    # Pin the genre list to the admin's combobox selection (comma-joined names,
+    # which Event's genre_list= setter canonicalizes and de-blocks — so a name typed
+    # rather than picked is filed the same way a captured one is). A missing field is
+    # left alone; an empty selection clears the list. Returns whether it actually
+    # changed, so the caller knows to lock it.
     def assign_genres(event, attrs)
-      return false unless attrs.key?(:override_genre_ids)
+      return false unless attrs.key?(:genres)
 
-      ids = attrs[:override_genre_ids].to_s.split(",").map(&:strip).reject(&:blank?)
       before = event.genre_list.sort
-      event.genre_list = Genre.where(id: ids).pluck(:name)
+      event.genre_list = attrs[:genres].to_s.split(",").map(&:strip).compact_blank
       event.genre_list.sort != before
     end
   end

@@ -199,7 +199,6 @@ fr:
       locality_hint: Tape une lettre ou deux — les localités connues apparaissent.
       canton: Canton
       genres: Genres
-      genres_placeholder: Tape ou choisis un genre
       genres_hint: Entrée pour ajouter. Les nouveaux genres sont permis — si un genre existe déjà, prends-le.
       past: Cette date est passée.
       refused: "Non retenu : %{values}"
@@ -365,6 +364,8 @@ fr:
       title: Nouveaux événements
       empty_all: Aucun nouvel événement durant cette période.
   genres:
+    combobox:
+      placeholder: Tape ou choisis un genre
     index:
       title: Genres
       search: Rechercher des genres
@@ -536,6 +537,7 @@ fr:
         title: Invitations
         intro: Codes d'invitation à usage unique. Partage le lien avec une personne — une fois inscrite, le code est utilisé.
         new_heading: Nouvelle invitation
+        note_label: Note (facultatif)
         note_placeholder: p. ex. pour Anna
         expires_label: Valable jusqu'au
         expires_never: Illimité
@@ -585,7 +587,7 @@ fr:
         date_label: Date
         time_label: Heure
         genres_label: Genres
-        genres_hint: Choisis dans la liste des genres. La modification verrouille la liste — le scraper n'y touche plus, et la visibilité en est reconstruite.
+        genres_hint: Entrée pour ajouter. Les nouveaux genres sont permis — si un genre existe déjà, prends-le. La modification verrouille la liste — le scraper n'y touche plus, et la visibilité en est reconstruite.
         dismissed_badge: retiré
         overridden_badge: modifié manuellement
         save: Enregistrer

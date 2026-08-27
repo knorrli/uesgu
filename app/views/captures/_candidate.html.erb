@@ -1,17 +1,14 @@
 <%# One event the model claims it read, as a card to decide on. Everything is
     editable and nothing is trusted: a value the normalizer refused is null here with
     the model's raw text beside it (see EventCapture::Candidate). Accepting publishes
-    immediately. %>
-<%# locals: (candidate:, key:, attempt_token: nil, index: nil, manual: false) %>
-<%# A hand-entered card has no poster, and must NOT be given the source target: the
-    controller empties that pane on connect to fill it from the browser-held blob, so
-    the target would wipe the note (see capture_controller.js). %>
-<% pane = manual ? { source: tag.p(t('capture.picker.by_hand'), class: "muted") }
-                 : { source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } } } %>
+    immediately. The fields themselves are shared with the hand-entry screen (see
+    captures/_event_fields). %>
+<%# locals: (candidate:, key:, attempt_token: nil, index: nil) %>
 <%= render layout: "shared/review_card",
       locals: { id: key, actions: render("captures/card_actions", key: key),
                 frame_class: "capture-card",
-                frame_attrs: { data: { capture_target: "card", state: "open" } }, **pane } do %>
+                frame_attrs: { data: { capture_target: "card", state: "open" } },
+                source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } } } do %>
   <%# Above the fields, not beside one: it asks about the whole card, and the answer
       it wants decides what publishing even means. %>
   <% matches = capture_duplicates(candidate) %>
@@ -21,7 +18,7 @@
                                    time: candidate.time, genres: candidate.genres) %>
   <% end %>
   <%= form_with url: capture_path, method: :post, id: "#{key}-form",
-        class: "capture-card__fields account-form flex flex-col gap-large",
+        class: "capture-fields account-form flex flex-col gap-large",
         data: { action: "turbo:submit-end->capture#decided change->capture#carryPlace" } do %>
     <%= hidden_field_tag :card_id, key, id: nil %>
     <%# What the model proposed, carried alongside what the human submits so the two
@@ -39,131 +36,10 @@
       <%= hidden_field_tag "normalized_#{field}", nil, id: nil %>
     <% end %>
 
-    <label class="flex flex-col gap-xsmall">
-      <span class="field-label"><%= t('capture.candidate.title') %></span>
-      <%= text_field_tag :title, candidate.title, required: true %>
-    </label>
-
-    <%= render layout: "shared/field_group",
-          locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :subtitle)) } do %>
-      <label class="flex flex-col gap-xsmall">
-        <span class="field-label"><%= t('capture.candidate.description') %></span>
-        <%= text_field_tag :description, candidate.subtitle %>
-      </label>
-    <% end %>
-
-    <div class="capture-card__when flex gap-small wrap">
-      <%= render layout: "shared/field_group",
-            locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :date)) } do %>
-        <label class="flex flex-col gap-xsmall">
-          <span class="field-label"><%= t('capture.candidate.date') %></span>
-          <%= date_field_tag :date, candidate.date, required: true %>
-        </label>
-      <% end %>
-      <%= render layout: "shared/field_group",
-            locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :time)) } do %>
-        <label class="flex flex-col gap-xsmall">
-          <span class="field-label"><%= t('capture.candidate.time') %></span>
-          <%# Native, and must stay so: mobile Safari keeps its own control metrics for a
-              date input whatever height the stylesheet sets, so a text field beside one
-              draws its underline at a different height. The value is always HH:MM or
-              blank — a time the normalizer refused is null with the raw text cited
-              beside it (see EventCapture::Normalizer). %>
-          <%= time_field_tag :time, candidate.time %>
-        </label>
-      <% end %>
-      <%# In the row rather than in the date group's `attached`, where every other remark
-          on this card hangs off the field it concerns: half a row is too narrow for the
-          sentence, and the row is the narrowest thing that is not. %>
-      <% if candidate.past? %>
-        <p class="capture-card__warning"><%= t('capture.candidate.past') %></p>
-      <% end %>
-    </div>
-
-    <% suggestions = place_suggestions(candidate) %>
-    <%= render layout: "shared/field_group",
-          locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :place)),
-                               render("shared/suggestions", label: t('capture.candidate.suggestions'),
-                                      chips: place_chips(suggestions))] } do %>
-      <label class="flex flex-col gap-xsmall">
-        <span class="field-label"><%= t('capture.candidate.place') %></span>
-        <%= text_field_tag :place, candidate.place %>
-      </label>
-    <% end %>
-
-    <%# Chips are the affordance where there is a ranking to render; where there is
-        none, the hint that takes their slot is. The same row also holds the towns
-        matching what is being typed, appended in the browser (see
-        capture_controller.js), which is how the long tail stays reachable at all.
-        Both hang off the PAIR: a chip fills the canton as well as the town (see
-        CapturesHelper#locality_chips), and the canton is computed from the locality
-        rather than read off the poster (see EventCapture::Normalizer). %>
-    <% towns = locality_chips(suggestions, candidate) %>
-    <% unranked_hint = tag.span(t('capture.candidate.locality_hint'), class: "muted",
-                                data: { locality_hint: true }) if towns.empty? %>
-    <%= render layout: "shared/field_group",
-          locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :locality)),
-                               render("shared/suggestions", label: t('capture.candidate.locality_suggestions'),
-                                      chips: towns, attrs: { data: { suggestions: "locality" },
-                                                             aria: { live: "polite" } }),
-                               unranked_hint] } do %>
-      <div class="capture-card__where flex gap-small wrap">
-        <label class="flex flex-col gap-xsmall">
-          <%# Required HERE and not at extraction: a poster never prints its own town,
-              but Location.add_to_tree drops any tuple missing the middle tier, so a
-              blank locality is an event nobody can browse to. %>
-          <span class="field-label"><%= t('capture.candidate.locality') %></span>
-          <%# autocomplete off because `name="locality"` is an address autofill token and
-              the field sits beside a canton: iOS otherwise offers to fill it with a whole
-              postal address ("Bern 3008 Switzerland"), which mints that as a town. %>
-          <%= text_field_tag :locality, candidate.locality, required: true, autocomplete: "off",
-                data: { action: "input->capture#suggestLocalities" } %>
-        </label>
-        <label class="flex flex-col gap-xsmall">
-          <span class="field-label"><%= t('capture.candidate.canton') %></span>
-          <%= select_tag :canton, options_for_select(canton_options, candidate.canton),
-                include_blank: true, required: true %>
-        </label>
-      </div>
-    <% end %>
-
-    <%= render layout: "shared/field_group",
-          locals: { attached: tag.span(t('capture.candidate.genres_hint'), class: "muted") } do %>
-      <%# The label names the field with `for` and must NOT wrap it, unlike every other
-          field on this card. The gem draws a selection as a chip inside the field, and
-          a tap on one targets the chip — inside a wrapping label that is a click on the
-          label, so the browser forwards activation to the labelled input as a second
-          click at the same coordinates, defeating the chip's remover. The gem ids the
-          input with a random uuid unless given one, so the label needs an id the card
-          can build. %>
-      <div class="flex flex-col gap-xsmall">
-        <label class="field-label" for="<%= key %>-genres"><%= t('capture.candidate.genres') %></label>
-        <%# Free text on purpose: a poster names genres the taxonomy has never seen, and
-            minting one is expected here. The suggestions exist so a genre we already
-            carry is picked rather than respelt. Submits the same comma-joined string
-            the text input did. %>
-        <div class="input-wrapper flex capture-card__genres">
-          <%# Empty on purpose: the options are cloned in from the page's one copy when
-              this card opens (see capture_controller.js). Sync and not a src, so typing
-              filters what is already here — a request per keystroke answers a query the
-              contributor has usually typed past by the time it lands, and on mobile data
-              the late answer overwrites the current list.
-
-              `mobile_at` is the width at or below which the gem swaps its inline listbox
-              for a modal <dialog>; a width no viewport can be under keeps the listbox
-              everywhere. On a phone the dialog covers the card from mid-screen down and
-              still shows fewer options than the dropdown it replaces, because the
-              software keyboard eats the bottom of it. %>
-          <%= combobox_tag :genres, [], value: candidate.genres.join(","),
-                id: "#{key}-genres", mobile_at: "0px",
-                free_text: true, multiselect_chip_src: genre_chips_capture_path,
-                placeholder: t('capture.candidate.genres_placeholder') do |combobox| %>
-            <% combobox.customize_fieldset class: 'flex-grow' %>
-            <% combobox.customize_input class: 'flex-grow' %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
+    <%# No genre options: a batch is N posters x M events, and shipping ~300 of them
+        into every card would grow with both, and with the taxonomy. Each card clones
+        the page's one copy when it opens instead (see capture_controller.js). %>
+    <%= render "captures/event_fields", candidate: candidate, key: key, suggestions: true %>
   <% end %>
 
   <%# OUTSIDE the form, and deliberately: this is a report on the read, not a value of
@@ -172,26 +48,23 @@
       Flagging beats re-sending the same request, because the provider is asked for no
       `temperature` and a model sampling deterministically answers an identical
       request identically (see EventCapture::Correction). %>
-  <%# A hand-entered card has no input to read again. %>
-  <% unless manual %>
-    <%= render layout: "shared/card_aside",
-          locals: { title: t('capture.reread.label'),
-                    action: tag.button(t('capture.actions.reread'), type: "button",
-                                       class: "button-small", data: { action: "capture#reread" }) } do %>
-      <div class="capture-card__reread account-form flex flex-col gap-small">
-        <div class="flex gap-xsmall wrap">
-          <% EventCapture::Correction::FIELDS.each do |field| %>
-            <label class="tag">
-              <%= check_box_tag "wrong", field, false, id: nil %>
-              <%= t("capture.candidate.#{field}") %>
-            </label>
-          <% end %>
-        </div>
-        <%= text_field_tag :note, nil, id: nil, class: "capture-card__note",
-              placeholder: t('capture.reread.note_placeholder') %>
-        <p class="muted" data-spent hidden><%= t('capture.reread.spent') %></p>
+  <%= render layout: "shared/card_aside",
+        locals: { title: t('capture.reread.label'),
+                  action: tag.button(t('capture.actions.reread'), type: "button",
+                                     class: "button-small", data: { action: "capture#reread" }) } do %>
+    <div class="capture-card__reread account-form flex flex-col gap-small">
+      <div class="flex gap-xsmall wrap">
+        <% EventCapture::Correction::FIELDS.each do |field| %>
+          <label class="tag">
+            <%= check_box_tag "wrong", field, false, id: nil %>
+            <%= t("capture.candidate.#{field}") %>
+          </label>
+        <% end %>
       </div>
-    <% end %>
+      <%= text_field_tag :note, nil, id: nil, class: "capture-card__note",
+            placeholder: t('capture.reread.note_placeholder') %>
+      <p class="muted" data-spent hidden><%= t('capture.reread.spent') %></p>
+    </div>
   <% end %>
 
   <%# The interesting column: what the model claimed and we refused, and why. A

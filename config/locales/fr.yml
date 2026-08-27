@@ -143,10 +143,11 @@ fr:
     images_hint: Plusieurs à la fois, pas de souci. Les images ne sont jamais stockées.
     text_label: Texte
     text_hint: D'un chat, d'une newsletter, peu importe.
+    manual:
+      title: Saisir un événement
     picker:
       drop_label: Dépose tes affiches ici, ou touche pour choisir
       add_by_hand: Saisir à la main
-      by_hand: Saisi à la main
       read_text: Lire
       start_over: Annuler et recommencer
     queue:

@@ -60,19 +60,19 @@ Rails.application.routes.draw do
       constraints: { format: "ics" }, format: true
 
   # The capture funnel: a contributor turns a poster photo or pasted text into
-  # events we don't scrape. `show` is the one screen (pick inputs, then verify what
-  # came back); `extract` runs ONE input and streams its candidates back, fired
-  # once per input by the client — 8 x 2.3s does not fit in one request and there
-  # is no queue to reach for. `create` publishes the candidates a human accepted.
+  # events we don't scrape. `show` reads inputs and verifies what came back, `manual`
+  # takes one typed in by hand; `extract` runs ONE input and streams its candidates
+  # back, fired once per input by the client — 8 x 2.3s does not fit in one request
+  # and there is no queue to reach for. `create` publishes what a human accepted.
   # `drop` records what a discarded candidate had proposed — nothing else does,
   # since a drop otherwise never reaches the server.
   resource :capture, only: %i[show create] do
     post :extract
     post :drop
-    # A contributor with no poster gets the same card as everyone else, empty. It is
-    # a render, not a read: no model call, no ExtractionAttempt, and it publishes
-    # through `create` like any other card.
-    post :blank
+    # A contributor with no poster fills the same fields in on a plain page of its
+    # own. No model call and no ExtractionAttempt; it publishes through `create`,
+    # which answers it in HTML where a card is answered in a turbo-stream.
+    get :manual
     # `genre_chips` renders the combobox's current selection. It speaks NAMES — the
     # taxonomy endpoints elsewhere answer with ids and only know genres already tagged
     # on an event, and a capture routinely proposes a name nothing carries yet.

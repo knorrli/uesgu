@@ -34,8 +34,6 @@ export default class extends Controller {
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 },
     localities: Object,
-    blankUrl: String,
-    byHand: String,
     foundOne: String,
     foundOther: String,
     done: Object,
@@ -136,12 +134,6 @@ export default class extends Controller {
     this.leavePicker()
     this.remember(this.rowId(id), id, { label, text })
     this.extract({ text }, label, id)
-  }
-
-  // Nothing to read, so nothing to send: the press is for the form.
-  byHand() {
-    this.leavePicker()
-    this.addBlank(crypto.randomUUID(), this.byHandValue)
   }
 
   // Sending IS leaving the picker, there being nothing to assemble on it first. Someone
@@ -710,30 +702,6 @@ export default class extends Controller {
       // ANIMATION FRAME, so the pending row is still standing here, and reading that
       // scored every failure a success and cleared the textarea under a refused paste.
       return this.failureIn(stream) === null
-    } catch {
-      return this.failRow(id)
-    }
-  }
-
-  // Asks the server for an empty card rather than building one here: the card is a
-  // whole ERB form, and a second copy of it in JS would drift from the real one. The
-  // pending row still has to exist first — a turbo-stream replace needs its target.
-  async addBlank(id, label) {
-    if (!document.getElementById(this.rowId(id))) this.appendPending(id, label)
-
-    const body = new FormData()
-    body.append("row_id", id)
-
-    try {
-      const response = await fetch(this.blankUrlValue, {
-        method: "POST",
-        body,
-        headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
-      })
-      if (!response.ok) return this.failRow(id)
-
-      Turbo.renderStreamMessage(await response.text())
-      return true
     } catch {
       return this.failRow(id)
     }

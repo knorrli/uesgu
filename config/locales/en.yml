@@ -147,6 +147,8 @@ en:
       title: Enter an event
     picker:
       drop_label: Drop posters here, or tap to pick
+      paste: Paste an image
+      paste_empty: No image on the clipboard.
       add_by_hand: Enter by hand
       read_text: Read
       start_over: Cancel and start over
@@ -181,6 +183,7 @@ en:
       unknown: That didn't work.
     row:
       pending: reading …
+      pasted: Pasted image
       untitled: Text
       nothing_found: Nothing here looks like an event.
       source_alt: The image this was read from

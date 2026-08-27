@@ -4,6 +4,7 @@
 
 <div class="capture flex flex-col gap-large"
      data-controller="capture"
+     data-action="paste@document->capture#pasted"
      data-capture-url-value="<%= extract_capture_path %>"
      data-capture-drop-url-value="<%= drop_capture_path %>"
      data-capture-max-edge-value="1568"
@@ -11,6 +12,7 @@
      data-capture-error-value="<%= t('capture.failures.unreachable') %>"
      data-capture-undecodable-value="<%= t('capture.failures.image_unsupported') %>"
      data-capture-source-alt-value="<%= t('capture.row.source_alt') %>"
+     data-capture-pasted-value="<%= t('capture.row.pasted') %>"
      data-capture-localities-value="<%= localities.to_json %>"
      data-capture-found-one-value="<%= found[:one] %>"
      data-capture-found-other-value="<%= found[:other] %>"
@@ -29,18 +31,22 @@
     </div>
   <% end %>
 
-  <%# Three ways in, each one action: nothing is assembled here first, because a
+  <%# Four ways in, each one action: nothing is assembled here first, because a
       contributor with more to add decides these and comes back for another pass. So
-      there is no batch to commit and no button that speaks for the screen — picking
-      files and dropping them send on their own, and the one press belongs to the text
-      field, which has no gesture of its own to end on. %>
+      there is no batch to commit and no button that speaks for the screen. Picking
+      files, dropping them and pasting them send on their own; the two presses each
+      stand in for a gesture that is missing — a phone has no paste keystroke, and
+      typing ends on nothing at all. %>
   <div class="capture-picker account-form flex flex-col gap-medium" data-capture-target="input">
     <%= render "shared/drop_zone",
           id: "capture-files", label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
+          paste_label: t('capture.picker.paste'), paste_error: t('capture.picker.paste_empty'),
           input_attrs: { accept: "image/*", multiple: true,
                          data: { capture_target: "files", action: "change->capture#readFiles" } },
           zone_attrs: { data: { capture_target: "zone",
-                                action: "dragover->capture#dragOver dragleave->capture#dragLeave drop->capture#dropFiles" } } %>
+                                action: "dragover->capture#dragOver dragleave->capture#dragLeave drop->capture#dropFiles" } },
+          paste_attrs: { data: { capture_target: "paste", action: "capture#pasteImages" } },
+          error_attrs: { data: { capture_target: "pasteError" } } %>
 
     <label class="flex flex-col gap-small">
       <span class="field-label"><%= t('capture.text_label') %></span>

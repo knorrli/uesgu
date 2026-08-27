@@ -828,7 +828,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   # Picking files ends on a dialog closing and dropping them ends on a drag; typing ends
-  # on nothing, which is why the text field is the only entry point with a button.
+  # on nothing, which is why this one has a button of its own.
   test "the read button is dead until there is text to read" do
     visit capture_path
     assert read_disabled?
@@ -838,6 +838,112 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     find(".capture-picker textarea").send_keys(:backspace)
     assert read_disabled?
+  end
+
+  # The way in that costs no download. Chrome hands `read()` over without a prompt once
+  # the permission is granted, but Safari — the browser this exists for — puts its own
+  # paste confirmation in front of it, so the clipboard is stubbed rather than filled:
+  # what is under test is what the controller does with a ClipboardItem, and that is the
+  # same object either way.
+  test "an image on the clipboard is read like a picked poster" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    paste_image
+
+    assert_equal "Zorpcore Nacht", field_value("title")
+    assert_decoded ".capture-card:not([hidden]) .review-card__source img"
+  end
+
+  # A clipboard item is named by nothing, so the strip cannot name the input the way it
+  # names a file — it says what the input was instead. Read as yielding nothing for the
+  # same reason the picked-file case is: a tile that found an event is renamed after it.
+  test "a pasted poster is named for the gesture on its tile" do
+    CannedExtractionClient.install(events: [])
+    visit capture_path
+    paste_image
+
+    assert_selector ".capture-queue__tile[aria-label='#{copy("row.pasted")}']"
+  end
+
+  test "a clipboard with no image on it says so rather than failing a row" do
+    visit capture_path
+    hold_on_clipboard clipboard_text
+    paste_button.click
+
+    assert_selector ".drop-zone__error", text: copy("picker.paste_empty")
+    assert_selector ".capture-picker"
+    assert_no_selector ".capture-row"
+  end
+
+  # Declining the browser's own paste prompt rejects the read. That is a decision the
+  # contributor made, not a failure of theirs to be told about.
+  test "a declined paste says nothing at all" do
+    visit capture_path
+    hold_on_clipboard "async () => { throw new DOMException('denied', 'NotAllowedError') }"
+    paste_button.click
+
+    assert_no_selector ".drop-zone__error", visible: true
+    assert_no_selector ".capture-row"
+  end
+
+  test "the refusal does not outlive the picker it was shown on" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    hold_on_clipboard clipboard_text
+    paste_button.click
+    assert_selector ".drop-zone__error"
+
+    pick "poster.png"
+    find("button[data-action='capture#startOver']").click
+
+    assert_no_selector ".drop-zone__error", visible: true
+  end
+
+  # The desktop door: no button, no permission prompt, just Ctrl/Cmd+V on the screen.
+  test "an image pasted onto the picker is read without touching the button" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    paste_onto "document.body"
+    settle_read
+
+    assert_equal "Zorpcore Nacht", field_value("title")
+  end
+
+  # An image rides along with the text on a clipboard filled from a rich document, and
+  # in a field that can hold the text the text is what was meant.
+  test "a paste into the text field stays the text field's" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    paste_onto "document.querySelector('.capture-picker textarea')", text: "Zorpcore Nacht"
+
+    assert_no_selector ".capture-row"
+    assert_selector ".capture-picker"
+  end
+
+  # Nothing on the screen is reachable while a card is being decided, and a keystroke
+  # that reaches the whole document has to answer for that itself.
+  test "a paste lands nowhere while cards are being decided" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    paste_onto "document.body"
+    assert_selector ".capture-row", count: 1, visible: :all
+  end
+
+  # The button ships rendered, so a browser with no async clipboard read is the one that
+  # has to be simulated. connect() is re-run by hand because the controller had already
+  # connected — with the real navigator — before the stub could be put in its way.
+  test "the paste button is taken away where the clipboard cannot be read" do
+    visit capture_path
+    assert paste_button.visible?
+
+    execute_script(<<~JS)
+      Object.defineProperty(navigator, "clipboard", { configurable: true, value: undefined })
+      Stimulus.getControllerForElementAndIdentifier(document.querySelector(".capture"), "capture").connect()
+    JS
+
+    assert_no_selector ".drop-zone__paste", visible: true
   end
 
   # Nothing is held back to be sent later, so a file no browser can decode has to fail
@@ -971,6 +1077,55 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def paste(text)
     type_text(text)
     read_text
+  end
+
+  def paste_button = find(".drop-zone__paste")
+
+  # Replaces the whole `clipboard` object rather than its `read`: the real one is a
+  # getter on Navigator.prototype, and an own property is what shadows it.
+  def hold_on_clipboard(read)
+    execute_script(<<~JS)
+      Object.defineProperty(navigator, "clipboard", { configurable: true, value: { read: #{read} } })
+    JS
+  end
+
+  # The bytes have to survive createImageBitmap and the signature sniff in
+  # EventCapture::Adapters::Image, so this is the same poster the picker tests use,
+  # carried in as base64 — a page cannot reach the fixture file itself.
+  def clipboard_image
+    "async () => [new ClipboardItem({ 'image/png': #{poster_blob_js} })]"
+  end
+
+  def clipboard_text
+    "async () => [new ClipboardItem({ 'text/plain': new Blob(['Zorpcore Nacht'], { type: 'text/plain' }) })]"
+  end
+
+  def poster_blob_js
+    data = Base64.strict_encode64(file_fixture("poster.png").binread)
+    "new Blob([Uint8Array.from(atob('#{data}'), (c) => c.charCodeAt(0))], { type: 'image/png' })"
+  end
+
+  def paste_image
+    hold_on_clipboard clipboard_image
+    paste_button.click
+    settle_read
+  end
+
+  # A real ClipboardEvent carrying a real DataTransfer: the guard that lets a field keep
+  # its own paste reads the text off it, so a hand-rolled stand-in would not exercise it.
+  def paste_onto(target, text: nil)
+    execute_script(<<~JS)
+      const data = new DataTransfer()
+      data.items.add(new File([#{poster_blob_js}], "poster.png", { type: "image/png" }))
+      #{"data.setData('text/plain', #{text.to_json})" if text}
+      #{target}.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }))
+    JS
+  end
+
+  # What `pick` waits on, for the ways in that do not go through a file input.
+  def settle_read
+    assert_selector ".capture-row", count: 1, wait: 5
+    assert_no_selector "[data-pending]", text: copy("row.pending"), wait: 5
   end
 
   def type_text(text) = find(".capture-picker textarea").set(text)

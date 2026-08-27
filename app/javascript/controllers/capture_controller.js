@@ -14,6 +14,9 @@ const TILE_MARKS = { published: "ph-check-circle", dropped: "ph-x", failed: "ph-
 // so "zur" reaches "Zürich" and "neuch" reaches "Neuchâtel".
 const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
 
+const isImageType = (type) => type.startsWith("image/")
+const isImage = (file) => isImageType(file.type)
+
 // The extraction fan-out lives here rather than on the server: one request per input,
 // because a batch cannot be held open in one and there is no queue to reach for (see
 // EventCapture::Extractor). It also drives the review queue — one card on screen, the
@@ -21,9 +24,9 @@ const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{
 //
 // Connects to data-controller="capture".
 export default class extends Controller {
-  static targets = ["files", "text", "zone", "read", "input", "restart",
-                    "rows", "strip", "card", "source", "stagingTitle", "reviewTitle",
-                    "reviewHint", "genreOptions"]
+  static targets = ["files", "text", "zone", "read", "paste", "pasteError", "input",
+                    "restart", "rows", "strip", "card", "source", "stagingTitle",
+                    "reviewTitle", "reviewHint", "genreOptions"]
   static values = {
     url: String,
     dropUrl: String,
@@ -31,6 +34,7 @@ export default class extends Controller {
     error: String,
     undecodable: String,
     sourceAlt: String,
+    pasted: String,
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 },
     localities: Object,
@@ -49,6 +53,13 @@ export default class extends Controller {
     this.inputs = new Map()
     this.rereads = new Map()
     this.currentId = null
+  }
+
+  // Rendered first and taken away here rather than the reverse: the styleguide renders
+  // the partial with no controller in reach, so a button that shipped hidden would
+  // leave the specimen demonstrating nothing.
+  connect() {
+    if (!navigator.clipboard?.read) this.pasteTarget.hidden = true
   }
 
   disconnect() {
@@ -89,7 +100,59 @@ export default class extends Controller {
   dropFiles(event) {
     event.preventDefault()
     this.zoneTarget.classList.remove("is-over")
-    this.readImages(Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/")))
+    this.readImages(Array.from(event.dataTransfer.files).filter(isImage))
+  }
+
+  // The way in that costs no download: copy a poster wherever it is and paste it here,
+  // rather than saving it to the photo library first. A phone has no keystroke for
+  // that, so it is a button — Safari answers the read with a system paste prompt of
+  // its own, and a declined prompt rejects and is not a failure to report.
+  //
+  // `read()` is started before anything is awaited: the tap's transient activation is
+  // what buys that prompt, and the first await spends it.
+  async pasteImages() {
+    this.pasteErrorTarget.hidden = true
+
+    let items
+    try {
+      items = await navigator.clipboard.read()
+    } catch {
+      return
+    }
+
+    const images = await this.clipboardImages(items)
+    if (images.length === 0) {
+      this.pasteErrorTarget.hidden = false
+      return
+    }
+
+    this.readImages(images)
+  }
+
+  // Ctrl/Cmd+V anywhere on the picker, which is the desktop door — there is no such
+  // gesture on a phone, where the button is the only one. A field that can hold what
+  // was copied keeps its own paste: an image rides along with the text on a clipboard
+  // filled from a rich document, and there the text is what was meant.
+  pasted(event) {
+    if (this.inputTarget.hidden) return
+    if (event.target.closest("input, textarea, [contenteditable]") && event.clipboardData.getData("text")) return
+
+    const images = Array.from(event.clipboardData.files).filter(isImage)
+    if (images.length === 0) return
+
+    event.preventDefault()
+    this.readImages(images)
+  }
+
+  // Named after the gesture: a clipboard image has no filename, and the tile's
+  // thumbnail is what tells two pasted posters apart.
+  async clipboardImages(items) {
+    const images = []
+    for (const item of items) {
+      const type = item.types.find(isImageType)
+      if (type) images.push(new File([await item.getType(type)], this.pastedValue, { type }))
+    }
+    return images
   }
 
   // Every row is stood up before the first read starts, so the strip states the whole
@@ -122,7 +185,7 @@ export default class extends Controller {
   }
 
   // Picking files closes a dialog and dropping them ends a drag; typing ends in nothing,
-  // so the one press on this screen belongs to the text field alone.
+  // which is the whole reason this one has a button of its own.
   readText() {
     const text = this.pendingText
     if (text === "") return
@@ -139,6 +202,7 @@ export default class extends Controller {
   // Sending IS leaving the picker, there being nothing to assemble on it first. Someone
   // who wants more decides these and comes back — which is what finish() hands them.
   leavePicker() {
+    this.pasteErrorTarget.hidden = true
     this.inputTarget.hidden = true
     this.restartTarget.hidden = false
   }

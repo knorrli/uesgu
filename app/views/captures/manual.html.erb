@@ -28,7 +28,7 @@
   <%= form_with url: capture_path, method: :post, id: "manual-event-form",
         class: "capture-fields account-form flex flex-col gap-large", data: { turbo: false } do |form| %>
     <%= render "captures/event_fields", candidate: @candidate, key: "manual-event",
-          genre_options: capture_genre_options %>
+          genre_options: genre_combobox_options(Genre.offerable) %>
     <%= render "shared/form_actions", form: form,
           submit_label: t('capture.actions.accept'), cancel_path: capture_path %>
   <% end %>

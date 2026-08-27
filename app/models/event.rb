@@ -154,15 +154,6 @@ class Event < ApplicationRecord
     update!(overridden_fields: overridden_fields - [field])
   end
 
-  # Genre-model ids matching this event's current genre tags (by fingerprint) —
-  # the selection the admin override combobox shows. ensure! guarantees a Genre
-  # row per tagged genre on every scrape (Scrapers::Agent#build_event), so this
-  # never silently drops one. The matching setter lives in the controller, which
-  # maps the submitted ids back to names through genre_list=.
-  def override_genre_ids
-    Genre.where(fingerprint: genre_list.map { |name| Genre.fingerprint_for(name) }).pluck(:id)
-  end
-
   def self.ransackable_attributes(auth_object = nil)
     ["title", "description", "start_date"]
   end

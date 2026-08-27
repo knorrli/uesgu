@@ -72,10 +72,10 @@ class GenresController < ApplicationController
   end
 
   # Selection chips for the per-event genre-override combobox (admin/events#show).
-  # Mirrors StylesController#chips but admin-gated (require_admin above).
+  # The capture screen has its own endpoint for the same chips because an admin is
+  # deliberately not implied to be a contributor; both render shared/_genre_chips.
   def chips
-    @genres = Genre.where(id: params[:combobox_values].to_s.split(",")).distinct.by_name
-    render turbo_stream: helpers.combobox_selection_chips_for(@genres)
+    @genres = params[:combobox_values].to_s.split(",").filter_map { |name| name.strip.presence }.uniq
   end
 
   def ignore

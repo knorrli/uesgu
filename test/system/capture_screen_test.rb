@@ -42,7 +42,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   end
 
   # Asserts the type and not the height: the trap is mobile Safari's control metrics
-  # for a date input (see app/views/captures/_candidate.html.erb), and headless Chrome
+  # for a date input (see app/views/captures/_event_fields.html.erb), and headless Chrome
   # lines a date up with a text field either way — so a height assertion here would
   # pass on the one browser that never had the problem.
   test "the date and time on a card are both native pickers" do
@@ -196,7 +196,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   # A tap on a chip targets the chip, and inside a wrapping <label> that is a click on
   # the label — which the browser forwards to the input, defeating the remover. What
-  # the markup has to do instead: app/views/captures/_candidate.html.erb.
+  # the markup has to do instead: app/views/shared/_genre_combobox.html.erb.
   test "tapping a genre chip's remover on a phone takes the genre off" do
     CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore])])
     visit capture_path

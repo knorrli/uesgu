@@ -442,7 +442,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   # The `for`/id wiring the phone behaviour rests on — a label that wraps the field
-  # instead reopens it on every tap (app/views/captures/_candidate.html.erb). The id is
+  # instead reopens it on every tap (app/views/shared/_genre_combobox.html.erb). The id is
   # asserted literally because the gem's fallback is a random uuid, which would satisfy
   # a `for`-matches-id check while changing on every render.
   test "the genre field is named by a label that does not wrap it" do
@@ -453,11 +453,11 @@ class CaptureTest < ActionDispatch::IntegrationTest
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
     end
 
-    input = css_select(".capture-fields__genres input.hw-combobox__input").sole
+    input = css_select(".genre-combobox input.hw-combobox__input").sole
     assert_equal "capture-row-abc123-0-genres", input["id"]
     assert_select "label[for=?]", input["id"], text: I18n.t("capture.candidate.genres")
-    assert_select ".capture-fields__genres dialog.hw-combobox__dialog"
-    assert_select "label .capture-fields__genres", count: 0
+    assert_select ".genre-combobox dialog.hw-combobox__dialog"
+    assert_select "label .genre-combobox", count: 0
   end
 
   # The taxonomy is offered so an existing genre is picked rather than respelt, but a

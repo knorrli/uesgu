@@ -19,7 +19,7 @@
 
   <%= form_with model: @event, url: admin_event_path(@event), method: :patch, class: 'account-form flex flex-col gap-medium' do |f| %>
     <label class="flex flex-col gap-small">
-      <span class="flex gap-small align-baseline">
+      <span class="field-label flex gap-small align-baseline">
         <%= t('.title_label') %>
         <% if @event.overridden?(:title) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
@@ -27,7 +27,7 @@
     </label>
 
     <label class="flex flex-col gap-small">
-      <span class="flex gap-small align-baseline">
+      <span class="field-label flex gap-small align-baseline">
         <%= t('.description_label') %>
         <% if @event.overridden?(:description) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
@@ -36,7 +36,7 @@
 
     <div class="flex gap-medium wrap">
       <label class="flex flex-col gap-small">
-        <span class="flex gap-small align-baseline">
+        <span class="field-label flex gap-small align-baseline">
           <%= t('.date_label') %>
           <% if @event.overridden?(:start_date) || @event.overridden?(:start_time) %>
             <span class="chip"><%= t('.overridden_badge') %></span>
@@ -45,35 +45,16 @@
         <%= date_field_tag 'event[date]', @event.start_date&.iso8601 %>
       </label>
       <label class="flex flex-col gap-small">
-        <span><%= t('.time_label') %></span>
+        <span class="field-label"><%= t('.time_label') %></span>
         <%= time_field_tag 'event[time]', @event.start_time&.strftime('%H:%M') %>
       </label>
     </div>
 
-    <%# The label names the field with `for` and must NOT wrap it: on small screens the
-        combobox renders a modal <dialog> inside itself, and a wrapping label forwards
-        taps on it — and on the chips — to the input, reopening what the tap closed. The
-        mechanism is written out in app/views/captures/_candidate.html.erb, on the other
-        field built this way. %>
     <div class="flex flex-col gap-small">
-      <label class="flex gap-small align-baseline" for="<%= f.field_id(:override_genre_ids) %>">
-        <%= t('.genres_label') %>
-        <% if @event.overridden?(:genres) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
-      </label>
-      <div class="input-wrapper flex genre-combobox">
-        <%# Multiselect over the assignable taxonomy; submits comma-joined Genre
-            ids the controller maps back to names. Options come from the shared
-            genre_combobox_options helper, so the umbrella genres sort to the top
-            and carry their descendant count — same surfacing as the genre editor. %>
-        <%= f.combobox :override_genre_ids, genre_combobox_options(Genre.listable),
-              value: @event.override_genre_ids.join(','),
-              multiselect_chip_src: chips_genres_path,
-              placeholder: t('.genres_label'),
-              dialog_label: t('.genres_label') do |combobox| %>
-          <% combobox.customize_fieldset class: 'flex-grow' %>
-          <% combobox.customize_input class: 'flex-grow' %>
-        <% end %>
-      </div>
+      <%= render "shared/genre_combobox", name: "event[genres]", id: "event_genres",
+            value: @event.genre_list.join(','), chip_src: chips_genres_path,
+            label: t('.genres_label'), options: genre_combobox_options(Genre.offerable),
+            badge: (tag.span(t('.overridden_badge'), class: "chip") if @event.overridden?(:genres)) %>
       <span class="muted"><%= t('.genres_hint') %></span>
     </div>
 

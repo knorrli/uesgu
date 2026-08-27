@@ -1,0 +1,38 @@
+<%# The chrome every catalogue browser opens with — admin events / localities / locations
+    / places and the genre index: filter chips, then the search field, then the sort row.
+    One partial rather than three because the blocks only work together — each has to
+    carry the other two's params through, or filtering drops your search and sorting
+    drops your filter.
+
+    `filter_param` names the query param AND the i18n key prefix (`status_…` / `type_…`),
+    so a page that filters by type needs nothing further. `divider_before` names the chip
+    that opens a second group: the genre index files its parked dispositions apart from
+    its tree statuses. %>
+<%# locals: (route:, scope:, filters:, active_filter:, sorts:, active_sort:, filter_param: :status, divider_before: nil) %>
+<div class="flex gap-small wrap align-baseline catalogue-filters">
+  <% filters.each do |value| %>
+    <% if value == divider_before %><span class="filter-divider" aria-hidden="true"></span><% end %>
+    <%= link_to t("#{scope}.#{filter_param}_#{value}"),
+          public_send(route, filter_param => (value == "all" ? nil : value),
+                      q: params[:q].presence, sort: params[:sort].presence),
+          class: class_names(:tag, active: active_filter == value) %>
+  <% end %>
+</div>
+
+<%= form_with url: public_send(route), method: :get, data: { turbo_frame: '_top' } do %>
+  <%= hidden_field_tag filter_param, params[filter_param] if params[filter_param].present? %>
+  <%= hidden_field_tag :sort, params[:sort] if params[:sort].present? %>
+  <div class="input-wrapper flex">
+    <%= text_field_tag :q, params[:q], placeholder: t("#{scope}.search"), autocomplete: 'off' %>
+  </div>
+<% end %>
+
+<div class="flex gap-small align-baseline muted catalogue-sort">
+  <span><%= t('catalogue.sort_by') %></span>
+  <% sorts.each do |value| %>
+    <%= link_to t("#{scope}.sort_#{value}"),
+          public_send(route, filter_param => params[filter_param].presence,
+                      q: params[:q].presence, sort: value),
+          class: class_names('catalogue-sort-option', active: active_sort == value) %>
+  <% end %>
+</div>

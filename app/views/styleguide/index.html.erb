@@ -33,6 +33,7 @@
     <a href="#drop-zone">Drop zone</a>
     <a href="#icons">Icons</a>
     <a href="#nav">Navigation</a>
+    <a href="#catalogue-controls">Catalogue controls</a>
     <a href="#pagination">Pagination</a>
     <a href="#page-header">Page header</a>
     <a href="#review-card">Review card</a>
@@ -652,6 +653,28 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Unread signal</span> · <code>.unread-dot</code> + <code>.badge</code>
         <p class="sg-purpose">A dot on the menu trigger flags unread at a glance; the count badge sits beside the Notifications item inside the menu.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section" id="catalogue-controls">
+    <h2>Catalogue controls</h2>
+    <p class="sg-section__intro">Every catalogue browser — admin events / localities / locations / places, and the genre index — opens with the same three blocks in the same order: <b>filter chips</b>, then the <b>search field</b>, then the <b>sort row</b>. Built from <code>shared/_catalogue_controls</code>; pass the route helper as a symbol plus the i18n scope, and the two lists. <b>Reuse it</b> rather than hand-rolling the row — five copies of this had already forked into two CSS names, two sort-row wordings and two controller shapes before it was pulled together.</p>
+    <p class="sg-section__intro"><b>The three blocks are one component because each has to carry the other two&rsquo;s params.</b> A chip that drops <code>sort</code> silently resets the ordering every time you filter; a sort link that drops the filter throws you back to the full list. That is the bug the split copies actually had, so the partial builds all three URLs from one place rather than leaving each page to remember.</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <%# The real partial with a real route + scope, so the chips and labels are the
+            ones the admin events browser renders. %>
+        <%= render "shared/catalogue_controls", route: :admin_events_path, scope: "admin.events.index",
+              filters: %w[all visible hidden cancelled], active_filter: "all",
+              sorts: %w[date title], active_sort: "date" %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Catalogue controls</span> &middot; <code>render "shared/catalogue_controls", route:, scope:, filters:, active_filter:, sorts:, active_sort:</code>
+        <p class="sg-purpose">The active chip fills accent (<code>.tag.active</code>); the active sort option goes full-colour and bold while the rest stay muted, and neither reads as an underlined link. <code>filters</code> leads with <code>"all"</code>, which maps to <b>no</b> filter param rather than the literal string, so the unfiltered URL stays clean.</p>
+        <p class="sg-purpose">Two locals cover the variation across the five pages. <code>filter_param:</code> names the query param <em>and</em> the i18n key prefix at once — the locations browser passes <code>:type</code> and gets <code>type_venue</code> keys with a <code>?type=</code> URL, no other change. <code>divider_before:</code> names the chip that opens a second group, which is how the genre index files its parked dispositions (ignored / hidden / blocked) apart from its tree statuses.</p>
+        <span class="sg-ok">The sort row&rsquo;s own label is a <b>single shared key</b> (<code>catalogue.sort_by</code>), not one per page &mdash; four pages said &ldquo;Sort by&rdquo; and the fifth said &ldquo;Sort:&rdquo; in all three locales before it was hoisted.</span>
       </div>
     </div>
   </section>

@@ -19,7 +19,7 @@
 
   <%= form_with model: @event, url: admin_event_path(@event), method: :patch, class: 'account-form flex flex-col gap-medium' do |f| %>
     <label class="flex flex-col gap-small">
-      <span class="flex gap-small align-baseline">
+      <span class="field-label flex gap-small align-baseline">
         <%= t('.title_label') %>
         <% if @event.overridden?(:title) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
@@ -27,7 +27,7 @@
     </label>
 
     <label class="flex flex-col gap-small">
-      <span class="flex gap-small align-baseline">
+      <span class="field-label flex gap-small align-baseline">
         <%= t('.description_label') %>
         <% if @event.overridden?(:description) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
       </span>
@@ -36,7 +36,7 @@
 
     <div class="flex gap-medium wrap">
       <label class="flex flex-col gap-small">
-        <span class="flex gap-small align-baseline">
+        <span class="field-label flex gap-small align-baseline">
           <%= t('.date_label') %>
           <% if @event.overridden?(:start_date) || @event.overridden?(:start_time) %>
             <span class="chip"><%= t('.overridden_badge') %></span>
@@ -45,7 +45,7 @@
         <%= date_field_tag 'event[date]', @event.start_date&.iso8601 %>
       </label>
       <label class="flex flex-col gap-small">
-        <span><%= t('.time_label') %></span>
+        <span class="field-label"><%= t('.time_label') %></span>
         <%= time_field_tag 'event[time]', @event.start_time&.strftime('%H:%M') %>
       </label>
     </div>

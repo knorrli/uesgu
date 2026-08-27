@@ -511,7 +511,7 @@
 
   <section class="sg-section" id="drop-zone">
     <h2>Drop zone</h2>
-    <p class="sg-section__intro">A file picker drawn as a drop target: drop files on it, or tap it to open the system picker. It holds nothing and lists nothing — what happens on pick belongs to the caller, and on the capture screen that is "send them and go to the review queue".</p>
+    <p class="sg-section__intro">A file picker drawn as a drop target: drop files on it, tap it to open the system picker, or paste an image onto it. It holds nothing and lists nothing — what happens on pick belongs to the caller, and on the capture screen that is "send them and go to the review queue".</p>
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen">
@@ -522,6 +522,20 @@
         <span class="sg-spec__name">Drop zone</span> · <code>render "shared/drop_zone", id:, label:, hint:</code>
         <p class="sg-purpose">A real <code>&lt;input type="file"&gt;</code> stays behind the dashed target, visually hidden and wrapped by a <code>&lt;label for&gt;</code>: the drop handler is an <b>enhancement</b>, and without the input keyboard users and every iOS browser lose the picker entirely. Pass <code>zone_attrs</code>/<code>input_attrs</code> for the caller's own hooks.</p>
         <span class="sg-ok">The dashed edge is the only one on the site, so a drop target is never mistaken for a field.</span>
+      </div>
+    </div>
+
+    <div class="sg-row sg-row--stack">
+      <div class="sg-specimen">
+        <%= render "shared/drop_zone", id: "sg-drop-zone-paste",
+              label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
+              paste_label: t('capture.picker.paste'), paste_error: t('capture.picker.paste_empty'),
+              error_attrs: { hidden: false } %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">…with a paste button</span> · <code>paste_label:</code>, <code>paste_error:</code>
+        <p class="sg-purpose">A third way in for a phone, which has no keystroke for pasting: copy a poster wherever it is and it never has to be downloaded first. The button is a <b>sibling</b> of the <code>&lt;label for&gt;</code> and never inside it — a label forwards every tap in its subtree to the file input, which would open the system picker instead. The caller hides it where <code>navigator.clipboard.read</code> is missing.</p>
+        <span class="sg-ok">The refusal is shown here; live it starts hidden. Declining the browser's own paste prompt is silent — the contributor decided that, and it is not a failure.</span>
       </div>
     </div>
   </section>

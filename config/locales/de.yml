@@ -147,6 +147,8 @@ de:
       title: Event erfassen
     picker:
       drop_label: Poster hierhin ziehen oder antippen
+      paste: Bild einfügen
+      paste_empty: Kein Bild in der Zwischenablage.
       add_by_hand: Von Hand erfassen
       read_text: Auslesen
       start_over: Abbrechen und neu starten
@@ -181,6 +183,7 @@ de:
       unknown: Das hat nicht geklappt.
     row:
       pending: wird ausgelesen …
+      pasted: Eingefügtes Bild
       untitled: Text
       nothing_found: Nichts gefunden, was nach einem Event aussieht.
       source_alt: Das ausgelesene Bild

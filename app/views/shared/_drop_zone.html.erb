@@ -1,10 +1,17 @@
-<%# A file picker that is also a drop target: drop files on it, or tap it to open the
-    system picker. What happens on pick is the caller's — nothing is staged here.
+<%# A file picker that is also a drop target: drop files on it, tap it to open the
+    system picker, or paste an image onto it. What happens on pick is the caller's —
+    nothing is staged here.
 
     The real <input type="file"> is kept and only visually hidden. The drop handler is
     an enhancement — without the input, keyboard users and every iOS browser lose the
-    picker entirely. %>
-<%# locals: (id:, label:, hint: nil, input_attrs: {}, zone_attrs: {}) %>
+    picker entirely.
+
+    The paste button is a SIBLING of the label, never inside it: a <label for> forwards
+    every tap in its subtree to the file input, so nesting it would open the system
+    picker instead of pasting. It renders whenever a caller passes `paste_label` and is
+    hidden again by the caller on a browser that cannot read the clipboard. %>
+<%# locals: (id:, label:, hint: nil, paste_label: nil, paste_error: nil,
+             input_attrs: {}, zone_attrs: {}, paste_attrs: {}, error_attrs: {}) %>
 <%= tag.div class: "drop-zone", **zone_attrs do %>
   <label class="drop-zone__target" for="<%= id %>">
     <span class="ph ph-camera" aria-hidden="true"></span>
@@ -12,4 +19,8 @@
     <% if hint.present? %><span class="drop-zone__hint muted"><%= hint %></span><% end %>
   </label>
   <%= tag.input type: "file", id: id, class: "drop-zone__input", **input_attrs %>
+  <% if paste_label.present? %>
+    <%= tag.button paste_label, type: "button", class: "button-small drop-zone__paste", **paste_attrs %>
+    <%= tag.p paste_error, class: "drop-zone__error", role: "status", hidden: true, **error_attrs %>
+  <% end %>
 <% end %>

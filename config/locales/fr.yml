@@ -147,6 +147,8 @@ fr:
       title: Saisir un événement
     picker:
       drop_label: Dépose tes affiches ici, ou touche pour choisir
+      paste: Coller une image
+      paste_empty: Aucune image dans le presse-papiers.
       add_by_hand: Saisir à la main
       read_text: Lire
       start_over: Annuler et recommencer
@@ -181,6 +183,7 @@ fr:
       unknown: Ça n'a pas marché.
     row:
       pending: lecture …
+      pasted: Image collée
       untitled: Texte
       nothing_found: Rien ici ne ressemble à un événement.
       source_alt: L'image lue

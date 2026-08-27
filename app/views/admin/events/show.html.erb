@@ -35,7 +35,7 @@
     </label>
 
     <div class="flex gap-medium wrap">
-      <label class="flex flex-col gap-small">
+      <label class="flex flex-col gap-small flex-grow">
         <span class="field-label flex gap-small align-baseline">
           <%= t('.date_label') %>
           <% if @event.overridden?(:start_date) || @event.overridden?(:start_time) %>
@@ -44,7 +44,7 @@
         </span>
         <%= date_field_tag 'event[date]', @event.start_date&.iso8601 %>
       </label>
-      <label class="flex flex-col gap-small">
+      <label class="flex flex-col gap-small flex-grow">
         <span class="field-label"><%= t('.time_label') %></span>
         <%= time_field_tag 'event[time]', @event.start_time&.strftime('%H:%M') %>
       </label>

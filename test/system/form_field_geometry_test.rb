@@ -1,9 +1,9 @@
 require "application_system_test_case"
 
-# A browser test because the heights come from layout, not from the declarations: a
-# field inherits its line-height from whatever it is nested in, so reading the CSS
-# cannot tell you two fields ended up different sizes.
-class FormFieldHeightTest < ApplicationSystemTestCase
+# Browser tests because the sizes come from layout, not from the declarations: a field
+# inherits its line-height from whatever it is nested in and its width from the row it
+# is a flex item of, so reading the CSS cannot tell you where a field ended up.
+class FormFieldGeometryTest < ApplicationSystemTestCase
   FIELDS = ".account-form input[type=email], .account-form input[type=password], .account-form select".freeze
 
   test "every field in the account-form skin is the same height" do
@@ -35,5 +35,22 @@ class FormFieldHeightTest < ApplicationSystemTestCase
 
     assert_equal 3, heights.size, "expected a date, a time and a text field on the event editor"
     assert_equal 1, heights.uniq.size, "field heights differ: #{heights.inspect}"
+  end
+
+  # Without the grow each half keeps its content width, and the two underlines stop
+  # mid-column — which reads as a different kind of field rather than as a pair sharing
+  # a row. The capture card pairs date and time the same way.
+  test "the date and time pair spans the row it shares" do
+    sign_in_as user(admin: true, locale: "de")
+    visit admin_event_path(event)
+    page.current_window.resize_to(390, 844)
+
+    row, date, time = evaluate_script(
+      "['.account-form .flex.wrap', '#event_date', '#event_time']" \
+      ".map((sel) => document.querySelector(sel).getBoundingClientRect().toJSON())"
+    )
+
+    assert_in_delta row["left"], date["left"], 1
+    assert_in_delta row["right"], time["right"], 1
   end
 end

@@ -134,7 +134,7 @@ fr:
     calendar_feed_hint_html: Ta liste existe aussi en abonnement pour ton app calendrier — %{link}.
     calendar_feed_link: à configurer dans les réglages
   capture:
-    title: Saisir un événement
+    title: Lire une affiche
     review:
       title:
         one: 1 événement trouvé

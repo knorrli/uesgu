@@ -28,7 +28,7 @@ class NotificationsTest < ActionDispatch::IntegrationTest
 
     get notifications_path
     assert_response :success
-    assert_select ".notification__meta", text: /2 Veranstaltungen/
+    assert_select ".notification__meta", text: /2 Events/
   end
 
   test "index event count drops events hidden after the digest fired" do
@@ -41,7 +41,7 @@ class NotificationsTest < ActionDispatch::IntegrationTest
 
     get notifications_path
     assert_response :success
-    assert_select ".notification__meta", text: /1 Veranstaltung/
+    assert_select ".notification__meta", text: /1 Event/
   end
 
   test "index splits unread and read into two tabs (Ungelesen | Gelesen)" do

@@ -35,9 +35,10 @@
 /* nowrap keeps the count and the date range each unbroken, which is what makes
    the dates line up flush right across rows (see the ordering comment in
    notifications/index). It is NOT allowed to push the row wider than the
-   viewport: at 320px the German meta line ("3 Veranstaltungen · 06.08.2026 –
-   13.08.2026") is ~50px too wide and used to overflow the page horizontally, so
-   the segments wrap onto a second line instead. */
+   viewport: French is the widest of the three, and at 320px its meta line
+   ("3 événements · 06.08.2026 – 13.08.2026") measures 385px, so without the wrap
+   the whole page scrolls sideways. Measured by
+   test/system/inbox_narrow_viewport_test.rb, which pins that locale for it. */
 .notification__meta {
   display: flex;
   flex-wrap: wrap;

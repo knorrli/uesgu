@@ -17,7 +17,7 @@
       <%= form.text_field :note, placeholder: t('.note_placeholder'), autocomplete: 'off' %>
 
       <label class="flex flex-col gap-small">
-        <span class="muted"><%= t('.expires_label') %></span>
+        <span class="field-label"><%= t('.expires_label') %></span>
         <%= select_tag 'invitation[expires_in_days]',
               options_for_select([
                 [t('.expires_never'), ''],

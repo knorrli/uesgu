@@ -3,24 +3,15 @@
 <div class="sg">
   <h1>üsgu styleguide</h1>
   <p class="sg-lede">
-    A living reference: every specimen below is the real shared element class,
-    rendered with the same bundled CSS as the rest of the app — so it stays in
-    sync as the styles change. Each entry states the <b>one purpose</b> the
-    element should telegraph. Amber notes flag a remaining drift, green notes mark what this
-    <b>experimental redesign</b> branch resolved.
+    Every specimen below is the real shared element, rendered with the app's own
+    bundled CSS. Each entry names the <b>one purpose</b> its element telegraphs.
   </p>
   <p class="sg-lede">
-    Palette: a <b>dirty-cream ground + green</b> (light theme; dark theme keeps the
-    aubergine ground + brighter green). On-accent text matches the background for a
-    "punched out" button. <b>Green is the dominant accent</b> — interaction (links,
-    focus, primary), state (today, selected) <b>and follows</b> (the green star) —
-    so it's present everywhere. <b>Raspberry is rare</b>: the "saved show" heart
-    only. The two personal signals differ in colour AND shape (green star = follow,
-    raspberry heart = saved), never colour alone. Structural rules use a neutral
-    hairline (<code>--border-color</code>) or content divider (<code>--rule-color</code>).
-    One <code>danger</code> language (hollow → fills), one Phosphor disclosure caret,
-    a baseline <code>:focus-visible</code> ring, and a display-only <code>.icon</code>
-    role beside the clickable <code>.icon-button</code>.
+    <b>Green is the dominant accent</b> &mdash; interaction (links, focus, primary),
+    state (today, selected) and follows (the green star). <b>Raspberry is rare</b>:
+    the saved-show heart alone. The two personal signals differ in colour AND shape,
+    never colour alone. Structural rules use a neutral hairline
+    (<code>--border-color</code>) or content divider (<code>--rule-color</code>).
   </p>
 
   <nav class="sg-toc">
@@ -57,11 +48,11 @@
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--on-accent"></div>
-        <p class="sg-swatch__label"><b>On accent</b> · <code>--theme-on-accent</code><br>Text/glyphs painted ON the accent fill (primary buttons, badges, today, ticks). Set to the page background (<code>--theme-bg-color</code>) for the "punched out" look — legible because each theme pairs a light-ish ground with a dark-enough green (cream-on-green in light, plum-on-green in dark).</p>
+        <p class="sg-swatch__label"><b>On accent</b> · <code>--theme-on-accent</code><br>Text and glyphs painted ON the accent fill (primary buttons, badges, today, ticks). Set to the page background for the "punched out" look.</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--favorite"></div>
-        <p class="sg-swatch__label"><b>Saved</b> · <code>--theme-saved-color</code><br>Raspberry — the rare, powerful "saved show" highlight (the heart) only. NOT follows (those are green). One emphatic colour, used sparingly.</p>
+        <p class="sg-swatch__label"><b>Saved</b> · <code>--theme-saved-color</code><br>Raspberry — the saved-show heart only, never follows. One emphatic colour, used sparingly.</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--warn"></div>
@@ -73,7 +64,7 @@
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--community"></div>
-        <p class="sg-swatch__label"><b>Community</b> · <code>--theme-community-color</code><br>Steel blue — provenance only: a human entered this event and no scraper re-derives it. The one cool hue in the palette, so it separates from the neutral grey of the off-site source chip beside it.</p>
+        <p class="sg-swatch__label"><b>Community</b> · <code>--theme-community-color</code><br>Steel blue — provenance only: a human entered this event and no scraper re-derives it.</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--bg"></div>
@@ -81,7 +72,7 @@
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--bg-mut"></div>
-        <p class="sg-swatch__label"><b>Background muted</b> · <code>--theme-bg-muted</code><br>Neutral fills + the sand highlight wash behind a dropdown option or date-picker day at hover/selected</p>
+        <p class="sg-swatch__label"><b>Background muted</b> · <code>--theme-bg-muted</code><br>Neutral fills, and the sand wash behind a hovered or selected dropdown option</p>
       </li>
       <li class="sg-swatch">
         <div class="sg-swatch__chip sg-swatch__chip--fg"></div>
@@ -92,21 +83,11 @@
         <p class="sg-swatch__label"><b>Foreground muted</b> · <code>--theme-fg-muted</code><br>Secondary text, at-rest chrome/icons</p>
       </li>
     </ul>
-    <p class="sg-ok">
-      <b>Audit #1 / #10 — resolved.</b> Structural borders, the nav-menu panel,
-      raw <code>input</code> text, and the filter-handle icon are neutral
-      (<code>--border-color</code> / <code>--rule-color</code> /
-      <code>--theme-fg-muted</code>). Field underlines use a more present neutral
-      (<code>--field-border-color</code>) so an empty input reads as fillable —
-      still neutral, derived from the foreground. Green appears on a field only on
-      focus, and otherwise only for links, active state, primary actions, and
-      follows.
-    </p>
   </section>
 
   <section class="sg-section" id="buttons">
     <h2>Buttons &amp; actions</h2>
-    <p class="sg-section__intro"><b>Three weights:</b> primary → secondary → danger, plus the flat icon action and the text link. Weight is the role; size (full-width vs small pill) is just context, not a separate tier. <b>Per-page primary:</b> at most one filled button per page, so it's the thing that stands out — everything else is secondary (hollow) or danger.</p>
+    <p class="sg-section__intro"><b>Three weights:</b> primary → secondary → danger, plus the flat icon action and the text link. Weight is the role; size (full-width vs small pill) is context. <b>At most one filled button per page</b>, so it is the thing that stands out.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -115,7 +96,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Primary</span> · <code>input[type=submit]</code> / <code>.primary</code>
-        <p class="sg-purpose">The ONE main commit of a page — filled accent. <code>input[type=submit]</code> is primary automatically; a non-submit primary (the rule editor's done link, the cookie CTA) opts in with <code>.primary</code> at any size.</p>
+        <p class="sg-purpose">The one main commit of a page — filled accent. <code>input[type=submit]</code> is primary automatically; a non-submit primary opts in with <code>.primary</code> at any size.</p>
       </div>
     </div>
 
@@ -126,8 +107,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Secondary</span> · <code>&lt;button&gt;</code> / <code>.button</code> / <code>.button-small</code> (default)
-        <p class="sg-purpose">Every action that isn't the page's primary or destructive — hollow accent, full-size or pill. One treatment (no separate "neutral box" vs "ghost"): Sign out, Enable, Test now, Pause, Create link, …</p>
-        <span class="sg-ok"><b>Resolved.</b> Collapsed the old neutral-box + secondary-filled-pill + tertiary-ghost into one secondary look; primary is now filled-only and rare. (The transitional <code>.button-ghost</code> no-op alias has since been removed — the markup is fully swept.)</span>
+        <p class="sg-purpose">Every action that is neither primary nor destructive — hollow accent, full-size or pill.</p>
       </div>
     </div>
 
@@ -138,8 +118,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Danger</span> · <code>.button-small.danger</code> &nbsp;/&nbsp; <code>.button.delete</code>
-        <p class="sg-purpose">A destructive, hard-to-undo action. Hollow warn at rest; fills warn on hover/focus.</p>
-        <span class="sg-ok"><b>Audit #2 — resolved.</b> Both now share one danger language (hollow → fills); the only difference is size (full-width vs pill). Hover a specimen to see the fill.</span>
+        <p class="sg-purpose">A destructive, hard-to-undo action. Hollow warn at rest, fills warn on hover/focus.</p>
       </div>
     </div>
 
@@ -156,8 +135,6 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <%# The real partial, in its two modes: bare (Save + Abbrechen) is the
-            plain render; extras (a danger delete) ride in via render layout:. %>
         <%= form_with url: "#buttons", method: :get do |f| %>
           <%= render layout: "shared/form_actions", locals: { form: f, submit_label: "Speichern", cancel_path: "#buttons" } do %>
             <a href="#buttons" class="button-small danger">Löschen</a>
@@ -166,7 +143,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Form actions</span> · <code>render "shared/form_actions", form:, submit_label:, cancel_path:</code>
-        <p class="sg-purpose">The standard closing row of a task-style form (a page you enter, then finish or abandon): primary submit + an explicit <b>Abbrechen</b> back to <code>cancel_path</code> — backing out never depends on scrolling back up to the header's back link. Extra actions go in a block via <code>render layout:</code>; anything <code>.danger</code>/<code>.delete</code> is pushed to the far end. In-place forms that aren't a task (Settings) and entry gates with an alternate-path link (login/signup) don't take one.</p>
+        <p class="sg-purpose">The closing row of a task-style form: primary submit plus an explicit <b>Abbrechen</b> to <code>cancel_path</code>, so backing out never depends on scrolling up to the header. Extra actions ride in a block via <code>render layout:</code>; anything <code>.danger</code>/<code>.delete</code> is pushed to the far end. In-place forms (Settings) and entry gates with an alternate-path link take none.</p>
       </div>
     </div>
 
@@ -174,7 +151,7 @@
       <div class="sg-specimen"><a href="#buttons" class="text-link">Open filter</a></div>
       <div class="sg-spec">
         <span class="sg-spec__name">Text link</span> · <code>.text-link</code>
-        <p class="sg-purpose">Navigation ("go somewhere else") rendered as an underlined accent link — distinct from in-place action buttons. Borderless: it's a link, not a control box.</p>
+        <p class="sg-purpose">Navigation rendered as an underlined accent link — borderless, because it is a link and not a control box.</p>
       </div>
     </div>
 
@@ -195,7 +172,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">View switcher</span> · <code>.view-switch__item</code>
-        <p class="sg-purpose">The shared flat text toggle (not a button); active = bold accent, others = muted underlined links. Used for the inbox's Ungelesen ↔ Gelesen tabs — one component, so reach for this rather than forking a lookalike for the next pair of sibling views. The flat-text controls use their own domain classes rather than borrowing <code>.button</code>.</p>
+        <p class="sg-purpose">The shared flat text toggle between sibling views of one page (the inbox's Ungelesen ↔ Gelesen): active = bold accent, the rest muted underlined links. Flat-text controls use their own classes rather than borrowing <code>.button</code>.</p>
       </div>
     </div>
 
@@ -209,8 +186,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">States</span> · <code>:disabled</code>, <code>:focus-visible</code>
-        <p class="sg-purpose">Disabled = 0.5 opacity + not-allowed cursor, and it un-fills — so a <b>primary</b> has to give up its <code>--theme-on-accent</code> text at the same time, or the label is left painted in the page background and the button reads as an empty box. Both primary weights are specimened here for that reason. Tab to any control to see the shared accent focus ring.</p>
-        <span class="sg-ok"><b>Audit #12 — resolved.</b> Baseline <code>:focus-visible</code> ring on all interactive elements; <code>:disabled</code> on buttons and pills.</span>
+        <p class="sg-purpose">Disabled is 0.5 opacity, a not-allowed cursor, and no fill — so a <b>primary</b> has to give up its <code>--theme-on-accent</code> text at the same time, or the label is left painted in the page background and the button reads as an empty box. Both primary weights are specimened for that reason. Tab to any control to see the shared focus ring.</p>
       </div>
     </div>
   </section>
@@ -229,7 +205,6 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Info chip</span> · <code>.chip</code> (<code>--window</code>, <code>--type</code>, <code>--muted</code>)
         <p class="sg-purpose">Read-only metadata that is never clickable (channels, windows, rule type, disabled state).</p>
-        <span class="sg-ok"><b>Resolved.</b> Now borderless (faint tint), so it no longer reads like a ghost action button. Border/fill is reserved for things you can click.</span>
       </div>
     </div>
 
@@ -244,7 +219,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Event markers</span> · <code>.chip--cancelled</code>, <code>.chip--moved</code>, <code>.chip--community</code>, <code>.chip--source</code>
-        <p class="sg-purpose">A quiet <code>.chip</code> sub-family that trails an event title with secondary info, sized down so it never competes with the title. One shape, and colour separates the two things a marker can say. <b>Status</b> runs warm by severity: cancelled (warn-red, + struck title) → rescheduled (sand heads-up). <b>Provenance</b> runs cool or neutral: <b>community</b> (steel blue) marks an event a contributor entered by hand, which no scraper re-derives nightly, while <b>source</b> (grey) names where the link leaves you and shows only on links that aren't the venue's own page (detected by host — most Petzi / deep-linked OLE carry none). The two are independent and regularly land on the same title, as above — which is why they don't share a colour.</p>
+        <p class="sg-purpose">A quiet <code>.chip</code> sub-family trailing an event title, sized down so it never competes with the title. <b>Status</b> runs warm by severity: cancelled (warn-red, struck title) → rescheduled (sand). <b>Provenance</b> runs cool or neutral: <b>community</b> (steel blue) marks an event a contributor entered by hand, <b>source</b> (grey) names where a link leaves you and shows only on links that are not the venue's own page. The two are independent and regularly land on the same title, which is why they do not share a colour.</p>
       </div>
     </div>
 
@@ -256,7 +231,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Suggestion row</span> · <code>shared/_suggestions</code> · <code>.suggestions</code>
-        <p class="sg-purpose">Values the app already carries, offered under the field they fill, in a <a href="#inputs">field group</a>'s <code>attached</code> slot — the capture card uses one for venues and one for the towns those venues sit in. The one place a <code>.chip</code> is clickable: tapping fills the field rather than stating a fact, and nothing ever auto-applies. Use it wherever a field has a short, ranked set of known answers. A whole vocabulary has no ranking to render, so it stays out of the row until the contributor types and their own letters do the ranking &mdash; which is what the capture card&rsquo;s town row does, appending matches to the chips already there.</p>
+        <p class="sg-purpose">Values the app already carries, offered under the field they fill, in a <a href="#inputs">field group</a>'s <code>attached</code> slot. The one place a <code>.chip</code> is clickable: tapping fills the field rather than stating a fact, and nothing ever auto-applies. A whole vocabulary has no ranking to render, so it stays out of the row until the contributor's own letters rank it.</p>
       </div>
     </div>
 
@@ -268,7 +243,6 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Count badge</span> · <code>.badge</code>
         <p class="sg-purpose">A small accent count attached to something else (unread notifications, "+N more").</p>
-        <span class="sg-ok"><b>Audit #8 — resolved.</b> The mobile filter trigger now uses this same <code>.badge</code>; the duplicate <code>.filter-trigger__badge</code> is gone.</span>
       </div>
     </div>
 
@@ -280,8 +254,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Selectable tag</span> · <code>.tag</code>, <code>.tag.active</code>, <code>button.tag</code>
-        <p class="sg-purpose">A style/query token. <code>.active</code> (filled accent) = the currently-selected / current option (e.g. a status filter). <b>No ×</b> — it's a state, not removable.</p>
-        <span class="sg-ok"><b>Audit #5 — resolved.</b> Removable applied-filters now carry a trailing × (<code>.tag__remove</code>, like the filter chip below); a selected-state <code>.tag.active</code> has none. The × is the tell: <b>× = remove me</b>, no × = current selection.</span>
+        <p class="sg-purpose">A style or query token. <code>.active</code> (filled accent) is the current selection. <b>No ×</b> — it is a state, not something removable; a trailing × is the tell that a chip removes.</p>
       </div>
     </div>
 
@@ -295,9 +268,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Applied filter chip</span> · <code>.filter-chip</code>
-        <p class="sg-purpose">An active filter on the mobile summary row; tapping it removes that one value.</p>
-        <span class="sg-ok"><b>Audit #12 — resolved.</b> Now dims on hover/focus to signal the "× to remove" affordance.</span>
-        <span class="sg-ok"><b>Audit #5 — resolved.</b> The inline desktop filter's applied tokens now carry the same trailing × — so removable filters read consistently across desktop and mobile, and distinctly from a selected-state <code>.tag.active</code>.</span>
+        <p class="sg-purpose">An active filter on the mobile summary row; tapping it removes that one value. Dims on hover/focus to signal the affordance.</p>
       </div>
     </div>
 
@@ -309,8 +280,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Applied location chip (desktop)</span> · <code>.tag[data-tag-chip]</code>
-        <p class="sg-purpose">A removable location filter (inline desktop filter + rule editor). The leading icon is <b>per type</b> — canton <code>map-trifold</code> / locality <code>map-pin</code> / venue <code>house</code> — not a flat pin, matching the dropdown and mobile sheet.</p>
-        <span class="sg-ok"><b>Resolved.</b> The × inherits the label colour (no longer pre-dimmed); the whole chip dims on hover/focus to telegraph "tap to remove". Resolved server-side (<code>filter_chip_icon</code> reads the value's type) — no location list shipped to JS.</span>
+        <p class="sg-purpose">A removable location filter (inline desktop filter + rule editor). The leading icon is <b>per type</b> — canton <code>map-trifold</code> / locality <code>map-pin</code> / venue <code>house</code> — matching the dropdown and the mobile sheet.</p>
       </div>
     </div>
 
@@ -331,7 +301,7 @@
 
   <section class="sg-section" id="dropdowns">
     <h2>Dropdowns &amp; selects</h2>
-    <p class="sg-section__intro">Disclosure indicators currently use three different glyph systems (audit #3). Specimens shown with the real account-form treatment.</p>
+    <p class="sg-section__intro">Specimens shown with the real account-form treatment.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -345,7 +315,6 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Styled select</span> · <code>.account-form select</code>
         <p class="sg-purpose">An underline field with a chevron, matching the form fields. Neutral underline at rest, accent on focus.</p>
-        <span class="sg-ok"><b>Audit #3 / #11 — resolved.</b> The chevron is now a neutral mid-grey that reads on both themes (was a hard-coded <code>#0e8857</code> that stayed green in dark mode).</span>
       </div>
     </div>
 
@@ -361,15 +330,14 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Menu dropdown</span> · <code>.nav-menu</code> (<code>&lt;details&gt;</code>)
-        <p class="sg-purpose">Collapses account links into a bordered panel; the summary is the trigger.</p>
-        <span class="sg-ok"><b>Audit #3 — resolved.</b> Now uses the shared Phosphor caret (mask + <code>currentColor</code>) that rotates on open — same glyph as the select and filter triggers (was a Unicode <code>▾</code>).</span>
+        <p class="sg-purpose">Collapses account links into a bordered panel; the summary is the trigger, carrying the shared Phosphor caret that rotates on open.</p>
       </div>
     </div>
   </section>
 
   <section class="sg-section" id="inputs">
     <h2>Form inputs</h2>
-    <p class="sg-section__intro">Two intentional field skins — underline (forms) and borderless-grow (filter bar) — plus three checkbox implementations (audit #4).</p>
+    <p class="sg-section__intro">Two field skins: underline (forms) and borderless-grow (filter bar).</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -381,7 +349,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Field label / value / hint</span> · <code>.field-label</code> + <code>.muted</code>
-        <p class="sg-purpose">One typographic ladder per form field, in reading order: a <b>bold</b> <code>.field-label</code> (a <code>&lt;span&gt;</code> over a value/select, or a fieldset <code>&lt;legend&gt;</code>), then a muted, smaller <code>.muted</code> hint, then the normal-weight value/input — so the hint is read <em>before</em> you fill the field, not after. The section <code>h2</code> is larger so it stays the heading. Every label in a section uses this one style — don't let them drift into mixed weights (bold legend vs muted span vs plain span).</p>
+        <p class="sg-purpose">One typographic ladder per field, in reading order: a <b>bold</b> <code>.field-label</code> (a <code>&lt;span&gt;</code> over a value/select, or a fieldset <code>&lt;legend&gt;</code>), then a muted, smaller <code>.muted</code> hint, then the normal-weight value — so the hint is read <em>before</em> you fill the field. Every label in a section uses this one style.</p>
       </div>
     </div>
 
@@ -415,7 +383,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Field group</span> · <code>render layout: "shared/field_group", attached:</code>
-        <p class="sg-purpose">A field — or a pair of fields settled from <b>one source</b>, as Ortschaft and Kanton are here — plus what hangs off it: the block holds the label and input (or the row), and <code>attached</code> takes the lines under it — a <code>cite</code>, a suggestion row, a hint — as one renderable or a list of them, blanks dropping out. No rule, no box, no tint, no indent: the lines inside a group sit at <code>gap-xsmall</code> and the column holding the groups gaps them at <code>gap-large</code>, and that difference is the only thing saying which field a line belongs to — a caller that gaps its column tighter has no grouping left. Reach for it the moment a field carries more than a label and an input: on the form's ordinary gap a subordinate line sits equidistant between the field above and the next field's label, and the heaviest of them (a chip row) wins that tie, so the block reads as an intro to the field <em>underneath</em>. Attach to the pair rather than to one column wherever both fields come from that one source — a town chip fills the canton as well as the town. Note the reading order flips against the ladder above: on a card whose fields arrive already filled there is nothing to read before typing, so everything subordinate hangs below the value it is about.</p>
+        <p class="sg-purpose">A field — or a pair of fields settled from <b>one source</b>, as Ortschaft and Kanton are here — plus what hangs off it: <code>attached</code> takes the lines under it (a <code>cite</code>, a suggestion row, a hint) as one renderable or a list, blanks dropping out. No rule, box, tint or indent: the lines inside a group sit at <code>gap-xsmall</code> while the column holding the groups gaps at <code>gap-large</code>, and that difference is the only thing saying which field a line belongs to — a caller that gaps its column tighter has no grouping left. Attach to the pair wherever both fields come from that one source.</p>
       </div>
     </div>
 
@@ -427,7 +395,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Multi-line field</span> · <code>.account-form textarea</code>
-        <p class="sg-purpose">The same underline skin on the field type the capture screen introduced. A textarea resizes vertically only — sideways resizing breaks the form column.</p>
+        <p class="sg-purpose">The same underline skin on a textarea. It resizes vertically only — sideways resizing breaks the form column.</p>
       </div>
     </div>
 
@@ -448,7 +416,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Date + time pair</span> · <code>.account-form input[type=date]</code> + <code>[type=time]</code>
-        <p class="sg-purpose"><b>Both halves are native pickers, and that is the rule</b> — never pair one with a plain text field. A date/time control takes its height from the value box the engine lays out in its shadow DOM, and mobile Safari holds on to its own control metrics for one whatever height the stylesheet sets; a text field beside it therefore draws its underline somewhere else. Two native controls agree with each other by construction, so the height pinned in <code>.account-form</code> only has to be self-consistent rather than exactly equal to a text line box. <b>Check this specimen on a real iPhone</b>, not on desktop — the two underlines must sit on one line. A desktop browser lines a date up with a text field either way, so it will not show you the break.</p>
+        <p class="sg-purpose"><b>Both halves are native pickers</b> — never pair one with a plain text field. A date/time control takes its height from the value box the engine lays out in its shadow DOM, and mobile Safari holds on to its own control metrics whatever height the stylesheet sets, so a text field beside it draws its underline somewhere else. <b>Check this specimen on a real iPhone</b>: a desktop browser lines a date up with a text field either way.</p>
       </div>
     </div>
 
@@ -461,8 +429,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Account / auth field</span> · <code>.account-form input</code>
-        <p class="sg-purpose">Underline-only field; neutral bottom border, lights accent on focus. Typed text is foreground.</p>
-        <span class="sg-ok"><b>Audit #1 — resolved.</b> Resting underline is neutral and the global <code>input</code> colour is foreground; green now appears only when the field is focused.</span>
+        <p class="sg-purpose">Underline-only field: neutral bottom border, accent on focus, foreground text.</p>
       </div>
     </div>
 
@@ -477,8 +444,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Checkboxes</span> · <code>input[type=checkbox]</code> &nbsp;/&nbsp; <code>label.tag</code> &nbsp;/&nbsp; <code>.opt__box</code> (sheets)
-        <p class="sg-purpose">Confirm an opt-in. One custom box (left) is used everywhere; the selectable chip fills accent when checked.</p>
-        <span class="sg-ok"><b>Audit #4 — resolved.</b> All standalone checkboxes now share one custom box (<code>appearance:none</code>, matching the sheet's <code>.opt__box</code>) — no more native-vs-custom split. The chip (<code>label.tag</code>) stays a distinct, deliberate selectable-chip pattern.</span>
+        <p class="sg-purpose">Confirm an opt-in. One custom box (left) everywhere; the selectable chip fills accent when checked.</p>
       </div>
     </div>
 
@@ -492,8 +458,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Sheet option rows</span> · <code>.opt</code> &nbsp;/&nbsp; <code>.opt--single</code>
-        <p class="sg-purpose">The checkable rows inside a filter sheet (What / Where / When). Default is multi-select (square box). <code>.opt--single</code> rounds the box to a radio dot for single-select sheets — the rule editor's <b>When</b>, where a recurring filter takes exactly one relative window.</p>
-        <span class="sg-ok">One row component, two semantics — the box shape (square vs round) is the only signal, so multi- and single-select read consistently across every sheet.</span>
+        <p class="sg-purpose">The checkable rows inside a filter sheet (What / Where / When). The box shape is the only signal: square is multi-select, <code>.opt--single</code> rounds it to a radio dot for a sheet that takes exactly one value.</p>
       </div>
     </div>
 
@@ -505,8 +470,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Sheet loading row</span> · <code>.sheet__loading</code>
-        <p class="sg-purpose">Stands in for a sheet's option rows while they load. The What and Where trees are ~360 rows, so they're fetched the first time the sheet opens instead of riding along on every page (#81) — this is what fills the panel in the meantime.</p>
-        <span class="sg-ok">Muted, one line, and it reserves a few rows' height, so the in-flow desktop panel doesn't jump when the tree lands.</span>
+        <p class="sg-purpose">Stands in for a sheet's option rows while they load — the What and Where trees run to a few hundred rows, so they are fetched the first time the sheet opens. Muted, one line, and it reserves a few rows' height so the in-flow desktop panel does not jump when the tree lands.</p>
       </div>
     </div>
   </section>
@@ -514,7 +478,7 @@
   <section class="sg-section" id="genre-combobox">
     <h2>Genre picker</h2>
     <p class="sg-section__intro">The one field for choosing an event's genres, wherever that happens: the capture card, the hand-entry page, the admin event editor. Built from <code>shared/_genre_combobox</code> &mdash; <b>reuse it</b> rather than configuring a combobox by hand, because three of its options are load-bearing and silently break the field if they drift apart.</p>
-    <p class="sg-section__intro"><b>Free text, and therefore names.</b> A poster names genres the taxonomy has never seen, so typing a new one is expected; the gem submits a newly-typed genre under the same field name as the picked ones, which is why every option is keyed by its <b>name</b> and not by a <code>Genre</code> id. <code>mobile_at: "0px"</code> keeps the inline listbox on every width &mdash; the gem's modal <code>&lt;dialog&gt;</code> covers a phone from the middle down and then loses its lower half to the software keyboard. Options ride along in the page rather than behind a <code>src</code>, so typing filters what is already there.</p>
+    <p class="sg-section__intro"><b>Free text, and therefore names.</b> A poster names genres the taxonomy has never seen, so typing a new one is expected, and the gem submits a newly-typed genre under the same field name as the picked ones &mdash; which is why every option is keyed by its <b>name</b> and not by a <code>Genre</code> id. <code>mobile_at: "0px"</code> keeps the listbox inline at every width: the gem's modal <code>&lt;dialog&gt;</code> covers a phone from the middle down and then loses its lower half to the software keyboard.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -527,16 +491,15 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Genre picker</span> &middot; <code>render "shared/genre_combobox", name:, id:, value:, chip_src:, label:</code>
-        <p class="sg-purpose">Each option reads <b>name &middot; where it sits</b> on the left and a descendant count on the right, with the umbrella genres sorted to the top &mdash; so the broad buckets you reach for most lead the list, and you can tell a precise child (&ldquo;Grind &middot; Metal&rdquo;) from a root at a glance. Both are render-only: typing still filters on the name alone.</p>
-        <p class="sg-purpose">Pass <code>badge:</code> to hang a chip off the label (the admin editor marks a pinned list that way), and <code>options: []</code> to render an empty listbox for a client that clones the page's one copy into it &mdash; which is how the capture queue avoids shipping the whole taxonomy per card.</p>
-        <span class="sg-ok">The label carries <code>for</code> and must <b>never</b> wrap the field: a tap on a selection chip inside a wrapping label is forwarded to the input as a second click, which defeats the chip's own remover.</span>
+        <p class="sg-purpose">Each option reads <b>name &middot; where it sits</b> on the left and a descendant count on the right, umbrella genres sorted to the top. Both are render-only: typing still filters on the name alone.</p>
+        <p class="sg-purpose">Pass <code>badge:</code> to hang a chip off the label, and <code>options: []</code> to render an empty listbox for a client that clones the page's one copy into it. The label carries <code>for</code> and must <b>never</b> wrap the field: a tap on a selection chip inside a wrapping label is forwarded to the input as a second click, defeating the chip's own remover.</p>
       </div>
     </div>
   </section>
 
   <section class="sg-section" id="drop-zone">
     <h2>Drop zone</h2>
-    <p class="sg-section__intro">A file picker drawn as a drop target: drop files on it, tap it to open the system picker, or paste an image onto it. It holds nothing and lists nothing — what happens on pick belongs to the caller, and on the capture screen that is "send them and go to the review queue".</p>
+    <p class="sg-section__intro">A file picker drawn as a drop target: drop files on it, tap it to open the system picker, or paste an image onto it. It holds nothing and lists nothing &mdash; what happens on pick belongs to the caller.</p>
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen">
@@ -545,8 +508,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Drop zone</span> · <code>render "shared/drop_zone", id:, label:, hint:</code>
-        <p class="sg-purpose">A real <code>&lt;input type="file"&gt;</code> stays behind the dashed target, visually hidden and wrapped by a <code>&lt;label for&gt;</code>: the drop handler is an <b>enhancement</b>, and without the input keyboard users and every iOS browser lose the picker entirely. Pass <code>zone_attrs</code>/<code>input_attrs</code> for the caller's own hooks.</p>
-        <span class="sg-ok">The dashed edge is the only one on the site, so a drop target is never mistaken for a field.</span>
+        <p class="sg-purpose">A real <code>&lt;input type="file"&gt;</code> stays behind the dashed target, visually hidden and wrapped by a <code>&lt;label for&gt;</code>: the drop handler is an <b>enhancement</b>, and without the input keyboard users and every iOS browser lose the picker entirely. The dashed edge is the only one on the site, so a drop target is never mistaken for a field. Pass <code>zone_attrs</code>/<code>input_attrs</code> for the caller's own hooks.</p>
       </div>
     </div>
 
@@ -559,15 +521,14 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">…with a paste button</span> · <code>paste_label:</code>, <code>paste_error:</code>
-        <p class="sg-purpose">A third way in for a phone, which has no keystroke for pasting: copy a poster wherever it is and it never has to be downloaded first. The button is a <b>sibling</b> of the <code>&lt;label for&gt;</code> and never inside it — a label forwards every tap in its subtree to the file input, which would open the system picker instead. The caller hides it where <code>navigator.clipboard.read</code> is missing.</p>
-        <span class="sg-ok">The refusal is shown here; live it starts hidden. Declining the browser's own paste prompt is silent — the contributor decided that, and it is not a failure.</span>
+        <p class="sg-purpose">A third way in for a phone, which has no keystroke for pasting. The button is a <b>sibling</b> of the <code>&lt;label for&gt;</code> and never inside it — a label forwards every tap in its subtree to the file input, which would open the system picker instead. The caller hides it where <code>navigator.clipboard.read</code> is missing. The refusal is specimened here; live it starts hidden.</p>
       </div>
     </div>
   </section>
 
   <section class="sg-section" id="icons">
     <h2>Icons</h2>
-    <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); the follow <b>star</b> and saved <b>heart</b> are masked SVGs (outline→fill for off/on state). Clickable icons use <code>.icon-button</code>; display-only icons use the <code>.icon</code> role (audit #9, resolved).</p>
+    <p class="sg-section__intro">Phosphor Regular (base class <code>ph</code>); the follow <b>star</b> and saved <b>heart</b> are masked SVGs (outline→fill for off/on). Clickable icons use <code>.icon-button</code>, display-only icons the <code>.icon</code> role.</p>
 
     <div class="sg-row">
       <div class="sg-specimen sg-specimen--lg">
@@ -577,7 +538,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Display icon</span> · <code>.icon</code> (muted) · <code>.filter-icon</code> (green)
-        <p class="sg-purpose">A non-interactive metadata glyph is muted (<code>.icon</code>, the counterpart to the clickable <code>.icon-button</code>). <b>Exception:</b> a filter field's leading handle (<code>.filter-icon</code> / <code>.filter-trigger__icon</code>, the green one) is accent-green — the field opens a dropdown/picker, so the glyph reads as an interactive affordance, not passive decoration.</p>
+        <p class="sg-purpose">A non-interactive metadata glyph is muted (<code>.icon</code>, the counterpart to the clickable <code>.icon-button</code>). <b>Exception:</b> a filter field's leading handle (<code>.filter-icon</code> / <code>.filter-trigger__icon</code>) is accent-green — the field opens a dropdown, so the glyph reads as an interactive affordance.</p>
       </div>
     </div>
 
@@ -610,7 +571,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Saved-filters menu</span> · <code>.filter-menu</code>, <code>.funnel-fill</code>, <code>.save-filter-icon</code>
-        <p class="sg-purpose">The single saved-filter control by the applied-filter chips — a funnel <code>&lt;details&gt;</code> menu that <b>saves</b> the active filter and <b>applies</b> a saved one. Toggle: outline funnel = nothing saved here; solid <b>green</b> funnel = the active filter is itself saved. Inside, the <b>+</b> badge (<code>.save-filter-icon</code>) marks the "save this filter" item. Shares the funnel metaphor with the nav "Filter" section.</p>
+        <p class="sg-purpose">The saved-filter control beside the applied-filter chips: a funnel <code>&lt;details&gt;</code> menu that <b>saves</b> the active filter and <b>applies</b> a saved one. Outline funnel = nothing saved here; solid <b>green</b> funnel = the active filter is itself saved. Inside, the <b>+</b> badge marks the save item.</p>
       </div>
     </div>
 
@@ -621,8 +582,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Save heart</span> · <code>.save-heart</code>
-        <p class="sg-purpose">"Save this show" — the rare, powerful signal. Faint outline = not saved; solid <b>raspberry</b> = saved.</p>
-        <span class="sg-ok"><b>The two personal signals:</b> save filter = green <b>star</b>, save show = raspberry <b>heart</b>. Distinct in colour AND shape, so neither relies on colour alone. Both use outline→fill for off/on.</span>
+        <p class="sg-purpose">"Save this show" — the rare, powerful signal, and the one raspberry on the site. Faint outline = not saved, solid <b>raspberry</b> = saved. Its counterpart is the green <b>star</b> of a saved filter: the two personal signals differ in shape as well as colour.</p>
       </div>
     </div>
   </section>
@@ -659,47 +619,43 @@
 
   <section class="sg-section" id="catalogue-controls">
     <h2>Catalogue controls</h2>
-    <p class="sg-section__intro">Every catalogue browser — admin events / localities / locations / places, and the genre index — opens with the same three blocks in the same order: <b>filter chips</b>, then the <b>search field</b>, then the <b>sort row</b>. Built from <code>shared/_catalogue_controls</code>; pass the route helper as a symbol plus the i18n scope, and the two lists. <b>Reuse it</b> rather than hand-rolling the row — five copies of this had already forked into two CSS names, two sort-row wordings and two controller shapes before it was pulled together.</p>
-    <p class="sg-section__intro"><b>The three blocks are one component because each has to carry the other two&rsquo;s params.</b> A chip that drops <code>sort</code> silently resets the ordering every time you filter; a sort link that drops the filter throws you back to the full list. That is the bug the split copies actually had, so the partial builds all three URLs from one place rather than leaving each page to remember.</p>
+    <p class="sg-section__intro">Every catalogue browser — admin events / localities / locations / places, and the genre index — opens with the same three blocks in the same order: <b>filter chips</b>, then the <b>search field</b>, then the <b>sort row</b>. Built from <code>shared/_catalogue_controls</code>; pass the route helper as a symbol, the i18n scope, and the two lists. <b>Reuse it</b> rather than hand-rolling the row.</p>
+    <p class="sg-section__intro"><b>The three blocks are one component because each has to carry the other two&rsquo;s params.</b> A chip that drops <code>sort</code> silently resets the ordering every time you filter; a sort link that drops the filter throws you back to the full list. The partial builds all three URLs from one place.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <%# The real partial with a real route + scope, so the chips and labels are the
-            ones the admin events browser renders. %>
         <%= render "shared/catalogue_controls", route: :admin_events_path, scope: "admin.events.index",
               filters: %w[all visible hidden cancelled], active_filter: "all",
               sorts: %w[date title], active_sort: "date" %>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Catalogue controls</span> &middot; <code>render "shared/catalogue_controls", route:, scope:, filters:, active_filter:, sorts:, active_sort:</code>
-        <p class="sg-purpose">The active chip fills accent (<code>.tag.active</code>); the active sort option goes full-colour and bold while the rest stay muted, and neither reads as an underlined link. <code>filters</code> leads with <code>"all"</code>, which maps to <b>no</b> filter param rather than the literal string, so the unfiltered URL stays clean.</p>
-        <p class="sg-purpose">Two locals cover the variation across the five pages. <code>filter_param:</code> names the query param <em>and</em> the i18n key prefix at once — the locations browser passes <code>:type</code> and gets <code>type_venue</code> keys with a <code>?type=</code> URL, no other change. <code>divider_before:</code> names the chip that opens a second group, which is how the genre index files its parked dispositions (ignored / hidden / blocked) apart from its tree statuses.</p>
-        <span class="sg-ok">The sort row&rsquo;s own label is a <b>single shared key</b> (<code>catalogue.sort_by</code>), not one per page &mdash; four pages said &ldquo;Sort by&rdquo; and the fifth said &ldquo;Sort:&rdquo; in all three locales before it was hoisted.</span>
+        <p class="sg-purpose">The active chip fills accent (<code>.tag.active</code>); the active sort option goes full-colour and bold while the rest stay muted, and neither reads as an underlined link. The sort row&rsquo;s label is one shared key (<code>catalogue.sort_by</code>) for every page. <code>filters</code> leads with <code>"all"</code>, which maps to <b>no</b> filter param rather than the literal string, so the unfiltered URL stays clean.</p>
+        <p class="sg-purpose"><code>filter_param:</code> names the query param <em>and</em> the i18n key prefix at once — the locations browser passes <code>:type</code> and gets <code>type_venue</code> keys with a <code>?type=</code> URL. <code>divider_before:</code> names the chip that opens a second group, which is how the genre index files its parked dispositions apart from its tree statuses.</p>
       </div>
     </div>
   </section>
 
   <section class="sg-section" id="pagination">
     <h2>Pagination</h2>
-    <p class="sg-section__intro">Every long list (admin events/locations/users, genres, the public feed) closes with the same quiet pager: prev/next plus a <code>Seite X / Y</code> readout, <b>never</b> a number grid — so it stays one calm line at any width. Built from <code>shared/_pagination</code>; pass the Kaminari <code>collection</code>. It renders nothing for a single page, and the end you can't move past (first/last) shows as muted, inert text so the readout never shifts as you page.</p>
+    <p class="sg-section__intro">Every long list closes with the same quiet pager: prev/next plus a <code>Seite X / Y</code> readout, <b>never</b> a number grid, so it stays one calm line at any width. Built from <code>shared/_pagination</code>; pass the Kaminari <code>collection</code>. It renders nothing for a single page, and the end you cannot move past shows as muted, inert text so the readout never shifts as you page.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <%# A throwaway 3-page array so the specimen shows a live middle page with
-            both steps active — the real partial, the real CSS. %>
+        <%# A throwaway 3-page array, so the specimen shows a live middle page. %>
         <%= render 'shared/pagination', collection: Kaminari.paginate_array((1..150).to_a).page(2).per(50) %>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Pager</span> · <code>render 'shared/pagination', collection: @events</code>
-        <p class="sg-purpose">Replaces the old Kaminari number grid (which wrapped to a second row on narrow screens). Use it everywhere a <code>.page(params[:page])</code> collection is listed — one home, so the pager reads identically across admin and app.</p>
+        <p class="sg-purpose">Use it everywhere a <code>.page(params[:page])</code> collection is listed, so the pager reads identically across admin and app.</p>
       </div>
     </div>
   </section>
 
   <section class="sg-section" id="page-header">
     <h2>Page header &amp; back link</h2>
-    <p class="sg-section__intro">Every page except the main events feed opens with the same block: an optional <b>back link</b> — the "up" navigation — above the title. Built from <code>shared/_page_header</code> + <code>shared/_back_link</code>; <b>reuse them</b> rather than hand-rolling a header, so admin and app pages stay identical. The ← is decorative and lives in the partial, never in the copy.</p>
-    <p class="sg-section__intro"><b>The rule:</b> the back link always points <b>up one level</b>, and the top of the tree is the events feed. A detail/edit page links to its parent list (e.g. a saved filter's editor → the filters list); a top-level page reached from the nav (Settings, Saved shows, Notifications, Admin …) links back to the feed (<code>root_path</code>, label <code>nav.events</code>). Only the feed itself and the pre-login auth pages omit the back link.</p>
+    <p class="sg-section__intro">Every page except the events feed opens with the same block: an optional <b>back link</b> — the "up" navigation — above the title. Built from <code>shared/_page_header</code> + <code>shared/_back_link</code>; <b>reuse them</b> rather than hand-rolling a header. The ← is decorative and lives in the partial, never in the copy.</p>
+    <p class="sg-section__intro"><b>The rule:</b> the back link points <b>up one level</b>, and the top of the tree is the events feed. A detail or edit page links to its parent list; a top-level page reached from the nav links back to the feed (<code>root_path</code>, label <code>nav.events</code>). Only the feed itself and the pre-login auth pages omit it.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -717,14 +673,12 @@
 
   <section class="sg-section" id="review-card">
     <h2>Review card</h2>
-    <p class="sg-section__intro">One thing being judged, with the evidence that settles it and the decision itself on screen at the same time — the shape the capture queue uses to review an extracted event. The card <b>divides</b> the height it is given: the source holds still (above the fields on a phone, left of them from 900px), the decision sits across the bottom, and only the fields scroll — in a pane of their own, so nothing ever passes behind the source. The job is a <b>comparison</b>, and a source that scrolls away turns "does this poster really say 20:00" back into remembering.</p>
+    <p class="sg-section__intro">One thing being judged, with the evidence that settles it and the decision itself on screen at the same time. The card <b>divides</b> the height it is given: the source holds still (above the fields on a phone, left of them from 900px), the decision sits across the bottom, and only the fields scroll — in a pane of their own, so nothing ever passes behind the source. The job is a <b>comparison</b>, and a source that scrolls away turns "does this poster really say 20:00" back into remembering.</p>
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen sg-specimen--review-card">
-        <%# The real partials. The pane normally holds evidence the browser never
-            uploaded, so this specimen stands an app icon in its place. The stage is
-            given a height because the card divides one — the app only ever renders it
-            inside something that has one. %>
+        <%# The pane normally holds evidence the browser never uploaded; an app icon
+            stands in. The stage needs a height because the card divides one. %>
         <%= render layout: "shared/review_card",
               locals: { id: "sg-review-card", source: image_tag("/icon.png", alt: ""),
                         actions: render(layout: "shared/action_bar") {
@@ -767,7 +721,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Cite</span> · <code>render "shared/cite", quote:</code>
-        <p class="sg-purpose">The verbatim text a model quoted as its source for the field <b>above</b> it — the opposite reading order from a <code>.field-label</code> hint, because it is provenance for a value already filled in rather than an instruction for filling one. Goes in a <a href="#inputs">field group</a>'s <code>attached</code> slot, which is what keeps it nearer the field it came off than the next field's label. It shares the quiet muted channel with a hint and is set apart by <b>slant</b>: italic is the transcribed line, upright the instruction. Quotation marks come from the locale (<code>„…“</code> / <code>“…”</code> / <code>«&nbsp;…&nbsp;»</code>) and carry the whole meaning, so there is no repeated label: a card showing one per field has to read as a form, not as a transcript. Render nothing by passing a blank <code>quote</code>.</p>
+        <p class="sg-purpose">The verbatim text a model quoted as its source for the field <b>above</b> it — provenance for a value already filled in, which is why it reads after the field rather than before it like a hint. Goes in a <a href="#inputs">field group</a>'s <code>attached</code> slot. It shares the muted channel with a hint and is set apart by <b>slant</b>: italic is the transcribed line, upright the instruction. Quotation marks come from the locale (<code>„…“</code> / <code>“…”</code> / <code>«&nbsp;…&nbsp;»</code>) and carry the whole meaning, so there is no repeated label. A blank <code>quote</code> renders nothing.</p>
       </div>
     </div>
 
@@ -787,14 +741,13 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Card aside</span> · <code>render layout: "shared/card_aside", title:, action:</code>
-        <p class="sg-purpose">A block inside a review card that is <b>not</b> part of what the card is deciding — a report on the read, a note, anything that does not post with the card's form. It has to separate itself by <b>kind</b> rather than by weight: the card body is borderless by design, so every input already draws a horizontal rule and one more hairline reads as one more field, not as a boundary. A recessed ground and a heading do read. <code>action</code> is the button that acts on what is in here, kept beside its own controls rather than sent down to the <a href="#review-card">action bar</a>, which holds only the decisions that end the card.</p>
+        <p class="sg-purpose">A block inside a review card that is <b>not</b> part of what the card is deciding — a report on the read, a note, anything that does not post with the card's form. It separates itself by <b>kind</b> rather than weight: the card body is borderless, so every input already draws a horizontal rule and one more hairline reads as one more field, while a recessed ground and a heading read as a boundary. <code>action</code> stays beside its own controls rather than going down to the <a href="#review-card">action bar</a>.</p>
       </div>
     </div>
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen">
-        <%# The real partial. Its buttons submit a card's form by id; here there is no
-            such form, so they do nothing. %>
+        <%# The buttons submit a card's form by id; there is none here, so they do nothing. %>
         <%= render "captures/matches", form_id: "sg-no-form",
               matches: [{ id: 1, title: "Zorpcore Nacht", meta: "21:00 · Zorpsaal",
                           adds: t('capture.matches.adds',
@@ -805,7 +758,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Match block</span> · <code>render "captures/matches", matches:, form_id:</code>
-        <p class="sg-purpose">Shows we may already carry, shown at the <b>top</b> of a capture card because they ask about the whole card rather than about one field — and because the answer decides what publishing even means. It is the one block in the body that is neither a field nor a <a href="#review-card">card aside</a>: it does post with the card's form, but it is not something to fill in, so it takes the recessed ground and adds the amber <a href="#colours">attention</a> edge. Each row names what this read would <b>add</b> to that show, so the offer never promises an enrichment it has nothing to make. Every button is a submitter carrying its own <code>name</code>/<code>value</code> into the card's form by id, which is how one form posts three different answers with no client code.</p>
+        <p class="sg-purpose">Shows we may already carry, at the <b>top</b> of a capture card because they ask about the whole card rather than one field. It is the one block in the body that is neither a field nor a <a href="#review-card">card aside</a>: it posts with the card's form but is not something to fill in, so it takes the recessed ground plus the amber <a href="#colours">attention</a> edge. Each row names what this read would <b>add</b> to that show. Every button is a submitter carrying its own <code>name</code>/<code>value</code> into the card's form by id, which is how one form posts three different answers with no client code.</p>
       </div>
     </div>
 
@@ -818,14 +771,14 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Action bar</span> · <code>render layout: "shared/action_bar"</code>
-        <p class="sg-purpose">The decision row of a review card, pinned to its bottom edge so it stays in thumb reach however long the field list runs. It holds only the decisions that <b>end</b> the card: the commit first (primary), the quiet way out <b>last</b> — pushed to the far end, because a dismissal next to the commit is one mis-tap away from being it. A control that leaves the card in play goes in a <a href="#review-card">card aside</a> instead, with the controls it acts on. Unlike <code>form_actions</code> this closes a decision, not a form: there is no <b>Abbrechen</b>, since leaving decides nothing.</p>
+        <p class="sg-purpose">The decision row of a review card, pinned to its bottom edge so it stays in thumb reach however long the field list runs. It holds only the decisions that <b>end</b> the card: the commit first (primary), the quiet way out <b>last</b> — a dismissal next to the commit is one mis-tap away from being it. A control that leaves the card in play goes in a <a href="#review-card">card aside</a> instead. There is no <b>Abbrechen</b>: leaving decides nothing.</p>
       </div>
     </div>
   </section>
 
   <section class="sg-section" id="footer">
     <h2>Footer</h2>
-    <p class="sg-section__intro">A quiet, in-flow row of secondary links (about + the privacy notice), rendered once at the bottom of every page by the layout. Deliberately <b>recessive</b> — small, foreground-muted text — so it never competes with the feed; it sits below <code>&lt;main&gt;</code> and pins to the bottom on short pages. The real partial, the real CSS:</p>
+    <p class="sg-section__intro">A quiet, in-flow row of secondary links (about + the privacy notice), rendered once at the bottom of every page by the layout. Deliberately <b>recessive</b> — small, foreground-muted text — so it never competes with the feed; it sits below <code>&lt;main&gt;</code> and pins to the bottom on short pages.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -833,7 +786,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Site footer</span> · <code>render 'shared/footer'</code>
-        <p class="sg-purpose">Already in the application layout — pages don't render it themselves. Add a link here (and a route) only when there's a genuinely new low-priority/legal destination; keep it short so the row stays scannable.</p>
+        <p class="sg-purpose">Already in the application layout — pages do not render it themselves. Add a link here (and a route) only for a genuinely new low-priority or legal destination; keep the row scannable.</p>
       </div>
     </div>
   </section>

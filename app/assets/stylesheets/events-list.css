@@ -105,11 +105,29 @@
   gap: var(--gap-medium);
 }
 
+/* Two columns: the start time in a gutter of its own, everything else in the
+   content column beside it. A title, description or genre row that wraps therefore
+   stays inside that column instead of running back under the time, so the time
+   reads as the thing grouping the event.
+
+   The gutter is a fixed 5ch — the width of "18:00" in the app's monospace — and not
+   an auto track, which sizes per row and so collapses to nothing on an event whose
+   time is unknown. A row with no time has to indent exactly like the timed rows
+   around it, including where a whole venue group is untimed. Baseline alignment
+   because the title sets its own tighter line-height (see _reset.css). */
 .event-body {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap-xsmall);
+  display: grid;
+  grid-template-columns: 5ch 1fr;
+  align-items: baseline;
+  row-gap: var(--gap-xsmall);
+  column-gap: 0.8ch;
+}
+
+.event-title,
+.event-description,
+.event-genres {
+  grid-column: 2;
 }
 
 /* Plain informational tags: genres, and tags for logged-out visitors who can't
@@ -196,7 +214,7 @@
 /* Time leads the title at full size but in muted grey, so it reads before the
    act without competing with the venue headline above it. */
 .event-time {
-  margin-right: 0.8ch;
+  grid-column: 1;
   color: var(--theme-fg-muted);
   font-weight: normal;
 }

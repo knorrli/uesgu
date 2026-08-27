@@ -13,8 +13,10 @@
 <article id="<%= dom_id event %>" class="<%= class_names(:event, past: event.start_date < Date.current.beginning_of_day, cancelled: event.cancelled?, rescheduled: rescheduled, 'is-interest': interest) %>">
   <div class="event-body">
 
+    <% if event.start_time.present? %><span class="event-time"><%= l event.start_time, format: :time %></span><% end %>
+
     <h3 class="event-title">
-      <% if event.start_time.present? %><span class="event-time"><%= l event.start_time, format: :time %></span> <% end %><%# A user-captured event has no source page to point its title at. %><% if event.url.present? %><%= link_to event.url, target: '_blank', rel: 'noopener' do %><%= event.title %> <span class="event-link-marker" aria-hidden="true">&#8599;</span><% end %><% else %><%= event.title %><% end %><%# Trailing event-level markers (a quiet .chip sub-family, colour = severity):
+      <%# A user-captured event has no source page to point its title at. %><% if event.url.present? %><%= link_to event.url, target: '_blank', rel: 'noopener' do %><%= event.title %> <span class="event-link-marker" aria-hidden="true">&#8599;</span><% end %><% else %><%= event.title %><% end %><%# Trailing event-level markers (a quiet .chip sub-family, colour = severity):
           cancelled / rescheduled status, then provenance — community, then the
           off-site source. All AFTER the title so they stay secondary to it. %><% if event.cancelled? %> <span class="chip chip--cancelled"><%= t('events.cancelled') %></span><% end %><% if rescheduled %> <span class="chip chip--moved"><%= t('events.rescheduled') %></span><% end %><% if event.captured? %> <span class="chip chip--community" title="<%= t('events.community_hint') %>"><%= t('events.community') %></span><% end %><% if (source = event_offsite_source(event)) %> <span class="chip chip--source" title="<%= t('events.offsite_link', source: source) %>"><%= source %></span><% end %>
     </h3>

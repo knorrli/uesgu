@@ -2,80 +2,11 @@
    Deliberately plain — every box on it is something a human is about to correct.
    The card frame itself is shared: see review_card.css. */
 
-/* Reviewing bounds the screen to the viewport instead of letting it run on as a
-   document. That is what gives the open card a definite height to divide, so the
-   poster can hold still ABOVE the fields rather than being pinned over them with the
-   fields passing behind it (see review_card.css). Set on <html> by
-   app/javascript/controllers/capture_controller.js.
-
-   On <html> and not <body>, and `clip` rather than `hidden`, because both weaker forms
-   leave the surface shovable: a hidden viewport still scrolls programmatically, so one
-   scrollIntoView — which is what a phone does when the keyboard covers a focused field
-   — slides the whole screen up with no user scroll left to bring it back.
-
-   dvh, and min-height as well as height, because the base rule's `min-height: 100vh` is
-   the LARGE viewport on a phone, taller than the visible one, and a min-height beats a
-   height: left alone it holds the screen open behind the browser chrome. */
-.capture-reviewing {
-  height: 100dvh;
-  overflow: clip;
+/* Declared on the screen rather than on the strip: the open card sits in a different
+   subtree and needs the strip's height as scroll clearance (see .capture-card). */
+.capture {
+  --queue-tile-size: 3.25rem;
 }
-
-.capture-reviewing body {
-  height: 100dvh;
-  min-height: 100dvh;
-  overflow: clip;
-}
-
-/* `flex: 1` overrides the shrink the base rule refuses (`flex: 1 0 auto`), which would
-   otherwise hold main open at its content height and hand the overflow straight back.
-   The padding goes for the reason the column's gap below does: every pixel the frame
-   keeps is one the fields lose, and at 393x844 the page's usual rhythm costs ~100px of
-   a pane that has ~280 to give. */
-.capture-reviewing main.content {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  padding-block: 0;
-}
-
-/* Unreachable once the page has no scroll of its own. */
-.capture-reviewing .site-footer {
-  display: none;
-}
-
-.capture-reviewing .capture {
-  flex: 1;
-  min-height: 0;
-  gap: var(--gap-medium);
-}
-
-.capture-reviewing .capture-rows {
-  flex: 1;
-  min-height: 0;
-}
-
-/* The rows stop being boxes so the open card is a direct child of the column. A row
-   whose cards have all been decided is empty but still a flex item, and the column's
-   gap for each one adds up to a card pushed off the bottom of the screen. A row that
-   never produced a card keeps its own contents — it is the only place its failure is
-   written. */
-.capture-reviewing .capture-row {
-  display: contents;
-}
-
-.capture-reviewing .capture-card {
-  flex: 1;
-  min-height: 0;
-}
-
-/* The cookie notice is fixed to the bottom edge, and reviewing leaves no page scroll to
-   carry the decision bar clear of it — unreserved, it sits on top of the two buttons the
-   card exists for. The same 3.5rem the footer reserves on a scrolling page. */
-.capture-reviewing:has(.cookie-notice:not([hidden])) .action-bar {
-  padding-bottom: calc(var(--gap-small) + var(--safe-bottom) + 3.5rem);
-}
-
 
 /* Set below the rule, and full width where the other two ways in are a drop target and
    a field: entering by hand is the alternative to having a source to read at all, not
@@ -87,6 +18,19 @@
 
 .capture-by-hand > button {
   width: 100%;
+}
+
+/* A row whose card is hidden — decided, or simply not the open one — is a zero-height
+   flex item that still draws the column's gap above it, and a batch of six stacks six
+   of those between the strip and whatever is open. */
+.capture-row:not(:has(> :not([hidden]))) {
+  display: none;
+}
+
+/* The strip is sticky, so a card scrolled into view lands underneath it unless the card
+   reserves the strip's own height as clearance. */
+.capture-card {
+  scroll-margin-top: calc(var(--queue-tile-size) + 2 * var(--gap-small));
 }
 
 /* One input's outcome that never became a card. Its label — a filename, or the head
@@ -109,13 +53,12 @@
   font-size: var(--font-size-lg);
 }
 
-/* Capped by the pane it sits in, not by the viewport: the source pane is a share of
-   the CARD (see review_card.css), which on a phone is shorter than 38vh ever was — so
-   a viewport-measured cap left the box overflowing a pane that clips, cutting off its
-   own bottom border and the scroll that would have reached the rest of the text. */
+/* The same cap a poster takes, declared on .review-card__source: a source is a look at
+   what the card was read from, and a long paste is no more entitled to the screen than
+   a tall poster. */
 .capture-row__excerpt {
   margin: 0;
-  max-height: 100%;
+  max-height: var(--source-max-height);
   overflow: auto;
   overscroll-behavior: contain;
   padding: var(--gap-small);
@@ -125,7 +68,8 @@
 }
 
 /* Sticky because the tile is the receipt: accepting publishes and moves on, so the
-   strip is the only place a decided card still exists. */
+   strip is the only place a decided card still exists. The one thing on this screen
+   that holds still — everything below it is an ordinary scrolling page. */
 .capture-queue {
   position: sticky;
   top: 0;
@@ -151,8 +95,8 @@
 button.capture-queue__tile {
   position: relative;
   flex: 0 0 auto;
-  width: 3.25rem;
-  height: 3.25rem;
+  width: var(--queue-tile-size);
+  height: var(--queue-tile-size);
   padding: 0;
   overflow: hidden;
   border: var(--border-width) solid var(--border-color);

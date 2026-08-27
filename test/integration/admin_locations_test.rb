@@ -50,4 +50,19 @@ class AdminLocationsTest < ActionDispatch::IntegrationTest
     get admin_locations_path(q: "synth")
     assert_select "a", text: "Synthville"
   end
+
+  # The Array-shaped whitelist (genres_admin_test pins the Hash). An unknown type
+  # filters this list down to nothing rather than raising, so the fallback is
+  # checked against a location that must survive it.
+  test "an unknown type or sort falls back to the defaults" do
+    venue = Location.venue_names.first
+    event(location_list: [venue])
+    sign_in_as user(admin: true)
+
+    get admin_locations_path(type: "bogus", sort: "bogus")
+    assert_response :success
+    assert_select "a", text: venue
+    assert_select "a.tag.active[href=?]", admin_locations_path(sort: "bogus")
+    assert_select ".catalogue-sort-option.active[href=?]", admin_locations_path(type: "bogus", sort: "name")
+  end
 end

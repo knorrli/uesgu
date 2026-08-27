@@ -4,12 +4,14 @@ module Admin
   # scrapers via the Location model. Mirrors the genres index idiom: filter by
   # type, sort, search, paginate. The set is small, so it's handled in Ruby.
   class LocationsController < BaseController
+    include CatalogueBrowsing
+
     TYPES = %w[all venue locality canton].freeze
     SORTS = %w[name count].freeze
 
     def index
-      @type = TYPES.include?(params[:type]) ? params[:type] : "all"
-      @sort = SORTS.include?(params[:sort]) ? params[:sort] : "name"
+      @type = catalogue_param(:type, TYPES, default: "all")
+      @sort = catalogue_param(:sort, SORTS, default: "name")
 
       locations = Location.usage
       locations.select! { |loc| loc[:type].to_s == @type } unless @type == "all"
@@ -24,7 +26,7 @@ module Admin
                     locations.sort_by { |loc| loc[:name].downcase }
       end
 
-      @locations = Kaminari.paginate_array(locations).page(params[:page]).per(50)
+      @locations = Kaminari.paginate_array(locations).page(params[:page]).per(PAGE_SIZE)
     end
   end
 end

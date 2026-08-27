@@ -1,4 +1,6 @@
 class GenresController < ApplicationController
+  include CatalogueBrowsing
+
   before_action :require_admin
 
   STATUS_SCOPES = {
@@ -19,11 +21,11 @@ class GenresController < ApplicationController
   # touched that currently tag 0 events — so nothing is ever truly hidden, it's
   # just one search away.
   def index
-    @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : "all"
-    @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : "name"
+    @status = catalogue_param(:status, STATUS_SCOPES, default: "all")
+    @sort = catalogue_param(:sort, SORT_SCOPES, default: "name")
     scope = @status == "all" ? Genre.all : Genre.public_send(STATUS_SCOPES[@status])
     scope = params[:q].present? ? scope.where("name ILIKE ?", "%#{params[:q]}%") : scope.listable
-    @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:parent).page(params[:page]).per(50)
+    @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:parent).page(params[:page]).per(PAGE_SIZE)
   end
 
   # Read-only hierarchy view: the curated genre tree, roots → descendants, for

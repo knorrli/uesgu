@@ -3,6 +3,8 @@ module Admin
   # filter by visibility status, sort, free-text title search, paginate. Unlike
   # the public index (scoped to :visible), the admin sees everything.
   class EventsController < BaseController
+    include CatalogueBrowsing
+
     # "hidden" = non-music events suppressed from the public listing; "cancelled"
     # = called-off shows that stay listed publicly with a marker; "dismissed" =
     # admin-soft-deleted (gone from public, never re-scraped back). The first
@@ -27,15 +29,15 @@ module Admin
     }.freeze
 
     def index
-      @status = STATUS_SCOPES.key?(params[:status]) ? params[:status] : "all"
-      @sort = SORT_SCOPES.key?(params[:sort]) ? params[:sort] : "date"
+      @status = catalogue_param(:status, STATUS_SCOPES, default: "all")
+      @sort = catalogue_param(:sort, SORT_SCOPES, default: "date")
       # "all" means all kept *canonical* events — duplicates merged into a
       # canonical are reached via their own filter, dismissed ones via theirs.
       scope = @status == "all" ? Event.kept.canonical : STATUS_SCOPES[@status].call
       scope = scope.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @events = SORT_SCOPES[@sort].call(scope)
                                   .includes(:locations, :genres, :discarded_by_rule, :canonical_event)
-                                  .page(params[:page]).per(50)
+                                  .page(params[:page]).per(PAGE_SIZE)
       # How many duplicates fold into each canonical on this page — one grouped
       # query (no N+1) so rows can flag aggregated events at a glance.
       @duplicate_counts = Event.where(canonical_event_id: @events.map(&:id)).group(:canonical_event_id).count

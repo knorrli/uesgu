@@ -1,27 +1,20 @@
-/* One thing being judged, with the evidence that settles it on screen at the same
-   time. Specimen in /styleguide.
+/* One thing being judged, with the evidence that settles it. Specimen in /styleguide.
 
-   The card DIVIDES its height rather than stacking: the source pane and the action bar
-   hold still and only the fields move, because the job is a comparison and a source
-   that scrolls away turns "does this poster really say 20:00" back into remembering.
-   It has to be given a definite height to divide — the capture screen bounds itself to
-   the viewport to supply one (see capture.css). Without one the panes fall back to their
-   natural heights and nothing scrolls. */
+   A plain block in document flow: source at the top, fields below it, the decision
+   after the last field, one page scroll for the whole thing. Nothing in the card holds
+   still while the rest of it moves — anything that did could only stay visible by
+   letting the fields pass behind it. The per-field cite quotes are what keeps the
+   source to hand once the poster has scrolled past. */
 .review-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
   padding-bottom: var(--gap-small);
   border-top: var(--border-width) solid var(--border-color);
 }
 
-/* A share of the CARD, not of the viewport: by the time the header, the queue and the
-   decision bar have taken theirs, a poster measured against the whole screen leaves the
-   fields a slot too short to fill in. Shrinks before the fields do. */
+/* Capped so the first field is on screen with the poster rather than below the fold —
+   an upright poster left to its own size is taller than the phone it is read on.
+   .capture-row__excerpt takes the same cap for a pasted source. */
 .review-card__source {
-  flex: 0 1 38%;
-  overflow: hidden;
+  --source-max-height: 50dvh;
   padding-block: var(--gap-small);
 }
 
@@ -32,7 +25,7 @@
 .review-card__source img {
   width: auto;
   max-width: 100%;
-  max-height: 100%;
+  max-height: var(--source-max-height);
   border: var(--border-width) solid var(--border-color);
 }
 
@@ -40,25 +33,15 @@
   cursor: zoom-in;
 }
 
-/* min-height because a flex item's floor is its own content: without it the fields
-   push the action bar off the bottom of a bounded card instead of scrolling. */
-.review-card__body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-/* Full-bleed: the small print on a poster is the reason to look at it at all, and
-   a pane sized to sit beside the fields cannot show it. Opaque because it covers the
-   card rather than replacing it. */
+/* Full-bleed: the small print on a poster is the reason to look at it at all, and the
+   capped pane cannot show it. Opaque because it covers the card rather than replacing
+   it. */
 .review-card__source--zoomed {
   position: fixed;
   inset: 0;
   z-index: 20;
   display: grid;
   place-items: center;
-  max-height: none;
   background: var(--theme-bg-color);
   padding: var(--gap-small) var(--gap-small) calc(var(--gap-small) + var(--safe-bottom));
   cursor: zoom-out;
@@ -107,15 +90,13 @@
   gap: var(--gap-small);
 }
 
-/* The card's last row, so it stays in thumb reach however long the field list runs.
-   The last action is pushed to the far end: a dismissal sitting next to the commit is
-   one mis-tap away from being it. */
+/* The card's last row, after the last field. The last action is pushed to the far end:
+   a dismissal sitting next to the commit is one mis-tap away from being it. */
 .action-bar {
-  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: var(--gap-small);
-  padding-block: var(--gap-small) calc(var(--gap-small) + var(--safe-bottom));
+  padding-block: var(--gap-small);
   border-top: var(--border-width) solid var(--rule-color);
 }
 
@@ -123,14 +104,12 @@
   margin-left: auto;
 }
 
-/* The same relationship rotated: source left, fields scrolling right, the decision
-   across the bottom of both. The body's row is bounded so it, and not the card, is
-   what grows a scrollbar. */
+/* The same three parts rotated where there is room for it: source left, fields right,
+   the decision across the bottom of both. */
 @media (min-width: 900px) {
   .review-card {
     display: grid;
     grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas:
       "source body"
       "actions actions";
@@ -139,6 +118,7 @@
 
   .review-card__source {
     grid-area: source;
+    align-self: start;
     margin-bottom: 0;
   }
 

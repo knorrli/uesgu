@@ -23,9 +23,9 @@
     <%# Absolute key: this block is yielded into shared/page_header, where a relative
         one resolves against that partial. %>
     <p class="muted" data-capture-target="reviewHint" hidden><%= t('capture.review.hint') %></p>
-    <%# In the header rather than under the card: reviewing pins the screen to the
-        viewport, and down there this competes with the decision bar for the bottom
-        edge as well as for the space the fields need. %>
+    <%# In the page header rather than under the card: it abandons the whole batch, and
+        next to the card's own two buttons it would read as a third decision about the
+        event in front of you. %>
     <div data-capture-target="restart" hidden>
       <button type="button" class="text-link" data-action="capture#startOver"><%= t('capture.picker.start_over') %></button>
     </div>
@@ -81,5 +81,5 @@
       thing saying so. %>
   <nav class="capture-queue" data-capture-target="strip" aria-label="<%= t('capture.queue.label') %>" hidden></nav>
 
-  <div id="capture-rows" class="capture-rows flex flex-col gap-medium" data-capture-target="rows"></div>
+  <div id="capture-rows" class="flex flex-col gap-medium" data-capture-target="rows"></div>
 </div>

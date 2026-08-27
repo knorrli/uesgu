@@ -63,16 +63,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    this.reviewing(false)
     this.release(this.sources)
-  }
-
-  // Bounding the screen to the viewport is what gives the open card a height to divide
-  // between its poster and its fields (see capture.css). On <html> because that is where
-  // the rule that stops the scroll has to land — from <body> it only propagates, and the
-  // propagated form still scrolls when something calls scrollIntoView.
-  reviewing(on) {
-    document.documentElement.classList.toggle("capture-reviewing", on)
   }
 
   release(held) {
@@ -226,13 +217,13 @@ export default class extends Controller {
     this.rowsTarget.replaceChildren()
     this.stripTarget.replaceChildren()
     this.stripTarget.hidden = true
-    this.reviewing(false)
     this.currentId = null
     this.restartTarget.hidden = true
     this.inputTarget.hidden = false
     this.reviewTitleTarget.hidden = true
     this.reviewHintTarget.hidden = true
     this.stagingTitleTarget.hidden = false
+    window.scrollTo({ top: 0 })
     this.refreshRead()
   }
 
@@ -248,7 +239,6 @@ export default class extends Controller {
   // queue of one.
   cardTargetConnected(card) {
     this.stripTarget.hidden = false
-    this.reviewing(true)
     this.announceFound()
     this.placeCard(card)
     card.hidden = card.id !== this.currentId
@@ -323,17 +313,19 @@ export default class extends Controller {
       const current = card.id === id
       card.hidden = !current
       this.stockGenres(card, current)
-      if (current) this.rewind(card)
     })
     this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === id) })
+    // After the loop, not inside it: hiding the cards below shortens the document, and a
+    // scroll set against the taller one is clamped back to somewhere short of the card.
+    this.reveal(this.cardTargets.find((card) => card.id === id))
   }
 
-  // Cards share one slot, so an arriving card inherits wherever the last one was left
-  // — which after a decision is the bottom of a form, putting this card's title and the
-  // shows it may duplicate above the top of the pane.
-  rewind(card) {
-    const body = card.querySelector(".review-card__body")
-    if (body) body.scrollTop = 0
+  // Cards share one slot on a page that scrolls as a whole, so a card opening after a
+  // decision inherits the scroll position the last one was left at — the bottom of a
+  // form, with this card's title and the shows it may duplicate above the top of the
+  // screen. Clearance for the sticky strip comes from the card's own scroll-margin.
+  reveal(card) {
+    card?.scrollIntoView()
   }
 
   // The genre vocabulary lives once in the page and is lent to whichever card is open.

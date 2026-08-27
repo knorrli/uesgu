@@ -495,6 +495,41 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorp Fest", Event.last.title
   end
 
+  # The strip is the only thing on this screen that holds still. Anything else that did
+  # — the poster, the decision bar — could only stay visible by letting the fields pass
+  # behind it, so what is asserted here is that everything but the strip moves.
+  test "everything below the queue strip scrolls like a plain page" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+    page.current_window.resize_to(390, 844)
+
+    assert_operator rect(".capture-card .action-bar")["top"], :>, viewport_height
+
+    scroll_to_bottom
+
+    assert_operator page.evaluate_script("window.scrollY"), :>, 0
+    assert_operator rect(".review-card__source")["bottom"], :<, 0
+    assert_in_delta 0, rect(".capture-queue")["top"], 1
+  end
+
+  # A decision is made at the bottom of a form, and the card that replaces it takes over
+  # the page's one scroll position — so without the handover the next card opens with its
+  # title, and the shows it may duplicate, above the top of the screen.
+  test "publishing brings the next card to rest under the strip" do
+    CannedExtractionClient.install(events: [poster_event, matinee])
+    visit capture_path
+    pick "poster.png"
+    page.current_window.resize_to(390, 844)
+    scroll_to_bottom
+
+    accept
+    assert_selector ".capture-queue__tile[data-state='published']"
+
+    assert_equal "Zorpcore Matinee", field_value("title")
+    assert_in_delta rect(".capture-queue")["bottom"], rect(".capture-card")["top"], 2
+  end
+
   # An absence test on purpose: the card's frame is shared markup one caller away, and
   # this is the only thing standing between it and creeping back onto a screen with no
   # source to compare against.
@@ -507,8 +542,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue"
     assert_no_selector ".capture-card__reread"
     assert_no_selector ".drop-zone__item"
-    # The viewport is bounded only so a poster can hold still above the fields.
-    assert_no_selector "html.capture-reviewing", visible: :all
   end
 
   # The third option beside publish and drop. The flags are what make it more than a
@@ -1160,6 +1193,14 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   # The strip is the only way onto a card that has not been decided yet. Waits for the
   # tile to exist: reads land one at a time, and `all` does not wait for a count.
+  def scroll_to_bottom = execute_script("window.scrollTo(0, document.body.scrollHeight)")
+
+  def viewport_height = page.evaluate_script("window.innerHeight")
+
+  # Viewport coordinates, which is what "holds still" and "has scrolled past" are claims
+  # about — an offset inside the document cannot tell the two apart.
+  def rect(selector) = find(selector).evaluate_script("this.getBoundingClientRect().toJSON()")
+
   def jump_to(index)
     assert_selector ".capture-queue__tile", minimum: index + 1
     all(".capture-queue__tile")[index].click

@@ -673,12 +673,12 @@
 
   <section class="sg-section" id="review-card">
     <h2>Review card</h2>
-    <p class="sg-section__intro">One thing being judged, with the evidence that settles it and the decision itself on screen at the same time. The card <b>divides</b> the height it is given: the source holds still (above the fields on a phone, left of them from 900px), the decision sits across the bottom, and only the fields scroll — in a pane of their own, so nothing ever passes behind the source. The job is a <b>comparison</b>, and a source that scrolls away turns "does this poster really say 20:00" back into remembering.</p>
+    <p class="sg-section__intro">One thing being judged, with the evidence that settles it. An ordinary block in document flow: the source at the top (left of the fields from 900px), the fields below it, the decision after the last field, and <b>one</b> page scroll for the whole card. Nothing in it holds still — a pane that stayed put while the page moved could only do it by letting the fields pass behind it. The source is capped so the first field is on screen beside it, and each field carries the line quoted off the source, so the comparison survives scrolling past the poster.</p>
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen sg-specimen--review-card">
         <%# The pane normally holds evidence the browser never uploaded; an app icon
-            stands in. The stage needs a height because the card divides one. %>
+            stands in. %>
         <%= render layout: "shared/review_card",
               locals: { id: "sg-review-card", source: image_tag("/icon.png", alt: ""),
                         actions: render(layout: "shared/action_bar") {
@@ -703,7 +703,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Review card</span> · <code>render layout: "shared/review_card", id:, actions:, source:</code>
-        <p class="sg-purpose">The block is the body. <code>actions</code> is pre-rendered markup rather than a second block because the bar sits outside the scrolling body; <code>source</code> is the evidence, or is left out and written into the pane by a client that holds it in memory only. Pass <code>frame_class</code>/<code>frame_attrs</code> for the caller's own hooks — never a second <code>class</code> attribute.</p>
+        <p class="sg-purpose">The block is the body. <code>actions</code> is a pre-rendered local rather than a second block so the decision row cannot be written into the middle of the field list; <code>source</code> is the evidence, or is left out and written into the pane by a client that holds it in memory only. Pass <code>frame_class</code>/<code>frame_attrs</code> for the caller's own hooks — never a second <code>class</code> attribute.</p>
       </div>
     </div>
 
@@ -771,7 +771,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Action bar</span> · <code>render layout: "shared/action_bar"</code>
-        <p class="sg-purpose">The decision row of a review card, pinned to its bottom edge so it stays in thumb reach however long the field list runs. It holds only the decisions that <b>end</b> the card: the commit first (primary), the quiet way out <b>last</b> — a dismissal next to the commit is one mis-tap away from being it. A control that leaves the card in play goes in a <a href="#review-card">card aside</a> instead. There is no <b>Abbrechen</b>: leaving decides nothing.</p>
+        <p class="sg-purpose">The decision row of a review card, sitting after the last field where the form ends. It holds only the decisions that <b>end</b> the card: the commit first (primary), the quiet way out <b>last</b> — a dismissal next to the commit is one mis-tap away from being it. A control that leaves the card in play goes in a <a href="#review-card">card aside</a> instead. There is no <b>Abbrechen</b>: leaving decides nothing.</p>
       </div>
     </div>
   </section>

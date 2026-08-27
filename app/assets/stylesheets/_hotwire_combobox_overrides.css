@@ -97,6 +97,15 @@ body {
     }
   }
 
+  /* The gem floors a multiselect's input at `calc(var(--hw-combobox-width) / 2)`, and
+     that variable is unset above so the field takes its width from our own wrapper —
+     which leaves the input with no floor and the 1rem width the gem also sets. Once the
+     chips nearly fill the row it shrinks to that sliver instead of wrapping onto a line
+     of its own. */
+  .hw-combobox--multiple .hw-combobox__input {
+    min-width: 6rem;
+  }
+
   .hw-combobox__input, .hw-combobox__dialog__input {
     background-color: var(--theme-bg-color);
     color: var(--theme-fg-color);

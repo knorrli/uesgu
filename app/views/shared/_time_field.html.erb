@@ -1,0 +1,19 @@
+<%# The native time control plus a clear button of our own, because no engine ships
+    one: iOS Safari's wheel picker has no empty position to scroll back to, and the
+    desktop engines only clear on a Delete keypress inside a focused segment. An event
+    whose start time is genuinely unknown has to be enterable somewhere.
+
+    The control stays native — a text field beside a native date draws its underline at
+    a different height on mobile Safari (see the input[type="time"] skin in
+    application.css). The caller keeps its own <label>; this is the field itself. %>
+<%# locals: (name:, value:) %>
+<div class="time-field" data-controller="time-field">
+  <%= time_field_tag name, value,
+        data: { time_field_target: "input",
+                action: "input->time-field#refresh change->time-field#refresh" } %>
+  <button type="button" class="time-field__clear icon-button" hidden
+          data-time-field-target="clear" data-action="time-field#clear"
+          aria-label="<%= t('shared.time_field.clear') %>">
+    <span class="ph ph-x" aria-hidden="true"></span>
+  </button>
+</div>

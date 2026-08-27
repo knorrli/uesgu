@@ -869,6 +869,8 @@ fr:
   shared:
     cancel: Annuler
     cite: "« %{quote} »"
+    time_field:
+      clear: Effacer l'heure
   helpers:
     page_entries_info:
       more_pages:

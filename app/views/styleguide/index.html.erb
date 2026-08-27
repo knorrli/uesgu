@@ -409,14 +409,15 @@
             </label>
             <label class="flex flex-col gap-xsmall flex-grow">
               <span class="field-label">Zeit</span>
-              <input type="time" value="20:00">
+              <%= render "shared/time_field", name: :styleguide_time, value: "20:00" %>
             </label>
           </div>
         </div>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Date + time pair</span> · <code>.account-form input[type=date]</code> + <code>[type=time]</code>
+        <span class="sg-spec__name">Date + time pair</span> · <code>.account-form input[type=date]</code> + <code>render "shared/time_field", name:, value:</code>
         <p class="sg-purpose"><b>Both halves are native pickers</b> — never pair one with a plain text field. A date/time control takes its height from the value box the engine lays out in its shadow DOM, and mobile Safari holds on to its own control metrics whatever height the stylesheet sets, so a text field beside it draws its underline somewhere else. <b>Check this specimen on a real iPhone</b>: a desktop browser lines a date up with a text field either way.</p>
+        <p class="sg-purpose"><b>Use the time partial rather than a bare <code>input[type=time]</code></b>, wherever a time may be unknown. It adds the ✕ that clears the field — no engine ships one, and iOS Safari's wheel picker has no empty position to scroll back to — so an event with no printed start time can be entered as having none. The ✕ shows only once the field holds a value, and it overlays the control's right end so the pair still spans its row.</p>
       </div>
     </div>
 

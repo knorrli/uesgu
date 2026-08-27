@@ -110,6 +110,19 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  # The chips and the sort row each have to carry the other's param through
+  # (shared/_catalogue_controls). Pinned on the genre index because it is the one
+  # whose chips used to drop the sort, silently resetting it on every filter click.
+  test "filtering keeps the active sort and sorting keeps the active filter" do
+    genre(events_count: 1)
+
+    get genres_path(sort: "count")
+    assert_select "a.tag[href=?]", genres_path(status: "unplaced", sort: "count")
+
+    get genres_path(status: "unplaced")
+    assert_select ".catalogue-sort-option[href=?]", genres_path(status: "unplaced", sort: "count")
+  end
+
   test "return_to honors an internal path" do
     g = genre(events_count: 1)
     post ignore_genre_path(g), params: { return_to: queue_genres_path }

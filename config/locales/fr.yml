@@ -363,12 +363,15 @@ fr:
       back: Toutes les notifications
       title: Nouveaux événements
       empty_all: Aucun nouvel événement durant cette période.
+  catalogue:
+    sort_by: Trier par
+
   genres:
     combobox:
       placeholder: Tape ou choisis un genre
     index:
       title: Genres
-      search: Rechercher des genres
+      search: Rechercher des genres…
       queue_link: File de curation
       tree_link: Arborescence
       status_all: tous
@@ -379,7 +382,6 @@ fr:
       status_blocked: bloqué
       status_merged: "fusionné avec %{canonical}"
       placed_under: "sous %{parent}"
-      sort_by: "Trier:"
       sort_name: A–Z
       sort_count: plus fréquents
     edit:
@@ -565,7 +567,6 @@ fr:
         status_duplicates: Doublons
         status_dismissed: Retirés
         search: Rechercher des événements…
-        sort_by: Trier par
         sort_date: date
         sort_title: titre
         cancelled_badge: annulé
@@ -678,7 +679,6 @@ fr:
         status_aliased: Fusionnées
         status_unsettled: Sans canton
         search: Chercher une localité…
-        sort_by: Trier par
         sort_name: nom
         sort_count: usage
         merged_into: "→ %{canonical}"
@@ -703,7 +703,6 @@ fr:
         status_all: Toutes
         status_aliased: Fusionnées
         search: Chercher une salle…
-        sort_by: Trier par
         sort_name: nom
         sort_count: usage
         merged_into: "→ %{canonical}"
@@ -731,7 +730,6 @@ fr:
         type_locality: Localité
         type_canton: Canton
         search: Rechercher des lieux…
-        sort_by: Trier par
         sort_name: nom
         sort_count: usage
         empty: Aucun lieu correspondant.

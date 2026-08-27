@@ -37,8 +37,10 @@
   text-decoration: underline;
 }
 
-/* Shared chrome for the read-only catalogue browsers (admin events / styles /
-   locations), lifted from the genres index so the three feel identical. */
+/* Shared chrome for every catalogue browser — admin events / localities / locations
+   / places and the genre index (see shared/_catalogue_controls, which is the only
+   thing that renders these). The divider splits one chip row into two groups: the
+   genre index files its parked dispositions apart from its tree statuses. */
 .catalogue-filters .filter-divider {
   align-self: center;
   height: 1.2em;

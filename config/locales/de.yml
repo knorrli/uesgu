@@ -363,12 +363,15 @@ de:
       back: Alle Benachrichtigungen
       title: Neue Events
       empty_all: Keine neuen Events in diesem Zeitraum.
+  catalogue:
+    sort_by: Sortieren nach
+
   genres:
     combobox:
       placeholder: Genre eingeben oder wählen
     index:
       title: Genres
-      search: Genres suchen
+      search: Genres suchen…
       queue_link: Kuratierungs-Queue
       tree_link: Baum
       status_all: alle
@@ -379,7 +382,6 @@ de:
       status_blocked: blockiert
       status_merged: "zusammengeführt mit %{canonical}"
       placed_under: "unter %{parent}"
-      sort_by: "Sortieren:"
       sort_name: A–Z
       sort_count: am häufigsten
     edit:
@@ -565,7 +567,6 @@ de:
         status_duplicates: Duplikate
         status_dismissed: Entfernt
         search: Events suchen…
-        sort_by: Sortieren nach
         sort_date: Datum
         sort_title: Titel
         cancelled_badge: abgesagt
@@ -678,7 +679,6 @@ de:
         status_aliased: Zusammengelegt
         status_unsettled: Ohne Kanton
         search: Orte suchen…
-        sort_by: Sortieren nach
         sort_name: Name
         sort_count: Nutzung
         merged_into: "→ %{canonical}"
@@ -703,7 +703,6 @@ de:
         status_all: Alle
         status_aliased: Zusammengelegt
         search: Lokale suchen…
-        sort_by: Sortieren nach
         sort_name: Name
         sort_count: Nutzung
         merged_into: "→ %{canonical}"
@@ -731,7 +730,6 @@ de:
         type_locality: Ort
         type_canton: Kanton
         search: Locations suchen…
-        sort_by: Sortieren nach
         sort_name: Name
         sort_count: Nutzung
         empty: Keine passenden Locations.

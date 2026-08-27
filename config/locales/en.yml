@@ -363,12 +363,15 @@ en:
       back: All notifications
       title: New events
       empty_all: No new events this period.
+  catalogue:
+    sort_by: Sort by
+
   genres:
     combobox:
       placeholder: Type or pick a genre
     index:
       title: Genres
-      search: Search genres
+      search: Search genres…
       queue_link: Assignment queue
       tree_link: Tree
       status_all: all
@@ -379,7 +382,6 @@ en:
       status_blocked: blocked
       status_merged: "merged into %{canonical}"
       placed_under: "under %{parent}"
-      sort_by: "Sort:"
       sort_name: A–Z
       sort_count: most used
     edit:
@@ -565,7 +567,6 @@ en:
         status_duplicates: Duplicates
         status_dismissed: Dismissed
         search: Search events…
-        sort_by: Sort by
         sort_date: date
         sort_title: title
         cancelled_badge: cancelled
@@ -678,7 +679,6 @@ en:
         status_aliased: Merged
         status_unsettled: No canton
         search: Search localities…
-        sort_by: Sort by
         sort_name: name
         sort_count: usage
         merged_into: "→ %{canonical}"
@@ -703,7 +703,6 @@ en:
         status_all: All
         status_aliased: Merged
         search: Search venues…
-        sort_by: Sort by
         sort_name: name
         sort_count: usage
         merged_into: "→ %{canonical}"
@@ -731,7 +730,6 @@ en:
         type_locality: Locality
         type_canton: Canton
         search: Search locations…
-        sort_by: Sort by
         sort_name: name
         sort_count: usage
         empty: No locations match.

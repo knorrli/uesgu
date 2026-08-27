@@ -14,6 +14,20 @@ class AdminLocationsTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  # This browser filters on `type` where every other catalogue filters on `status`,
+  # so the shared controls take it as a local — pass the wrong one and the chips
+  # still render, they just filter nothing.
+  test "the type chips and the sort row carry each other's param" do
+    event(location_list: ["Synthville", Location.canton_codes.first])
+    sign_in_as user(admin: true)
+
+    get admin_locations_path(sort: "count")
+    assert_select "a.tag[href=?]", admin_locations_path(type: "locality", sort: "count")
+
+    get admin_locations_path(type: "locality")
+    assert_select ".catalogue-sort-option[href=?]", admin_locations_path(type: "locality", sort: "count")
+  end
+
   test "an admin can browse locations classified by type" do
     venue = Location.venue_names.first
     canton = Location.canton_codes.first

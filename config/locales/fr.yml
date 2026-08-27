@@ -534,6 +534,7 @@ fr:
         title: Invitations
         intro: Codes d'invitation à usage unique. Partage le lien avec une personne — une fois inscrite, le code est utilisé.
         new_heading: Nouvelle invitation
+        note_label: Note (facultatif)
         note_placeholder: p. ex. pour Anna
         expires_label: Valable jusqu'au
         expires_never: Illimité

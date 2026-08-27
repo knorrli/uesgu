@@ -534,6 +534,7 @@ de:
         title: Einladungen
         intro: Einmal verwendbare Einladungscodes. Teile den Link mit einer Person – nach der Registrierung ist der Code verbraucht.
         new_heading: Neue Einladung
+        note_label: Notiz (optional)
         note_placeholder: z. B. für Anna
         expires_label: Gültig bis
         expires_never: Unbegrenzt

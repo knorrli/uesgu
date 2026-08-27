@@ -534,6 +534,7 @@ en:
         title: Invitations
         intro: Single-use invitation codes. Share the link with one person — once they sign up, the code is spent.
         new_heading: New invitation
+        note_label: Note (optional)
         note_placeholder: e.g. for Anna
         expires_label: Valid until
         expires_never: Unlimited

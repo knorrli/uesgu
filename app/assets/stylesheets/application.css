@@ -102,7 +102,14 @@ a {
      its shadow DOM, which comes out taller than the line box a text input gets from
      the same font — so a date and a text field sharing a row (Datum beside Zeit)
      draw their underlines at different heights. Pin the box to what the text field
-     measures: one line, plus this skin's own padding and underline. */
+     measures: one line, plus this skin's own padding and underline.
+
+     iOS Safari sizes the control from its own metrics and renders it ~11px taller
+     than the pin regardless; dropping the native appearance is what makes it obey
+     the height. Chrome, desktop WebKit and Firefox size it identically either way
+     and keep their picker glyph, so this costs them nothing. */
+  appearance: none;
+  -webkit-appearance: none;
   height: calc(1lh + 2 * var(--gap-small) + var(--border-width));
 }
 

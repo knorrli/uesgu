@@ -64,7 +64,12 @@
             locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :time)) } do %>
         <label class="flex flex-col gap-xsmall">
           <span class="field-label"><%= t('capture.candidate.time') %></span>
-          <%= text_field_tag :time, candidate.time %>
+          <%# Native, and must stay so: mobile Safari keeps its own control metrics for a
+              date input whatever height the stylesheet sets, so a text field beside one
+              draws its underline at a different height. The value is always HH:MM or
+              blank — a time the normalizer refused is null with the raw text cited
+              beside it (see EventCapture::Normalizer). %>
+          <%= time_field_tag :time, candidate.time %>
         </label>
       <% end %>
       <%# In the row rather than in the date group's `attached`, where every other remark

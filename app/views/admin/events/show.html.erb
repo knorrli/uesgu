@@ -115,7 +115,9 @@
             <% combobox.customize_input class: 'flex-grow' %>
           <% end %>
         </div>
-        <%= submit_tag t('.merge'), class: 'button-small' %>
+        <%# Secondary (a <button>, not input[type=submit], which is filled whatever
+            class it carries) so the page keeps the one filled primary its Save is. %>
+        <%= button_tag t('.merge'), type: :submit, class: 'button-small' %>
       <% end %>
     <% end %>
   </section>

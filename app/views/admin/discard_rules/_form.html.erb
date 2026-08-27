@@ -10,9 +10,9 @@
 
     <label class="flex flex-col gap-small">
       <span class="field-label"><%= t('.pattern_label') %></span>
+      <span class="muted"><%= t('.pattern_hint') %></span>
       <%= f.text_field :pattern, autocomplete: 'off',
             data: { preview_target: 'field', preview_param: 'pattern', action: 'input->preview#schedule' } %>
-      <span class="muted"><%= t('.pattern_hint') %></span>
     </label>
 
     <label class="flex flex-col gap-small">

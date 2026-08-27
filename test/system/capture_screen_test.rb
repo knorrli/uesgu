@@ -41,6 +41,19 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-picker"
   end
 
+  # Asserts the type and not the height: the trap is mobile Safari's control metrics
+  # for a date input (see app/views/captures/_candidate.html.erb), and headless Chrome
+  # lines a date up with a text field either way — so a height assertion here would
+  # pass on the one browser that never had the problem.
+  test "the date and time on a card are both native pickers" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    pick "poster.png"
+
+    assert_equal "date", field_type("date")
+    assert_equal "time", field_type("time")
+  end
+
   test "a rejected card publishes nothing and hands over to the next one" do
     CannedExtractionClient.install(events: [poster_event, poster_event(title: "Zorpcore Matinee")])
     visit capture_path
@@ -985,6 +998,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def cite(quote) = I18n.t("shared.cite", locale: :de, quote: quote)
 
   def field_value(field) = find(".capture-card [name='#{field}']").value
+  def field_type(field) = find(".capture-card [name='#{field}']")[:type]
 
   # Accepting the last card in a queue hands the screen straight back to the picker, so
   # the tile that said it published is gone before an assertion could look for it. The

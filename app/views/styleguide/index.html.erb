@@ -431,6 +431,27 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
+        <div class="account-form">
+          <div class="flex gap-small wrap">
+            <label class="flex flex-col gap-xsmall flex-grow">
+              <span class="field-label">Datum</span>
+              <input type="date" value="2026-09-01">
+            </label>
+            <label class="flex flex-col gap-xsmall flex-grow">
+              <span class="field-label">Zeit</span>
+              <input type="time" value="20:00">
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Date + time pair</span> · <code>.account-form input[type=date]</code> + <code>[type=time]</code>
+        <p class="sg-purpose"><b>Both halves are native pickers, and that is the rule</b> — never pair one with a plain text field. A date/time control takes its height from the value box the engine lays out in its shadow DOM, and mobile Safari holds on to its own control metrics for one whatever height the stylesheet sets; a text field beside it therefore draws its underline somewhere else. Two native controls agree with each other by construction, so the height pinned in <code>.account-form</code> only has to be self-consistent rather than exactly equal to a text line box. <b>Check this specimen on a real iPhone</b>, not on desktop — the two underlines must sit on one line. A desktop browser lines a date up with a text field either way, so it will not show you the break.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
         <span class="account-form flex gap-medium wrap">
           <input type="text" placeholder="Username" aria-label="Username">
           <input type="password" placeholder="Password" aria-label="Password">

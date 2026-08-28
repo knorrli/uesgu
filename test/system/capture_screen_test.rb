@@ -1109,9 +1109,13 @@ class CaptureScreenTest < ApplicationSystemTestCase
   # default_max_wait_time. Waiting on the pending copy clearing absorbs the canvas
   # encode, the upload and the extraction here instead. The TEXT, not the element: an
   # undecodable file keeps its row and overwrites that copy with the reason.
+  #
+  # The count is `visible: :all` because only one card is ever on screen: a row whose
+  # read has landed and is queued behind the strip holds nothing but its hidden card,
+  # so it renders empty and a visibility-filtered count can never reach names.size.
   def pick(*names)
     find(".drop-zone__input", visible: :all).set(names.map { |name| file_fixture(name) })
-    assert_selector ".capture-row", count: names.size, wait: 5
+    assert_selector ".capture-row", count: names.size, wait: 5, visible: :all
     assert_no_selector "[data-pending]", text: copy("row.pending"), wait: 5
   end
 

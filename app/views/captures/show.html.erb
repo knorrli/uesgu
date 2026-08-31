@@ -17,18 +17,22 @@
      data-capture-found-one-value="<%= found[:one] %>"
      data-capture-found-other-value="<%= found[:other] %>"
      data-capture-done-value="<%= capture_done_flashes.to_json %>">
+  <%# One action slot beside the title, holding whichever of the two the mode calls for.
+      Both leave the screen you are on, and neither is ever a decision about the event
+      in front of you — which is why "start over" is up here and not under the card,
+      beside that card's own two buttons. %>
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
-    <h1 data-capture-target="stagingTitle"><%= t('capture.title') %></h1>
-    <h1 data-capture-target="reviewTitle" hidden></h1>
-    <%# Absolute key: this block is yielded into shared/page_header, where a relative
-        one resolves against that partial. %>
-    <p class="muted" data-capture-target="reviewHint" hidden><%= t('capture.review.hint') %></p>
-    <%# In the page header rather than under the card: it abandons the whole batch, and
-        next to the card's own two buttons it would read as a third decision about the
-        event in front of you. %>
-    <div data-capture-target="restart" hidden>
-      <button type="button" class="text-link" data-action="capture#startOver"><%= t('capture.picker.start_over') %></button>
+    <div class="flex justify-between align-center wrap gap-medium">
+      <h1 data-capture-target="stagingTitle"><%= t('capture.title') %></h1>
+      <h1 data-capture-target="reviewTitle" hidden></h1>
+      <%# Absolute key: this block is yielded into shared/page_header, where a relative
+          one resolves against that partial. %>
+      <%= link_to t('capture.picker.add_by_hand'), manual_capture_path,
+            class: "button-small", data: { capture_target: "byHand" } %>
+      <button type="button" class="text-link" data-capture-target="restart"
+              data-action="capture#startOver" hidden><%= t('capture.picker.start_over') %></button>
     </div>
+    <p class="muted" data-capture-target="reviewHint" hidden><%= t('capture.review.hint') %></p>
   <% end %>
 
   <%# Four ways in, each one action: nothing is assembled here first, because a
@@ -37,7 +41,7 @@
       files, dropping them and pasting them send on their own; the two presses each
       stand in for a gesture that is missing — a phone has no paste keystroke, and
       typing ends on nothing at all. %>
-  <div class="capture-picker account-form flex flex-col gap-medium" data-capture-target="input">
+  <div class="capture-picker account-form flex flex-col gap-large" data-capture-target="input">
     <%= render "shared/drop_zone",
           id: "capture-files", label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
           paste_label: t('capture.picker.paste'), paste_error: t('capture.picker.paste_empty'),
@@ -48,21 +52,13 @@
           paste_attrs: { data: { capture_target: "paste", action: "capture#pasteImages" } },
           error_attrs: { data: { capture_target: "pasteError" } } %>
 
-    <label class="flex flex-col gap-small">
-      <span class="field-label"><%= t('capture.text_label') %></span>
+    <div class="capture-text">
+      <label class="field-label" for="capture-text"><%= t('capture.text_label') %></label>
       <p class="muted"><%= t('capture.text_hint') %></p>
-      <textarea rows="4" data-capture-target="text"
+      <textarea id="capture-text" rows="4" data-capture-target="text"
                 data-action="input->capture#refreshRead"></textarea>
-    </label>
-    <div class="flex">
-      <button type="button" class="button-small" data-capture-target="read"
+      <button type="button" class="button-small primary" data-capture-target="read"
               data-action="capture#readText" disabled><%= t('capture.picker.read_text') %></button>
-    </div>
-
-    <%# A link, not a send: there is nothing to read, so this way in leaves the funnel's
-        one screen for a page of its own (see captures/manual). %>
-    <div class="capture-by-hand">
-      <%= link_to t('capture.picker.add_by_hand'), manual_capture_path, class: "button" %>
     </div>
   </div>
 

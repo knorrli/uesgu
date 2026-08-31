@@ -8,16 +8,37 @@
   --queue-tile-size: 3.25rem;
 }
 
-/* Set below the rule, and full width where the other two ways in are a drop target and
-   a field: entering by hand is the alternative to having a source to read at all, not
-   one more thing to hand the reader. */
-.capture-by-hand {
-  padding-top: var(--gap-medium);
-  border-top: var(--border-width) solid var(--rule-color);
+/* The typing way in: the same shape as the drop target above it — a box, then a pill
+   at the trailing edge — so the two ways onto the screen read as a pair. */
+.capture-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-small);
 }
 
-.capture-by-hand > button {
-  width: 100%;
+/* The one boxed field on the site. The .account-form underline is legible in a stack
+   of sibling fields, where the rhythm is what says "these are inputs"; standing alone
+   beside a drop target, an empty four-row box shows only a rule 90px below its label
+   and reads as a section divider. The border is solid where the target's is dashed —
+   see drop_zone.css, which keeps the only dashed edge on the site precisely so a
+   target is never mistaken for a field. */
+.capture-text textarea {
+  padding: var(--gap-small) var(--gap-medium);
+  border: var(--border-width) solid var(--field-border-color);
+}
+
+/* .account-form turns only the underline accent on focus; with four borders that
+   would light one edge of the box. */
+.capture-text textarea:focus {
+  border-color: var(--theme-accent-color);
+}
+
+/* Its own width at the column's edge: a direct child stretches, and a full-width pill
+   reads as a commit for the screen rather than for this one field. Left, like every
+   other action row on the site — see .form-actions in controls.css, which reserves the
+   far end for pushing a destructive button away from the safe ones. */
+.capture-text > button {
+  align-self: flex-start;
 }
 
 /* A row whose card is hidden — decided, or simply not the open one — is a zero-height

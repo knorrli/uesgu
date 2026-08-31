@@ -1,21 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
-
-// Several acts on one poster share a venue; the date and time are what differ, so
-// only this tuple carries between the candidates off one input.
-const PLACE_FIELDS = ["place", "locality", "canton"]
-const LOCALITY_MATCHES = 6
-
-// `failed` carries its own mark rather than the ×: nothing came back is not a decision
-// anybody made, and sharing the drop's glyph filed it as one.
-const TILE_MARKS = { published: "ph-check-circle", dropped: "ph-x", failed: "ph-warning-circle" }
-
-// Compare towns the way a contributor types them rather than the way they are spelt,
-// so "zur" reaches "Zürich" and "neuch" reaches "Neuchâtel".
-const fold = (value) => value.trim().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "")
-
-const isImageType = (type) => type.startsWith("image/")
-const isImage = (file) => isImageType(file.type)
+import { downscale, isImage, isImageType } from "lib/downscale"
+import { runPool } from "lib/task_pool"
+import { streamedContent } from "lib/turbo_stream"
+import { CaptureSources, posterImage } from "lib/capture/sources"
+import { CaptureQueueStrip } from "lib/capture/queue_strip"
+import { PlaceCarry } from "lib/capture/place_carry"
 
 // The extraction fan-out lives here rather than on the server: one request per input,
 // because a batch cannot be held open in one and there is no queue to reach for (see
@@ -35,7 +25,10 @@ export default class extends Controller {
     undecodable: String,
     sourceAlt: String,
     pasted: String,
+    // 1568px is where the provider's accuracy was measured.
     maxEdge: { type: Number, default: 1568 },
+    // Puma runs three threads, so eight parallel uploads would queue behind each other
+    // anyway while holding every byte of the request in memory at the same time.
     concurrency: { type: Number, default: 3 },
     localities: Object,
     foundOne: String,
@@ -44,14 +37,10 @@ export default class extends Controller {
     rereadLimit: { type: Number, default: 2 }
   }
 
-  // What each row was read from, held only in the browser: nothing is uploaded for
-  // storage, so this is the only copy a contributor can check a field against, and it
-  // has to outlive the turbo-stream that replaces the whole row.
   initialize() {
-    this.sources = new Map()
-    this.places = new Map()
-    this.inputs = new Map()
-    this.rereads = new Map()
+    this.sources = new CaptureSources()
+    this.places = new PlaceCarry(this.localitiesValue)
+    this.strip = new CaptureQueueStrip(this.stripTarget, this.sources, this.sourceAltValue)
     this.currentId = null
   }
 
@@ -63,12 +52,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    this.release(this.sources)
-  }
-
-  release(held) {
-    held.forEach(({ objectUrl }) => { if (objectUrl) URL.revokeObjectURL(objectUrl) })
-    held.clear()
+    this.sources.clear()
   }
 
   readFiles() {
@@ -153,7 +137,7 @@ export default class extends Controller {
   //
   // The blob the request carries is the same one the card's source pane paints from:
   // nothing is re-derived, and nothing but that EXIF-stripped copy ever leaves the
-  // device (see downscale).
+  // device (see lib/downscale.js).
   async readImages(files) {
     if (files.length === 0) return
 
@@ -162,17 +146,18 @@ export default class extends Controller {
     for (const file of files) {
       const id = crypto.randomUUID()
       this.appendPending(id, file.name)
-      const image = await this.downscale(file).catch(() => null)
+      const image = await downscale(file, this.maxEdgeValue).catch(() => null)
       if (!image) {
         this.failRow(id, this.undecodableValue)
         continue
       }
 
-      this.remember(this.rowId(id), id, { label: file.name, objectUrl: URL.createObjectURL(image), blob: image })
-      this.dressTile(this.rowId(id))
+      this.sources.remember(this.rowId(id), id,
+                            { label: file.name, objectUrl: URL.createObjectURL(image), blob: image })
+      this.strip.dress(this.rowId(id))
       reads.push(() => this.extract({ image, filename: file.name }, file.name, id))
     }
-    this.run(reads)
+    runPool(reads, this.concurrencyValue)
   }
 
   // Picking files closes a dialog and dropping them ends a drag; typing ends in nothing,
@@ -186,7 +171,7 @@ export default class extends Controller {
     this.textTarget.value = ""
     this.refreshRead()
     this.leavePicker()
-    this.remember(this.rowId(id), id, { label, text })
+    this.sources.remember(this.rowId(id), id, { label, text })
     this.extract({ text }, label, id)
   }
 
@@ -199,25 +184,13 @@ export default class extends Controller {
     this.byHandTarget.hidden = true
   }
 
-  // The downscaled blob is held beside the object URL the pane paints from: a re-read
-  // has to send the input a second time, and nothing was ever uploaded to fetch back.
-  // `inputs` is what ties a row to it — a re-read's row is a different row off the
-  // same input.
-  remember(rowId, inputId, source) {
-    this.sources.set(rowId, source)
-    this.inputs.set(rowId, inputId)
-  }
-
   // Destructive on purpose: there is no way back to a queue of half-decided cards, so
   // the honest offer is a clean second batch rather than a partial restore.
   startOver() {
-    this.release(this.sources)
+    this.sources.clear()
     this.places.clear()
-    this.inputs.clear()
-    this.rereads.clear()
+    this.strip.clear()
     this.rowsTarget.replaceChildren()
-    this.stripTarget.replaceChildren()
-    this.stripTarget.hidden = true
     this.currentId = null
     this.restartTarget.hidden = true
     this.byHandTarget.hidden = false
@@ -240,11 +213,10 @@ export default class extends Controller {
   // The first card to land opens, so picking a single poster shows it rather than a
   // queue of one.
   cardTargetConnected(card) {
-    this.stripTarget.hidden = false
     this.announceFound()
-    this.placeCard(card)
+    this.strip.place(card)
     card.hidden = card.id !== this.currentId
-    this.sharePlace(card)
+    this.places.share(card, this.cardTargets)
     this.refreshRereads()
     if (!this.currentId) this.open(card.id)
   }
@@ -266,14 +238,12 @@ export default class extends Controller {
   async reread(event) {
     const card = event.target.closest(".capture-card")
     const rowId = card.closest(".capture-row")?.id
-    const input = this.inputs.get(rowId)
     const source = this.sources.get(rowId)
-    const spent = this.rereads.get(input) ?? 0
-    if (!source || spent >= this.rereadLimitValue) return
+    if (!source || this.sources.spent(rowId) >= this.rereadLimitValue) return
 
-    this.rereads.set(input, spent + 1)
-    const id = `${input}-r${spent + 1}`
-    this.remember(this.rowId(id), input, source)
+    const input = this.sources.inputFor(rowId)
+    const id = `${input}-r${this.sources.spend(rowId)}`
+    this.sources.remember(this.rowId(id), input, source)
     this.refreshRereads()
 
     const sent = source.blob ? { image: source.blob, filename: source.label } : { text: source.text }
@@ -289,16 +259,13 @@ export default class extends Controller {
     }
   }
 
-  // Counted per INPUT and not per card: the cards a re-read produces would otherwise
-  // arrive with a budget of their own, and every card off one poster spends the same
-  // one. A published card is frozen and stays that way.
   refreshRereads() {
     this.cardTargets.forEach((card) => {
       const button = card.querySelector("[data-action~='capture#reread']")
       if (!button || card.dataset.state === "published") return
 
       const rowId = card.closest(".capture-row")?.id
-      const left = this.rereadLimitValue - (this.rereads.get(this.inputs.get(rowId)) ?? 0)
+      const left = this.rereadLimitValue - this.sources.spent(rowId)
       button.disabled = left <= 0 || !this.sources.has(rowId)
       const spent = card.querySelector("[data-spent]")
       if (spent) spent.hidden = left > 0
@@ -316,7 +283,7 @@ export default class extends Controller {
       card.hidden = !current
       this.stockGenres(card, current)
     })
-    this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === id) })
+    this.strip.highlight(id)
     // After the loop, not inside it: hiding the cards below shortens the document, and a
     // scroll set against the taller one is clamped back to somewhere short of the card.
     this.reveal(this.cardTargets.find((card) => card.id === id))
@@ -388,7 +355,7 @@ export default class extends Controller {
   // reopened from its tile.
   settle(card, state) {
     card.dataset.state = state
-    this.markTile(this.tileFor(card), state)
+    this.strip.mark(card, state)
     if (state === "published") {
       card.querySelectorAll("input, select, button").forEach((field) => { field.disabled = true })
     }
@@ -441,286 +408,21 @@ export default class extends Controller {
     if (pane.querySelector("img")) pane.classList.toggle("review-card__source--zoomed")
   }
 
-  get tiles() {
-    return Array.from(this.stripTarget.querySelectorAll("[data-card]"))
-  }
-
-  // One group per input. Several candidates off one poster then read as one thing
-  // with parts, which is what lets the card header drop the "n of m" it used to need
-  // to explain why two cards look alike.
-  groupFor(rowId) {
-    const existing = this.stripTarget.querySelector(`[data-row="${rowId}"]`)
-    if (existing) return existing
-
-    const group = document.createElement("div")
-    group.className = "capture-queue__group"
-    group.dataset.row = rowId
-    this.stripTarget.appendChild(group)
-    return group
-  }
-
-  placeCard(card) {
-    const group = this.groupFor(card.closest(".capture-row")?.id)
-    group.querySelector('[data-state="pending"]')?.remove()
-    group.appendChild(this.tileFor(card))
-    this.numberTiles()
-  }
-
-  // Renumbered on every arrival rather than assigned once: a poster yielding a second
-  // event lands its tile inside its own group, which pushes every tile after it along.
-  // Pending tiles are left out — one input can become two cards, so a number given
-  // before the read lands is a number that moves.
-  numberTiles() {
-    this.tiles.forEach((tile, index) => { tile.dataset.index = index + 1 })
-  }
-
-  // Stood up when the row is appended, not when a card lands, so the strip states the
-  // denominator from the start — and so an input that yields nothing still gets a tile
-  // saying so instead of vanishing from the queue entirely.
-  pendingTile(rowId, label) {
-    const tile = document.createElement("button")
-    tile.type = "button"
-    tile.className = "capture-queue__tile"
-    tile.dataset.state = "pending"
-    tile.disabled = true
-    tile.setAttribute("aria-label", label)
-    tile.appendChild(this.thumbnail(this.sources.get(rowId)))
-    return tile
-  }
-
-  // The tile is stood up before the downscale that gives it a picture to show, so the
-  // thumbnail lands when there is one rather than by holding the whole strip back for it.
-  dressTile(rowId) {
-    const tile = this.stripTarget.querySelector(`[data-row="${rowId}"] [data-state="pending"]`)
-    tile?.replaceChildren(this.thumbnail(this.sources.get(rowId)))
-  }
-
-  settleEmpty(id) {
-    const pending = this.stripTarget.querySelector(`[data-row="${this.rowId(id)}"] [data-state="pending"]`)
-    if (pending) this.markTile(pending, "failed")
-  }
-
-  tileFor(card) {
-    const existing = this.stripTarget.querySelector(`[data-card="${card.id}"]`)
-    if (existing) return existing
-
-    const tile = document.createElement("button")
-    tile.type = "button"
-    tile.className = "capture-queue__tile"
-    tile.dataset.card = card.id
-    tile.dataset.state = "open"
-    tile.dataset.action = "capture#jump"
-    const title = card.querySelector('[name="title"]')?.value
-    if (title) tile.setAttribute("aria-label", title)
-    tile.appendChild(this.thumbnail(this.sources.get(card.closest(".capture-row")?.id)))
-    return tile
-  }
-
-  markTile(tile, state) {
-    tile.dataset.state = state
-    tile.querySelector(".ph")?.remove()
-    const mark = document.createElement("span")
-    mark.className = `ph ${TILE_MARKS[state]}`
-    mark.setAttribute("aria-hidden", "true")
-    tile.appendChild(mark)
-  }
-
-  // A pasted text has no picture to shrink, so its tile carries the head of the text
-  // instead — the strip stays scannable when the queue mixes the two.
-  thumbnail(source) {
-    if (source?.objectUrl) return this.poster(source.objectUrl)
-
-    const snippet = document.createElement("span")
-    snippet.className = "capture-queue__snippet"
-    snippet.textContent = source?.text?.slice(0, 24) ?? ""
-    return snippet
-  }
-
-  // Fill the place tuple from a near-match instead of minting a variant spelling.
   applySuggestion(event) {
-    const card = event.target.closest(".capture-card")
-    const { name, locality, canton } = event.params
-    this.setField(card, "place", name, { normalized: true })
-    if (locality) this.setField(card, "locality", locality, { normalized: true })
-    if (canton) this.setField(card, "canton", canton, { normalized: true })
-    this.pin(card, "place", locality && "locality", canton && "canton")
-    this.sharePlace(card)
+    this.places.applySuggestion(event.target.closest(".capture-card"), event.params, this.cardTargets)
   }
 
-  // Fills the town and nothing else. The reason to tap one of these is that the venue
-  // is NOT among the places being suggested, so writing a place here would replace the
-  // contributor's reading of the poster with one nobody offered.
   applyLocality(event) {
-    const card = event.target.closest(".capture-card")
-    const { locality, canton } = event.params
-    this.setField(card, "locality", locality, { normalized: true })
-    if (canton) this.setField(card, "canton", canton, { normalized: true })
-    this.pin(card, "locality")
-    this.sharePlace(card)
-    this.showLocalityMatches(card, [])
+    this.places.applyLocality(event.target.closest(".capture-card"), event.params, this.cardTargets)
   }
 
-  // The town list is drawn here rather than left to the browser: iOS Safari renders an
-  // <input list> datalist in the keyboard's form-assistant bar, and hands that bar to
-  // its own address autofill instead — so on the device most posters are captured on,
-  // the towns never appear at all. Every locality the app knows is already in the page
-  // for the canton, so matching costs no request.
   suggestLocalities(event) {
-    const card = event.target.closest(".capture-card")
-    this.showLocalityMatches(card, this.matchingLocalities(event.target.value))
-  }
-
-  // Matches take the row over while they stand: a ranked chip that also matches is in
-  // the matches already, and one that does not is an answer to a question nobody is
-  // asking any more. The hint goes with them — it promises the towns will come up, and
-  // they have.
-  showLocalityMatches(card, matches) {
-    const row = card?.querySelector("[data-suggestions=locality]")
-    if (!row) return
-
-    row.querySelectorAll("[data-typed]").forEach((chip) => chip.remove())
-    row.querySelectorAll(".chip").forEach((chip) => { chip.hidden = matches.length > 0 })
-    matches.forEach((name) => row.appendChild(this.localityChip(name)))
-    const hint = card.querySelector("[data-locality-hint]")
-    if (hint) hint.hidden = matches.length > 0
-  }
-
-  // Two letters before anything is offered, because one letter ranks nothing: the cap
-  // would just take the first few of an alphabet.
-  matchingLocalities(typed) {
-    const needle = fold(typed)
-    if (needle.length < 2) return []
-
-    const trailing = (name) => (fold(name).startsWith(needle) ? 0 : 1)
-    return Object.keys(this.localitiesValue)
-                 .filter((name) => fold(name).includes(needle))
-                 .sort((a, b) => trailing(a) - trailing(b) || a.localeCompare(b))
-                 .slice(0, LOCALITY_MATCHES)
-  }
-
-  localityChip(name) {
-    const chip = document.createElement("button")
-    chip.type = "button"
-    chip.className = "chip"
-    chip.textContent = name
-    chip.dataset.typed = "true"
-    chip.dataset.action = "capture#applyLocality"
-    chip.dataset.captureLocalityParam = name
-    chip.dataset.captureCantonParam = this.localitiesValue[name] ?? ""
-    return chip
+    this.places.suggest(event.target.closest(".capture-card"), event.target.value)
   }
 
   carryPlace(event) {
-    const card = event.target.closest(".capture-card")
-    // A field the contributor typed in themselves is their reading of the poster,
-    // whatever a suggestion put there before.
-    this.markNormalized(card, event.target.name, false)
-    if (event.target.name === "locality") this.placeLocality(card, event.target.value)
-    if (!PLACE_FIELDS.includes(event.target.name)) return
-
-    this.pin(card, event.target.name)
-    this.sharePlace(card)
-  }
-
-  // Extraction computes the canton from the locality once, server-side, so a locality
-  // changed here would otherwise keep the canton the one it replaced was placed in.
-  // A locality matching nothing leaves the canton ALONE rather than clearing it — it
-  // may hold the model's own postcode reading, which is why the field is still asked
-  // for at all, or a value a human picked by hand.
-  placeLocality(card, typed) {
-    const canton = this.localitiesValue[typed.trim()]
-    if (!canton || canton === this.fieldValue(card, "canton")) return
-
-    this.setField(card, "canton", canton, { normalized: true })
-  }
-
-  // Taking the registry's spelling is a normalisation, not a report that the model
-  // misread the poster, and the two must not land in the same number (see
-  // ExtractionFieldOutcome).
-  markNormalized(card, name, normalized) {
-    const flag = card?.querySelector(`[name="normalized_${name}"]`)
-    if (flag) flag.value = normalized ? "1" : ""
-  }
-
-  // The canton is computed from the locality and never asked for on its own, so an
-  // answer for the town claims it too (see CapturesHelper#locality_chips).
-  pin(card, ...names) {
-    const claimed = names.includes("locality") ? [...names, "canton"] : names
-    claimed.filter(Boolean).forEach((name) => {
-      const field = this.field(card, name)
-      if (field) field.dataset.pinned = "true"
-    })
-  }
-
-  pinned(card, name) {
-    return this.field(card, name)?.dataset.pinned === "true"
-  }
-
-  // Sticky on the controller rather than a sweep of the cards on screen, so the tuple
-  // still reaches a card that connects after the field was filled. An answer outranks
-  // a reading: once the contributor has ruled on a field, a card landing later cannot
-  // put the model back in charge of it.
-  sharePlace(card) {
-    const row = card?.closest(".capture-row")
-    if (!row) return
-
-    const shared = this.places.get(row.id) ?? { values: {}, answered: new Set() }
-    PLACE_FIELDS.forEach((name) => {
-      const value = this.fieldValue(card, name)
-      if (!value || (shared.answered.has(name) && !this.pinned(card, name))) return
-
-      shared.values[name] = value
-      if (this.pinned(card, name)) shared.answered.add(name)
-    })
-    this.places.set(row.id, shared)
-
-    this.cardTargets.filter((sibling) => sibling.closest(".capture-row") === row)
-                    .forEach((sibling) => this.fillPlace(sibling, shared))
-  }
-
-  // Completes what a card never printed, and carries a correction across the ones that
-  // did: one poster is one venue in one town, so a value the model read wrong is wrong
-  // on every card off it. Only an answer corrects — one model reading must not
-  // overwrite another, which is what a bill across two halls comes down to.
-  fillPlace(card, shared) {
-    if (card.dataset.state !== "open") return
-
-    PLACE_FIELDS.forEach((name) => {
-      const value = shared.values[name]
-      if (!value || this.pinned(card, name)) return
-      if (this.fieldValue(card, name) && !shared.answered.has(name)) return
-
-      this.setField(card, name, value)
-    })
-  }
-
-  field(card, name) {
-    return card?.querySelector(`[name="${name}"]`)
-  }
-
-  fieldValue(card, name) {
-    return this.field(card, name)?.value ?? ""
-  }
-
-  setField(card, name, value, { normalized = false } = {}) {
-    const field = this.field(card, name)
-    if (field) field.value = value
-    if (normalized) this.markNormalized(card, name, true)
-  }
-
-  // Capped rather than all-at-once: Puma runs three threads, so eight parallel
-  // uploads would queue behind each other anyway while holding every byte of the
-  // request in memory at the same time.
-  async run(tasks) {
-    const queue = tasks.slice()
-    const workers = Array.from({ length: Math.min(this.concurrencyValue, queue.length) }, async () => {
-      while (queue.length > 0) {
-        // A task renders its own failure row, so a throw here must not take the
-        // worker — and with it the rest of the queue — down with it.
-        try { await queue.shift()() } catch { /* already surfaced on the row */ }
-      }
-    })
-    await Promise.all(workers)
+    this.places.carry(event.target.closest(".capture-card"), event.target.name, event.target.value,
+                      this.cardTargets)
   }
 
   async extract(payload, label, id = crypto.randomUUID()) {
@@ -751,33 +453,30 @@ export default class extends Controller {
 
       const stream = await response.text()
       Turbo.renderStreamMessage(stream)
-      // Counted off the stream rather than the page for the same reason the failure is:
-      // Turbo performs the action on the next animation frame, so no card exists yet.
-      if (this.cardsIn(stream) === 0) this.settleEmpty(id)
       // A provider failure comes back as a turbo-stream with status 200 — the request
       // succeeded, the extraction did not — so the response markup is the only honest
-      // signal. It cannot be read off the page: Turbo performs the action on the NEXT
-      // ANIMATION FRAME, so the pending row is still standing here, and reading that
-      // scored every failure a success and cleared the textarea under a refused paste.
-      return this.failureIn(stream) === null
+      // signal, for both the failure and the count. It cannot be read off the page:
+      // Turbo performs the action on the NEXT ANIMATION FRAME, so the pending row is
+      // still standing here, and reading that scored every failure a success and
+      // cleared the textarea under a refused paste.
+      const content = streamedContent(stream)
+      if (this.cardsIn(content) === 0) this.settleEmpty(id)
+      return this.failureIn(content) === null
     } catch {
       return this.failRow(id)
     }
   }
 
-  failureIn(stream) {
-    return this.streamed(stream)?.querySelector("[data-failed]") ?? null
+  failureIn(content) {
+    return content?.querySelector("[data-failed]") ?? null
   }
 
-  cardsIn(stream) {
-    return this.streamed(stream)?.querySelectorAll(".capture-card").length ?? 0
+  cardsIn(content) {
+    return content?.querySelectorAll(".capture-card").length ?? 0
   }
 
-  // The template of a <turbo-stream> is inert markup, so what it carries has to be
-  // reached through it rather than by querying the parsed document.
-  streamed(stream) {
-    const template = new DOMParser().parseFromString(stream, "text/html").querySelector("turbo-stream template")
-    return template?.content ?? null
+  settleEmpty(id) {
+    this.strip.markFailed(this.rowId(id))
   }
 
   // Named, unlike the row it replaces: while a read is in flight the filename is one
@@ -816,14 +515,8 @@ export default class extends Controller {
     slot.replaceChildren()
     if (!source) return
 
-    slot.appendChild(source.objectUrl ? this.poster(source.objectUrl) : this.excerpt(source.text))
-  }
-
-  poster(objectUrl, alt = this.sourceAltValue) {
-    const image = document.createElement("img")
-    image.src = objectUrl
-    image.alt = alt
-    return image
+    slot.appendChild(source.objectUrl ? posterImage(source.objectUrl, this.sourceAltValue)
+                                      : this.excerpt(source.text))
   }
 
   excerpt(text) {
@@ -851,30 +544,7 @@ export default class extends Controller {
     row.appendChild(pending)
     this.rowsTarget.appendChild(row)
 
-    this.stripTarget.hidden = false
-    this.groupFor(this.rowId(id)).appendChild(this.pendingTile(this.rowId(id), label))
-  }
-
-  // 1568px is where the provider's accuracy was measured. It happens on the client
-  // because there is no image library in the bundle and none on the deployed box — and
-  // the canvas re-encode drops EXIF, so a poster photo's GPS never leaves the device,
-  // which a server-side resize could never achieve.
-  //
-  // Encoded BOTH ways because canvas PNG output is unoptimised: on a real poster
-  // sample it came out at 1.81MB against 221KB as JPEG, 32% larger than the 1.37MB
-  // source. Flat-colour screenshots, where PNG genuinely wins, still get PNG.
-  async downscale(file) {
-    const bitmap = await createImageBitmap(file)
-    const scale = Math.min(1, this.maxEdgeValue / Math.max(bitmap.width, bitmap.height))
-    const canvas = document.createElement("canvas")
-    canvas.width = Math.round(bitmap.width * scale)
-    canvas.height = Math.round(bitmap.height * scale)
-    canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height)
-    bitmap.close()
-
-    const encode = (type) => new Promise((resolve) => canvas.toBlob(resolve, type, 0.9))
-    const [png, jpeg] = await Promise.all([encode("image/png"), encode("image/jpeg")])
-    return png.size <= jpeg.size ? png : jpeg
+    this.strip.appendPending(this.rowId(id), label)
   }
 
   get csrfToken() {

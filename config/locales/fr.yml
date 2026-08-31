@@ -412,6 +412,9 @@ fr:
     editor:
       usage: "%{count} événements"
       status: "Statut :"
+      name_label: Nom
+      rename: Renommer
+      rename_hint: Renommer réécrit l'étiquette sur tous les événements portant l'ancienne orthographe, ainsi que les filtres enregistrés.
       set_parent: Définir le parent
       set_parent_into: "Classer sous un autre genre…"
       ignore: "Ignorer"
@@ -827,6 +830,8 @@ fr:
       invitation:
         code: Code
         note: Note
+      genre:
+        name: Nom
   date:
     formats:
       default: "%d.%m.%Y"

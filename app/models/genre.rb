@@ -7,6 +7,9 @@ class Genre < ApplicationRecord
   has_many :children, class_name: "Genre", foreign_key: :parent_id,
                       inverse_of: :parent, dependent: :nullify
 
+  validates :name, presence: true, on: :rename
+  validate :fingerprint_available, on: :rename
+
   scope :in_use, -> { where("events_count > 0") }
   scope :offerable, -> { in_use.where(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil) }
   scope :unplaced, lambda {
@@ -222,6 +225,22 @@ class Genre < ApplicationRecord
     Genre.reconcile!
   end
 
+  def rename!(new_name)
+    previous = fingerprint
+    self.name = new_name.to_s.strip
+    unless valid?(:rename)
+      restore_attributes
+      return false
+    end
+
+    transaction do
+      save!
+      retag_events(previous)
+      rewrite_saved_filters(previous)
+    end
+    true
+  end
+
   def restore!
     update!(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
     recompute_events!
@@ -269,6 +288,46 @@ class Genre < ApplicationRecord
   end
 
   private
+
+  def fingerprint_available
+    return if name.blank?
+
+    duplicates = Genre.where(fingerprint: Genre.fingerprint_for(name)).where.not(id: id)
+    errors.add(:name, :taken) if duplicates.exists?
+  end
+
+  def variant_tag_names(of_fingerprint)
+    ActsAsTaggableOn::Tag.joins(:taggings)
+                         .where(taggings: { context: "genres", taggable_type: Event.name })
+                         .distinct.pluck(:name)
+                         .select { |tag| Genre.fingerprint_for(tag) == of_fingerprint }
+  end
+
+  def retag_events(of_fingerprint)
+    variant_tag_names(of_fingerprint).each do |variant|
+      next if variant == name
+
+      Event.where(id: Event.tagged_with(variant, on: :genres).pluck(:id)).find_each do |event|
+        event.genre_list.remove(variant)
+        event.genre_list.add(name)
+        event.save!
+      end
+    end
+  end
+
+  def rewrite_saved_filters(of_fingerprint)
+    SavedFilter.find_each do |saved|
+      rewritten = saved.genres.map { |picked| Genre.fingerprint_for(picked) == of_fingerprint ? name : picked }.uniq
+      next if rewritten == saved.genres
+
+      saved.filter = saved.filter.merge("genres" => rewritten)
+      redundant?(saved) ? saved.destroy! : saved.save!
+    end
+  end
+
+  def redundant?(saved)
+    saved.user.saved_filters.where.not(id: saved.id).any? { |other| other.fingerprint == saved.fingerprint }
+  end
 
   def recompute_events!
     Event.tagged_with(name, on: :genres).find_each(&:recompute_visibility!)

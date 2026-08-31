@@ -20,6 +20,21 @@
       </div>
     <% end %>
 
+    <% unless genre.aliased? %>
+      <%= form_with url: rename_genre_path(genre), method: :post, scope: :genre,
+            class: 'account-form flex flex-col gap-small genre-rename' do |f| %>
+        <%= hidden_field_tag :return_to, return_to %>
+        <div class="flex justify-between gap-medium wrap align-end">
+          <label class="flex flex-col gap-small flex-grow">
+            <span class="field-label"><%= t('genres.editor.name_label') %></span>
+            <%= f.text_field :name, value: genre.name, autocomplete: 'off' %>
+          </label>
+          <%= f.submit t('genres.editor.rename') %>
+        </div>
+        <p class="muted"><%= t('genres.editor.rename_hint') %></p>
+      <% end %>
+    <% end %>
+
     <% parent_candidates = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
                                 .where.not(id: [genre.id, *genre.descendant_ids]) %>
     <% parent_options = genre_tree_options(parent_candidates) %>

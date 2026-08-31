@@ -51,6 +51,13 @@ class GenresController < ApplicationController
     redirect_to return_to, alert: e.message
   end
 
+  def rename
+    genre = Genre.find(params[:id])
+    return redirect_to return_to if genre.rename!(genre_params[:name])
+
+    redirect_to return_to, alert: genre.errors.full_messages.to_sentence
+  end
+
   def chips
     @genres = params[:combobox_values].to_s.split(",").filter_map { |name| name.strip.presence }.uniq
   end
@@ -84,7 +91,7 @@ class GenresController < ApplicationController
   private
 
   def genre_params
-    params.expect(genre: %i[canonical_genre_id parent_genre_id])
+    params.expect(genre: %i[canonical_genre_id name parent_genre_id])
   end
 
   def return_to

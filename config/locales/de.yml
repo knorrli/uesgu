@@ -412,6 +412,9 @@ de:
     editor:
       usage: "%{count} Events"
       status: "Status:"
+      name_label: Name
+      rename: Umbenennen
+      rename_hint: Beim Umbenennen wird der Tag auf allen Events mit der alten Schreibweise neu gesetzt, samt der gespeicherten Filter.
       set_parent: Übergeordnetes Genre setzen
       set_parent_into: "Unter ein Genre einordnen…"
       ignore: "Ignorieren"
@@ -827,6 +830,8 @@ de:
       invitation:
         code: Code
         note: Notiz
+      genre:
+        name: Name
   date:
     formats:
       default: "%d.%m.%Y"

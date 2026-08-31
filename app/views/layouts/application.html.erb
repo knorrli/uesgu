@@ -112,10 +112,14 @@
             <details class="nav-menu" data-controller="menu" data-action="toggle->menu#toggle">
               <summary><%= current_user.username %><% if unread.positive? %> <span class="unread-dot" role="img" aria-label="<%= t('nav.unread_notifications') %>"></span><% end %></summary>
               <div class="nav-menu__items">
-                <%# Reused icons (bell/funnel/heart/gear) so the labels scan at a
-                    glance. Notifications = the received inbox; Filter = the saved
-                    filters that feed it (its own section now, no longer an inbox
-                    tab); logout moved to Settings. %>
+                <%# Capturing events is granted per account, so the door only
+                    exists for accounts that have it. %>
+                <% if current_user.contributor? %>
+                  <%= link_to capture_path, class: 'nav-menu__item' do %>
+                    <span class="ph ph-calendar-plus" aria-hidden="true"></span>
+                    <span><%= t('nav.capture') %></span>
+                  <% end %>
+                <% end %>
                 <%= link_to notifications_path, class: 'nav-menu__item' do %>
                   <span class="ph ph-bell" aria-hidden="true"></span>
                   <span><%= t('nav.notifications') %></span><% if unread.positive? %> <span class="badge"><%= unread %></span><% end %>
@@ -131,14 +135,6 @@
                 <%= link_to settings_path, class: 'nav-menu__item' do %>
                   <span class="ph ph-gear" aria-hidden="true"></span>
                   <span><%= t('nav.settings') %></span>
-                <% end %>
-                <%# Capturing events is granted per account, so the door only
-                    exists for accounts that have it. %>
-                <% if current_user.contributor? %>
-                  <%= link_to capture_path, class: 'nav-menu__item' do %>
-                    <span class="ph ph-calendar-plus" aria-hidden="true"></span>
-                    <span><%= t('nav.capture') %></span>
-                  <% end %>
                 <% end %>
                 <% if current_user.admin? %>
                   <%= link_to admin_path, class: 'nav-menu__item' do %>

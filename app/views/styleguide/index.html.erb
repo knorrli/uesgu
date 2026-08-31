@@ -27,6 +27,7 @@
     <a href="#catalogue-controls">Catalogue controls</a>
     <a href="#pagination">Pagination</a>
     <a href="#page-header">Page header</a>
+    <a href="#text-pages">Text pages</a>
     <a href="#review-card">Review card</a>
     <a href="#footer">Footer</a>
   </nav>
@@ -672,12 +673,41 @@
     </div>
   </section>
 
+  <section class="sg-section" id="text-pages">
+    <h2>Text pages</h2>
+    <p class="sg-section__intro">The two long-form pages — <b>Über üsgu</b> and <b>Datenschutz</b>. Prose, not chrome: a <code>.text-page</code> column narrowed to a readable measure, holding one <code>.prose</code> block of plain ERB. <b>Both pages have the same shape</b>, so the tiers below are the whole vocabulary; a third text page copies it rather than inventing a variant.</p>
+    <p class="sg-section__intro"><b>Every heading is a direct child of <code>.prose</code></b> — no <code>&lt;section&gt;</code> wrappers. The section break is a top margin on the heading itself, which a wrapper would put out of reach; nothing is gained in exchange, because no browser or screen reader implements the sectioning outline.</p>
+
+    <div class="sg-row sg-row--stack">
+      <div class="sg-specimen sg-specimen--block">
+        <div class="text-page">
+          <div class="prose flex flex-col gap-medium">
+            <p>The intro paragraph, unheaded, sitting directly under the page title.</p>
+            <h2>A section heading</h2>
+            <p>Body copy. Space Mono has no width variation and a very even stroke density, so <code>.prose</code> carries more leading than chrome text to keep the lines apart.</p>
+            <h3>A subhead</h3>
+            <p>The h3 tier is a spaced uppercase label, not a bigger bold sentence — at base size, bold alone is too weak a signal in a monospace face. It reads as a subhead by shape, so it never competes with <a href="#text-pages">an inline link</a>.</p>
+            <h2>A section with a list</h2>
+            <ul>
+              <li>Bulleted items sit tighter to each other than paragraphs do.</li>
+              <li>They take the section break from the heading above them.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Prose block</span> · <code>.text-page &gt; .prose.flex.flex-col.gap-medium</code>
+        <p class="sg-purpose">Four tiers only: <code>h2</code> section, <code>h3</code> subhead, paragraph, list. <b>Spacing is what separates sections</b> — the flex gap gives every child the same 10px, so <code>h2</code> and <code>h3</code> add a top margin to buy the break, and the ratio above vs. below a heading is what groups it with its own copy. Inline links are underlined here and nowhere else in the app: chrome links read as links from position and colour, a link mid-sentence does not.</p>
+      </div>
+    </div>
+  </section>
+
   <section class="sg-section" id="review-card">
     <h2>Review card</h2>
     <p class="sg-section__intro">One thing being judged, with the evidence that settles it. An ordinary block in document flow: the source at the top (left of the fields from 900px), the fields below it, the decision after the last field, and <b>one</b> page scroll for the whole card. Nothing in it holds still — a pane that stayed put while the page moved could only do it by letting the fields pass behind it. The source is capped so the first field is on screen beside it, and each field carries the line quoted off the source, so the comparison survives scrolling past the poster.</p>
 
     <div class="sg-row sg-row--stack">
-      <div class="sg-specimen sg-specimen--review-card">
+      <div class="sg-specimen sg-specimen--block">
         <%# The pane normally holds evidence the browser never uploaded; an app icon
             stands in. %>
         <%= render layout: "shared/review_card",

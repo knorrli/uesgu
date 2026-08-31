@@ -97,6 +97,6 @@ module CapturesHelper
   end
 
   def canton_options
-    Location::CANTON_CODES.sort.map { |code| ["#{code} — #{Location.canton_name(code)}", code] }
+    Location::CANTON_CODES.sort
   end
 end

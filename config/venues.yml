@@ -468,3 +468,10 @@ venues:
     locality: Basel
     canton: BS
   checked: 2026-06-21
+- domain: z-7.ch
+  name: Z7
+  disposition: consume
+  place:
+    locality: Pratteln
+    canton: BL
+  checked: 2026-08-31

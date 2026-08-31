@@ -21,7 +21,8 @@ namespace :scrapers do
       "nouveau_monde" => ".poster[data-tofilter*=concert]",
       "sedel"         => ".programm ul > li a",
       "sous_soul"     => ".event_item.w-dyn-item a.link-block",
-      "neubad"        => "ul.liste li.zeile .views-field-title a"
+      "neubad"        => "ul.liste li.zeile .views-field-title a",
+      "z7"            => ".block-event-calendar article a"
     }
 
     only = args[:only]

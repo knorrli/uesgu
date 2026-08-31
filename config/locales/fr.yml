@@ -118,10 +118,10 @@ fr:
     invalid_invite: Ce code d'invitation est invalide ou déjà utilisé.
   push:
     digest:
-      title: Nouveaux événements sur üsgu
+      title: Nouveaux événements
     test:
-      title: üsgu
-      body: Ceci est une notification de test — le push fonctionne. 🎉
+      title: Test
+      body: Le push fonctionne. 🎉
   inbox:
     title: Notifications
   saved_events:

@@ -118,10 +118,10 @@ de:
     invalid_invite: Dieser Einladungscode ist ungültig oder schon benutzt.
   push:
     digest:
-      title: Neue Events auf üsgu
+      title: Neue Events
     test:
-      title: üsgu
-      body: Dies ist eine Test-Benachrichtigung — Push funktioniert. 🎉
+      title: Test
+      body: Push funktioniert. 🎉
   inbox:
     title: Benachrichtigungen
   saved_events:

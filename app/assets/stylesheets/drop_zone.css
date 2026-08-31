@@ -52,14 +52,14 @@
   outline-offset: 2px;
 }
 
-/* Centred rather than stretched: the column is `align-items: stretch`, so a pill left
-   to itself spans the whole zone and reads as a second target. */
+/* Its own width at the column's edge: the column is `align-items: stretch`, so a pill
+   left to itself spans the whole zone and reads as a second target. */
 .drop-zone__paste {
-  align-self: center;
+  align-self: flex-start;
 }
 
 .drop-zone__error {
-  align-self: center;
+  align-self: flex-start;
   margin: 0;
   font-size: var(--font-size-small);
   color: var(--theme-warn-color);

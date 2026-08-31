@@ -148,7 +148,7 @@ en:
     calendar_feed_hint_html: Your watchlist is also available as a subscription for your calendar app — %{link}.
     calendar_feed_link: set it up in settings
   capture:
-    title: Read a poster
+    title: Read it
     review:
       title:
         one: 1 event found
@@ -163,7 +163,7 @@ en:
       drop_label: Drop posters here, or tap to pick
       paste: Paste an image
       paste_empty: No image on the clipboard.
-      add_by_hand: Enter by hand
+      add_by_hand: By hand
       read_text: Read
       start_over: Cancel and start over
     queue:

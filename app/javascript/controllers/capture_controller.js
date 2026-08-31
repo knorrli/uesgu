@@ -6,6 +6,7 @@ import { streamedContent } from "lib/turbo_stream"
 import { CaptureSources, posterImage } from "lib/capture/sources"
 import { CaptureQueueStrip } from "lib/capture/queue_strip"
 import { PlaceCarry } from "lib/capture/place_carry"
+import { PlaceFields } from "lib/capture/place_fields"
 
 // The extraction fan-out lives here rather than on the server: one request per input,
 // because a batch cannot be held open in one and there is no queue to reach for (see
@@ -31,6 +32,7 @@ export default class extends Controller {
     // anyway while holding every byte of the request in memory at the same time.
     concurrency: { type: Number, default: 3 },
     localities: Object,
+    places: Object,
     foundOne: String,
     foundOther: String,
     done: Object,
@@ -39,7 +41,9 @@ export default class extends Controller {
 
   initialize() {
     this.sources = new CaptureSources()
-    this.places = new PlaceCarry(this.localitiesValue)
+    this.fields = new PlaceFields({ places: this.placesValue, localities: this.localitiesValue },
+                                  this.identifier)
+    this.carry = new PlaceCarry()
     this.strip = new CaptureQueueStrip(this.stripTarget, this.sources, this.sourceAltValue)
     this.currentId = null
   }
@@ -188,7 +192,7 @@ export default class extends Controller {
   // the honest offer is a clean second batch rather than a partial restore.
   startOver() {
     this.sources.clear()
-    this.places.clear()
+    this.carry.clear()
     this.strip.clear()
     this.rowsTarget.replaceChildren()
     this.currentId = null
@@ -216,7 +220,7 @@ export default class extends Controller {
     this.announceFound()
     this.strip.place(card)
     card.hidden = card.id !== this.currentId
-    this.places.share(card, this.cardTargets)
+    this.carry.share(card, this.cardTargets)
     this.refreshRereads()
     if (!this.currentId) this.open(card.id)
   }
@@ -409,20 +413,33 @@ export default class extends Controller {
   }
 
   applySuggestion(event) {
-    this.places.applySuggestion(event.target.closest(".capture-card"), event.params, this.cardTargets)
+    const card = this.cardFor(event)
+    this.fields.applySuggestion(card, event.params)
+    this.carry.share(card, this.cardTargets)
   }
 
   applyLocality(event) {
-    this.places.applyLocality(event.target.closest(".capture-card"), event.params, this.cardTargets)
+    const card = this.cardFor(event)
+    this.fields.applyLocality(card, event.params)
+    this.carry.share(card, this.cardTargets)
+  }
+
+  suggestPlaces(event) {
+    this.fields.suggest(this.cardFor(event), "place", event.target.value)
   }
 
   suggestLocalities(event) {
-    this.places.suggest(event.target.closest(".capture-card"), event.target.value)
+    this.fields.suggest(this.cardFor(event), "locality", event.target.value)
   }
 
-  carryPlace(event) {
-    this.places.carry(event.target.closest(".capture-card"), event.target.name, event.target.value,
-                      this.cardTargets)
+  typedPlace(event) {
+    const card = this.cardFor(event)
+    this.fields.typed(card, event.target.name, event.target.value)
+    this.carry.share(card, this.cardTargets)
+  }
+
+  cardFor(event) {
+    return event.target.closest(".capture-card")
   }
 
   async extract(payload, label, id = crypto.randomUUID()) {

@@ -19,7 +19,7 @@
   <% end %>
   <%= form_with url: capture_path, method: :post, id: "#{key}-form",
         class: "capture-fields account-form flex flex-col gap-large",
-        data: { action: "turbo:submit-end->capture#decided change->capture#carryPlace" } do %>
+        data: { action: "turbo:submit-end->capture#decided" } do %>
     <%= hidden_field_tag :card_id, key, id: nil %>
     <%# What the model proposed, carried alongside what the human submits so the two
         can be diffed on accept — and on drop, where nothing else says what was
@@ -39,7 +39,8 @@
     <%# No genre options: a batch is N posters x M events, and shipping ~300 of them
         into every card would grow with both, and with the taxonomy. Each card clones
         the page's one copy when it opens instead (see capture_controller.js). %>
-    <%= render "captures/event_fields", candidate: candidate, key: key, suggestions: true %>
+    <%= render "captures/event_fields", candidate: candidate, key: key, suggestions: true,
+          controller: "capture" %>
   <% end %>
 
   <%# OUTSIDE the form, and deliberately: this is a report on the read, not a value of

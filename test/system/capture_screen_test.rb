@@ -361,6 +361,50 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "LU", field_value("canton")
   end
 
+  # The venue half of the same door, and the one that matters most: a poster the model
+  # read badly leaves the field offering nothing, and the contributor mints a fresh
+  # spelling of a venue the app already carries — which is the split that keeps a real
+  # venue below the nomination threshold forever (see PlaceSuggester).
+  test "typing a venue offers the ones the app already knows" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    place(name: "Flarnhalle", locality: "Flarnhausen", canton: "ZH")
+    CannedExtractionClient.install(events: [poster_event(place: nil, place_evidence: nil,
+                                                         locality: nil, locality_evidence: nil,
+                                                         canton: nil)])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".suggestions"
+    type("place", "zorps")
+
+    assert_selector ".suggestions button", text: "Zorpsaal"
+    assert_no_selector ".suggestions button", text: "Flarnhalle"
+
+    find(".suggestions button", text: "Zorpsaal").click
+    assert_equal "Zorpsaal", field_value("place")
+    assert_equal "Zorpwil", field_value("locality")
+    assert_equal "BE", field_value("canton")
+  end
+
+  # A typed match is the registry's spelling arriving the same way a ranked chip's does,
+  # so it is counted the same way: the poster said one thing, the app carries another,
+  # and neither is the model having misread anything.
+  test "taking a typed venue is recorded as a normalisation, not a correction" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    CannedExtractionClient.install(events: [poster_event(place: "Blorpwerk",
+                                                         place_evidence: "Blorpwerk")])
+    visit capture_path
+    pick "poster.png"
+
+    assert_no_selector ".suggestions"
+    type("place", "zorps")
+    find(".suggestions button", text: "Zorpsaal").click
+    accept
+    assert_published
+
+    assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :normalized?
+  end
+
   # Tapping a town is taking the app's spelling over the poster's, exactly as tapping a
   # venue is — and counted as a correction it would inflate the one number a prompt
   # edit is judged on. A venue the fingerprint reaches is folded before the card
@@ -550,6 +594,30 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue"
     assert_no_selector ".capture-card__reread"
     assert_no_selector ".drop-zone__item"
+  end
+
+  # Both fields were minted blind here: the screen mounted no controller at all, so it
+  # had neither the ranked chips a poster earns nor the typed ones every screen can.
+  test "the hand-entry screen offers the venues and towns the app already knows" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    place(name: "Flarnhalle", locality: "Flarnhausen", canton: "ZH")
+    visit capture_path
+    by_hand
+
+    assert_no_selector ".suggestions"
+
+    manual_field("place").set("zorps")
+    find(".suggestions button", text: "Zorpsaal").click
+
+    assert_equal "Zorpsaal", manual_value("place")
+    assert_equal "Zorpwil", manual_value("locality")
+    assert_equal "BE", manual_value("canton")
+
+    manual_field("locality").set("flarn")
+    find(".suggestions button", text: "Flarnhausen").click
+
+    assert_equal "Flarnhausen", manual_value("locality")
+    assert_equal "ZH", manual_value("canton")
   end
 
   # The third option beside publish and drop. The flags are what make it more than a

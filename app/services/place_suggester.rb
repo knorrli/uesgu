@@ -40,6 +40,17 @@ class PlaceSuggester
       score(name, name_candidates, limit: limit)
     end
 
+    # The same vocabulary as name_candidates, as name => [locality, canton], for the
+    # card to match what is being typed against. Aliases are out for the reason given
+    # there, and the two sources are one list because a contributor picking a name has
+    # no use for which side of the registry line it falls on.
+    def by_name
+      rows = Venue.in_taxonomy.map { |venue| [venue.name, venue.locality, venue.canton] }
+      rows += Place.canonicals.pluck(:name, :locality, :canton)
+      rows.sort_by { |name, _, _| name.downcase }
+          .to_h { |name, locality, canton| [name, [locality, canton]] }
+    end
+
     private
 
     # The registry is keyed by domain, so a capture carrying zar.ch resolves to the

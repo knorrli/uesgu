@@ -3,10 +3,14 @@
     renders them alone. Most of that needs no branch — a quote for a field with no value
     renders nothing, and field_group drops what renders nothing.
 
-    `suggestions` is what does. Place and locality chips are ranked from what a model
-    read, so a screen with no read has nothing to rank — and the towns matching what is
-    typed are appended by the capture controller, which only a review card mounts. %>
-<%# locals: (candidate:, key:, suggestions: false, genre_options: []) %>
+    `suggestions` is what does: the place and locality chips a card OPENS with are ranked
+    from what a model read, so a screen with no read has nothing to rank. The rows
+    themselves render either way, because they are also where the names matching what is
+    being typed are appended (see lib/capture/place_fields.js).
+
+    `controller` is whichever one the screen mounts — the two differ in everything else
+    they do, so the actions name it rather than assuming one. %>
+<%# locals: (candidate:, key:, controller:, suggestions: false, genre_options: []) %>
 <label class="flex flex-col gap-xsmall">
   <span class="field-label"><%= t('capture.candidate.title') %></span>
   <%= text_field_tag :title, candidate.title, required: true %>
@@ -48,26 +52,30 @@
 <% ranked = suggestions ? place_suggestions(candidate) : [] %>
 <%= render layout: "shared/field_group",
       locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :place)),
-                           (render("shared/suggestions", label: t('capture.candidate.suggestions'),
-                                   chips: place_chips(ranked)) if suggestions)] } do %>
+                           render("shared/suggestions", label: t('capture.candidate.suggestions'),
+                                  chips: place_chips(ranked, controller),
+                                  attrs: { data: { suggestions: "place" },
+                                           aria: { live: "polite" } })] } do %>
   <label class="flex flex-col gap-xsmall">
     <span class="field-label"><%= t('capture.candidate.place') %></span>
-    <%= text_field_tag :place, candidate.place %>
+    <%# Off as a precaution rather than on an observed fill: the town below has to be
+        (`name="locality"` is an address autofill token), and a venue beside a town and a
+        canton is the same address-shaped group — a fill here mints a street line as a
+        place, which nothing downstream can tell from a real one. %>
+    <%= text_field_tag :place, candidate.place, autocomplete: "off",
+          data: { action: "input->#{controller}#suggestPlaces change->#{controller}#typedPlace" } %>
   </label>
 <% end %>
 
-<%# The row renders even with nothing to rank, because it is also where the towns
-    matching what is being typed are appended in the browser (see
-    lib/capture/place_carry.js) — which is how the long tail stays reachable at all.
-    Both hang off the PAIR: a chip fills the canton as well as the town (see
-    CapturesHelper#locality_chips), and the canton is computed from the locality
-    rather than read off the poster (see EventCapture::Normalizer). %>
-<% towns = suggestions ? locality_chips(ranked, candidate) : [] %>
+<%# Both rows hang off the PAIR: a chip fills the canton as well as the town (see
+    CapturesHelper#locality_chips), and the canton is computed from the locality rather
+    than read off the poster (see EventCapture::Normalizer). %>
+<% towns = suggestions ? locality_chips(ranked, candidate, controller) : [] %>
 <%= render layout: "shared/field_group",
       locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :locality)),
-                           (render("shared/suggestions", label: t('capture.candidate.locality_suggestions'),
-                                   chips: towns, attrs: { data: { suggestions: "locality" },
-                                                          aria: { live: "polite" } }) if suggestions)] } do %>
+                           render("shared/suggestions", label: t('capture.candidate.locality_suggestions'),
+                                  chips: towns, attrs: { data: { suggestions: "locality" },
+                                                         aria: { live: "polite" } })] } do %>
   <div class="capture-fields__where flex gap-small wrap">
     <label class="flex flex-col gap-xsmall">
       <%# Required HERE and not at extraction: a poster never prints its own town,
@@ -78,12 +86,13 @@
           the field sits beside a canton: iOS otherwise offers to fill it with a whole
           postal address ("Bern 3008 Switzerland"), which mints that as a town. %>
       <%= text_field_tag :locality, candidate.locality, required: true, autocomplete: "off",
-            data: { action: ("input->capture#suggestLocalities" if suggestions) } %>
+            data: { action: "input->#{controller}#suggestLocalities change->#{controller}#typedPlace" } %>
     </label>
     <label class="flex flex-col gap-xsmall">
       <span class="field-label"><%= t('capture.candidate.canton') %></span>
       <%= select_tag :canton, options_for_select(canton_options, candidate.canton),
-            include_blank: true, required: true %>
+            include_blank: true, required: true,
+            data: { action: "change->#{controller}#typedPlace" } %>
     </label>
   </div>
 <% end %>

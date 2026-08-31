@@ -210,7 +210,6 @@ fr:
       suggestions: "Déjà connu :"
       locality: Localité
       locality_suggestions: "Localités connues :"
-      locality_hint: Tape une lettre ou deux — les localités connues apparaissent.
       canton: Canton
       genres: Genres
       genres_hint: Entrée pour ajouter. Les nouveaux genres sont permis — si un genre existe déjà, prends-le.

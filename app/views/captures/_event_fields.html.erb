@@ -4,9 +4,8 @@
     renders nothing, and field_group drops what renders nothing.
 
     `suggestions` is what does. Place and locality chips are ranked from what a model
-    read, so a screen with no read can only ever offer an empty row, and the hint that
-    sits under an empty one promises towns will appear as you type — which only the
-    capture controller delivers. %>
+    read, so a screen with no read has nothing to rank — and the towns matching what is
+    typed are appended by the capture controller, which only a review card mounts. %>
 <%# locals: (candidate:, key:, suggestions: false, genre_options: []) %>
 <label class="flex flex-col gap-xsmall">
   <span class="field-label"><%= t('capture.candidate.title') %></span>
@@ -57,22 +56,18 @@
   </label>
 <% end %>
 
-<%# Chips are the affordance where there is a ranking to render; where there is
-    none, the hint that takes their slot is. The same row also holds the towns
-    matching what is being typed, appended in the browser (see
-    capture_controller.js), which is how the long tail stays reachable at all.
+<%# The row renders even with nothing to rank, because it is also where the towns
+    matching what is being typed are appended in the browser (see
+    lib/capture/place_carry.js) — which is how the long tail stays reachable at all.
     Both hang off the PAIR: a chip fills the canton as well as the town (see
     CapturesHelper#locality_chips), and the canton is computed from the locality
     rather than read off the poster (see EventCapture::Normalizer). %>
 <% towns = suggestions ? locality_chips(ranked, candidate) : [] %>
-<% unranked_hint = tag.span(t('capture.candidate.locality_hint'), class: "muted",
-                            data: { locality_hint: true }) if suggestions && towns.empty? %>
 <%= render layout: "shared/field_group",
       locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :locality)),
                            (render("shared/suggestions", label: t('capture.candidate.locality_suggestions'),
                                    chips: towns, attrs: { data: { suggestions: "locality" },
-                                                          aria: { live: "polite" } }) if suggestions),
-                           unranked_hint] } do %>
+                                                          aria: { live: "polite" } }) if suggestions)] } do %>
   <div class="capture-fields__where flex gap-small wrap">
     <label class="flex flex-col gap-xsmall">
       <%# Required HERE and not at extraction: a poster never prints its own town,

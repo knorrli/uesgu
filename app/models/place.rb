@@ -49,7 +49,7 @@ class Place < ApplicationRecord
   end
 
   def rename!(new_name)
-    self.name = new_name
+    self.name = new_name.to_s.strip
     unless valid?
       restore_attributes
       return false

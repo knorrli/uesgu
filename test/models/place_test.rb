@@ -228,6 +228,14 @@ class PlaceTest < ActiveSupport::TestCase
     assert_equal "Flarnhalle", flarnhalle.reload.name
   end
 
+  test "a rename to nothing at all is refused" do
+    flarnhalle = place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
+
+    refute flarnhalle.rename!("   ")
+
+    assert_equal "Flarnhalle", flarnhalle.reload.name
+  end
+
   test "splitting undoes the link and leaves the moved events where they were moved" do
     akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
     variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")

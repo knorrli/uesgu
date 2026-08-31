@@ -7,7 +7,15 @@
 
   <div class="prose flex flex-col gap-medium">
     <p><%= t('about.intro') %></p>
-    <p><%= t('about.why') %></p>
-    <p><%= link_to t('about.privacy'), privacy_path %></p>
+    <h2><%= t('about.why.title') %></h2>
+    <p><%= t('about.why.body') %></p>
+    <h2><%= t('about.how.title') %></h2>
+    <p><%= t('about.how.body') %></p>
+    <h3><%= t('about.how.crawler.title') %></h3>
+    <p><%= t('about.how.crawler.body') %></p>
+    <h3><%= t('about.how.capture.title') %></h3>
+    <p><%= t('about.how.capture.body') %></p>
+    <h2><%= t('about.contact.title') %></h2>
+    <p><%= t('about.contact.body', email: t('about.contact.email')) %></p>
   </div>
 </div>

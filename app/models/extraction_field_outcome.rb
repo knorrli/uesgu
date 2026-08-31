@@ -27,7 +27,7 @@ class ExtractionFieldOutcome < ApplicationRecord
   VALUED = (FIELDS - %w[title]).freeze
 
   # The tuple a place suggestion fills in one tap, and so the only fields whose change
-  # can be a normalisation rather than a correction (see capture_controller.js).
+  # can be a normalisation rather than a correction (see lib/capture/place_fields.js).
   PLACE_FIELDS = %w[place locality canton].freeze
 
   # The last decision on a candidate wins: a dropped card can be reopened from its

@@ -105,6 +105,27 @@ class PlaceSuggesterTest < ActiveSupport::TestCase
     assert_includes names_for("Warum Bar"), "Warum? Bar"
   end
 
+  # The map the card matches typing against. Same vocabulary as the ranking, so a name
+  # the suggester would offer is one the field can reach by typing it.
+  test "the shipped map carries both sources with the town and canton each sits in" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    venue = Venue.in_taxonomy.first
+
+    map = PlaceSuggester.by_name
+
+    assert_equal ["Zorpwil", "BE"], map["Zorpsaal"]
+    assert_equal [venue.locality, venue.canton], map[venue.name]
+  end
+
+  # Offering a spelling that was merged away is an invitation to re-mint it.
+  test "a place merged into another is not in the shipped map" do
+    canonical = place(name: "Zorpsaal")
+    place(name: "Zorpsaal Halle").merge_into!(canonical)
+
+    assert_includes PlaceSuggester.by_name.keys, "Zorpsaal"
+    assert_not_includes PlaceSuggester.by_name.keys, "Zorpsaal Halle"
+  end
+
   private
 
   def names_for(query) = PlaceSuggester.for_name(query).map(&:name)

@@ -93,7 +93,7 @@ class CapturesController < ApplicationController
   end
 
   # Fields the contributor filled from a place suggestion rather than by judging the
-  # model's reading (see capture_controller.js).
+  # model's reading (see lib/capture/place_fields.js).
   def normalized_fields
     ExtractionFieldOutcome::PLACE_FIELDS.select { |field| params[:"normalized_#{field}"].present? }
   end

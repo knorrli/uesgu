@@ -18,13 +18,13 @@ module CapturesHelper
   end
 
   # Tapping one takes a spelling the app already has instead of minting a variant —
-  # see PlaceSuggester for what a split venue name costs.
-  def place_chips(suggestions)
+  # see PlaceSuggester for what a split venue name costs. `controller` is the one the
+  # screen mounts: the review queue and hand entry share these fields and nothing else.
+  def place_chips(suggestions, controller)
     suggestions.map do |suggestion|
-      suggestion_chip(suggestion.name, action: "capture#applySuggestion",
-                      capture_name_param: suggestion.name,
-                      capture_locality_param: suggestion.locality,
-                      capture_canton_param: suggestion.canton)
+      suggestion_chip(suggestion.name, controller,
+                      action: "#{controller}#applySuggestion", name: suggestion.name,
+                      locality: suggestion.locality, canton: suggestion.canton)
     end
   end
 
@@ -33,14 +33,14 @@ module CapturesHelper
   # alphabetical order ranks nothing; the places already being suggested are few, and
   # they are about this poster. The long tail stays reachable by typing, which fills
   # the same row from the map below.
-  def locality_chips(suggestions, candidate)
+  def locality_chips(suggestions, candidate, controller)
     suggestions.select { |suggestion| suggestion.locality.present? }
                .uniq { |suggestion| Fingerprint.for(suggestion.locality) }
                .reject { |suggestion| changes_nothing?(suggestion, candidate) }
                .map do |suggestion|
-                 suggestion_chip(suggestion.locality, action: "capture#applyLocality",
-                                 capture_locality_param: suggestion.locality,
-                                 capture_canton_param: suggestion.canton)
+                 suggestion_chip(suggestion.locality, controller,
+                                 action: "#{controller}#applyLocality",
+                                 locality: suggestion.locality, canton: suggestion.canton)
                end
   end
 
@@ -52,7 +52,12 @@ module CapturesHelper
       suggestion.canton == candidate.canton
   end
 
-  def suggestion_chip(label, **data) = { label: label, attrs: { data: data } }
+  # Stimulus reads a param off `data-<controller>-<name>-param`, so the keys are built
+  # rather than written out: the same chip is rendered for two controllers.
+  def suggestion_chip(label, controller, action:, **params)
+    data = params.compact.transform_keys { |name| "#{controller}_#{name}_param".tr("-", "_") }
+    { label: label, attrs: { data: data.merge(action: action) } }
+  end
 
   # Shows we may already carry, looked up from what the model read. Computed here for
   # the same reason place_suggestions is: the extracted values are the ones that need
@@ -102,6 +107,12 @@ module CapturesHelper
   # matches the names as they are typed and fills the canton from the same map once one
   # is picked, so both halves of the field answer from one place.
   def capture_localities = Locality.cantons_by_name
+
+  # The venues the same field offers, name => [locality, canton]. Shipped whole rather
+  # than looked up as they type, for the reason place_suggestions gives: a second
+  # ranking beside the one already rendered can disagree with it, and there are tens of
+  # these names, not thousands.
+  def capture_places = PlaceSuggester.by_name
 
   # What the model proposed, keyed the way the form posts it, so the card can carry it
   # back for the diff. Mirrors the visible inputs exactly — a value that renders one

@@ -210,7 +210,6 @@ de:
       suggestions: "Gibt es schon:"
       locality: Ort
       locality_suggestions: "Bekannte Orte:"
-      locality_hint: Tipp ein, zwei Buchstaben – bekannte Orte tauchen auf.
       canton: Kanton
       genres: Genres
       genres_hint: Enter fügt eins hinzu. Neue Genres sind ok — wenn es eins schon gibt, lieber das nehmen.

@@ -210,7 +210,6 @@ en:
       suggestions: "Already known:"
       locality: Locality
       locality_suggestions: "Known towns:"
-      locality_hint: Type a letter or two — the towns we know come up.
       canton: Canton
       genres: Genres
       genres_hint: Enter adds one. New genres are fine — if one already exists, take that instead.

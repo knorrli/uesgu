@@ -100,7 +100,7 @@ export class PlaceCarry {
 
   // Matches take the row over while they stand: a ranked chip that also matches is in the
   // matches already, and one that does not is an answer to a question nobody is asking
-  // any more. The hint goes with them — it promises the towns will come up, and they have.
+  // any more.
   showMatches(card, matches) {
     const row = card?.querySelector("[data-suggestions=locality]")
     if (!row) return
@@ -108,8 +108,6 @@ export class PlaceCarry {
     row.querySelectorAll("[data-typed]").forEach((chip) => chip.remove())
     row.querySelectorAll(".chip").forEach((chip) => { chip.hidden = matches.length > 0 })
     matches.forEach((name) => row.appendChild(this.chip(name)))
-    const hint = card.querySelector("[data-locality-hint]")
-    if (hint) hint.hidden = matches.length > 0
   }
 
   // Two letters before anything is offered, because one letter ranks nothing: the cap

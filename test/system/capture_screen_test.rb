@@ -443,17 +443,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal ["Zorpwil"], Event.last.location_list.grep_v(/\A(BE|Zorpsaal)\z/)
   end
 
-  # A venue nobody knows is exactly the case that mints a fresh spelling, and it is the
-  # case with no ranking to render — so the words are what say the suggestions exist.
-  test "with no venue to suggest, the locality field says the suggestions are there" do
-    CannedExtractionClient.install(events: [poster_event(place: nil, place_evidence: nil)])
-    visit capture_path
-    pick "poster.png"
-
-    assert_no_selector ".suggestions"
-    assert_selector ".capture-card", text: copy("candidate.locality_hint")
-  end
-
   # The canton is computed from the locality once, server-side, at extraction — so a
   # locality changed on the card has to bring its own (see Locality).
   test "a locality the app already knows fills the canton beside it" do

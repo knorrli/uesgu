@@ -48,6 +48,21 @@ class Place < ApplicationRecord
     end
   end
 
+  def rename!(new_name)
+    self.name = new_name
+    unless valid?
+      restore_attributes
+      return false
+    end
+
+    transaction do
+      retag_events(add: [name, locality, canton].compact_blank)
+      rewrite_saved_filters(name)
+      save!
+    end
+    true
+  end
+
   def unmerge! = update!(canonical_id: nil)
 
   private

@@ -726,6 +726,9 @@ de:
           zero: keine Events
           one: 1 Event
           other: "%{count} Events"
+        name_label: Name
+        rename: Umbenennen
+        rename_hint: Beim Umbenennen werden alle Events mit der alten Schreibweise umgehängt und gespeicherte Filter mitgezogen. Zwei Schreibweisen legst du besser zusammen.
         merge: Zusammenlegen
         merge_into: Zusammenlegen mit…
         merge_hint: Beim Zusammenlegen werden alle Events unter diesem Namen umgehängt, samt Ort und Kanton des anderen Lokals. Die Verknüpfung bleibt, spätere Captures landen ebenfalls beim anderen Lokal.
@@ -817,6 +820,8 @@ de:
         one: Einladung
         other: Einladungen
     attributes:
+      place:
+        name: Name
       user:
         username: Benutzername
         password: Passwort

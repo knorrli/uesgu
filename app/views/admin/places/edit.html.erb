@@ -19,6 +19,24 @@
   <% elsif @place.shadowed? %>
     <p class="muted"><%= t('.shadowed_hint') %></p>
   <% else %>
+    <%= form_with model: @place, url: admin_place_path(@place), method: :patch,
+          class: 'account-form flex flex-col gap-small' do |f| %>
+      <% if @place.errors.any? %>
+        <ul class="form-errors">
+          <% @place.errors.full_messages.each do |message| %><li><%= message %></li><% end %>
+        </ul>
+      <% end %>
+
+      <div class="flex justify-between gap-medium wrap align-end">
+        <label class="flex flex-col gap-small flex-grow">
+          <span class="field-label"><%= t('.name_label') %></span>
+          <%= f.text_field :name, autocomplete: 'off' %>
+        </label>
+        <%= f.submit t('.rename') %>
+      </div>
+    <% end %>
+    <p class="muted"><%= t('.rename_hint') %></p>
+
     <%= form_with url: merge_admin_place_path(@place), method: :post, scope: :place,
           class: 'flex justify-between gap-medium wrap align-end' do |f| %>
       <div class="input-wrapper flex flex-grow">

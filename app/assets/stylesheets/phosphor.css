@@ -37,6 +37,9 @@
 .ph.ph-calendar-dots:before {
   content: "\e7b4";
 }
+.ph.ph-calendar-plus:before {
+  content: "\e714";
+}
 .ph.ph-camera:before {
   content: "\e10e";
 }

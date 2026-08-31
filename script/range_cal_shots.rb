@@ -1,8 +1,3 @@
-# Screenshots of the When-sheet custom-range CALENDAR (range_calendar_controller)
-# on mobile (full-screen sheet, 390px) and desktop (inline dropdown panel, 1100px).
-# Same harness as script/ui_sheet_shots.rb: drives the dev server on :3199, logs in
-# as the disposable `shotbot` fixture, light/cream theme. Captures each width at
-# rest and with a range picked. Output: tmp/shots-rangecal/.
 require "ferrum"
 require "fileutils"
 require "date"
@@ -12,9 +7,8 @@ OUT  = File.expand_path("../tmp/shots-rangecal", __dir__)
 FileUtils.rm_rf(OUT)
 FileUtils.mkdir_p(OUT)
 
-# Two days in the displayed (current) month — the calendar opens on it.
-START_DAY = (Date.today - Date.today.mday + 1) + 9  # the 10th
-END_DAY   = (Date.today - Date.today.mday + 1) + 19 # the 20th
+START_DAY = (Date.today - Date.today.mday + 1) + 9
+END_DAY   = (Date.today - Date.today.mday + 1) + 19
 
 def login(b)
   b.goto("#{BASE}/session/new")
@@ -49,18 +43,16 @@ def shoot(b, slug, full: false)
   puts slug
 end
 
-# Mobile: the When sheet goes full-screen below the 600px breakpoint.
 b = Ferrum::Browser.new(headless: true, window_size: [390, 844], timeout: 20, process_timeout: 30)
 b.resize(width: 390, height: 844)
 login(b)
 
 open_when(b)
-shoot(b, "01-mobile-rest", full: true)   # full page: presets + calendar in one image
+shoot(b, "01-mobile-rest", full: true)
 pick_range(b)
 shoot(b, "02-mobile-range", full: true)
 b.quit
 
-# Desktop: the same sheet renders as an in-flow dropdown panel.
 d = Ferrum::Browser.new(headless: true, window_size: [1100, 900], timeout: 20, process_timeout: 30)
 d.resize(width: 1100, height: 900)
 login(d)

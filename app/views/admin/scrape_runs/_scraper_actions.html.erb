@@ -1,6 +1,3 @@
-<%# Per-scraper row actions. A live scraper can be run now or snoozed; a snoozed
-    one shows Wake instead, since snoozing already skips it from the sweep.
-    locals: (scraper:, snooze: nil) %>
 <span class="scrape-actions">
   <% if snooze %>
     <%= button_to t('admin.scrape_runs.index.wake'), wake_admin_scrape_runs_path,

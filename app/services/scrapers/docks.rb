@@ -30,15 +30,6 @@ module Scrapers
       content.css(".event-subtitle").text.split("+").map { |part| part.squish }.compact_blank.join(", ")
     end
 
-    # Docks has no dedicated genre field (the former `.event-info-style` selector
-    # is dead in the current markup). The only genre-ish signal is the per-artist
-    # `.artist-info` spans, which interleave the artist's ORIGIN COUNTRY CODE
-    # ("US", "CH") with a loose genre word ("ROCK") under one shared class. Since
-    # every extracted token now MINTS taxonomy, the codes no longer "drop out for
-    # free" — reading them whole is what minted "Us"/"Ch"/"Au" as bogus genres. So
-    # drop the bare 2-letter ISO codes here; they're an artist-origin signal, not a
-    # genre (a real origin facet is future work). Everything else titleizes into a
-    # genre.
     def event_genres(content)
       content.css(".artist-item .artist-info")
              .map { |node| node.text.squish }
@@ -50,9 +41,6 @@ module Scrapers
 
     private
 
-    # A bare two-letter code (US, CH, AU, UK…) is the artist's origin, not a
-    # genre. No real genre is two letters, so this cleanly separates the two
-    # signals that share the `.artist-info` class.
     def origin_code?(tag)
       tag.match?(/\A[A-Za-z]{2}\z/)
     end

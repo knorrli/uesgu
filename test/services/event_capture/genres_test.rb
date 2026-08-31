@@ -1,11 +1,6 @@
 require "db_test_helper"
 
-# The rule that decides whether punctuation in a captured genre separates a list or
-# sits inside a name. Synthetic genre names throughout; only the last test reads the
-# table.
 class EventCapture::GenresTest < ActiveSupport::TestCase
-  # Every separator a poster reaches for, decided by the same rule: the fingerprint
-  # discards all of them, so only the tokenizer ever knows which one was printed.
   SEPARATORS = %w[/ · |].freeze
 
   def taxonomy(*names) = EventCapture::Genres.for_names(names)
@@ -27,20 +22,15 @@ class EventCapture::GenresTest < ActiveSupport::TestCase
     end
   end
 
-  # A poster that punctuates one line two ways is still printing one list.
   test "separators mix inside a single run" do
     assert_equal %w[Loops Zorpcore FX],
                  taxonomy("Zorpcore").split("Loops/Zorpcore·FX")
   end
 
-  # A hyphen sits inside names we carry, so it is not a separator and a run built on
-  # one is left for the contributor to split by hand.
   test "a hyphen never separates" do
     assert_equal ["Zorpcore-Flarnwave"], taxonomy("Zorpcore").split("Zorpcore-Flarnwave")
   end
 
-  # The motivating poster: six genres in one string, half of them names nobody
-  # carries yet. One vouched part is what says the slash is a separator.
   test "one known part carries the parts nobody knows with it" do
     assert_equal %w[Loops Zorpcore FX Flarnwave],
                  taxonomy("Zorpcore").split("Loops/Zorpcore/FX/Flarnwave")
@@ -67,7 +57,6 @@ class EventCapture::GenresTest < ActiveSupport::TestCase
     assert_equal ["Zorpcore/Flarnwave"], EventCapture::Genres.none.split("Zorpcore/Flarnwave")
   end
 
-  # Blocked genres are scraper noise, so recognising one says nothing about the run.
   test "the taxonomy it reads is every genre that is not blocked" do
     carried = genre(name: "zorpcore")
     blocked = genre(name: "flarnwave")

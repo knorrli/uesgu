@@ -1,12 +1,3 @@
-# Mobile locale screenshot pass. Drives the running dev server (port 3199) with
-# Ferrum at a phone viewport, logs in as the disposable `shotbot` fixture, then
-# captures a fixed set of pages once per locale (locale comes from Accept-Language
-# because shotbot.locale is nil). Output: tmp/shots/<page>__<locale>.png so the
-# three locales of one page sit next to each other for diffing.
-#
-# full: false captures just the 390x844 viewport (readable scale, above-the-fold
-# controls where locale wrapping usually breaks). Pages where the interesting
-# content sits lower (forms) are also captured full-page as <page>__<locale>__full.
 require "ferrum"
 require "fileutils"
 
@@ -23,7 +14,6 @@ LOCALES = {
   "fr" => "fr-CH,fr;q=0.9"
 }
 
-# [slug, path, also_full?]
 PAGES = [
   ["home-list",     "/?view=list",                            false],
   ["home-calendar", "/?view=calendar&start_date=2026-06-26",  false],

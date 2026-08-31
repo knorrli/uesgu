@@ -1,16 +1,8 @@
 namespace :scrapers do
-  # Capture one list page per venue (+ one detail page per click-into-detail venue)
-  # into test/fixtures/scrapers/<venue>/ for the golden parser tests. Read-only HTTP,
-  # no DB writes. Re-run when a venue's markup changes and a golden goes stale.
-  #
-  #   bin/rails scrapers:capture_fixtures            # all venues
-  #   bin/rails scrapers:capture_fixtures[kofmehl]   # one venue
   desc "Save live HTML fixtures for the scraper golden tests"
   task :capture_fixtures, [:only] => :environment do |_task, args|
     root = Rails.root.join("test/fixtures/scrapers")
 
-    # First-detail-link selector for each click-into-detail (Shape B) scraper, so we
-    # can grab a representative detail page the same way the scraper would.
     detail_link = {
       "bad_bonn"      => ".program-row .program-bands a",
       "kofmehl"       => ".events .events__element a.events__link",
@@ -54,37 +46,19 @@ namespace :scrapers do
       end
       puts
 
-      sleep 1 # be a courteous guest
+      sleep 1
     rescue StandardError => e
       puts "  FAILED #{slug}: #{e.class}: #{e.message}"
     end
   end
 
-  # Run every scraper once, sequentially. This is the entrypoint for the daily
-  # Render cron (see render.yaml) that replaced the in-Puma Solid Queue worker.
-  #
-  # Records the sweep into a ScrapeRun + per-scraper ScrapeResult rows (the
-  # /admin/scrape_runs oversight page reads these), stamps the events each
-  # scraper created with the run, prints a per-scraper summary to stdout (which
-  # Render captures as the cron job's live log), and exits non-zero if a scraper
-  # raised OR a venue that produced events last run came back empty (a silent
-  # drop-to-zero — HTTP 200 but the markup broke). Render's failure notification
-  # then fires for a site being down or a quietly-broken parser, but NOT for a
-  # venue that's simply chronically empty (that surfaces in-app instead). A
-  # per-event parse error is skipped and counted inside the scraper.
-  #
-  #   bin/rails scrapers:run_all
   desc "Run all scrapers once, recording a ScrapeRun and per-scraper summary (daily cron entrypoint)"
   task run_all: :environment do
     run = Scrapers::Sweep.run!
-    # This cron is the app's only scheduled hook — there is no queue and no
-    # scheduler — so the capture funnel's size backstop rides along with it.
     ExtractionAttempt.prune!
 
     failed = run.scrape_results.failed.pluck(:scraper)
     dropped = run.dropped_to_zero
-    # Snoozed scrapers were skipped on purpose — never a failure — but note them
-    # so the cron log doesn't overstate coverage (and reminds you they're muted).
     snoozed = run.scrape_results.snoozed.pluck(:scraper)
     snoozed_note = snoozed.any? ? " · #{snoozed.size} snoozed (#{snoozed.join(', ')})" : ""
 
@@ -103,21 +77,6 @@ namespace :scrapers do
     end
   end
 
-  # One-off backfill: rewrite the stored Rote Fabrik event URLs that the old
-  # event_url built wrongly — they pointed at the login-gated `kalender.` backend
-  # using `r_f_event_id`, which 404s to a visitor (a dead link in the app). The
-  # fixed scraper now emits the public SPA route keyed on the occurrence id. Since
-  # events are matched on `url`, the next scrape would otherwise CREATE fresh rows
-  # and orphan the old ones — so run this BEFORE the next sweep to heal in place.
-  #
-  # Fetches the live feed and reuses the scraper's own event_url so the rewritten
-  # URL is byte-identical to what re-scraping produces. Idempotent: only touches
-  # rows still on the old `kalender.` host; an event whose id has dropped from the
-  # feed (can't be remapped) is reported and left untouched. Run on prod via the
-  # Render shell after deploy.
-  #
-  #   bin/rails scrapers:rote_fabrik:fix_urls          # apply
-  #   DRY_RUN=1 bin/rails scrapers:rote_fabrik:fix_urls # preview only
   namespace :rote_fabrik do
     desc "Backfill Rote Fabrik event URLs from the dead kalender. backend to the public SPA route"
     task fix_urls: :environment do
@@ -131,8 +90,6 @@ namespace :scrapers do
 
       agent = Scrapers::RoteFabrik.new
       agent.get(Scrapers::RoteFabrik.url)
-      # r_f_event_id (the id baked into the OLD url) → the live row, so we can rebuild
-      # the new url via the scraper's own event_url.
       rows_by_rf = agent.send(:event_rows).index_by { |r| r["r_f_event_id"].to_s }
 
       fixed = skipped = collided = 0
@@ -163,14 +120,6 @@ namespace :scrapers do
     end
   end
 
-  # REVIEW-ONLY dry run for vetting a draft scraper before it's wired in. Runs the
-  # scraper LIVE (real get/page/click) but mirrors build_event into a plain hash
-  # instead of an Event — so it never touches the DB, never mints genres, and never
-  # derives styles (raw genres are reported instead, which is what a human needs to
-  # eyeball date/title correctness). Writes tmp/dry_run/<slug>.json and prints a
-  # summary. NOT part of the nightly sweep.
-  #
-  #   bin/rails "scrapers:dry_run[Treibhaus]"   # by demodulized class name
   desc "Dry-run one scraper live and dump parsed events to tmp/dry_run/<slug>.json (no DB writes)"
   task :dry_run, [:scraper] => :environment do |_task, args|
     name = args[:scraper] or abort "usage: scrapers:dry_run[ClassName]"
@@ -189,8 +138,6 @@ namespace :scrapers do
       url = agent.send(:event_url, row)
       next if url.blank?
 
-      # transact restores the agent's page after a click-into-detail scraper
-      # navigates away, exactly as build_event does — a no-op for list-page scrapers.
       agent.transact do
         content = agent.send(:event_content, row)
         agent.send(:preprocess, content)

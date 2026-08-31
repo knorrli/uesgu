@@ -1,20 +1,4 @@
 module EventCapture
-  # What we send Gemma. Deliberately a copy of the prompt in
-  # script/event_capture_bakeoff.rb rather than a shared constant: that script is a
-  # frozen evaluation harness whose sessions record a `prompt_sha`, and editing it
-  # would silently break the comparability of the runs the provider decision rests on.
-  # Its copy has since diverged — `city` rather than `locality`, no `subtitle`, another
-  # default model — so it cannot measure this wording. It settled the provider and it
-  # preps the sample images; it does not evaluate a change made here.
-  #
-  # Treat the wording as measured, not as prose: the evidence rule below is most of the
-  # difference between 0/6 and 5/6 fabricated dates, and tuning was measured NOT to
-  # transfer between models, so an edit here means measuring this prompt against the
-  # configured model first. The field is `locality` and not `city` because a model asked
-  # for a city nulls out on a hamlet — the exact field match-at-entry depends on.
-  #
-  # Only the image wording is measured. The evaluation scores six images against image
-  # ground truth and can say nothing about how the text variant below performs.
   module Prompt
     MEDIA = {
       image: {
@@ -61,10 +45,6 @@ module EventCapture
 
     def request(medium: :image) = MEDIA.fetch(medium)[:request]
 
-    # What an ExtractionAttempt's numbers are attributable to. Hashed against a
-    # fixed date, NOT today's: `instructions` interpolates the date, so hashing the
-    # rendered prompt would mint a new sha every night and the column would measure
-    # the calendar instead of the wording.
     SHA_DATE = Date.new(2000, 1, 1)
 
     def sha(medium: :image)
@@ -162,11 +142,6 @@ module EventCapture
       TXT
     end
 
-    # OpenAI-style structured output. Infomaniak rejects the older `json_object` mode
-    # outright ("no longer supported... please use 'json_schema'"), and strict mode is
-    # better anyway: it forces every field to be present, so a model that simply omits
-    # `date` cannot be read as if it thoughtfully returned null. strict mode requires
-    # every property in `required` and additionalProperties false.
     SCHEMA = {
       name: "extracted_events",
       strict: true,

@@ -11,15 +11,8 @@ class GenresController < ApplicationController
     "blocked" => :blocked
   }.freeze
 
-  # Browse default is alphabetical (finding a known genre); 'count' surfaces the
-  # heaviest hitters (the queue's order).
   SORT_SCOPES = { "name" => :by_name, "count" => :by_usage }.freeze
 
-  # Standard CRUD entry, filterable by status and sortable. Browsing shows the
-  # curation catalogue (`Genre.listable` = in use + parked); a name search instead
-  # reaches *every* genre — including dormant taxonomy entries and genres you've
-  # touched that currently tag 0 events — so nothing is ever truly hidden, it's
-  # just one search away.
   def index
     @status = catalogue_param(:status, STATUS_SCOPES, default: "all")
     @sort = catalogue_param(:sort, SORT_SCOPES, default: "name")
@@ -28,28 +21,16 @@ class GenresController < ApplicationController
     @genres = scope.public_send(SORT_SCOPES[@sort]).includes(:parent).page(params[:page]).per(PAGE_SIZE)
   end
 
-  # Read-only hierarchy view: the curated genre tree, roots → descendants, for
-  # eyeballing the cultivation at a glance. Loads the whole placed taxonomy once
-  # (dispositions/aliases excluded — they sit outside the tree) and builds the
-  # parent→children map in memory, so the recursive render does no per-node query.
   def tree
     genres = Genre.where(hidden_at: nil, blocked_at: nil, ignored_at: nil, canonical_id: nil)
                   .by_name.to_a
     @children = genres.group_by(&:parent_id)
-    # A top-level genre is a tree *root* only if something points to it as a
-    # parent. This keeps the unplaced genres (parent_id nil, no children — the
-    # curation queue's backlog) out of the hierarchy view; they're summarised
-    # below and curated from the queue, not here.
     parents = @children.keys.compact.to_set
     @roots = (@children[nil] || []).select { |g| parents.include?(g.id) }
     @placed = Genre.placed.count
     @unplaced = Genre.unplaced.count
   end
 
-  # The curation queue: serve the single highest-impact genre not yet filed into
-  # the tree (unplaced = in use, no parent, no disposition), plus alias suggestions
-  # and the events it appears on. Placing/ignoring it returns here, surfacing the
-  # next one — a "tinder" flow.
   def queue
     @remaining = Genre.unplaced.count
     @genre = Genre.unplaced.by_usage.first
@@ -63,9 +44,6 @@ class GenresController < ApplicationController
     @sample_events = sample_events_for(@genre)
   end
 
-  # File a genre into the tree under a chosen parent. A blank parent makes it a
-  # top-level (root) genre. The
-  # combobox emits a single parent genre id. Rejects cycles (self/descendant).
   def set_parent
     Genre.find(params[:id]).set_parent!(genre_params[:parent_genre_id])
     redirect_to return_to
@@ -73,9 +51,6 @@ class GenresController < ApplicationController
     redirect_to return_to, alert: e.message
   end
 
-  # Selection chips for the per-event genre-override combobox (admin/events#show).
-  # The capture screen has its own endpoint for the same chips because an admin is
-  # deliberately not implied to be a contributor; both render shared/_genre_chips.
   def chips
     @genres = params[:combobox_values].to_s.split(",").filter_map { |name| name.strip.presence }.uniq
   end
@@ -100,8 +75,6 @@ class GenresController < ApplicationController
     redirect_to return_to
   end
 
-  # Fold this genre into a canonical one (a semantic alias the fingerprint can't
-  # catch). The combobox emits a single genre id.
   def merge
     canonical = Genre.find(genre_params[:canonical_genre_id])
     Genre.find(params[:id]).merge_into!(canonical)
@@ -114,16 +87,11 @@ class GenresController < ApplicationController
     params.expect(genre: %i[canonical_genre_id parent_genre_id])
   end
 
-  # Where to land after an action. Constrained to internal paths so the
-  # round-tripped value can't be turned into an open redirect.
   def return_to
     to = params[:return_to].to_s
     to.start_with?("/") ? to : genres_path
   end
 
-  # The two suggestion rows: tight Levenshtein near-spellings to merge, plus
-  # word-overlap "related genres" for filing (tighter parent / merge target).
-  # Related excludes anything already shown as an alias so the two never repeat.
   def load_suggestions
     @alias_suggestions = @genre ? AliasSuggester.call(@genre) : []
     @related_suggestions = @genre ? RelatedGenreSuggester.call(@genre, exclude: @alias_suggestions.map(&:id)) : []

@@ -1,15 +1,9 @@
 require "db_test_helper"
 
-# Locks the reframed web flow: the landing "Notify me" button (shown for any
-# signed-in user — an empty filter saves as the notify-on-everything rule), the
-# new-alert page (filter carried through + sync checkbox when it matches
-# favorites), create from filter params, the read-only list, and
-# fire/toggle/destroy. Email channel stays off.
 class SavedFiltersTest < ActionDispatch::IntegrationTest
   test "the save action shows for a signed-in user, empty filter included" do
     sign_in_as user
 
-    # An empty filter still offers to save — it's the notify-on-everything rule.
     get events_path
     assert_select "a.filter-menu__save"
 
@@ -26,8 +20,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get events_path
     assert_response :success
     assert_select "details.filter-menu"
-    # The apply item links to the full events URL for that filter (shareable; the
-    # same target as the /saved_filters "Apply" link).
     assert_select "a.filter-menu__apply[href=?]",
                   events_path(q: [], g: ["Rock"], l: ["Bern"], d: [])
   end
@@ -37,7 +29,7 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get events_path
     assert_select "details.filter-menu", true, "menu shows on an empty feed (save-everything)"
 
-    reset! # drop the session → signed out
+    reset!
     get events_path
     assert_select "details.filter-menu", false, "no menu for anonymous visitors"
   end
@@ -50,27 +42,23 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
   test "new (added filter) carries the filter through and wires the schedule form" do
     sign_in_as user
     leaf = genre_in_tree("Zylonew")
-    get new_saved_filter_path(g: [leaf.name]) # no date → added rule
+    get new_saved_filter_path(g: [leaf.name])
 
     assert_response :success
-    # The picked genre is pre-checked in the What tree; the window is the When panel.
     assert_select "input[name='g[]'][value='#{leaf.name}'][checked]"
     assert_select 'form[data-controller~="saved-filter-form"]'
     assert_select 'select[name="saved_filter[cadence]"][data-saved-filter-form-target="cadence"]'
     assert_select '[data-saved-filter-form-target="weekday"]'
-    # No name field — the name is the derived filter description, in the title.
     assert_select 'input[name="saved_filter[name]"]', false
     assert_select "h1", text: /Zylonew/
   end
 
   test "new (windowed filter) preselects the window and shows the firing-day picker" do
     sign_in_as user
-    get new_saved_filter_path(l: ["Bern"], d: ["this_weekend"]) # weekly window
+    get new_saved_filter_path(l: ["Bern"], d: ["this_weekend"])
 
     assert_response :success
     assert_select "section.sheet[data-field='when'] input[name='d[]'][value='this_weekend'][checked]"
-    # The cadence picker is always in the DOM (hidden client-side when windowed);
-    # the firing-day picker is present for the weekly rhythm.
     assert_select 'select[name="saved_filter[weekday]"]'
   end
 
@@ -79,11 +67,9 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     get new_saved_filter_path(d: %w[tomorrow this_weekend next_week])
 
     assert_response :success
-    # Single-select: only the first window is pre-checked, the others are not.
     assert_select "section.sheet[data-field='when'] input[name='d[]'][value='tomorrow'][checked]"
     assert_select "section.sheet[data-field='when'] input[name='d[]'][value='this_weekend'][checked]", false
     assert_select "section.sheet[data-field='when'] input[name='d[]'][value='next_week'][checked]", false
-    # The trigger badge reflects one window, not three.
     assert_select ".filter-trigger[data-filter-sheets-field-param='when'] .badge", text: "1"
   end
 
@@ -99,7 +85,7 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     end
 
     r = u.saved_filters.last
-    assert_redirected_to saved_filters_path # explicit Save → the Saved-filters list
+    assert_redirected_to saved_filters_path
     assert_equal 1050, r.time_of_day
     assert_equal ["Bern"], r.location_list
     assert_equal ["this_weekend"], r.date_ranges
@@ -109,8 +95,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
   test "create uses safe defaults — in-app on, push/email off" do
     u = sign_in_as user
 
-    # A draft saved with only the filter (no channel params) lands on the in-app
-    # channel only — notifying by default, but nothing intrusive.
     assert_difference -> { u.saved_filters.count }, 1 do
       post saved_filters_path, params: { q: ["Rock"] }
     end
@@ -138,7 +122,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     existing.filter_attributes = { q: ["Rock"], l: ["Bern"] }
     existing.save!
 
-    # Same filter set, order flipped → still the same rule.
     assert_no_difference -> { u.saved_filters.count } do
       post saved_filters_path, params: { l: ["Bern"], q: ["Rock"] }
     end
@@ -148,20 +131,16 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
   test "the save control is a single menu item: draft link when unsaved, edit link when saved" do
     u = sign_in_as user
 
-    # Unsaved: the menu's save item drafts a new saved filter from this filter.
     get events_path(g: ["Rock"])
     assert_select "a.filter-menu__save[href=?]", new_saved_filter_path(g: ["Rock"])
     assert_select "a.filter-menu__save.is-saved", false
 
-    # Saved (any kind): the active filter is now a saved one — the item links to its
-    # editor and the menu toggle shows the filled-funnel saved cue.
     r = u.saved_filters.new(name: "x", cadence: "daily", time_of_day: 540)
     r.filter_attributes = { g: ["Rock"] }
     r.save!
     get events_path(g: ["Rock"])
     assert_select "a.filter-menu__save.is-saved[href=?]", edit_saved_filter_path(r)
     assert_select ".filter-menu__toggle .funnel-fill"
-    # No separate notify control on the events page.
     assert_select "a.notify-bell-link", false
   end
 
@@ -174,10 +153,8 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
 
     get edit_saved_filter_path(r)
     assert_response :success
-    # The saved genre is pre-checked in the What tree; the window is the When panel.
     assert_select "input[name='g[]'][value='#{leaf.name}'][checked]"
     assert_select "section.sheet[data-field='when'] input[name='d[]']"
-    # No name field; the derived name is the (server-rendered) page title.
     assert_select 'input[name="saved_filter[name]"]', false
     assert_select "h1", text: /Zyloedit/
   end
@@ -188,13 +165,12 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     r.filter_attributes = { g: ["Rock"] }
     r.save!
 
-    # The What tree submits genre picks as g[] and free text as q[].
     patch saved_filter_path(r), params: {
       saved_filter: { cadence: "daily", time_string: "09:00" },
       g: %w[Rock Jazz], q: ["Radiohead"], l: [""], d: [""]
     }
 
-    assert_redirected_to saved_filters_path # explicit save returns to the list
+    assert_redirected_to saved_filters_path
     r.reload
     assert_equal %w[Rock Jazz], r.genres
     assert_equal ["Radiohead"], r.queries
@@ -209,12 +185,9 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     b.filter_attributes = { g: ["Jazz"] }
     b.save!
 
-    # Editing B's scope to match A is now blocked (duplicate fingerprints break the
-    # events-page "saved?" match) — not applied, re-renders the editor.
     patch saved_filter_path(b), params: { g: ["Rock"], l: [""], d: [""] }
     assert_response :unprocessable_entity
-    assert_equal ["Jazz"], b.reload.genres # unchanged
-    # The re-rendered editor surfaces the heads-up linking to A.
+    assert_equal ["Jazz"], b.reload.genres
     assert_select ".saved-filter-notice a[href=?]", edit_saved_filter_path(a)
   end
 
@@ -248,17 +221,16 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     assert_equal 2, r.weekday
     assert_equal 495, r.time_of_day
     assert r.notify_email?
-    assert_equal ["Rock"], r.genres # filter untouched
+    assert_equal ["Rock"], r.genres
   end
 
   test "update with a windowed filter flips an added rule to happening" do
     u = sign_in_as user
     r = u.saved_filters.new(cadence: "weekly", weekday: 5, time_of_day: 1050)
-    r.filter_attributes = { g: ["Rock"] } # no date → added
+    r.filter_attributes = { g: ["Rock"] }
     r.save!
     assert r.added?
 
-    # Selecting a window in the form flips the rule to happening.
     patch saved_filter_path(r), params: {
       saved_filter: { cadence: "weekly", weekday: "5", time_string: "17:30" },
       g: ["Rock"], d: ["this_weekend"]
@@ -289,10 +261,8 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
 
     get saved_filters_path
     assert_response :success
-    # The name is the derived filter description (no custom names), and the name
-    # itself is the link to the editor (no separate Bearbeiten button in the row).
     assert_select ".saved-filter-card .saved-filter-card__name", /Dachstock/
-    assert_select ".saved-filter-card__actions form" # fire/toggle/delete
+    assert_select ".saved-filter-card__actions form"
     assert_select "a.saved-filter-card__name[href=?]", edit_saved_filter_path(r)
   end
 
@@ -307,7 +277,7 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     assert_difference -> { u.notifications.count }, 1 do
       post fire_saved_filter_path(r)
     end
-    assert_redirected_to notification_path(u.notifications.last) # lands on the digest
+    assert_redirected_to notification_path(u.notifications.last)
   end
 
   test "fire with no matches stays on the list with an empty notice" do
@@ -351,9 +321,6 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
 
   private
 
-  # A genre that actually renders in the editor's What tree: a root (no events) with
-  # one in-use child, so genre_filter_tree includes it and the child is checkable.
-  # Returns the child (the leaf you filter by).
   def genre_in_tree(name)
     root = genre(name: "#{name}root", events_count: 0)
     leaf = genre(name: name, events_count: 1)

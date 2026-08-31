@@ -1,9 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="reminder" on the saved-shows day-of reminder
-// toggle. Like save_controller: optimistically keep the checkbox where the user
-// put it, persist in the background, revert on failure. The checkbox IS the
-// state, so there's no separate value to track.
 export default class extends Controller {
   static targets = ["checkbox"]
 

@@ -1,17 +1,3 @@
-<%#
-  Reusable copyable field: a read-only input holding `value` plus a Copy button,
-  wired to the shared `clipboard` Stimulus controller (one click copies; tapping
-  the field selects all for manual copy as a fallback). Used for shareable URLs —
-  the ICS subscription feed and signup invite links.
-
-  Locals:
-    value:   — the text shown and copied (required)
-    label:        — optional field-label rendered above the field
-    lead_actions: — optional buttons (captured markup) rendered BEFORE Copy, for a
-                    caller's primary action (e.g. the calendar Subscribe button)
-    actions:      — optional extra buttons (captured markup) rendered AFTER Copy, so
-                    caller actions (e.g. regenerate/remove) read as one group
-%>
 <div class="copy-field" data-controller="clipboard"
      data-clipboard-copied-value="<%= t('copy_field.copied') %>">
   <% if local_assigns[:label].present? %>

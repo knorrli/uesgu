@@ -3,8 +3,6 @@ class CreateScrapeResults < ActiveRecord::Migration[8.0]
     create_table :scrape_results do |t|
       t.references :scrape_run, null: false, foreign_key: { on_delete: :cascade }
       t.string :scraper, null: false
-      # ok = wrote >=1 event; empty = ran clean but wrote none (silent
-      # regression); failed = raised out of the scraper (site down etc.).
       t.string :status, null: false
       t.datetime :started_at
       t.integer :duration_ms

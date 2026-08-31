@@ -1,36 +1,19 @@
 require "test_helper"
 
-# Focused parser test for the generic OLE adapter. The shared golden harness
-# assumes one HTML list page per venue; OLE is XML + pagination + one-event-to-
-# many-shows + per-event aggregator locations, none of which that harness models,
-# so OLE gets its own fixtures + asserts (same call as Petzi/Schüür).
-#
-# Fixtures + taxonomy are synthetic (project-test-synthetic-taxonomy): invented
-# venue, artist and genre names, never real catalogue content.
 class Scrapers::OleTest < Minitest::Test
   FIXTURES = File.expand_path("../../fixtures/scrapers/ole", __dir__)
-  # Pin "today" so the date filter is deterministic regardless of when the suite
-  # runs (same device as the golden harness's REFERENCE_DATE).
   TODAY = Date.new(2026, 6, 10)
 
-  # Isolated source classes built from the SAME factory the shipping loop uses,
-  # so the parser is tested independently of which live feeds are currently
-  # enabled (e.g. the only aggregator, BeJazz, is deferred for robots reasons).
   def single_venue
     Scrapers::Ole.build(key: "Klangkeller", feed_url: "https://venue.example/oleexport",
                         place: ["Klangkeller", "Bern", "BE"])
   end
 
-  # :lenient so the parse-focused tests below see EVERY resolved event regardless of
-  # whether its (synthetic) venue is approved in the registry. The :strict gate is
-  # exercised separately (test_strict_gate_*).
   def aggregator
     Scrapers::Ole.build(key: "TestAgg", feed_url: "https://agg.example/oleexport",
                         aggregator: true, gate: :lenient)
   end
 
-  # An editorial aggregator that keys + links on the per-event <source_url>
-  # instead of the venue homepage <url> (Bewegungsmelder-shaped).
   def source_aggregator
     Scrapers::Ole.build(key: "TestSrc", feed_url: "https://bm.example/oleexport",
                         aggregator: true, link_via: :source, gate: :lenient)
@@ -39,18 +22,12 @@ class Scrapers::OleTest < Minitest::Test
   def test_single_venue_paginates_filters_and_expands
     events = run_offline(single_venue, "single_page1.xml", "single_page2.xml")
 
-    # A (1 future show; its 2020 show dropped) + B (2 future shows) + C (page 2).
-    # "Has Been Trio" (all-past) contributes nothing. Wibble Trio appearing at all
-    # proves page 2 was fetched (pagination), not just page 1.
     assert_equal ["Zorptron Quartet", "Glorptet", "Glorptet", "Wibble Trio"],
                  events.map(&:title)
 
     refute(events.any? { |e| e.title == "Has Been Trio" }, "an all-past event must be dropped entirely")
   end
 
-  # Newest-first feeds dump full history behind the upcoming events; stop once
-  # STOP_AFTER_EMPTY_PAGES consecutive pages yield no upcoming row so we don't
-  # page through years of past-only events. (Real feeds: 25 pages → ~8.)
   def test_pagination_stops_after_consecutive_past_only_pages
     events = run_offline(single_venue,
                          "paginate_future.xml",
@@ -62,9 +39,6 @@ class Scrapers::OleTest < Minitest::Test
                      "must bail after the past-only tail, never reaching the 5th page"
   end
 
-  # Safety for oldest-first feeds: leading past-only pages must NOT trip the
-  # early-exit — we've collected nothing yet, so the rows.any? guard keeps paging
-  # until the upcoming events at the tail.
   def test_pagination_keeps_going_through_leading_past_pages
     events = run_offline(single_venue,
                          "paginate_empty.xml", "paginate_empty.xml", "paginate_empty.xml",
@@ -78,46 +52,35 @@ class Scrapers::OleTest < Minitest::Test
     by_title = events.index_by(&:title)
 
     a = by_title["Zorptron Quartet"]
-    assert_equal "Zorptron Quartet", a.title           # source had "Zorptron Quartet:"
-    # <lead>, kept because the event has a <description>; HTML entity decoded.
+    assert_equal "Zorptron Quartet", a.title
     assert_equal "with Blip & Collective", a.description
   end
 
-  # The description gate: an event whose <description> is just a stray <br/> is a
-  # bare listing, so its <lead> is the generic venue blurb and must be dropped.
   def test_lead_dropped_when_description_is_empty
     events = run_offline(single_venue, "single_page1.xml", "single_page2.xml")
     wibble = events.find { |e| e.title == "Wibble Trio" }
     assert_nil wibble.description, "no real <description> → venue-blurb <lead> is gated out"
   end
 
-  # The frequency filter: even when <description> is populated (so the gate above
-  # passes), a <lead> the feed repeats across REPEAT_DROP_THRESHOLD+ events is a
-  # house blurb, not per-event copy, and must be dropped — while a genuinely shared
-  # festival blurb (below threshold) and unique copy both survive.
   def test_repeated_house_blurb_dropped_but_low_repeat_and_unique_kept
     by_title = run_offline(single_venue, "repeated_blurb.xml").index_by(&:title)
 
-    # 5 events share the house blurb -> dropped despite each having a <description>.
     %w[One Two Three Four Five].each do |n|
       assert_nil by_title["Echo #{n}"].description,
                  "a lead repeated across >= #{Scrapers::Ole::REPEAT_DROP_THRESHOLD} events is a house blurb"
     end
 
-    # The festival blurb appears on only 2 days (below threshold) -> kept.
     assert_equal "Das Glorpfest kehrt zurueck mit drei Tagen Programm.",
                  by_title["Glorpfest Day One"].description
     assert_equal "Das Glorpfest kehrt zurueck mit drei Tagen Programm.",
                  by_title["Glorpfest Day Two"].description
 
-    # A unique per-event lead -> kept.
     assert_equal "Original per-event copy that appears exactly once.",
                  by_title["Wibble Trio"].description
   end
 
   def test_past_shows_are_dropped_but_future_kept
     a = run_offline(single_venue, "single_page1.xml", "single_page2.xml").first
-    # Only the 2026-07-01 show survives the 2020-01-15 drop.
     assert_equal "2026-07-01 20:30", a.start_time.strftime("%Y-%m-%d %H:%M")
     assert_equal Date.new(2026, 7, 1), a.start_date
   end
@@ -135,7 +98,6 @@ class Scrapers::OleTest < Minitest::Test
 
   def test_event_url_is_the_venue_not_the_ticket_mirror
     events = run_offline(single_venue, "single_page1.xml", "single_page2.xml")
-    # <ticket_url> points at eventfrog.ch — it must never become the event URL.
     refute(events.any? { |e| e.url.include?("eventfrog") },
            "the canonical URL must be the venue <url>, never the <ticket_url> mirror")
     assert(events.all? { |e| e.url.start_with?("https://venue.example/") })
@@ -152,14 +114,10 @@ class Scrapers::OleTest < Minitest::Test
     events = run_offline(aggregator, "aggregator.xml")
     by_title = events.index_by(&:title)
 
-    # 3011 → BE, 3920 → VS (deliberately non-Bern, proving it isn't hard-wired).
     assert_equal ["Marians Jazzroom", "Bern", "BE"], by_title["Snarftet plays Florp"].location_list
     assert_equal ["Vernissage Halle", "Zermatt", "VS"], by_title["Bergglorp Ensemble"].location_list
   end
 
-  # Two different events at the SAME venue homepage on the SAME night: keying on
-  # <url>+date would collide them into one, so the per-event <source_url> is the
-  # only safe upsert key. Also proves the HTML char-ref in the URL is decoded.
   def test_source_linked_aggregator_keys_on_decoded_source_url
     events = run_offline(source_aggregator, "source_keyed.xml")
 
@@ -172,7 +130,6 @@ class Scrapers::OleTest < Minitest::Test
                  "same-venue/same-night events must get distinct keys via <source_url>"
   end
 
-  # A multi-show event still gets one distinct key per show (source_url + date).
   def test_source_linked_multi_show_keys_stay_distinct
     events = run_offline(source_aggregator, "source_keyed.xml")
     snarf = events.select { |e| e.title == "Snarfwave" }
@@ -181,8 +138,6 @@ class Scrapers::OleTest < Minitest::Test
                  snarf.map(&:url).sort
   end
 
-  # When the aggregator's <url> IS a genuine per-event deep link, link there
-  # (the venue) rather than the aggregator's own <source_url>.
   def test_source_linked_prefers_a_real_venue_deep_link_over_source_url
     events = run_offline(source_aggregator, "source_keyed.xml")
     florp = events.find { |e| e.title == "Florpcore Festival" }
@@ -190,8 +145,6 @@ class Scrapers::OleTest < Minitest::Test
                  "a digit-bearing venue deep link is preferred over <source_url>"
   end
 
-  # A category shipping "&amp;" literally inside its CDATA must be entity-decoded,
-  # not minted as the junk genre "Speis &Amp; Trank".
   def test_category_html_entities_are_decoded
     events = run_offline(source_aggregator, "source_keyed.xml")
     florp = events.find { |e| e.title == "Florpcore Festival" }
@@ -199,8 +152,6 @@ class Scrapers::OleTest < Minitest::Test
     refute(florp.genre_list.any? { |g| g.include?("amp;") }, "no raw HTML entity may leak into a genre")
   end
 
-  # A locality the feed mis-tags via a wrong PLZ is corrected to its real canton
-  # (Wabern → BE, not VS as PLZ 3984/Fiesch would resolve).
   def test_locality_canton_fix_overrides_a_wrong_plz
     s = aggregator.new
     node = Nokogiri::XML(<<~XML).remove_namespaces!.at_css("event")
@@ -224,7 +175,6 @@ class Scrapers::OleTest < Minitest::Test
     assert_equal "https://x.example/y#show-2026-07-01", url
   end
 
-  # gate defaults to :strict in Scrapers::Ole.build.
   def strict_aggregator
     Scrapers::Ole.build(key: "TestStrict", feed_url: "https://s.example/oleexport", aggregator: true)
   end
@@ -242,7 +192,7 @@ class Scrapers::OleTest < Minitest::Test
   end
 
   def test_lenient_gate_keeps_an_unapproved_venue
-    s = aggregator.new # gate: :lenient
+    s = aggregator.new
     refute s.send(:skip_row?, row_for("Totally Unknown Venue 9000")),
            ":lenient ingests unapproved venues too"
   end
@@ -272,10 +222,6 @@ class Scrapers::OleTest < Minitest::Test
 
   private
 
-  # Drive #process_events fully offline. `get` serves the next fixture page from a
-  # queue (so following <meta><next_url> just pops page 2), `page` returns the
-  # current one, and the DB-touching genre/visibility derivation is no-op'd —
-  # exactly the seams the golden + Schüür harnesses stub.
   Capture = Struct.new(:url) do
     def new_record? = true
     def id = nil

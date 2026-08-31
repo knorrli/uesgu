@@ -1,29 +1,5 @@
 # frozen_string_literal: true
 
-# FEED DISCOVERY — reconnaissance, NOT wired into the app. Persists nothing.
-#
-# Run:
-#   ruby script/feed_discovery.rb                      # sweep every domain in the venue ledger
-#   ruby script/feed_discovery.rb mokka.ch onobern.ch  # recon arbitrary candidate domains
-#   ruby script/feed_discovery.rb --js                 # only ledger rows rejected js_only / no_date
-#
-# Point it at any venue/aggregator domain and it probes for a MACHINE-READABLE
-# event source we could ingest WITHOUT running JS — and stays on the right side of
-# our ethics line: documented / public interfaces only, never a reverse-engineered
-# private backend (cf. Heitere Fahne's undocumented /ajax/). Signals, strongest first:
-#
-#   ★ iCal / .ics        — carries real start TIMES (our perennial gap)
-#   ★ WP REST API        — The Events Calendar /wp-json/tribe/events/v1/events &c.
-#   ★ schema.org/Event   — JSON-LD embedded in server-rendered HTML
-#   ✓ RSS / Atom         — cheap to check; often timeless
-#   ✓ sitemap.xml        — enumerates detail URLs even when the listing is JS
-#
-# Also reports robots posture, including an AI/bot opt-out flag — we honour a site's
-# stated intent (cf. bka.ch), not just whether a rule happens to name our UA.
-#
-# Politeness: honest UA, robots respected, sequential, throttled. Like petzi_poc.rb,
-# this is a POC — read the output, make the call, record it in config/venue_ledger.yml.
-
 require 'mechanize'
 require 'json'
 require 'yaml'
@@ -31,17 +7,13 @@ require 'date'
 
 UA       = 'uesgu-discovery/1.0 (+https://uesgu.ch; event-feed reconnaissance)'
 LEDGER   = File.expand_path('../config/venue_ledger.yml', __dir__)
-THROTTLE = 0.4 # seconds between requests to one host
+THROTTLE = 0.4
 
-# Candidate paths. These are plugin/CMS CONVENTIONS, not guesses at private routes.
 ICS_PATHS = ['/events/?ical=1', '/?ical=1', '/event/?ical=1',
              '/agenda/?ical=1', '/?post_type=tribe_events&tribe-bar-date=&ical=1'].freeze
 RSS_PATHS = ['/feed/', '/events/feed/', '/agenda/feed/', '/?feed=rss2', '/blog/feed/'].freeze
 SITEMAPS  = ['/sitemap.xml', '/sitemap_index.xml', '/wp-sitemap.xml'].freeze
 
-# WP event plugins keyed by their post-type slug (read from /wp-json/wp/v2/types).
-# Only The Events Calendar exposes a clean public REST collection; the rest we flag
-# so a human knows what they're looking at (EventON/MEC hide data behind admin-ajax).
 WP_EVENT_PLUGINS = {
   'tribe_events' => ['The Events Calendar', '/wp-json/tribe/events/v1/events?per_page=3', :rest],
   'mec-events'   => ['Modern Events Calendar', nil, :ajax],
@@ -53,7 +25,6 @@ WP_EVENT_PLUGINS = {
 
 EVENT_LINK_RX = %r{/(agenda|programm?|events?|konzerte?|veranstaltung|termine?|daten|spielplan|gigs?|shows?)\b}i
 
-# AI/crawler UAs whose blanket Disallow we treat as a "don't ingest" intent signal.
 AI_BOTS = %w[ClaudeBot GPTBot CCBot Google-Extended anthropic-ai PerplexityBot Applebot-Extended Bytespider].freeze
 
 Fetched = Struct.new(:url, :code, :type, :body, :error, keyword_init: true) do
@@ -113,7 +84,7 @@ def classify_tribe(f)
   return nil unless f.ok? && f.type =~ /json/i
 
   data = JSON.parse(f.body) rescue (return nil)
-  return nil unless data.is_a?(Hash) # Tribe envelope; a bare Array is a wp/v2 CPT
+  return nil unless data.is_a?(Hash)
 
   events = data['events']
   return nil unless events.is_a?(Array) && events.any?
@@ -175,7 +146,6 @@ def analyze_robots(base)
   return { ok: false } unless f.ok?
 
   sitemaps = f.body.scan(/^\s*Sitemap:\s*(\S+)/i).flatten
-  # Any AI bot named in a User-agent block that also carries a blanket Disallow: / ?
   ai_block = nil
   current  = []
   after_rule = false
@@ -195,7 +165,6 @@ def analyze_robots(base)
   { ok: true, sitemaps: sitemaps.uniq, ai_block: ai_block }
 end
 
-# First usable sitemap → its <loc> list (descends one level into a sitemapindex).
 def first_sitemap(base, rob)
   urls = rob[:sitemaps].to_a.empty? ? SITEMAPS.map { |p| base + p } : rob[:sitemaps]
   urls.first(3).each do |sm|
@@ -212,8 +181,6 @@ def first_sitemap(base, rob)
   [nil, []]
 end
 
-# Event DETAIL URLs from a sitemap: an event-ish path with a child segment
-# (…/collection/slug), i.e. a single-event page rather than the listing root.
 def event_detail_urls(locs)
   locs.select do |u|
     next false unless u =~ EVENT_LINK_RX
@@ -225,7 +192,7 @@ end
 
 def recon(domain, label)
   base = "https://#{domain}"
-  hits = [] # [tier, text] ; tier: :time (★) > :weak (✓)
+  hits = []
   add  = ->(tier, text) { hits << [tier, text] if text }
 
   rob = analyze_robots(base)
@@ -240,7 +207,6 @@ def recon(domain, label)
 
   sm_url, sm_locs = first_sitemap(base, rob)
 
-  # homepage + one discovered events/agenda page
   home  = fetch(base)
   pages = [home].compact
   cms   = nil
@@ -256,7 +222,6 @@ def recon(domain, label)
     end
   end
 
-  # JSON-LD Event across fetched HTML pages + autodiscovery links
   disco = { rss: [], ics: [], json: [] }
   ld    = []
   pages.each do |pg|
@@ -275,7 +240,6 @@ def recon(domain, label)
   add.call(:weak, "autodiscovery → RSS #{disco[:rss].first}") if disco[:rss].any?
   add.call(:time, "autodiscovery → iCal #{disco[:ics].first}") if disco[:ics].any?
 
-  # iCal probes (declared links first, then conventions)
   ical_urls = (disco[:ics].map { |h| h.start_with?('http') ? h : "#{base}#{h}" } +
                ICS_PATHS.map { |p| base + p }).uniq.first(6)
   ical_urls.each do |u|
@@ -286,19 +250,17 @@ def recon(domain, label)
     break
   end
 
-  # WP REST: read post types, map to a known event plugin, hit its collection
   if cms == 'WordPress' || home.body.to_s =~ %r{/wp-json}
     types = fetch("#{base}/wp-json/wp/v2/types")
     if types.ok? && (j = (JSON.parse(types.body) rescue nil))
       (j.keys & WP_EVENT_PLUGINS.keys).each do |slug|
         name, route, kind = WP_EVENT_PLUGINS[slug]
         if slug == 'tribe_events'
-          d = classify_tribe(fetch(base + route)) # real event start_date envelope
+          d = classify_tribe(fetch(base + route))
           add.call(d ? :time : :weak, "wp-rest: #{name} → #{d || 'route present'}")
         elsif kind == :rest && route
           r = fetch(base + route)
           live = r.ok? && ((JSON.parse(r.body) rescue nil).is_a?(Array))
-          # wp/v2 CPT carries the POST date, not the event date (cf. ONO no_date).
           add.call(:weak, "wp-rest: #{name} → #{live ? 'collection live (post dates — verify event date)' : 'route present'}")
         else
           add.call(:weak, "wp: #{name} detected (#{kind} — no clean public REST)")
@@ -307,10 +269,6 @@ def recon(domain, label)
     end
   end
 
-  # Sample an event DETAIL page from the sitemap for server-rendered Event JSON-LD.
-  # This is the robots-clean path that flips many "js_only" listings: even when the
-  # listing renders client-side, detail pages are usually SSR'd with schema.org/Event
-  # (e.g. every Squarespace event page). Only worth it if we've no time signal yet.
   unless hits.any? { |t, _| t == :time }
     event_detail_urls(sm_locs).first(3).each do |u|
       pg = fetch(u)
@@ -324,12 +282,8 @@ def recon(domain, label)
     end
   end
 
-  # Squarespace's ?format=json / ?format=ical carry the whole programme with times,
-  # but its default robots.txt disallows them for every UA — flag it as an opt-out
-  # option (cf. Bad Bonn), since the detail-page JSON-LD above is the clean route.
   add.call(:weak, 'squarespace: ?format=json/ical feed exists but robots-disallowed by default (opt-out option)') if cms == 'Squarespace'
 
-  # RSS conventions (only if autodiscovery found none)
   if disco[:rss].empty?
     RSS_PATHS.each do |p|
       desc = classify_rss(fetch(base + p))
@@ -340,7 +294,6 @@ def recon(domain, label)
     end
   end
 
-  # sitemap → event-ish URL count (fetched once, above)
   if sm_locs.any?
     evs = sm_locs.count { |u| u =~ EVENT_LINK_RX }
     add.call(:weak, "sitemap #{sm_url}  (#{sm_locs.size} URLs, ~#{evs} event-ish)")

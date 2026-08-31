@@ -1,6 +1,3 @@
-# Preview at http://localhost:3000/rails/mailers/notification_mailer/digest
-# Builds an unsaved digest from real visible events so you can eyeball the layout
-# without firing anything.
 class NotificationMailerPreview < ActionMailer::Preview
   def digest
     user = User.first || User.new(username: "preview", locale: "de")
@@ -14,7 +11,7 @@ class NotificationMailerPreview < ActionMailer::Preview
       period_start: 1.week.ago,
       period_end: Time.current
     )
-    notification.id = 0 # let notification_url resolve in the preview
+    notification.id = 0
 
     NotificationMailer.digest(notification)
   end

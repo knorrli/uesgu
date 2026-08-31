@@ -56,10 +56,10 @@ class ScrapeRunTest < ActiveSupport::TestCase
     prev.scrape_results.create!(scraper: "chronic", status: :empty)
 
     run = finished_run(Time.zone.local(2030, 1, 2))
-    run.scrape_results.create!(scraper: "steady",  status: :ok)    # still fine
-    run.scrape_results.create!(scraper: "broke",   status: :empty) # silent drop
-    run.scrape_results.create!(scraper: "chronic", status: :empty) # empty both runs
-    run.scrape_results.create!(scraper: "fresh",   status: :empty) # no baseline
+    run.scrape_results.create!(scraper: "steady",  status: :ok)
+    run.scrape_results.create!(scraper: "broke",   status: :empty)
+    run.scrape_results.create!(scraper: "chronic", status: :empty)
+    run.scrape_results.create!(scraper: "fresh",   status: :empty)
 
     assert_equal %w[broke], run.dropped_to_zero
   end

@@ -1,24 +1,9 @@
 # frozen_string_literal: true
 
-# PROOF OF CONCEPT — not wired into the app. Run with: ruby script/petzi_poc.rb
-#
-# Demonstrates that the PETZI federation agenda (petzi.ch) is a clean, uniform,
-# robots-allowed, server-rendered source covering ~15 of our venues, exposing
-# date + DOORS/SHOW clock time + curated genre tags from a single schema.
-#
-# Pipeline mirrors what a real Scrapers::Petzi (template-method Agent) would do:
-#   1. fetch the EN sitemap.xml -> enumerate every /events/ URL (one per show)
-#   2. filter to our target venues by URL slug
-#   3. fetch each detail page (server-rendered HTML, no JS) and extract fields
-#
-# Politeness: one event per venue, sequential, honest uesgu/1.0 UA, robots on.
-
 require 'mechanize'
 
 SITEMAP = 'https://www.petzi.ch/en/sitemap.xml'
 
-# PETZI member venues that are on our roster, keyed by the slug fragment PETZI
-# uses in its event URLs (…/events/{id}-{venue-slug}-{title-slug}/).
 TARGET_VENUES = {
   'dachstock'           => 'Dachstock (Bern)',
   'isc'                 => 'ISC (Bern)',
@@ -43,7 +28,6 @@ end
 
 def squish(str) = str.to_s.gsub(/\s+/, ' ').strip
 
-# "Malevolence / 17.06.2026 / Kulturfabrik Kofmehl - Solothurn / PETZI"
 def parse_title_bar(text)
   parts = squish(text).split(' / ')
   date = parts.find { |p| p =~ %r{\A\d{2}\.\d{2}\.\d{4}\z} }

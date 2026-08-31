@@ -1,21 +1,6 @@
-# A daily nudge about the shows a user has saved. Unlike a SavedFilter
-# (a saved filter + schedule), this is a single global opt-in: once a day, around
-# the user's chosen time (noon by default), if any saved show falls on the target
-# day (day-of by default), send one digest.
-#
-# It fires at a fixed wall-clock time, so an event whose start time the scraper
-# couldn't read (stored as nil / midnight) is no problem — the nudge doesn't
-# depend on the show's own time.
-#
-# Reuses the notification stack: it creates a Notification (so it lands in the
-# inbox) and delivers over whatever channels the user has — push to their
-# devices, email if they've added an address.
 class EventReminder
-  DEFAULT_TIME = 12 * 60 # noon, minutes since midnight
+  DEFAULT_TIME = 12 * 60
 
-  # Sweep every reminder-enabled user, firing those past their time today that
-  # haven't fired yet. Idempotent via last_reminded_on, so the quarter-hourly
-  # cron can re-run safely. Returns the Notifications created.
   def self.run_due!(now = Time.current)
     User.where(event_reminders: true).find_each.filter_map do |user|
       new(user, now).fire_if_due!
@@ -34,9 +19,6 @@ class EventReminder
     @now >= scheduled_at(@now.to_date)
   end
 
-  # Fire if due, then mark today done either way (we evaluated today; the nudge is
-  # a once-a-day digest, not a running watch). Returns the Notification, or nil
-  # when nothing was due / nothing matched.
   def fire_if_due!
     return unless due?
 
@@ -46,15 +28,6 @@ class EventReminder
     notification
   end
 
-  # Saved shows on the target day. Narrowed to Event.visible so the firing set
-  # matches what every consumer later recomputes (Notification#events, the
-  # mailer, the inbox) — otherwise a saved duplicate merged into a canonical
-  # (canonical_event_id set), or an event since hidden/discarded, would be
-  # counted in the frozen title + event_ids but dropped downstream, so the
-  # header ("3 ... stehen an") would disagree with the body/list ("2 für dich").
-  # Also drops cancelled shows (no point reminding about a show that's off);
-  # visible keeps cancelled events, so that filter stays explicit. Public for
-  # the controller's "preview".
   def target_events
     @user.saved_events
          .merge(Event.visible)
@@ -98,7 +71,6 @@ class EventReminder
     @user.push_subscriptions.find_each { |sub| sub.deliver(title: title, body: body, path: path) }
   end
 
-  # Isolated so a bad address / SMTP hiccup can't abort the firing (or the sweep).
   def deliver_email(note)
     return unless MailConfig.configured? && @user.email_address.present?
 

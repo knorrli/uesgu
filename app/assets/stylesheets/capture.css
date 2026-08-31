@@ -1,62 +1,34 @@
-/* The capture screen: pick posters or paste text, then decide one card at a time.
-   Deliberately plain — every box on it is something a human is about to correct.
-   The card frame itself is shared: see review_card.css. */
-
-/* Declared on the screen rather than on the strip: the open card sits in a different
-   subtree and needs the strip's height as scroll clearance (see .capture-card). */
 .capture {
   --queue-tile-size: 3.25rem;
 }
 
-/* The typing way in: the same shape as the drop target above it — a box, then a pill
-   at the trailing edge — so the two ways onto the screen read as a pair. */
 .capture-text {
   display: flex;
   flex-direction: column;
   gap: var(--gap-small);
 }
 
-/* The one boxed field on the site. The .account-form underline is legible in a stack
-   of sibling fields, where the rhythm is what says "these are inputs"; standing alone
-   beside a drop target, an empty four-row box shows only a rule 90px below its label
-   and reads as a section divider. The border is solid where the target's is dashed —
-   see drop_zone.css, which keeps the only dashed edge on the site precisely so a
-   target is never mistaken for a field. */
 .capture-text textarea {
   padding: var(--gap-small) var(--gap-medium);
   border: var(--border-width) solid var(--field-border-color);
 }
 
-/* .account-form turns only the underline accent on focus; with four borders that
-   would light one edge of the box. */
 .capture-text textarea:focus {
   border-color: var(--theme-accent-color);
 }
 
-/* Its own width at the column's edge: a direct child stretches, and a full-width pill
-   reads as a commit for the screen rather than for this one field. Left, like every
-   other action row on the site — see .form-actions in controls.css, which reserves the
-   far end for pushing a destructive button away from the safe ones. */
 .capture-text > button {
   align-self: flex-start;
 }
 
-/* A row whose card is hidden — decided, or simply not the open one — is a zero-height
-   flex item that still draws the column's gap above it, and a batch of six stacks six
-   of those between the strip and whatever is open. */
 .capture-row:not(:has(> :not([hidden]))) {
   display: none;
 }
 
-/* The strip is sticky, so a card scrolled into view lands underneath it unless the card
-   reserves the strip's own height as clearance. */
 .capture-card {
   scroll-margin-top: calc(var(--queue-tile-size) + 2 * var(--gap-small));
 }
 
-/* One input's outcome that never became a card. Its label — a filename, or the head
-   of the pasted text — is what ties it back to the input it came from while several
-   are in flight. */
 .capture-row {
   display: flex;
   flex-direction: column;
@@ -67,16 +39,11 @@
   color: var(--theme-warn-color);
 }
 
-/* The row's only line while a read is in flight, so it is set at the size of a
-   statement rather than the size of an aside. */
 .capture-row [data-pending] {
   margin: 0;
   font-size: var(--font-size-lg);
 }
 
-/* The same cap a poster takes, declared on .review-card__source: a source is a look at
-   what the card was read from, and a long paste is no more entitled to the screen than
-   a tall poster. */
 .capture-row__excerpt {
   margin: 0;
   max-height: var(--source-max-height);
@@ -88,9 +55,6 @@
   white-space: pre-wrap;
 }
 
-/* Sticky because the tile is the receipt: accepting publishes and moves on, so the
-   strip is the only place a decided card still exists. The one thing on this screen
-   that holds still — everything below it is an ordinary scrolling page. */
 .capture-queue {
   position: sticky;
   top: 0;
@@ -102,17 +66,12 @@
   background: var(--theme-bg-color);
 }
 
-/* Keep the strip's gap between groups unmistakably larger than this one inside them:
-   the grouping is all that says two tiles came off one poster (see
-   app/javascript/controllers/capture_controller.js), and a reader who cannot see it
-   is back to two cards that look duplicated. */
 .capture-queue__group {
   display: flex;
   flex: 0 0 auto;
   gap: 1px;
 }
 
-/* Out-specifies the boxed <button> base rather than relying on stylesheet order. */
 button.capture-queue__tile {
   position: relative;
   flex: 0 0 auto;
@@ -130,8 +89,6 @@ button.capture-queue__tile.is-current {
   border-color: var(--theme-accent-color);
 }
 
-/* Standing in for cards that have not landed yet — it already carries the source, so
-   the strip is the full count from the moment the batch is sent. */
 button.capture-queue__tile[data-state="pending"] {
   opacity: 0.5;
   border-style: dashed;
@@ -152,10 +109,6 @@ button.capture-queue__tile[data-state="pending"] {
   overflow: hidden;
 }
 
-/* Two candidates off one poster are the same picture twice, so the number is the only
-   thing on a tile that tells them apart — and the only thing tying the strip to the
-   count in the heading. Its own ground because a poster is arbitrary underneath, and
-   above the decided mark and in the opposite corner, that mark covering the tile. */
 .capture-queue__tile::before {
   content: attr(data-index);
   position: absolute;
@@ -169,10 +122,6 @@ button.capture-queue__tile[data-state="pending"] {
   line-height: 1.3;
 }
 
-/* The verdict covers the whole tile rather than tucking into a corner. At 3.25rem
-   square a corner mark is a squint, and scanning for what is already decided is the
-   only reason the strip outlives the cards. Covering the poster is the point: a tile
-   still worth looking at is one that has not been decided. */
 .capture-queue__tile .ph {
   position: absolute;
   inset: 0;
@@ -183,23 +132,16 @@ button.capture-queue__tile[data-state="pending"] {
   color: var(--theme-on-accent);
 }
 
-/* Warn, because a drop is the destructive half of the pair — and one of the few
-   places the palette's rare red is earned. */
 .capture-queue__tile[data-state="dropped"] .ph {
   background: var(--theme-warn-color);
   color: var(--theme-bg-color);
 }
 
-/* Off the verdict colours entirely: an input that came back with nothing was not
-   judged by anyone, and green/red are for the two answers a contributor gave. */
 .capture-queue__tile[data-state="failed"] .ph {
   background: var(--theme-bg-muted);
   color: var(--theme-fg-muted);
 }
 
-/* Names the input on the rows that still have to say WHICH one they are about — a
-   failure, an empty read — and an uploaded filename runs long enough to push that
-   line ragged. */
 .capture-row__label {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -218,8 +160,6 @@ button.capture-queue__tile[data-state="pending"] {
   color: var(--theme-warn-color);
 }
 
-/* Amber, not red: a past date is a thing to look at, not a thing that failed —
-   the same channel the feed already uses for a passive "this concerns you" hint. */
 .capture-fields__warning {
   color: var(--theme-interest-color);
 }
@@ -228,24 +168,12 @@ button.capture-queue__tile[data-state="pending"] {
   font-size: var(--font-size-small);
 }
 
-/* The shared .account-form skin sizes fields to their content; a capture screen wants
-   them filling the column, so a long title is not read through a letterbox. The canton
-   needs it for a second reason: a flex item's floor is its own content, and a <select>
-   with no width set measures its widest option ("Appenzell Ausserrhoden"), which is
-   wide enough to push the town off the row the two share. The submit is an <input> too
-   and is left out on purpose — full-width it reads as a batch commit, which neither
-   screen has such a thing as. The genre picker's inner input is left out because it is
-   not the field: it is one flex item on a wrapping row it shares with the selection
-   chips, and at 100% it takes a row of its own and pushes the handle onto a third. */
 .capture-fields input:not([type=submit], .hw-combobox__input),
 .capture-fields select,
 .capture-picker textarea {
   width: 100%;
 }
 
-/* Two fields to a row where they belong together (date + time, locality + canton).
-   Without the grow, a wrapped field keeps its content width and its underline stops
-   mid-column, reading as a different kind of field rather than a wrapped one. */
 .capture-fields__when > .field-group,
 .capture-fields__where > label {
   flex: 1 1 8rem;
@@ -259,11 +187,6 @@ button.capture-queue__tile[data-state="pending"] {
   width: 100%;
 }
 
-/* A recessed block, the same set-apart-by-KIND treatment .card-aside uses, for the
-   same reason: the card body is borderless by design, so one more hairline reads as
-   one more field rather than as a boundary. It sits at the TOP of the body and keeps
-   the amber attention channel, because unlike a card aside this is not a side note —
-   it is a question the card cannot be published without answering. */
 .capture-card__matches {
   display: flex;
   flex-direction: column;
@@ -289,9 +212,6 @@ button.capture-queue__tile[data-state="pending"] {
   list-style: none;
 }
 
-/* The button beside the show rather than under it, so a list of three reads as three
-   choices; it wraps under on a narrow phone, where side-by-side would squeeze the
-   title to two words. */
 .capture-card__matches-list li {
   display: flex;
   flex-wrap: wrap;
@@ -300,8 +220,6 @@ button.capture-queue__tile[data-state="pending"] {
   justify-content: space-between;
 }
 
-/* A basis rather than plain shrink, so a narrow phone WRAPS the button under the show
-   instead of squeezing the title down to two words per line. */
 .capture-card__matches-show {
   flex: 1 1 12rem;
 }

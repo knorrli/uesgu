@@ -1,23 +1,8 @@
-# The rewrite half of a location fold, shared by the two vocabularies that own a
-# location tag: Locality (the town) and Place (the captured venue).
-#
-# Filing everything under one spelling REWRITES the taggings rather than resolving the
-# alias at query time, and deliberately: Location.hierarchy, Location.usage, the
-# filter-tree pruning in TagsHelper#location_filter_tree and Filter#location_list all
-# group on the literal tag string. A link that repoints nothing leaves the town or the
-# venue split across two nodes of the WHERE tree holding half the events each — the
-# thing the fold is asked to fix.
-#
-# Requires the including model to expose `fingerprint` (the stored generated column
-# both tables carry).
 module LocationTagFold
   extend ActiveSupport::Concern
 
   private
 
-  # Every location tag that folds onto this row, not just its own spelling: a tag
-  # minted before entry-time normalisation existed ("bern") shares this fingerprint
-  # and has to travel with it.
   def variant_tag_names
     ActsAsTaggableOn::Tag.joins(:taggings)
                          .where(taggings: { context: "locations", taggable_type: Event.name })
@@ -25,13 +10,6 @@ module LocationTagFold
                          .select { |tag| Fingerprint.for(tag) == fingerprint }
   end
 
-  # `add` is every tag the target row puts on an event; `strip` is what this row put
-  # there beyond its own name — a place also tags its town and its canton, a locality
-  # tags only itself. Where the two rows agree on a tag it is removed and re-added,
-  # which costs nothing and keeps the caller from having to diff them.
-  #
-  # Snapshot the ids first: removing the tag shrinks the tagged_with set find_each
-  # would page over, which would skip events and leave them on the old name.
   def retag_events(add:, strip: [])
     variant_tag_names.each do |variant|
       next if add.include?(variant)
@@ -44,10 +22,6 @@ module LocationTagFold
     end
   end
 
-  # A saved filter's location names are a jsonb snapshot frozen at save time and
-  # matched as literal strings (see SavedFilter), so one left on the old name matches
-  # nothing the moment the events move — silently, in the saved scope, the digest and
-  # the feed highlighting alike.
   def rewrite_saved_filters(canonical_name)
     SavedFilter.find_each do |saved|
       locations = saved.location_list
@@ -59,14 +33,6 @@ module LocationTagFold
     end
   end
 
-  # DESTRUCTIVE, and reachable only from an admin merge across two fingerprints
-  # (Bienne -> Biel): there the rewrite genuinely changes a filter's identity and can
-  # land it on a scope its owner already saved, which the one-filter-per-fingerprint
-  # rule forbids. Dropping the copy carrying the merged-away name keeps the merge from
-  # failing that validation and leaves the older filter's schedule and firing history
-  # intact. A same-fingerprint fold cannot get here — SavedFilter.fingerprint compares
-  # locations by fingerprint, so rewriting one spelling to another leaves it unchanged
-  # — which is what lets Locality.reconcile! fold unattended.
   def redundant?(saved)
     saved.user.saved_filters.where.not(id: saved.id).any? { |other| other.fingerprint == saved.fingerprint }
   end

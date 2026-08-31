@@ -1,13 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="theme" on the header toggle button.
-//
-// Binary light ↔ dark, stored in a `theme` cookie (per-device) so the SERVER can
-// render <html data-theme> up-front — no flash. The first-visit default (no
-// cookie yet) is resolved from the OS inline in <head>.
-// This controller only handles the click and keeps the button icon/label in
-// sync; it no longer follows the OS live (that was the old "system" preference,
-// now dropped).
 const LABELS = { light: "Light", dark: "Dark" }
 const ICONS = { light: "ph-sun", dark: "ph-moon" }
 const ONE_YEAR = 60 * 60 * 24 * 365
@@ -19,8 +11,6 @@ export default class extends Controller {
     this.render()
   }
 
-  // The cookie is the source of truth; fall back to whatever the inline head
-  // script resolved onto <html> (covers the click before a cookie round-trips).
   get theme() {
     const m = document.cookie.match(/(?:^|;\s*)theme=(light|dark)/)
     if (m) return m[1]

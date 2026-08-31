@@ -1,11 +1,6 @@
-# One scraper's outcome within a ScrapeRun. The status is the headline signal;
-# the counts (seen / created / updated / errored) explain it and seed any future
-# "degraded" / trend detection.
 class ScrapeResult < ApplicationRecord
   belongs_to :scrape_run
 
-  # snoozed = the sweep deliberately skipped this scraper (see ScraperSnooze), so
-  # it's neither a success nor a fault — kept out of the attention/alert paths.
   enum :status, { ok: "ok", empty: "empty", failed: "failed", snoozed: "snoozed" }
 
   scope :attention, -> { where(status: %w[empty failed]) }
@@ -18,8 +13,6 @@ class ScrapeResult < ApplicationRecord
     errored_count.to_i.positive?
   end
 
-  # Headline status for display. An "ok" run that nevertheless errored on some
-  # rows is downgraded to a warning so it never reads as a clean success.
   def display_status
     ok? && errored? ? "errors" : status
   end

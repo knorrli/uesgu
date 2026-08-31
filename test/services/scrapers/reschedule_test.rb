@@ -1,16 +1,12 @@
 require "test_helper"
 
-# Locks the reschedule-marker behaviour (the counterpart to CancellationTest): the
-# multilingual keyword set, the letter-boundary guards against false positives, the
-# "new date" phrases, and the fact that cancellation markers are NOT reschedules
-# (and vice versa) — the two are deliberately disjoint.
 class Scrapers::RescheduleTest < Minitest::Test
   Event = Struct.new(:title, :description)
 
   RESCHEDULED = [
     "Konzert verschoben",
     "Show verlegt",
-    "NEUES DATUM / NEW DATE: DeathbyRomy", # the real-world motivating case
+    "NEUES DATUM / NEW DATE: DeathbyRomy",
     "Neuer Termin",
     "Spectacle reporté",
     "Soirée reportée",
@@ -22,13 +18,13 @@ class Scrapers::RescheduleTest < Minitest::Test
   ].freeze
 
   NOT_RESCHEDULED = [
-    "Konzert abgesagt",          # cancelled is NOT rescheduled
-    "Concert annulé",            # cancelled (FR) is NOT rescheduled
-    "Reportage Festival",        # "report…age", not the accented marker
-    "Annual Report",             # English "report" (no accent) is not a marker
-    "Renew date drive",          # "new date" embedded after "re" — boundary guards it
-    "Newsworthy Datum",          # not the "neues datum" phrase
-    "Ausverkauft"                # sold out is neither
+    "Konzert abgesagt",
+    "Concert annulé",            #
+    "Reportage Festival",
+    "Annual Report",
+    "Renew date drive",
+    "Newsworthy Datum",
+    "Ausverkauft"
   ].freeze
 
   def test_matches_reschedule_markers
@@ -50,8 +46,6 @@ class Scrapers::RescheduleTest < Minitest::Test
     assert scraper.send(:event_rescheduled?, event, nil)
   end
 
-  # The two status markers are disjoint: a cancelled show must not also read as
-  # rescheduled, and a rescheduled show must not read as cancelled.
   def test_cancellation_and_reschedule_are_disjoint
     cancelled = Event.new("Konzert abgesagt", nil)
     refute scraper.send(:event_rescheduled?, cancelled, nil)

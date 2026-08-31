@@ -1,9 +1,3 @@
-// What each row was read from, held only in the browser: nothing is uploaded for
-// storage, so this is the only copy a contributor can check a field against, and it has
-// to outlive the turbo-stream that replaces the whole row.
-//
-// Rows and inputs are deliberately different keys. A re-read is a new ROW off the same
-// INPUT, and the budget is spent per input, so every card off one poster shares one.
 export class CaptureSources {
   constructor() {
     this.byRow = new Map()

@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Locks the subscribable ICS feed: the public token-keyed endpoint (no session),
-# minting / rotating / removing the link, auth on management, and the settings UI.
 class CalendarFeedTest < ActionDispatch::IntegrationTest
   test "the public feed serves ICS for a valid token without a session" do
     u = user

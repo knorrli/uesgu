@@ -1,26 +1,13 @@
 module Scrapers
-  # Runs every scraper once, sequentially, recording the sweep as a ScrapeRun +
-  # per-scraper ScrapeResult rows and stamping the events each scraper created
-  # with the run. Extracted from the scrapers:run_all rake task so the
-  # orchestration is testable without Rake; the task keeps only the stdout
-  # summary + exit-code policy that Render's cron alerting depends on.
   class Sweep
-    # Create the run and execute it. The cron entrypoint uses this.
     def self.run!(scrapers: All.scrapers, out: $stdout)
       perform(ScrapeRun.create!(started_at: Time.current), scrapers: scrapers, out: out)
     end
 
-    # Execute an already-created run. The manual /admin trigger creates the run
-    # synchronously (so the UI and the in-progress guard see it immediately),
-    # then calls this in a background thread.
     def self.perform(run, scrapers: All.scrapers, out: $stdout)
       new(scrapers, out).perform(run)
     end
 
-    # Run a sweep off the request thread. There's no background worker (Solid
-    # Queue was dropped — see render.yaml), so this is a plain thread with the
-    # Rails executor managing the connection checkout. The seam the controller
-    # calls, so tests can stub it instead of spawning real work.
     def self.enqueue(run, scrapers: All.scrapers)
       Thread.new do
         Rails.application.executor.wrap { perform(run, scrapers: scrapers) }
@@ -34,7 +21,6 @@ module Scrapers
       @out = out
     end
 
-    # Returns the finished ScrapeRun so the caller can decide exit status.
     def perform(run)
       ScraperSnooze.prune_expired!
       snoozed = ScraperSnooze.active_by_slug
@@ -47,21 +33,10 @@ module Scrapers
         end
       end
 
-      # Collapse cross-source duplicates (PETZI vs our bespoke scrapers) once every
-      # scraper has run, before reconcile so the canonical's merged genres count.
       Dedup.run
 
-      # Refresh genre usage counts once after the full sweep so newly seen genres
-      # surface in the assignment queue (the old per-scraper job did this each time).
       Genre.reconcile!
-      # Same, for the towns: a scraper minting a venue in a place we did not cover is
-      # the other way a locality enters, and an unreconciled one has no canton for the
-      # capture card to fill from.
       Locality.reconcile!
-      # The capture funnel's leads, refreshed in the same pass that refreshes the
-      # aggregator's: both halves of the discovery inbox are then as of one moment.
-      # Nightly rather than per publish — the count is a group-by over every location
-      # tagging, and nothing is urgent about a place that needs a second show anyway.
       CapturedVenueLeads.refresh!
       finalize(run)
       ScrapeRun.prune!
@@ -70,10 +45,6 @@ module Scrapers
 
     private
 
-    # A snoozed scraper: record it (so the admin page shows *why* the row is
-    # blank, rather than looking like a scraper that silently never ran) but
-    # don't touch the site. status: :snoozed keeps it out of both the failed and
-    # the drop-to-zero alert paths — the whole point of snoozing a flaky venue.
     def skip(run, slug, snooze)
       @out.puts "[#{slug}] SNOOZED until #{snooze.snoozed_until.iso8601} — skipping"
       run.scrape_results.create!(scraper: slug, status: :snoozed,
@@ -85,10 +56,6 @@ module Scrapers
       @out.puts "[#{slug}] starting #{klass.url}"
 
       result = klass.call
-      # ok = processed at least one event (created/updated/unchanged); empty =
-      # ran clean but processed none, the silent regression this exists to catch.
-      # Unchanged counts as processed: a re-scrape that changed nothing is still
-      # a healthy run, not an empty one.
       processed = result.created + result.updated + result.unchanged
       status = processed.positive? ? :ok : :empty
       run.scrape_results.create!(
@@ -105,11 +72,6 @@ module Scrapers
                        slug, status.to_s.upcase, ms_since(started) / 1000.0,
                        result.seen, result.created, result.updated, result.errored, result.discarded)
     rescue StandardError => e
-      # A total failure (site down, robots block, markup that breaks before the
-      # loop) raises out of #call; record it and carry on to the next venue. The
-      # @out.puts is the cron's plain summary stream; log at ERROR too so the
-      # failure carries a severity in Render's log stream, like every other
-      # handled scraper error.
       run.scrape_results.create!(
         scraper: slug, status: :failed, started_at: started, duration_ms: ms_since(started),
         error_class: e.class.name, error_message: e.message&.truncate(1000)

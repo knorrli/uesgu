@@ -1,19 +1,11 @@
 module Scrapers
   class BadBonn < Agent
-    # club.badbonn.ch serves no robots.txt (all hosts 404) but ships a
-    # `<meta name="robots" content="noindex, nofollow">` on every page — a
-    # CMS/site-builder indexing default, not a crawl ban. Mechanize lumps that
-    # meta tag in with robots.txt and raises RobotsDisallowedError, so the only
-    # way past it is to opt this venue out of robots enforcement entirely. We
-    # still identify honestly and crawl gently (one daily pass).
     self.respect_robots = false
 
     def self.url
       URI.parse("https://club.badbonn.ch/program")
     end
 
-    # Bad Bonn's pages carry only a title + a free-text blurb (the description) —
-    # there is no genre/style/tag field anywhere to extract.
     field_gaps genres: :no_field
 
     def event_rows
@@ -28,9 +20,6 @@ module Scrapers
       click(link_for(row))
     end
 
-    # The detail page carries the event data as data-* attributes on <article>.
-    # (The element used to be `article.show`; the site dropped that class in a
-    # Tailwind redesign, but the data attributes are stable.)
     def event_start_time(content)
       article = content.at_css("article[data-date]")
       date_string = article&.attr("data-date").to_s
@@ -47,9 +36,6 @@ module Scrapers
       content.css("article p").map { |node| node.text.squish }.find(&:present?).to_s
     end
 
-    # No genre field, but the detail-page blurb (the `<article>` prose, here the
-    # same `<p>` nodes the description samples from) names real styles — mine the
-    # known ones (Scrapers::Agent match-only mining).
     def event_genre_prose(content)
       content.css("article p").map(&:text).join("\n")
     end

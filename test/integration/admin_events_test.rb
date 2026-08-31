@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Read-only events browser under /admin/events: admin-gated, with visibility
-# filters, title search, and sort. The admin sees everything (the public index
-# is scoped to :visible).
 class AdminEventsTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_events_path
@@ -61,14 +58,9 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "event[title]"
     assert_select "input[name=?]", "event[date]"
     assert_select "input[name=?]", "event[time]"
-    # The locked title appears in the "manual overrides" list with a revert form.
     assert_select "form[action=?]", revert_admin_event_path(e, field: "title")
   end
 
-  # The same field the capture screens render (app/views/shared/_genre_combobox).
-  # Structural rather than behavioural: no system test drives this page, and the phone
-  # behaviour is pinned on the other screen built from it, in
-  # test/system/capture_screen_test.rb.
   test "the genre field is named by a label that does not wrap it" do
     e = event(title: "Editable Show")
     sign_in_as user(admin: true)
@@ -94,8 +86,7 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     e.reload
     assert_equal "Fixed Title", e.title
     assert e.overridden?(:title)
-    refute e.overridden?(:description) # resubmitted unchanged → not locked
-    # The time went from none → 20:30, so the date/time pair locks together.
+    refute e.overridden?(:description)
     assert e.overridden?(:start_time)
     assert e.overridden?(:start_date)
   end
@@ -129,7 +120,7 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     e.reload
     assert_equal original_url, e.url
     refute e.hidden?
-    assert_empty e.overridden_fields # nothing editable actually changed
+    assert_empty e.overridden_fields
   end
 
   test "reverting a locked field releases it back to the scraper" do
@@ -171,7 +162,6 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_equal [g1.name, g2.name].sort, e.genre_list.sort
     assert e.overridden?(:genres)
 
-    # Pinned genres surface in the manual-overrides list with a revert form.
     get admin_event_path(e)
     assert_select "form[action=?]", revert_admin_event_path(e, field: "genres")
 
@@ -189,7 +179,6 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     } }
 
     assert_equal %w[Zorpcore], e.reload.genre_list
-    # ensure! files it the way a scraped or captured genre is, so it reaches curation.
     assert Genre.exists?(fingerprint: Genre.fingerprint_for("zorpcore"))
   end
 
@@ -221,16 +210,13 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     51.times { |i| event(title: "Show #{format('%02d', i)}") }
     sign_in_as user(admin: true)
 
-    # Page 1 of 2: a readout and a working "next" link, no "prev" link.
     get admin_events_path(sort: "title")
     assert_response :success
     assert_select ".pagination__status", text: /1 .* 2/
     assert_select '.pagination a[rel=next][href*="page=2"]'
     assert_select ".pagination a[rel=prev]", count: 0
-    # Filter params survive into the page links.
     assert_select '.pagination a[rel=next][href*="sort=title"]'
 
-    # Page 2: a working "prev" link, no "next" link.
     get admin_events_path(sort: "title", page: 2)
     assert_select '.pagination a[rel=prev][href*="page=1"]'
     assert_select ".pagination a[rel=next]", count: 0
@@ -279,10 +265,6 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     event(title: "Unrelated")
     sign_in_as user(admin: true)
 
-    # Request format as a URL param (format: :turbo_stream), exactly as the
-    # combobox's async fetch does — not `as: :turbo_stream` (an Accept header),
-    # which leaves :html in the format list and lets the option partial resolve
-    # via fallback, masking the missing-template 500 the real request hits.
     get search_admin_events_path(exclude: current.id, q: "Matching", format: :turbo_stream)
     assert_response :success
     assert_match "Matching Canonical", response.body
@@ -296,12 +278,10 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     dup.merge_into!(canonical)
     sign_in_as user(admin: true)
 
-    # canonical lists its merged duplicates
     get admin_event_path(canonical)
     assert_select "a", text: "The Duplicate"
     assert_select "form[action=?]", merge_admin_event_path(canonical)
 
-    # the duplicate offers an unmerge action
     get admin_event_path(dup)
     assert_select "form[action=?]", unmerge_admin_event_path(dup)
   end

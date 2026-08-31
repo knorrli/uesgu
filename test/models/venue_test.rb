@@ -1,11 +1,5 @@
 require "test_helper"
 
-# Integrity of the venue registry (config/venues.yml, wrapped by Venue) — the
-# code-controlled source of truth the ledger projection, the location taxonomy, and
-# discovery read from. Like the ledger drift test, this reads the REAL registry (no
-# fixtures): it pins the Venue API + per-venue invariants the drift test doesn't
-# cover (place shape, name matching). Source/scraper reconciliation lives in the
-# drift test (every consume venue is backed by a live scraper).
 class VenueTest < ActiveSupport::TestCase
   def venues = Venue.all
 
@@ -59,9 +53,6 @@ class VenueTest < ActiveSupport::TestCase
     refute d.matches?("Gaskessel")
   end
 
-  # Café Kairo carries a precomposed accent; an aggregator feed might emit the
-  # decomposed form. Build the decomposed variant FROM the name so it's provably the
-  # same name in a different normalization form (refute_equal guards that).
   test "matches? folds unicode normalization forms (NFC vs NFD)" do
     k = Venue.find_by_domain("cafe-kairo.ch")
     decomposed = k.name.unicode_normalize(:nfd)
@@ -83,8 +74,6 @@ class VenueTest < ActiveSupport::TestCase
     assert hf.matches?("Heitere Fahne"), "must match the raw <location> name the feed emits"
   end
 
-  # An aggregator-sourced venue has no scraper covering its own domain — the
-  # aggregator backs its consume row. This is what keeps the drift test green.
   test "an OLE aggregator's venue_domains include the approved venues that name it" do
     bm = Scrapers::OleBewegungsmelder
     sourced = Venue.consuming.select { |v| v.aggregator_names.include?(bm.label) }.map(&:domain)
@@ -93,13 +82,11 @@ class VenueTest < ActiveSupport::TestCase
     assert_includes bm.venue_domains, "bewegungsmelder.ch", "still covers its own feed host"
   end
 
-  # The invariant the registry must keep: every consume venue is backed either by a
-  # scraper covering its own domain, or by an aggregator it names as a source.
   test "every consume venue is backed by an own-domain scraper or an aggregator" do
     own = Scrapers::All.scrapers.values.reject(&:aggregator?).flat_map(&:venue_domains).to_set
     feeds = Scrapers::All.scrapers.values.select(&:aggregator?).map { |k| Scrapers::Discovery.domain(k.url.host) }.to_set
     Venue.consuming.each do |v|
-      next if own.include?(v.domain) || feeds.include?(v.domain) # own scraper or the feed host itself
+      next if own.include?(v.domain) || feeds.include?(v.domain)
       assert v.sourced_via_aggregator?, "#{v.domain}: consume but no own scraper and not aggregator-sourced"
     end
   end
@@ -121,8 +108,6 @@ class VenueTest < ActiveSupport::TestCase
     refute bejazz.consume?, "defer status keeps it un-generated"
   end
 
-  # The place-inversion invariant: a bespoke scraper reads its place FROM its venue
-  # (Agent#location / #locations), so the two can never silently diverge.
   test "every bespoke scraper's place is its venue's place (derived, not declared)" do
     bespoke = Scrapers::All.scrapers.reject { |name, k| k.aggregator? || name.start_with?("Ole") }
     bespoke.each do |name, k|

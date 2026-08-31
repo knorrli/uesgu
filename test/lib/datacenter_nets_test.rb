@@ -1,15 +1,6 @@
 require "test_helper"
 
-# Two separate concerns here, kept apart on purpose:
-#
-#   * Table — the lookup itself, exercised against synthetic ranges so the
-#     boundary cases are exact and can never drift when the vendored list is
-#     refreshed.
-#   * The generated list — integrity of what `datacenter_nets:refresh` produced,
-#     plus the two properties the whole design rests on: every provider really is
-#     covered, and nothing a real user could arrive from is.
 class DatacenterNetsTest < ActiveSupport::TestCase
-  # Two ranges with a deliberate gap, so "just outside" is unambiguous.
   def table
     @table ||= DatacenterNets::Table.new([ [ 100, 200 ], [ 500, 600 ] ])
   end
@@ -33,8 +24,6 @@ class DatacenterNetsTest < ActiveSupport::TestCase
   end
 
   test "misses an address below the lowest range and above the highest" do
-    # The bsearch returns index -1 for the first and the final range for the
-    # second; both have to fall through rather than match or raise.
     refute table.include?(0)
     refute table.include?(10_000)
   end
@@ -52,14 +41,10 @@ class DatacenterNetsTest < ActiveSupport::TestCase
   end
 
   test "an unparseable client address is never blocked" do
-    # Rack::Attack::Request#true_ip_addr hands us nil when the forwarded address
-    # did not parse. An unknown client gets served, never blocked.
     refute DatacenterNets.include?(nil)
   end
 
   test "resolves an IPv4-mapped IPv6 address to its IPv4 form" do
-    # ::ffff:47.80.0.1 is the same client as 47.80.0.1; matching only the literal
-    # v4 form would hand a crawler a free bypass.
     assert DatacenterNets.include?(IPAddr.new("::ffff:47.80.0.1"))
   end
 
@@ -81,8 +66,6 @@ class DatacenterNetsTest < ActiveSupport::TestCase
   end
 
   test "the vendored list is large enough to be the real thing" do
-    # A refresh that silently half-fetched would still parse. This is a floor, not
-    # an exact count — the list moves every time a provider announces a prefix.
     assert_operator DatacenterNets.v4.size, :>, 5_000
     assert_operator DatacenterNets.v6.size, :>, 1_000
   end
@@ -99,9 +82,6 @@ class DatacenterNetsTest < ActiveSupport::TestCase
   end
 
   test "the vendored list is disjoint and ascending within each family" do
-    # The generator coalesces overlapping and adjacent prefixes before writing, so
-    # overlap here means the range arithmetic regressed — and Table's binary search
-    # assumes non-overlapping ranges, so it would start returning wrong answers.
     list_lines.group_by { |line| line.include?(":") }.each_value do |lines|
       ranges = lines.map do |line|
         net = IPAddr.new(line)
@@ -115,10 +95,6 @@ class DatacenterNetsTest < ActiveSupport::TestCase
     end
   end
 
-  # Generated alongside the list by `datacenter_nets:refresh` — one address per
-  # source, derived from that source's own data rather than hand-picked. Hand-picked
-  # addresses rot: a provider stops announcing the prefix and the test quietly
-  # asserts nothing. These cannot drift out of step with the list they came from.
   SAMPLES = YAML.load_file(
     Rails.root.join("test", "fixtures", "files", "datacenter_net_samples.yml")
   ).freeze
@@ -133,15 +109,11 @@ class DatacenterNetsTest < ActiveSupport::TestCase
   end
 
   test "blocks the Alibaba range the August 2026 crawl came from" do
-    # The addresses the crawl actually came from, which this list has to keep covering.
     %w[47.74.0.1 47.79.51.85 47.82.54.165 47.87.255.254].each do |address|
       assert DatacenterNets.include?(IPAddr.new(address)), "expected #{address} to stay blocked"
     end
   end
 
-  # The entire design rests on these addresses being servable. If a refresh ever
-  # pulls a consumer ISP or a CDN egress pool into the list, this is what catches
-  # it — CI fails instead of a real person silently getting a 403.
   SERVABLE = {
     "Cloudflare resolver" => "1.1.1.1",
     "Cloudflare edge (Render's front door)" => "104.23.175.21",

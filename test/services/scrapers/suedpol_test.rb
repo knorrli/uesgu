@@ -1,10 +1,5 @@
 require "test_helper"
 
-# Locks the post-relaunch Südpol mechanics the offline golden can't cover: the
-# list's `data-date` is only MIDNIGHT of the event day, and the real start time
-# is combined in from the /api/event/<id> detail (unreachable in the golden
-# harness, whose events therefore all sit at midnight). SYNTHETIC rows shaped
-# like the live Contao markup — no real programme content.
 class Scrapers::SuedpolTest < Minitest::Test
   def test_combines_list_date_with_detail_time
     row = row_for(detail: <<~HTML)
@@ -43,7 +38,6 @@ class Scrapers::SuedpolTest < Minitest::Test
     @scraper ||= Scrapers::Suedpol.new
   end
 
-  # 1767726000 = 2026-01-06 00:00 +01:00, a real midnight stamp from the site.
   def node_for(category: "Konzert", stamp: 1_767_726_000)
     html = <<~HTML
       <div class="event-list__item" data-event-id="99999"

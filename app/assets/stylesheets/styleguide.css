@@ -1,9 +1,3 @@
-/* Living styleguide page (/styleguide, admin-only). Everything here is scoped
- * under `.sg` so it never leaks into the rest of the app. The point of the page
- * is to render the REAL shared element classes (button, .tag, .chip, .badge,
- * .icon-button, …) using the real bundled CSS; this file only adds the
- * scaffolding around those specimens. */
-
 .sg {
   max-width: 60rem;
 }
@@ -24,7 +18,6 @@
   font-size: var(--font-size-small);
 }
 
-/* A top-level element category. */
 .sg-section {
   padding-top: var(--gap-large);
   margin-top: var(--gap-large);
@@ -41,8 +34,6 @@
   margin-bottom: var(--gap-medium);
 }
 
-/* One specimen row: the live element(s) on the left, the spec on the right.
- * Stacks on narrow viewports — the page itself is mobile-first like the app. */
 .sg-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -58,14 +49,10 @@
   }
 }
 
-/* A specimen that is itself responsive (the review card switches to two columns at
-   900px) would render its wide layout inside a half-width cell — the one situation
-   the app never puts it in. */
 .sg-row--stack {
   grid-template-columns: 1fr;
 }
 
-/* The neutral stage the element sits on. */
 .sg-specimen {
   display: flex;
   flex-wrap: wrap;
@@ -74,11 +61,8 @@
   min-height: 2.5rem;
 }
 
-/* Larger specimen text (e.g. icon-size demos). */
 .sg-specimen--lg { font-size: 1.4rem; }
 
-/* Opts a specimen out of the centered flex stage, for elements that own their own
-   internal layout (the review card, a prose column). */
 .sg-specimen--block {
   display: block;
 }
@@ -100,8 +84,6 @@
   margin: var(--gap-xsmall) 0 0;
 }
 
-/* Colour token swatches — driven by the live tokens, so recolouring the theme
- * recolours these automatically. */
 .sg-swatches {
   display: flex;
   flex-wrap: wrap;

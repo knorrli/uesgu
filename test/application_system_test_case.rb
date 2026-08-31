@@ -1,19 +1,7 @@
-# Browser-driven system tests. Cuprite talks CDP to the system Chrome via Ferrum
-# — no chromedriver/Selenium binary, no downloaded browser. `bin/rails test:system`.
-#
-# We require db_test_helper (not the DB-free test_helper) so system tests get
-# rails/test_help + the shared fixtures (TaxonomyFixtures: user/event/...).
 require "db_test_helper"
 require "capybara/cuprite"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  # headless by default; set HEADLESS=0 to watch a run, CHROME_PATH to override
-  # the auto-detected browser binary.
-  # Chrome's first launch on a CI runner has been measured past the 20s that is
-  # generous on a warm laptop — it fails the whole suite with "Browser did not
-  # produce websocket url", before a single test runs. The wait bounds STARTUP
-  # only, so a roomy ceiling costs a healthy run nothing and turns a red build
-  # back into a slow one.
   BOOT_TIMEOUT = ENV["CI"] ? 60 : 20
 
   driven_by :cuprite,
@@ -25,10 +13,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       browser_path: ENV["CHROME_PATH"].presence
     }.compact
 
-  # Kill CSS transitions/animations after every visit so tests never race a
-  # slide/fade — e.g. the mobile filter sheet's 0.22s slide-up: a click dispatched
-  # while the target is still translating can land on empty space and be lost.
-  # Instant state = deterministic clicks; no test depends on animation timing.
   NO_MOTION_CSS = "*,*::before,*::after{transition:none!important;animation:none!important}"
 
   def visit(*)
@@ -39,9 +23,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     )
   end
 
-  # Sign in through the real login form. (The integration `sign_in_as` posts to
-  # the session controller and only sets the test's cookie jar — that doesn't
-  # carry into the browser, so the browser must log in for real.)
   def sign_in_as(user, password: TaxonomyFixtures::PASSWORD)
     visit new_session_path
     fill_in "username", with: user.username

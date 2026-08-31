@@ -1,8 +1,6 @@
 <% content_for :title, t('settings.title') %>
 <div class="settings flex flex-col gap-large">
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
-    <%# Logout is a page-level action (top-right), not its own section — rare
-        account plumbing, one tap, no heading/hint needed. %>
     <div class="flex justify-between align-center wrap gap-medium">
       <h1><%= t('settings.title') %></h1>
       <%= button_to t('settings.signout_button'), session_path, method: :delete, class: "button-small" %>
@@ -17,9 +15,6 @@
     </ul>
   <% end %>
 
-  <%# One form covers everything stored on the user: language, email and
-      password. The controller permits all of these in a single update, so a
-      single Save button keeps the page from sprouting a button per block. %>
   <section class="settings-section">
     <h2><%= t('settings.account_heading') %></h2>
 
@@ -38,9 +33,6 @@
 
       <fieldset class="settings-field flex flex-col gap-small">
         <legend><%= t('settings.email_heading') %></legend>
-        <%# Hint sits between the label and the field so reading order is
-            label → hint → input (the optional + why + third-party disclosure that
-            the address goes to resend.com — read before you type, not after). %>
         <p class="muted"><%= t('settings.email_hint') %></p>
         <%= form.email_field :email_address, autocomplete: "email", placeholder: t('settings.email_placeholder') %>
       </fieldset>
@@ -52,18 +44,10 @@
         <%= form.password_field :password_confirmation, autocomplete: "new-password", placeholder: t('settings.confirm_new_password'), maxlength: 72 %>
       </fieldset>
 
-      <%# Saved-show reminders moved to the saved-shows page — they're a property of
-          that feature (they nudge about the shows saved there), so the opt-in lives
-          where the shows do, not split off in Settings. %>
-
       <%= form.submit t('settings.save') %>
     <% end %>
   </section>
 
-  <%# Per-device web push opt-in + a self-test. Installing the app now lives in
-      the top nav (it targets logged-out users too), so it's no longer here. The
-      whole section renders only when VAPID keys are configured; the push
-      controller handles the unsupported / denied / needs-install states. %>
   <% if WebPushConfig.configured? %>
     <section class="settings-section">
       <h2><%= t('settings.notifications_heading') %></h2>
@@ -75,9 +59,6 @@
            data-push-label-off-value="<%= t('settings.push_enable') %>"
            data-push-status-denied-value="<%= t('settings.push_status_denied') %>">
         <p class="muted"><%= t('settings.push_hint') %></p>
-        <%# On/off state is already obvious from the button label, so the status
-            line shows ONLY when permission is denied (the one state the button —
-            disabled, still reading "activate" — can't explain). Hidden otherwise. %>
         <p class="muted" hidden data-push-target="status"></p>
         <div class="settings-actions">
           <button type="button" data-push-target="button" data-action="push#toggle">
@@ -88,38 +69,22 @@
           </button>
         </div>
         <p class="muted" hidden data-push-target="unsupported"><%= t('settings.push_unsupported') %></p>
-        <%# iOS exposes the Push API only to an installed home-screen app, so
-            there we point the user at installing first rather than saying
-            "unsupported". %>
         <p class="muted" hidden data-push-target="installFirst"><%= t('settings.push_install_first') %></p>
       </div>
     </section>
   <% end %>
 
-  <%# An ICS feed of the saved shows, subscribable in any calendar app. Opt-in:
-      no link exists until the user creates one (the token is a URL-borne
-      credential, so we don't mint it unasked). Rotating revokes the old URL. %>
-  <%# The id is the anchor target for the pointer on the saved-shows page. %>
   <section class="settings-section" id="calendar-feed">
     <h2><%= t('settings.calendar_feed_heading') %></h2>
 
     <% if @user.calendar_feed_token.present? %>
       <% feed_url = public_calendar_feed_url(@user.calendar_feed_token, format: :ics, **share_url_options) %>
-      <%# webcal:// hands the same feed straight to the OS default calendar app
-          (Apple Calendar, Outlook, Thunderbird …) on one tap — no copy/paste. The
-          scheme just swaps in front of the existing http(s) URL. Google Calendar on
-          the web doesn't register webcal://, so the copy field below stays as the
-          paste-the-URL fallback. %>
       <% webcal_url = feed_url.sub(/\Ahttps?/, 'webcal') %>
       <div class="flex flex-col gap-small">
         <p class="muted"><%= t('settings.calendar_feed_hint_on') %></p>
-        <%# Subscribe (primary) leads the action row; Copy + regenerate/remove follow,
-            so all four read as one group on a single line. %>
         <% subscribe_action = capture do %>
           <%= link_to t('calendar_feed.subscribe'), webcal_url, class: 'button primary' %>
         <% end %>
-        <%# Deactivate revokes the link (the feed 404s). To rotate a leaked link,
-            deactivate then create a new one — create always mints a fresh token. %>
         <% feed_actions = capture do %>
           <%= button_to t('calendar_feed.remove'), calendar_feed_path, method: :delete, class: "delete",
                 data: { turbo_confirm: t('calendar_feed.remove_confirm') } %>

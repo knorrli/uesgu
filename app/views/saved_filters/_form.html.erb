@@ -1,25 +1,8 @@
-<%# Shared by new + edit. form_with infers POST (create) vs PATCH (update) from
-    the record. The saved filter (q/g/l/d) posts as top-level fields (read by the
-    controller's filter_params, not nested under saved_filter).
-
-    A plain form with an explicit Save — no autosave. The What/Where pickers are the
-    SAME genre/location tree the events filter uses (tags/_genre_sheet, _location_sheet
-    via the filter-sheets controller), with submit-on-apply OFF: picking a genre
-    stages it into this form as a checked g[]/l[] input and commits only on Save.
-    (Autosave existed to tame the old combobox's client-side chip drift; the tree is
-    plain server-rendered checkboxes, so there's nothing to drift — see the redesign
-    doc.) saved-filter-form keys the schedule off the window select. %>
-<%# .filter-sheets pulls in the same desktop dropdown-panel + mobile full-screen
-    sheet CSS the events filter uses (keyed off that class). %>
 <div class="saved-filter-picker filter-sheets"
      data-controller="filter-sheets"
      data-filter-sheets-submit-on-apply-value="false"
      data-filter-sheets-search-for-template-value="<%= t('events.filter.search_for', query: '%{query}') %>"
      data-filter-sheets-search-anything-value="<%= t('events.filter.search_anything') %>">
-  <%# `filter` is the rule's saved filter (SavedFiltersController#filter_for). %>
-  <%# action: the schedule (cadence/weekday/monthday visibility) reacts to the
-      window picked in the When sheet below — a checkbox toggle, not a select — so
-      saved-filter-form recomputes on any change bubbling up from the picker. %>
   <%= form_with model: rule, class: 'saved-filter-form account-form flex flex-col gap-medium',
         data: { controller: 'saved-filter-form', 'saved-filter-form-rhythms-value': SavedFilter::WINDOW_RHYTHM.to_json,
                 'filter-sheets-target': 'form', action: 'change->saved-filter-form#update' } do |form| %>
@@ -29,21 +12,12 @@
       </ul>
     <% end %>
 
-    <%# ── FILTER ── what this saved filter matches: the same trigger bar + tree
-        sheets as the events page, so the two read identically — What / Where /
-        When all on one row. The When sheet is single-select with no calendar (a
-        recurring filter takes ONE relative window, never a custom range); the
-        chosen window also drives the notification cadence below. %>
     <fieldset class="saved-filter-fieldset flex flex-col gap-medium">
       <legend><%= t('saved_filters.section_filter') %></legend>
 
       <% what_terms  = filter.queries + filter.genres %>
       <% where_terms = filter.location_list.map { |loc| location_display(loc) } %>
-      <%# One window only (single-select) — show just the first, matching the panel. %>
       <% when_terms  = Array(filter.date_ranges.find { |r| Datepicker.preset.key?(r) }).map { |w| t("datepicker.#{w}") } %>
-      <%# Bar + sheets grouped together: on desktop a sheet opens in-flow right
-          below this bar (pushing the rest of the form down), so keeping them in one
-          wrapper places the panel directly under its triggers. %>
       <div class="filter-sheets__fields">
         <div class="filter-sheets__bar">
           <%= render 'tags/filter_trigger', field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') %>
@@ -57,11 +31,6 @@
       </div>
     </fieldset>
 
-    <%# ── NOTIFICATIONS ── delivery is OPTIONAL: in-app is the MASTER channel, and
-        unchecking it makes this a silent saved filter (never delivers), so push +
-        email are forced off and disabled — client-side (notify-channels) and
-        server-side (SavedFilter#silence_other_channels). The schedule (how often /
-        when) lives here too, reactive to the window above (saved-filter-form). %>
     <fieldset class="saved-filter-fieldset flex flex-col gap-small" data-controller="notify-channels">
       <legend><%= t('saved_filters.section_notifications') %></legend>
       <label class="saved-filter-check flex gap-small">
@@ -69,10 +38,6 @@
         <span><%= t('saved_filters.fields.notify_in_app') %></span>
       </label>
       <% push_ready = WebPushConfig.configured? && current_user.push_subscriptions.any? %>
-      <%# Push has a second reason to be disabled (not set up on any device yet);
-          data-locked keeps it off even when in-app is on, so notify-channels never
-          re-enables it. Enabling push stays a deliberate action in Settings (linked
-          here) — we never trigger the browser permission flow from this checkbox. %>
       <label class="<%= class_names('saved-filter-check', 'saved-filter-check--sub', 'flex', 'gap-small', 'saved-filter-check--disabled': !push_ready) %>">
         <%= form.check_box :notify_push, disabled: !push_ready,
               data: { 'notify-channels-target': 'dependent', locked: !push_ready } %>
@@ -84,8 +49,6 @@
         </span>
       </label>
       <% email_ready = MailConfig.configured? && current_user.email_address.present? %>
-      <%# Email has a second reason to be disabled (no address on file); data-locked
-          keeps it off even when in-app is on, so the controller never re-enables it. %>
       <label class="<%= class_names('saved-filter-check', 'saved-filter-check--sub', 'flex', 'gap-small', 'saved-filter-check--disabled': !email_ready) %>">
         <%= form.check_box :notify_email, disabled: !email_ready,
               data: { 'notify-channels-target': 'dependent', locked: !email_ready } %>
@@ -97,10 +60,6 @@
         </span>
       </label>
 
-      <%# The schedule: with a window the cadence is derived (picker hidden, model
-          forces it), without one the user picks freely. weekday shows for
-          weekly/biweekly, monthday for monthly. aria-labels name each control; the
-          time snaps to the quarter hour on blur (the scheduler runs quarter-hourly). %>
       <div class="saved-filter-schedule flex flex-col gap-xsmall">
         <span class="field-label"><%= t('saved_filters.schedule_label') %></span>
         <div class="saved-filter-row flex gap-small">
@@ -113,10 +72,6 @@
           <label class="flex flex-col gap-xsmall" data-saved-filter-form-target="monthday">
             <%= form.select :monthday, rule_monthday_options, {}, 'aria-label': t('saved_filters.fields.monthday') %>
           </label>
-          <%# Time as hour + quarter-minute selects, not a native time input: reads
-              identically on every device and only offers the quarter values the
-              scheduler honours, so nothing clamps silently. The pair is folded into
-              time_of_day server-side (SavedFilter#time_hour). %>
           <div class="saved-filter-time flex gap-xsmall">
             <label class="flex flex-col gap-xsmall">
               <%= form.select :time_hour, rule_time_hour_options, {}, 'aria-label': t('saved_filters.fields.time_hour') %>
@@ -130,11 +85,6 @@
       </div>
     </fieldset>
 
-    <%# The third consequence of saving a filter: matches are marked in the feed (row
-        flag, sidebar accent). Default ON; someone with a broad
-        scope-filter (canton + date) unticks it once so highlighting stays reserved
-        for taste. Independent of the channels above — a silent filter can still
-        highlight. %>
     <fieldset class="saved-filter-fieldset flex flex-col gap-small">
       <legend><%= t('saved_filters.section_feed') %></legend>
       <label class="saved-filter-check flex gap-small">
@@ -143,9 +93,6 @@
       </label>
     </fieldset>
 
-    <%# Explicit Save (the form commits everything at once) + Abbrechen via the
-        shared actions row; "Löschen" rides along in the block, pushed to the far
-        end. Delete is a turbo_method link (not button_to, which would nest a form). %>
     <%= render layout: 'shared/form_actions',
           locals: { form: form, submit_label: t('saved_filters.save_button'), cancel_path: saved_filters_path } do %>
       <% if rule.persisted? %>

@@ -18,16 +18,10 @@
      data-capture-found-one-value="<%= found[:one] %>"
      data-capture-found-other-value="<%= found[:other] %>"
      data-capture-done-value="<%= capture_done_flashes.to_json %>">
-  <%# One action slot beside the title, holding whichever of the two the mode calls for.
-      Both leave the screen you are on, and neither is ever a decision about the event
-      in front of you — which is why "start over" is up here and not under the card,
-      beside that card's own two buttons. %>
   <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
     <div class="flex justify-between align-center wrap gap-medium">
       <h1 data-capture-target="stagingTitle"><%= t('capture.title') %></h1>
       <h1 data-capture-target="reviewTitle" hidden></h1>
-      <%# Absolute key: this block is yielded into shared/page_header, where a relative
-          one resolves against that partial. %>
       <%= link_to t('capture.picker.add_by_hand'), manual_capture_path,
             class: "button-small", data: { capture_target: "byHand" } %>
       <button type="button" class="text-link" data-capture-target="restart"
@@ -36,12 +30,6 @@
     <p class="muted" data-capture-target="reviewHint" hidden><%= t('capture.review.hint') %></p>
   <% end %>
 
-  <%# Four ways in, each one action: nothing is assembled here first, because a
-      contributor with more to add decides these and comes back for another pass. So
-      there is no batch to commit and no button that speaks for the screen. Picking
-      files, dropping them and pasting them send on their own; the two presses each
-      stand in for a gesture that is missing — a phone has no paste keystroke, and
-      typing ends on nothing at all. %>
   <div class="capture-picker account-form flex flex-col gap-large" data-capture-target="input">
     <%= render "shared/drop_zone",
           id: "capture-files", label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
@@ -63,19 +51,10 @@
     </div>
   </div>
 
-  <%# Every genre the picker offers, once for the whole page. A card clones this into
-      its own listbox when it opens and empties it when it does not (see
-      capture_controller.js): a batch is N posters x M events, and shipping ~300 options
-      into every card would grow with both, and with the taxonomy. Inert here — a
-      template's contents are not in the document, so the option ids it carries only
-      ever exist once in the live DOM. %>
   <template data-capture-target="genreOptions">
     <% combobox_options(genre_combobox_options(Genre.offerable)).each do |option| %><%= render option %><% end %>
   </template>
 
-  <%# Progress, navigation and receipts in one strip: a card publishes the moment it is
-      accepted and moves on, so for as long as the batch lasts its tile is the only
-      thing saying so. %>
   <nav class="capture-queue" data-capture-target="strip" aria-label="<%= t('capture.queue.label') %>" hidden></nav>
 
   <div id="capture-rows" class="flex flex-col gap-medium" data-capture-target="rows"></div>

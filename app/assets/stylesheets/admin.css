@@ -1,13 +1,10 @@
-/* A section heading that doubles as a link to its management page. Keeps the
-   heading's normal colour (so it doesn't read as body-text link) and reveals a
-   trailing arrow + underline on hover/focus to signal it's clickable. */
 .heading-link {
   color: inherit;
   text-decoration: none;
 }
 
 .heading-link::after {
-  content: "\2192"; /* → */
+  content: "\2192";
   margin-left: var(--gap-xsmall);
   color: var(--theme-fg-muted);
   opacity: 0;
@@ -24,9 +21,6 @@
   opacity: 1;
 }
 
-/* A dashboard stat whose label links to its catalogue (Events / Styles /
-   Locations → their index). Keeps the label in body colour and only underlines
-   on hover/focus, so the row still reads as a figure, not a link list. */
 .stat-link {
   color: inherit;
   text-decoration: none;
@@ -37,10 +31,6 @@
   text-decoration: underline;
 }
 
-/* Shared chrome for every catalogue browser — admin events / localities / locations
-   / places and the genre index (see shared/_catalogue_controls, which is the only
-   thing that renders these). The divider splits one chip row into two groups: the
-   genre index files its parked dispositions apart from its tree statuses. */
 .catalogue-filters .filter-divider {
   align-self: center;
   height: 1.2em;
@@ -57,15 +47,10 @@
   font-weight: bold;
 }
 
-/* The ×N usage figure trailing a catalogue row's name. */
 .catalogue-count {
   font-variant-numeric: tabular-nums;
 }
 
-/* Admin events list. A fixed date column + a stacked content block, with a
-   hairline between rows, so each event is one legible unit (the old single
-   wrapping line let a long title push the venue/genres onto the next line and
-   blur which info belonged to which event). */
 .event-rows {
   display: flex;
   flex-direction: column;
@@ -96,8 +81,6 @@
   overflow-wrap: anywhere;
 }
 
-/* Venue · genres · state flags as one muted meta line. Borderless info (a box
-   reads as clickable); middot separators keep the items distinct. */
 .event-row__meta {
   display: flex;
   flex-wrap: wrap;
@@ -115,8 +98,6 @@
   color: var(--theme-warn-color);
 }
 
-/* On narrow screens the date moves above the title (its own line) rather than
-   squeezing the 6.5rem column. */
 @media (max-width: 560px) {
   .event-row {
     grid-template-columns: 1fr;
@@ -124,8 +105,6 @@
   }
 }
 
-/* Stat rows on the admin dashboard: label and figure joined by a dotted leader
-   so the eye can follow a row across the width to its number. */
 .stat {
   display: flex;
   align-items: baseline;
@@ -144,8 +123,6 @@
   border-bottom: 1px dotted var(--theme-fg-muted);
 }
 
-/* Scannable account / invitation lists in the admin area. Same dotted-leader
-   idiom as .stat: a label group on the left, muted meta on the right. */
 .admin-list {
   list-style: none;
   margin: 0;
@@ -185,8 +162,6 @@
   color: var(--theme-warn-color);
 }
 
-/* Scraper run oversight (/admin/scrape_runs). A per-scraper outcomes table plus
-   a colour-coded history strip so a newly-broken or flapping venue stands out. */
 .scrape-table-wrap {
   overflow-x: auto;
 }
@@ -217,17 +192,12 @@
   border-top: 1px solid var(--theme-bg-muted);
 }
 
-/* Compact per-scraper "Run" button so a row of them stays scannable. button_to
-   wraps each in a form, so collapse the form's own box too. */
 .scrape-table form {
   margin: 0;
 }
 
-/* Status pill: ok = green, empty (ran but wrote nothing) = amber, failed = red. */
 .scrape-badge {
   display: inline-block;
-  /* Centre the pill against adjacent text instead of letting its padded box
-     sit on the text baseline (which makes it ride high next to the run date). */
   vertical-align: middle;
   padding: 0 var(--gap-xsmall);
   border-radius: 3px;
@@ -243,8 +213,6 @@
   background: var(--color-amber);
 }
 
-/* Ran and wrote events, but errored on some rows: amber like empty, so it never
-   reads as a clean success — distinct from a fully failed run (red). */
 .scrape-badge--errors {
   background: var(--color-amber);
 }
@@ -257,13 +225,10 @@
   background: var(--theme-fg-muted);
 }
 
-/* Deliberately skipped (see ScraperSnooze): muted grey, never an alarm colour —
-   a snooze is an intentional state, not a fault. */
 .scrape-badge--snoozed {
   background: var(--theme-fg-muted);
 }
 
-/* Run + Snooze (or the lone Wake) sit side by side in the row's action cell. */
 .scrape-actions {
   display: inline-flex;
   gap: var(--gap-xsmall);
@@ -303,7 +268,6 @@
   background: var(--theme-fg-muted);
 }
 
-/* A run where this scraper produced no result at all. */
 .scrape-dot--none {
   background: transparent;
   box-shadow: inset 0 0 0 1px var(--theme-fg-muted);
@@ -315,28 +279,19 @@
   color: var(--theme-warn-color);
 }
 
-/* .scrape-error's sibling, muted rather than warn: a note about how the run
-   proceeded, not a fault. */
 .scrape-note {
   white-space: normal;
   font-size: var(--font-size-small);
   color: var(--theme-fg-muted);
 }
 
-/* A non-zero per-run error count: warn colour so it stands out in the table,
-   mirroring the coverage matrix's low-fill highlight. */
 .scrape-num--errors {
   color: var(--theme-warn-color);
 }
 
-/* Scraper coverage matrix: low fill-rates get the warn colour (a scraper leaving
-   collectable data on the table, or a broken extractor), never green. */
 .coverage--low {
   color: var(--theme-warn-color);
 }
-/* A field the source structurally can't provide (declared via Scrapers::Agent
-   .field_gaps): shown muted as "n/a", never red — a settled absence, not a
-   broken extractor. The dotted underline hints at the hover title (the reason). */
 .coverage--gap {
   color: var(--theme-fg-muted);
   text-decoration: underline dotted;

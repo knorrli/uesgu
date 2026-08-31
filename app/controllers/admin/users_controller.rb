@@ -1,5 +1,4 @@
 module Admin
-  # Account moderation: list, inspect, and delete (spam) accounts.
   class UsersController < BaseController
     def index
       @users = User.order(created_at: :desc).page(params[:page])
@@ -20,9 +19,6 @@ module Admin
     def destroy
       @user = User.find(params[:id])
 
-      # The only guard needed: you can't delete yourself. Since self-deletion is
-      # always refused, at least one admin (you) always remains — there's no way
-      # to lock the site out of its admin via this screen.
       if @user == current_user
         redirect_to admin_users_path, alert: t("admin.users.cant_delete_self"), status: :see_other
       else

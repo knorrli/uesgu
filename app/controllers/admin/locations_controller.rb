@@ -1,8 +1,4 @@
 module Admin
-  # Read-only browser over the location tags that classify events. Locations have
-  # no table of their own — the type (venue / locality / canton) is derived from the
-  # scrapers via the Location model. Mirrors the genres index idiom: filter by
-  # type, sort, search, paginate. The set is small, so it's handled in Ruby.
   class LocationsController < BaseController
     include CatalogueBrowsing
 

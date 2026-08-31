@@ -1,10 +1,5 @@
 require "db_test_helper"
 
-# The display-name normalization that runs when a scraped/prose-mined token is
-# minted into taxonomy. The match key (fingerprint) is deliberately punctuation-
-# blind, so the job here is purely cosmetic: strip the sentence punctuation a
-# prose miner welds onto a token ("Virtuos." → "Virtuos") WITHOUT changing which
-# genre it resolves to. Synthetic genre names only (never real taxonomy content).
 class GenreNameNormalizationTest < ActiveSupport::TestCase
   test "display strips a trailing dot the prose miner leaves behind" do
     assert_equal "Flarnwave", Genre.display_name_for("Flarnwave.")
@@ -31,7 +26,6 @@ class GenreNameNormalizationTest < ActiveSupport::TestCase
     assert_equal "Flarndrone", row.name
     assert_equal before + 1, Genre.count
 
-    # The clean spelling shares the fingerprint, so it folds into the same row.
     Genre.ensure!(["Flarndrone"])
     assert_equal before + 1, Genre.count
   end
@@ -48,7 +42,7 @@ class GenreNameNormalizationTest < ActiveSupport::TestCase
   end
 
   test "a dotted token resolves onto an existing clean genre row" do
-    genre(name: "Flarnstep") # pre-existing clean taxonomy
+    genre(name: "Flarnstep")
     e = event(genre_list: ["Flarnstep."])
     assert_equal ["Flarnstep"], e.reload.genre_list
   end

@@ -1,10 +1,4 @@
 module EventCapture
-  # One event the model read out of one input — 0..n per input, because a poster can
-  # advertise two concerts. A plain value object; nothing here is persisted.
-  #
-  # `raw` keeps every value the normalizer refused, keyed by field, and `issues` says
-  # why. A rejected value is never silently dropped: a human completes a null in one
-  # tap, but only if they can still see what the model claimed.
   Candidate = Data.define(:title, :subtitle, :subtitle_evidence, :date, :date_evidence, :time,
                           :time_evidence, :place, :place_evidence, :locality, :locality_evidence,
                           :canton, :genres, :source_url, :raw, :issues) do
@@ -14,7 +8,6 @@ module EventCapture
       super
     end
 
-    # Computed, never asked of the model: it got is_past wrong every time it tried.
     def past?(today: Time.zone.today) = date.present? && date < today
   end
 end

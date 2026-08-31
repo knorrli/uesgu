@@ -1,15 +1,6 @@
 require "icalendar"
 
-# Builds the subscribable ICS feed of a user's saved shows.
-#
-# Scoped to events from yesterday on, so a show drops off the calendar about a
-# day after it happens — late enough that anything still in progress / running
-# past midnight stays put, without hoarding the whole past. A live subscription
-# re-fetches this, so there's nothing to delete: old events simply fall outside
-# the window on the next refresh.
 class SavedEventsCalendar
-  # How long a timed show blocks out in a subscriber's calendar. Venues rarely
-  # publish an end time, so we assume a typical evening's length.
   DEFAULT_DURATION = 3.hours
 
   def self.ics(user, now: Time.current)
@@ -43,8 +34,6 @@ class SavedEventsCalendar
 
   def build_event(event)
     Icalendar::Event.new.tap do |e|
-      # Stable per event so a re-fetch updates the same entry instead of duplicating;
-      # AppHost::CODE is just the identifier namespace here, not a routable link.
       e.uid     = "saved-event-#{event.id}@#{AppHost::CODE}"
       e.summary = event.cancelled? ? I18n.t("calendar_feed.cancelled_prefix", title: event.title) : event.title
       e.dtstamp = utc(event.updated_at)
@@ -56,12 +45,6 @@ class SavedEventsCalendar
     end
   end
 
-  # A known start time → a timed block (emitted in UTC, which every client
-  # localises). No usable time → an all-day entry, so a show whose time the
-  # scraper couldn't read never lands at a misleading midnight. We treat an exact
-  # 00:00 as "unknown" too: a genuine midnight start essentially never happens at
-  # these venues, so it's almost always a placeholder. (DTEND is exclusive for
-  # all-day entries, hence +1 day.)
   def apply_times(e, event)
     if timed?(event)
       e.dtstart = utc(event.start_time)

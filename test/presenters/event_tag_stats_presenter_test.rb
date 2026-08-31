@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the curation-dashboard projections in EventTagStatsPresenter: location tag
-# lookups scoped to Event taggings, and the genre buckets (in-use, placed,
-# unplaced, ignored). Synthetic names only.
 class EventTagStatsPresenterTest < ActiveSupport::TestCase
   setup { @presenter = EventTagStatsPresenter.new }
 
@@ -35,7 +32,7 @@ class EventTagStatsPresenterTest < ActiveSupport::TestCase
 
     assert_includes names, placed.name
     refute_includes names, "bare"
-    refute_includes names, "root" # in use but not placed (no parent)
+    refute_includes names, "root"
   end
 
   test "unplaced_genre_tags lists the in-use, undisposed, unfiled queue" do

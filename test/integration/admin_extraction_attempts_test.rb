@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# The capture funnel's oversight page under /admin/extraction_attempts: admin-gated,
-# read-only. Asserts that the two signals the table exists for — provider failures
-# and the codes for values the Normalizer refused — actually reach the page.
 class AdminExtractionAttemptsTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_extraction_attempts_path

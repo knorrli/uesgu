@@ -1,19 +1,7 @@
-<%# Saved-filters menu — the single merged control pinned to the right of the
-    chip row, for everything saved-filter:
-      • SAVE the current filter (top item) — funnel+ when unsaved (new draft),
-        "Gespeichert — bearbeiten" when the current filter is itself a saved one.
-        An empty filter saves as the "all events" rule, so the save item always
-        shows for a signed-in user.
-      • APPLY any of the user's other saved filters (the list) — each links to the
-        full events URL for that filter (shareable; the feed stays ephemeral).
-    A native <details> dropdown (menu_controller closes it on outside-click / Esc),
-    reusing the nav's .nav-menu dropdown pattern. The caller renders this for any
-    signed-in user; reads @filter, @saved_filter, @saved_filters. %>
 <% applyable = Array(@saved_filters).reject { |sf| sf == @saved_filter } %>
 <details class="nav-menu filter-menu" data-controller="menu" data-action="toggle->menu#toggle">
   <summary class="filter-menu__toggle" aria-label="<%= t('events.filter.saved.menu') %>">
     <% if @saved_filter %>
-      <%# Active filter is saved → filled funnel (the at-a-glance saved cue). %>
       <span class="funnel-fill" aria-hidden="true"></span>
     <% else %>
       <span class="ph ph-funnel" aria-hidden="true"></span>

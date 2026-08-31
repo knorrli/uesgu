@@ -1,22 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# THE üsgu app-icon pipeline — one command regenerates EVERY icon artifact from
-# the single source of truth below (geometry + the two palettes). There is one
-# canonical mark; the only theme split is the email digest (light + dark), which
-# is the one surface that sits on the mail client's own background.
-#
-#   ruby script/generate_icons.rb
-#
-# Edit the icon = edit GEOMETRY / PALETTES here, then re-run. Everything else
-# (favicon, PWA icons, apple-touch, iOS splash + its <link> partial, the two
-# email rasters, and the ICON_VERSION cache-bust token) is derived. No file under
-# public/ that this script writes should ever be hand-edited.
-#
-# Needs: rsvg-convert (faithful gradient/opacity render at exact px — ImageMagick's
-# own SVG path mangles the light-cone gradients to black) + ImageMagick `magick`
-# (compose splash, build .ico, resize).
-
 require "fileutils"
 require "tmpdir"
 require "digest"
@@ -27,23 +11,16 @@ SPLASH   = File.join(PUBLIC, "splash")
 PARTIAL  = File.join(ROOT, "app/views/layouts/_ios_splash_screens.html.erb")
 VERSION_RB = File.join(ROOT, "config/initializers/icon_version.rb")
 
-# The master, 512×512 viewBox. The mark: a blocky lowercase "ü" whose two umlaut dots are
-# coloured stage-lights (rose left, green right) casting asymmetric "party
-# spotlight" cones — short stubby rose + long raking green — with rounded pool
-# ends (a quadratic-curved base, not a sliced straight line).
 ROSE_DOT  = [186, 140]
 GREEN_DOT = [326, 140]
 DOT_R     = 34
 
-# Letterform rects: [x, y, w, h] (rx = 13 on all).
 LETTER = [
-  [151, 199,  70, 207],  # left stem
-  [291, 199,  70, 207],  # right stem
-  [151, 336, 210,  70]   # bottom bar
+  [151, 199,  70, 207],
+  [291, 199,  70, 207],
+  [151, 336, 210,  70]
 ].freeze
 
-# Each cone: [b1x, b1y, b2x, b2y, bulge]. Apex = its dot; the bottom edge is a
-# quadratic curve bulging `bulge` px past the base midpoint → a rounded light pool.
 ROSE_CONE  = [44, 470, 176, 500, 30].freeze
 GREEN_CONE = [296, 500, 512, 452, 40].freeze
 
@@ -52,7 +29,7 @@ PALETTES = {
   cream: { bg: "#e8e1cd", letter: "#17131a", rose: "#c2185b", green: "#0e7a4a", top: ".58", bot: ".03" }
 }.freeze
 
-BG = PALETTES[:dark][:bg] # splash canvas = brand plum, seamless splash→app hand-off
+BG = PALETTES[:dark][:bg]
 
 def cone(dot, c, fill)
   ax, ay = dot
@@ -73,10 +50,6 @@ def svg_markup(key)
   SVG
 end
 
-# iOS splash device matrix (portrait-only; app is portrait-locked). Deduped by
-# physical resolution → one image covers every device sharing it. Uncovered
-# devices fall back to a blank launch (no regression). Add a row for new Apple
-# screen sizes and re-run.
 DEVICES = [
   ["iPhone SE / 8",                         375,  667, 2],
   ["iPhone XR / 11",                        414,  896, 2],
@@ -97,7 +70,7 @@ DEVICES = [
   ["iPad Pro 12.9",                        1024, 1366, 2],
   ["iPad Pro 13 (M4)",                     1032, 1376, 2]
 ].freeze
-MARK_FRACTION = 0.62 # mark bounding box as fraction of the shorter screen edge
+MARK_FRACTION = 0.62
 
 abort "`rsvg-convert` not found on PATH" if `which rsvg-convert`.strip.empty?
 abort "`magick` (ImageMagick) not found on PATH" if `which magick`.strip.empty?
@@ -115,11 +88,9 @@ Dir.mktmpdir("usgu-icons") do |tmp|
   File.write(dark_svg,  svg_markup(:dark))
   File.write(cream_svg, svg_markup(:cream))
 
-  # 1. canonical SVG — served as the favicon AND the human-viewable master.
   File.write(File.join(PUBLIC, "icon.svg"), svg_markup(:dark))
   puts "icon.svg               canonical mark (served favicon + master)"
 
-  # 2. dark raster set — favicon.ico (16+32), apple-touch (180), PWA (192 + 512).
   ico16 = File.join(tmp, "ico16.png"); render_png(dark_svg, 16, ico16)
   ico32 = File.join(tmp, "ico32.png"); render_png(dark_svg, 32, ico32)
   abort "magick .ico failed" unless system("magick", ico16, ico32, File.join(PUBLIC, "favicon.ico"))
@@ -130,12 +101,10 @@ Dir.mktmpdir("usgu-icons") do |tmp|
     puts format("%-22s %d", name, size)
   end
 
-  # 3. email pair — the one theme split. light = cream ground, dark = plum ground.
   render_png(cream_svg, 192, File.join(PUBLIC, "email-icon-light.png"))
   render_png(dark_svg,  192, File.join(PUBLIC, "email-icon-dark.png"))
   puts "email-icon-{light,dark}.png  192 (cream / plum)"
 
-  # 4. iOS splash — dark mark centred on the brand canvas + the <link> partial.
   mark_tmp = File.join(tmp, "splash-mark.png")
   seen = {}
   DEVICES.each do |label, css_w, css_h, ratio|
@@ -172,8 +141,6 @@ Dir.mktmpdir("usgu-icons") do |tmp|
   File.write(PARTIAL, header + links.join("\n") + "\n")
   puts "_ios_splash_screens.html.erb  #{emitted.size} <link> tags"
 
-  # 5. ICON_VERSION — content hash of both masters, so the cache-bust token
-  #    changes iff the art changes. Deterministic; never a forgotten manual bump.
   digest = Digest::SHA256.hexdigest(svg_markup(:dark) + svg_markup(:cream))[0, 8]
   File.write(VERSION_RB, <<~RB)
     # GENERATED by script/generate_icons.rb — do not edit by hand.

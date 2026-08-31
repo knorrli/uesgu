@@ -2,8 +2,6 @@ require_relative "../../db_test_helper"
 require_relative "../../support/counting_scraper_harness"
 require "stringio"
 
-# Scrapers::Sweep is the orchestration behind scrapers:run_all: one ScrapeRun,
-# a ScrapeResult per scraper, the created events stamped with the run.
 class Scrapers::SweepTest < ActiveSupport::TestCase
   def sweep(scrapers)
     Scrapers::Sweep.run!(scrapers: scrapers, out: StringIO.new)
@@ -32,8 +30,6 @@ class Scrapers::SweepTest < ActiveSupport::TestCase
     assert(run.created_events.all? { |e| e.created_in_scrape_run_id == run.id })
   end
 
-  # The nightly re-derivations ride on the sweep, and a capture lead only ever
-  # appears if this one is still wired in.
   test "the sweep nominates the captured places that keep hosting shows" do
     zorpsaal = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     2.times { event(location_list: [zorpsaal.name, zorpsaal.locality, zorpsaal.canton]) }
@@ -100,7 +96,6 @@ class Scrapers::SweepTest < ActiveSupport::TestCase
 
     result = run.scrape_results.sole
     assert_equal "snoozed", result.status
-    # Skipped entirely: no site hit, no events, and — the point — not an alert.
     assert_equal 0, result.created_count
     assert_equal 0, run.scrapers_ok
     assert_equal 0, run.scrapers_empty

@@ -1,12 +1,5 @@
 require_relative "../db_test_helper"
 
-# Word-overlap suggestions for the curation queue: filing a novel compound genre
-# should surface the existing genres nested inside it (the tighter parent / merge
-# target) that Levenshtein distance never relates. Synthetic taxonomy only.
-#
-# These create genres with EXACT names (not the `genre` fixture, which appends a
-# "-<seq>" uniquifier) because the whole point under test is fingerprint
-# substring/containment — a suffix would poison those relationships.
 class RelatedGenreSuggesterTest < ActiveSupport::TestCase
   def mk(name, events_count: 1)
     Genre.create!(name:, events_count:)
@@ -18,12 +11,11 @@ class RelatedGenreSuggesterTest < ActiveSupport::TestCase
 
     related = RelatedGenreSuggester.call(mk("Flarnwave"))
 
-    # Both are substrings of 'flarnwave'; the busier one leads.
     assert_equal [wave.id, flarn.id], related.map(&:id)
   end
 
   test "matches an existing genre that contains one of a multi-word name's words" do
-    neo = mk("Neoflarn", events_count: 3) # contains the word 'flarn'
+    neo = mk("Neoflarn", events_count: 3)
 
     related = RelatedGenreSuggester.call(mk("Flarn Crossover"))
 
@@ -31,8 +23,8 @@ class RelatedGenreSuggesterTest < ActiveSupport::TestCase
   end
 
   test "ranks a nested stem above a mere word-container" do
-    stem = mk("Flarn", events_count: 1)      # substring of 'flarnwaveflarn'
-    container = mk("Xflarnx", events_count: 9) # only contains the word 'flarn'
+    stem = mk("Flarn", events_count: 1)
+    container = mk("Xflarnx", events_count: 9)
 
     related = RelatedGenreSuggester.call(mk("Flarnwave Flarn"))
 
@@ -44,7 +36,7 @@ class RelatedGenreSuggesterTest < ActiveSupport::TestCase
     subject = mk("Flarnwave")
     hidden = mk("Flarn"); hidden.hide!
     aliased = mk("Wave"); aliased.merge_into!(mk("Welle"))
-    mk("Fl", events_count: 5) # too short to be a meaningful relative
+    mk("Fl", events_count: 5)
 
     related = RelatedGenreSuggester.call(subject)
 

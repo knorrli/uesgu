@@ -1,13 +1,3 @@
-# The deployed version string shown in the footer.
-#
-# In production the build script (bin/render-build.sh) stamps a `REVISION` file
-# at the repo root with `git describe --tags --always` — a clean tag like
-# "v0.1.0" when deployed from a release tag (the only thing we deploy), or a
-# short SHA as a fallback. At runtime we just read that file; we never shell out
-# to git on a production box (git history isn't guaranteed to be there).
-#
-# In development there's no REVISION file, so we fall back to a live
-# `git describe` for convenience. Memoised: computed once per process.
 module AppVersion
   REPO_URL = "https://github.com/knorrli/uesgu".freeze
 
@@ -17,8 +7,6 @@ module AppVersion
     @current ||= revision_file || git_describe || "dev"
   end
 
-  # The best GitHub link for whatever `current` resolved to: the release page for
-  # a clean tag, the commit for a bare SHA, else the repo's commit history.
   def url
     if release_tag?
       "#{REPO_URL}/releases/tag/#{current}"

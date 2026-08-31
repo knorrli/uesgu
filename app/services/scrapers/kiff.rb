@@ -16,8 +16,6 @@ module Scrapers
       click(link_for(row))
     end
 
-    # The start time lives on the list card, not the detail page, so read it from
-    # the current row rather than the clicked-into content.
     def event_start_time(_content)
       Time.zone.parse(current_row.css(".Card__Date time").attr("datetime"))
     end

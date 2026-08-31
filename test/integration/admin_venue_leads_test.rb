@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Read-only discovery inbox under /admin/venue_leads: admin-gated. Lists VenueLead
-# rows — venues an aggregator surfaced or people kept capturing at, neither in the
-# registry — ranked by demand. Synthetic venue names.
 class AdminVenueLeadsTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_venue_leads_path
@@ -36,8 +33,6 @@ class AdminVenueLeadsTest < ActionDispatch::IntegrationTest
     assert_select "span.chip", text: "OLE:TestAgg", count: 2
   end
 
-  # The two producers rank together, and the source chip is the only thing that says
-  # which count means "upcoming" and which means "ever captured".
   test "a nominated place sits in the same ranked list as an aggregator's leads" do
     VenueLead.refresh!(source: "OLE:TestAgg", leads: [
       { venue: "Glorphalle", locality: "Snarftown", canton: "BE", event_count: 9 }

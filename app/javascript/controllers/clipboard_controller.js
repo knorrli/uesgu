@@ -1,8 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="clipboard". Copies the source field's value and
-// briefly swaps the button label to confirm. Falls back to selecting the field
-// when the async clipboard API is unavailable (insecure context / old browser).
 export default class extends Controller {
   static targets = ["source", "button"]
   static values = { copied: String }
@@ -18,7 +15,6 @@ export default class extends Controller {
     }
   }
 
-  // Tapping the field selects the whole URL, so manual copy is one gesture.
   select() {
     this.sourceTarget.select()
   }

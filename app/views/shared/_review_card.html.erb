@@ -1,11 +1,3 @@
-<%# One thing being judged, with the evidence that settles it (see review_card.css).
-    Render with `render layout:` — the block is the body, and i18n inside it must use
-    ABSOLUTE keys.
-
-    `actions` is a pre-rendered local rather than a second block so the decision row
-    cannot be written into the middle of the field list. Leave `source` out and pass
-    `source_attrs` instead when the evidence exists only in the browser — a capture's
-    poster is never uploaded, so the client writes it into the pane itself. %>
 <%# locals: (id:, actions:, source: nil, frame_class: nil, frame_attrs: {}, source_attrs: {}) %>
 <%= tag.div id: id, class: ["review-card", frame_class], **frame_attrs do %>
   <%= tag.div source, class: "review-card__source", **source_attrs %>

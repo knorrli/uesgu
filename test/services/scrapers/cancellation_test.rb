@@ -1,8 +1,5 @@
 require "test_helper"
 
-# Locks the cancellation-marker behaviour independent of fixtures: the multilingual
-# keyword set, the letter-boundary guards against false positives, and the fact that
-# the default reads the extracted title/description (not full HTML).
 class Scrapers::CancellationTest < Minitest::Test
   Event = Struct.new(:title, :description)
 
@@ -19,13 +16,13 @@ class Scrapers::CancellationTest < Minitest::Test
   ].freeze
 
   NOT_CANCELLED = [
-    "Fabian Cancellara Tribute", # contains "cancell" but not "cancelled"
-    "Annie Lennox",              # "ann…" but not a marker
-    "Annual Festival",           # "annu…al", not "annul…"
-    "Konzert verschoben",        # postponed is NOT cancelled
-    "Spectacle reporté",         # postponed (FR) is NOT cancelled
-    "Ausverkauft",               # sold out is NOT cancelled
-    "Uncancellable Party"        # marker embedded in a longer word
+    "Fabian Cancellara Tribute",
+    "Annie Lennox",
+    "Annual Festival",
+    "Konzert verschoben",
+    "Spectacle reporté",         #
+    "Ausverkauft",
+    "Uncancellable Party"
   ].freeze
 
   def test_matches_cancellation_markers

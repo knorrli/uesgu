@@ -1,25 +1,7 @@
 # frozen_string_literal: true
 
-# READ-ONLY dry parse of live OLE feeds — sanity-checks the production
-# Scrapers::Ole adapter against real endpoints WITHOUT touching the database.
-#
-#   bin/rails runner script/ole_dry_parse.rb              # a couple of clean feeds
-#   bin/rails runner script/ole_dry_parse.rb Dachstock    # one source by key
-#   bin/rails runner script/ole_dry_parse.rb BeJazz       # also reaches DEFERRED
-#                                                         # feeds (re-check robots)
-#   bin/rails runner script/ole_dry_parse.rb all          # every shipping source
-#
-# It runs the SAME code the sweep would (fetch → follow pagination → expand
-# events×shows → drop past shows → map fields) but stops short of
-# find_or_initialize_by/save!, so it writes NOTHING. Use it to confirm a feed
-# parses and that every event is upcoming (the date filter actually fired) before
-# trusting it in a real sweep.
-
 DEFAULT_KEYS = %w[Dachstock Bewegungsmelder].freeze
 
-# Every OLE feed in the registry by its feed_key → { venue:, source: }. Consume
-# feeds are also registered classes; deferred ones (robots-blocked BeJazz / Bird's
-# Eye) aren't generated, so we build a throwaway class on demand to still dry-parse.
 def feed_configs
   Venue.all.each_with_object({}) do |venue, acc|
     venue.sources.each do |source|
@@ -51,8 +33,8 @@ end
 def dry_parse(klass)
   puts "\n=== #{klass.source_key}  (#{klass.url})"
   scraper = klass.new
-  scraper.get(klass.url)              # page 1; #event_rows follows pagination
-  rows = scraper.send(:event_rows)    # real parse: paginate + date-filter + expand
+  scraper.get(klass.url)
+  rows = scraper.send(:event_rows)
 
   if rows.empty?
     puts '  (no upcoming events)'

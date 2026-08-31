@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# The invite gate is üsgu's anti-bot defence, so the code must be unguessable,
-# unambiguous to read, and — critically — spendable exactly once.
 class InvitationTest < ActiveSupport::TestCase
   test "generates an unambiguous fixed-length code on create" do
     inv = invitation

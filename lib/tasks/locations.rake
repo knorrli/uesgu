@@ -33,7 +33,6 @@ namespace :locations do
     end
     puts "Users reconciled: #{users_changed}"
 
-    # Remove tag rows that, after the above, no longer tag anything.
     unused = ActsAsTaggableOn::Tag.left_joins(:taggings).where(taggings: { id: nil })
     names = unused.pluck(:name)
     ActsAsTaggableOn::Tag.where(id: unused.pluck(:id)).destroy_all

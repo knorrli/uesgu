@@ -15,9 +15,6 @@
         sorts: %w[name count], active_sort: @sort,
         divider_before: "ignored" %>
 
-  <%# Left-aligned and tight so name, count and status read as one row (the old
-      justify-between stranded the status far right). The count makes the sort
-      legible. %>
   <div class="flex flex-col gap-small">
     <% @genres.each do |genre| %>
       <div class="flex align-baseline gap-medium wrap genre-row">

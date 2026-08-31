@@ -1,35 +1,14 @@
 class Genre < ApplicationRecord
-  # A genre is a raw, scraped descriptor (e.g. "indie-rock", "techno"), filed into
-  # a curated tree (see parent below). Genres live alongside the AATO genre tags on
-  # events and are matched to them by *fingerprint* (see fingerprint_for) so
-  # spelling variants collapse to one row.
-
-  # An alias points at the canonical genre it should be treated as (e.g.
-  # "Elektronik" → "Electronic"): semantic merges the fingerprint can't catch.
   belongs_to :canonical, class_name: "Genre", optional: true
   has_many :aliases, class_name: "Genre", foreign_key: :canonical_id,
                      inverse_of: :canonical, dependent: :nullify
 
-  # The genre tree: a genre sits under one parent (e.g. Crustpunk → Punk → Rock),
-  # forming the curated taxonomy that supersedes the flat Style layer. A tree, not
-  # a DAG — one primary parent only. Filtering by a genre matches it OR any
-  # descendant (see subtree_ids). A root genre (no parent) is a top-level browse
-  # bucket. Orphan, don't cascade, on delete — losing a parent shouldn't delete
-  # the subtree.
   belongs_to :parent, class_name: "Genre", optional: true
   has_many :children, class_name: "Genre", foreign_key: :parent_id,
                       inverse_of: :parent, dependent: :nullify
 
   scope :in_use, -> { where("events_count > 0") }
-  # What a picker may offer: in active use and carrying no disposition or alias. A
-  # genre we ignore, hide or block is not something to suggest, and an alias would tag
-  # the raw token rather than its canonical.
   scope :offerable, -> { in_use.where(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil) }
-  # Tree curation queue: in active use, sitting under no parent, carrying no
-  # disposition or alias, AND not itself a parent of other genres — the genres
-  # still waiting to be filed into the tree. Excluding parents is what separates
-  # an unfiled leaf from a deliberate top-level root (a root has children but no
-  # parent, so it would otherwise look unplaced). Ordered most-used first by by_usage.
   scope :unplaced, lambda {
     in_use.where(parent_id: nil, ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil)
           .where.not(id: Genre.where.not(parent_id: nil).select(:parent_id))
@@ -40,16 +19,6 @@ class Genre < ApplicationRecord
   scope :hidden, -> { where.not(hidden_at: nil) }
   scope :blocked, -> { where.not(blocked_at: nil) }
   scope :aliased, -> { where.not(canonical_id: nil) }
-  # The catalogue: genres actually in use OR parked (given a disposition, merged
-  # into a canonical, or serving as a canonical for >=1 alias). Excludes the dormant
-  # taxonomy entries (count 0, pre-mapped by the seed) that have never appeared on an
-  # event — they'd swamp the curation views. Blocked genres tag 0 events yet stay
-  # listed via their mark so Restore stays reachable (an aliased genre keeps its own
-  # taggings — a query-time link, not a rewrite — so it stays listed via events_count
-  # too). A canonical hub can itself sit at count 0 (the live event carries the
-  # alias's raw token, not the canonical's) — the EXISTS clause keeps it listed so it
-  # doesn't vanish from the catalogue right after a merge. Genres outside this set
-  # remain findable by name search (see GenresController#index), so nothing is hidden.
   scope :listable, lambda {
     where("events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL " \
           "OR blocked_at IS NOT NULL OR canonical_id IS NOT NULL " \
@@ -58,10 +27,6 @@ class Genre < ApplicationRecord
   scope :by_usage, -> { order(events_count: :desc, name: :asc) }
   scope :by_name, -> { order(name: :asc) }
 
-  # Curated display spellings, keyed by fingerprint. Reuses the alias-map
-  # canonicals so collapsed variants surface with a nice name (the lowercase
-  # taxonomy seed and raw scrapes both store a pretty `name`; `fingerprint` stays
-  # the matching key). Anything not listed falls back to titleize_genre.
   DISPLAY_OVERRIDES = {
     "hiphop" => "Hip Hop", "postpunk" => "Post-Punk", "blackmetal" => "Black Metal",
     "indiepop" => "Indie Pop", "randb" => "R&B", "dreampop" => "Dream Pop",
@@ -101,12 +66,6 @@ class Genre < ApplicationRecord
     parent_id.present?
   end
 
-  # The id of this genre and every genre transitively beneath it in the tree —
-  # the set a "filter by this genre" expands to (match the genre OR any
-  # descendant). A single recursive query, freshly evaluated so it never goes
-  # stale after a re-parent (the doc's "cached descendant_ids OR recursive CTE"
-  # — CTE chosen for correctness; wrap in a cache later if the read volume grows).
-  # UNION (not UNION ALL) so a stray parent cycle terminates instead of looping.
   def self.subtree_ids(root_ids)
     root_ids = Array(root_ids).map(&:to_i).uniq
     return [] if root_ids.empty?
@@ -126,11 +85,6 @@ class Genre < ApplicationRecord
     @descendant_ids ||= self.class.subtree_ids([id]) - [id]
   end
 
-  # Descendant count for every genre that has any, in one pass over the adjacency
-  # list: a single `pluck(:id, :parent_id)` plus an in-memory tree walk — no
-  # per-row query. Powers the "set parent" picker, where candidates with the most
-  # sub-genres (the umbrella genres you usually file into) sort first and show the
-  # count. Cheap: one lightweight query over the whole (few-hundred-row) table.
   def self.descendant_counts
     children = Hash.new { |hash, key| hash[key] = [] }
     pluck(:id, :parent_id).each { |id, parent_id| children[parent_id] << id if parent_id }
@@ -140,12 +94,6 @@ class Genre < ApplicationRecord
     counts
   end
 
-  # For every genre, the chain of ancestor NAMES from the root down to its
-  # immediate parent (empty for a root) — e.g. Grindcore under Metal → Grind
-  # yields ["Metal", "Grind"]. One query + an in-memory walk, so annotating a
-  # whole picker's worth of options with where-it-sits context costs nothing per
-  # row. Powers the tree-path suffix on the parent/merge pickers and the related-
-  # genre suggestions (see GenresHelper#genre_ancestor_label).
   def self.ancestor_paths
     rows      = pluck(:id, :parent_id, :name)
     name_of   = rows.to_h { |id, _parent, name| [id, name] }
@@ -158,30 +106,14 @@ class Genre < ApplicationRecord
     paths
   end
 
-  # The normalized matching key, shared with Place (see Fingerprint). MUST
-  # reproduce the SQL `fingerprint` generated column exactly
-  # (AddFingerprintToGenres) — verified by test. Used at ingest on raw scraped
-  # strings that have no row to read the stored column off.
   def self.fingerprint_for(str)
     Fingerprint.for(str)
   end
 
-  # The display spelling for a (possibly messy) scraped/seeded name: a curated
-  # override if any, else a title-caser that — unlike Rails #titleize — preserves
-  # `-`, `/`, and `&` separators (so "post-punk" → "Post-Punk", not "Post Punk").
   def self.display_name_for(str)
     DISPLAY_OVERRIDES[fingerprint_for(str)] || titleize_genre(str)
   end
 
-  # The leading/trailing noise a prose miner or sloppy scraper leaves welded to a
-  # token — sentence punctuation, quotes, brackets, a stray separator ("Virtuos."
-  # → "Virtuos", "…Bässe" → "Bässe"). It trims exactly the characters the
-  # fingerprint already discards (everything non-alphanumeric), so the match key
-  # is untouched and only the human-readable spelling gets cleaned. Unicode-aware:
-  # accented edge letters (Bässe, Éthérée) are alphanumeric and survive; interior
-  # separators (Post-Punk, Drum & Bass) are left alone. A token that is ALL noise
-  # (".", "…") trims to "" and is dropped by the blank guards in ensure! /
-  # canonicalize_names / Event#genre_list=.
   GENRE_EDGE_NOISE = /\A[^[:alnum:]]+|[^[:alnum:]]+\z/
 
   def self.titleize_genre(str)
@@ -189,13 +121,6 @@ class Genre < ApplicationRecord
        .split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
   end
 
-  # The genre names a picked-genre filter should match: every name in the picked
-  # genres' subtrees, PLUS the raw names of any alias that resolves into those
-  # subtrees. An event tagged with the raw token "Elektronik" matches a filter for
-  # "Electronic" because Elektronik#canonical is Electronic, which sits in the
-  # subtree — without the event's stored tag ever being rewritten. Defined once so
-  # the filter query (Filter#expanded_genre_names) and the row highlighter
-  # (EventsHelper#genre_subtree_names) can't drift apart.
   def self.filter_names_for(picked_names)
     picked_names = Array(picked_names).map(&:to_s).reject(&:blank?)
     return [] if picked_names.empty?
@@ -205,23 +130,10 @@ class Genre < ApplicationRecord
     (where(id: subtree).pluck(:name) + where(canonical_id: subtree).pluck(:name)).uniq
   end
 
-  # Genre names that are also ordinary words — too ambiguous to mine out of free
-  # prose, where "the house was packed" / "from every country" / "good for the
-  # soul" would false-match. Prose mining (names_in_prose) skips these; they still
-  # tag normally from a venue's own curated genre field, where the context is
-  # unambiguous. Compared by fingerprint, so spelling variants are caught too.
-  # Tunable — widen it if a homograph keeps surfacing junk taggings.
   PROSE_MINING_STOPWORDS = %w[
     house pop soul folk country garage industrial drum band world wave experimental
   ].freeze
 
-  # The vocabulary prose mining matches against: fingerprint => stored display
-  # name for every known genre EXCEPT blocked noise (never a real genre) and the
-  # everyday-word stoplist above. Built from the same Genre name-space the filter
-  # matcher draws on, so a mined token lights up genre filters exactly like a
-  # hand-tagged one — including alias raw names (e.g. "Elektronik"), which keep
-  # their own fingerprint and resolve to their canonical at query time. The caller
-  # builds this ONCE per scrape run (it's a full-table read).
   def self.prose_mining_index
     stop = PROSE_MINING_STOPWORDS.to_set { |word| fingerprint_for(word) }
     where(blocked_at: nil).pluck(:fingerprint, :name)
@@ -229,19 +141,6 @@ class Genre < ApplicationRecord
                           .to_h
   end
 
-  # The known genre names that appear, on word boundaries, in a free-text blob —
-  # MATCH-ONLY mining over `index` (fingerprint => name, from prose_mining_index):
-  # it attaches existing taxonomy, minting NOTHING new (unlike a scraper's
-  # event_genres). Tokenises on whitespace and tests 1..3-word windows by
-  # fingerprint, so spelling variants fold the way the genre filter matches
-  # ("post punk" → "Post-Punk", "drum and bass" → "Drum & Bass") with no sub-word
-  # hits ("Jazzgeschichte" never matches "jazz"). Greedy + non-overlapping:
-  # "indie rock" yields the single "Indie Rock", not also "Indie" + "Rock".
-  #
-  # Known limitation: negation/comparison in prose still matches ("not your
-  # typical techno" attaches Techno). Known-vocab-only bounds the blast radius, and
-  # a wrong tag is a normal tagging an admin can dismiss/block — but it is NOT
-  # zero, so this stays an ingest-only dataset-quality aid, surfaced nowhere new.
   def self.names_in_prose(text, index)
     return [] if text.blank? || index.empty?
 
@@ -266,13 +165,6 @@ class Genre < ApplicationRecord
     found.uniq
   end
 
-  # Replace each scraped name with its canonical *display* spelling, matched by
-  # fingerprint: the collapsed spelling for a known genre, or a titleized form for
-  # a brand-new one. Cosmetic normalization ONLY (e.g. "post punk" → "Post-Punk").
-  # It deliberately does NOT substitute a semantic alias's canonical — an event
-  # keeps its raw token ("Elektronik"); the filter resolves the alias at query
-  # time (see filter_names_for). Dedupes the publicly-shown tag — see
-  # Event#genre_list=.
   def self.canonicalize_names(names)
     names = Array(names).map(&:to_s)
     return names if names.empty?
@@ -285,11 +177,6 @@ class Genre < ApplicationRecord
     end
   end
 
-  # File this genre into the tree under `parent` (a Genre or its id; nil detaches
-  # it back to a root). A placed genre carries no disposition or alias, so clear
-  # those. Rejects parenting a
-  # genre under itself or its own descendant (which would form a cycle). Re-derives
-  # events so a previously-hidden genre re-surfaces once it's placed.
   def set_parent!(parent)
     new_parent_id = parent.is_a?(Genre) ? parent.id : parent.presence&.to_i
     if new_parent_id && self.class.subtree_ids([id]).include?(new_parent_id)
@@ -302,8 +189,6 @@ class Genre < ApplicationRecord
     recompute_events!
   end
 
-  # "Ignore" it for mapping: a real, publicly-shown genre we deliberately leave
-  # unfiled. Set ignored_at, re-derive events.
   def ignore!
     transaction do
       update!(ignored_at: Time.current, hidden_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
@@ -311,8 +196,6 @@ class Genre < ApplicationRecord
     recompute_events!
   end
 
-  # "Hide": mark as non-music. Set hidden_at. Events carrying only this (and no
-  # other non-hidden genre) drop out of public listings — see Event#hidden_by_genre?.
   def hide!
     transaction do
       update!(hidden_at: Time.current, ignored_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
@@ -320,33 +203,18 @@ class Genre < ApplicationRecord
     recompute_events!
   end
 
-  # "Block" scraper noise (never a real genre): set blocked_at, and strip this
-  # genre's taggings off every event that carries it. The event itself stays
-  # untouched and visible — only the junk tag goes. Event#genre_list= then keeps
-  # it out on every future scrape, since scrapers re-tag by name.
   def block!
     transaction do
       update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil, canonical_id: nil, parent_id: nil)
     end
-    # Snapshot ids first: recompute_visibility! drops this genre's tagging from each
-    # event, shrinking the tagged_with set find_each would page over — which would
-    # skip events and leave the blocked tag attached (cf. merge_into!).
     affected = Event.tagged_with(name, on: :genres).pluck(:id)
     Event.where(id: affected).find_each do |event|
       event.genre_list.remove(name)
-      event.recompute_visibility! # persists the dropped tagging + re-derives visibility
+      event.recompute_visibility!
     end
     update_columns(events_count: 0)
   end
 
-  # Mark this genre as a semantic alias of `canonical` — a synonym the fingerprint
-  # can't catch (e.g. "Elektronik" → "Electronic"). The alias is a query-time LINK,
-  # not a data rewrite: events keep their own raw tag ("Elektronik") intact and the
-  # genre filter resolves the alias at query time (see Genre.filter_names_for), so
-  # source data stays untouched. Clearing the other marks keeps alias and
-  # disposition/placement mutually exclusive. Idempotent. reconcile! keeps
-  # events_count authoritative — the alias row retains its own taggings, so unlike
-  # a blocked/hidden genre its count stays > 0.
   def merge_into!(canonical)
     raise ArgumentError, "a genre cannot be merged into itself" if canonical.id == id
 
@@ -354,42 +222,30 @@ class Genre < ApplicationRecord
     Genre.reconcile!
   end
 
-  # Back to the queue: clear every mark (disposition or alias) and re-derive
-  # events. Like restoring a blocked genre, repointed/stripped taggings don't
-  # come back — restore only lifts the mark for future scrapes.
   def restore!
     update!(ignored_at: nil, hidden_at: nil, blocked_at: nil, canonical_id: nil, parent_id: nil)
     recompute_events!
   end
 
-  # Fingerprints of every blocked genre, for blocklist matching at tagging time
-  # (see Event#genre_list=) — fingerprint-based so spelling variants are caught.
   def self.blocked_fingerprints
     blocked.pluck(:fingerprint).to_set
   end
 
-  # Ensure a Genre row exists for each given name, matched and de-duplicated by
-  # fingerprint (so "Post Punk" resolves to an existing "Post-Punk" rather than
-  # spawning a third row). New rows are stored under their display name.
   def self.ensure!(names)
     names = Array(names).map(&:to_s).reject(&:blank?).uniq
     return if names.empty?
 
-    representative = names.index_by { |name| fingerprint_for(name) } # fingerprint => a raw name
+    representative = names.index_by { |name| fingerprint_for(name) }
     existing = where(fingerprint: representative.keys).pluck(:fingerprint)
     (representative.keys - existing).each do |fingerprint|
       display = display_name_for(representative[fingerprint])
-      next if display.blank? # an all-punctuation token ("...") normalizes to nothing
+      next if display.blank?
       create!(name: display)
     rescue ActiveRecord::RecordNotUnique
-      next # a concurrent insert or fingerprint race already created it
+      next
     end
   end
 
-  # Refresh the cached usage count from the current genre taggings on events,
-  # creating rows for any new genres and zeroing those no longer in use. Folds
-  # tag-name variants that share a fingerprint into the one Genre, so a stray
-  # case/spacing variant never re-splits what fingerprinting merged.
   def self.reconcile!
     counts = ActsAsTaggableOn::Tagging
              .where(context: "genres", taggable_type: Event.name)

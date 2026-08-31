@@ -4,8 +4,6 @@ module Scrapers
       URI.parse("https://www.saegegasse.ch/programm")
     end
 
-    # Sägegasse lists a title + a free-text description (the description); there is
-    # no genre/style/tag field.
     field_gaps genres: :no_field
 
     def event_rows
@@ -16,8 +14,6 @@ module Scrapers
       URI.join(self.class.url, row.at_css("a.rs_event_link").attr("href")).to_s
     end
 
-    # The list page carries schema.org microdata, so the start time is a clean ISO
-    # datetime (full date + time + year) — no text parsing, no silent-today risk.
     def event_start_time(content)
       date_string = content.at_css('meta[itemprop="startDate"]')&.attr("content")
       raise "Unparseable date #{date_string.inspect}" if date_string.blank?

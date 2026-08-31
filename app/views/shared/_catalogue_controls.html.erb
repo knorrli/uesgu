@@ -1,13 +1,3 @@
-<%# The chrome every catalogue browser opens with — admin events / localities / locations
-    / places and the genre index: filter chips, then the search field, then the sort row.
-    One partial rather than three because the blocks only work together — each has to
-    carry the other two's params through, or filtering drops your search and sorting
-    drops your filter.
-
-    `filter_param` names the query param AND the i18n key prefix (`status_…` / `type_…`),
-    so a page that filters by type needs nothing further. `divider_before` names the chip
-    that opens a second group: the genre index files its parked dispositions apart from
-    its tree statuses. %>
 <%# locals: (route:, scope:, filters:, active_filter:, sorts:, active_sort:, filter_param: :status, divider_before: nil) %>
 <div class="flex gap-small wrap align-baseline catalogue-filters">
   <% filters.each do |value| %>

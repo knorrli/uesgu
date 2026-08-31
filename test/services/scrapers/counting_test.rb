@@ -1,8 +1,6 @@
 require_relative "../../db_test_helper"
 require_relative "../../support/counting_scraper_harness"
 
-# The instrumentation Scrapers::Agent#call adds: a Scrapers::Result tallying
-# what the run saw and wrote, plus the ids of the events it created.
 class Scrapers::CountingTest < ActiveSupport::TestCase
   test "tallies created + collects ids, then unchanged on an identical re-scrape" do
     rows = [{ url: "https://fixture.test/e1" }, { url: "https://fixture.test/e2" }]
@@ -18,7 +16,6 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     created = Event.where(url: rows.map { |r| r[:url] })
     assert_equal created.pluck(:id).sort, result.created_ids.sort
 
-    # Same urls, identical data: re-saved but nothing changed → unchanged, not updated.
     again = CountingScraperHarness.new.call
     assert_equal 0, again.created
     assert_equal 0, again.updated
@@ -31,7 +28,6 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     CountingScraperHarness.next_rows = [{ url: url, title: "First Title" }]
     CountingScraperHarness.new.call
 
-    # Same url, different title → a real change.
     CountingScraperHarness.next_rows = [{ url: url, title: "Second Title" }]
     result = CountingScraperHarness.new.call
 
@@ -62,10 +58,8 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     CountingScraperHarness.next_rows = [{ url: url, title: "Real Title", description: "First Sub" }]
     CountingScraperHarness.new.call
     event = Event.find_by(url: url)
-    event.lock_field!(:title) # admin corrected the title
+    event.lock_field!(:title)
 
-    # Source changes both fields; the locked title must be preserved, the
-    # unlocked description must track the source → a real change → updated.
     CountingScraperHarness.next_rows = [{ url: url, title: "Source Title", description: "Second Sub" }]
     result = CountingScraperHarness.new.call
 
@@ -82,8 +76,6 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     CountingScraperHarness.new.call
     Event.find_by(url: url).lock_field!(:title)
 
-    # The only source change is the locked title → the event is effectively
-    # untouched, so it tallies as unchanged, not updated.
     CountingScraperHarness.next_rows = [{ url: url, title: "Ignored New Title" }]
     result = CountingScraperHarness.new.call
 
@@ -99,8 +91,6 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     dismissed = Event.find_by(url: url)
     dismissed.dismiss!
 
-    # Same url still in the source with changed data — the scraper must leave the
-    # dismissed event untouched rather than update it back into view.
     CountingScraperHarness.next_rows = [{ url: url, title: "Changed" }]
     result = CountingScraperHarness.new.call
 
@@ -119,7 +109,6 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     event.dismiss!
     event.undismiss!
 
-    # No longer dismissed → the scraper resumes updating it from source.
     CountingScraperHarness.next_rows = [{ url: url, title: "Changed" }]
     result = CountingScraperHarness.new.call
 
@@ -136,7 +125,6 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert event.discarded?, "event should be flagged by the matching rule"
     assert_equal 1, result.discarded, "the run should tally the filtered event"
 
-    # Rule gone → next scrape re-derives the flag to nil (not sticky).
     DiscardRule.destroy_all
     CountingScraperHarness.next_rows = [{ url: url, title: "Tschütte live" }]
     CountingScraperHarness.new.call
@@ -144,17 +132,12 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
   end
 
   test "an identical re-scrape with a duplicate-carrying genre list stays unchanged" do
-    # Guards a plausible over-count source: an extractor can hand build_event a list
-    # that already carries a DUPLICATE ("Ggg" twice). acts-as-taggable-on dedupes on
-    # assignment, and tag_snapshot sorts, so the freshly-built list still compares
-    # equal to the persisted one — a no-op re-scrape stays unchanged, not updated.
     url = "https://fixture.test/genre-overlap"
     rows = [{ url: url, genres: %w[Ggg Ggg] }]
     CountingScraperHarness.next_rows = rows
     CountingScraperHarness.new.call
     assert_equal ["Ggg"], Event.find_by(url: url).genre_list
 
-    # Same data again: the dedup means nothing actually changes → unchanged, not updated.
     CountingScraperHarness.next_rows = rows
     again = CountingScraperHarness.new.call
     assert_equal 0, again.updated, "a no-op re-scrape must not count as updated"
@@ -169,12 +152,10 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     assert event.rescheduled?, 'a "Verschoben" title should flag the event as rescheduled'
     first_at = event.rescheduled_at
 
-    # Marker still present on re-scrape → flag stays, original timestamp preserved.
     CountingScraperHarness.next_rows = [{ url: url, title: "Verschoben: The Band" }]
     CountingScraperHarness.new.call
     assert_equal first_at, event.reload.rescheduled_at
 
-    # Venue fixed the title (marker gone) → flag clears, re-derived from source.
     CountingScraperHarness.next_rows = [{ url: url, title: "The Band" }]
     CountingScraperHarness.new.call
     refute event.reload.rescheduled?
@@ -189,8 +170,6 @@ class Scrapers::CountingTest < ActiveSupport::TestCase
     event.lock_field!(:genres)
     event.save!
 
-    # Source still says "Aaa" — but genres are pinned, so the re-scrape keeps
-    # "Bbb" rather than overwriting it.
     CountingScraperHarness.next_rows = [{ url: url, title: "Show", genres: ["Aaa"] }]
     CountingScraperHarness.new.call
 

@@ -1,8 +1,5 @@
 require "test_helper"
 
-# AppVersion turns whatever git/REVISION reports into a display string and the
-# best matching GitHub URL. `current` is memoised + environment-dependent, so we
-# stub it and assert the classification (url + release_tag?) around it.
 class AppVersionTest < ActiveSupport::TestCase
   test "a clean version tag links to its GitHub release" do
     AppVersion.stub(:current, "v0.1.0") do

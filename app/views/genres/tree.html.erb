@@ -3,7 +3,6 @@
     <h1><%= t('genres.tree.title') %></h1>
   <% end %>
 
-  <%# Read-only — each genre links to its editor (where you set the parent). %>
   <p class="muted">
     <%= t('.summary', roots: @roots.size, placed: @placed) %>
     <% if @unplaced.positive? %>

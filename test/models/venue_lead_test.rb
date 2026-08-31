@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# VenueLead is the discovery inbox: aggregator-resolved venues NOT approved in the
-# registry, rewritten fresh per source each run, ranked by upcoming-event demand.
-# Synthetic names (project-test-synthetic-taxonomy).
 class VenueLeadTest < ActiveSupport::TestCase
   test "refresh! replaces a source's leads with the current run's set" do
     VenueLead.create!(venue: "Stale", locality: "X", canton: "BE", source: "OLE:Test", event_count: 1)

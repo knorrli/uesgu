@@ -1,11 +1,3 @@
-<%# Shows the app may already carry, and the answer the card cannot publish without.
-    Rendered twice from the same locals: inside the card while the contributor is
-    still reading the poster, and into the status slot when the publish itself turns
-    one up (EventCapture::Creator returns :duplicate rather than writing).
-
-    Every button submits the card's own form BY ID — the status slot sits outside it,
-    and a submit button carries its own name/value, which is what lets one form post
-    three different answers with no client code. %>
 <%# locals: (id: nil, matches:, form_id:) %>
 <%= tag.div id: id, class: "capture-card__matches" do %>
   <p class="capture-card__matches-heading"><%= t('capture.matches.heading') %></p>
@@ -22,8 +14,6 @@
       </li>
     <% end %>
   </ul>
-  <%# A row of its own so the button keeps its own width: stretched to the block it
-      reads as the card's commit, which belongs to the action bar. %>
   <div class="capture-card__matches-actions">
     <%= button_tag t('capture.matches.distinct'), type: "submit", form: form_id,
           name: "acknowledged", value: "1", class: "button-small" %>

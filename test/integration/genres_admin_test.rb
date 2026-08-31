@@ -1,10 +1,5 @@
 require "db_test_helper"
 
-# Locks the admin genre-curation flow through the controller: the set_parent
-# (tree-filing) write path, each disposition endpoint, the queue that serves the
-# next highest-impact unplaced genre, and the internal-only return_to. Disposition
-# *behaviour* is unit-tested in genre_disposition_test; here we prove the
-# endpoints wire through and redirect. Synthetic taxonomy only.
 class GenresAdminTest < ActionDispatch::IntegrationTest
   setup { sign_in_as user(admin: true) }
 
@@ -70,10 +65,8 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
   end
 
   test "queue editor surfaces related genres with file + merge actions" do
-    # Exact names (not the suffixing `genre` helper) so 'flarn' really is a
-    # substring of 'flarnwave' — the relationship the suggester keys on.
-    Genre.create!(name: "Flarn", events_count: 1)                 # an existing stem
-    compound = Genre.create!(name: "Flarnwave", events_count: 99) # the queue head
+    Genre.create!(name: "Flarn", events_count: 1)
+    compound = Genre.create!(name: "Flarnwave", events_count: 99)
 
     get queue_genres_path
 
@@ -81,8 +74,8 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     assert_select ".genre-related" do
       assert_select "h3", text: I18n.t("genres.editor.related")
       assert_select ".genre-related__label", text: /Flarn/
-      assert_select "form[action=?]", set_parent_genre_path(compound) # file under it
-      assert_select "form[action=?]", merge_genre_path(compound)      # or merge into it
+      assert_select "form[action=?]", set_parent_genre_path(compound)
+      assert_select "form[action=?]", merge_genre_path(compound)
     end
   end
 
@@ -94,8 +87,6 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     get edit_genre_path(subject)
 
     assert_response :success
-    # The root sits at depth 0 (flush) and its sub-genre one level in — the tree
-    # is visible in the dropdown, not a flat alphabetical wall.
     assert_select ".genre-set-parent .genre-tree-option[data-depth=0] .genre-option-name.umbrella",
                   text: root.name
     assert_select ".genre-set-parent .genre-tree-option[data-depth=1] .genre-option-name",
@@ -110,9 +101,6 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  # The chips and the sort row each have to carry the other's param through
-  # (shared/_catalogue_controls). Pinned on the genre index because it is the one
-  # whose chips used to drop the sort, silently resetting it on every filter click.
   test "filtering keeps the active sort and sorting keeps the active filter" do
     genre(events_count: 1)
 
@@ -123,16 +111,11 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     assert_select ".catalogue-sort-option[href=?]", genres_path(status: "unplaced", sort: "count")
   end
 
-  # A status or sort off the whitelist has to land on the default rather than reach
-  # public_send (see CatalogueBrowsing). This pins the Hash-shaped whitelist;
-  # admin_locations_test pins the Array-shaped one.
   test "an unknown status or sort falls back to the defaults" do
     genre(events_count: 1)
 
     get genres_path(status: "bogus", sort: "bogus")
     assert_response :success
-    # The controls echo the raw params back, so the junk stays in the hrefs — the
-    # fallback shows in which link renders active.
     assert_select "a.tag.active[href=?]", genres_path(sort: "bogus")
     assert_select ".catalogue-sort-option.active[href=?]", genres_path(status: "bogus", sort: "name")
   end

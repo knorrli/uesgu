@@ -1,18 +1,3 @@
-<%# The filter UI: a trigger bar + three sheets (What / Where / When). One markup
-    for both breakpoints — full-screen bottom sheets below 600px, and in-flow
-    dropdown panels (push the results down, no float) at/above it. Same component
-    drives the saved-filter editor (saved_filters/_form).
-
-    It is a plain GET form whose option rows ARE the submitted inputs
-    (name="q[]/g[]/l[]/d[]"), so it produces the exact same params as the inline
-    filter and EventsController#build_filter needs no changes. Selections are
-    staged inside a sheet and committed (one Turbo navigation) when it closes;
-    server-rendered state below keeps the bar, chips and results in sync.
-
-    Sheets own a full-screen search field instead of a floating dropdown, so the
-    on-screen keyboard never collides with an options list — the field is only
-    focused when the user taps it, never on open. %>
-
 <% what_terms  = @filter.queries + @filter.genres %>
 <% where_terms = @filter.location_list.map { |loc| location_display(loc) } %>
 <% when_terms  = @filter.date_ranges.map { |range| date_range_label(range) } %>
@@ -25,13 +10,8 @@
         html: { autocomplete: 'off' },
         data: { filter_sheets_target: 'form', turbo_frame: '_top' } do %>
 
-    <%# Marks every submission of THIS form (apply, chip ×, Clear-then-commit — all
-        go through requestSubmit) as a deliberate filter action, so the controller
-        treats even a cleared-to-empty submit as "no filter" instead of replaying the
-        persisted cookie. Plain visits to /events omit it and so replay the cookie. %>
     <%= hidden_field_tag :filtered, 1 %>
 
-    <%# ── Trigger bar — each row opens its sheet ── %>
     <div class="filter-sheets__bar">
       <% [
            { field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') },
@@ -42,15 +22,6 @@
       <% end %>
     </div>
 
-    <%# ── Applied filters (removable) + the saved-filters menu. Server-rendered =
-        always matches results. Chips wrap inside their own growing container; the
-        saved-filters menu (save the active filter / apply a saved one) is pinned to
-        the right of the same row. The container is ALWAYS in the layout (with a
-        reserved min-height, see .filter-sheets__summary) and only its CONTENTS are
-        conditional — so activating a filter fills the space already held instead of
-        inserting a new row that shoves the toolbar + results down. ── %>
-    <%# Signed-in users always get the menu: even on an empty feed it offers to save
-        the all-events rule ("notify me about everything"). %>
     <% show_saved_menu = current_user.present? %>
     <div class="<%= class_names('filter-sheets__summary', 'filter-sheets__summary--empty': !@filter.active? && !show_saved_menu) %>">
       <% if @filter.active? %>
@@ -74,13 +45,9 @@
       <% end %>
     </div>
 
-    <%# ── WHAT + WHERE sheets — the genre tree + the location tree, shared with
-        the rule editor so both read identically (tags/_genre_sheet, _location_sheet). ── %>
     <%= render 'tags/genre_sheet', filter: @filter %>
     <%= render 'tags/location_sheet', filter: @filter %>
 
-    <%# ── WHEN sheet — presets + custom-range calendar (shared with the rule
-        editor, which renders it single-select with no calendar). ── %>
     <%= render 'tags/when_sheet', filter: @filter %>
   <% end %>
 </div>

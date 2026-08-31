@@ -1,10 +1,6 @@
 require "db_test_helper"
 
-# InterestProfile derives "what could interest me" from a user's saved filters:
-# a date-stripped, whole-filter match used to highlight the list.
-# Synthetic taxonomy only (see db_test_helper taxonomy rule).
 class InterestProfileTest < ActiveSupport::TestCase
-  # Build + persist a saved filter from landing-page params (q/g/l/d).
   def saved(owner, **filter)
     rule = owner.saved_filters.new(cadence: "daily", time_of_day: 18 * 60, weekday: 1, monthday: 1,
                                    notify_in_app: false, notify_push: false, notify_email: false)
@@ -25,7 +21,7 @@ class InterestProfileTest < ActiveSupport::TestCase
     u = user
     saved(u, g: [parent.name])
 
-    hit  = event_with_genres(child.name)   # tagged a descendant of the filtered genre
+    hit  = event_with_genres(child.name)
     miss = event_with_genres(genre(name: "techno").name)
 
     profile = InterestProfile.for(u)
@@ -82,8 +78,6 @@ class InterestProfileTest < ActiveSupport::TestCase
   test "the date window is ignored (taste only)" do
     g = genre(name: "klassik")
     u = user
-    # A "happening this weekend" filter — InterestProfile must match on taste
-    # regardless of the event's date or the window.
     saved(u, g: [g.name], d: ["this_weekend"])
 
     far_future = event(genre_list: [g.name], start_date: Date.new(2099, 1, 1))

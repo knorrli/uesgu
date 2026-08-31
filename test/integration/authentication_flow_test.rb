@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the account lifecycle through the real HTTP stack: registration (which
-# logs the new user straight in, without forcing favorites), login success and
-# failure, logout, and the redirect that guards authenticated pages.
 class AuthenticationFlowTest < ActionDispatch::IntegrationTest
   test "registration with a valid invite creates an account, signs in, and lands on root" do
     invite = invitation
@@ -19,7 +16,6 @@ class AuthenticationFlowTest < ActionDispatch::IntegrationTest
     assert_empty created.saved_filters, "onboarding must not force a saved filter"
     assert_equal created, invite.reload.redeemed_by, "the code is spent on the new user"
 
-    # The session cookie is live: a protected page now renders.
     get settings_path
     assert_response :success
   end

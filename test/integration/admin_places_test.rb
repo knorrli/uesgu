@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# The venue curation screens under /admin/places: admin-gated, and the one place two
-# captured spellings of one venue can be folded together. Synthetic venue names; the
-# registry is read live.
 class AdminPlacesTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_places_path
@@ -53,8 +50,6 @@ class AdminPlacesTest < ActionDispatch::IntegrationTest
     refute_predicate variant.reload, :alias?
   end
 
-  # The picker cannot offer it, so this only happens to a hand-made request — and it
-  # must not 500 the screen.
   test "merging a venue into itself is refused, not crashed on" do
     akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
     sign_in_as user(admin: true)
@@ -78,7 +73,6 @@ class AdminPlacesTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", merge_admin_place_path(graduated), count: 0
   end
 
-  # The town rides along with the merge, so it has to be readable before choosing.
   test "the editor offers every other venue as a merge target, labelled with its town" do
     akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
     place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")

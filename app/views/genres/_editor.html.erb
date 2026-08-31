@@ -1,17 +1,7 @@
-<%# Shared genre editor (tinder queue, per-genre edit, inline edit). The primary
-    action files the genre into the tree under a parent; the rest are dispositions
-    + merge. `return_to` decides where each action lands: the queue passes its own
-    path (next genre), the others return to their page. %>
 <section class="flex flex-col gap-large">
-  <%# Filing group: the genre's name, its current disposition (if any), the
-      primary "set parent" action and the disposition alternatives — one block,
-      since they're the same decision ("where does this genre go?"). %>
   <div class="flex flex-col gap-medium">
     <h2><%= genre.name %></h2>
 
-    <%# Current disposition + an inline Restore, shown only once a genre has one.
-        Explains an otherwise-mysterious empty editor (a blocked genre tags 0
-        events, since block stripped them). %>
     <% if genre.aliased? %>
       <div class="flex gap-medium align-baseline wrap genre-current-status">
         <span class="muted"><%= t('genres.editor.status') %> <strong><%= t('genres.index.status_merged', canonical: genre.canonical.name) %></strong></span>
@@ -30,14 +20,6 @@
       </div>
     <% end %>
 
-    <%# Primary curation action: file this genre into the tree under a parent (e.g.
-        Crustpunk → Punk). Blank = a top-level (root) genre. Parents exclude this
-        genre and its own descendants (which would form a cycle) and any
-        hidden/blocked/aliased genre. The parent-based successor to "Assign".
-        Rendered (via genre_tree_options) as the actual tree — umbrellas first,
-        their sub-genres nested and indented beneath them — so you can see the
-        hierarchy you're filing into and pick the right branch at a glance. The
-        indent/count is render-only, so typing still filters on the name. %>
     <% parent_candidates = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
                                 .where.not(id: [genre.id, *genre.descendant_ids]) %>
     <% parent_options = genre_tree_options(parent_candidates) %>
@@ -56,12 +38,6 @@
       <%= f.submit t('genres.editor.set_parent') %>
     <% end %>
 
-    <%# Related existing genres — the filing shortcut. Word-overlap matches (filing
-        "Grindpunk" surfaces "Grind", "Punk"), each shown with its tree path so you
-        can see it IS the precise parent you were after ("Grind · Metal › Grind").
-        One tap files this genre under it, or merges into it — answering "where does
-        this go?" without hunting the tree. Distinct from the spelling-distance
-        "did you mean" in the merge group below (which excludes these). %>
     <% if related_suggestions.any? %>
       <div class="flex flex-col gap-small genre-related">
         <h3><%= t('genres.editor.related') %></h3>
@@ -83,10 +59,6 @@
       </div>
     <% end %>
 
-    <%# Three terminal dispositions besides "set parent" (the form above): ignore =
-        keep the genre but leave it unfiled; hide = non-music, drop the event; block
-        = scraper noise, strip the tag entirely. A quiet label sets them apart as
-        the "none of the above" escape hatches rather than a fourth filing option. %>
     <div class="flex flex-col gap-small genre-dispositions-group">
       <span class="muted genre-dispositions-label"><%= t('genres.editor.disposition_group') %></span>
       <div class="flex gap-small wrap genre-dispositions">
@@ -97,11 +69,7 @@
     </div>
   </div>
 
-  <%# Merge group: fold this genre into another. A hairline + air (genre-editor-
-      section) sets it apart from the filing decision above. %>
   <div class="flex flex-col gap-medium genre-editor-section">
-    <%# "Did you mean" — the closest existing genres by fingerprint similarity
-        (levenshtein), e.g. "postpunkz" → "Post-Punk". One click merges. %>
     <% if alias_suggestions.any? %>
       <div class="flex flex-col gap-small">
         <h3><%= t('genres.editor.merge_suggested') %></h3>
@@ -115,14 +83,6 @@
       </div>
     <% end %>
 
-    <%# Merge into a canonical genre — a semantic alias the fingerprint can't catch
-        (e.g. "Elektronik" → "Electronic"). A query-time link: this genre keeps its
-        own taggings, and a filter on the canonical resolves the alias (see
-        Genre.filter_names_for), so future scrapes auto-match too. Candidates mirror
-        the parent picker — any genre that isn't hidden, blocked, or itself an alias,
-        minus this one — so a correctly-spelled but dormant (0-event) genre stays a
-        valid target (the live event often carries the messy variant, leaving the
-        clean canonical at count 0). Ordered most-used first. %>
     <% merge_candidates = Genre.where(hidden_at: nil, blocked_at: nil, canonical_id: nil)
                                .where.not(id: genre.id) %>
     <%= form_with url: merge_genre_path(genre), method: :post, scope: :genre,
@@ -136,8 +96,6 @@
           <% combobox.customize_input class: 'flex-grow' %>
         <% end %>
       </div>
-      <%# Secondary (a <button>, not input[type=submit]) so the page keeps a single
-          filled primary — filing under a parent, the main curation act. %>
       <%= f.button t('genres.editor.merge'), type: :submit %>
     <% end %>
   </div>
@@ -148,14 +106,6 @@
         <h3><%= t('genres.editor.appears_on') %></h3>
         <span class="muted"><%= t('genres.editor.usage', count: genre.events_count) %></span>
       </div>
-      <%# Reuse the real event card so the full extracted context (description,
-          styles, sibling genres) is visible. interactive:false renders it
-          read-only (no interest highlighting), but the admin edit/delete tooling
-          stays — curating a genre often means it doesn't belong on a listed event
-          (mis-extracted from a blurb), so the card's edit gear jumps straight to
-          that event and its delete returns here (return_to). The date + venue
-          (which the card omits, the list shows them via grouping) sit in a muted
-          header above each. %>
       <% sample_events.each do |event| %>
         <div class="genre-sample-event flex flex-col gap-small">
           <span class="muted">

@@ -1,59 +1,26 @@
 require "test_helper"
 
-# Behavior-preservation harness for the scraper template-method refactor.
-#
-# It exercises each scraper's `process_events` against a saved HTML fixture with
-# every I/O seam stubbed — `get`/`page`/`click` parse fixtures, `Event` is a plain
-# capture object, and the genre/visibility derivation is no-op'd — so the run is fully
-# offline and touches no database. The captured per-event field assignments are compared to
-# a committed golden JSON.
-#
-# Crucially the harness only relies on seams shared by BOTH the old (inline) and new
-# (hook-based) scrapers, so the SAME test captures the golden on the pre-refactor
-# code and then guards the refactor:
-#
-#   CAPTURE_GOLDEN=1 bin/rails test test/services/scrapers/golden_test.rb   # write goldens
-#   bin/rails test test/services/scrapers/golden_test.rb                    # assert vs goldens
 class Scrapers::GoldenTest < Minitest::Test
   FIXTURE_ROOT = File.expand_path("../../fixtures/scrapers", __dir__)
-  # Click-into-detail scrapers: a stubbed `click` returns the saved detail page.
   SHAPE_B = %w[bad_bonn kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken marians z7].freeze
   CAPTURING = ENV["CAPTURE_GOLDEN"] == "1"
-  # Pin the clock to when the fixtures were captured so year-inferring scrapers
-  # stay deterministic regardless of when the suite runs (ISC reads Date.current
-  # to resolve the year its detail pages omit; left live, its golden rots a year
-  # later). This is the only clock dependency in golden output.
   REFERENCE_DATE = Date.new(2026, 6, 10)
 
-  # Stand-in for an Event that records field assignments instead of persisting.
   class Capture
     FIELDS = %i[start_time start_date title description genre_list location_list cancelled_at].freeze
-    # :data_source / :hidden / :rescheduled_at are set by build_event but aren't part
-    # of the golden output (rescheduled_at is keyword-derived like cancelled_at, but
-    # left out of the golden so existing baselines don't need regenerating).
     attr_accessor(*FIELDS, :hidden, :data_source, :rescheduled_at)
     attr_reader :url
 
     def initialize(url) = @url = url
     def save! = nil
 
-    # process_events now branches on new_record? to tally created-vs-updated and
-    # collect created ids. The offline run never persists, so every capture reads
-    # as a brand-new record with no id — neither feeds the golden output.
     def new_record? = true
     def id = nil
 
-    # Offline captures are never dismissed (no DB) — the scraper's dismissed-skip
-    # guard must read as false here.
     def dismissed? = false
 
-    # Likewise no admin field-overrides offline, so build_event's per-field
-    # override guard reads as false and every field is captured from source.
     def overridden?(_field) = false
 
-    # Visibility is a DB-derived projection (Genre.hidden), not a parsing concern,
-    # so the offline run treats every event as visible — mirroring the stubbed
-    # ensure_genres_and_visibility. The real derivation is covered by EventTest.
     def hidden_by_genre? = false
 
     def to_h
@@ -63,8 +30,6 @@ class Scrapers::GoldenTest < Minitest::Test
     private
 
     def serialize(field, value)
-      # cancelled_at is a wall-clock timestamp; record only its presence so the
-      # golden stays deterministic while still proving detection fired.
       return !value.nil? if field == :cancelled_at
 
       value.respond_to?(:iso8601) ? value.iso8601 : value
@@ -100,13 +65,6 @@ class Scrapers::GoldenTest < Minitest::Test
     end
   end
 
-  # Guard every scraper's event URLs against the Rote Fabrik failure class: a wrong
-  # host or path-base that ships dead links into the app. Each scraper declares the
-  # shape its URLs must match (Scrapers::Agent.event_url_pattern — default: scheme +
-  # the listing host); we assert every captured URL is present and matches it. This
-  # can't catch a valid-host-but-wrong-id link (undetectable offline), but it does
-  # catch the whole-host/path regressions that broke Rote Fabrik. Aggregators return
-  # nil (per-event host, no single shape) and are skipped.
   def assert_url_shape(klass, slug, captured)
     pattern = klass.event_url_pattern
     return if pattern.nil?
@@ -132,13 +90,7 @@ class Scrapers::GoldenTest < Minitest::Test
       scraper.define_singleton_method(:get) { |*| nil }
       scraper.define_singleton_method(:page) { list_page }
       scraper.define_singleton_method(:click) { |*| detail_page } if detail_page
-      # Keep the run DB-free: the genre-row/visibility derivation hits the DB and
-      # isn't under test here (EventTest covers it), so no-op it.
       scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
-      # Likewise prose genre-mining reads the taxonomy from the DB; its matching is
-      # covered by GenreTest and its composition by GenreMintingTest. No-op'ing it
-      # keeps golden output the pure parse result (event_genres only), so the
-      # baseline stays deterministic and independent of taxonomy state.
       scraper.define_singleton_method(:mined_genres) { |content| [] }
 
       Event.stub(:find_or_initialize_by, factory) do

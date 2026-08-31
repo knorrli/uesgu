@@ -1,26 +1,10 @@
 module EventCapture
-  # The provider call. Infomaniak's AI tools speak an OpenAI-shaped API under a
-  # product-scoped path, so the body below is the ordinary chat-completions
-  # shape: an image is inlined as a data URL, while pasted text rides in a second
-  # text part.
-  #
-  # Swiss-hosted, and chosen on accuracy rather than price: 0/6 fabricated dates
-  # against Mistral Small 4's 5/6, at ~6 cents a month either way. Net::HTTP rather
-  # than Mechanize,
-  # which exists for scraping HTML under robots enforcement — none of that applies to a
-  # JSON API we hold an account with.
   class Infomaniak
     Response = Data.define(:text, :model, :input_tokens, :output_tokens)
 
-    # 2.3s is the measured round trip. The read timeout is generous against a slow
-    # day but still bounded, because the caller is a person watching a spinner.
     OPEN_TIMEOUT = 5
     READ_TIMEOUT = 60
 
-    # Eight times the largest answer measured over the bake-off corpus — 530
-    # completion tokens, for a poster advertising four events (see
-    # script/event_capture_bakeoff.rb). A response that reaches this ceiling is a
-    # model looping, not a long poster: raising it buys a slower, dearer failure.
     MAX_TOKENS = 4000
 
     TOKEN_CEILING_REACHED = "length"
@@ -55,8 +39,6 @@ module EventCapture
       {
         model: EventCaptureConfig.model,
         max_tokens: MAX_TOKENS,
-        # Strict mode, not the older `json_object`, which Infomaniak rejects outright
-        # (see Prompt::SCHEMA).
         response_format: { type: "json_schema", json_schema: Prompt::SCHEMA },
         messages: [
           { role: "system",
@@ -76,10 +58,6 @@ module EventCapture
 
     def request_part(input) = { type: "text", text: Prompt.request(medium: input.kind) }
 
-    # Fenced because pasted text is third-party content sharing a channel with the
-    # instructions: the contributor vouches for pasting it, not for what it says. NOT a
-    # security boundary — nothing stops the text writing a fence of its own. The human
-    # reading every field on the capture screen is the actual check.
     def text_part(input)
       { type: "text", text: "<<<INPUT\n#{input.text}\nINPUT" }
     end
@@ -104,9 +82,6 @@ module EventCapture
       JSON.parse(response.body)
     rescue JSON::ParserError => e
       raise ProviderError.new("unreadable response", detail: e.message)
-    # URI::InvalidURIError belongs here too: the product id is interpolated into the
-    # path, so a malformed one must fail like any other bad configuration rather
-    # than escape Extractor's rescue as a 500 on the capture screen.
     rescue Timeout::Error, IOError, SystemCallError, SocketError, Net::HTTPBadResponse,
            OpenSSL::SSL::SSLError, URI::InvalidURIError => e
       raise ProviderError, "#{e.class}: #{e.message}"

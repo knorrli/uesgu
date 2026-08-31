@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# Locks Event's non-taxonomy mechanics: presence validations, the visible /
-# cancelled scopes, cancellation predicate, venue extraction from the flat
-# location tags, and the to_s summary. Visibility derivation (the music gate) is
-# covered by genre_disposition_test.
 class EventTest < ActiveSupport::TestCase
   test "title and start_date are required, url is not" do
     e = Event.new
@@ -116,7 +112,7 @@ class EventTest < ActiveSupport::TestCase
     e.release_field!(:description)
     refute e.reload.overridden?(:description)
 
-    e.release_field!(:description) # no-op, no error
+    e.release_field!(:description)
     assert_empty e.reload.overridden_fields
   end
 

@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Scraper oversight under /admin/scrape_runs: gated to admins, and the index +
-# show render a recorded sweep (status badges, per-scraper counts, the events it
-# created) without view/i18n errors.
 class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_scrape_runs_path
@@ -41,7 +38,7 @@ class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "body", text: /bad_bonn/
     assert_select "body", text: /Linked Show/
-    assert_select "input[name=scraper][value=?]", "bad_bonn" # a per-scraper re-run button
+    assert_select "input[name=scraper][value=?]", "bad_bonn"
   end
 
   test "show surfaces the robots note on an otherwise-ok result" do
@@ -109,7 +106,7 @@ class AdminScrapeRunsTest < ActionDispatch::IntegrationTest
 
   test "a trigger is refused while a run is already in progress" do
     sign_in_as user(admin: true)
-    ScrapeRun.create!(started_at: Time.current) # running + recent => in progress
+    ScrapeRun.create!(started_at: Time.current)
 
     Scrapers::Sweep.stub(:enqueue, ->(_run, scrapers:) { flunk "must not enqueue a second run" }) do
       assert_no_difference -> { ScrapeRun.count } do

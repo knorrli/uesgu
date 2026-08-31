@@ -25,12 +25,6 @@ module Scrapers
       content.css(".views-field-field-subtitle .field-content").text.squish
     end
 
-    # Freetext-mined: Mahogany Hall exposes NO dedicated genre field (verified
-    # against the live markup — the event row carries only title/description/teaser/
-    # price). The description mixes real genre lists ("dixieland, blues, gospel und
-    # swing") with free-text prose ("big band goes modern grooves"). The 1–2-word
-    # filter is a damage-limiter on what gets mined; leftover prose tokens now land
-    # in the curation queue (filed, aliased, or blocked) rather than being dropped.
     def event_genres(content)
       event_description(content)
         .split(/,|\s\-\s|\s[au]nd\s|&|\//)

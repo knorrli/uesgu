@@ -1,23 +1,11 @@
-/* Static text pages (Über üsgu, Datenschutz) — prose, not chrome. Mirrors the
-   install page's narrow single column, but tuned for reading rather than a hero
-   action. The .prose block owns the few raw HTML elements these pages use
-   (paragraphs, headings, lists, inline links) so the copy stays plain ERB. */
-
 .text-page {
   max-width: 40rem;
 }
 
-/* Space Mono has no width variation and a very even stroke density, so running
-   copy at this measure needs more leading than chrome text to keep lines apart. */
 .prose {
   line-height: 1.65;
 }
 
-/* A heading belongs to the text that follows it, but .prose is a flex column with
-   one uniform gap, so a heading sits exactly as far from its own paragraph as from
-   the previous section's. These add the break above it, and only above it. Both
-   text pages keep every heading a direct child of .prose so one selector serves
-   them; wrapping a section in <section> would move the heading out of reach. */
 .prose > h2:not(:first-child) {
   margin-block-start: var(--gap-large);
 }
@@ -26,10 +14,6 @@
   margin-block-start: var(--gap-medium);
 }
 
-/* h3 is base size, and bold alone is a weak signal in a monospace face, so a
-   subhead reads as an emphasised sentence. Drop it to a spaced small-caps label
-   instead: distinct from body text by shape rather than by size, and it cannot be
-   mistaken for the accent-coloured links this block is full of. */
 .prose h3 {
   font-size: var(--font-size-small);
   letter-spacing: 0.08em;
@@ -44,8 +28,6 @@
   gap: var(--gap-small);
 }
 
-/* In-prose links get an underline (chrome links rely on position/colour for
-   affordance; a sentence link needs the underline to read as a link). */
 .prose a {
   text-decoration: underline;
 }

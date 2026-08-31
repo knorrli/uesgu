@@ -1,9 +1,5 @@
 require "test_helper"
 
-# Locks the Z7 mechanics the offline golden can't cover: it stubs `get` to nil, so
-# the genre-tag vocabulary is never fetched there and every golden event ships
-# genre-less. SYNTHETIC markup and tag terms shaped like the live ones — no real
-# programme content.
 class Scrapers::Z7Test < Minitest::Test
   def test_tag_slugs_resolve_to_the_venues_own_spelling
     assert_equal ["Zorp/Blorp-Core", "GRB"],
@@ -15,8 +11,6 @@ class Scrapers::Z7Test < Minitest::Test
     assert_equal ["GRB"], genres_for(%w[grb never-registered])
   end
 
-  # The related-events strip repeats the same `product_tag-` shape for OTHER shows;
-  # reading it would tag every event with its neighbours' genres.
   def test_neighbouring_products_tags_are_not_collected
     html = <<~HTML
       <div id="product-11" class="product product_tag-grb"></div>
@@ -35,8 +29,6 @@ class Scrapers::Z7Test < Minitest::Test
     assert_equal "2026-09-04 20:00", start_time_for(detail: meta("Beginn" => "20:00", "Einlass" => "19:00"))
   end
 
-  # Doors sits directly below the start in the same markup, so a scraper reaching
-  # for the first clock time in the block would ship every show an hour early.
   def test_doors_time_is_not_mistaken_for_the_start
     assert_equal "2026-09-04 21:30", start_time_for(detail: meta("Einlass" => "20:30", "Beginn" => "21:30"))
   end
@@ -45,7 +37,6 @@ class Scrapers::Z7Test < Minitest::Test
     assert_equal "2026-09-04 00:00", start_time_for(detail: meta("Einlass" => "19:00"))
   end
 
-  # A festival row carries a second <time> for its closing day.
   def test_a_multi_day_row_starts_on_its_first_day
     row = row_for(dates: %w[2026-10-02 2026-10-04])
     assert_equal "2026-10-02 17:00", formatted(scraper_at(row).event_start_time(meta("Beginn" => "17:00")))
@@ -90,8 +81,6 @@ class Scrapers::Z7Test < Minitest::Test
 
   def formatted(time) = time.strftime("%Y-%m-%d %H:%M")
 
-  # `current_row` is the list row the template method is mid-way through; the
-  # extractors read the date off it while `content` is the clicked detail page.
   def scraper_at(row)
     Scrapers::Z7.new.tap { |scraper| scraper.instance_variable_set(:@current_row, row) }
   end

@@ -1,13 +1,8 @@
 require "db_test_helper"
 
-# The extraction path with the provider stubbed out. The contract: 0..n candidates on
-# success, a failure RETURNED rather than raised (so one bad image is one row to
-# retry), and one ExtractionAttempt written whichever of the two happened.
 class EventCapture::ExtractorTest < ActiveSupport::TestCase
   TODAY = Date.new(2026, 8, 19)
 
-  # Stands in for EventCapture::Infomaniak: answers with canned provider text, or
-  # raises the way the real client does.
   class FakeClient
     attr_reader :calls
 
@@ -53,8 +48,6 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     assert_equal 1200, extraction.input_tokens
   end
 
-  # The Extractor is the only thing that hands the Normalizer the taxonomy to read,
-  # so it is the only place the wiring can break.
   test "candidates are placed against the localities the taxonomy already carries" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
 
@@ -93,8 +86,6 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     assert_equal "HTTP 503: upstream busy", extraction.error
   end
 
-  # The code is what makes the rate visible in the admin funnel, which is the whole
-  # point of separating this from a provider that is simply erroring.
   test "a truncated response is its own code, not a generic provider error" do
     extraction = extract(FakeClient.new(raises: "truncated at max_tokens (4000)",
                                         error_class: EventCapture::TruncatedResponse))
@@ -146,8 +137,6 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     assert_equal 2, attempt.issues["time_unparseable"]
   end
 
-  # A re-read is the same prompt with a report appended, so it is attributable to the
-  # same wording: a sha per contributor's sentence would measure contributors.
   test "a report rides to the provider without moving the sha it is recorded under" do
     client = FakeClient.new(text: payload)
     correction = EventCapture::Correction.from(fields: "date", note: "it says 21 August")
@@ -166,8 +155,6 @@ class EventCapture::ExtractorTest < ActiveSupport::TestCase
     assert_nil client.calls.sole[:correction]
   end
 
-  # The whole point of separating ProviderError's message from its detail: a
-  # screenshot's model output can name the person who sent it.
   test "a failed attempt records the code and the neutral message, never the provider payload" do
     extraction = extract(FakeClient.new(raises: "HTTP 503", detail: "upstream busy — from Zorp Zorpsson, +41 79 000 00 00"))
 

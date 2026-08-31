@@ -1,8 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="save" on a per-event "save this show" toggle.
-// Self-contained (one per button, no cross-element sync): optimistically flip
-// the bookmark, persist in the background, revert on failure.
 export default class extends Controller {
   static values = { eventId: Number, saved: Boolean }
 
@@ -12,9 +9,6 @@ export default class extends Controller {
     this.#persist(saved).catch(() => this.#apply(!saved))
   }
 
-  // Flip the bookmark and announce it so the day's header ♥ count can keep step
-  // (day_summary_controller listens for save:toggled). It bubbles, so this per-
-  // button controller stays self-contained — it tells the day, never reaches in.
   #apply(saved) {
     this.savedValue = saved
     this.element.classList.toggle("saved", saved)

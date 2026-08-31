@@ -1,41 +1,22 @@
 require "test_helper"
 
-# Locks the Schüür date parser independent of the big captured fixture.
-#
-# Schüür emits dates in several shapes the original single-regex parser got
-# wrong or choked on:
-#
-#   * abbreviated months WITH a trailing dot ("Do. 06. Aug. 2026 – 21:00") —
-#     the old code passed "Aug." straight to Time.zone.parse, which silently
-#     dropped the day and pinned every such event to the 1st of the month;
-#   * months it had no number for ("Okt.", "Dez.") fell through to a bogus parse
-#     that raised "argument out of range" and aborted that event;
-#   * multi-day ranges ("Fr. 11. – So. 13. Juni 2026 – 20:00") let the range's
-#     trailing weekday masquerade as the month and lost the year;
-#   * genuine non-dates ("Diverse Daten") with no day/month/year at all.
-#
-# The fix parses each field with its own anchored pattern and, for a truly
-# unparseable row, skips it with a warn (via #skip_row?) instead of raising and
-# taking the rest of the venue's programme down. These are SYNTHETIC dates — no
-# real taxonomy — asserting the parse mechanics, not catalogue content.
 class Scrapers::SchueuerTest < Minitest::Test
-  # day-shaped string => expected "YYYY-MM-DD HH:MM" (nil = should not parse)
   PARSEABLE = {
-    "Do. 11. Juni 2026 – 21:00"             => "2026-06-11 21:00", # full month
+    "Do. 11. Juni 2026 – 21:00"             => "2026-06-11 21:00", #
     "Mi. 01. Juli 2026 – 17:00"             => "2026-07-01 17:00",
-    "Do. 06. Aug. 2026 – 21:00"             => "2026-08-06 21:00", # abbrev + dot
-    "Do. 08. Okt. 2026 – 19:00"             => "2026-10-08 19:00", # abbrev that old code raised on
+    "Do. 06. Aug. 2026 – 21:00"             => "2026-08-06 21:00", #
+    "Do. 08. Okt. 2026 – 19:00"             => "2026-10-08 19:00", #
     "Mo. 29. Dez. 2026 – 19:00"             => "2026-12-29 19:00",
-    "Do. 5. März 2026 – 20:00"              => "2026-03-05 20:00", # single-digit day + umlaut month
-    "Fr. 11. – So. 13. Juni 2026 – 20:00"   => "2026-06-11 20:00", # day range → start day
-    "11.–13. Juli 2026"                     => "2026-07-11 00:00"  # compact range, no time
+    "Do. 5. März 2026 – 20:00"              => "2026-03-05 20:00", # s
+    "Fr. 11. – So. 13. Juni 2026 – 20:00"   => "2026-06-11 20:00", # da
+    "11.–13. Juli 2026"                     => "2026-07-11 00:00"  #
   }.freeze
 
   UNPARSEABLE = [
-    "Diverse Daten",          # no day/month/year at all
-    "Demnächst",              # placeholder
-    "32. Juni 2026 – 20:00",  # day out of range — old code raised "argument out of range"
-    "Sa. 11. Foobar 2026",    # unknown month word
+    "Diverse Daten",
+    "Demnächst",              #
+    "32. Juni 2026 – 20:00",  #
+    "Sa. 11. Foobar 2026",
     ""
   ].freeze
 
@@ -55,9 +36,6 @@ class Scrapers::SchueuerTest < Minitest::Test
     end
   end
 
-  # The whole point of the bug: an unparseable row must be skipped + logged at
-  # warn (with the offending value) — never raise out of the loop and abort the
-  # rest of the programme.
   def test_skip_row_warns_and_skips_unparseable_without_raising
     logged = nil
     fake_logger = Object.new
@@ -77,8 +55,6 @@ class Scrapers::SchueuerTest < Minitest::Test
            "a normally-dated row must not be skipped"
   end
 
-  # End-to-end through the template method: a programme with one bad row between
-  # two good ones yields exactly the two good events, no raise.
   def test_process_events_skips_bad_row_and_keeps_good_ones
     captured = run_offline(<<~HTML)
       #{event_box('Good A', 'Do. 11. Juni 2026 – 21:00', '/events/good-a')}
@@ -120,8 +96,6 @@ class Scrapers::SchueuerTest < Minitest::Test
     )
   end
 
-  # Drive #process_events fully offline (no network, no DB) the same way the
-  # golden harness does, capturing the events it would have built.
   Capture = Struct.new(:url) do
     def new_record? = true
     def id = nil

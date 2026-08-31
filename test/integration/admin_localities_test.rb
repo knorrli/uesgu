@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# The locality curation screens under /admin/localities: admin-gated, and the one
-# place a contributor's spelling of a town can be folded into another. Synthetic town
-# names; the venue registry is read live.
 class AdminLocalitiesTest < ActionDispatch::IntegrationTest
   def locality(name, canton: nil) = Locality.create!(name: name, canton: canton)
 
@@ -55,8 +52,6 @@ class AdminLocalitiesTest < ActionDispatch::IntegrationTest
     refute_predicate zorpville.reload, :alias?
   end
 
-  # The picker cannot offer it, so this only happens to a hand-made request — and it
-  # must not 500 the screen.
   test "merging a locality into itself is refused, not crashed on" do
     zorpwil = locality("Zorpwil", canton: "BE")
     sign_in_as user(admin: true)

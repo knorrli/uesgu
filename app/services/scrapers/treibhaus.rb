@@ -1,9 +1,5 @@
 module Scrapers
   class Treibhaus < Agent
-    # `?filter=konzerte` is server-rendered and keeps only live concerts (the
-    # unfiltered programme mixes in quiz nights, public-viewings, e-sports, etc.),
-    # so the music filter is done by URL — no per-event detail fetch needed. Club
-    # /DJ nights live under a separate `?filter=club` view (not included here).
     def self.url
       URI.parse("https://www.treibhausluzern.ch/programm?filter=konzerte")
     end
@@ -19,8 +15,6 @@ module Scrapers
       URI.join(self.class.url, link.attr("href")).to_s
     end
 
-    # The <time datetime> carries a German "Monat TT, JJJJ" date WITH the year, but
-    # its clock is a dummy 00:00 — the real start time is the HH:MM span beside it.
     def event_start_time(content)
       time_node = content.at_css("time")
       date_string = time_node&.attr("datetime").to_s

@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the notifications inbox: the index lists the user's digests with their
-# name + event count, and show marks a digest read. (Digests are created by
-# SavedFilter#fire!, not lazily on visit.)
 class NotificationsTest < ActionDispatch::IntegrationTest
   test "index lists the users digests by name" do
     u = user
@@ -14,7 +11,6 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     get notifications_path
     assert_response :success
     assert_select ".notification__name", text: /My alert/
-    # The inbox is its own standalone section now — no Eingang/Filter tabs.
     assert_select ".inbox-tabs", false
   end
 
@@ -54,7 +50,6 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     unread = u.notifications.create!(title: "Fresh", event_ids: [e.id],
                                      period_start: 1.week.ago, period_end: Time.current)
 
-    # Default (Ungelesen): unread only; both tabs are offered.
     get notifications_path
     assert_response :success
     assert_select ".notification__name", text: /Fresh/
@@ -62,7 +57,6 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     assert_select ".view-switcher .view-switch__item[href=?]", notifications_path
     assert_select ".view-switcher .view-switch__item[href=?]", notifications_path(read: 1)
 
-    # Gelesen (?read=1): read only — a distinct slice, not unread + read.
     get notifications_path(read: 1)
     assert_response :success
     assert_select ".notification__name", text: /Old read/
@@ -75,7 +69,6 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     u = user
     sign_in_as u
     e = event(start_date: Date.current + 2)
-    # period_end is identical; created_at is what should drive the order.
     older = u.notifications.create!(title: "Older", event_ids: [e.id],
                                     period_start: 1.week.ago, period_end: Time.current,
                                     created_at: 2.days.ago)
@@ -102,7 +95,6 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     get notifications_path
     assert_response :success
     assert_select ".empty-state", text: /Alles gelesen/
-    # The Gelesen tab is still offered so the read digest is reachable.
     assert_select ".view-switcher .view-switch__item[href=?]", notifications_path(read: 1)
   end
 
@@ -133,8 +125,6 @@ class NotificationsTest < ActionDispatch::IntegrationTest
 
     post mark_all_read_notifications_path
 
-    # The unread scope excludes it, so its original read timestamp survives —
-    # the archive's ordering/dates don't get rewritten by a bulk clear.
     assert_in_delta was_read_at, read.reload.read_at, 1.second
   end
 
@@ -158,15 +148,12 @@ class NotificationsTest < ActionDispatch::IntegrationTest
     digest = u.notifications.create!(title: "Fresh", event_ids: [e.id],
                                      period_start: 1.week.ago, period_end: Time.current)
 
-    # Unread tab, something unread: offered.
     get notifications_path
     assert_select "form[action=?]", mark_all_read_notifications_path
 
-    # Read archive: never offered, even while unread digests exist elsewhere.
     get notifications_path(read: 1)
     assert_select "form[action=?]", mark_all_read_notifications_path, count: 0
 
-    # Nothing left unread: gone.
     digest.mark_read!
     get notifications_path
     assert_select "form[action=?]", mark_all_read_notifications_path, count: 0

@@ -1,8 +1,5 @@
 require "application_system_test_case"
 
-# Browser tests because the sizes come from layout, not from the declarations: a field
-# inherits its line-height from whatever it is nested in and its width from the row it
-# is a flex item of, so reading the CSS cannot tell you where a field ended up.
 class FormFieldGeometryTest < ApplicationSystemTestCase
   FIELDS = ".account-form input[type=email], .account-form input[type=password], .account-form select".freeze
 
@@ -19,9 +16,6 @@ class FormFieldGeometryTest < ApplicationSystemTestCase
     assert_equal 1, heights.uniq.size, "field heights differ: #{heights.inspect}"
   end
 
-  # A date or time picker sizes itself from the value box the engine lays out in its
-  # shadow DOM, which is taller than the line box a text field gets from the same
-  # font. The event editor is where the two sit side by side.
   PICKERS = "#event_date, #event_time, #event_description".freeze
 
   test "the date and time pickers are the height of the text fields beside them" do
@@ -37,9 +31,6 @@ class FormFieldGeometryTest < ApplicationSystemTestCase
     assert_equal 1, heights.uniq.size, "field heights differ: #{heights.inspect}"
   end
 
-  # Without the grow each half keeps its content width, and the two underlines stop
-  # mid-column — which reads as a different kind of field rather than as a pair sharing
-  # a row. The capture card pairs date and time the same way.
   test "the date and time pair spans the row it shares" do
     sign_in_as user(admin: true, locale: "de")
     visit admin_event_path(event)

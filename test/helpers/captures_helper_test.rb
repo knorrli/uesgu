@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# The ranking behind the capture card's suggestion rows. The place chips are the
-# suggester's answer as it stands; the locality chips are what is left of it once
-# the towns are what is being offered. Both rows go quiet where they would only
-# offer the card what it is already holding.
 class CapturesHelperTest < ActionView::TestCase
   def suggestion(name, locality, canton = "BE")
     PlaceSuggester::Suggestion.new(name: name, locality: locality, canton: canton,
@@ -21,8 +17,6 @@ class CapturesHelperTest < ActionView::TestCase
     assert_equal "BE", chip[:attrs][:data]["capture_canton_param"]
   end
 
-  # The two screens that enter an event mount a controller each, so a chip is only
-  # tappable where its params are keyed for the one reading them.
   test "a chip is keyed for the controller the screen mounts" do
     chip = place_chips([suggestion("Zorpsaal", "Zorpwil")], "manual-capture").sole
 
@@ -46,8 +40,6 @@ class CapturesHelperTest < ActionView::TestCase
     assert_empty place_suggestions(candidate(place: "Zorpsaal", locality: "Zorpwil"))
   end
 
-  # The first assertion is the guard: without it an empty row could mean the suggester
-  # had never reached the name at all, and this would pass for the wrong reason.
   test "a name matching one only once folded leaves nothing to suggest either" do
     place(name: "Zorpsaal", locality: "Zorpwil")
 
@@ -64,8 +56,6 @@ class CapturesHelperTest < ActionView::TestCase
     assert_equal "AG", chips.last[:attrs][:data]["capture_canton_param"]
   end
 
-  # Two venues in one town is one town, and two spellings of that town are still one:
-  # offering both is how the field fills with the near-duplicates it exists to prevent.
   test "one town is one chip, however its venues spell it" do
     chips = locality_chips([suggestion("Zorpsaal", "Zorpwil"),
                             suggestion("Zorpkeller", "Zorpwil"),

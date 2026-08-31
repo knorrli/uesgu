@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the ICS feed of a user's saved shows: timed vs all-day handling (incl.
-# the unknown-time → all-day rule), the yesterday-onward window, cancellation,
-# and per-user scoping. Synthetic events only (taxonomy rule in db_test_helper).
 class SavedEventsCalendarTest < ActiveSupport::TestCase
   def saved(owner, **attrs)
     e = event(**attrs)

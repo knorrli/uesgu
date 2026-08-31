@@ -1,12 +1,5 @@
 require "application_system_test_case"
 
-# A browser test because the bug is a cascade outcome, not a declaration: a disabled
-# primary got its background from one rule and its text colour from another, and the
-# two happened to resolve to the same token — the label was painted in the page
-# background and the button read as an empty box. Nothing in either rule looks wrong
-# on its own, so only the computed pair catches it.
-#
-# The styleguide is the target because it specimens every weight in one place.
 class DisabledButtonContrastTest < ApplicationSystemTestCase
   test "no disabled button paints its label in its own background" do
     sign_in_as user(admin: true, locale: "de")

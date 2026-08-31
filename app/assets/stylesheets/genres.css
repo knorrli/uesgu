@@ -1,25 +1,13 @@
-/* The three secondary disposition actions (keep / hide / strip) carry long,
-   self-describing labels. Render them compact — smaller type + tight padding —
-   so they group on one row beneath the primary Assign action instead of each
-   stacking onto its own line. They still wrap on narrow screens. */
 .genre-dispositions button,
 .genre-current-status button {
   font-size: var(--font-size-small);
   padding: var(--gap-xsmall) var(--gap-small);
 }
 
-/* A quiet lead-in over the ignore/hide/block cluster, marking it off as the
-   "none of the above" escape hatches rather than a fourth way to file the genre.
-   Small caps-ish muted label, matching the section headings' quieter sibling. */
 .genre-dispositions-label {
   font-size: var(--font-size-small);
 }
 
-/* Related-genre suggestions: a clean two-column list — name + its tree path on the
-   left, the file/merge actions pinned right — instead of a justify-between row that
-   zig-zagged (short labels kept the buttons inline, long ones bumped them to their
-   own line). minmax(0,1fr) lets the label column shrink and wrap so the actions
-   stay put on one axis; baseline keeps the name aligned to the buttons' text. */
 .genre-related__row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -32,15 +20,10 @@
   overflow-wrap: anywhere;
 }
 
-/* Keep the two action chips together on the right, top-aligned with the label's
-   first line even when a long name wraps. */
 .genre-related__actions {
   justify-content: flex-end;
 }
 
-/* Genre tree (admin hierarchy view): nested lists, no bullets, each level
-   indented behind a hairline so the parent → child structure reads at a glance.
-   Roots stand out in full colour + bold; deeper names stay quieter. */
 .genre-tree,
 .genre-tree ul {
   list-style: none;
@@ -48,10 +31,6 @@
   padding: 0;
 }
 
-/* Scoped under .genre-tree so this out-specifies the `.genre-tree ul` reset
-   above (else its padding:0 would flatten every level to the same indent). Each
-   nested level compounds this inset, so depth reads at a glance; the hairline
-   traces each subtree back to its parent. */
 .genre-tree .genre-tree-children {
   margin-left: var(--gap-medium);
   padding-left: var(--gap-xlarge);
@@ -62,7 +41,6 @@
   padding-block: var(--gap-small);
 }
 
-/* Roots get extra air above so each top-level subtree reads as its own block. */
 .genre-tree > .genre-tree-node {
   padding-top: var(--gap-large);
 }
@@ -79,11 +57,6 @@
   font-weight: bold;
 }
 
-/* The genre picker (shared/_genre_combobox) lays each option out as name + its tree
-   path (left) and descendant count (right), so you can read where a candidate sits
-   and how broad it is at a glance. Scoped to this picker so other comboboxes are
-   untouched. (The genre editor's own "set parent" / "merge" pickers use the indented
-   .genre-tree-option layout below instead.) */
 .genre-combobox .hw-combobox__option {
   display: flex;
   justify-content: space-between;
@@ -91,12 +64,6 @@
   align-items: baseline;
 }
 
-/* The genre editor's "set parent" + "merge" pickers render the actual tree: each
-   option is its name (left), indented by its depth so a sub-genre sits visibly
-   under its umbrella, with a right-aligned descendant count for the umbrellas.
-   flex:1/min-width:0 fills the option row and lets the name shrink so the count
-   stays pinned right — including inside the mobile dialog, where the gem also
-   makes the option a flex row (so this is a flex item there). */
 .genre-tree-option {
   display: flex;
   flex: 1 1 auto;
@@ -106,22 +73,15 @@
   gap: var(--gap-medium);
 }
 
-/* Indent a nested genre one step per level of depth (capped at MAX_INDENT_DEPTH),
-   so the tree structure reads down the dropdown; roots sit flush at depth 0. */
 .genre-tree-option[data-depth="1"] { padding-left: 1.2em; }
 .genre-tree-option[data-depth="2"] { padding-left: 2.4em; }
 .genre-tree-option[data-depth="3"] { padding-left: 3.6em; }
 .genre-tree-option[data-depth="4"] { padding-left: 4.8em; }
 
-/* The umbrella genres (those with sub-genres) are the branches you file into most,
-   so bold them — they lead the list and anchor each indented subtree. */
 .genre-option-name.umbrella {
   font-weight: bold;
 }
 
-/* Name + ancestor path share the left column and take any wrapping (the mobile
-   dialog wraps; the inline dropdown clips at its edge, inheriting the option's
-   own white-space); min-width:0 lets that column actually shrink in the flex row. */
 .genre-option-main {
   min-width: 0;
 }
@@ -135,21 +95,14 @@
 .genre-option-count {
   color: var(--theme-fg-muted);
   font-size: 0.85em;
-  flex: none; /* a one-line anchor on the right; never wrap or shrink it */
+  flex: none;
 }
 
-/* Genre editor — separate the three task groups (file under a parent / merge /
-   sample events) with a hairline + generous space, so the dense stack of form
-   rows reads as distinct decisions instead of one cramped block. */
 .genre-editor-section {
   border-top: var(--border-width) solid var(--theme-accent-muted);
   padding-top: var(--gap-large);
 }
 
-/* The "appears on" sample events. A hairline *between* events (not above the
-   first — that would double the section divider under the header) gives a clear
-   break, whose muted date/venue header otherwise blends into the previous
-   event's (equally muted) genre/style meta. */
 .genre-sample-event + .genre-sample-event {
   border-top: var(--border-width) solid var(--theme-accent-muted);
   padding-top: var(--gap-medium);

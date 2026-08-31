@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Minting and managing invite codes under /admin/invitations: admin-only, and a
-# redeemed code stays on the books as an audit record (can't be revoked away).
 class AdminInvitationsTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_invitations_path
@@ -30,20 +28,14 @@ class AdminInvitationsTest < ActionDispatch::IntegrationTest
     assert_select "code.invite__code", text: available.formatted_code
     assert_select "code.invite__code", text: redeemed.formatted_code
     assert_select "code.invite__code", text: expired.formatted_code
-    # The shareable link is offered only for the still-usable code, as a
-    # copyable field holding the signup URL.
     assert_select ".copy-field input[value=?]", signup_url(invite: available.code), count: 1
   end
 
   test "invite links served on the umlaut host are minted against the ASCII domain" do
     available = invitation
-    # Set the public host before signing in so the session cookie is scoped to it.
     host! "xn--sgu-goa.ch"
     sign_in_as user(admin: true)
 
-    # On the punycode public host, the ugly form would otherwise leak into the
-    # copyable link text; share_url_options swaps it for the ASCII twin uesgu.ch
-    # (which 301s back, preserving path + query).
     get admin_invitations_path
     assert_response :success
     assert_select ".copy-field input[value*=?]", "://uesgu.ch/", count: 1

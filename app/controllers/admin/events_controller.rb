@@ -1,16 +1,7 @@
 module Admin
-  # Read-only browser over the scraped events table. Mirrors the genres index:
-  # filter by visibility status, sort, free-text title search, paginate. Unlike
-  # the public index (scoped to :visible), the admin sees everything.
   class EventsController < BaseController
     include CatalogueBrowsing
 
-    # "hidden" = non-music events suppressed from the public listing; "cancelled"
-    # = called-off shows that stay listed publicly with a marker; "dismissed" =
-    # admin-soft-deleted (gone from public, never re-scraped back). The first
-    # three exclude dismissed so it only surfaces under its own filter.
-    # "duplicates" = events merged into a canonical (their own dedicated bucket,
-    # hidden from the default list which is canonical-only — see #index).
     STATUS_SCOPES = {
       "visible" => -> { Event.visible },
       "hidden" => -> { Event.kept.where(hidden: true) },
@@ -20,9 +11,6 @@ module Admin
       "dismissed" => -> { Event.dismissed }
     }.freeze
 
-    # Chronological by default — oldest/nearest-term events first (the bulk of the
-    # table is upcoming, so this surfaces what's current rather than the furthest-
-    # out shows); 'title' is the alphabetical lookup.
     SORT_SCOPES = {
       "date" => ->(scope) { scope.order(start_date: :asc, start_time: :asc) },
       "title" => ->(scope) { scope.order(:title) }
@@ -31,15 +19,11 @@ module Admin
     def index
       @status = catalogue_param(:status, STATUS_SCOPES, default: "all")
       @sort = catalogue_param(:sort, SORT_SCOPES, default: "date")
-      # "all" means all kept *canonical* events — duplicates merged into a
-      # canonical are reached via their own filter, dismissed ones via theirs.
       scope = @status == "all" ? Event.kept.canonical : STATUS_SCOPES[@status].call
       scope = scope.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @events = SORT_SCOPES[@sort].call(scope)
                                   .includes(:locations, :genres, :discarded_by_rule, :canonical_event)
                                   .page(params[:page]).per(PAGE_SIZE)
-      # How many duplicates fold into each canonical on this page — one grouped
-      # query (no N+1) so rows can flag aggregated events at a glance.
       @duplicate_counts = Event.where(canonical_event_id: @events.map(&:id)).group(:canonical_event_id).count
     end
 
@@ -47,22 +31,12 @@ module Admin
       @event = Event.find(params.expect(:id))
     end
 
-    # Async autocomplete source for the merge (dedup) picker on #show — find a
-    # canonical event to fold this one into by title instead of by raw id. Scoped
-    # to kept canonical events (the only valid merge targets), minus the event
-    # being edited (passed as `exclude`). Renders combobox options (turbo_stream).
     def search
       scope = Event.kept.canonical.where.not(id: params[:exclude])
       scope = scope.where("title ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @events = scope.includes(:locations).order(start_date: :asc).limit(20)
     end
 
-    # Manual correction of an event's fields. Locking is implicit on edit: any
-    # overridable field whose value the admin actually changed is added to
-    # overridden_fields, so the next re-scrape leaves it alone. Date + time are
-    # locked as a pair (either change locks both) so start_time's date can never
-    # diverge from start_date. A genre edit also re-derives the styles/visibility
-    # that hang off the genres.
     def update
       @event = Event.find(params.expect(:id))
       attrs = params.expect(event: %i[title description date time genres])
@@ -76,8 +50,6 @@ module Admin
       redirect_to admin_event_path(@event), notice: t(".saved")
     end
 
-    # Release one locked field (or the date/time pair) back to the scraper; the
-    # next run refills it from source.
     def revert
       event = Event.find(params.expect(:id))
       fields = SCHEDULE_FIELDS.include?(params[:field]) ? SCHEDULE_FIELDS : [params[:field]]
@@ -85,25 +57,18 @@ module Admin
       redirect_to admin_event_path(event), notice: t(".reverted")
     end
 
-    # Soft-delete: the event drops out of every public listing and is never
-    # resurrected by a re-scrape (Scrapers::Agent skips dismissed events).
-    # Reversible via #undismiss — not a hard delete.
     def destroy
       event = Event.find(params.expect(:id))
       event.dismiss!
       redirect_to admin_events_path(status: "dismissed"), notice: t(".dismissed")
     end
 
-    # Lift a dismissal so the event reappears and re-scrapes resume updating it.
     def undismiss
       event = Event.find(params.expect(:id))
       event.undismiss!
       redirect_to admin_event_path(event), notice: t(".restored")
     end
 
-    # Manually mark this event a duplicate of another (the canonical), pinning the
-    # link so dedup won't undo it — for a pair the fuzzy matcher missed because the
-    # PETZI and venue titles drifted apart. The duplicate drops out of listings.
     def merge
       event = Event.find(params.expect(:id))
       canonical = Event.find_by(id: params[:canonical_id])
@@ -115,8 +80,6 @@ module Admin
       redirect_to admin_event_path(event), alert: e.message
     end
 
-    # Split this event back out as standalone and pin that, so dedup won't re-merge
-    # it — for a pair the fuzzy matcher wrongly joined.
     def unmerge
       event = Event.find(params.expect(:id))
       event.mark_standalone!
@@ -125,8 +88,6 @@ module Admin
 
     private
 
-    # start_date + start_time move together: the form edits a date and a
-    # time-of-day, and a change to either locks both.
     SCHEDULE_FIELDS = %w[start_date start_time].freeze
 
     def assign_scalars(event, attrs)
@@ -141,11 +102,6 @@ module Admin
         end
     end
 
-    # Pin the genre list to the admin's combobox selection (comma-joined names,
-    # which Event's genre_list= setter canonicalizes and de-blocks — so a name typed
-    # rather than picked is filed the same way a captured one is). A missing field is
-    # left alone; an empty selection clears the list. Returns whether it actually
-    # changed, so the caller knows to lock it.
     def assign_genres(event, attrs)
       return false unless attrs.key?(:genres)
 

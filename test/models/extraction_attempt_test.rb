@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# The capture funnel's measurement row. It is written on every extraction, so the
-# only behaviour of its own is the size backstop.
 class ExtractionAttemptTest < ActiveSupport::TestCase
   test "prune! keeps only the most recent attempts" do
     attempts = Array.new(4) { |i| ExtractionAttempt.create!(status: :ok, created_at: Time.zone.local(2030, 1, 1, 0, i)) }

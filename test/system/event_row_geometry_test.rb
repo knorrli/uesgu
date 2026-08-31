@@ -1,9 +1,5 @@
 require "application_system_test_case"
 
-# The start time sits in a gutter of its own, so an event whose time is unknown has
-# to indent exactly like the timed rows around it — including where a whole venue
-# group is untimed. Browser-driven because the indent comes from a grid track
-# resolving against the row's own font, which reading the CSS cannot settle.
 class EventRowGeometryTest < ApplicationSystemTestCase
   test "a title starts at the same edge whether or not the event has a time" do
     day = Date.current + 2

@@ -644,7 +644,6 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <%# A throwaway 3-page array, so the specimen shows a live middle page. %>
         <%= render 'shared/pagination', collection: Kaminari.paginate_array((1..150).to_a).page(2).per(50) %>
       </div>
       <div class="sg-spec">
@@ -708,8 +707,6 @@
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen sg-specimen--block">
-        <%# The pane normally holds evidence the browser never uploaded; an app icon
-            stands in. %>
         <%= render layout: "shared/review_card",
               locals: { id: "sg-review-card", source: image_tag("/icon.png", alt: ""),
                         actions: render(layout: "shared/action_bar") {
@@ -778,7 +775,6 @@
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen">
-        <%# The buttons submit a card's form by id; there is none here, so they do nothing. %>
         <%= render "captures/matches", form_id: "sg-no-form",
               matches: [{ id: 1, title: "Zorpcore Nacht", meta: "21:00 · Zorpsaal",
                           adds: t('capture.matches.adds',

@@ -1,14 +1,14 @@
 <% location_filter_tree.each do |canton| %>
   <div class="loc-group collapsed" data-filter-sheets-target="group">
     <div class="loc-group__head">
-      <label class="opt opt--top" data-search="<%= canton[:search] %>">
+      <label class="opt opt--top" title="<%= canton[:title] %>" data-search="<%= canton[:search] %>">
         <input type="checkbox" name="l[]" value="<%= canton[:value] %>" <%= 'checked' if filter.location_list.include?(canton[:value]) %>>
         <span class="opt__box"></span>
         <span class="opt__label"><%= canton[:name] %></span>
         <span class="opt__type"><%= t('events.filter.location_types.canton') %></span>
       </label>
       <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
-              aria-label="<%= canton[:name] %>">
+              aria-label="<%= canton[:title] %>">
         <span class="loc-group__count"><%= canton[:count] %></span>
         <span class="loc-group__chevron ph ph-caret-down"></span>
       </button>

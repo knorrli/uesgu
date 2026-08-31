@@ -448,7 +448,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     manual_field("title").set("Zorp Fest")
     manual_field("date").set(show_date.to_s)
     manual_field("locality").set("Zorpwil")
-    manual_field("canton").select("Bern")
+    manual_field("canton").select("BE — Bern")
 
     assert_difference -> { Event.count } => 1 do
       find("#manual-event-form input[type=submit]").click

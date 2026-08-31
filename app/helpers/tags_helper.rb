@@ -70,14 +70,6 @@ module TagsHelper
       children: child_nodes }
   end
 
-  def canton_name(code)
-    t("cantons.#{code}", default: code)
-  end
-
-  def location_display(name)
-    Location.type_for(name) == :canton ? canton_name(name) : name
-  end
-
   def location_filter_tree
     counts = Location.usage.to_h { |row| [row[:name], row[:count]] }
 
@@ -95,10 +87,10 @@ module TagsHelper
       end
       next if locality_nodes.empty? && counts[canton].to_i.zero?
 
-      name = canton_name(canton)
-      { name: name, value: canton, type: :canton,
+      title = Location.canton_name(canton)
+      { name: canton, value: canton, type: :canton, title: title,
         count: counts[canton] || locality_nodes.sum { |c| c[:count] },
-        search: ([name, canton] + locality_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(" "),
+        search: ([canton, title] + locality_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(" "),
         children: locality_nodes }
     end
   end

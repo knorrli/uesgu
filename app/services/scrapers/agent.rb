@@ -337,8 +337,11 @@ module Scrapers
       # unless independently locked, so a locked time keeps both consistent.
       event.start_time    = event_start_time(content) unless event.overridden?(:start_time)
       event.start_date    = event.start_time.to_date  unless event.overridden?(:start_date)
-      event.title         = event_title(content)      unless event.overridden?(:title)
-      event.description   = event_description(content)   unless event.overridden?(:description)
+      # Recased here rather than in each scraper: several venue sites set their whole
+      # programme in capitals, and the rule is the same wherever the text came from
+      # (see Casing).
+      event.title         = Casing.recase(event_title(content))       unless event.overridden?(:title)
+      event.description   = Casing.recase(event_description(content)) unless event.overridden?(:description)
       # Every genre a scraper extracts — whether from a clean structured field or
       # mined from unstable free text (artist blurbs, descriptions, origin codes) —
       # mints taxonomy: an unrecognised token arrives UNPLACED in the admin

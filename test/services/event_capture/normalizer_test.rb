@@ -448,4 +448,68 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     refute normalize(dated).past?(today: TODAY)
     refute normalize({}).past?(today: TODAY)
   end
+  # A poster is set in capitals, so the model transcribes it faithfully and the card
+  # would still shout. Nobody retypes a name to fix its casing, so accepting the card
+  # unchanged has to be the right answer.
+  test "a shouted title reaches the card restyled" do
+    candidate = normalize(dated("title" => "MICHAEL SCHENKER GROUP"))
+
+    assert_equal "Michael Schenker Group", candidate.title
+    assert_includes candidate.issues, :title_recased
+  end
+
+  test "a shouted description reaches the card restyled" do
+    candidate = normalize(dated("subtitle" => "EIN ABEND MIT FREUNDEN",
+                                "subtitle_evidence" => "EIN ABEND MIT FREUNDEN"))
+
+    assert_equal "Ein Abend Mit Freunden", candidate.subtitle
+    assert_includes candidate.issues, :subtitle_recased
+  end
+
+  test "a title the poster did not shout is left as it was read" do
+    candidate = normalize(dated("title" => "LEYA + Junge Eko"))
+
+    assert_equal "LEYA + Junge Eko", candidate.title
+    assert_not_includes candidate.issues, :title_recased
+  end
+
+  # Restyling is not a refusal, and `raw` is what the card prints as the values we
+  # would not take (see captures/_candidate).
+  test "the shouted reading is not reported back as refused" do
+    candidate = normalize(dated("title" => "MICHAEL SCHENKER GROUP"))
+
+    assert_empty candidate.raw
+  end
+
+  test "a venue nobody carries is minted restyled rather than shouting" do
+    candidate = normalize(cited_place("ZORPSAAL HALLE"))
+
+    assert_equal "Zorpsaal Halle", candidate.place
+    assert_includes candidate.issues, :place_recased
+  end
+
+  # The stored spelling is identity, so it wins outright and there is nothing to
+  # restyle — the recaser must not get a second say over it.
+  test "a venue the app carries keeps its own spelling over a restyled one" do
+    place(name: "ZORPSAAL Halle", locality: "Zorpwil", canton: "BE")
+
+    candidate = normalize(cited_place("ZORPSAAL HALLE"))
+
+    assert_equal "ZORPSAAL Halle", candidate.place
+    assert_not_includes candidate.issues, :place_recased
+  end
+
+  test "a town nobody carries is minted restyled rather than shouting" do
+    candidate = normalize(cited_locality("ZORPWIL AN DER AARE"))
+
+    assert_equal "Zorpwil An Der Aare", candidate.locality
+    assert_includes candidate.issues, :locality_recased
+  end
+
+  test "a town the app carries keeps its own spelling" do
+    candidate = normalize_in(cited_locality("ZORPWIL"), Zorpwil: "BE")
+
+    assert_equal "Zorpwil", candidate.locality
+    assert_not_includes candidate.issues, :locality_recased
+  end
 end

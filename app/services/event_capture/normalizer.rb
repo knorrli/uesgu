@@ -33,8 +33,8 @@ module EventCapture
       locality = normalized_locality(venue)
 
       Candidate.new(
-        title: string(event["title"]),
-        subtitle: cited(:subtitle),
+        title: recased(:title, string(event["title"])),
+        subtitle: recased(:subtitle, cited(:subtitle)),
         subtitle_evidence: string(event["subtitle_evidence"]),
         date: date,
         date_evidence: string(event["date_evidence"]),
@@ -57,6 +57,18 @@ module EventCapture
     attr_reader :event, :today, :genres, :raw, :issues, :salvaged_time, :time_evidence
 
     def string(value) = value.to_s.strip.presence
+
+    # Posters are set in capitals, so a faithful transcription still shouts (see
+    # Casing). Nothing goes to `raw`: the card renders that as the values we REFUSED
+    # (captures/_candidate), and a restyled one was taken rather than refused — the
+    # flag is what says the rule fired.
+    def recased(field, value)
+      return value if value.nil?
+
+      restyled = Casing.recase(value)
+      issues << :"#{field}_recased" unless restyled == value
+      restyled
+    end
 
     def reject(field, value, issue)
       raw[field.to_s] = value
@@ -168,7 +180,8 @@ module EventCapture
     # match is an admin's ruling that two names are one, so there is no rejected
     # reading here for a human to judge.
     def normalized_place(typed, venue)
-      return typed if venue.nil? || venue.name == typed
+      return recased(:place, typed) if venue.nil?
+      return typed if venue.name == typed
 
       issues << :place_normalized
       venue.name
@@ -201,7 +214,7 @@ module EventCapture
       return if typed.nil?
 
       canonical = Locality.canonical_name(typed)
-      return typed if canonical == typed
+      return recased(:locality, typed) if canonical == typed
 
       issues << :locality_normalized
       canonical

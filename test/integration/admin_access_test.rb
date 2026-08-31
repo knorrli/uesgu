@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the admin gate: require_authentication then require_admin. Curation
-# endpoints (admin dashboard, genre dispositions) must be unreachable by guests
-# and non-admins, and the genre return_to must resist open redirects.
 class AdminAccessTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden, admins get in" do
     get admin_path

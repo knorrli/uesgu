@@ -5,12 +5,10 @@ class EventTagStatsPresenter
       .where(taggings: { context: "locations", taggable_type: Event.name })
   end
 
-  # Genres are now first-class; "in use" means present on at least one event.
   def genre_tags
     Genre.in_use
   end
 
-  # Filed into the tree (placed under a parent) vs. still waiting in the queue.
   def placed_genre_tags
     Genre.in_use.placed
   end

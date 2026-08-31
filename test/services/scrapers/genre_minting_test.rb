@@ -1,16 +1,8 @@
 require_relative "../../db_test_helper"
 
-# DB-backed coverage that a scraper collects ALL its genres and they MINT
-# taxonomy, with no closed-vocab gate: whatever a scraper's single `event_genres`
-# hook returns — a clean structured field or tokens mined from unstable free text
-# — is kept, and an unrecognised token lands as a fresh (unplaced) Genre row for
-# the curation queue rather than being dropped at ingest. Synthetic taxonomy only.
 class Scrapers::GenreMintingTest < ActiveSupport::TestCase
   include TaxonomyFixtures
 
-  # A minimal named scraper exposing the genre hook for a single event, with the
-  # other field extractors stubbed so build_event can run offline. Named (not
-  # anonymous) because Registerable's `inherited` hook reads the class name.
   class StubScraper < Scrapers::Agent
     def self.location = "Testville"
     def self.locations = %w[Testville Bern BE]
@@ -25,8 +17,6 @@ class Scrapers::GenreMintingTest < ActiveSupport::TestCase
     def event_genres(_content) = Array(@genres)
     def event_genre_prose(_content) = @description
   end
-  # Keep this test-only scraper out of the global registry so the golden suite
-  # (which iterates Scrapers::All) doesn't pick it up.
   Scrapers::All.scrapers.delete("StubScraper")
 
   def scraper(genres: nil, description: nil)
@@ -62,19 +52,11 @@ class Scrapers::GenreMintingTest < ActiveSupport::TestCase
       scraper(genres: [known.name, "Salsa Namá"]).send(:build_event, e, :row)
     end
 
-    # The already-known token AND the brand-new token both attach...
     assert_includes fingerprints(event.genre_list), known.fingerprint
     assert_includes fingerprints(event.genre_list), Genre.fingerprint_for("Salsa Namá")
-    # ...and the unrecognised one mints a fresh row (lands unplaced for curation).
     assert_equal before + 1, Genre.count, "a new token now mints a Genre"
     assert Genre.exists?(fingerprint: Genre.fingerprint_for("Salsa Namá"))
   end
-
-  # A genre-less scraper that opts into event_genre_prose gets known genre
-  # names mined from the blurb attached at ingest — match-only, minting nothing.
-
-  # Mining matches the STORED name, so these create exact-named genres directly
-  # (the genre() helper appends a uniqueness suffix that the prose couldn't name).
 
   test "a known genre named in the description prose is mined and attached" do
     known = Genre.create!(name: "Zorptronic")
@@ -112,14 +94,13 @@ class Scrapers::GenreMintingTest < ActiveSupport::TestCase
   end
 
   test "mining is skipped when an admin has pinned the genre list" do
-    Genre.create!(name: "Zorptronic") # would otherwise be mined from the blurb below
+    Genre.create!(name: "Zorptronic")
     event = Event.create!(url: "https://fixture.test/#{TaxonomyFixtures.next_seq}", title: "x",
                           start_date: Date.new(2030, 1, 1), overridden_fields: ["genres"])
     event.update!(genre_list: ["Handpicked"])
 
     scraper(description: "a night of pure zorptronic energy").send(:build_event, event, :row)
 
-    # the pinned list survives untouched — neither event_genres nor mining ran
     assert_equal ["Handpicked"], event.genre_list.sort
   end
 end

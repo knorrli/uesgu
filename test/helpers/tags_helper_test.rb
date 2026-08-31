@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks TagsHelper's pure logic: the context→icon mapping, the canton fallback,
-# and the hierarchical ordering of location tags (canton › locality › venue, with
-# unknown names appended). Derived from the live scraper hierarchy, not hardcoded.
 class TagsHelperTest < ActionView::TestCase
   test "tag_icon_glyph maps known contexts and falls back for the rest" do
     assert_equal "ph-magnifying-glass", tag_icon_glyph(context: "query")
@@ -23,9 +20,6 @@ class TagsHelperTest < ActionView::TestCase
     assert_equal "ZZ", canton_name("ZZ")
   end
 
-  # The locations filter dropdown is now a flat alphabetical list (matching the
-  # styles dropdown) via available_tags(context: :locations); the former
-  # hierarchical ordering helpers were removed with the flatten.
   test "available_tags(:locations) lists location tags alphabetically, excluding applied" do
     venue = Location.venue_names.first
     skip "no scrapers registered" if venue.nil?
@@ -44,7 +38,7 @@ class TagsHelperTest < ActionView::TestCase
     indie = genre(name: "treeindie", events_count: 2); indie.set_parent!(rock)
     shoegaze = genre(name: "treeshoe", events_count: 3); shoegaze.set_parent!(indie)
     empty = genre(name: "treeempty", events_count: 0); empty.set_parent!(rock)
-    loose = genre(name: "treeloose", events_count: 5) # top-level but childless = unplaced
+    loose = genre(name: "treeloose", events_count: 5)
 
     tree = genre_filter_tree
     root = tree.find { |node| node[:name] == rock.name }

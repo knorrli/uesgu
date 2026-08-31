@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Locks User's normalizations, validation rules, and the notification-interval
-# lookup. No taxonomy involved — pure account mechanics.
 class UserTest < ActiveSupport::TestCase
   test "username is normalized to stripped lowercase" do
     u = user(username: "  FooBar  ")

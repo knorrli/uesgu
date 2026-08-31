@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# The diff between what the model proposed and what a human published. Every case
-# here is one of the three shapes the leaderboard is built on, plus the drop.
 class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
   def attempt = @attempt ||= ExtractionAttempt.create!(status: :ok, medium: "image")
 
@@ -24,8 +22,6 @@ class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
     assert ExtractionFieldOutcome.all.all?(&:unchanged?)
   end
 
-  # The three shapes mean opposite things about the prompt, so they are never one
-  # "changed" bucket.
   test "the three shapes are told apart, and keep both values" do
     record(proposed: proposed(time: nil, locality: "Us", place: "Zorpsaal"),
            accepted: proposed(time: "21:00", locality: "Zorpwil", place: nil))
@@ -50,8 +46,6 @@ class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
     assert_predicate outcome_for("genres"), :unchanged?
   end
 
-  # The free-text field a chat screenshot's sender name lands in: the outcome is the
-  # signal, the value is not worth keeping.
   test "the title's outcome is recorded without either value" do
     record(proposed: proposed(title: "Zorp Zorpsson"), accepted: proposed(title: "Zorpcore Nacht"))
 
@@ -69,8 +63,6 @@ class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
     assert_nil outcome_for("place").accepted
   end
 
-  # A drop is reversible on screen: the card can be reopened from its strip and
-  # published, and that later decision is the one that happened.
   test "publishing after a drop replaces the discarded rows" do
     record(proposed: proposed)
     record(proposed: proposed, accepted: proposed)
@@ -93,8 +85,6 @@ class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
     end
   end
 
-  # The drop is posted fire-and-forget, so it can land after the publish that
-  # superseded it — and publishing freezes the card, so nothing legitimately follows.
   test "a late drop does not overwrite the publish that superseded it" do
     record(proposed: proposed, accepted: proposed)
     record(proposed: proposed)
@@ -103,8 +93,6 @@ class ExtractionFieldOutcomeTest < ActiveSupport::TestCase
     assert_equal ExtractionFieldOutcome::FIELDS.size, ExtractionFieldOutcome.unchanged.count
   end
 
-  # Tapping a suggestion trades the poster's spelling for the registry's, which is not
-  # something a prompt edit could have got right.
   test "a value taken from a place suggestion is normalized, not corrected" do
     record(proposed: proposed(place: "Zorpsaal Zorpwil"), accepted: proposed(place: "Zorpsaal"),
            normalized: %w[place])

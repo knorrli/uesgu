@@ -1,5 +1,4 @@
 module Admin
-  # Mint and manage single-use invite codes — the only way to create an account.
   class InvitationsController < BaseController
     def index
       load_invitations
@@ -42,8 +41,6 @@ module Admin
       params.fetch(:invitation, {}).permit(:note, :expires_in_days)
     end
 
-    # Expiry is offered as a small set of day presets ('' = unlimited) to keep
-    # the form dead simple and dodge timezone/date-parsing footguns.
     def expires_at_from(days)
       days.present? ? days.to_i.days.from_now : nil
     end

@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the saved-show reminder: due? scheduling + once-a-day guard, the day's
-# digest (incl. unknown-time shows, since it fires at a fixed noon), cancelled/
-# dismissed exclusion, the day-before lead option, and the run_due! sweep.
 class EventReminderTest < ActiveSupport::TestCase
   NOON = Time.zone.local(2030, 6, 3, 12, 0, 0).freeze
   TODAY = NOON.to_date
@@ -61,10 +58,6 @@ class EventReminderTest < ActiveSupport::TestCase
     assert_equal [live.id], note.event_ids
   end
 
-  # A saved show merged into a canonical (canonical_event_id set), or one since
-  # hidden/discarded, must not be counted: it's dropped by Notification#events
-  # downstream, so counting it here would split the frozen header count from the
-  # body/list count (the "3 stehen an" / "2 für dich" mismatch).
   test "skips events excluded from Event.visible (merged duplicate, hidden, discarded)" do
     u = reminder_user
     canonical = save_for(u, title: "Canonical", start_date: TODAY)
@@ -100,6 +93,6 @@ class EventReminderTest < ActiveSupport::TestCase
 
     created = EventReminder.run_due!(at(12, 30))
     assert_equal 1, created.size
-    assert_empty EventReminder.run_due!(at(12, 45)) # already fired today
+    assert_empty EventReminder.run_due!(at(12, 45))
   end
 end

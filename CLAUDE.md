@@ -42,63 +42,30 @@ The page header is the worked example: `shared/_page_header` (+ `shared/_back_li
 
 ## Comments
 
-**This repeats the global rule in `~/.claude/CLAUDE.md` because it keeps getting
-missed — it was raised on four consecutive PRs. Run the check below before opening
-one; a comment that fails it is a review finding, not a style preference.**
+**This repo has no comments.** That is not shorthand for "few" — outside the
+exceptions listed below, `app/`, `lib/`, `test/`, `config/`, `script/` and the
+stylesheets contain zero. Match what you see: if a file you are editing has no
+comments, the change you add to it has none either.
 
-Code must be self-documenting: *what* it does has to be clear from reading it.
-Reach for a better name, a smaller method, or a clearer structure before reaching
-for a comment.
+Code must be self-documenting. Reach for a better name, a smaller method, or a
+clearer structure — those are the only tools. Design rationale goes in the PR
+description.
 
-Only write a comment carrying something that **cannot** be recovered by reading the
-code:
+The exceptions, all of which already exist and none of which you should extend
+without saying so in the PR:
 
-- a constraint or gotcha imposed from outside — a library's surprising behaviour,
-  an API contract, a browser/renderer quirk, a spec clause
-- a special case and why it exists — the bug it prevents, the input that breaks
-  without it
-- why a non-obvious approach was chosen where the obvious one looks correct
-- a warning that changing this breaks something non-local
+- `app/assets/stylesheets/_hotwire_combobox_overrides.css` — every rule works
+  around a value the gem hardcodes, so every rule is annotated.
+- `app/javascript/controllers/install_controller.js` — what each browser engine
+  supports, which is the only reason the branching exists.
+- A handful of single blocks pinning an external fact the code cannot state: the
+  Rails inflector turning `saves` into `safe`, `NOT IN (NULL)` being SQL-unknown,
+  a unique index comparing `''` but not `NULL`, `Time.zone.parse` returning today
+  for a bare date, webrobots fabricating `Disallow: /` on an unreachable
+  robots.txt, Turbo painting a stream action on the next animation frame,
+  Firefox ignoring `line-height` on a single-line `<input>`, iOS Safari putting
+  an `<input list>` datalist somewhere the suggestions never show.
 
-Never write a comment that restates the code, narrates control flow, labels a
-block, announces what the next line does, or repeats intent already stated by the
-method or test name.
-
-**A comment must be understandable on its own, by someone reading only this file.**
-It may not lean on context the reader has no way to resolve from the code in front
-of them. Concretely, never write:
-
-- `decision 6`, `decision 9` — ordinals in a design doc's numbered list. Nothing in
-  the code identifies them, and they renumber.
-- `(#119)`, `PR #113`, `shipped in #97` — issue and PR numbers. They say a
-  conversation happened somewhere else, not what the reader needs to know.
-- in-house shorthand for artifacts the sentence never names (`the bake-off`, `the
-  audit`, `the walkthrough`).
-
-State the substance instead: *why* the field is free text, *what* the threat model
-is, *which* measurement produced the number. If the full reasoning is too long,
-give the one-line reason in the comment and cite a **file path** (`see
-EventCapture::Extractor`, `script/event_capture_bakeoff.rb`) — a path is something
-the reader can open; an ordinal or a ticket number is not. Cite only a path that
-exists *now*: a pointer to a deleted file is worse than no pointer. The comment
-still has to make sense if they never open it.
-
-Prefer one dense comment at the top of a construct over running commentary inside
-it, and never explain the same thing at two altitudes — a class header that
-re-explains what a method's own comment already says is duplication that will drift.
-
-**The check, before every PR:** re-read each comment you added and name which
-bullet above it satisfies. If you cannot, delete it. Watch for these, which are
-what actually slips through here:
-
-- A comment whose first sentence paraphrases the method body (`# Registry first,
-  then an existing place, then a new one` above code that reads exactly that).
-- A test comment restating its own `test "..."` name.
-- Rationale copied into a second file instead of pointed at (`see
-  EventCapture::Extractor`), so the two copies can disagree later.
-- Density: comments are dense here by house style, but a hunk that is ~40%+ comment
-  is a prompt to cut, not a target to hit.
-
-Design rationale belongs in the PR description, not duplicated in prose above the
-code that implements it. Keep in the file only the one line the reader cannot do
-without.
+The test for a new one: name the third party — a library, a browser, a spec, the
+database — whose behaviour forces the code to look wrong. If the sentence is
+about *our* design instead, it belongs in the PR.

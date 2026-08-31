@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# The publish half: one verified candidate in, one live Event out. This is the
-# first and only thing in the funnel that writes, so what it refuses matters as
-# much as what it creates. Synthetic place names; the registry is read live.
 class EventCapture::CreatorTest < ActiveSupport::TestCase
   def attrs(**overrides)
     { title: "Zorp Fest", date: "2026-09-01", time: "20:00", place: "Zorpsaal",
@@ -32,9 +29,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "capture", EventCapture::Creator.call(attrs).event.data_source
   end
 
-  # acknowledged, because the two titles are one show to TitleSimilarity ("2" is too
-  # short to be a token) and the second publish would otherwise stop to ask about the
-  # first. What is under test is the place, not the question.
   test "mints the captured place, once, and reuses it for a variant spelling" do
     EventCapture::Creator.call(attrs)
     second = EventCapture::Creator.call(attrs(place: "ZORP-SAAL", title: "Zorp Fest 2",
@@ -45,7 +39,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_includes second.event.location_list, "Zorpsaal"
   end
 
-  # The most valuable outcome of match-at-entry: tag the event and write no Place.
   test "a registry venue is tagged, never mirrored into places" do
     venue = Venue.in_taxonomy.first
     skip "no venues in the taxonomy" if venue.nil?
@@ -56,13 +49,9 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_predicate result, :ok?
     assert_nil result.place
     assert_empty Place.all
-    # The REGISTRY's spelling, not the contributor's: a venue's name must equal the
-    # location tag its events carry, or the taxonomy stops resolving it.
     assert_includes result.event.location_list, venue.name
   end
 
-  # Location.hierarchy groups on the literal string, so an uncorrected "bern" is a
-  # second node in the WHERE tree forever (see Locality).
   test "a locality differing only in case or accents adopts the stored spelling" do
     venue = Venue.in_taxonomy.find { |v| v.locality.present? }
     skip "no placed venue" if venue.nil?
@@ -83,8 +72,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_includes result.event.location_list, "Zorpwil"
   end
 
-  # The complement of the case above: a genuine variant is left alone rather than
-  # guessed at (see Locality).
   test "a genuinely different spelling is left as typed" do
     place(name: "Zorpsaal", locality: "Zorpwil")
 
@@ -93,8 +80,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "Zorpvil", result.place.locality
   end
 
-  # Both lookups match on NAME alone, so the form's locality can disagree with where
-  # the place actually is — and the chips would then describe one event two ways.
   test "a matched place is tagged with its own locality and canton, not the form's" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
 
@@ -112,8 +97,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal [venue.canton, venue.locality, venue.name].sort, result.event.location_list.sort
   end
 
-  # A show in a park: located by locality + canton alone, which is still a node
-  # the WHERE tree can reach.
   test "a blank place publishes without minting one" do
     result = EventCapture::Creator.call(attrs(place: ""))
 
@@ -122,8 +105,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal %w[BE Zorpwil], result.event.location_list.sort
   end
 
-  # Location.add_to_tree drops any tuple missing the middle tier, so a blank
-  # locality is an event nobody can browse to.
   test "refuses a candidate missing the fields the tree needs" do
     assert_equal :incomplete, EventCapture::Creator.call(attrs(locality: "")).error
     assert_equal :incomplete, EventCapture::Creator.call(attrs(title: "")).error
@@ -134,7 +115,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal :incomplete, EventCapture::Creator.call(attrs(date: "next Friday")).error
   end
 
-  # A poster that never printed a time must not read as a show starting at 00:00.
   test "no time leaves start_time null rather than inventing midnight" do
     result = EventCapture::Creator.call(attrs(time: ""))
 
@@ -149,9 +129,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "2026-09-01 20:00", event.start_time.strftime("%Y-%m-%d %H:%M")
   end
 
-  # events.url is unique and every captured event leaves it null, which Postgres
-  # counts as distinct — the constraint the scrapers upsert on cannot collide two
-  # captures.
   test "a captured event carries no url, and several of them publish" do
     first = EventCapture::Creator.call(attrs)
     second = EventCapture::Creator.call(attrs(title: "Zorp Fest 2", acknowledged: "1"))
@@ -166,8 +143,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_nil EventCapture::Creator.call(attrs).place.url
   end
 
-  # A poster prints "25:00" for an after-midnight show, and Time.zone.parse raises on
-  # it — a 500 that would take the whole unpersisted queue with it.
   test "an out-of-range clock is nulled, not raised" do
     result = EventCapture::Creator.call(attrs(time: "25:00"))
 
@@ -175,8 +150,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_nil result.event.start_time
   end
 
-  # A correction has to land where the model's own answer would; Time.zone.parse reads
-  # every one of these as midnight.
   test "a typed time is read by the same parser the model's answer went through" do
     assert_equal "20:00", EventCapture::Creator.call(attrs(time: "20 Uhr")).event.start_time.strftime("%H:%M")
     assert_equal "20:30", EventCapture::Creator.call(attrs(time: "20h30", title: "B")).event.start_time.strftime("%H:%M")
@@ -184,7 +157,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_nil EventCapture::Creator.call(attrs(time: "20.08.2026", title: "D")).event.start_time
   end
 
-  # add_to_tree bails on a blank canton exactly as it does on a blank locality.
   test "refuses a candidate with no canton" do
     assert_equal :incomplete, EventCapture::Creator.call(attrs(canton: "")).error
   end
@@ -197,16 +169,12 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_empty Place.all
   end
 
-  # Racy by construction: Place#fingerprint_available checks before it writes, so a
-  # concurrent capture of the same new venue really does reach the index.
   test "a venue another capture minted first is a refusal, not a 500" do
     Place.stub(:create, ->(*, **) { raise ActiveRecord::RecordNotUnique }) do
       assert_equal :place_invalid, EventCapture::Creator.call(attrs).error
     end
   end
 
-  # Captured genres join the taxonomy exactly like scraped ones, and a capture
-  # carrying only non-music genres is hidden by the same rule.
   test "genres are ensured in the taxonomy and visibility is recomputed" do
     result = EventCapture::Creator.call(attrs(genres: ["Zorpwave", "Flarncore"]))
 
@@ -214,8 +182,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal %w[Flarncore Zorpwave], Genre.where(name: %w[Zorpwave Flarncore]).pluck(:name).sort
     refute_predicate result.event, :hidden?
   end
-  # The three answers a card can post, and the one thing none of them may do: publish a
-  # second copy of a show we already carry without anyone having looked at the pair.
   class MatchTest < ActiveSupport::TestCase
     def attrs(**overrides)
       { title: "Zorp Fest", date: (Date.current + 20).to_s, time: "20:00", place: "Zorpsaal",
@@ -238,8 +204,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
       assert_equal 1, Event.count, "nothing was published"
     end
 
-    # The card ran the same lookup against what the model read; this is the look that
-    # sees the values actually being published.
     test "the check runs on the EDITED values, not the ones the card was rendered with" do
       listed(start_date: Date.current + 21)
 
@@ -269,8 +233,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
       assert_includes match.genre_list.map(&:downcase), "zorpcore"
     end
 
-    # Pinned because a human compared the two rows, which the sweep's fuzzy matcher
-    # cannot — so it may not re-derive the link away that night.
     test "an answered merge is pinned against the next sweep" do
       match = listed
       result = EventCapture::Creator.call(attrs(matched_event_id: match.id))
@@ -290,8 +252,6 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
       assert_equal 2, Event.count
     end
 
-    # A capture nobody was asked about stays the sweep's to fold, which is how a show
-    # we only start scraping later still collapses.
     test "a capture with no match to answer pins nothing" do
       result = EventCapture::Creator.call(attrs)
 

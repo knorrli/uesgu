@@ -7,9 +7,6 @@ class RegistrationsController < ApplicationController
     @invite_code = submitted_invite_code
   end
 
-  # Invitation-only: a valid, unredeemed code is required to create an account.
-  # The user and the redemption are committed together, so a failure on either
-  # side (taken username, or the code lost a race) leaves nothing behind.
   def create
     @user = User.new(registration_params)
     @invite_code = submitted_invite_code
@@ -47,8 +44,6 @@ class RegistrationsController < ApplicationController
     params.expect(user: %i[ username password password_confirmation ])
   end
 
-  # The code typed into the form (create / failed re-render) or carried in the
-  # shareable signup link (?invite=…).
   def submitted_invite_code
     params[:invitation_code].presence || params[:invite]
   end

@@ -1,7 +1,3 @@
-<%# The locality rows behind the locations browser. Same catalogue idiom as the
-    events / locations / genres indexes — filter, search, sort, paginate — with the
-    merge link as the one action, since combining two spellings of one town is the
-    only thing there is to decide about a locality. %>
 <% content_for :title, t('.title') %>
 <div class="flex flex-col gap-large">
   <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>

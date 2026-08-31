@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Locks the Datepicker preset structure and date math. Labels are I18n strings
-# (locale-dependent), so we assert their presence but never their text.
 class DatepickerTest < ActiveSupport::TestCase
   test "exposes every preset key with indifferent access" do
     preset = Datepicker.preset

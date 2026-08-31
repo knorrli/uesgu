@@ -1,5 +1,3 @@
-# Plain query object built from request params (see EventsController#index).
-# Filters are no longer persisted, so this is not an ActiveRecord model.
 class Filter
   attr_reader :queries, :genres, :location_list, :date_ranges
 
@@ -10,13 +8,6 @@ class Filter
     @date_ranges = []
   end
 
-  # Construct from the list inputs, skipping any passed as nil (so each caller
-  # sets only what it has). The one place the q/g/l/d shape is assembled — the
-  # events listing, a saved rule's edit filter, and the rule's own matcher all
-  # funnel through here instead of each repeating `new.tap { ... }`.
-  #
-  # `genres` (g[]) is the tree-aware slot: each picked genre matches itself + every
-  # descendant (see expanded_genre_names).
   def self.build(queries: nil, genres: nil, location_list: nil, date_ranges: nil)
     new.tap do |filter|
       filter.queries = queries unless queries.nil?
@@ -43,22 +34,10 @@ class Filter
     @date_ranges = ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] }
   end
 
-  # True when the listing is scoped by ANY UI input. Drives both the applied-chips
-  # row and the "follow this filter" bell — there's no longer a filter you can
-  # apply but not follow. Tapping a genre on an event applies it as a free-text
-  # query (q[]), so a genre rides in `queries`: searchable, followable, and
-  # SUBSTRING-matched, which catches sibling tags ("psych" → psych / psych rock /
-  # psychedelic rock) instead of silently missing them the way an exact match would.
-  # Meaningless on an unfiltered, all-events listing.
   def active?
     [queries, genres, location_list, date_ranges].any?(&:present?)
   end
 
-  # The genre names a `genres` pick expands to: each picked genre plus every genre
-  # beneath it in the tree, plus any alias resolving into that subtree (so a filter
-  # for "Electronic" still matches an event carrying the raw alias "Elektronik").
-  # Picking "Rock" thus also catches "Shoegaze", "Grunge", … without name guessing.
-  # See Genre.filter_names_for (shared with the row highlighter).
   def expanded_genre_names
     return [] if genres.blank?
 
@@ -79,9 +58,6 @@ class Filter
         {}.tap do |date_group|
           if mapped_ranges = map_date_ranges(date_ranges).presence
             date_group[:start_date_between_any] = mapped_ranges
-            # A named/preset window ("this month", "this weekend") still hides the
-            # past — it intersects with [today, ∞). Only an explicitly typed
-            # absolute range reveals past events, so drop the floor just for that.
             date_group[:start_date_gteq] = Date.current.beginning_of_day unless custom_range?
           else
             date_group[:start_date_gteq] = Date.current.beginning_of_day
@@ -93,9 +69,6 @@ class Filter
 
   private
 
-  # Whether the date filter holds an explicitly-typed absolute range (vs. only
-  # named presets). Such a range is the user asking for a specific window, which
-  # may be in the past — so it opts out of the future floor.
   def custom_range?
     date_ranges.any? { |range| !Datepicker.preset.key?(range) && range.to_s.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) }
   end

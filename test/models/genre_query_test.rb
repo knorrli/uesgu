@@ -1,10 +1,5 @@
 require "db_test_helper"
 
-# Locks Genre's class-level mechanics — ensure! (idempotent, fingerprint-keyed
-# row creation), reconcile! (usage-count refresh from taggings),
-# blocked_fingerprints (the blocklist) — and the curation scopes. Synthetic
-# names only; genres are matched by fingerprint via the genre_for helper since
-# ingest canonicalizes casing/spelling.
 class GenreQueryTest < ActiveSupport::TestCase
   test "ensure! creates a row per new name" do
     assert_difference -> { Genre.count }, 2 do
@@ -48,7 +43,7 @@ class GenreQueryTest < ActiveSupport::TestCase
   end
 
   test "reconcile! zeroes the count for a genre no longer tagged anywhere" do
-    event_with_genres("still-tagged") # keep the taggings table non-empty
+    event_with_genres("still-tagged")
     stale = genre(name: "forgotten", events_count: 9)
 
     Genre.reconcile!
@@ -58,8 +53,6 @@ class GenreQueryTest < ActiveSupport::TestCase
   end
 
   test "reconcile! zeroes stale counts even when nothing is tagged at all" do
-    # Regression: with an empty taggings set the old `NOT IN (NULL)` matched no
-    # rows, so phantom counts survived and genres stayed falsely "in use".
     stale = genre(name: "orphan", events_count: 7)
 
     Genre.reconcile!
@@ -70,7 +63,7 @@ class GenreQueryTest < ActiveSupport::TestCase
   test "blocked_fingerprints returns the fingerprints of only blocked genres" do
     blocked = Genre.create!(name: "NoiseTag")
     blocked.block!
-    genre(name: "kept") # un-blocked, must not appear
+    genre(name: "kept")
 
     fingerprints = Genre.blocked_fingerprints
 
@@ -83,15 +76,15 @@ class GenreQueryTest < ActiveSupport::TestCase
     queued = genre(name: "queued", events_count: 5)
     root = genre(name: "root", events_count: 5)
     placed = genre(name: "placed", events_count: 5, parent: root)
-    genre(name: "dormant", events_count: 0) # not in use → excluded
+    genre(name: "dormant", events_count: 0)
     parked = genre(name: "parked", events_count: 3)
     parked.ignore!
 
     names = Genre.unplaced.pluck(:name)
 
     assert_includes names, queued.name
-    refute_includes names, placed.name # filed under a parent
-    refute_includes names, root.name   # IS a parent (has a child) → a root, not unplaced
+    refute_includes names, placed.name
+    refute_includes names, root.name
     refute_includes names, "dormant"
     refute_includes names, parked.name
   end
@@ -109,9 +102,9 @@ class GenreQueryTest < ActiveSupport::TestCase
 
   test "listable includes parked (disposed) genres even at zero usage" do
     blocked = genre(name: "blocked-zero", events_count: 0)
-    blocked.block! # blocked genres tag 0 events yet must stay listed
+    blocked.block!
     used = genre(name: "used", events_count: 1)
-    genre(name: "truly-dormant", events_count: 0) # excluded
+    genre(name: "truly-dormant", events_count: 0)
 
     names = Genre.listable.pluck(:name)
 
@@ -121,10 +114,6 @@ class GenreQueryTest < ActiveSupport::TestCase
   end
 
   test "listable includes a zero-usage canonical that an alias points at" do
-    # The clean-spelled genre can sit at events_count 0 because the live event
-    # carries the messy variant's raw token (e.g. "Death Metal Melodic" → "Melodic
-    # Death Metal"). It only earns its place via the alias, so it must stay listed
-    # so it doesn't vanish from the catalogue right after the merge.
     canonical = genre(name: "melodic-death-metal", events_count: 0)
     aliased = genre(name: "death-metal-melodic", events_count: 1)
     aliased.merge_into!(canonical)
@@ -134,9 +123,6 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_includes names, canonical.name, "a zero-usage canonical with an alias stays listed"
     assert_includes names, aliased.name, "the alias stays listed via its own taggings"
   end
-
-  # The ingest-time match-only miner: find KNOWN genre names in dropped
-  # description prose, mint nothing. Synthetic taxonomy only.
 
   test "names_in_prose matches a known genre named in prose" do
     Genre.create!(name: "Zorptronic")
@@ -152,10 +138,9 @@ class GenreQueryTest < ActiveSupport::TestCase
   end
 
   test "names_in_prose folds spelling variants like the genre filter" do
-    Genre.create!(name: "Wub Core") # fingerprint "wubcore"
+    Genre.create!(name: "Wub Core")
     index = Genre.prose_mining_index
 
-    # multi-word window and hyphen variant both collapse to the stored spelling
     assert_equal ["Wub Core"], Genre.names_in_prose("expect some wub core tonight", index)
     assert_equal ["Wub Core"], Genre.names_in_prose("expect some wub-core tonight", index)
   end
@@ -181,7 +166,7 @@ class GenreQueryTest < ActiveSupport::TestCase
 
     assert_no_difference -> { Genre.count } do
       result = Genre.names_in_prose("zorptronic meets some flarejazz", index)
-      assert_equal ["Zorptronic"], result # flarejazz is unknown → not mined
+      assert_equal ["Zorptronic"], result
     end
   end
 
@@ -194,7 +179,7 @@ class GenreQueryTest < ActiveSupport::TestCase
 
   test "prose_mining_index excludes the everyday-word stoplist" do
     word = Genre::PROSE_MINING_STOPWORDS.first
-    Genre.create!(name: word) # a real genre, but too ambiguous to mine from prose
+    Genre.create!(name: word)
     index = Genre.prose_mining_index
 
     refute_includes index.keys, Genre.fingerprint_for(word)
@@ -207,8 +192,6 @@ class GenreQueryTest < ActiveSupport::TestCase
     aliased.merge_into!(canonical)
     index = Genre.prose_mining_index
 
-    # the alias keeps its own fingerprint/name; mining "zorptronik" attaches the
-    # raw token, which the filter resolves to Zorptronic at query time.
     assert_equal ["Zorptronik"], Genre.names_in_prose("pure zorptronik vibes", index)
   end
 end

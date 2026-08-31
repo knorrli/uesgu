@@ -4,7 +4,6 @@ module Scrapers
       URI.parse("https://boeroem.ch/")
     end
 
-    # Böröm lists a title + Untertitel only; there is no genre/style/tag field.
     field_gaps genres: :no_field
 
     def event_rows
@@ -22,8 +21,7 @@ module Scrapers
     def event_start_time(content)
       date_string = content.at_css(".event-single-datum").text.squish
       /(?<day>\d{1,2})\.\W*(?<month>\S*)\W*(?<year>\d{4})*/ =~ date_string
-      # Without a year, Time.zone.parse silently returns today — skip+log instead
-      # (mirrors the guard in Schueuer/Roessli/Gaskessel).
+      # Without a year, Time.zone.parse silently returns today.
       raise "Unparseable Böröm date: #{date_string.inspect}" if day.blank? || month.blank? || year.blank?
 
       time_string = content.css(".elementor-widget-container").select { |node| node.text.squish.starts_with?("Show Start") }.map(&:text).join[/\d{2}:\d{2}/]

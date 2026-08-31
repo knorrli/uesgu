@@ -2,14 +2,7 @@ require "cgi"
 require "nokogiri"
 
 module Scrapers
-  # Bierhübeli (Bern) runs on WordPress + Toolset; its public site is a paginated
-  # Elementor view, but the WP REST API exposes the `event` post type cleanly. Each
-  # row is a Hash. The Toolset custom field `eventzusatz.datum` is a Unix timestamp
-  # whose UTC rendering is the show's Swiss wall-clock start (doors live alongside),
-  # and the genre tags sit in free-text `beschreibungstag` fields.
   class Bierhuebeli < Agent
-    # Ordered by publish date (newest first); 100 comfortably covers the upcoming
-    # programme. Rows are JSON, so `page.body` is parsed, not the DOM.
     def self.url
       URI.parse("https://bierhuebeli.ch/wp-json/wp/v2/event?per_page=100")
     end
@@ -18,7 +11,6 @@ module Scrapers
       parse_json(page.body)
     end
 
-    # Skip rows with no event date (drafts / mis-entered events).
     def skip_row?(row)
       event_field(row, "datum").blank?
     end
@@ -27,9 +19,6 @@ module Scrapers
       row["link"].to_s
     end
 
-    # `datum` is a Unix timestamp whose UTC rendering already reads as the local
-    # Swiss wall-clock show time (verified against the separate doors time), so map
-    # those Y/M/D h:m straight onto the zone — never apply the epoch's UTC offset.
     def event_start_time(row)
       stamp = event_field(row, "datum")
       raise "Unparseable Bierhübeli date: #{stamp.inspect}" if stamp.blank?
@@ -42,29 +31,15 @@ module Scrapers
       CGI.unescapeHTML(row.dig("title", "rendered").to_s).squish
     end
 
-    # billboard-byline is free-text HTML. Its <br> tags separate the tagline from
-    # the support act (and some samples have no spaces around them), so promote
-    # those to a middot first or strip_tags would merge the words; then strip every
-    # remaining tag and decode entities (&amp; → &), matching event_title.
     def event_description(row)
       html = event_field(row, "billboard-byline").to_s.gsub(%r{<br\s*/?>}i, " · ")
       CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(html)).squish.presence
     end
 
-    # beschreibungstag-1/2/3 are the short genre/type tags the venue types per
-    # event — clean enough to MINT new taxonomy from (typos/marketing terms land
-    # UNPLACED for filing/aliasing/blocking downstream). The `musicradar` blurb's
-    # "Stil:" line is genre data too, but the venue writes it as free-flowing prose
-    # as often as a comma-list ("…modernen Lieblingssongs, die verbinden, bewegen
-    # und gute Laune machen."), so splitting it on commas minted junk clauses like
-    # "Die Verbinden". It's mined MATCH-ONLY via event_genre_prose instead.
     def event_genres(row)
       extract_tag_genres(row)
     end
 
-    # The musicradar "Stil:" line, handed to the match-only miner as prose rather
-    # than tokenised (see event_genres). Mints nothing — only attaches genres the
-    # taxonomy already knows, so a prose clause that isn't a real genre never sticks.
     def event_genre_prose(row)
       musicradar_stil_text(row)
     end
@@ -79,20 +54,12 @@ module Scrapers
       row.dig("toolset-meta", "artistfields", key, "raw").to_s.squish
     end
 
-    # beschreibungstag-1 sometimes carries real genre info and sometimes a
-    # type/location note ("Externer Anlass", "Girlhood") that DOES match vocabulary
-    # and leaks onto events — kept in deliberately; the noise is pruned via the
-    # admin queue rather than dropped here. beschreibungstag-2/3 are clean genre tags.
     def extract_tag_genres(row)
       %w[beschreibungstag-1 beschreibungstag-2 beschreibungstag-3].filter_map do |key|
         artist_field(row, key).presence
       end
     end
 
-    # The plain text of the musicradar blurb's "Stil:" segment — walking the DOM
-    # from the <strong>Stil:</strong> label to the next <strong> so the surrounding
-    # marketing HTML (data-* attrs, decorative <strong>, <br>) can't derail the
-    # boundary. Returns the raw prose for match-only mining, NOT a token list.
     def musicradar_stil_text(row)
       doc   = Nokogiri::HTML.fragment(artist_field(row, "musicradar"))
       label = doc.css("strong").find { |s| s.text.squish =~ /\AStil:?\z/i }

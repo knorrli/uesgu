@@ -12,9 +12,6 @@ module DatepickerHelper
     content_tag(:span, date_range_label(date_range))
   end
 
-  # Plain-text label for a date range — a preset's localized name, a single
-  # localized date, or a localized "start - end" span. Shared by the date chip
-  # (datepicker_tag_content) and the mobile filter sheet's summary.
   def date_range_label(date_range)
     if preset = Datepicker.preset[date_range]
       preset[:label]

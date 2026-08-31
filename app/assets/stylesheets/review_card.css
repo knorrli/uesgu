@@ -1,18 +1,8 @@
-/* One thing being judged, with the evidence that settles it. Specimen in /styleguide.
-
-   A plain block in document flow: source at the top, fields below it, the decision
-   after the last field, one page scroll for the whole thing. Nothing in the card holds
-   still while the rest of it moves — anything that did could only stay visible by
-   letting the fields pass behind it. The per-field cite quotes are what keeps the
-   source to hand once the poster has scrolled past. */
 .review-card {
   padding-bottom: var(--gap-small);
   border-top: var(--border-width) solid var(--border-color);
 }
 
-/* Capped so the first field is on screen with the poster rather than below the fold —
-   an upright poster left to its own size is taller than the phone it is read on.
-   .capture-row__excerpt takes the same cap for a pasted source. */
 .review-card__source {
   --source-max-height: 50dvh;
   padding-block: var(--gap-small);
@@ -33,9 +23,6 @@
   cursor: zoom-in;
 }
 
-/* Full-bleed: the small print on a poster is the reason to look at it at all, and the
-   capped pane cannot show it. Opaque because it covers the card rather than replacing
-   it. */
 .review-card__source--zoomed {
   position: fixed;
   inset: 0;
@@ -52,10 +39,6 @@
   max-width: 100%;
 }
 
-/* Provenance for what it is attached to: the text quoted off the source. Shares
-   the quiet muted channel with a field's hint and is set apart from it by slant alone
-   — transcription against instruction — because a card carrying one per field has to
-   read as a form and not as a transcript. Rhythm comes from .field-group__attached. */
 .review-card__cite {
   margin: 0;
   color: var(--theme-fg-muted);
@@ -63,9 +46,6 @@
   font-style: italic;
 }
 
-/* Set apart from the fields above it by KIND, not by weight: the card body is
-   borderless, so every input already draws a horizontal rule and one more cannot be
-   read as a boundary. A recessed ground and a heading can. */
 .card-aside {
   display: flex;
   flex-direction: column;
@@ -82,16 +62,12 @@
   font-weight: normal;
 }
 
-/* A row of its own so the button keeps its own width — a direct child of the column
-   stretches to the block, which reads as one more full-width field. */
 .card-aside__actions {
   display: flex;
   align-items: start;
   gap: var(--gap-small);
 }
 
-/* The card's last row, after the last field. The last action is pushed to the far end:
-   a dismissal sitting next to the commit is one mis-tap away from being it. */
 .action-bar {
   display: flex;
   align-items: center;
@@ -104,8 +80,6 @@
   margin-left: auto;
 }
 
-/* The same three parts rotated where there is room for it: source left, fields right,
-   the decision across the bottom of both. */
 @media (min-width: 900px) {
   .review-card {
     display: grid;

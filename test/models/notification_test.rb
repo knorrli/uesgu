@@ -1,10 +1,6 @@
 require "db_test_helper"
 
 class NotificationTest < ActiveSupport::TestCase
-  # Locks Notification.visible_event_counts — the batched inbox count that
-  # replaced a per-notification N+1. It must still honour #events' "currently
-  # visible" rule (an event hidden after the digest fired drops out) and key the
-  # result by notification id.
   test "visible_event_counts counts only currently-visible snapshot events" do
     u = user
     shown = event(start_date: Date.current + 1)

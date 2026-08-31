@@ -1,7 +1,3 @@
-/* Notifications index + digest pages. Mobile-first.
-   (Page header + back link moved to the shared page_header.css.) */
-
-/* Index: a hairline-separated list of digests (no boxes). */
 .notifications {
   list-style: none;
   margin: 0;
@@ -27,18 +23,10 @@
   font-weight: bold;
 }
 
-/* Unread is signalled by the accent name + badge, not a heavy border. */
 .notification.unread .notification__name {
   color: var(--theme-accent-color);
 }
 
-/* nowrap keeps the count and the date range each unbroken, which is what makes
-   the dates line up flush right across rows (see the ordering comment in
-   notifications/index). It is NOT allowed to push the row wider than the
-   viewport: French is the widest of the three, and at 320px its meta line
-   ("3 événements · 06.08.2026 – 13.08.2026") measures 385px, so without the wrap
-   the whole page scrolls sideways. Measured by
-   test/system/inbox_narrow_viewport_test.rb, which pins that locale for it. */
 .notification__meta {
   display: flex;
   flex-wrap: wrap;
@@ -48,9 +36,6 @@
   font-size: var(--font-size-small);
   white-space: nowrap;
 }
-
-/* The inbox's Ungelesen | Gelesen toggle reuses the shared .view-switcher /
-   .view-switch__item component (see controls.css). No bespoke styles here. */
 
 .empty-state {
   color: var(--theme-fg-muted);

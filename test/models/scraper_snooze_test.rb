@@ -1,6 +1,5 @@
 require "db_test_helper"
 
-# ScraperSnooze: a self-expiring, admin-set mute for one scraper.
 class ScraperSnoozeTest < ActiveSupport::TestCase
   test "snooze! mutes a scraper for the default window and active_by_slug finds it" do
     ScraperSnooze.snooze!("bad_bonn")

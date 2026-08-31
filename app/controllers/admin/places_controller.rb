@@ -1,12 +1,4 @@
 module Admin
-  # Curation for the captured venues. The locations browser next door lists every
-  # location TAG (venue / locality / canton) as derived usage; this lists the place
-  # rows themselves, because combining two spellings of one venue needs something with
-  # an id to point at. Mirrors the localities index idiom: filter by status, sort,
-  # search, paginate.
-  #
-  # Counts come from the taggings rather than a column — a place has no reconcile pass
-  # to maintain one — so the sort happens in Ruby over a table that stays small.
   class PlacesController < BaseController
     include CatalogueBrowsing
 
@@ -50,8 +42,6 @@ module Admin
       places.sort_by { |place| [-@counts[place.name].to_i, place.name.downcase] }
     end
 
-    # Constrained to internal paths so the round-tripped value can't be turned into
-    # an open redirect.
     def return_to
       to = params[:return_to].to_s
       to.start_with?("/") ? to : admin_places_path

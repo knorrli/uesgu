@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the events-list interest highlighting end to end: a saved filter lights
-# matching rows (amber rule + flag) and leaves the rest alone. Synthetic taxonomy
-# only (see db_test_helper).
 class InterestHighlightingTest < ActionDispatch::IntegrationTest
   def save_filter(owner, **filter)
     owner.saved_filters.create!(cadence: "daily", time_of_day: 18 * 60, weekday: 1, monthday: 1,

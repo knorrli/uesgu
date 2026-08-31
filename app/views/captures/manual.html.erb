@@ -1,17 +1,8 @@
 <% content_for :title, t('capture.manual.title') %>
 
-<%# The same fields a review card carries (see captures/_event_fields), on an ordinary
-    form page: a hand-entered event has no source to compare against, so nothing the
-    card's frame exists to hold still applies here.
-
-    `turbo: false` is load-bearing, not a preference. It makes the publish ask for HTML,
-    which is the whole of what tells this screen apart from a card in
-    CapturesController#create. %>
 <div class="capture-manual flex flex-col gap-large">
   <%= render layout: "shared/page_header",
         locals: { back_path: capture_path, back_label: t('capture.title') } do %>
-    <%# Absolute key: this block is yielded into shared/page_header, where a relative
-        one resolves against that partial. %>
     <h1><%= t('capture.manual.title') %></h1>
   <% end %>
 
@@ -25,8 +16,6 @@
     <%= render "captures/matches", form_id: "manual-event-form", matches: @matches %>
   <% end %>
 
-  <%# Its own controller rather than the review queue's, for the reason in
-      manual_capture_controller.js. %>
   <%= form_with url: capture_path, method: :post, id: "manual-event-form",
         class: "capture-fields account-form flex flex-col gap-large",
         data: { turbo: false, controller: "manual-capture",

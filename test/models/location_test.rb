@@ -1,15 +1,8 @@
 require "db_test_helper"
 
-# Locks the location type derivation. Locations have no stored type — venue vs
-# region is derived from the VENUE REGISTRY (config/venues.yml via Venue): the
-# placed, consumed venues (Venue.in_taxonomy) are the source of truth, joined by
-# the captured places (Place), which cover only what the registry does not.
-# Expectations are derived from the live registry, never hardcoded venue names, so
-# this stays correct as the registry changes. The canton codes are the exception: a
-# closed list of 26 that must NOT follow the registry.
 class LocationTest < ActiveSupport::TestCase
   setup do
-    @venue = Venue.in_taxonomy.first # a placed, consumed venue
+    @venue = Venue.in_taxonomy.first
     skip "no venues in the taxonomy" if @venue.nil?
   end
 
@@ -32,9 +25,6 @@ class LocationTest < ActiveSupport::TestCase
     assert_equal :canton, Location.type_for(@venue.canton)
   end
 
-  # The bug this list replaced: canton_codes was Venue.in_taxonomy's cantons, so a
-  # tag for a canton we do not source from fell through to :locality and rendered
-  # with a locality icon and a "· Ort" suffix everywhere a location is shown.
   test "a canton we source no venue from is still classified as :canton" do
     uncovered = Location::CANTON_CODES - Location.taxonomy_venues.map(&:canton).to_set
     skip "the registry covers all 26 cantons" if uncovered.empty?
@@ -49,9 +39,6 @@ class LocationTest < ActiveSupport::TestCase
     assert Location.canton_codes.frozen?
   end
 
-  # The codes and their display names are two lists in two places; if they drift, a
-  # canton renders as a raw code (missing name) or a name is dead weight (missing
-  # code). Locked against every locale, not just the default.
   test "every canton code has a display name in every locale, and vice versa" do
     I18n.available_locales.each do |locale|
       names = I18n.t("cantons", locale: locale).keys.map(&:to_s).to_set
@@ -72,10 +59,6 @@ class LocationTest < ActiveSupport::TestCase
     assert_includes tree[@venue.canton][@venue.locality], @venue.name
   end
 
-  # A venue fed by an aggregator (no scraper covering its own domain) is approved
-  # in the registry like any other and must fold into the taxonomy exactly the same
-  # — classified as a venue and nested in the tree — otherwise the aggregator's
-  # venues are unfilterable (the gap Bewegungsmelder first exposed).
   test "an aggregator-sourced venue folds into venue_names, type and tree" do
     agg = Venue.in_taxonomy.find(&:sourced_via_aggregator?)
     skip "no aggregator-sourced placed venue" if agg.nil?
@@ -119,9 +102,6 @@ class LocationTest < ActiveSupport::TestCase
     refute_includes fingerprints, zorpsaal.fingerprint
   end
 
-  # A consume venue with no place (e.g. the Bewegungsmelder aggregator feed itself)
-  # must be excluded from the tree — otherwise the favorites location picker calls
-  # parameterize on a nil locality and the whole /favorites page 500s.
   test "hierarchy excludes placeless venues and never yields a nil locality/canton" do
     placeless = Venue.consuming.reject(&:placed?).first
     tree = Location.hierarchy

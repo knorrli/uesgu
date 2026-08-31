@@ -1,7 +1,3 @@
-# Screenshots the digest email preview in both color schemes by emulating
-# prefers-color-scheme via CDP — faithful to how WebKit-based mail clients
-# (Apple Mail, new Outlook for Mac, iOS Mail) resolve the media query.
-# Loads the raw HTML part (not the preview chrome). Output: tmp/mail/<scheme>.png
 require "ferrum"
 require "fileutils"
 

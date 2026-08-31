@@ -4,16 +4,8 @@ module Scrapers
       URI.parse("https://neubad.org/veranstaltungen")
     end
 
-    # Music-relevant categories at this mixed-use venue (the rest is film, markets,
-    # talks, yoga…). The category sits on the list row as `span.kategorie`.
     MUSIC_CATEGORIES = %w[Konzert Klubnacht].freeze
 
-    # Neubad exposes no music-genre field — its only taxonomy is the event TYPE
-    # (`span.kategorie`, mirrored in the detail "Was" row: Konzert, Klubnacht,
-    # Kunst, Film…), which we use to filter to music, not to tag a genre. Any
-    # genre coverage on these events is incidental (PETZI carries the same shows
-    # with tags; a dedup merge or admin pin can leave a few). Record a no_field
-    # gap so the low number isn't re-investigated.
     field_gaps genres: :no_field
 
     def event_rows
@@ -31,8 +23,6 @@ module Scrapers
       URI.join("https://neubad.org", link.attr("href")).to_s
     end
 
-    # The list groups events under a year-less <h3> date header; the detail page's
-    # "Wann" row gives the full German date WITH the year, so click through for it.
     def event_content(row)
       click(Page::Link.new(row.at_css(".views-field-title a"), @mech, page))
     end
@@ -52,8 +42,6 @@ module Scrapers
 
     private
 
-    # Read a labelled value from the detail page's `.event-details` rows
-    # (Wann / Was / Wo / Türöffnung / Beginn).
     def detail_value(content, label)
       content.css(".event-details .event-detail-row").each do |row|
         return row.at_css(".event-detail-value")&.text&.squish if row.at_css(".event-detail-label")&.text&.squish == label

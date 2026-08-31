@@ -1,11 +1,5 @@
 require "db_test_helper"
 
-# The OLE aggregator records discovery LEADS (VenueLead): venues it resolved that
-# are NOT consume venues in the registry, with their upcoming-event counts. A
-# consume venue ingests and is not a lead; a rejected/deferred one is dropped but
-# also not a lead (already triaged). Needs the DB, so it lives apart from the offline
-# ole_test.rb. Synthetic names for the leads; a real consume venue (Dachstock) for
-# the match path (project-test-synthetic-taxonomy).
 class Scrapers::OleLeadsTest < ActiveSupport::TestCase
   def aggregator
     Scrapers::Ole.build(key: "TestAgg", feed_url: "https://agg.example/oleexport", aggregator: true)
@@ -19,7 +13,7 @@ class Scrapers::OleLeadsTest < ActiveSupport::TestCase
   test "an aggregator records UNSEEN resolved venues as leads, with accumulated counts" do
     s = aggregator.new
     s.send(:note_place, ["Glorphalle", "Snarftown", "BE"], 3)
-    s.send(:note_place, ["Glorphalle", "Snarftown", "BE"], 2) # same venue, more shows
+    s.send(:note_place, ["Glorphalle", "Snarftown", "BE"], 2)
     s.send(:note_place, ["Blipbar", "Blipcity", "ZH"], 1)
 
     assert_difference "VenueLead.count", 2 do
@@ -32,7 +26,7 @@ class Scrapers::OleLeadsTest < ActiveSupport::TestCase
 
   test "a CONSUME registry venue is ingested, not recorded as a lead" do
     s = aggregator.new
-    s.send(:note_place, ["Dachstock", "Bern", "BE"], 4) # approved (consume) in the registry
+    s.send(:note_place, ["Dachstock", "Bern", "BE"], 4)
 
     assert_no_difference "VenueLead.count" do
       s.send(:persist_leads)
@@ -41,7 +35,7 @@ class Scrapers::OleLeadsTest < ActiveSupport::TestCase
 
   test "a REJECTED registry venue is not recorded as a lead (already triaged)" do
     s = aggregator.new
-    s.send(:note_place, ["La Cappella", "Bern", "BE"], 2) # reject in the registry
+    s.send(:note_place, ["La Cappella", "Bern", "BE"], 2)
 
     assert_no_difference "VenueLead.count" do
       s.send(:persist_leads)
@@ -59,7 +53,7 @@ class Scrapers::OleLeadsTest < ActiveSupport::TestCase
 
   test "a place too thin to nest (no locality) is skipped" do
     s = aggregator.new
-    s.send(:note_place, ["LonelyVenue"], 1) # size 1 — nothing to nest under
+    s.send(:note_place, ["LonelyVenue"], 1)
 
     assert_no_difference "VenueLead.count" do
       s.send(:persist_leads)

@@ -5,10 +5,6 @@
     <h1><%= t('saved_events.title') %></h1>
   <% end %>
 
-  <%# Day-of reminder opt-in: a property of the saved-shows feature (it nudges you
-      about the shows listed here), so it lives on this page rather than Settings.
-      Only shown once there's something to be reminded about. Auto-saves in the
-      background (reminder controller); no Save button. %>
   <% if @any_saved %>
     <div class="saved-reminder" data-controller="reminder">
       <label class="saved-reminder__toggle flex gap-small align-center">
@@ -19,9 +15,6 @@
       <p class="muted saved-reminder__hint"><%= t('saved_events.reminders_hint') %></p>
     </div>
 
-    <%# Points at the ICS feed of exactly this list, which is set up in Settings and
-        not here: minting the token is a deliberate opt-in, because the URL is a
-        credential. %>
     <p class="muted">
       <%= t('saved_events.calendar_feed_hint_html',
             link: link_to(t('saved_events.calendar_feed_link'), settings_path(anchor: 'calendar-feed'))).html_safe %>
@@ -37,9 +30,6 @@
       <% @events.group_by(&:start_date).each do |date, events| %>
         <div class="date-events flex flex-col gap-medium">
           <h2 class="date"><%= l date, format: :detailed %></h2>
-          <%# interactive: the venue/style tags are follow-toggles here too, same as
-              the main programme — clicking a name follows/unfollows it (not a filter
-              link), so the behaviour is consistent everywhere. %>
           <%= render 'events/venue_groups', events: events, filter: nil, interactive: true %>
         </div>
       <% end %>

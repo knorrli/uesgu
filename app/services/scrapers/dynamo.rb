@@ -1,16 +1,9 @@
 require "cgi"
 
 module Scrapers
-  # Jugendkulturhaus Dynamo (Zürich) runs a Next.js front-end over a headless
-  # Drupal/NodeHive JSON:API. We query upcoming events server-side, keep the ones
-  # tagged as concerts, and map the finer category tags to genres. Rows are Hashes.
   class Dynamo < Agent
-    # The feed is on the NodeHive backend (see #url), so the venue domain isn't
-    # derivable from url.host — declare it for the ledger drift test.
     def self.venue_domains = ["dynamo.ch"]
 
-    # The "Konzert" category marks an event as a concert; the rest of the term ids
-    # are genre facets we surface as genres (they mint and are curated downstream).
     CONCERT_TID = 20
     GENRE_BY_TID = {
       14 => "Metal", 15 => "Hip-Hop", 16 => "Elektro",
@@ -28,15 +21,12 @@ module Scrapers
       URI.parse("https://dynamo.nodehive.app/jsonapi/node/event?#{query}")
     end
 
-    # Dynamo's feed carries a genre taxonomy (extracted below) but no description
-    # field.
     field_gaps description: :no_field
 
     def event_rows
       Array(parse_json(page.body, default: {})["data"])
     end
 
-    # Drop courses/markets/workshops; keep only concert-tagged events.
     def skip_row?(row)
       category_tids(row).exclude?(CONCERT_TID)
     end
@@ -46,13 +36,10 @@ module Scrapers
       "https://www.dynamo.ch#{alias_path}" if alias_path.present?
     end
 
-    # The feed is a NodeHive backend, so the public event host isn't the feed host
-    # — pin it explicitly for the golden-suite URL assertion.
     def self.event_url_pattern
       %r{\Ahttps://www\.dynamo\.ch/}
     end
 
-    # `field_event_date.value` is full ISO 8601 with offset and year — clean.
     def event_start_time(row)
       value = row.dig("attributes", "field_event_date", "value")
       raise "Missing Dynamo date for #{event_url(row)}" if value.blank?
@@ -60,13 +47,10 @@ module Scrapers
       Time.zone.parse(value)
     end
 
-    # `attributes.title` appends a "- DD.MM.YYYY" suffix; `field_title` is clean.
     def event_title(row)
       row.dig("attributes", "field_title").to_s.squish
     end
 
-    # Genres come from a fixed Drupal taxonomy (stable term ids → known names) — a
-    # clean structured source, so allowed to mint taxonomy (discovery).
     def event_genres(row)
       category_tids(row).filter_map { |tid| GENRE_BY_TID[tid] }
     end

@@ -1,33 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 import { searchForSuggestion } from "lib/search_for"
 
-// Connects to data-controller="filter-sheets"
-//
-// Drives the mobile filter sheets (app/views/events/_filter_sheets.html.erb).
-// The option rows are real form inputs (name="q[]/g[]/l[]/d[]"), so committing is
-// just a GET submit — same params as the inline combobox filter. This controller
-// only handles presentation: opening/closing sheets, in-sheet search, the
-// free-text "search for X" row, and removing a chip. The custom date range is a
-// nested range-calendar controller; we just reset it on Clear / chip removal.
-//
-// Filters are non-destructive, so closing a sheet (× or Apply) keeps the
-// selection; we navigate only when something actually changed, so tapping × on an
-// untouched sheet closes instantly with no reload.
 export default class extends Controller {
   static targets = ["form", "sheet", "queries", "group"]
-  // submitOnApply: the events filter navigates on every apply (live listing). The
-  // rule editor sets it false — picks stage into the form as checked inputs and
-  // commit only on the explicit Save, so we refresh the trigger counts client-side
-  // instead of round-tripping.
   static values = { searchForTemplate: String, searchAnything: String, submitOnApply: { type: Boolean, default: true } }
 
   connect() {
     this.onKeydown = (event) => { if (event.key === "Escape") this.#closeOpenSheet() }
     document.addEventListener("keydown", this.onKeydown)
 
-    // Click-outside-to-close: on desktop the open panel is dismissed by clicking
-    // anywhere off it (and off its trigger, which toggles itself — see open()). On
-    // mobile the sheet is full-screen, so there is no "outside" and this never fires.
     this.onClickOutside = (event) => {
       const open = this.sheetTargets.find((sheet) => sheet.classList.contains("sheet--open"))
       if (!open || open.contains(event.target) || event.target.closest(".filter-trigger")) return
@@ -35,9 +16,6 @@ export default class extends Controller {
     }
     document.addEventListener("click", this.onClickOutside)
 
-    // A tree that failed to arrive must not leave the sheet stuck on its loading
-    // row: drop the src again so the next open retries. The staged values are
-    // untouched — Turbo only replaces the frame's contents once a response lands.
     this.onFetchError = (event) => {
       const frame = event.target.closest?.("turbo-frame[data-src]")
       frame?.removeAttribute("src")
@@ -52,9 +30,6 @@ export default class extends Controller {
     document.body.classList.remove("filter-sheet-open")
   }
 
-  // Reveal any group that already holds a checked row, so a pre-applied genre or
-  // location isn't hidden inside a collapsed one. A target callback, not a loop in
-  // connect(): most groups arrive later, with their lazily-loaded tree.
   groupTargetConnected(group) {
     if (group.querySelector("input:checked")) group.classList.remove("collapsed")
   }
@@ -62,36 +37,22 @@ export default class extends Controller {
   open(event) {
     const sheet = this.#sheetFor(event.params.field)
     if (!sheet) return
-    // Toggle: clicking the trigger of an already-open panel closes it.
     if (sheet.classList.contains("sheet--open")) { this.#commit(sheet); return }
-    // First open of a sheet whose options are lazy: go get them.
     this.#loadOptions(sheet)
-    // Desktop shows panels inline, so a second trigger could open a second panel.
-    // Hide any already-open one WITHOUT committing — its checkbox state persists in
-    // the form and applies on the next submit, so nothing is lost. (On mobile only
-    // one sheet is ever reachable, so this loop is a no-op there.)
     this.sheetTargets.forEach((other) => { if (other !== sheet) this.#closeSheet(other) })
     this.snapshot = this.#serialize(sheet)
     sheet.classList.add("sheet--open")
     sheet.setAttribute("aria-hidden", "false")
     document.body.classList.add("filter-sheet-open")
-    // Move focus into the dialog for screen-reader/keyboard users. On DESKTOP
-    // (inline dropdown panel) focus the search field so you can type straight away;
-    // on MOBILE focus the close button instead — never the search field, so opening
-    // a sheet never summons the on-screen keyboard. preventScroll keeps the page put.
     const search = sheet.querySelector(".sheet__search-input")
     const target = (this.#isDesktop() && search) ? search : sheet.querySelector(".sheet__close")
     target?.focus({ preventScroll: true })
-    // Show the free-text affordance straight away (blank "type to search" hint
-    // on the What sheet; a no-op on sheets without the row).
     this.#updateNewQuery(sheet, sheet.querySelector(".sheet__search-input")?.value.trim() || "")
   }
 
-  // × and Apply both commit (see class comment). Distinct labels, same behaviour.
   close(event) { this.#commit(event.target.closest(".sheet")) }
   apply(event) { this.#commit(event.target.closest(".sheet")) }
 
-  // Uncheck everything in this sheet; the user then closes to commit the clear.
   clear(event) {
     const sheet = this.#sheetFor(event.params.field)
     if (!sheet) return
@@ -104,12 +65,6 @@ export default class extends Controller {
     event.currentTarget.closest(".loc-group")?.classList.toggle("collapsed")
   }
 
-  // Single-select sheets (the rule editor's When): a recurring filter takes ONE
-  // relative window, so ticking a preset clears the rest — radio behaviour over
-  // plain checkboxes, which keeps #serialize / #refreshTrigger / clear unchanged.
-  // Clicking the active preset off leaves none checked = "new events". Wired only
-  // where the sheet opts in (data-action on a single sheet); the feed's When is
-  // multi-select and never calls this.
   enforceSingle(event) {
     const input = event.target
     if (!input.checked) return
@@ -118,8 +73,6 @@ export default class extends Controller {
     })
   }
 
-  // In-sheet search: hide non-matching rows. While searching, expand groups and
-  // drop those with no surviving rows; clearing the box re-collapses them.
   filter(event) {
     const sheet = event.target.closest(".sheet")
     const raw = event.target.value.trim()
@@ -143,10 +96,6 @@ export default class extends Controller {
     this.#updateNewQuery(sheet, raw)
   }
 
-  // Free-text "Search for X" row → a checked q[] row. When it's still the blank
-  // "type to search" hint (no value yet), people tap it expecting it to focus the
-  // search field and start typing — so do exactly that (the tap is a user gesture,
-  // so the mobile keyboard opens) rather than no-op.
   addQuery(event) {
     const row = event.currentTarget
     const search = row.closest(".sheet").querySelector(".sheet__search-input")
@@ -158,11 +107,6 @@ export default class extends Controller {
     if (search) { search.value = ""; search.dispatchEvent(new Event("input", { bubbles: true })) }
   }
 
-  // Enter / the keyboard's search key on the What field commits the typed query
-  // straight away — no need to tap the "search for X" row first. Mirrors addQuery,
-  // then submits. Wired only on the What field (it owns the free-text concept);
-  // preventDefault stops the input's implicit form submit, which would otherwise
-  // reload without the typed text (the field carries no name of its own).
   commitTyped(event) {
     if (event.key !== "Enter") return
     event.preventDefault()
@@ -177,7 +121,6 @@ export default class extends Controller {
     if (!this.submitOnApplyValue) this.#refreshTrigger(input.closest(".sheet"))
   }
 
-  // Remove one applied filter from the summary row, then re-submit.
   remove(event) {
     const { name, value } = event.params
     this.formTarget.querySelectorAll(`input[name="${name}[]"]`).forEach((input) => {
@@ -185,17 +128,12 @@ export default class extends Controller {
       input.checked = false
       input.closest("[data-dynamic]")?.remove()
     })
-    // A custom-range chip also resets its calendar so the sheet reopens empty.
     if (name === "d" && String(value).includes(" - ")) {
       this.element.querySelectorAll(".range-cal").forEach((cal) => cal.dispatchEvent(new CustomEvent("range-calendar:reset")))
     }
     this.#submit()
   }
 
-  // Fetch a sheet's option tree, which the page deliberately doesn't ship (see
-  // tags/_sheet_options_frame). Copying data-src onto src is what starts the frame
-  // — the attribute is held back precisely so nothing loads it before this point.
-  // The staged values sitting in the frame keep the form correct until it lands.
   #loadOptions(sheet) {
     const frame = sheet.querySelector("turbo-frame[data-src]")
     if (!frame || frame.hasAttribute("src")) return
@@ -212,9 +150,6 @@ export default class extends Controller {
     row.hidden = false
   }
 
-  // Add a resolved value as a checked q[] row (deduped), and tell the live title
-  // to recompute. The single place text becomes a query — shared by the
-  // "search for X" row, Enter, and commit-time staging.
   #addQueryValue(value) {
     const exists = [...this.queriesTarget.querySelectorAll('input[name="q[]"]')]
       .some((input) => input.value === value)
@@ -238,9 +173,6 @@ export default class extends Controller {
 
   #commit(sheet) {
     if (!sheet) return
-    // Fold any text still sitting in the What search field into a q[] query first,
-    // so committing keeps it (Apply, ×, or click-outside) — matching what Enter and
-    // the "search for X" row already do.
     this.#stagePendingQuery(sheet)
     const changed = this.snapshot !== undefined && this.#serialize(sheet) !== this.snapshot
     this.#closeSheet(sheet)
@@ -249,20 +181,11 @@ export default class extends Controller {
     if (!this.submitOnApplyValue) this.#refreshTrigger(sheet)
   }
 
-  // Only the What sheet carries the free-text affordance (.opt--newquery); other
-  // sheets' search box just filters their rows, so leave those alone. Staged BEFORE
-  // the change check in #commit so the new row counts as a change and commits.
   #stagePendingQuery(sheet) {
     if (!this.hasQueriesTarget || !sheet.querySelector(".opt--newquery")) return
     const input = sheet.querySelector(".sheet__search-input")
     if (!input || !input.value.trim()) return
 
-    // Session-scoped guard: if the user ticked/unticked a genre while this sheet
-    // was open, the leftover search text was only used to LOCATE that genre (type
-    // "ber" → tick Chamber Pop) — don't also promote it to a stray free-text term.
-    // Genres applied BEFORE opening don't count (we compare to the open snapshot),
-    // and the explicit paths (Enter, tapping the "search for X" row) still add text
-    // regardless, so this only suppresses the implicit auto-stage on commit.
     if (this.#genresToggled(sheet)) { input.value = ""; return }
 
     const { value, blank } = searchForSuggestion(input.value, this.searchForTemplateValue, this.searchAnythingValue)
@@ -271,22 +194,13 @@ export default class extends Controller {
     input.value = ""
   }
 
-  // Did any genre (g[]) checkbox change while this sheet was open? Compared against
-  // the open-time snapshot so pre-applied genres don't suppress a genuinely-typed
-  // free-text term — only genres toggled in THIS session count.
   #genresToggled(sheet) {
-    // Pairs are serialized from each input's literal name attribute, i.e. "g[]=…"
-    // (NOT "g=…") — matching the wrong prefix here is what let the typed term leak
-    // through despite a genre being ticked.
     const genres = (serialized) =>
       serialized.split("|").filter((pair) => pair.startsWith("g[]=")).sort().join("|")
     const opened = this.snapshot === undefined ? "" : genres(this.snapshot)
     return genres(this.#serialize(sheet)) !== opened
   }
 
-  // Update a trigger's label + count from its sheet's checked rows — the live
-  // feedback the events filter gets from a server re-render, done client-side for
-  // the no-submit (rule editor) path.
   #refreshTrigger(sheet) {
     const trigger = this.element.querySelector(`.filter-trigger[data-filter-sheets-field-param="${sheet.dataset.field}"]`)
     if (!trigger) return
@@ -333,8 +247,6 @@ export default class extends Controller {
   }
 
   #serialize(sheet) {
-    // The custom range rides along as a hidden d[] checkbox, so its value is
-    // captured here too — no separate date-input read needed.
     return [...sheet.querySelectorAll("input[type=checkbox]")]
       .filter((input) => input.checked)
       .map((input) => `${input.name}=${input.value}`)
@@ -347,9 +259,6 @@ export default class extends Controller {
     this.formTarget.requestSubmit()
   }
 
-  // A staged free-text query row carries no native change event (it's created
-  // checked, not toggled), so emit a bubbling one — the rule editor's live title
-  // (saved-filter-title) listens for change to recompute. No-op elsewhere.
   #notifyChanged() {
     this.formTarget.dispatchEvent(new Event("change", { bubbles: true }))
   }
@@ -358,9 +267,6 @@ export default class extends Controller {
     return this.sheetTargets.find((sheet) => sheet.dataset.field === field)
   }
 
-  // Desktop = the inline dropdown-panel layout (≥600px, matching the CSS breakpoint
-  // where the full-screen sheet becomes a panel). Drives autofocus: search on
-  // desktop, close button on mobile (no surprise keyboard).
   #isDesktop() {
     return window.matchMedia("(min-width: 600px)").matches
   }

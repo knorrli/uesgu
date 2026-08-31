@@ -3,29 +3,9 @@ require "json"
 require "net/http"
 require "uri"
 
-# Regenerates config/datacenter_nets.txt, the hosting-provider range list behind
-# the block/datacenter-nets rule. Vendored rather than fetched at boot: a single
-# 512MB worker must not depend on four third-party endpoints being up in order to
-# start, and a committed file is reviewable in the PR that changes it.
-#
-# Staleness is handled reactively, not on a schedule — the list only has to stay
-# ahead of the crawler, and `git diff` after a refresh shows exactly what moved.
-#
-#   bin/rails datacenter_nets:refresh
-#   bin/rails datacenter_nets:check[47.80.0.1]
-#
-# Everything lives in this module rather than at the top level of the rake file:
-# bare `def`s in a .rake file land on Object, and a constant as generic as
-# LIST_PATH has no business there.
 module DatacenterNetsRefresh
   SAMPLES_PATH = Rails.root.join("test", "fixtures", "files", "datacenter_net_samples.yml")
 
-  # Providers that rent compute. Deliberately NOT here: Cloudflare, Fastly,
-  # Akamai, Apple, Google-outside-GCP, Microsoft-outside-Azure — CDN and consumer
-  # proxy egress is where real people come from. See lib/datacenter_nets.rb.
-  #
-  # Sourced from each provider's own published feed where one exists, and from
-  # the ASN's announced prefixes (via RIPEstat) where it does not.
   ASNS = {
     "hetzner" => 24940,
     "ovh" => 16276,
@@ -40,12 +20,6 @@ module DatacenterNetsRefresh
     "huawei" => 55990
   }.freeze
 
-  # CloudFront/Global Accelerator blocks that stand alone in AWS's feed. Removing
-  # them is close to cosmetic — most CloudFront prefixes are *nested inside*
-  # broader Amazon supernets, and carving those out by range subtraction would
-  # punch holes in exactly the EC2 space a crawler runs in. Left in deliberately:
-  # a CDN address is a content-delivery destination, never a client's egress path,
-  # so it cannot arrive here as a real visitor's source IP.
   AWS_EDGE_SERVICES = %w[CLOUDFRONT CLOUDFRONT_ORIGIN_FACING GLOBALACCELERATOR].freeze
 
   module_function
@@ -57,9 +31,6 @@ module DatacenterNetsRefresh
     sources["azure"] = azure_prefixes
     ASNS.each { |name, asn| sources["asn:#{name}"] = asn_prefixes(name, asn) }
 
-    # Abort rather than write a short list. A source that silently 404s would
-    # quietly shrink the blocklist, and a stealth downgrade of a defense is far
-    # worse than a loud failure.
     empty = sources.select { |_, prefixes| prefixes.empty? }.keys
     abort "aborting: no prefixes from #{empty.join(', ')}" if empty.any?
 
@@ -89,11 +60,6 @@ module DatacenterNetsRefresh
     prefixes
   end
 
-  # cloud.json is GCP CUSTOMER ranges. goog.json (all Google-owned space) would
-  # sweep in Google's own proxies and service fetchers — including whatever
-  # Chrome's IP Protection egresses through — and must never be used here. The
-  # tradeoff is that cloud.json is not exhaustive: parts of 34.64.0.0/10 are
-  # absent from it. Accepted — partial GCP coverage beats blocking Google proper.
   def gcp_prefixes
     data = get_json("https://www.gstatic.com/ipranges/cloud.json")
     prefixes = data["prefixes"].filter_map { |p| p["ipv4Prefix"] || p["ipv6Prefix"] }
@@ -101,9 +67,6 @@ module DatacenterNetsRefresh
     prefixes
   end
 
-  # Azure publishes Service Tags behind a download page whose JSON filename is
-  # date-stamped, so the URL has to be discovered rather than hardcoded.
-  # "AzureCloud" is the umbrella tag covering all Azure public address space.
   def azure_prefixes
     page = get("https://www.microsoft.com/en-us/download/details.aspx?id=56519")
     url  = page[%r{https://download\.microsoft\.com/download/[^"]*ServiceTags_Public_\d+\.json}]
@@ -117,13 +80,12 @@ module DatacenterNetsRefresh
     prefixes
   end
 
-  # Providers without a published feed: take what the ASN actually announces.
   def asn_prefixes(name, asn)
     data = get_json("https://stat.ripe.net/data/announced-prefixes/data.json" \
                     "?resource=AS#{asn}&sourceapp=uesgu")
     prefixes = (data.dig("data", "prefixes") || []).map { |p| p["prefix"] }
     report("asn:#{name}", prefixes, "AS#{asn}")
-    sleep 0.3 # RIPEstat asks for a gentle pace
+    sleep 0.3
     prefixes
   end
   def partition_ranges(prefixes)
@@ -137,8 +99,6 @@ module DatacenterNetsRefresh
     [ v4, v6 ]
   end
 
-  # Merges overlapping AND adjacent ranges (.0/25 + .128/25 become one /24),
-  # which is what takes ~32k published prefixes down to ~8k ranges.
   def coalesce(ranges)
     merged = []
     ranges.sort_by(&:first).each do |start, finish|
@@ -151,12 +111,9 @@ module DatacenterNetsRefresh
     merged
   end
 
-  # Re-expresses a merged range as the minimal list of aligned CIDR blocks, so the
-  # vendored file stays in the notation everyone reads and greps.
   def range_to_cidrs(start, finish, bits, family)
     out = []
     while start <= finish
-      # Largest block that is both aligned at `start` and fits inside the range.
       aligned = start.zero? ? bits : Math.log2(start & -start).to_i
       span    = Math.log2(finish - start + 1).to_i
       size    = [ aligned, span, bits ].min
@@ -188,13 +145,6 @@ module DatacenterNetsRefresh
     DatacenterNets::LIST_PATH.write("#{(header + cidrs4 + cidrs6).join("\n")}\n")
   end
 
-  # One representative address per source, derived from the data rather than
-  # hand-picked, so the "every provider is actually covered" test cannot rot into
-  # asserting on an address the provider stopped announcing. Regenerated with the
-  # list itself, so the two can never disagree.
-  #
-  # Under test/fixtures/FILES, never test/fixtures itself — Rails loads every .yml
-  # directly in that directory as an ActiveRecord fixture table.
   def write_samples(sources)
     FileUtils.mkdir_p(SAMPLES_PATH.dirname)
     lines = [

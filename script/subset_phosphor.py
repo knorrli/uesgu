@@ -59,9 +59,6 @@ def main():
     if not CSS_MASTER.exists():
         sys.exit(f"missing master CSS: {CSS_MASTER} (the full, un-trimmed phosphor.css)")
 
-    # 1. class -> codepoint, parsed straight from the master CSS. Everything before
-    #    the first glyph def (the @font-face + base `.ph` rule) is the header we
-    #    carry verbatim into the trimmed output.
     master_css = CSS_MASTER.read_text()
     first = DEF.search(master_css)
     if not first:
@@ -69,10 +66,6 @@ def main():
     header = master_css[: first.start()].rstrip() + "\n"
     defs = {m.group(1): int(m.group(2), 16) for m in DEF.finditer(master_css)}
 
-    # 2. which ph- classes the app references (every tracked file except the two
-    #    phosphor CSS files — see SCAN_SKIP). Intersecting with `defs` keeps only
-    #    real icon classes, so stray matches like "ph-5" or genre slugs containing
-    #    "ph-" fall away on their own.
     files = subprocess.check_output(["git", "ls-files"], cwd=ROOT).decode().splitlines()
     used = set()
     for rel in files:
@@ -96,8 +89,6 @@ def main():
 
     before = MASTER.stat().st_size
 
-    # 3. subset. Access is by codepoint (CSS `content`), so we drop layout
-    #    features (ligatures) and hinting — none of it is reachable.
     subprocess.check_call([
         sys.executable, "-m", "fontTools.subset", str(MASTER),
         f"--unicodes={unicodes}",
@@ -108,7 +99,6 @@ def main():
         f"--output-file={OUT}",
     ])
 
-    # 4. verify every requested codepoint actually survived into the subset.
     from fontTools.ttLib import TTFont
     cmap = set()
     with TTFont(OUT) as font:
@@ -122,8 +112,6 @@ def main():
     print(f"\nwrote {OUT.relative_to(ROOT)}")
     print(f"{before:,} -> {after:,} bytes ({100 * after / before:.1f}% of original)")
 
-    # 5. emit the matching trimmed CSS: header verbatim + only the used glyph
-    #    defs, rebuilt canonically from the same map the font subset used.
     css_before = len(master_css.encode())
     body = "\n".join(
         f'.ph.{cls}:before {{\n  content: "\\{defs[cls]:x}";\n}}'

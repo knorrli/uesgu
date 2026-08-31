@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# DiscardRule: admin-authored text rules that auto-filter junk scraped events.
-# Asserts the match semantics + the single-source-of-truth reapply sweep, using
-# invented event text (never real taxonomy).
 class DiscardRuleTest < ActiveSupport::TestCase
   test "pattern must be present and at least 2 chars" do
     assert DiscardRule.new(pattern: "ab").valid?
@@ -56,7 +53,6 @@ class DiscardRuleTest < ActiveSupport::TestCase
     assert_equal rule.id, junk.reload.discarded_by_rule_id
     assert_nil keep.reload.discarded_by_rule_id
 
-    # Deleting the rule (and reapplying) releases the event.
     rule.destroy
     DiscardRule.reapply_all!
     assert_nil junk.reload.discarded_by_rule_id

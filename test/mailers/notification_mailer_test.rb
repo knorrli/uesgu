@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Locks the digest email: right recipient/subject, the events rendered inline,
-# the event's own link, and a CTA back to the in-app notification page. Runs in
-# :test delivery (see config/initializers/mail.rb) so nothing hits Resend.
 class NotificationMailerTest < ActionMailer::TestCase
   test "digest addresses the user, lists events, and links to the in-app page" do
     u = user(email_address: "fan@example.test", locale: "de")
@@ -18,14 +15,13 @@ class NotificationMailerTest < ActionMailer::TestCase
     html = mail.html_part.body.to_s
     text = mail.text_part.body.to_s
     assert_match show.title, html
-    assert_match "https://venue.test/show", html        # the event's own link
-    assert_match "/notifications/#{note.id}", html       # CTA to the in-app page
+    assert_match "https://venue.test/show", html
+    assert_match "/notifications/#{note.id}", html
     assert_match show.title, text
   end
 
   test "the heading renders in the recipient locale, not the frozen-title locale" do
     u = user(email_address: "fan4@example.test", locale: "en")
-    # The rule's name freezes under the test's default locale (de): "… · Neue Events".
     rule = u.saved_filters.new(cadence: "daily", time_of_day: 600,
                                     notify_push: false, notify_email: false)
     rule.filter_attributes = { q: ["Rock"] }
@@ -43,7 +39,6 @@ class NotificationMailerTest < ActionMailer::TestCase
 
   test "a non-http event url is not turned into a link" do
     u = user(email_address: "fan3@example.test", locale: "de")
-    # Scraped data can be malformed; such a value must never become an href.
     show = event(start_date: Date.current + 2, title: "Sketchy Show", url: "javascript:alert(1)")
     note = u.notifications.create!(title: "D", event_ids: [show.id],
                                    period_start: 1.week.ago, period_end: Time.current)

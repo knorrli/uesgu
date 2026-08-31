@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# Read-only locations browser under /admin/locations: admin-gated. Locations
-# have no table — the type (venue / locality / canton) is derived from the scrapers
-# via Location.type_for — so the type filter is exercised with a real venue and
-# canton (scraper code, not churned taxonomy) plus a synthetic locality.
 class AdminLocationsTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_locations_path
@@ -14,9 +10,6 @@ class AdminLocationsTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  # This browser filters on `type` where every other catalogue filters on `status`,
-  # so the shared controls take it as a local — pass the wrong one and the chips
-  # still render, they just filter nothing.
   test "the type chips and the sort row carry each other's param" do
     event(location_list: ["Synthville", Location.canton_codes.first])
     sign_in_as user(admin: true)
@@ -51,9 +44,6 @@ class AdminLocationsTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "Synthville"
   end
 
-  # The Array-shaped whitelist (genres_admin_test pins the Hash). An unknown type
-  # filters this list down to nothing rather than raising, so the fallback is
-  # checked against a location that must survive it.
   test "an unknown type or sort falls back to the defaults" do
     venue = Location.venue_names.first
     event(location_list: [venue])

@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# The invitation gate over the real HTTP signup flow: no account is ever created
-# without a valid, unspent code, and a code lets exactly one account through.
 class InviteSignupTest < ActionDispatch::IntegrationTest
   test "signup is refused with no code" do
     assert_no_difference -> { User.count } do
@@ -34,7 +32,6 @@ class InviteSignupTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     assert_equal "first", invite.reload.redeemed_by.username
 
-    # The now-spent code cannot create a second account.
     delete session_path
     assert_no_difference -> { User.count } do
       post registration_path, params: { invitation_code: invite.code, user: signup_user("second") }

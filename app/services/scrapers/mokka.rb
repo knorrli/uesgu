@@ -1,20 +1,4 @@
 module Scrapers
-  # Café/Bar Mokka (Thun) runs WordPress, and its custom `event` post type is
-  # exposed over the WP REST API with clean ACF fields — a machine `event_date`
-  # (YYYYMMDD) and a start time — so we read JSON rather than the JS-hydrated agenda
-  # that earned the old `js_only` write-off. Rows are plain Hashes; the extractors
-  # read ACF keys instead of CSS.
-  #
-  # The API serves the FULL archive (5000+ events, newest-POSTED first) and offers
-  # no server-side filter on the event date, so we page from the top and keep only
-  # events dated today or later, stopping once a page carries no upcoming event
-  # (upcoming ones cluster in the most-recently-posted pages). MAX_PAGES caps it.
-  #
-  # There is no genre/category taxonomy on the event type, and Mokka's programme
-  # mixes the odd non-music night (quiz, kids, Kleinkunst) in among the concerts.
-  # We can't gate those at ingest — there's no field to read — so we mine the
-  # subtitle + body for known styles (match-only) and leave recurring non-music
-  # formats to admin discard rules.
   class Mokka < Agent
     field_gaps genres: :no_field
 
@@ -29,8 +13,6 @@ module Scrapers
       endpoint(1)
     end
 
-    # The base fetched page 1; keep paging until a page has no upcoming event (or the
-    # cap). A nil `get` (offline golden harness) ends paging after the fixture page.
     def event_rows
       rows = upcoming_from(page.body)
       page_num = 2
@@ -44,15 +26,6 @@ module Scrapers
       rows
     end
 
-    # The WP `link` permalink only actually renders when the venue enables the
-    # detail page (ACF has_detail_page) — external co-promotions (the Schadau-
-    # Konzerte series etc.) keep it false, so their /event/<slug>/ permalink
-    # 404s while the site links them out via the ACF external_link instead.
-    # Mirror the site: own page when it exists, else the external link — with
-    # the event date as a fragment so two shows sharing one external target
-    # (a real case: one festival page for several nights) keep distinct upsert
-    # keys, like OLE's occurrence URLs. Neither present → nil, and the base
-    # skips the row (those are title-less placeholder posts).
     def event_url(row)
       return row["link"].presence if row.dig("acf", "has_detail_page")
 
@@ -61,15 +34,10 @@ module Scrapers
       url && "#{url}#mokka-#{row.dig('acf', 'event_date')}"
     end
 
-    # Own detail pages live on mokka.ch, but external co-promotions legitimately
-    # link out to the partner's site, so the golden's URL-shape assertion can
-    # only pin the scheme here.
     def self.event_url_pattern
       %r{\Ahttps://}
     end
 
-    # ACF `event_date` is "YYYYMMDD"; `event_start` is "HH.MM Uhr" (dot separator).
-    # Fall back to the doors time (`event_opening`) if a start time is ever missing.
     def event_start_time(row)
       date = row.dig("acf", "event_date").to_s
       raise "Unparseable Mokka date: #{date.inspect}" unless date.match?(/\A\d{8}\z/)
@@ -82,22 +50,16 @@ module Scrapers
       decode(row.dig("title", "rendered"))
     end
 
-    # The subtitle is the venue's own one-line descriptor ("100% DRUM'N'BASS ALL
-    # NIGHT LONG…") — our secondary text.
     def event_description(row)
       decode(row.dig("acf", "event_subtitle")).presence
     end
 
-    # No genre field, but the subtitle + the WYSIWYG body blocks name real styles —
-    # mine the known ones (match-only; mints nothing).
     def event_genre_prose(row)
       blocks = Array(row.dig("acf", "elements")).map { |el| el["wysiwyg"] }
       html = [row.dig("acf", "event_subtitle"), *blocks].compact.join("\n")
       decode(html.gsub(/<[^>]+>/, " "))
     end
 
-    # The ACF `event_state` badge occasionally carries a cancellation word; read it
-    # on top of the base title/description scan.
     def event_cancelled?(event, row)
       super || CANCELLATION_MARKER.match?(row.dig("acf", "event_state").to_s)
     end

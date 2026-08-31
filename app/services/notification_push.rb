@@ -1,7 +1,3 @@
-# Rule-aware Web Push: a short blurb that deep-links to the in-app notification
-# page (the full detail lives there and in the email — push is just the nudge).
-# Parallel to WebPushNotifier (the legacy frequency-digest push); both end up in
-# PushSubscription#deliver, which prunes dead endpoints.
 class NotificationPush
   def self.deliver(rule, notification, events)
     new(rule, notification, events).deliver

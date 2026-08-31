@@ -2,55 +2,26 @@
 <% theme = cookies[:theme].presence_in(%w[light dark]) %>
 <html<%= " data-theme=\"#{theme}\"".html_safe if theme %>>
   <head>
-    <%# One place owns the brand: a page sets just its own name via
-        content_for(:title) and the layout prefixes "üsgu | " (bare "üsgu" when a
-        page sets none), so every tab title reads the same way. %>
     <title><%= ["üsgu", content_for(:title).presence].compact.join(" | ") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <%# iOS reads the meta tag (not the manifest) to tint the status bar / launch
-        chrome; matched to the manifest's theme/background colour so the installed
-        PWA launches as ours rather than a blank white frame. %>
     <meta name="theme-color" content="#17131a">
 
-    <%# Turbo treats a 100ms hover as a real credentialed GET, then serves that
-        response to the click. EventsController#index stores the filter cookie on
-        any GET carrying q/g/l/d, so with prefetch on, merely resting the cursor on
-        a genre chip commits that filter. Guarding the cookie write on the prefetch
-        header does NOT fix it: the click reuses the prefetched response and never
-        reaches the server, so the filter would stick only when NOT hovered first. %>
     <meta name="turbo-prefetch" content="false">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# PWA manifest makes the app installable; routes enabled in config/routes.rb. %>
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <%# One canonical mark (script/generate_icons.rb). The SVG is what modern
-        browsers use; the .ico (sizes="any") is the legacy fallback they skip when
-        an SVG is present. The 512px PNG is intentionally NOT a <link rel=icon> —
-        it's a raster Chrome would prefer from cache over the SVG; the PWA manifest
-        references it for the installed app.
-        ?v=ICON_VERSION busts the icon cache on change — iOS especially caches the
-        home-screen (apple-touch) icon hard, keyed by URL, so a reused filename
-        keeps serving a stale icon across reinstalls. ICON_VERSION is a content
-        hash of the art, so it bumps itself; a fresh "Add to Home Screen" refetches. %>
     <link rel="icon" href="/favicon.ico?v=<%= ICON_VERSION %>" sizes="any">
     <link rel="icon" href="/icon.svg?v=<%= ICON_VERSION %>" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=<%= ICON_VERSION %>">
 
-    <%# iOS PWA launch images (apple-touch-startup-image) — generated, see
-        script/generate_icons.rb. Android derives its splash from the
-        manifest; iOS needs these per-device or it launches blank. %>
     <%= render "layouts/ios_splash_screens" %>
 
-    <%# The server set <html data-theme> from the `theme` cookie. On the very
-        first visit there's no cookie yet, so it's unset: resolve from the OS and
-        persist a cookie so every later request renders the right theme with no
-        flash. Pre-paint (still in <head>), so no visible theme flash. %>
     <script nonce="<%= content_security_policy_nonce %>">
       (function () {
         if (document.documentElement.dataset.theme) return
@@ -60,10 +31,6 @@
       })()
     </script>
 
-    <%# Preload the icon font: it's needed for the header glyphs at first paint
-        but is otherwise only discovered after the (large) CSS parses, costing a
-        serial round-trip + an icon flash on cold start. crossorigin is required
-        on font preloads even same-origin. %>
     <%= tag.link rel: "preload", href: asset_path("Phosphor.woff2"), as: "font", type: "font/woff2", crossorigin: "anonymous" %>
 
     <%= combobox_style_tag %>
@@ -72,10 +39,6 @@
   </head>
 
   <body class="<%= class_names(yield(:body_class)) %>">
-    <%# The region is always here, empty or not: a live region announces what is put
-        INTO it, so one added to the page with its message already inside is read out
-        by some screen readers and not others. It also gives a flash raised in the
-        browser somewhere to land (see capture_controller.js). %>
     <div class="flashes" role="status" aria-live="polite">
       <% if notice.present? %><p class="flash notice"><%= notice %></p><% end %>
       <% if alert.present? %><p class="flash alert"><%= alert %></p><% end %>
@@ -83,8 +46,6 @@
 
     <header class="site-header">
       <div class="site-header__inner">
-        <%# Brand doubles as the home link; the theme switcher sits beside it
-            (icon-only) and stays visible whether signed in or not. %>
         <div class="site-header__brand">
           <%= link_to 'üsgu', root_path, class: 'site-brand' %>
           <button type="button" class="theme-toggle" aria-label="<%= t('nav.theme') %>"
@@ -93,27 +54,15 @@
           </button>
         </div>
         <nav class="site-nav">
-          <%# Install shortcut, visible signed in or out (installing needs no
-              account). Ships hidden; the install-link controller reveals it only
-              where the PWA can actually be installed (not when already installed,
-              and not on Firefox desktop). Icon + label; the label collapses to
-              icon-only on phones (German "App installieren" + "Anmelden" together
-              would otherwise wrap the bar on a ~390px screen). aria-label keeps the
-              accessible name when the text is hidden. %>
           <%= link_to install_path, class: 'nav-install', hidden: true, 'aria-label': t('nav.install'), data: { controller: 'install-link' } do %>
             <span class="ph ph-download-simple" aria-hidden="true"></span>
             <span class="nav-install__label"><%= t('nav.install') %></span>
           <% end %>
           <% if authenticated? %>
             <% unread = current_user.notifications.unread.count %>
-            <%# Personal/account links collapse into one menu to keep the bar light.
-                A dot on the trigger preserves the at-a-glance unread signal now
-                that the Notifications link lives inside the menu. %>
             <details class="nav-menu" data-controller="menu" data-action="toggle->menu#toggle">
               <summary><%= current_user.username %><% if unread.positive? %> <span class="unread-dot" role="img" aria-label="<%= t('nav.unread_notifications') %>"></span><% end %></summary>
               <div class="nav-menu__items">
-                <%# Capturing events is granted per account, so the door only
-                    exists for accounts that have it. %>
                 <% if current_user.contributor? %>
                   <%= link_to capture_path, class: 'nav-menu__item' do %>
                     <span class="ph ph-calendar-plus" aria-hidden="true"></span>
@@ -145,9 +94,6 @@
               </div>
             </details>
           <% else %>
-            <%# Just "Log in" — signup is reached via the login page's "no account?
-                register" link, keeping the header light (matters on mobile).
-                Hidden on the login page itself, where it's a no-op duplicate. %>
             <% unless current_page?(new_session_path) %>
               <%= link_to t('nav.login'), new_session_path %>
             <% end %>

@@ -1,8 +1,3 @@
-<%# The "What" sheet/panel: free-text queries + the curated genre tree. Shared by
-    the events filter (filter: @filter) and the rule editor (filter: the rule's
-    saved filter). The option rows ARE the submitted inputs (q[]/g[]); the parent
-    filter-sheets controller handles open/close, in-sheet search, and the free-text
-    "search for X" row. Local: filter. %>
 <section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
          aria-label="<%= t('events.filter.sheet.what') %>"
          data-filter-sheets-target="sheet" data-field="what">
@@ -18,15 +13,11 @@
            data-action="input->filter-sheets#filter keydown->filter-sheets#commitTyped">
   </div>
   <div class="sheet__body">
-    <%# The thing a fixed list can't do: turn whatever you typed into a search. %>
     <button type="button" class="opt opt--newquery" hidden data-action="filter-sheets#addQuery">
       <span class="opt__box"><span class="ph ph-magnifying-glass"></span></span>
       <span class="opt__label" data-newquery-label></span>
     </button>
 
-    <%# Applied free-text queries (how a tapped genre arrives). Genres (g[]) and
-        free text (q[]) are one What vocabulary on the row, so no type label —
-        mirrors the unified chip. %>
     <div class="sheet__queries" data-filter-sheets-target="queries">
       <% filter.queries.each do |query| %>
         <label class="opt opt--query">
@@ -37,8 +28,6 @@
       <% end %>
     </div>
 
-    <%# Curated GENRE TREE — lazily loaded (tags/_genre_options), see
-        tags/_sheet_options_frame. %>
     <%= render 'tags/sheet_options_frame', field: 'what', name: 'g', values: filter.genres,
           src: filter_options_tags_path(field: 'what', g: filter.genres) %>
   </div>

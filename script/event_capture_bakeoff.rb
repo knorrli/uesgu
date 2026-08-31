@@ -1,31 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Event-extraction bake-off for the user-event-capture funnel. It settled the
-# provider: Gemma 4 31B on Infomaniak, Swiss-hosted, 0/6 fabricated dates.
-#
-# Runs ONE prompt over six real sample images through every provider you have a
-# key for, then scores the results against event_capture_bakeoff_truth.json.
-# The question it answers: can a Swiss/EU-hosted model read a Bern concert poster
-# well enough that we don't have to send images to a US provider?
-#
-# Stdlib only — no bundler, nothing to install. Providers with no key are SKIPPED,
-# so you can run this with one key today and re-run as the others arrive.
-#
-#   ANTHROPIC_API_KEY=sk-ant-...   MISTRAL_API_KEY=...
-#   INFOMANIAK_API_TOKEN=...       INFOMANIAK_PRODUCT_ID=12345
-#
-#   ruby script/event_capture_bakeoff.rb                    # every provider with a key
-#   ruby script/event_capture_bakeoff.rb --only mistral     # just one
-#   ruby script/event_capture_bakeoff.rb --no-crop          # send the WhatsApp chrome too
-#   ruby script/event_capture_bakeoff.rb --list-infomaniak  # discover Infomaniak model IDs
-#
-# The sample images are NOT in the repo and must not be — two are WhatsApp
-# screenshots containing other people's names and phone numbers. They're read
-# from ~/Downloads (override with BAKEOFF_IMAGE_DIR). Everything the script
-# writes — the prepped images actually uploaded, and the raw model responses —
-# goes to tmp/event_capture_bakeoff/, which is gitignored. Keep it that way.
-
 require "net/http"
 require "uri"
 require "json"
@@ -42,26 +17,18 @@ PREPPED    = File.join(OUT, "prepped")
 TRUTH      = JSON.parse(File.read(File.join(ROOT, "event_capture_bakeoff_truth.json")))
 TODAY      = Time.now.strftime("%Y-%m-%d")
 
-# The six samples, in ascending difficulty-ish order.
 IMAGES = TRUTH.keys.reject { |k| k.start_with?("_") }
 
-# WhatsApp screenshots carry other people's names and phone numbers in the
-# chrome. Crop it off before anything leaves the machine. Fractions are
-# [top, bottom] of the image height to remove.
 CHROME_CROP = {
   "IMG_2023.PNG" => [0.14, 0.07],
   "IMG_2024.PNG" => [0.11, 0.07]
 }.freeze
 
-# Cropping the chrome is not enough for IMG_2024: two senders' names and full
-# phone numbers sit INLINE in the message list, mid-image. These bands (as
-# fractions of the post-crop height) get painted black. Verified by eye against
-# the prepped output — re-check them if you change CHROME_CROP.
 REDACT_BANDS = {
-  "IMG_2024.PNG" => [[0.000, 0.021],   # sliver of the member list left by the crop
-                     [0.267, 0.299],   # sender header row (display name + phone number)
-                     [0.880, 0.911],   # second sender header row
-                     [0.943, 0.971]]   # a third, clipped at the cut edge
+  "IMG_2024.PNG" => [[0.000, 0.021],
+                     [0.267, 0.299],
+                     [0.880, 0.911],
+                     [0.943, 0.971]]
 }.freeze
 
 options = { only: nil, crop: true, list_infomaniak: false, prep_only: false,
@@ -76,8 +43,6 @@ OptionParser.new do |o|
   o.on("--no-json-mode", "Drop response_format — some compat layers reject it") { options[:json_mode] = false }
   o.on("--list-infomaniak", "List Infomaniak model IDs and exit") { options[:list_infomaniak] = true }
 end.parse!
-
-# ---------------------------------------------------------------- the prompt
 
 SYSTEM = <<~TXT
   You extract concert/event listings from images for a Swiss (Bern-area) event
@@ -156,11 +121,6 @@ TXT
 
 USER_TEXT = "Extract every event advertised in this image. JSON only."
 
-# OpenAI-style structured output. Infomaniak rejects the older `json_object` mode
-# outright ("no longer supported... please use 'json_schema'"), and a strict schema
-# is better anyway: it forces every field to be present, so a model that simply
-# omits `date` can't be scored as if it thoughtfully returned null.
-# strict mode requires: every property listed in `required`, and additionalProperties false.
 EVENT_SCHEMA = {
   name: "extracted_events",
   strict: true,
@@ -194,8 +154,6 @@ EVENT_SCHEMA = {
     }
   }
 }.freeze
-
-# ---------------------------------------------------------------- image prep
 
 def prepare(name, options)
   src = File.join(IMAGE_DIR, name)
@@ -237,8 +195,6 @@ def prepare(name, options)
   [Base64.strict_encode64(File.binread(out)), out]
 end
 
-# ---------------------------------------------------------------- HTTP helper
-
 def post_json(url, headers, body, timeout: 180)
   uri = URI(url)
   http = Net::HTTP.new(uri.host, uri.port)
@@ -252,7 +208,6 @@ def post_json(url, headers, body, timeout: 180)
   JSON.parse(res.body)
 end
 
-# strip ```json fences, then find the outermost {...}
 def parse_payload(text)
   cleaned = text.to_s.gsub(/\A\s*```(?:json)?/, "").gsub(/```\s*\z/, "")
   start = cleaned.index("{")
@@ -264,16 +219,12 @@ rescue JSON::ParserError => e
   { "events" => [], "_parse_error" => "#{e.message} :: #{text.to_s[0, 300]}" }
 end
 
-# ---------------------------------------------------------------- providers
-
-# Resolved once, so the output directory can be named after what was actually run.
 MODEL_IDS = {
   "anthropic"  => ENV.fetch("ANTHROPIC_MODEL",  "claude-opus-5"),
   "mistral"    => ENV.fetch("MISTRAL_MODEL",    "mistral-large-latest"),
   "infomaniak" => ENV.fetch("INFOMANIAK_MODEL", "mistralai/Mistral-Small-4-119B-2603")
 }.freeze
 
-# $/1M in, $/1M out — for the cost column.
 PRICES = {
   "anthropic"  => [5.00, 25.00],
   "mistral"    => [0.50,  1.50],
@@ -288,7 +239,6 @@ def call_anthropic(b64, _opts)
     {
       model: model,
       max_tokens: 4000,
-      # effort low: this is extraction, not reasoning — the realistic prod setting.
       output_config: { effort: "low" },
       system: SYSTEM,
       messages: [{ role: "user", content: [
@@ -348,8 +298,6 @@ PROVIDERS = {
                     need: "INFOMANIAK_API_TOKEN + INFOMANIAK_PRODUCT_ID" }
 }.freeze
 
-# Discovery: from just the token, find the product ID and list the models.
-# Sends no image data — only two authenticated GETs.
 if options[:list_infomaniak]
   token = ENV.fetch("INFOMANIAK_API_TOKEN") { abort "set INFOMANIAK_API_TOKEN (scope: ai-tools)" }
 
@@ -378,8 +326,6 @@ if options[:list_infomaniak]
     puts "product id: #{pid}   (export INFOMANIAK_PRODUCT_ID=#{pid})\n\n"
   end
 
-  # The model list lives on the product-scoped OpenAI route; older accounts expose
-  # a global one. Try both before giving up.
   models = nil
   ["https://api.infomaniak.com/2/ai/#{pid}/openai/v1/models",
    "https://api.infomaniak.com/1/ai/models"].each do |url|
@@ -410,8 +356,6 @@ if options[:list_infomaniak]
   exit
 end
 
-# ---------------------------------------------------------------- scoring
-
 def norm(s) = s.to_s.downcase.gsub(/[^a-z0-9]/, "")
 
 def score(image, payload)
@@ -434,7 +378,6 @@ def score(image, payload)
     places_ok += 1 if e["place"] && norm(match["place"]).include?(norm(e["place"]))
   end
 
-  # A date invented where ground truth says none is legible is the worst failure.
   exp.each_with_index do |e, i|
     next unless e["date"].nil?
 
@@ -442,27 +385,12 @@ def score(image, payload)
     hallucinated += 1 if g && g["date"]
   end
 
-  # Independent of ground truth: a value the model could not quote from the image
-  # is self-reported fabrication. Catches invented venues on samples where our
-  # ground truth has no opinion.
   uncited = got.count { |g| (g["date"] && !g["date_evidence"]) || (g["place"] && !g["place_evidence"]) }
 
   { count_ok:, dates_ok:, places_ok:, expected: exp.size, hallucinated:, uncited: }
 end
 
 SWISS_CANTONS = %w[AG AI AR BE BL BS FR GE GL GR JU LU NE NW OW SG SH SO SZ TG TI UR VD VS ZG ZH].freeze
-
-# --- Year resolution, in code -------------------------------------------------
-#
-# Posters almost never print a year. Across 6 runs the model transcribed
-# "Mi 19. August" correctly every single time and then resolved it to 2025 in two
-# of them — it can read, it just can't reliably do calendar arithmetic. So we do
-# the arithmetic here, from the verbatim `date_evidence`.
-#
-# This is tractable because the candidate set is tiny: a user photographing a
-# poster is looking at something happening soon, so the year is last, this, or
-# next — and if a weekday is printed it picks exactly one of those (a given
-# day/month lands on a given weekday only once every 5-6 years).
 
 WEEKDAY_TOKENS = {
   0 => %w[so son sonntag sunday dimanche dim],
@@ -489,8 +417,6 @@ def weekday_in(text)
   nil
 end
 
-# Pull day/month/(year) out of the verbatim evidence. Textual months are tried
-# first: "Mi 19. August 19.30h" must read as 19 August, not as day 19 month 30.
 def day_month_year(text)
   t = text.to_s
   year = t[/\b(20\d{2})\b/, 1]&.to_i
@@ -511,9 +437,6 @@ def day_month_year(text)
   nil
 end
 
-# Nearest plausible occurrence, weekday-filtered when a weekday is printed.
-# Past is allowed but penalised: a poster for 08.08 seen on 19.08 means the show
-# was 11 days ago (stale poster), NOT next year.
 def resolve_year(evidence, today = Date.parse(TODAY))
   day, month, year = day_month_year(evidence)
   return nil unless day && month
@@ -532,7 +455,6 @@ def resolve_year(evidence, today = Date.parse(TODAY))
   matching.min_by { |d| (d - today).to_i.negative? ? (today - d).to_i * 3 : (d - today).to_i }
 end
 
-
 def normalize_time(value)
   s = value.to_s.strip
   if (m = s.match(/\A(\d{1,2})[:.](\d{2})/))        then format("%02d:%02d", m[1].to_i, m[2].to_i)
@@ -541,18 +463,11 @@ def normalize_time(value)
   end
 end
 
-# Anything deterministic is OUR job, not the model's. Across runs the model
-# returned "Mi 19. August" in the `date` field, five different time formats, and
-# is_past was wrong every time it tried. So: the model transcribes, this validates.
-# A value that fails validation is NULLED (kept under *_raw) rather than trusted —
-# a null is completed by a human; a malformed date silently corrupts the feed.
 def validate!(payload)
   Array(payload["events"]).each do |e|
     issues = []
 
     if (d = e["date"])
-      # "2026-08-19T19:30:00" is a right answer in a wrong shape — split it,
-      # don't bin it. Only genuinely unparseable values get nulled.
       if (m = d.match(/\A(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/))
         e["date_raw"] = d
         e["date"] = m[1]
@@ -596,7 +511,6 @@ def validate!(payload)
       end
     end
 
-    # Recompute the year from the evidence and prefer it over the model's guess.
     if (ev = e["date_evidence"]) && e["date"]
       computed = resolve_year(ev)&.to_s
       if computed && computed != e["date"]
@@ -612,11 +526,6 @@ def validate!(payload)
   payload
 end
 
-# ---------------------------------------------------------------- run
-
-# --prep-only: sanitize everything and STOP. No socket is opened, so this is the
-# honest way to inspect what would leave the machine. (Running with a bogus API
-# key is NOT equivalent — the request body is uploaded before the 401 comes back.)
 if options[:prep_only]
   puts "PREP ONLY — no network calls will be made.\n\n"
   (options[:limit] ? IMAGES.first(options[:limit]) : IMAGES).each do |image|
@@ -641,9 +550,6 @@ end
 
 abort "\nNo provider has credentials. Set at least one key and re-run." if active.empty?
 
-# Output dir carries WHAT was tested, so two sessions can never be confused:
-#   tmp/event_capture_bakeoff/20260819-0114-infomaniak-mistral-small-4-119b-2603/
-#     run-1/… run-2/… manifest.json
 def slug(str)
   str.to_s.downcase.sub(%r{\A[^/]+/}, "").gsub(/[^a-z0-9]+/, "-").gsub(/\A-|-\z/, "")
 end
@@ -716,8 +622,6 @@ rows = []
   puts
 end
 
-# ---------------------------------------------------------------- summary
-
 puts "=" * 78
 puts "SUMMARY  (#{runs} run#{'s' unless runs == 1} x #{images.size} images)"
 puts "=" * 78
@@ -736,8 +640,6 @@ active.each_key do |name|
               ok.sum { |r| r[:issues].to_i },
               format("$%.4f", mine.sum { |r| r[:cost] }))
 end
-
-# ---------------------------------------------------------------- stability
 
 if runs > 1
   puts
@@ -766,7 +668,6 @@ if runs > 1
         end
       end
 
-      # The metric that decides the whole evaluation.
       if Array(TRUTH[image]["expect"]).any? { |e| e["date"].nil? }
         bad = per_run.count { |r| r[:events].any? { |e| e["date"] } }
         puts format("    >> NO DATE EXISTS in this image: fabricated in %d/%d runs (%d%%)",

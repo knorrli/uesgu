@@ -1,6 +1,3 @@
-/* The file picker, drawn as a drop target. The dashed edge is the one place on the
-   site that draws one, so it is not shared with the field skin in controls.css. */
-
 .drop-zone {
   position: relative;
   display: flex;
@@ -33,11 +30,6 @@
   background: var(--theme-bg-muted);
 }
 
-/* Hidden with opacity, never `display: none` — see shared/_drop_zone for why the
-   input has to stay reachable. It fills the zone rather than collapsing to a 0×0
-   point at the origin, so focusing it never scroll-jumps the page (same reason as
-   .opt in events-filter.css); pointer-events are off because the label owns the
-   click. */
 .drop-zone__input {
   position: absolute;
   inset: 0;
@@ -52,8 +44,6 @@
   outline-offset: 2px;
 }
 
-/* Its own width at the column's edge: the column is `align-items: stretch`, so a pill
-   left to itself spans the whole zone and reads as a second target. */
 .drop-zone__paste {
   align-self: flex-start;
 }

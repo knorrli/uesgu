@@ -1,15 +1,11 @@
 require_relative "../../db_test_helper"
 
-# Scrapers::Agent#get splits Mechanize's two robots outcomes into three:
-# allowed / disallowed / unknown. webrobots fail-closes to a synthetic
-# "Disallow: /" whenever it can't FETCH robots.txt, so an unreachable one used to
-# read as a ban the venue never issued.
 class Scrapers::RobotsErrorTest < ActiveSupport::TestCase
   class RobotsProbe < Scrapers::Agent
     def self.url = URI.parse("https://cms.fixture.test/?rest_route=/feed")
     def self.location = "Robots Probe"
   end
-  Scrapers::All.scrapers.delete("RobotsProbe") # Registerable auto-registers it
+  Scrapers::All.scrapers.delete("RobotsProbe")
 
   setup do
     @probe = RobotsProbe.new
@@ -19,9 +15,6 @@ class Scrapers::RobotsErrorTest < ActiveSupport::TestCase
     )
   end
 
-  # Keeps the real robots gate (real webrobots) and fakes only the page I/O.
-  # Stubbing fetch wholesale skips the gate — the check lives INSIDE fetch — which
-  # makes every assertion below pass against deliberately broken code.
   def fake_fetch
     agent = @probe.agent
     lambda do |uri, *_rest|
@@ -92,9 +85,6 @@ class Scrapers::RobotsErrorTest < ActiveSupport::TestCase
     assert_nil @probe.robots_note, "a real ban is a ban, not an unreachable robots.txt"
   end
 
-  # Mechanize maps a 4xx to an empty robots.txt below us (RFC 9309 §2.3.1.3), so a
-  # venue that publishes none is crawled with no note. Locked so an upgrade that
-  # changed it wouldn't quietly start flagging every such venue.
   test "a 404 robots.txt allows the fetch with no note" do
     @probe.agent.stub(:get_robots, "") do
       @probe.agent.stub(:fetch, fake_fetch) do
@@ -105,8 +95,6 @@ class Scrapers::RobotsErrorTest < ActiveSupport::TestCase
     assert_nil @probe.robots_note
   end
 
-  # Bad Bonn opts out via respect_robots = false; the retry must restore that,
-  # not clobber it back to "enforce".
   test "the robots-free retry restores the scraper's own respect_robots setting" do
     ssl = OpenSSL::SSL::SSLError.new("certificate verify failed")
 

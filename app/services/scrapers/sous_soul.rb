@@ -2,18 +2,12 @@ require "set"
 
 module Scrapers
   class SousSoul < Agent
-    # The Webflow homepage is the event listing. List rows carry the start time
-    # only on the detail page, which also exposes a year-qualified date in its
-    # <title>, so click through for the fields.
     def self.url
       URI.parse("https://www.sous-soul.love/")
     end
 
-    # Sous Soul lists a title + Untertitel only; there is no genre/style/tag field.
     field_gaps genres: :no_field
 
-    # Each event renders twice in the list (a default + a hover variant); dedupe by
-    # detail href so we don't fetch every detail page twice.
     def event_rows
       seen = Set.new
       page.css(".event_item.w-dyn-item").select do |row|
@@ -30,9 +24,6 @@ module Scrapers
       click(link_for(row))
     end
 
-    # The date block shows an English month + day with no year, but the page
-    # <title> ("… | Jun 11, 2026 | SOUSSOUL") carries the year — parse that, and
-    # take the start time from the detail's `.time` block.
     def event_start_time(content)
       title_text = content.at_css("title")&.text.to_s
       /(?<month>\p{L}{3,})\s+(?<day>\d{1,2}),\s+(?<year>\d{4})/ =~ title_text

@@ -1,7 +1,3 @@
-# Phase 2b: the Style layer is gone — genres now form the taxonomy tree that
-# replaced it. Drop the styles table, the Style↔Genre join, and every
-# styles-context tagging on events. (No real users yet, so the dropped data
-# needs no migration — it just goes; see the taxonomy redesign doc.)
 class RemoveStyles < ActiveRecord::Migration[8.0]
   def up
     ActsAsTaggableOn::Tagging.where(context: "styles").delete_all

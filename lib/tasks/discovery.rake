@@ -1,16 +1,8 @@
 namespace :discovery do
-  # READ-ONLY triage report: which venues/feeds the upstream indices expose that
-  # we don't already consume/defer/reject. Fetches each upstream, subtracts the
-  # venue registry (config/venues.yml), and prints the unknowns for a human to
-  # add. Never enables anything — the only write path is adding/editing a venue
-  # row in a PR. See docs/venue-registry-design.md + docs/discovery-design.md.
-  # Suitable for a periodic (weekly) cron.
-  #
-  #   bin/rails discovery:report
   desc "Report upstream venues/feeds we do not yet consume (read-only triage)"
   task report: :environment do
     ledger = Scrapers::Discovery::Ledger.load
-    agent  = Scrapers::Agent.new # honest UA + robots.txt, like every scraper
+    agent  = Scrapers::Agent.new
 
     fetch = lambda do |label, url|
       doc = Nokogiri::XML(agent.get(url).body)
@@ -32,7 +24,6 @@ namespace :discovery do
 
     recheck = ledger.stale_revisitable(Date.current)
 
-    # Same check as the drift test in CI: a new scraper without a ledger row fails there.
     consume = ledger.consume_domains
     covered = Scrapers::All.scrapers.values.flat_map(&:venue_domains).to_set
     orphans = (consume - covered).to_a.sort

@@ -1,8 +1,3 @@
-<%# A field — or a pair of fields settled from one source — and what hangs off it: the
-    text a model quoted as its source, chips that fill it, a hint for typing it. The
-    field goes in the block, the rest in `attached`, one renderable or a list of them;
-    blank entries drop out, so a caller may pass a render that produced nothing. The
-    grouping itself is .field-group in application.css, not anything in this markup. %>
 <%# locals: (attached: nil) %>
 <% attachments = Array(attached).select(&:present?) %>
 <div class="field-group">

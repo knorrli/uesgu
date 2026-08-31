@@ -1,10 +1,5 @@
 require "db_test_helper"
 
-# Locks the disposition state machine on Genre: ignore!, hide!, block!, restore!,
-# set_parent! and the visibility they re-derive on events. These are pure
-# mechanics — the curation behaviour the app is built on — so they're tested with
-# invented genre names and never reference real taxonomy content (which the
-# parallel session is rewriting).
 class GenreDispositionTest < ActiveSupport::TestCase
   test "set_parent! files the genre and clears any prior disposition" do
     root = genre(events_count: 3)
@@ -55,7 +50,7 @@ class GenreDispositionTest < ActiveSupport::TestCase
   end
 
   test "block! strips the genre tagging off events but keeps the event visible" do
-    noise = genre(name: "us") # scraper noise, e.g. a country code
+    noise = genre(name: "us")
     real = genre(name: "indie")
     event = event_with_genres(noise.name, real.name)
     event.recompute_visibility!
@@ -77,7 +72,7 @@ class GenreDispositionTest < ActiveSupport::TestCase
     fresh = event_with_genres(noise.name, "techno-ish")
 
     refute_includes fresh.reload.genre_list, noise.name
-    assert_includes fresh.genre_list, "Techno-Ish" # survivor stored canonicalized
+    assert_includes fresh.genre_list, "Techno-Ish"
   end
 
   test "restore! lifts every disposition mark and un-hides events" do

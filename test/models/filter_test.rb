@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Locks the Filter query object: how request params parse into tag lists, the
-# shape of the ransack query it builds, and date-range preset ordering.
 class FilterTest < ActiveSupport::TestCase
   test "list setters parse a comma string into a tag array" do
     f = Filter.new
@@ -30,7 +28,7 @@ class FilterTest < ActiveSupport::TestCase
 
   test "date_ranges are ordered by the datepicker preset sequence" do
     f = Filter.new
-    f.date_ranges = %w[next_week today] # given out of order
+    f.date_ranges = %w[next_week today]
 
     assert_equal %w[today next_week], f.date_ranges,
                  "presets sort into Datepicker.preset key order"
@@ -80,7 +78,7 @@ class FilterTest < ActiveSupport::TestCase
     rock = genre(name: "filterrock")
     indie = genre(name: "filterindie"); indie.set_parent!(rock)
     shoegaze = genre(name: "filtershoegaze"); shoegaze.set_parent!(indie)
-    genre(name: "filterpolka") # unrelated sibling tree
+    genre(name: "filterpolka")
 
     names = Filter.build(genres: [rock.name]).expanded_genre_names.sort
 
@@ -94,7 +92,7 @@ class FilterTest < ActiveSupport::TestCase
   test "filtering by a genre matches events tagged with any descendant" do
     rock = genre(name: "matchrock")
     shoegaze = genre(name: "matchshoegaze"); shoegaze.set_parent!(rock)
-    hit = event_with_genres(shoegaze.name)        # tagged only with the descendant
+    hit = event_with_genres(shoegaze.name)
     miss = event_with_genres(genre(name: "matchpolka").name)
 
     ids = Event.ransack(Filter.build(genres: [rock.name]).ransack_query).result.ids
@@ -108,12 +106,9 @@ class FilterTest < ActiveSupport::TestCase
     elektronik = genre(name: "aliaselektronik"); elektronik.merge_into!(electronic)
     event = event_with_genres(elektronik.name)
 
-    # Source-data integrity: ingest keeps the raw alias token, never rewrites it to
-    # the canonical (match-not-rewrite).
     assert_includes event.reload.genre_list, elektronik.name
     refute_includes event.genre_list, electronic.name
 
-    # …yet a filter on the canonical expands to, and matches, that raw token.
     assert_includes Filter.build(genres: [electronic.name]).expanded_genre_names, elektronik.name
     ids = Event.ransack(Filter.build(genres: [electronic.name]).ransack_query).result.ids
     assert_includes ids, event.id, "the canonical filter catches the raw-aliased event"

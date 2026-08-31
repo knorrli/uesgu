@@ -1,7 +1,5 @@
 require "application_system_test_case"
 
-# The date-header ♥ saved count updates live, no reload: day_summary_controller
-# adjusts it when you save/unsave a show within that day.
 class DaySummaryTest < ApplicationSystemTestCase
   test "the saved count updates live as you save and unsave" do
     event(start_date: Date.current + 2, title: "A", genre_list: ["Rock"])

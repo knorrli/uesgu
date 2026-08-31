@@ -1,11 +1,5 @@
 module Scrapers
-  # Le Singe (Biel/Bienne) is run by the KartellCulturel collective; its public
-  # `getEvents` JSON endpoint serves clean structured events (ISO dates with year,
-  # curated genre arrays), so this scraper reads JSON rather than HTML. Rows are
-  # plain Hashes — the field extractors read keys instead of CSS.
   class LeSinge < Agent
-    # Biel/Bienne is in canton Bern.
-    # location=1 is Le Singe. The endpoint pages by `offset` in steps of 10.
     def self.endpoint(offset)
       URI.parse("https://kartellculturel.ch/getEvents?startDate=#{Date.current.iso8601}&lang=de&offset=#{offset}&location=1")
     end
@@ -14,12 +8,9 @@ module Scrapers
       endpoint(0)
     end
 
-    # The base fetched offset 0; keep requesting further offsets until a page comes
-    # back empty.
     def event_rows
       events = data_from(page.body)
       offset = 10
-      # `get` returning nil (offline golden harness) ends pagination cleanly.
       while (resp = get(self.class.endpoint(offset)))
         batch = data_from(resp.body)
         break if batch.empty?
@@ -34,8 +25,6 @@ module Scrapers
       row["detailUrl"].presence
     end
 
-    # startDate is a clean "YYYY-MM-DD HH:MM:SS" (year present); startTime is the
-    # real door/show time in "HHhMM" form (e.g. "17h00").
     def event_start_time(row)
       date = row["startDate"].to_s[/\d{4}-\d{2}-\d{2}/]
       raise "Unparseable Le Singe date: #{row['startDate'].inspect}" if date.blank?
@@ -52,9 +41,6 @@ module Scrapers
       row["subTitle"].presence
     end
 
-    # The endpoint's `genres` is a curated, closed vocabulary maintained by the
-    # collective (with stable numeric genreIds) — a clean structured field, so it
-    # is allowed to mint taxonomy (discovery).
     def event_genres(row)
       Array(row["genres"]).map { |g| g.to_s.squish }.compact_blank
     end

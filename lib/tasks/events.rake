@@ -6,8 +6,6 @@ namespace :events do
     dupes = Event.group(:url).having("COUNT(*) > 1").count
     removed = 0
     dupes.each_key do |url|
-      # Keep the first-seen row; destroy the rest (destroy_all so AATO taggings
-      # are cleaned up rather than orphaned).
       stale = Event.where(url: url).order(:id).offset(1)
       removed += stale.destroy_all.size
     end

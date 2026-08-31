@@ -4,8 +4,6 @@ module Scrapers
       URI.parse("https://www.nouveaumonde.ch/agenda/")
     end
 
-    # Nouveau Monde's only taxonomy is activity-type filters (concert / expo /
-    # atelier / …), not music genres — there is no genre/style field to extract.
     field_gaps genres: :no_field
 
     def event_rows
@@ -31,9 +29,6 @@ module Scrapers
     end
 
     def event_title(content)
-      # Some events render multiple `.groupHeading` sections (the lineup acts
-      # each get one, doubling as `.groupIntro`); only the first carries the
-      # event title — taking all of them jams the artist names onto the title.
       content.at_css(".groupHeading h2")&.text&.squish
     end
 
@@ -46,14 +41,6 @@ module Scrapers
         act_name.string
       end.compact_blank.join(", ")
     end
-
-    # No genre extraction: the live ProcessWire template exposes no genre/style
-    # field (verified against the live site 2026-06-12). Both former selectors
-    # were dead — `.plateSmall` no longer exists and the lone `<h5>` is the
-    # event-info header, not genres. The only genre-ish text is artist-reference
-    # prose ("For fans of : Daughter…") and the bio, which we deliberately don't
-    # mine. So Nouveau Monde is a genre-less venue (inherits the nil default).
-    # (The list/event selectors still work — only genres are absent.)
 
     private
 

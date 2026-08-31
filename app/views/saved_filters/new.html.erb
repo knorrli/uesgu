@@ -1,10 +1,5 @@
 <% content_for :title, t('saved_filters.new.title') %>
 
-<%# Secondary entry (the events "Benachrichtigen" button creates the rule and
-    lands straight on the editor). The name is the derived filter description,
-    rendered server-side. %>
-<%# saved-filter-title live-updates the h1 from the picker as you build the draft (mirrors
-    SavedFilter#describe); the server re-derives the authoritative name on Save. %>
 <div class="saved-filters flex flex-col gap-large"
      data-controller="saved-filter-title"
      data-saved-filter-title-scope-all-value="<%= t('saved_filters.summary.scope_all') %>"

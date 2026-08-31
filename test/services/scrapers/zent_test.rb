@@ -1,23 +1,14 @@
 require "test_helper"
 
-# Locks the Zent start-time miner independent of the captured fixture.
-#
-# Zent's markup gives the date a clean <time> element but never the start time —
-# that lives in the body prose ("Start: 18:30", "Türöffnung 18.30"). The miner
-# is keyword-anchored on purpose: a bare \d\d[:.]\d\d would false-match prices,
-# and the show start ("Start", "Beginn") must win over the doors time
-# ("Türöffnung") when both appear. An event whose prose names no time keeps the
-# date-at-midnight default. SYNTHETIC prose shaped like the live bodies.
 class Scrapers::ZentTest < Minitest::Test
-  # body prose => expected "HH:MM" (nil = keep the midnight default)
   CASES = {
-    "5 Gänge / nur auf Reservation. Start: 18:30"      => "18:30", # live shape
-    "Türöffnung 18.30, Ausklang an der Bar"            => "18:30", # dot separator, doors
-    "Konzertbeginn: 20:00"                             => "20:00", # 'beginn' inside a compound
-    "Türöffnung 19.00 / Beginn um 20.00"               => "20:00", # start beats doors
+    "5 Gänge / nur auf Reservation. Start: 18:30"      => "18:30", #
+    "Türöffnung 18.30, Ausklang an der Bar"            => "18:30", #
+    "Konzertbeginn: 20:00"                             => "20:00",
+    "Türöffnung 19.00 / Beginn um 20.00"               => "20:00", #
     "Show 21:15"                                       => "21:15",
-    "Feines vom Feuer / 75.— exkl. Getränke"           => nil,     # price prose, no time
-    "Start: 99:99 kaputt"                              => nil,     # nonsense guarded
+    "Feines vom Feuer / 75.— exkl. Getränke"           => nil,     # p
+    "Start: 99:99 kaputt"                              => nil,
     ""                                                 => nil
   }.freeze
 

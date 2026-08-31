@@ -1,10 +1,5 @@
 require "db_test_helper"
 
-# Locks the genre-tree mechanics on Genre: parent/child wiring, subtree
-# expansion (the set a "filter by this genre" matches), set_parent! placement
-# and its cycle guard, the unplaced curation scope, and the invariant that a
-# disposition/alias detaches a genre from the tree. Pure mechanics — invented
-# genre names only, never real taxonomy content (which the redesign churns).
 class GenreTreeTest < ActiveSupport::TestCase
   test "subtree_ids returns the genre and all transitive descendants" do
     rock = genre(name: "flux-rock")
@@ -29,9 +24,9 @@ class GenreTreeTest < ActiveSupport::TestCase
     crust = genre(name: "flux-crust"); crust.set_parent!(punk)
 
     paths = Genre.ancestor_paths
-    assert_equal [], paths[rock.id]                      # a root has no ancestors
-    assert_equal [rock.name], paths[punk.id]             # parent only
-    assert_equal [rock.name, punk.name], paths[crust.id] # root → parent, in order
+    assert_equal [], paths[rock.id]
+    assert_equal [rock.name], paths[punk.id]
+    assert_equal [rock.name, punk.name], paths[crust.id]
   end
 
   test "descendant_ids excludes self" do
@@ -71,7 +66,7 @@ class GenreTreeTest < ActiveSupport::TestCase
     punk = genre(name: "flux-punk2"); punk.set_parent!(rock)
 
     assert_raises(ArgumentError) { rock.set_parent!(rock) }
-    assert_raises(ArgumentError) { rock.set_parent!(punk) } # punk is rock's descendant
+    assert_raises(ArgumentError) { rock.set_parent!(punk) }
     assert_nil rock.reload.parent_id, "a rejected re-parent leaves the tree unchanged"
   end
 

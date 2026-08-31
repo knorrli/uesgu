@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# Locks ApplicationController's locale precedence: a logged-in user's saved
-# preference wins, else the first available browser Accept-Language, else the
-# default. Tested directly on a controller instance so it stays independent of
-# any translated page content.
 class SetLocaleTest < ActiveSupport::TestCase
   def build_controller(accept_language: nil)
     env = {}
@@ -14,7 +10,6 @@ class SetLocaleTest < ActiveSupport::TestCase
     end
   end
 
-  # set_locale mutates the thread-global I18n.locale; restore it afterwards.
   def with_locale_reset
     original = I18n.locale
     yield
@@ -41,7 +36,7 @@ class SetLocaleTest < ActiveSupport::TestCase
     with_locale_reset do
       u = user(locale: "en")
       Current.session = u.sessions.create!
-      c = build_controller(accept_language: "fr") # would otherwise win
+      c = build_controller(accept_language: "fr")
       c.define_singleton_method(:authenticated?) { true }
 
       c.send(:set_locale)
@@ -63,7 +58,7 @@ class SetLocaleTest < ActiveSupport::TestCase
 
   test "set_locale falls back to the default locale" do
     with_locale_reset do
-      c = build_controller # no header
+      c = build_controller
       c.define_singleton_method(:authenticated?) { false }
 
       c.send(:set_locale)

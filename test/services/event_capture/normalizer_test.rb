@@ -1,8 +1,5 @@
 require "db_test_helper"
 
-# Every case here is a shape the model actually returned during the provider
-# evaluation. The invariant under test is always the same one: a value we cannot trust
-# is nulled and kept, never coerced into something plausible.
 class EventCapture::NormalizerTest < ActiveSupport::TestCase
   TODAY = Date.new(2026, 8, 19)
 
@@ -12,8 +9,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     EventCapture::Normalizer.call(event, today: TODAY, genres: EventCapture::Genres.for_names(known))
   end
 
-  # The taxonomy the canton half reads. Synthetic town names; whether a canton is
-  # settled or abstained is Locality.reconcile!'s job, tested in LocalityTest.
   def normalize_in(event, **localities)
     localities.each { |name, canton| Locality.create!(name: name.to_s, canton: canton) }
     EventCapture::Normalizer.call(event, today: TODAY)
@@ -113,8 +108,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_includes candidate.issues, :place_uncited
   end
 
-  # A two-letter origin code printed beside an act name is what filled this field
-  # before it had to be cited, and "Us" is a well-formed string nothing else refuses.
   test "an uncited locality is dropped and kept" do
     candidate = normalize("locality" => "Us", "locality_evidence" => nil)
 
@@ -160,8 +153,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     end
   end
 
-  # The sample posters were all German, so a parser built from their vocabulary would
-  # encode an accident of six inputs. These are the shapes the long tail carries.
   test "French, English and marker-less clock formats normalise too" do
     { "20h30" => "20:30", "20 h 30" => "20:30", "20h" => "20:00", "21 heures" => "21:00",
       "8pm" => "20:00", "8:30 PM" => "20:30", "12 am" => "00:00", "12pm" => "12:00",
@@ -229,7 +220,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.raw
   end
 
-  # The case computation cannot serve, and the reason the field stays in the schema.
   test "a locality nobody carries leaves the model's canton standing" do
     candidate = normalize_in(cited_locality("Flarnhausen", "canton" => "AG"), Zorpwil: "BE")
 
@@ -347,8 +337,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_equal venue.canton, candidate.canton
   end
 
-  # Creator#located files the event under the venue's tuple whatever the card said, so
-  # a card left on the poster's town would show one the publish overrules.
   test "a resolved venue supplies the town and canton the model left blank" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
 
@@ -378,8 +366,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.issues
   end
 
-  # The chips exist because "AKUT Thun" and "AKUT Bern" score alike and can be two
-  # real venues; taking one here would file a show at the wrong address.
   test "a near-match is left alone — only an exact fingerprint folds" do
     place(name: "AKuT", locality: "Zorpwil", canton: "BE")
 
@@ -389,9 +375,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.issues
   end
 
-  # A quote can legitimately span more than one date ("Fr 20. & Sa 21. Februar" on a
-  # two-night poster). Taking the resolver's whole answer there turned a wrong year
-  # into a wrong show.
   test "evidence describing another date corrects nothing and says so" do
     candidate = normalize("date" => "2026-02-20", "date_evidence" => "Fr 20. & Sa 21. Februar")
 
@@ -400,8 +383,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_empty candidate.raw
   end
 
-  # A weekday that contradicts the date is surfaced, never obeyed (see
-  # YearResolver.weekday_conflict? for what it cost as a selector).
   test "a contradicting weekday is flagged and the date left alone" do
     candidate = normalize("date" => "2026-08-19", "date_evidence" => "Di 19. August")
 
@@ -420,8 +401,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_equal "2026-02-30T20:00:00", candidate.raw["date"]
   end
 
-  # Observed on a real poster: six genres arrived as one string. The taxonomy is what
-  # says the slash is a separator (see EventCapture::Genres).
   test "a slash run the taxonomy vouches for becomes several genres" do
     candidate = normalize_with_genres({ "genres" => ["Loops/Zorpcore/FX"] }, "Zorpcore")
 
@@ -429,8 +408,6 @@ class EventCapture::NormalizerTest < ActiveSupport::TestCase
     assert_includes candidate.issues, :genres_split
   end
 
-  # Splitting refuses nothing, so there is no refused value to keep — the flag is the
-  # whole record that the rule fired.
   test "a run nothing vouches for stays one genre and raises nothing" do
     candidate = normalize_with_genres({ "genres" => ["Loops/FX"] }, "Zorpcore")
 

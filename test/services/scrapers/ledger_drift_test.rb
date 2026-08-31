@@ -1,30 +1,14 @@
 require "test_helper"
 
-# Drift detection for the venue registry (config/venues.yml), via its ledger
-# projection. The registry is the authoritative "have we decided on this source?"
-# record; these rules keep it reconciled with the live scraper registry and
-# internally well-formed, so it can never silently diverge from what we actually
-# scrape. A failure here means the registry and the code disagree — the message
-# says exactly how.
-#
-# This is data hygiene, not behaviour: it reads the real registry + the real
-# scraper registry, no fixtures, no DB.
 class Scrapers::LedgerDriftTest < Minitest::Test
   def setup
     @ledger = Scrapers::Discovery::Ledger.load
   end
 
-  # Every domain any registered scraper covers (single-venue: one; Petzi: 14;
-  # a per-event aggregator: none). The unit of reconciliation — one scraper can
-  # cover many domains, one domain can be covered by many scrapers (Dachstock via
-  # bespoke + OLE + Petzi), so we compare domain SETS, not scraper classes.
   def registry_domains
     Scrapers::All.scrapers.values.flat_map(&:venue_domains).to_set
   end
 
-  # Rule 1 — no orphan consume row: every `consume` entry is backed by a live
-  # scraper. A failure means a ledger row is stale (its scraper was renamed/deleted)
-  # or its `domain` is typo'd.
   def test_every_consume_row_is_backed_by_a_scraper
     orphans = @ledger.consume_domains - registry_domains
     assert_empty orphans,
@@ -32,10 +16,6 @@ class Scrapers::LedgerDriftTest < Minitest::Test
                  "remove the row or fix its `domain` (typo / renamed scraper): #{orphans.to_a.sort.join(', ')}"
   end
 
-  # Rule 2 — no unrecorded scraper: every domain a scraper covers has a `consume`
-  # row. A failure means a scraper was added (or its venue_domains changed) without
-  # recording the decision in the ledger. This is the rule that disciplines new
-  # direct-venue scrapers.
   def test_every_scraped_domain_has_a_consume_row
     missing = registry_domains - @ledger.consume_domains
     assert_empty missing,
@@ -43,8 +23,6 @@ class Scrapers::LedgerDriftTest < Minitest::Test
                  "add a venue row (or, for a SaaS-hosted feed, override the scraper's `venue_domains`): #{missing.to_a.sort.join(', ')}"
   end
 
-  # Rule 3 — reason well-formedness: defer/reject carry a valid reason; consume
-  # carries none; disposition is one of the three.
   def test_dispositions_and_reasons_are_well_formed
     @ledger.entries.each do |e|
       assert_includes Scrapers::Discovery::Ledger::DISPOSITIONS, e.disposition,
@@ -59,8 +37,6 @@ class Scrapers::LedgerDriftTest < Minitest::Test
     end
   end
 
-  # Rule 4 — domains are normalized: each `domain` is already its own eTLD+1 (no
-  # scheme/subdomain/path/uppercase). Catches a `www.` or a URL slipping into the key.
   def test_domains_are_canonical
     @ledger.entries.each do |e|
       assert_equal e.domain, Scrapers::Discovery.domain(e.domain),
@@ -68,13 +44,11 @@ class Scrapers::LedgerDriftTest < Minitest::Test
     end
   end
 
-  # No duplicate rows: one row per domain.
   def test_domains_are_unique
     dupes = @ledger.entries.map(&:domain).tally.select { |_, n| n > 1 }.keys
     assert_empty dupes, "Duplicate ledger rows for: #{dupes.join(', ')}"
   end
 
-  # Rule 5 — alias uniqueness: no single upstream raw key resolves to two domains.
   def test_aliases_resolve_to_a_single_domain
     clashes = @ledger.alias_pairs
                      .group_by { |upstream, key, _domain| [upstream, key] }
@@ -83,10 +57,4 @@ class Scrapers::LedgerDriftTest < Minitest::Test
                  "These upstream keys map to more than one domain: " \
                  "#{clashes.map { |(u, k), pairs| "#{u}:#{k} -> #{pairs.map(&:last).join('/')}" }.join('; ')}"
   end
-
-  # Petzi slug→place and slug→domain are now both DERIVED from the registry's
-  # `petzi` aliases (Petzi.venues / .domains), so they can't diverge by construction
-  # — the old parity guard is obsolete. A petzi alias on a non-consume venue is
-  # caught by the consume/scraped reconciliation above (its domain enters
-  # Petzi.venue_domains but has no consume row).
 end

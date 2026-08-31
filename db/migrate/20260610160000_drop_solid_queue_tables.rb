@@ -1,7 +1,3 @@
-# Solid Queue has been removed — scheduled work now runs as Render cron jobs
-# (see render.yaml) and nothing enqueues Active Job. Drop its tables. Child
-# execution tables are listed before solid_queue_jobs (which they reference);
-# force: :cascade also clears any remaining FKs.
 class DropSolidQueueTables < ActiveRecord::Migration[8.0]
   TABLES = %w[
     solid_queue_recurring_executions

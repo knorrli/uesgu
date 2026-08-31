@@ -1,11 +1,6 @@
 require "db_test_helper"
 
-# The capture funnel end to end: the screen exists only for contributors, one
-# extraction per request replaces its own row, and nothing is written before the
-# human submits. Synthetic place names; the registry is read live.
 class CaptureTest < ActionDispatch::IntegrationTest
-  # Stands in for the extraction service — the provider itself is covered in
-  # EventCapture::ExtractorTest.
   def stub_extraction(extraction, &)
     EventCapture::Extractor.stub(:call, ->(**) { extraction }, &)
   end
@@ -30,8 +25,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select "form#manual-event-form input[name=title]"
   end
 
-  # The page asks for HTML where a card asks for a turbo-stream, which is the whole of
-  # what tells the two apart (see CapturesController#create).
   test "the hand-entry page publishes through the same path as a card and lands back on the picker" do
     sign_in_as user(contributor: true, locale: "en")
 
@@ -153,8 +146,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match "Zorp Fest II", response.body
   end
 
-  # The card posts the report; the extractor is what has to receive it, because the
-  # prompt is the only thing that makes a second read differ from the first.
   test "a re-read carries the marked fields and the note into the extraction" do
     sign_in_as user(contributor: true)
     seen = nil
@@ -182,7 +173,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_nil seen
   end
 
-  # A DOM id is interpolated from it, so anything else must not reach the markup.
   test "extract ignores a row id that is not a plain token" do
     sign_in_as user(contributor: true)
 
@@ -194,8 +184,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_no_match "<script>x</script>", response.body
   end
 
-  # An adapter failure and a provider failure are the same shape, and the screen
-  # owns the copy for both — the service only ever returns a symbol.
   test "extract renders the contributor-facing copy for a failure code" do
     sign_in_as user(contributor: true, locale: "en")
 
@@ -231,8 +219,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match I18n.t("capture.card.published", title: "Kept", locale: :en), response.body
   end
 
-  # The card still holds the contributor's edits, so the response addresses the status
-  # region rather than re-rendering fields over the top of them.
   test "a refusal lands on the card that caused it and writes nothing" do
     sign_in_as user(contributor: true, locale: "en")
 
@@ -245,8 +231,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_empty Event.all
   end
 
-  # The card posts no link and this endpoint is reachable directly, so a url arriving
-  # anyway is not a value of the event.
   test "a url posted past the card is ignored, not published" do
     sign_in_as user(contributor: true, locale: "en")
 
@@ -284,8 +268,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_equal %w[Flarncore Zorpwave], Event.sole.genre_list.sort
   end
 
-  # An 8MB cap applied after `read` is not a cap: this endpoint is reachable
-  # directly, and the client-side downscale is not a control.
   test "an oversize upload is refused before its bytes are read" do
     sign_in_as user(contributor: true, locale: "en")
     oversize = Rack::Test::UploadedFile.new(
@@ -293,8 +275,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
       original_filename: "big.png"
     )
 
-    # Adapters::Image.call is what pulls the bytes in, so the guard works only if it
-    # is never reached. (Extractor.call always runs — it passes a failure through.)
     EventCapture::Adapters::Image.stub(:call, ->(_) { flunk "read the upload before capping it" }) do
       post extract_capture_path, params: { row_id: "abc123", image: oversize },
                                  headers: { "Accept" => "text/vnd.turbo-stream.html" }
@@ -303,8 +283,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match ERB::Util.html_escape(I18n.t("capture.failures.image_too_large", locale: :en)), response.body
   end
 
-  # The corrections are the only evidence of a confidently wrong value: nothing
-  # refuses "Us" as a locality, so without the diff the read records as clean.
   test "publishing records what the human changed against what the model proposed" do
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
     sign_in_as user(contributor: true)
@@ -356,8 +334,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_empty attempt.field_outcomes
   end
 
-  # A forged or stale id is the client's to send, so it may cost the row and nothing
-  # else — never the event.
   test "a forged attempt token costs the record, not the publish" do
     sign_in_as user(contributor: true)
 
@@ -379,17 +355,11 @@ class CaptureTest < ActionDispatch::IntegrationTest
     end
 
     assert_select "input[name=?][value=?]", "proposed_locality", "Us"
-    # Compared by what it resolves to: the token carries its own expiry, so two of
-    # them for the same attempt are not the same string.
     token = css_select("input[name=attempt_token]").first["value"]
     assert_equal attempt, ExtractionAttempt.find_by_capture_token(token)
     assert_select "input[name=?][value=?]", "candidate_index", "0"
   end
 
-  # The Ort/Kanton pair shares one quote because the canton is computed from the
-  # locality rather than read off the poster (see EventCapture::Normalizer), and a town
-  # chip fills both fields too — confining either line to one column would claim less
-  # than the card knows.
   test "a quote that settled a pair of fields is attached to the whole row" do
     place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
     sign_in_as user(contributor: true)
@@ -406,9 +376,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select ".capture-fields__where .field-group", false
   end
 
-  # Datum and Zeit are read off separate lines of a poster — "Türöffnung 20:00" beside
-  # a date is a different source from the date's own — so each carries its own quote
-  # rather than sharing the row's.
   test "date and time each carry the line they were read from" do
     sign_in_as user(contributor: true)
 
@@ -424,9 +391,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_match "Türöffnung 20:00", cites.last.text
   end
 
-  # A date already gone is a remark about the date, and a line of its own between two
-  # fields belongs to neither of them. It sits in the row rather than in the date
-  # field's own group, which is half a row wide and wrapped the sentence.
   test "the warning about a past date is the last line of the date and time row" do
     sign_in_as user(contributor: true)
 
@@ -441,10 +405,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select ".field-group .capture-fields__warning", false
   end
 
-  # The `for`/id wiring the phone behaviour rests on — a label that wraps the field
-  # instead reopens it on every tap (app/views/shared/_genre_combobox.html.erb). The id is
-  # asserted literally because the gem's fallback is a random uuid, which would satisfy
-  # a `for`-matches-id check while changing on every render.
   test "the genre field is named by a label that does not wrap it" do
     sign_in_as user(contributor: true)
 
@@ -460,8 +420,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select "label .genre-combobox", count: 0
   end
 
-  # The taxonomy is offered so an existing genre is picked rather than respelt, but a
-  # genre we ignore, hide or block is not something to put in front of a contributor.
   test "the offered genres cover what is in use and leave the dispositioned out" do
     wanted = genre(name: "zorpwave", events_count: 3)
     genre(name: "zorpwave-blocked", events_count: 3).block!
@@ -503,9 +461,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     assert_empty Event.all
   end
-  # A show we already carry, put in front of the contributor while they are still
-  # looking at the poster — and the same question again at publish, because everything
-  # on the card is editable after it renders.
   def already_listed(**overrides)
     event(**{ title: "Zorp Fest", start_date: Date.new(2026, 9, 1),
               location_list: %w[Zorpsaal Zorpwil BE] }.merge(overrides))
@@ -543,8 +498,6 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_select ".capture-card__matches"
   end
 
-  # The buttons sit in the status slot, which is OUTSIDE the card's form — they reach
-  # it by id, so the id has to be the one the card actually rendered.
   test "the question posts back to the card's own form" do
     sign_in_as user(contributor: true)
     already_listed

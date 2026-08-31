@@ -1,7 +1,5 @@
 require "test_helper"
 
-# The media type is sniffed rather than trusted, so these are the bytes a real
-# upload starts with.
 class EventCapture::Adapters::ImageTest < ActiveSupport::TestCase
   PNG = "\x89PNG\r\n\x1A\n".b + ("\0" * 32)
   JPEG = "\xFF\xD8\xFF\xE0".b + ("\0" * 32)
@@ -23,7 +21,6 @@ class EventCapture::Adapters::ImageTest < ActiveSupport::TestCase
       end
   end
 
-  # "RIFF" alone is also AVI and WAV.
   test "a RIFF container that is not WebP is not accepted as one" do
     input = call("RIFF".b + "\x24\0\0\0".b + "AVI ".b + ("\0" * 16))
 

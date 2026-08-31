@@ -1,23 +1,13 @@
-/* One focus indicator for every interactive element. Zero-specificity :where()
-   so any component can still override placement without fighting this rule. The
-   ring is the one deliberate spend of green on chrome (see --focus-ring). */
 :where(a, button, summary, input, select, textarea, [tabindex]):focus-visible {
   outline: var(--border-width) solid var(--focus-ring);
   outline-offset: 2px;
 }
 
-/* SECONDARY is the default for any button: hollow accent (outlined green). Every
-   action that isn't the page's one primary commit or a destructive action looks
-   like this — one secondary treatment, no separate "neutral box" vs "ghost". */
 button, a.button {
   text-align: center;
   align-content: center;
   cursor: pointer;
   text-decoration: none;
-  /* Match the reset's native-control line-height (button/input get 1.1, but <a>
-     doesn't) so an a.button is exactly as tall as a native <button>/submit at the
-     same padding — otherwise the link inherits the body's looser line-height and
-     renders a few px taller (the calendar Subscribe link beside Copy/Deactivate). */
   line-height: 1.1;
   padding: 5px;
   border: var(--border-width) solid var(--theme-accent-color);
@@ -25,17 +15,12 @@ button, a.button {
   background-color: transparent;
   color: var(--theme-accent-color);
 
-  /* PRIMARY: the single main commit of a page (opt-in; input[type=submit] is
-     primary automatically). Filled accent so it's the one thing that stands out. */
   &.primary {
     background-color: var(--theme-accent-color);
     border-color: var(--theme-accent-color);
     color: var(--theme-on-accent);
   }
 
-  /* Destructive: hollow warn at rest, fills warn on commit (hover/focus) — the
-     single danger language, shared with .button-small.danger (scales by size,
-     not by a different look). */
   &.delete {
     border-color: var(--theme-warn-color);
     background-color: transparent;
@@ -48,15 +33,6 @@ button, a.button {
     color: var(--theme-bg-color);
   }
 
-  /* Both halves, or a primary goes invisible: dropping the fill without also
-     dropping `&.primary`'s `--theme-on-accent` text leaves the label painted in
-     `--color-background`, which is what that token resolves to. Same pair as
-     input[type=submit][disabled] above, deliberately.
-
-     This rule also settles `.button-small.primary`, which has no disabled treatment
-     of its own: `&` carries the specificity of the MOST specific selector in its
-     list, so `a.button` makes this 0-2-1 and it out-ranks `.button-small.primary`
-     (0-2-0). Anything overriding a disabled button has to clear that bar. */
   &[disabled] {
     cursor: not-allowed;
     opacity: 0.5;
@@ -65,13 +41,6 @@ button, a.button {
   }
 }
 
-/* Icon buttons: a flat, boxless, muted clickable icon — the single shared role
-   for every inline icon action (the admin event edit/delete on a row, the genre
-   tag edit gears, …), on either an <a> or a <button>. This is the chrome reset
-   only: no box, no link underline, muted with a hover lift. Layout — sizing,
-   padding, margins, glyph centring — belongs to the context that places them.
-   The `a.`/`button.` qualifiers out-specify the boxed button base above without
-   depending on stylesheet order. Add `danger` for a destructive (delete) tone. */
 a.icon-button,
 button.icon-button {
   cursor: pointer;
@@ -90,10 +59,6 @@ button.icon-button:hover {
   color: var(--theme-warn-color);
 }
 
-/* Display-only icon: a non-interactive glyph (a field's leading handle, a search
-   affordance, a metadata marker) — the counterpart to the clickable .icon-button.
-   Muted, no hover lift, no cursor change. Centralises what was ad-hoc per context
-   (.filter-icon, .sheet__search-icon, …). */
 .icon {
   color: var(--theme-fg-muted);
   line-height: 1;
@@ -115,29 +80,7 @@ input[type=submit] {
   }
 }
 
-/* The button ladder: three weights, app-wide. "A box reads as clickable", so every one is a box
-   (except .text-link, a navigation link). Weight is the role; size is just
-   context (full-width vs small pill), NOT a separate tier:
-
-     PRIMARY    input[type=submit], .primary    filled accent — the ONE main
-                                                 commit of a page (Save, Log in,
-                                                 the rule editor's done link)
-     SECONDARY  <button> / .button / .button-small (default)
-                                                 hollow accent — every other
-                                                 action (Sign out, Enable, Test
-                                                 now, Pause, Create link, …)
-     DANGER     .delete / .danger               hollow warn → fills on commit
-     ICON       .icon-button (+ .danger)        flat boxless inline icon action
-     LINK       .text-link                      underlined accent navigation
-
-   Per-page primary: at most one filled button per page; everything else is
-   secondary (hollow) or danger, so the primary is the thing that stands out.
-   Flat-text controls that aren't buttons (view switcher, save/notify shortcut)
-   keep their own domain classes. */
 .button-small {
-  /* inline-flex + a fixed line-height makes every pill the same height whether
-     it's an <a>, a <button> (via button_to), or an <input> — otherwise the <a>
-     inherits the body's 1.5 line-height and renders taller than the buttons'. */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -152,7 +95,6 @@ input[type=submit] {
   text-decoration: none;
 }
 
-/* Filled primary, small-pill size (the rule editor's done link, the cookie CTA). */
 .button-small.primary {
   background: var(--theme-accent-color);
   color: var(--theme-on-accent);
@@ -163,8 +105,6 @@ input[type=submit] {
   cursor: not-allowed;
 }
 
-/* Destructive pill: hollow warn at rest, fills warn on commit — the same danger
-   language as .button.delete, just the small/pill size. */
 .button-small.danger {
   background: none;
   border-color: var(--theme-warn-color);
@@ -177,8 +117,6 @@ input[type=submit] {
   color: var(--theme-bg-color);
 }
 
-/* A text navigation link (underlined accent), NOT a button — for "go somewhere
-   else" sitting among in-place action buttons. Borderless: a link, not a box. */
 .text-link {
   color: var(--theme-accent-color);
   text-decoration: underline;
@@ -189,11 +127,6 @@ input[type=submit] {
   cursor: pointer;
 }
 
-/* The standard closing row of a task-style form (shared/_form_actions): primary
-   Save + secondary Abbrechen side by side, so backing out is as explicit as
-   committing. A destructive extra (.danger/.delete, e.g. the saved-filter
-   Löschen) is pushed to the far end — the safe pair and the dangerous one never
-   sit shoulder to shoulder. */
 .form-actions {
   display: flex;
   align-items: center;
@@ -205,12 +138,6 @@ input[type=submit] {
   margin-inline-start: auto;
 }
 
-/* One custom checkbox everywhere (forms, the favorites picker, …) so a native browser
-   checkbox never sneaks in beside it. appearance:none lets us draw the box on the
-   input itself — no sibling element, so no markup changes — matching the
-   filter-sheet .opt__box exactly. The full-row sheet option (.opt) and the
-   selectable .tag chip hide this input and draw their own affordance, but share
-   this visual language. */
 input[type=checkbox] {
   appearance: none;
   -webkit-appearance: none;
@@ -225,7 +152,6 @@ input[type=checkbox] {
   vertical-align: -0.2em;
 }
 
-/* The tick: a masked Phosphor check, hidden (scaled to 0) until checked. */
 input[type=checkbox]::before {
   content: "";
   width: 0.8rem;
@@ -249,9 +175,8 @@ input[type=radio] {
   accent-color: var(--theme-accent-color);
 }
 
-/* Placeholder text. The UA default is a low-opacity tint of the text colour,
-   which washes out to poor contrast against our backgrounds; pin it to the muted
-   foreground token at full opacity so it stays clearly legible in both themes. */
+/* The UA default is a low-opacity tint of the text colour, so `opacity: 1` is
+   load-bearing: without it the muted token washes out below readable contrast. */
 ::placeholder {
   color: var(--theme-fg-muted);
   opacity: 1;
@@ -262,10 +187,6 @@ input[type=text] {
   color: inherit;
   border: none;
   font-size: inherit;
-  /* The field now sits alone on its row (chips moved to their own row below), so
-     it no longer needs to reserve half the combobox width against inline chips.
-     min-width: 0 lets it shrink within flex instead of forcing horizontal
-     overflow on narrow (mobile) viewports. */
   min-width: 0;
   padding: 0;
   text-overflow: ellipsis;
@@ -281,9 +202,6 @@ input[type=text] {
   }
 }
 
-/* Flat text toggle between sibling views of one page (the inbox's unread/read
-   tabs): the active option is bold accent, the others muted links. Its own class,
-   not .button — that means a real boxed button. */
 .view-switcher {
   gap: var(--gap-medium);
 
@@ -292,8 +210,6 @@ input[type=text] {
     padding: 0;
     background: none;
     color: var(--theme-fg-muted);
-    /* Persistent underline (not :hover-only) so the inactive option reads as a
-       tappable link on touch, where there is no hover. */
     text-decoration: underline;
   }
 
@@ -301,7 +217,6 @@ input[type=text] {
     color: var(--theme-accent-color);
     font-weight: bold;
     background: none;
-    /* The current view is state, not a link — drop the underline. */
     text-decoration: none;
   }
 }

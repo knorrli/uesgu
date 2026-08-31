@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Locks "save this show": the toggle endpoint, the saved-shows list (upcoming
-# only), and the per-event save button on the events list.
 class SavedEventsTest < ActionDispatch::IntegrationTest
   test "saved events require authentication" do
     get saved_events_path

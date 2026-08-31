@@ -1,8 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="day-summary" on a list date block. Keeps that
-// header's saved (♥) count in step with the save toggles inside the day, which
-// bubble up as save:toggled.
 export default class extends Controller {
   static targets = ["saved"]
 

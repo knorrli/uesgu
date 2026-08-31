@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# Locks GenreTreeSeed: it builds the genre tree from a parsed seed hash, applies
-# dispositions + aliases, is idempotent, and leaves out-of-seed genres untouched.
-# Synthetic taxonomy only (invented names), matching db/genres.yml's shape but
-# never its content.
 class GenreTreeSeedTest < ActiveSupport::TestCase
   SEED = {
     "genres" => [
@@ -31,7 +27,6 @@ class GenreTreeSeedTest < ActiveSupport::TestCase
     assert_equal find("Zorppunk").id, find("Zorpcrust").parent_id
     assert_equal find("Zorppunk").id, find("Zorphardcore").parent_id
     assert_equal find("Zorprock").id, find("Zorpgaze").parent_id
-    # The whole Zorprock subtree, reached by descendant expansion.
     names = Genre.where(id: find("Zorprock").descendant_ids).pluck(:name)
     assert_equal %w[Zorpcrust Zorpgaze Zorphardcore Zorppunk], names.sort
   end
@@ -58,7 +53,6 @@ class GenreTreeSeedTest < ActiveSupport::TestCase
   end
 
   test "leaves genres not named in the seed untouched (they stay unplaced)" do
-    # A real tagging so reconcile! (run by import) registers it and keeps it in_use.
     event_with_genres("Zorpstray")
 
     GenreTreeSeed.import(SEED)

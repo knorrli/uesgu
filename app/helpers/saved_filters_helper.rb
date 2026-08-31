@@ -3,7 +3,6 @@ module SavedFiltersHelper
     SavedFilter::CADENCES.map { |c| [t("saved_filters.cadences.#{c}"), c] }
   end
 
-  # Display Monday-first; values are Ruby wday (0=Sun..6=Sat) to match the column.
   def rule_weekday_options
     names = I18n.t("date.day_names")
     [1, 2, 3, 4, 5, 6, 0].map { |wday| [names[wday], wday] }
@@ -13,14 +12,10 @@ module SavedFiltersHelper
     (1..28).map { |day| [t("saved_filters.monthday_option", day: day), day] }
   end
 
-  # The notification time, split into two selects (see SavedFilter#time_hour). The
-  # minute list is only the quarter hours the scheduler can honour, so the time can
-  # never be set to a value that would silently snap.
   def rule_time_hour_options = (0..23).map { |h| format("%02d", h) }
 
   def rule_time_minute_options = %w[00 15 30 45]
 
-  # "Weekly on Friday at 17:30"
   def rule_schedule_summary(rule)
     day_names = I18n.t("date.day_names")
     cadence =
@@ -33,7 +28,6 @@ module SavedFiltersHelper
     t("saved_filters.summary.at_time", cadence: cadence, time: rule.time_string)
   end
 
-  # In-app is always present; push/email per rule.
   def rule_channels(rule)
     channels = [t("saved_filters.channels.in_app")]
     channels << t("saved_filters.channels.push") if rule.notify_push?

@@ -1,8 +1,5 @@
 require "test_helper"
 
-# Unit tests for the discovery diff logic (Scrapers::Discovery) — the pure
-# functions the discovery:report rake feeds fetched upstream data into. Network +
-# printing live in the rake; the resolution/clustering logic is tested here.
 class Scrapers::DiscoveryTest < Minitest::Test
   D = Scrapers::Discovery
 
@@ -13,7 +10,7 @@ class Scrapers::DiscoveryTest < Minitest::Test
   end
 
   def test_domain_is_nil_for_a_bare_slug_or_blank
-    assert_nil D.domain("dachstock") # a slug has no TLD — never false-resolves
+    assert_nil D.domain("dachstock")
     assert_nil D.domain("")
     assert_nil D.domain(nil)
   end
@@ -21,33 +18,31 @@ class Scrapers::DiscoveryTest < Minitest::Test
   def test_ole_unknown_domains_subtracts_ledger_and_ignores_hinto
     ledger = ledger_with("dachstock.ch", "birdseye.ch")
     sources = [
-      "https://api.dachstock.ch/wp-json/ds/v1/hinto",   # known -> dropped
-      "https://www.birdseye.ch/HintoEventlist.php",     # known -> dropped
-      "https://www.futurina.ch/app/x/action/oleexport", # new
-      "https://petrus.refbern.ch/app/refbern/x",        # new (church)
-      "https://nydegg.refbern.ch/app/refbern/x",        # same eTLD+1 -> deduped
-      "https://www.hinto.ch/de/app/hinto/action/oleexport/id/all" # aggregator -> ignored
+      "https://api.dachstock.ch/wp-json/ds/v1/hinto",
+      "https://www.birdseye.ch/HintoEventlist.php",
+      "https://www.futurina.ch/app/x/action/oleexport",
+      "https://petrus.refbern.ch/app/refbern/x",
+      "https://nydegg.refbern.ch/app/refbern/x",
+      "https://www.hinto.ch/de/app/hinto/action/oleexport/id/all"
     ]
     assert_equal %w[futurina.ch refbern.ch], D.ole_unknown_domains(sources, ledger)
   end
 
   def test_petzi_clusters_unknown_venues_and_drops_known_slugs
     urls = [
-      petzi("sedel", "new-york-ska-jazz-ensemble"),          # known -> dropped
-      petzi("chat-noir", "donne-ton-slam-au-chat"),          # unknown
-      petzi("chat-noir", "standimpro-show"),                 # unknown, same venue
-      petzi("chat-noir", "ema-catalyse-les-eleves"),         # unknown, same venue
-      petzi("caves-du-manoir", "maquina-moja")               # unknown, singleton
+      petzi("sedel", "new-york-ska-jazz-ensemble"),
+      petzi("chat-noir", "donne-ton-slam-au-chat"),
+      petzi("chat-noir", "standimpro-show"),
+      petzi("chat-noir", "ema-catalyse-les-eleves"),
+      petzi("caves-du-manoir", "maquina-moja")
     ]
     clusters = D.petzi_unknown_clusters(urls, Set["sedel"])
 
     chat = clusters.find { |c| c[:slug] == "chat-noir" }
     assert_equal 3, chat[:count]
-    # the multi-token singleton venue keeps (at least) its leading tokens
     caves = clusters.find { |c| c[:slug].start_with?("caves-du") }
     assert_equal 1, caves[:count]
     refute(clusters.any? { |c| c[:slug] == "sedel" }, "known venue is not reported")
-    # most-frequent first
     assert_equal "chat-noir", clusters.first[:slug]
   end
 
@@ -60,7 +55,6 @@ class Scrapers::DiscoveryTest < Minitest::Test
 
   def petzi(slug, title) = "https://www.petzi.ch/en/events/#{rand_id}-#{slug}-#{title}/"
 
-  # deterministic-enough id; value is irrelevant to slug extraction
   def rand_id = (@seq = (@seq || 60_000) + 1)
 
   def ledger_with(*domains)

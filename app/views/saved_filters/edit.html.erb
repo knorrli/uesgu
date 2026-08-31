@@ -1,10 +1,5 @@
 <% content_for :title, t('saved_filters.edit.title') %>
 
-<%# A plain edit page (no autosave / turbo frame): the form commits on Save and
-    redirects to the Saved filters list. The title is the derived filter
-    description, rendered server-side. %>
-<%# saved-filter-title live-updates the h1 from the picker as you edit (mirrors
-    SavedFilter#describe); the server re-derives the authoritative name on Save. %>
 <div class="saved-filters flex flex-col gap-large"
      data-controller="saved-filter-title"
      data-saved-filter-title-scope-all-value="<%= t('saved_filters.summary.scope_all') %>"
@@ -15,9 +10,6 @@
     <h1 data-saved-filter-title-target="title"><%= @rule.display_name %></h1>
   <% end %>
 
-  <%# Heads-up: another rule already covers this exact filter. Non-blocking —
-      editing is allowed to produce a duplicate (only the events-page ★ dedupes) —
-      so it's an info notice, not an error, with a link to that rule. %>
   <% if @duplicate_of %>
     <p class="saved-filter-notice">
       <%= t('saved_filters.duplicate_edit') %>

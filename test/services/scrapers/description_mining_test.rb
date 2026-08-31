@@ -1,11 +1,5 @@
 require "test_helper"
 
-# Locks the per-scraper event_genre_prose selectors for the five venues that
-# opt into ingest-time prose genre-mining (B1). It asserts each hook pulls the
-# right blurb out of the committed fixture by checking for the venue's OWN words —
-# not taxonomy content — so it's churn-proof and stays DB-free (the matching of
-# those words against the genre vocabulary is covered by GenreQueryTest, and the
-# build_event composition by GenreMintingTest).
 class Scrapers::DescriptionMiningTest < Minitest::Test
   FIXTURE_ROOT = File.expand_path("../../fixtures/scrapers", __dir__)
 
@@ -21,8 +15,8 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     row = html("kairo").at_css('article[id^="kultur_"]')
     text = Scrapers::Kairo.new.event_genre_prose(row)
 
-    assert_includes text, "Musikförderung"      # blurb prose is captured...
-    refute_includes text, "Meet the Pros"        # ...but the h2 title is not
+    assert_includes text, "Musikförderung"      #
+    refute_includes text, "Meet the Pros"
   end
 
   def test_helsinki_mines_the_description_block
@@ -51,19 +45,16 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     row = JSON.parse(fixture("rote_fabrik", "list.html")).values.first
     text = Scrapers::RoteFabrik.new.event_genre_prose(row)
 
-    assert_includes text, "experimental music" # the prose survives...
-    refute_includes text, "<p"                  # ...with its HTML markup stripped
+    assert_includes text, "experimental music"
+    refute_includes text, "<p"
   end
 
-  # The musicradar "Stil:" line is venue prose (commas don't make it a token list),
-  # so it's mined match-only rather than minted — and the walk must stop at the next
-  # <strong>, never bleeding the "Aktuell:" section into the genre text.
   def test_bierhuebeli_mines_the_musicradar_stil_line_only
     row  = JSON.parse(fixture("bierhuebeli", "list.html"))
              .find { |r| r["link"].to_s.include?("best-of-2000er-party-september") }
     text = Scrapers::Bierhuebeli.new.event_genre_prose(row)
 
-    assert_includes text, "Heartbeat-Faktor" # the Stil prose is captured...
-    refute_includes text, "kollektiver"       # ...but the next section (Aktuell:) is not
+    assert_includes text, "Heartbeat-Faktor"
+    refute_includes text, "kollektiver"
   end
 end

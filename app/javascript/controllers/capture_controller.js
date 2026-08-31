@@ -8,12 +8,6 @@ import { CaptureQueueStrip } from "lib/capture/queue_strip"
 import { PlaceCarry } from "lib/capture/place_carry"
 import { PlaceFields } from "lib/capture/place_fields"
 
-// The extraction fan-out lives here rather than on the server: one request per input,
-// because a batch cannot be held open in one and there is no queue to reach for (see
-// EventCapture::Extractor). It also drives the review queue — one card on screen, the
-// rest behind it in the strip.
-//
-// Connects to data-controller="capture".
 export default class extends Controller {
   static targets = ["files", "text", "zone", "read", "paste", "pasteError", "input",
                     "restart", "byHand", "rows", "strip", "card", "source", "stagingTitle",
@@ -26,10 +20,7 @@ export default class extends Controller {
     undecodable: String,
     sourceAlt: String,
     pasted: String,
-    // 1568px is where the provider's accuracy was measured.
     maxEdge: { type: Number, default: 1568 },
-    // Puma runs three threads, so eight parallel uploads would queue behind each other
-    // anyway while holding every byte of the request in memory at the same time.
     concurrency: { type: Number, default: 3 },
     localities: Object,
     places: Object,
@@ -48,9 +39,6 @@ export default class extends Controller {
     this.currentId = null
   }
 
-  // Rendered first and taken away here rather than the reverse: the styleguide renders
-  // the partial with no controller in reach, so a button that shipped hidden would
-  // leave the specimen demonstrating nothing.
   connect() {
     if (!navigator.clipboard?.read) this.pasteTarget.hidden = true
   }
@@ -61,7 +49,6 @@ export default class extends Controller {
 
   readFiles() {
     this.readImages(Array.from(this.filesTarget.files))
-    // Cleared so that re-picking the same file still fires `change`.
     this.filesTarget.value = ""
   }
 
@@ -70,8 +57,6 @@ export default class extends Controller {
     this.zoneTarget.classList.add("is-over")
   }
 
-  // dragleave also fires when the pointer crosses onto a CHILD of the zone, so the
-  // highlight flickers unless the element being entered is checked.
   dragLeave(event) {
     if (!this.zoneTarget.contains(event.relatedTarget)) this.zoneTarget.classList.remove("is-over")
   }
@@ -108,10 +93,6 @@ export default class extends Controller {
     this.readImages(images)
   }
 
-  // Ctrl/Cmd+V anywhere on the picker, which is the desktop door — there is no such
-  // gesture on a phone, where the button is the only one. A field that can hold what
-  // was copied keeps its own paste: an image rides along with the text on a clipboard
-  // filled from a rich document, and there the text is what was meant.
   pasted(event) {
     if (this.inputTarget.hidden) return
     if (event.target.closest("input, textarea, [contenteditable]") && event.clipboardData.getData("text")) return
@@ -123,8 +104,6 @@ export default class extends Controller {
     this.readImages(images)
   }
 
-  // Named after the gesture: a clipboard image has no filename, and the tile's
-  // thumbnail is what tells two pasted posters apart.
   async clipboardImages(items) {
     const images = []
     for (const item of items) {
@@ -134,14 +113,6 @@ export default class extends Controller {
     return images
   }
 
-  // Every row is stood up before the first read starts, so the strip states the whole
-  // count from the moment the picker closes rather than growing as slots free up. A file
-  // no browser can decode (a HEIC out of Finder, anything corrupt) fails its own row
-  // here, while the filename is still what identifies it.
-  //
-  // The blob the request carries is the same one the card's source pane paints from:
-  // nothing is re-derived, and nothing but that EXIF-stripped copy ever leaves the
-  // device (see lib/downscale.js).
   async readImages(files) {
     if (files.length === 0) return
 
@@ -164,8 +135,6 @@ export default class extends Controller {
     runPool(reads, this.concurrencyValue)
   }
 
-  // Picking files closes a dialog and dropping them ends a drag; typing ends in nothing,
-  // which is the whole reason this one has a button of its own.
   readText() {
     const text = this.pendingText
     if (text === "") return
@@ -179,8 +148,6 @@ export default class extends Controller {
     this.extract({ text }, label, id)
   }
 
-  // Sending IS leaving the picker, there being nothing to assemble on it first. Someone
-  // who wants more decides these and comes back — which is what finish() hands them.
   leavePicker() {
     this.pasteErrorTarget.hidden = true
     this.inputTarget.hidden = true
@@ -188,8 +155,6 @@ export default class extends Controller {
     this.byHandTarget.hidden = true
   }
 
-  // Destructive on purpose: there is no way back to a queue of half-decided cards, so
-  // the honest offer is a clean second batch rather than a partial restore.
   startOver() {
     this.sources.clear()
     this.carry.clear()
@@ -214,8 +179,6 @@ export default class extends Controller {
     return this.textTarget.value.trim()
   }
 
-  // The first card to land opens, so picking a single poster shows it rather than a
-  // queue of one.
   cardTargetConnected(card) {
     this.announceFound()
     this.strip.place(card)
@@ -225,20 +188,15 @@ export default class extends Controller {
     if (!this.currentId) this.open(card.id)
   }
 
-  // Held back until a card exists rather than swapped at commit time, so the heading
-  // never states a count of zero while the reads are still in flight.
   announceFound() {
     const count = this.cardTargets.length
     const title = count === 1 ? this.foundOneValue : this.foundOtherValue
     this.reviewTitleTarget.textContent = title.replace("%{count}", count)
     this.stagingTitleTarget.hidden = true
     this.reviewTitleTarget.hidden = false
-    // A queue of one is already open: there is nowhere to tap to.
     this.reviewHintTarget.hidden = count < 2
   }
 
-  // A new row at the END of the queue, never a replacement: the read being disputed
-  // stays on screen to compare against, and the strip's denominator grows.
   async reread(event) {
     const card = event.target.closest(".capture-card")
     const rowId = card.closest(".capture-row")?.id
@@ -288,23 +246,13 @@ export default class extends Controller {
       this.stockGenres(card, current)
     })
     this.strip.highlight(id)
-    // After the loop, not inside it: hiding the cards below shortens the document, and a
-    // scroll set against the taller one is clamped back to somewhere short of the card.
     this.reveal(this.cardTargets.find((card) => card.id === id))
   }
 
-  // Cards share one slot on a page that scrolls as a whole, so a card opening after a
-  // decision inherits the scroll position the last one was left at — the bottom of a
-  // form, with this card's title and the shows it may duplicate above the top of the
-  // screen. Clearance for the sticky strip comes from the card's own scroll-margin.
   reveal(card) {
     card?.scrollIntoView()
   }
 
-  // The genre vocabulary lives once in the page and is lent to whichever card is open.
-  // Only one card is ever on screen, so one copy is all the live DOM needs — and the
-  // combobox reads its options off the listbox as it filters rather than caching them
-  // when it connects, which is what makes lending them work at all.
   stockGenres(card, wanted) {
     const listbox = card.querySelector(".hw-combobox__listbox")
     if (!listbox || !this.hasGenreOptionsTarget) return
@@ -315,8 +263,6 @@ export default class extends Controller {
     this.markPickedGenres(card, listbox)
   }
 
-  // A genre already on the card is spent: the combobox hides an option it holds in the
-  // field, and a fresh clone knows nothing of what this card has picked.
   markPickedGenres(card, listbox) {
     const field = card.querySelector("[data-hw-combobox-target='hiddenField']")
     field?.value.split(",").map((name) => name.trim()).filter(Boolean).forEach((name) => {
@@ -328,9 +274,6 @@ export default class extends Controller {
     })
   }
 
-  // turbo:submit-end fires for a refusal too, and that response is the stream putting
-  // the reason on a card the contributor is still looking at — so only a landed
-  // publish decides one.
   decided(event) {
     if (!event.detail.success) return
 
@@ -343,10 +286,6 @@ export default class extends Controller {
     this.settle(card, "dropped")
   }
 
-  // A drop is the only decision that never reaches the server, and it is the one the
-  // field record most wants (see ExtractionFieldOutcome). Sent from the card's own
-  // form, so it carries the proposals and the CSRF token, and deliberately not
-  // awaited: the card is already gone, and a failed metric may not undo that.
   recordDrop(card) {
     const form = card?.querySelector("form")
     if (!form || !this.hasDropUrlValue) return
@@ -354,9 +293,6 @@ export default class extends Controller {
     fetch(this.dropUrlValue, { method: "POST", body: new FormData(form) }).catch(() => {})
   }
 
-  // Only publishing freezes a card: the event is live and the form behind it would
-  // publish a second one. Rejecting is the reversible half, so a dropped card can be
-  // reopened from its tile.
   settle(card, state) {
     card.dataset.state = state
     this.strip.mark(card, state)
@@ -366,8 +302,6 @@ export default class extends Controller {
     this.advance()
   }
 
-  // Wraps, so a card left behind by a jump backwards is picked up rather than
-  // stranded.
   advance() {
     const cards = this.cardTargets
     const from = cards.findIndex((card) => card.id === this.currentId)
@@ -378,10 +312,6 @@ export default class extends Controller {
     this.finish()
   }
 
-  // A queue with nothing left to decide is a screen with nothing to do on it, so the
-  // batch ends where it began. That throws the tiles away with it, and they are what
-  // said which events went live — hence the count in the flash, the only receipt to
-  // outlive the reset.
   finish() {
     const published = this.cardTargets.filter((card) => card.dataset.state === "published").length
     this.flash(this.doneMessage(published).replace("%{count}", published))
@@ -394,9 +324,6 @@ export default class extends Controller {
     return count === 1 ? this.doneValue.one : this.doneValue.other
   }
 
-  // Dropped once it has faded rather than left hidden in the region: this screen never
-  // navigates, so nothing else would ever clear it and a second batch would announce
-  // itself under the first one's ghost. The fade is .flash in application.css.
   flash(message) {
     const note = document.createElement("p")
     note.className = "flash notice"
@@ -405,8 +332,6 @@ export default class extends Controller {
     document.querySelector(".flashes")?.append(note)
   }
 
-  // Full-bleed for the reason in review_card.css: the small print is what a poster is
-  // being looked at for.
   zoom(event) {
     const pane = event.currentTarget
     if (pane.querySelector("img")) pane.classList.toggle("review-card__source--zoomed")
@@ -462,10 +387,6 @@ export default class extends Controller {
         body,
         headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
       })
-      // renderStreamMessage is a silent no-op on any body without a <turbo-stream>, so
-      // an unchecked status leaves the row spinning forever on a 500, on a 403 after the
-      // capability is revoked mid-session, and on an expired session (fetch follows the
-      // redirect and hands back the login page).
       if (!response.ok) return this.failRow(id)
 
       const stream = await response.text()
@@ -496,10 +417,6 @@ export default class extends Controller {
     this.strip.markFailed(this.rowId(id))
   }
 
-  // Named, unlike the row it replaces: while a read is in flight the filename is one
-  // more thing to read and nothing to act on, but a row that failed is the only place
-  // its input is still identified. Same two parts as a failure the server rendered
-  // (see captures/_extraction).
   failRow(id, message = this.errorValue) {
     const row = document.getElementById(this.rowId(id))
     if (row) row.replaceChildren(this.rowLabel(row.dataset.label), this.rowFailure(message))
@@ -526,9 +443,6 @@ export default class extends Controller {
   // exist yet at the point the request settles.
   sourceTargetConnected(slot) {
     const source = this.sources.get(slot.closest(".capture-row")?.id)
-    // Emptied first because a Turbo-cached snapshot restores an <img> whose object
-    // URL this controller revoked on the way out — left alone it paints a broken
-    // image, which is worse than the empty slot the restored card has earned.
     slot.replaceChildren()
     if (!source) return
 
@@ -547,9 +461,6 @@ export default class extends Controller {
     return `capture-row-${id}`
   }
 
-  // Says one thing: a contributor picked these files seconds ago and there is nothing
-  // to do about the one in flight, so the filename is carried by the tile's label and
-  // by whatever replaces this row, not by a second quiet line here.
   appendPending(id, label) {
     const row = document.createElement("div")
     row.id = this.rowId(id)

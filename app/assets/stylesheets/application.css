@@ -1,17 +1,9 @@
-/*
- * Foundation / layout. Mobile-first: styles apply to small screens by default,
- * with min-width media queries layering on larger-screen adjustments.
- * Brand tokens live in variables.css / theme.css.
- */
-
 body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-/* The single page container. Full width with padding on mobile, a centered
- * max-width column on larger screens. Replaces the old fixed 30vw margins. */
 .content {
   width: 100%;
   max-width: var(--content-max-width);
@@ -23,12 +15,6 @@ main.content {
   flex: 1 0 auto;
 }
 
-/* The cookie notice is fixed to the bottom; without clearance the last row on a
-   tall page scrolls under it. The footer is now the bottom-most element, so the
-   clearance lives there (its links would otherwise hide behind the notice).
-   Reserve it ONLY while the notice is visible — the controller drops the `hidden`
-   attr to show it and removes the element entirely on dismiss / for returning
-   visitors, so the space is reclaimed the moment it's gone. */
 body:has(.cookie-notice:not([hidden])) .site-footer {
   padding-bottom: calc(var(--gap-large) + 3.5rem + var(--safe-bottom));
 }
@@ -47,25 +33,15 @@ a {
   font-size: var(--font-size-small);
 }
 
-/* The account-delete / user-delete / revoke buttons are full-width danger
-   buttons. `.button` is the real boxed button (controls.css) and `.delete` is its
-   danger variant (hollow warn → fills); this only adds the full-width sizing. */
 .button.delete {
   width: 100%;
 }
 
-/* In Settings, delete-account is auto-width and left-aligned like the other
-   standalone actions (install, push, logout) — only the account form's Save is
-   full-width. A destructive action that isn't a giant button also suits the
-   anti-dark-pattern stance: clearly available, not over-emphasised. (Admin
-   delete/revoke keep the full-width treatment above.) */
 .settings-section .button.delete {
   width: auto;
 }
 
-/* Account / auth form fields: underline inputs, matching the events filter bar.
- * Scoped so the events filter comboboxes keep their own treatment.
- * line-height is pinned because Firefox ignores it on a single-line <input> and uses
+/* line-height is pinned because Firefox ignores it on a single-line <input> and uses
  * the font's natural box regardless: `normal` is the only value an <input> and a
  * <select> render at the same height. */
 .account-form input[type="text"],
@@ -85,29 +61,14 @@ a {
   max-width: 100%;
 }
 
-/* Sideways resizing would break the form column. */
 .account-form textarea {
   resize: vertical;
 }
 
-/* The native time/date pickers ship as bordered, opaque-white boxes that ignored
-   the underline treatment entirely (a stark white rectangle beside the underline
-   inputs — see the admin event editor's Datum next to its Zeit). Strip the box to
-   match, and let the picker glyph follow the theme. */
 .account-form input[type="time"],
 .account-form input[type="date"] {
   background: none;
   color-scheme: light dark;
-  /* A date/time control takes its height from the value box the engine lays out in
-     its shadow DOM, which comes out taller than the line box a text input gets from
-     the same font — so a date and a text field sharing a row (Datum beside Zeit)
-     draw their underlines at different heights. Pin the box to what the text field
-     measures: one line, plus this skin's own padding and underline.
-
-     iOS Safari sizes the control from its own metrics and renders it ~11px taller
-     than the pin regardless; dropping the native appearance is what makes it obey
-     the height. Chrome, desktop WebKit and Firefox size it identically either way
-     and keep their picker glyph, so this costs them nothing. */
   appearance: none;
   -webkit-appearance: none;
   height: calc(1lh + 2 * var(--gap-small) + var(--border-width));
@@ -125,10 +86,6 @@ a {
   height: 1lh;
 }
 
-/* A time field's clear button (shared/_time_field), overlaid at the right end of the
-   control: the value is laid out at the left by the rule above, so nothing sits under
-   it. Overlaid rather than a sibling because the field shares its row with the date
-   and the pair spans that row — a button beside it would stop the underline short. */
 .time-field {
   position: relative;
   display: flex;
@@ -157,12 +114,6 @@ a {
   line-height: 1;
 }
 
-/* Neutral at rest, accent underline on focus — green now signals "this field is
-   active", rather than decorating every passive field. The outline is suppressed
-   in favour of the underline (the field's own focus affordance). Scoped to the
-   same text-like inputs as the styling above: a checkbox/radio is an <input>
-   too, and the bare `input:focus` form gave a focused checkbox a green
-   bottom-border (visible in Firefox) while killing its real focus ring. */
 .account-form input[type="text"]:focus,
 .account-form input[type="email"]:focus,
 .account-form input[type="password"]:focus,
@@ -173,24 +124,17 @@ a {
   border-bottom-color: var(--theme-accent-color);
 }
 
-/* Make the select read unmistakably as a dropdown: strip the native chrome and
-   add a prominent accent chevron (the tiny native arrow was easy to miss). */
 .account-form select {
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
   padding-right: 1.8em;
-  /* Neutral mid-grey chevron (was a hard-coded accent green that ignored the
-     theme and stayed green in dark mode). Mid-grey reads on both grounds; the
-     caret is field chrome, so it's neutral like the underline. */
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='14'%20height='9'%20viewBox='0%200%2014%209'%3E%3Cpath%20d='M1%201l6%206%206-6'%20fill='none'%20stroke='%23808080'%20stroke-width='2'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.2em center;
   background-size: 0.85em;
 }
 
-/* When the empty prompt option is showing, grey it to match input placeholders;
-   real options stay full-contrast. */
 .account-form select:has(option[value=""]:checked) {
   color: var(--theme-fg-muted);
 }
@@ -199,27 +143,17 @@ a {
   color: var(--theme-fg-color);
 }
 
-/* Settings page: stacked sections (account / notifications / delete), separated
-   by a hairline rather than cards — the design uses square corners. */
 .settings-section {
   display: flex;
   flex-direction: column;
   gap: var(--gap-medium);
 }
 
-/* RULE: a section hairline marks a boundary between INDEPENDENT sections —
-   distinct concerns with their own forms/actions (here: the account form, the
-   per-device notification controls, account deletion). It is NOT used between
-   sub-parts of a single form: e.g. the Interessen page's Stile/Orte share one
-   form + one Save, so they're separated by whitespace + headings only, never a
-   divider (which would falsely imply they're independent). */
 .settings-section + .settings-section {
   padding-top: var(--gap-large);
   border-top: var(--border-width) solid var(--theme-bg-muted);
 }
 
-/* A labelled group within a section (password, email). Strip the native
-   fieldset chrome; the legend carries the label. */
 .settings-field {
   border: 0;
   margin: 0;
@@ -227,23 +161,12 @@ a {
   min-width: 0;
 }
 
-/* Form field label: bold at base size — ONE consistent style for every field
-   label in a section, whether it's a <span> over a value/select or a fieldset
-   <legend>. Bold keeps the label distinct from the normal-weight value/input
-   below it (and from the muted+small hint); the section's h2 is larger, so it
-   stays the heading. Documented in the styleguide Inputs section. */
 .account-form .field-label,
 .settings-field legend {
   font-weight: bold;
   padding: 0;
 }
 
-/* One form field — or a pair of fields settled from one source — with what hangs off
-   it underneath (shared/_field_group): the text a value was read off, chips that fill
-   it, a hint. The group exists so those lines can sit tighter than the gap the form
-   leaves between one group and the next; that difference is the whole tie, since a
-   rule, a tint or an indent would fight the borderless field skin. Specimen in
-   /styleguide. */
 .field-group {
   display: flex;
   flex-direction: column;
@@ -262,9 +185,6 @@ a {
   gap: var(--gap-small);
 }
 
-/* Copyable field (shared/_copy_field): a full-width read-only URL input with a
-   button row below it (long URLs would crowd a side-by-side button off the
-   edge). The row holds Copy plus any caller-supplied actions as one group. */
 .copy-field {
   display: flex;
   flex-direction: column;
@@ -286,8 +206,6 @@ a {
   white-space: nowrap;
 }
 
-/* Flash messages: a fixed toast at the bottom so they never push content down;
-   auto-dismiss after a few seconds. */
 .flashes {
   position: fixed;
   left: 50%;

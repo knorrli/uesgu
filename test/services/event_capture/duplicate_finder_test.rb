@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# What the capture card offers a contributor as "is it one of these?". A proposal, so
-# the net is wider than the sweep's — it reaches across venues within a town — and the
-# question is which rows are worth putting in front of someone, not which may be
-# folded unattended. Synthetic venue and town names throughout.
 class EventCapture::DuplicateFinderTest < ActiveSupport::TestCase
   DATE = Date.current + 20
 
@@ -33,9 +29,6 @@ class EventCapture::DuplicateFinderTest < ActiveSupport::TestCase
     assert_empty find
   end
 
-  # The case the nightly sweep structurally cannot reach: a show captured for a venue
-  # the registry does not cover has no venue name to meet the other copy on, so the
-  # town is the only thing the two share.
   test "matches on the town alone when the venues differ" do
     listed(title: "Malevolence", venue: "Andere Zorphalle")
 
@@ -54,14 +47,12 @@ class EventCapture::DuplicateFinderTest < ActiveSupport::TestCase
     assert_empty find
   end
 
-  # An admin threw these away; offering to enrich one would walk that back.
   test "a dismissed event is not offered" do
     listed(title: "Malevolence").dismiss!
 
     assert_empty find
   end
 
-  # Merging onto a duplicate would build a chain no listing follows.
   test "an event already folded onto a canonical is not offered" do
     canonical = listed(title: "Malevolence")
     listed(title: "Malevolence").update!(canonical_event_id: canonical.id)
@@ -69,8 +60,6 @@ class EventCapture::DuplicateFinderTest < ActiveSupport::TestCase
     assert_equal [canonical.id], find.map(&:id)
   end
 
-  # The music gate hid it for carrying only non-music genres — which is exactly what a
-  # captured genre can legitimately lift, and it is the same show either way.
   test "a hidden event is still offered" do
     listed(title: "Malevolence", hidden: true)
 

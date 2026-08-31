@@ -1,35 +1,19 @@
 Rails.application.routes.draw do
-  # Canonical host. üsgu.ch (punycode xn--sgu-goa.ch) is the public web domain.
-  # Render also terminates TLS for uesgu.ch (the code/email domain) and the www
-  # variants, so 301 every one of those to the umlaut domain, preserving path +
-  # query. www.üsgu.ch is included here too so Rails is the single source of
-  # truth for canonicalization rather than relying on Render's www handling.
   redirecting_hosts = ["www.#{AppHost::PUBLIC}", AppHost::CODE, "www.#{AppHost::CODE}"]
   constraints(host: /\A(?:#{redirecting_hosts.map { |h| Regexp.escape(h) }.join('|')})\z/i) do
     match "(*path)", via: :all,
       to: redirect(status: 301) { |_params, request| "https://#{AppHost::PUBLIC}#{request.fullpath}" }
   end
 
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/* (manifest is linked in the
-  # layout head; the service worker is registered in application.js).
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
   root "events#index"
 
-  # Public "add üsgu to your phone" page — no account required (installing is the
-  # most important first step for users). Linked from the header.
   get "install", to: "install#show", as: :install
 
-  # Footer pages — public, no account: "what is this / why" and the privacy
-  # notice. Linked from shared/_footer.
   get "about", to: "pages#about", as: :about
   get "privacy", to: "pages#privacy", as: :privacy
 
@@ -38,80 +22,41 @@ Rails.application.routes.draw do
   get "signup", to: "registrations#new"
   resource :settings, only: %i[show update]
   resources :notifications, only: %i[index show] do
-    # Clear the whole unread slice at once — the inbox's bulk escape hatch, so a
-    # pile of digests needn't be opened one by one to stop reading as new.
     post :mark_all_read, on: :collection
   end
 
-  # "Save this show": the saved-shows list + an inline per-event save toggle.
   resources :saved_events, only: %i[index] do
     post :toggle, on: :collection
-    # The day-of reminder for saved shows is a property of the saved-shows feature,
-    # so its opt-in lives on this page (not Settings); a small background toggle.
     patch :reminders, on: :collection
   end
 
-  # Subscribable ICS feed of the user's saved shows. The public feed is keyed by
-  # an unguessable token (no session); create/destroy mint and revoke it.
   resource :calendar_feed, only: %i[create destroy]
-  # format: true keeps the ".ics" extension in the URL (some calendar clients
-  # insist on it); the token segment has no dots, so it never swallows it.
   get "calendar/:token", to: "calendar_feeds#show", as: :public_calendar_feed,
       constraints: { format: "ics" }, format: true
 
-  # The capture funnel: a contributor turns a poster photo or pasted text into
-  # events we don't scrape. `show` reads inputs and verifies what came back, `manual`
-  # takes one typed in by hand; `extract` runs ONE input and streams its candidates
-  # back, fired once per input by the client — 8 x 2.3s does not fit in one request
-  # and there is no queue to reach for. `create` publishes what a human accepted.
-  # `drop` records what a discarded candidate had proposed — nothing else does,
-  # since a drop otherwise never reaches the server.
   resource :capture, only: %i[show create] do
     post :extract
     post :drop
-    # A contributor with no poster fills the same fields in on a plain page of its
-    # own. No model call and no ExtractionAttempt; it publishes through `create`,
-    # which answers it in HTML where a card is answered in a turbo-stream.
     get :manual
-    # `genre_chips` renders the combobox's current selection. It speaks NAMES — the
-    # taxonomy endpoints elsewhere answer with ids and only know genres already tagged
-    # on an event, and a capture routinely proposes a name nothing carries yet.
     post :genre_chips
   end
 
-  # Saved filters (a saved landing-page filter, with notification delivery
-  # optional — see SavedFilter). new/create save the current events filter;
-  # edit/update tune it; fire runs it on demand ("Fire now" — test without waiting
-  # for the schedule). There's no pause toggle: a filter delivers iff its in-app
-  # channel is on, edited on the form like any other channel.
   resources :saved_filters, only: %i[index new create edit update destroy] do
     member do
       post :fire
     end
   end
 
-  # Web Push opt-in/out for the current device. Keyed by endpoint (in the body),
-  # not an id, so a singular-style pair of bare routes fits better than a
-  # resource collection.
   post "push_subscriptions" => "push_subscriptions#create"
   delete "push_subscriptions" => "push_subscriptions#destroy"
-  # Send a test push to the current device, so a user can verify it arrives.
   post "push_subscriptions/test" => "push_subscriptions#test"
 
-  # Living styleguide: a single admin-only page that renders every shared UI
-  # element with the real bundled CSS, so it stays in sync as the styles change
-  # (rather than rotting like a static design doc).
   get "styleguide" => "styleguide#index", as: :styleguide
 
   resources :events, only: [:index, :destroy]
   resources :tags, only: [:index, :edit] do
     collection do
       post :chips
-      # The option tree behind a filter sheet ("what" = genres, "where" = places),
-      # fetched by that sheet's turbo-frame the first time it is opened rather than
-      # rendered inline: the two trees are ~360 checkbox rows, about half the feed's
-      # compressed weight. The field is a closed set — anything else 404s here rather
-      # than reaching the controller.
       get "filter_options/:field", action: :filter_options, as: :filter_options,
           constraints: { field: /what|where/ }
     end
@@ -120,11 +65,6 @@ Rails.application.routes.draw do
   scope :admin do
     get "", to: "admin#index", as: :admin
 
-    # Genre curation. index/edit browse + open the per-genre editor; queue is the
-    # "tinder" flow serving the next genre not yet filed into the tree; set_parent
-    # files a genre under a parent (the tree's curation action); ignore/hide/block
-    # set a disposition, restore clears it; merge folds the genre into a canonical
-    # one (a semantic alias).
     resources :genres, only: %i[index edit] do
       member do
         post :set_parent
@@ -136,25 +76,17 @@ Rails.application.routes.draw do
       end
       collection do
         get :queue
-        # Read-only hierarchy view of the curated genre tree.
         get :tree
-        # Selection chips for the per-event genre-override combobox (admin only).
         post :chips
       end
     end
   end
 
-  # Account moderation + the invite-only gate. Namespaced (Admin::) so these
-  # get their own admin_users_/admin_invitations_ helpers, distinct from the
-  # legacy scoped dashboard/genre routes above.
   namespace :admin do
     resources :users, only: %i[index show destroy] do
       member { patch :toggle_contributor }
     end
     resources :invitations, only: %i[index create destroy]
-    # Scraper run oversight: nightly sweep health + per-venue outcomes. create
-    # triggers a full sweep on demand (runs in a background thread). snooze/wake
-    # mute a single flaky scraper for a while (self-expiring — see ScraperSnooze).
     resources :scrape_runs, only: %i[index show create] do
       collection do
         post :snooze
@@ -162,39 +94,23 @@ Rails.application.routes.draw do
       end
     end
 
-    # Discovery inbox: venues an aggregator surfaced that aren't approved in the
-    # registry (VenueLead), ranked by upcoming-event demand. Read-only — approving
-    # one is a config/venues.yml edit (a PR).
     resources :venue_leads, only: %i[index]
 
-    # Capture oversight: one row per model call (ExtractionAttempt) — provider
-    # failures, and the values the Normalizer refused. Read-only.
     resources :extraction_attempts, only: %i[index]
 
-    # Catalogue browsers reached from the dashboard stats: events (the scraped
-    # table) and locations (derived from the location tags). Each mirrors the
-    # genres index idiom — filter / sort / search / paginate. (Genres keep their
-    # own legacy scoped route above, with edit/queue actions these two don't
-    # need.) Events additionally get
-    # show/update for per-event manual correction; revert releases one locked
-    # field back to the scraper; destroy dismisses (soft-deletes) it and undismiss
-    # restores it.
     resources :events, only: %i[index show update destroy] do
       collection do
-        get :search       # title autocomplete source for the merge (dedup) picker
+        get :search
       end
       member do
         patch :revert
         patch :undismiss
-        patch :merge      # pin this event as a duplicate of another (canonical_id)
-        patch :unmerge    # pin this event as standalone (split a wrong auto-merge)
+        patch :merge
+        patch :unmerge
       end
     end
     resources :locations, only: %i[index]
 
-    # Locality curation: the rows behind the locality half of the locations browser.
-    # merge folds one spelling into another (repointing its taggings and places, see
-    # Locality#merge_into!); unmerge splits the link back out.
     resources :localities, only: %i[index edit] do
       member do
         post :merge
@@ -202,9 +118,6 @@ Rails.application.routes.draw do
       end
     end
 
-    # The same pair for the captured venues behind the venue half of that browser
-    # (see Place#merge_into!). A registry venue has no row here and is not mergeable:
-    # its spelling is a config/venues.yml edit.
     resources :places, only: %i[index edit] do
       member do
         post :merge
@@ -212,12 +125,8 @@ Rails.application.routes.draw do
       end
     end
 
-    # Per-scraper data-coverage matrix (fill-rates computed live from events).
     get "scraper_coverage", to: "scraper_coverage#index", as: :scraper_coverage
 
-    # Admin-authored rules that auto-discard junk scraped events by text match.
-    # preview is a live, save-less lookup of the events a (possibly unsaved) rule
-    # would target, for spotting false positives before committing.
     resources :discard_rules, except: %i[show] do
       collection { get :preview }
     end

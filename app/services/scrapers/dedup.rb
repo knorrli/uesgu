@@ -1,41 +1,4 @@
 module Scrapers
-  # Non-destructive event dedup, run once at the end of a sweep (after every
-  # scraper). Several sources can list the same show — a venue's OLE feed, PETZI
-  # (the shared ticketing backend), and/or a bespoke HTML scraper. Where they
-  # overlap (same venue + date + fuzzy title) the less-authoritative copies are
-  # pointed at a single canonical (canonical_event_id) and their genres are
-  # unioned onto it. Duplicates are never deleted — bookmarks stay intact — just
-  # hidden by Event.visible.
-  #
-  # ONE source can also list one show twice — a venue double-posting on an
-  # aggregator (Köniz posted the same Salsa night twice on Bewegungsmelder,
-  # distinct post ids → distinct upsert keys), or a scraper's URL scheme change
-  # stranding the old-keyed copy next to the freshly-keyed one. Those fold too,
-  # but only on the IDENTICAL start time: two same-titled events at different
-  # times on one day are genuinely distinct happenings (ONO lists a 15:00 workshop
-  # and a 20:00 concert under one title), while cross-source
-  # copies keep date-level matching because different sources routinely disagree
-  # on doors-vs-show time for the same gig.
-  #
-  # Source authority (most authoritative wins the canonical, see #source_rank).
-  # We rank by which copy links most DIRECTLY to the venue's own event page:
-  #   OLE  — venue-published, structured, links to the venue's OWN page; the
-  #          source we're consolidating on, so it wins where present.
-  #   bespoke HTML scrapers — also link to the venue's own event page, so they
-  #          beat PETZI; fragile, but a successfully-parsed event is venue-direct.
-  #   PETZI — shared ticketing aggregator; links to its own ticket page unless the
-  #          venue exposes an official-website link.
-  #   capture — a contributor's read of a poster (EventCapture::Creator), the copy
-  #          of LAST resort: it carries no url at all, and it is a one-off human
-  #          read rather than something re-derived from the venue each night.
-  # So an OLE show absorbs the matching bespoke / PETZI / captured copies, each
-  # staying the lone visible listing. Whoever wins, the canonical then takes the
-  # duplicates' genres and whatever it is itself missing (see CanonicalEnrichment).
-  #
-  # Idempotent: each run re-derives every link from scratch, so a show a source
-  # drops (or whose title drifts) re-surfaces. The enrichment self-heals for the
-  # same reason — each scraper resets its own event from source each sweep, before
-  # this re-derives what the duplicates add on top.
   class Dedup
     def self.run = new.run
 
@@ -45,68 +8,34 @@ module Scrapers
 
     private
 
-    # Every venue we consume and every PETZI member — all from the registry, no
-    # list to maintain — plus the captured places, which is where a captured event
-    # lands when the registry does not cover its venue (Place is the registry's
-    # complement). Without those, the copies most in need of folding are the ones
-    # never looked at. (The venue list was once only where a SECOND source could
-    # land an event, but same-source double-posts happen at any venue — the Köniz
-    # case — so every venue gets the pass; one small query per venue, nightly.) A
-    # registry row that never becomes a location tag (an aggregator's own row,
-    # e.g. Bewegungsmelder) simply matches no events and is a no-op.
-    #
-    # Canonical places only: Location.resolve_venue folds an alias to its canonical
-    # before tagging, so an alias name is on no event.
-    #
-    # A capture with no venue at all (a show in a park) is reachable by no name here
-    # and is deliberately left alone: locality is far too wide a net for a fuzzy
-    # title match to auto-merge on.
     def dedup_venues
       (Petzi.venues.values.map(&:first) + Venue.consuming.map(&:name) +
         Place.canonicals.pluck(:name)).uniq
     end
 
-    # All future, non-dismissed events for this venue, processed in descending
-    # source authority. Each event links to the best already-seen (i.e. more-or-
-    # equally authoritative) match; an event with no match becomes a canonical
-    # itself and can in turn absorb the lower-authority copies that follow.
     def dedup_venue(venue)
       events = Event.kept.where(start_date: Date.current..).tagged_with(venue, on: :locations).to_a
       return if events.size < 2
 
-      # Within one rank the NEWEST copy is preferred as canonical: for a true
-      # double-post either copy would do, but for a re-keyed strand (a scraper whose
-      # URL scheme changed, as Mokka's and Südpol's did) the newer row carries the
-      # working link while the stale one folds away beneath it.
       ranked     = events.sort_by { |e| [source_rank(e), -e.id] }
       canonicals = []
 
       ranked.each do |e|
-        # Admin-pinned merge/un-merge: leave the link as the admin set it. A
-        # pinned standalone (link nil) still counts as a canonical others can fold
-        # onto; a pinned merge keeps pointing where it was pinned.
         if e.overridden?("canonical_event")
           canonicals << e if e.canonical_event_id.nil?
           next
         end
 
         canonical = best_match(e, canonicals)
-        e.update_column(:canonical_event_id, canonical&.id) # nil resets a stale link
+        e.update_column(:canonical_event_id, canonical&.id)
         canonicals << e if canonical.nil?
       end
 
-      # Re-derive what each canonical takes from its duplicates (auto-matched AND
-      # admin-pinned), so a manual merge enriches it too.
       canonicals.each do |c|
         CanonicalEnrichment.call(c, ranked.select { |e| e.canonical_event_id == c.id })
       end
     end
 
-    # 0 = OLE feed (preferred), 1 = bespoke HTML scraper, 2 = PETZI, 3 = capture
-    # (last resort). Drives which copy of an overlapping show stays visible (see
-    # class comment) — we rank by which links most directly to the venue.
-    # data_source is the provenance stamp ("OLE:Dachstock", "Petzi", "Dachstock",
-    # "capture", …).
     def source_rank(event)
       case event.data_source
       when /\AOLE:/ then 0
@@ -116,12 +45,6 @@ module Scrapers
       end
     end
 
-    # Best canonical for an event: same date, highest title similarity, accepting a
-    # subset relationship (our club scrapers truncate "Darkside" where the feed
-    # lists the full DJ lineup) or Jaccard >= threshold. A same-source candidate
-    # must additionally share the exact start TIME (see the class comment: a
-    # double-post is identical; a same-titled show at another hour is a second,
-    # real happening).
     def best_match(event, candidates)
       bt = TitleSimilarity.tokens(event.title)
       scored = candidates
@@ -137,9 +60,6 @@ module Scrapers
       (best[:jaccard] >= TitleSimilarity::THRESHOLD || best[:subset]) ? best[:event] : nil
     end
 
-    # Cross-source copies match on the date alone (sources disagree on doors vs
-    # show time); a same-source pair is only a duplicate when the start time is
-    # identical too.
     def time_compatible?(event, candidate)
       return true if candidate.data_source != event.data_source
 

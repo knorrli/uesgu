@@ -1,8 +1,3 @@
-# One-off: screenshot the admin genre-tree view from the dev DB so we can eyeball
-# the cultivation + spacing. Drives the running dev server (port 3199) with
-# Ferrum, logs in as the disposable `shotbot` fixture (temporarily made admin by
-# the caller), resizes to a desktop viewport (ctor window_size does NOT set the
-# layout viewport — must resize), and captures the full page.
 require 'ferrum'
 require 'fileutils'
 

@@ -1,9 +1,5 @@
 require "test_helper"
 
-# Credentials arrive by hand — pasted into `bin/rails credentials:edit` or typed
-# into a Render env var — so the whitespace that comes with a paste is the normal
-# case, not the exotic one. Unhandled, a trailing newline makes Net::HTTP raise on
-# the header and never reaches the "not configured" path the caller can show.
 class EventCaptureConfigTest < ActiveSupport::TestCase
   def with_env(**pairs)
     original = pairs.keys.to_h { |key| [key, ENV[key]] }

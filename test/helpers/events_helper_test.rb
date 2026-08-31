@@ -1,9 +1,6 @@
 require "db_test_helper"
 
-# Locks EventsHelper's predicate/URL logic (the fiddly bits that break silently):
-# offsite-link badging and the genre-subtree descendant highlight.
 class EventsHelperTest < ActionView::TestCase
-  # The helper resolves current_user via the controller; provide it for the test.
   attr_writer :current_user
   def current_user = @current_user
 
@@ -22,7 +19,7 @@ class EventsHelperTest < ActionView::TestCase
     rock = genre(name: "helprock")
     indie = genre(name: "helpindie"); indie.set_parent!(rock)
     shoegaze = genre(name: "helpshoe"); shoegaze.set_parent!(indie)
-    genre(name: "helppolka") # unrelated
+    genre(name: "helppolka")
 
     names = genre_subtree_names(rock.name)
 
@@ -37,11 +34,8 @@ class EventsHelperTest < ActionView::TestCase
     shoegaze = genre(name: "litshoe"); shoegaze.set_parent!(rock)
     jazz = genre(name: "litjazz")
 
-    # Filtering by the ancestor "litrock" lights the descendant tag "litshoe"...
     assert_equal [rock.name], filter_terms_matching([rock.name], shoegaze.name, param: "g")
-    # ...and tapping the genre itself lights it (self is in its own subtree).
     assert_equal [rock.name], filter_terms_matching([rock.name], rock.name, param: "g")
-    # An unrelated applied genre does not light it.
     assert_empty filter_terms_matching([jazz.name], shoegaze.name, param: "g")
   end
 
@@ -49,7 +43,6 @@ class EventsHelperTest < ActionView::TestCase
     electronic = genre(name: "lithelpelectronic")
     elektronik = genre(name: "lithelpelektronik"); elektronik.merge_into!(electronic)
 
-    # Filtering by "Electronic" lights the raw "Elektronik" tag the event carries.
     assert_equal [electronic.name], filter_terms_matching([electronic.name], elektronik.name, param: "g")
   end
 end

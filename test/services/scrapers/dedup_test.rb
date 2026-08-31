@@ -1,13 +1,5 @@
 require_relative "../../db_test_helper"
 
-# Mechanics of cross-source dedup. Uses real tracked venues ("Kofmehl" for the
-# PETZI/bespoke cases, "Dachstock" for the OLE cases) because Dedup processes
-# every consume venue in the registry (+ the PETZI members); genres are
-# invented (taxonomy rule). Source authority is read from data_source
-# (OLE > bespoke > PETZI): we rank by which copy links most directly to the
-# venue, so PETZI is the last resort. Same-source pairs fold only on the
-# identical start TIME (a double-post), never across different hours (a
-# same-titled second happening).
 class Scrapers::DedupTest < ActiveSupport::TestCase
   FUTURE = Date.current + 10
 
@@ -16,15 +8,13 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
   end
 
   def bespoke_event(title:, date: FUTURE, genres: [], venue: "Kofmehl")
-    make(title:, date:, genres:, venue:, source: venue) # bespoke stamps its class name
+    make(title:, date:, genres:, venue:, source: venue)
   end
 
   def ole_event(title:, date: FUTURE, genres: [], venue: "Dachstock")
     make(title:, date:, genres:, venue:, source: "OLE:#{venue}")
   end
 
-  # A contributor's capture. No url — which is half of why it ranks below even PETZI
-  # — so it cannot go through `make`, whose url is the scrapers' upsert key.
   def captured_event(title:, date: FUTURE, genres: [], venue: "Kofmehl",
                      locality: "Solothurn", canton: "SO", time: nil)
     e = Event.new(title:, start_date: date, start_time: time,
@@ -60,8 +50,8 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
   end
 
   test "bookmarks on a duplicate survive (it is hidden, never deleted)" do
-    bespoke_event(title: "Survivor")          # the canonical
-    p = petzi_event(title: "Survivor")        # the duplicate (PETZI ranks last)
+    bespoke_event(title: "Survivor")
+    p = petzi_event(title: "Survivor")
     u = user
     EventSave.create!(user: u, event: p)
 
@@ -72,8 +62,8 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
   end
 
   test "duplicate's genres are unioned onto the canonical" do
-    b = bespoke_event(title: "Union Show", genres: ["zorprock-canon"])  # canonical
-    petzi_event(title: "Union Show", genres: ["zorpmetal-dup"])         # duplicate
+    b = bespoke_event(title: "Union Show", genres: ["zorprock-canon"])
+    petzi_event(title: "Union Show", genres: ["zorpmetal-dup"])
 
     Scrapers::Dedup.run
 
@@ -113,7 +103,7 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
   test "a stale canonical link resets when PETZI no longer lists the show" do
     other = petzi_event(title: "Unrelated Headliner")
     b = bespoke_event(title: "Orphaned Show")
-    b.update_column(:canonical_event_id, other.id) # stale link from a prior run
+    b.update_column(:canonical_event_id, other.id)
 
     Scrapers::Dedup.run
 
@@ -124,7 +114,7 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
   test "an admin-pinned merge is not undone by a later dedup" do
     p = petzi_event(title: "Pinned Canonical")
     b = bespoke_event(title: "Drifted Title The Matcher Misses")
-    b.merge_into!(p) # manual merge + pin
+    b.merge_into!(p)
 
     Scrapers::Dedup.run
 
@@ -146,8 +136,8 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
 
   test "an admin-pinned standalone is not re-merged by dedup" do
     p = petzi_event(title: "Identical Title")
-    b = bespoke_event(title: "Identical Title") # would auto-match
-    b.mark_standalone! # admin says: NOT a duplicate, pin it
+    b = bespoke_event(title: "Identical Title")
+    b.mark_standalone!
 
     Scrapers::Dedup.run
 
@@ -155,10 +145,6 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes Event.visible, b
   end
 
-  # OLE is the PREFERRED source (venue-published, links to the venue's own page),
-  # so where it overlaps a PETZI show the PETZI copy folds onto the OLE canonical
-  # — not the other way round — and OLE stays the single visible listing. Genres ∪
-  # onto the OLE canonical, so PETZI's genres are not lost.
   test "an OLE event overlapping a PETZI show is canonical; PETZI folds onto it" do
     ole = make(title: "Shared Headliner", date: FUTURE, genres: ["ole-genre"],
                venue: "Dachstock", source: "OLE:Dachstock")
@@ -176,10 +162,6 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes genres, "petzi-genre", "PETZI genres union onto the OLE canonical"
   end
 
-  # The reported bug: a venue with BOTH an OLE feed and a bespoke HTML scraper but
-  # no PETZI listing for the show. The old dedup only linked bespoke→PETZI, so the
-  # two non-PETZI copies were never compared and both showed. Now OLE outranks
-  # bespoke and absorbs it directly.
   test "an OLE event absorbs a matching bespoke show with no PETZI listing" do
     ole = ole_event(title: "Reitschule Fest", venue: "Dachstock", genres: ["ole-genre"])
     b   = bespoke_event(title: "Reitschule Fest", venue: "Dachstock", genres: ["bespoke-genre"])
@@ -193,10 +175,6 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes ole.reload.genre_list.map(&:downcase), "bespoke-genre", "genres union onto OLE"
   end
 
-  # A venue double-posting one show on its aggregator: the same Salsa night under two
-  # Bewegungsmelder post ids, so two distinct upsert keys land two events from ONE
-  # source. The NEWER copy wins the canonical, because for a re-keyed strand — a
-  # scraper whose URL scheme changed — the newer row is the one with the working link.
   test "a same-source double-post folds onto the newest copy" do
     showtime = Time.zone.local(FUTURE.year, FUTURE.month, FUTURE.day, 19, 0)
     older = make(title: "Tanzen im Schlosshof | Zorpsalsa", date: FUTURE, genres: [],
@@ -212,8 +190,6 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     refute_includes Event.visible, older
   end
 
-  # One title, one day, two HOURS: a 15:00 workshop and a 20:00 concert are two real
-  # happenings from one source, and must both stay.
   test "same-titled shows at different hours are distinct happenings, not duplicates" do
     workshop = make(title: "Tradition in Zorpbewegung", date: FUTURE, genres: [],
                     venue: "ONO", source: "Ono",
@@ -230,10 +206,6 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes Event.visible, concert
   end
 
-  # A capture is always NEWER than the scraped copy it duplicates, and within one
-  # rank the newest wins — so ranking it explicitly is the whole point: unranked it
-  # falls in beside the bespoke scrapers and takes the canonical off a copy that
-  # links to the venue's own page.
   test "a captured event folds onto the scraped copy, newer though it is" do
     b = bespoke_event(title: "Zorpcore Allstars")
     c = captured_event(title: "Zorpcore Allstars")
@@ -257,9 +229,6 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_nil p.reload.canonical_event_id
   end
 
-  # What a capture is FOR: the description and genres a contributor read off the
-  # poster reaching the listing that lacks them. Genres already ride the existing
-  # union; nothing else does yet.
   test "a captured duplicate's genres accumulate onto the scraped canonical" do
     b = bespoke_event(title: "Zorpjazz Sextet", genres: ["scraped-genre"])
     captured_event(title: "Zorpjazz Sextet", genres: ["captured-genre"])
@@ -270,10 +239,6 @@ class Scrapers::DedupTest < ActiveSupport::TestCase
     assert_includes b.genre_list.map(&:downcase), "scraped-genre"
   end
 
-  # A captured place is the registry's complement, so it appears in no venue list
-  # the sweep walked before — and two contributors shooting the same poster is
-  # exactly where a duplicate lands. Neither carries a time, which is what a
-  # same-source pair needs to be one double-post rather than two happenings.
   test "captures at a captured place are deduped at all" do
     venue = place.name
     first  = captured_event(title: "Zorpfolk im Hof", venue: venue, locality: "Zorpwil", canton: "BE")

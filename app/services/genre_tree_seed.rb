@@ -1,12 +1,3 @@
-# Loads a curated genre tree (the parsed db/genres.yml hash) into the database:
-# upsert a Genre per name (matched/deduped by fingerprint via Genre.ensure!), set
-# each genre's parent from the YAML nesting, and apply the hidden/blocked/ignored
-# dispositions and aliases. Idempotent — re-running converges. Genres NOT named in
-# the seed are left untouched, so new scrapes stay unplaced in the curation queue.
-#
-# The rake task taxonomy:import_tree is a thin wrapper that reads the YAML and
-# hands the hash here; this object holds the logic so it's unit-testable with
-# synthetic data.
 class GenreTreeSeed
   Result = Struct.new(:placed, :tree_entries, :hidden, :blocked, :ignored, :alias_groups, :multi_home, keyword_init: true)
 
@@ -42,8 +33,6 @@ class GenreTreeSeed
 
   private
 
-  # Flatten the nested tree into { name => parent name } (nil parent = root). A
-  # node is either a bare string leaf or a { 'name' =>, 'children' => [...] } hash.
   def flatten_tree(nodes, parent_name = nil, acc = {})
     Array(nodes).each do |node|
       name, children = node.is_a?(Hash) ? [node["name"], node["children"]] : [node, nil]
@@ -59,10 +48,6 @@ class GenreTreeSeed
     @lookup[Genre.fingerprint_for(name)]
   end
 
-  # Tree placement first; dispositions/aliases below clear parent_id and so win if
-  # a hand-edited seed lists a genre in both the tree and a disposition list.
-  # Returns the names that resolved to a genre listed under more than one parent
-  # (the tree is single-parent, so the last write wins — a heads-up, not an error).
   def place_tree
     seen = Hash.new { |h, k| h[k] = [] }
     @parent_of.each do |child_name, parent_name|
@@ -70,8 +55,6 @@ class GenreTreeSeed
       next unless child
 
       parent = parent_name && find(parent_name)
-      # A child whose fingerprint collapses onto its parent (e.g. "pop" under root
-      # "Pop") IS that genre — leave it put rather than tripping the not-self check.
       next if parent && parent.id == child.id
 
       seen[child.id] << (parent_name || "(root)")

@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Account moderation under /admin/users: gated to admins, and a self-delete
-# guard so an admin can't lock themselves out.
 class AdminUsersTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_users_path

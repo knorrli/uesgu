@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# The captured-place vocabulary: the complement of the venue registry. Locks the
-# invariants Location and the capture flow lean on — fingerprint matching, the
-# NOT NULL place tuple, and the "never duplicate a registry venue" rule.
-# Synthetic place names throughout; the registry is read live, never hardcoded.
 class PlaceTest < ActiveSupport::TestCase
   test "a place carries a name, locality and canton" do
     zorpsaal = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
@@ -22,9 +18,6 @@ class PlaceTest < ActiveSupport::TestCase
     assert Place.new(name: "Zorpsaal", locality: "Zorpwil", canton: "VS").valid?
   end
 
-  # The stored generated column and the Ruby reproduction are two copies of one
-  # rule; a capture matches raw extracted text (no row yet) against rows written
-  # by the DB, so a drift between them silently splits a place in two.
   test "the stored fingerprint reproduces Place.fingerprint_for exactly" do
     zorpsaal = place(name: "Zörp-Saal & Bar")
 
@@ -32,9 +25,6 @@ class PlaceTest < ActiveSupport::TestCase
     assert_equal "zorpsaalandbar", zorpsaal.fingerprint
   end
 
-  # name_folded is the fingerprint's rule with word boundaries kept, and
-  # match-at-entry scores a raw extracted string (folded in Ruby) against it.
-  # Same drift risk as the fingerprint, same lock.
   test "the stored name_folded reproduces Fingerprint.folded exactly" do
     zorpsaal = place(name: "Zörp-Saal & Bar")
 
@@ -48,8 +38,6 @@ class PlaceTest < ActiveSupport::TestCase
     refute Place.new(name: "ZORP SAAL", locality: "Zorpwil", canton: "BE").valid?
   end
 
-  # The duplicate check is check-then-create, so two concurrent captures can both
-  # pass it. The index is what actually holds the line.
   test "the unique index backstops the duplicate validation" do
     place(name: "Zorpsaal")
     duplicate = Place.new(name: "ZORP SAAL", locality: "Zorpwil", canton: "BE")
@@ -85,9 +73,6 @@ class PlaceTest < ActiveSupport::TestCase
     refute Place.new(name: venue.name.upcase, locality: venue.locality, canton: venue.canton).valid?
   end
 
-  # The complement is drawn at the taxonomy, not at the file: a venue we decided
-  # not to scrape (or never placed) is still somewhere a captured show can happen,
-  # and the docs' "rejecting a lead" flow depends on the two rows coexisting.
   test "a place may duplicate a registry venue we do not source from" do
     unsourced = Venue.all.find { |v| !Venue.in_taxonomy.include?(v) }
     skip "every registry venue is in the taxonomy" if unsourced.nil?
@@ -95,8 +80,6 @@ class PlaceTest < ActiveSupport::TestCase
     assert Place.new(name: unsourced.name, locality: "Zorpwil", canton: "BE").valid?
   end
 
-  # The reverse direction the validation can't catch: the registry gains a row for
-  # a place we already captured. `bin/rails places:drift` reports these.
   test "shadowed lists the places the registry has since absorbed" do
     venue = Venue.in_taxonomy.first
     skip "no venues in the taxonomy" if venue.nil?
@@ -122,8 +105,6 @@ class PlaceTest < ActiveSupport::TestCase
     rule
   end
 
-  # Location.hierarchy and the filter tree group on the literal tag, so a link that
-  # repoints nothing leaves the venue holding half its shows under each spelling.
   test "a merge retags the events carrying the old name" do
     akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
     variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
@@ -135,8 +116,6 @@ class PlaceTest < ActiveSupport::TestCase
     refute_includes show.location_list, "AKUT Zorpwil"
   end
 
-  # An event cannot be nested under one venue in the WHERE tree and filed in another
-  # venue's town, so the canonical's tuple wins whole.
   test "a merge moves the events onto the canonical's town and canton" do
     akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
     variant = place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")

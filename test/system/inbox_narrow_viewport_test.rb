@@ -1,11 +1,6 @@
 require "application_system_test_case"
 
-# The inbox at the narrowest viewport we still support (320px — iPhone SE 1st gen,
-# Galaxy Fold cover screen).
 class InboxNarrowViewportTest < ApplicationSystemTestCase
-  # .notification__meta is nowrap so the date range stays flush right, and it used to
-  # shove the whole page wider than the viewport. Locale matters, and French is the
-  # widest of the three ("3 événements"), so it is the one that has to fit.
   test "the inbox does not scroll horizontally at 320px" do
     u = user(locale: "fr")
     events = 3.times.map { event(start_date: Date.new(2026, 8, 8)) }

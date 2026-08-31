@@ -1,11 +1,7 @@
 require "db_test_helper"
 
-# Locks the reframed rule engine: a saved filter + schedule. Inference
-# (date window => happening, none => added), matched_events for both, live
-# favorites, due? scheduling, fire! snapshot, and the empty=all-events rule.
-# Synthetic events/styles only (see taxonomy rule in db_test_helper).
 class SavedFilterTest < ActiveSupport::TestCase
-  NOON = Time.zone.local(2030, 6, 3, 12, 0, 0).freeze # a Monday
+  NOON = Time.zone.local(2030, 6, 3, 12, 0, 0).freeze
   TODAY = NOON.to_date
 
   def at(hour, minute = 0, date: TODAY)
@@ -40,14 +36,11 @@ class SavedFilterTest < ActiveSupport::TestCase
 
   test "a legacy stored custom range is ignored as a window (no dead past range)" do
     r = rule(user, filter: { q: ["some-style"] })
-    # Simulate an old row that stored an absolute range directly in the jsonb.
     r.filter = r.filter.merge("date_ranges" => ["2020-01-01 - 2020-01-02"])
     assert_empty r.active_windows
     assert r.added?
   end
 
-  # Real-current dates here: the non-favorites path delegates to
-  # Filter#ransack_query, whose future floor is the real Date.current.
   test "added matches events created since last fire that are not in the past" do
     u = user
     fresh = event(created_at: 1.hour.ago,  start_date: Date.current + 5, genre_list: ["probe-rock"])
@@ -60,8 +53,8 @@ class SavedFilterTest < ActiveSupport::TestCase
 
     matched = r.matched_events(Time.current).to_a
     assert_includes matched, fresh
-    refute_includes matched, stale # created before the window floor
-    refute_includes matched, past  # already happened
+    refute_includes matched, stale
+    refute_includes matched, past
   end
 
   test "happening matches by start_date in the window regardless of created_at" do
@@ -81,9 +74,6 @@ class SavedFilterTest < ActiveSupport::TestCase
   end
 
   test "the scheduled time tracks wall-clock across a DST spring-forward (no hour drift)" do
-    # CET→CEST on Sun 2026-03-29: clocks jump 02:00→03:00. Adding 18h to local
-    # midnight lands at 19:00 (the skipped hour double-counts); a daily 18:00 rule
-    # must still resolve to 18:00 wall-clock.
     r = rule(user, filter: { q: ["x"] }, cadence: "daily", time_of_day: 18 * 60)
     scheduled = r.previous_scheduled_at(Time.zone.local(2026, 3, 29, 20, 0))
 
@@ -108,13 +98,11 @@ class SavedFilterTest < ActiveSupport::TestCase
     note = r.fire!(at(18))
     assert_equal [show.id], note.event_ids
     assert_equal at(18).to_i, r.reload.last_fired_at.to_i
-    assert_nil r.fire!(at(18, 1)) # nothing new after the cursor
+    assert_nil r.fire!(at(18, 1))
   end
 
   test "run_due! fires due rules and ignores silent (notify-off) ones" do
     u = user
-    # One event matching both styles, so the silent rule *would* fire if notifying
-    # — distinct filters keep the two rules legal under the one-per-filter rule.
     event(created_at: 1.hour.ago, start_date: Date.current + 3, genre_list: ["probe-rock", "probe-techno"])
 
     due = rule(u, filter: { q: ["probe-rock"] }, time_of_day: 0)
@@ -151,12 +139,10 @@ class SavedFilterTest < ActiveSupport::TestCase
     b = rule(user, filter: { l: ["Bern"], q: ["Jazz", "Rock"] })
     assert_equal a.fingerprint, b.fingerprint
 
-    # An absolute range isn't kept by a rule, so it doesn't affect identity.
     windowed = rule(user, filter: { q: ["Rock"], d: ["2030-01-01 - 2030-01-02"] })
     plain    = rule(user, filter: { q: ["Rock"] })
     assert_equal plain.fingerprint, windowed.fingerprint
 
-    # A preset window *does* change identity.
     refute_equal plain.fingerprint, rule(user, filter: { q: ["Rock"], d: ["this_weekend"] }).fingerprint
   end
 
@@ -164,16 +150,13 @@ class SavedFilterTest < ActiveSupport::TestCase
     u = user
     rule(u, filter: { q: ["Rock"], l: ["Bern"] }).save!
 
-    dup = rule(u, filter: { l: ["Bern"], q: ["Rock"] }) # order flipped, same set
+    dup = rule(u, filter: { l: ["Bern"], q: ["Rock"] })
     refute dup.valid?
     assert_includes dup.errors[:base], I18n.t("saved_filters.errors.duplicate")
 
     assert rule(u, filter: { q: ["Rock"] }).valid?, "a different filter is fine"
   end
 
-  # Two spellings of one town are one filter, so Locality#normalize_spellings! can
-  # rewrite either without landing its owner on a duplicate — the collision whose only
-  # resolution is destroying one of them.
   test "two spellings of one location are the same filter" do
     u = user
     rule(u, filter: { l: ["Zorpwil"] }).save!
@@ -190,11 +173,9 @@ class SavedFilterTest < ActiveSupport::TestCase
     a = rule(u, filter: { q: ["Rock"] }).tap(&:save!)
     b = rule(u, filter: { q: ["Jazz"] }).tap(&:save!)
 
-    # Editing only the schedule never self-collides (excluded by id).
     b.time_of_day = 600
     assert b.valid?, "a schedule-only edit is allowed"
 
-    # Editing B's filter to match A's is rejected.
     b.filter_attributes = { q: ["Rock"] }
     refute b.valid?
     assert_includes b.errors[:base], I18n.t("saved_filters.errors.duplicate")
@@ -219,21 +200,17 @@ class SavedFilterTest < ActiveSupport::TestCase
   test "describe is <what> · [where] · <temporal>, with all-events and new-events fallbacks" do
     all = I18n.t("saved_filters.summary.scope_all")
     added = I18n.t("saved_filters.type.added")
-    # no what → "Alle Events" leads; location-only still leads with it
     assert_equal "#{all} · Bern · #{added}", rule(user, filter: { l: ["Bern"] }).describe
-    # added rule always ends with the new-events label
     assert_equal "Rock · #{added}", rule(user, filter: { q: ["Rock"] }).describe
-    # happening rule ends with the window label
     assert_equal "Rock · Bern · #{I18n.t('datepicker.this_week')}",
                  rule(user, filter: { q: ["Rock"], l: ["Bern"], d: ["this_week"] }, weekday: 5).describe
   end
 
   test "the name always mirrors the filter on save (no custom names)" do
-    r = rule(user, filter: { l: ["Bern"], d: ["next_week"] }, weekday: 5) # next_week => weekly
+    r = rule(user, filter: { l: ["Bern"], d: ["next_week"] }, weekday: 5)
     r.save!
     assert_equal r.describe, r.name
 
-    # A name passed in is ignored — re-derived from the filter on save.
     given = rule(user, filter: { q: ["Rock"] }, name: "Keep me")
     given.save!
     assert_equal given.describe, given.name
@@ -241,7 +218,7 @@ class SavedFilterTest < ActiveSupport::TestCase
   end
 
   test "name re-derives when the filter changes" do
-    r = rule(user, filter: { q: ["Rock"] }, weekday: 5) # weekday set for the weekly window below
+    r = rule(user, filter: { q: ["Rock"] }, weekday: 5)
     r.save!
     before = r.name
 
@@ -265,7 +242,7 @@ class SavedFilterTest < ActiveSupport::TestCase
     u = user
     weekend = rule(u, filter: { d: ["this_weekend"] }, cadence: "daily", weekday: 5)
     weekend.save!
-    assert_equal "weekly", weekend.cadence # the daily choice is overridden
+    assert_equal "weekly", weekend.cadence
 
     month = rule(u, filter: { d: ["this_month"] }, cadence: "daily", monthday: 1)
     month.save!
@@ -293,11 +270,11 @@ class SavedFilterTest < ActiveSupport::TestCase
     r = rule(user, filter: { q: ["Rock"] })
     r.time_string = "17:03"
     r.save!
-    assert_equal((17 * 60), r.time_of_day) # 17:03 → 17:00
+    assert_equal((17 * 60), r.time_of_day)
 
     r.time_string = "17:08"
     r.save!
-    assert_equal((17 * 60) + 15, r.time_of_day) # 17:08 → 17:15
+    assert_equal((17 * 60) + 15, r.time_of_day)
   end
 
   test "time_hour + time_minute combine into time_of_day (the two-select picker)" do
@@ -307,7 +284,7 @@ class SavedFilterTest < ActiveSupport::TestCase
   end
 
   test "time_hour / time_minute read back the stored time, zero-padded" do
-    r = SavedFilter.new(time_of_day: (8 * 60) + 15) # 08:15
+    r = SavedFilter.new(time_of_day: (8 * 60) + 15)
     assert_equal "08", r.time_hour
     assert_equal "15", r.time_minute
   end

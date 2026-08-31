@@ -14,8 +14,6 @@
 }
 
 body {
-  /* Self-hosted Space Mono — distinctive, characterful identity. System mono
-     fallbacks (SF Mono on Apple, Cascadia on Windows, etc.) cover load/failure. */
   font-family: "Space Mono", ui-monospace, "SF Mono", "Cascadia Mono",
     "Roboto Mono", Menlo, Consolas, monospace;
 }

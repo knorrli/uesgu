@@ -1,12 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Connects to data-controller="install"
-//
-// "Install as app" affordance. Unlike a hide-when-impossible block, this always
-// shows *something*: a one-tap button where we can drive a native prompt, concrete
-// steps where the user can do it by hand, or — where install is genuinely
-// impossible — an honest note. Behaviour is unavoidably platform-split:
-//  - Already installed (standalone): a short "you're all set" confirmation.
+// What each engine actually supports, which is why the branching exists:
 //  - Chrome/Edge/Chromium (Android + desktop) fire `beforeinstallprompt`; we
 //    capture it and drive the native install dialog from our own button.
 //  - iOS Safari: no programmatic install → "Share → Add to Home Screen" steps.
@@ -20,36 +14,26 @@ export default class extends Controller {
   connect() {
     this.deferredPrompt = null
 
-    // Already installed → reassure, and tell the page (so e.g. the header link
-    // can hide itself).
     if (this.#isStandalone) {
       this.#show("installed")
       return
     }
 
-    // iOS can't install programmatically; reveal the manual steps.
     if (this.#isIos) {
       this.#show("ios")
       return
     }
 
-    // Firefox never fires beforeinstallprompt. On Android its menu installs / adds
-    // to the home screen; on desktop it can't install a PWA at all, so be honest.
     if (this.#isFirefox) {
       this.#show(this.#isAndroid ? "firefox" : "firefoxDesktop")
       return
     }
 
-    // Desktop Safari: no prompt event either. Safari 17+ can "Add to Dock"; show
-    // that rather than the wrong generic browser-menu steps.
     if (this.#isSafari) {
       this.#show("safariDesktop")
       return
     }
 
-    // Chromium & everything else: show generic menu steps right away so the
-    // page is never empty, then upgrade to the one-tap button if the browser
-    // offers a native prompt.
     this.#show("generic")
     this.capture = this.capture.bind(this)
     this.installed = this.installed.bind(this)
@@ -62,8 +46,6 @@ export default class extends Controller {
     window.removeEventListener("appinstalled", this.installed)
   }
 
-  // Chrome fires this when the app is installable: swap the generic steps for our
-  // own one-tap button instead of the browser's mini-infobar.
   capture(event) {
     event.preventDefault()
     this.deferredPrompt = event
@@ -114,8 +96,6 @@ export default class extends Controller {
     return /safari/i.test(ua) && !/chrome|chromium|crios|edg|fxios|android/i.test(ua)
   }
 
-  // iPadOS 13+ reports a desktop ("MacIntel") UA, so also treat a touch-capable
-  // Mac as iOS.
   get #isIos() {
     return /iphone|ipad|ipod/i.test(window.navigator.userAgent) ||
       (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1)

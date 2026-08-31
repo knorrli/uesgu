@@ -1,6 +1,4 @@
 module Admin
-  # Scraper oversight: did last night's sweep work, and what did each venue do?
-  # Also the on-demand triggers (full sweep, or a single scraper).
   class ScrapeRunsController < BaseController
     def index
       @presenter = ScrapeRunsPresenter.new
@@ -14,13 +12,6 @@ module Admin
       @active_snoozes = ScraperSnooze.active_by_slug
     end
 
-    # Trigger a run on demand: the full sweep, or a single scraper when a
-    # `scraper` slug is given (re-run one venue after fixing its parser, without
-    # waiting on all the others). The sweep takes a while (it hits live sites),
-    # so we create the run synchronously — which makes it visible and blocks a
-    # second concurrent trigger — then run the rest in a background thread and
-    # redirect straight away. No live tracking beyond the page's own poll-refresh.
-    # (A thread, not a job, because there's no background worker — see render.yaml.)
     def create
       if ScrapeRun.in_progress.exists?
         return redirect_to admin_scrape_runs_path, alert: t(".already_running"), status: :see_other
@@ -35,16 +26,12 @@ module Admin
       redirect_to admin_scrape_runs_path, notice: trigger_notice(scrapers), status: :see_other
     end
 
-    # Mute a flaky scraper for a while: the nightly sweep skips it and it stops
-    # firing the failure alert. Self-expiring, so there's nothing to remember to
-    # switch back on (see ScraperSnooze).
     def snooze
       slug = known_scraper_slug or return refuse_unknown_scraper
       ScraperSnooze.snooze!(slug)
       redirect_to admin_scrape_runs_path, notice: t(".snoozed", scraper: slug), status: :see_other
     end
 
-    # Cancel a snooze early so the scraper runs again on the next sweep.
     def wake
       slug = known_scraper_slug or return refuse_unknown_scraper
       ScraperSnooze.wake!(slug)
@@ -53,8 +40,6 @@ module Admin
 
     private
 
-    # The posted slug, but only if it names a real scraper — so snooze/wake can't
-    # mint rows for a typo'd or retired scraper.
     def known_scraper_slug
       slug = params[:scraper].presence
       slug if slug && Scrapers::All.scrapers.keys.any? { |name| name.underscore == slug }
@@ -65,8 +50,6 @@ module Admin
                   alert: t("admin.scrape_runs.create.unknown_scraper"), status: :see_other
     end
 
-    # All scrapers, or just the one whose slug was posted (empty hash = the slug
-    # matched nothing, so the caller refuses the trigger).
     def selected_scrapers
       slug = params[:scraper].presence
       return Scrapers::All.scrapers unless slug
@@ -75,9 +58,6 @@ module Admin
       match ? { match[0] => match[1] } : {}
     end
 
-    # Relative keys (`t('.started')`) would scope to this helper's name under
-    # i18n static analysis; at runtime they resolve against the `create` action.
-    # Spell them out so the scanner and runtime agree.
     def trigger_notice(scrapers)
       if params[:scraper].present?
         t("admin.scrape_runs.create.started_one", scraper: scrapers.keys.first.underscore)

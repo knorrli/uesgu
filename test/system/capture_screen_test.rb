@@ -1,15 +1,6 @@
 require "application_system_test_case"
 require_relative "../support/canned_extraction_client"
 
-# The capture screen in a real browser. Everything between picking a file and a
-# decision lives in app/javascript/controllers/capture_controller.js, and no other
-# suite reaches it: test/integration/capture_test.rb starts at the request the client
-# fires.
-#
-# Capybara ignores hidden elements, so a bare `.capture-card` selector is the card on
-# screen; `visible: :all` is how the queue behind it is counted. Copy assertions pin
-# the locale because headless Chrome asks for English and missing keys fall back to
-# German.
 class CaptureScreenTest < ApplicationSystemTestCase
   def setup
     @user = user(contributor: true, locale: "de")
@@ -29,8 +20,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     assert_equal "Zorpcore Nacht", field_value("title")
     assert_equal show_date.to_s, field_value("date")
-    # Normalised by EventCapture::Clock on the way here, not by the model, which
-    # said "20 Uhr" — proof the card went through the real extraction path.
     assert_equal "20:00", field_value("time")
 
     assert_difference -> { Event.count } => 1, -> { Place.count } => 1 do
@@ -41,10 +30,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-picker"
   end
 
-  # Asserts the type and not the height: the trap is mobile Safari's control metrics
-  # for a date input (see app/views/captures/_event_fields.html.erb), and headless Chrome
-  # lines a date up with a text field either way — so a height assertion here would
-  # pass on the one browser that never had the problem.
   test "the date and time on a card are both native pickers" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -69,9 +54,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpcore Matinee", field_value("title")
   end
 
-  # The residual failure after the evidence rule is cited-but-wrong, and the quote is
-  # the only thing on the card that separates a locality read off a postcode from one
-  # read off an artist's origin code.
   test "each field carries the text the model quoted as its source" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -82,9 +64,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".review-card__cite", text: cite("steht auf dem Plakat")
   end
 
-  # A quote under an empty field reads as a value being withheld. The model can cite a
-  # place it then returned as null, so the card keys the quote to the value, not to the
-  # evidence string.
   test "a field the model left empty shows no quote" do
     CannedExtractionClient.install(events: [poster_event(place: nil)])
     visit capture_path
@@ -94,9 +73,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".review-card__cite", text: cite("3000 Zorpwil")
   end
 
-  # An origin code the model can quote back survives the evidence rule and is
-  # well-formed, so nothing refuses it: the human's edit is the only record that it
-  # was wrong (see ExtractionFieldOutcome).
   test "an edited field is reported as a correction against what the model proposed" do
     CannedExtractionClient.install(events: [poster_event(locality: "Us", locality_evidence: "Us")])
     visit capture_path
@@ -112,8 +88,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpwil", locality.accepted
   end
 
-  # Two candidates off one poster are the same picture twice, so without a number the
-  # strip reads as one thumbnail rendered twice rather than as two events to decide on.
   test "the strip numbers what it found and says the tiles can be tapped" do
     CannedExtractionClient.install(events: [poster_event, matinee])
     visit capture_path
@@ -145,9 +119,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal %w[Flarncore Zorpcore], Event.sole.genre_list.sort
   end
 
-  # A phone is where posters are captured, and the gem's alternative to the dropdown is
-  # a modal dialog that covers the card from mid-screen down and — once the software
-  # keyboard takes the bottom of it — shows fewer options than the dropdown does.
   test "the genre field opens a list, not a dialog, on a phone" do
     genre(name: "zorpwave", events_count: 3)
     CannedExtractionClient.install(events: [poster_event(genres: [])])
@@ -161,9 +132,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-card dialog.hw-combobox__dialog[open]"
   end
 
-  # The vocabulary is a few hundred options and a batch is N posters x M events, so a
-  # copy inside every card grows with both — and with the taxonomy. One copy lives in
-  # the page and is lent to whichever card is open.
   test "the genre options sit in one card at a time" do
     2.times { |i| genre(name: "zorpwave#{i}", events_count: 3) }
     CannedExtractionClient.install(events: [poster_event(genres: []), matinee(genres: [])])
@@ -179,8 +147,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-card .hw-combobox__listbox [role=option]", count: 1
   end
 
-  # The combobox hides an option it already holds in the field, and a card is lent a
-  # list that knows nothing of what it has picked.
   test "a genre already on the card is not offered again" do
     picked = genre(name: "zorpwave", events_count: 3)
     genre(name: "zorpstep", events_count: 3)
@@ -194,9 +160,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-card .hw-combobox__listbox [role=option]", text: picked.name
   end
 
-  # A tap on a chip targets the chip, and inside a wrapping <label> that is a click on
-  # the label — which the browser forwards to the input, defeating the remover. What
-  # the markup has to do instead: app/views/shared/_genre_combobox.html.erb.
   test "tapping a genre chip's remover on a phone takes the genre off" do
     CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore])])
     visit capture_path
@@ -209,11 +172,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".hw-combobox__chip", text: "flarncore"
   end
 
-  # Two things go wrong on a narrow card once the chips fill the row. The card's "fields
-  # fill the column" rule catches the picker's inner input, which is not the field but a
-  # flex item on that row, so it takes a row of its own and leaves the handle a third;
-  # and the gem's own floor for that input is written in a variable we unset, so without
-  # a replacement it shrinks to the 1rem it also sets — too narrow to type a genre into.
   test "a genre row full of chips keeps a typable box beside the handle" do
     CannedExtractionClient.install(events: [poster_event(genres: %w[zorpcore flarncore dubtronica])])
     visit capture_path
@@ -228,8 +186,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_operator input["width"], :>=, 96
   end
 
-  # The field used to be a comma-joined text input, so a poster naming its genres with
-  # any other separator became one genre. A chip per genre is what makes that visible.
   test "a genre the taxonomy has never seen can still be typed in" do
     genre(name: "zorpwave", events_count: 3)
     CannedExtractionClient.install(events: [poster_event(genres: [])])
@@ -244,9 +200,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal %w[Dubtronica], Event.sole.genre_list
   end
 
-  # Observed on a real poster: six genres came back as one string. The chips make the
-  # run visible as a single genre, and the taxonomy is what says it is several (see
-  # EventCapture::Genres).
   test "a slash run the taxonomy vouches for arrives as one chip per genre" do
     carried = genre(name: "zorpcore", events_count: 3)
     CannedExtractionClient.install(events: [poster_event(genres: ["Loops/#{carried.name}/FX"])])
@@ -259,13 +212,9 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     accept
     assert_published
-    # "Fx", not "FX": a genre nobody carries is stored under the display spelling
-    # Genre.canonicalize_names gives it, exactly as a hand-typed one is.
     assert_equal ["Fx", "Loops", carried.name].sort, Event.sole.genre_list.sort
   end
 
-  # The other half of the rule, and the one that keeps a genre name with a slash in it
-  # from being minted as two that do not exist.
   test "a slash run nothing vouches for stays the single genre the model returned" do
     CannedExtractionClient.install(events: [poster_event(genres: ["Loops/FX"])])
     visit capture_path
@@ -274,9 +223,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".hw-combobox__chip", count: 1, text: "Loops/FX"
   end
 
-  # The suggestions are the point of the combobox: a genre we already carry should be
-  # picked rather than respelt, which is what keeps the taxonomy from growing a fourth
-  # spelling of the same thing.
   test "a genre already in the taxonomy is offered while typing" do
     genre(name: "zorpwave", events_count: 3)
     CannedExtractionClient.install(events: [poster_event(genres: [])])
@@ -289,8 +235,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".hw-combobox__chip", text: /zorpwave/
   end
 
-  # Tapping a suggestion swaps the poster's spelling for the registry's. Counted as a
-  # correction it would inflate the one number a prompt edit is judged on.
   test "taking a place suggestion is recorded as a normalisation, not a correction" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Zorpwil")])
@@ -318,8 +262,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :corrected?
   end
 
-  # Nothing is offered until a contributor types, so the towns of the venues being
-  # suggested are the only ranking the field has before they do.
   test "the towns of the suggested venues are chips beside the locality field" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     place(name: "Zorpkeller", locality: "Zorpwil", canton: "BE")
@@ -336,10 +278,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "BE", field_value("canton")
   end
 
-  # Typing is the only way to the towns no venue on this poster points at, and the
-  # matching is the app's own: iOS Safari draws an <input list> in the strip above the
-  # keyboard and gives that strip to its own address autofill, so a datalist is offered
-  # to nobody there.
   test "typing a town offers the ones the app already knows" do
     place(locality: "Zorpwil", canton: "BE")
     place(locality: "Zorpheim", canton: "LU")
@@ -361,10 +299,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "LU", field_value("canton")
   end
 
-  # The venue half of the same door, and the one that matters most: a poster the model
-  # read badly leaves the field offering nothing, and the contributor mints a fresh
-  # spelling of a venue the app already carries — which is the split that keeps a real
-  # venue below the nomination threshold forever (see PlaceSuggester).
   test "typing a venue offers the ones the app already knows" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     place(name: "Flarnhalle", locality: "Flarnhausen", canton: "ZH")
@@ -386,9 +320,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "BE", field_value("canton")
   end
 
-  # A typed match is the registry's spelling arriving the same way a ranked chip's does,
-  # so it is counted the same way: the poster said one thing, the app carries another,
-  # and neither is the model having misread anything.
   test "taking a typed venue is recorded as a normalisation, not a correction" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     CannedExtractionClient.install(events: [poster_event(place: "Blorpwerk",
@@ -405,11 +336,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "place"), :normalized?
   end
 
-  # Tapping a town is taking the app's spelling over the poster's, exactly as tapping a
-  # venue is — and counted as a correction it would inflate the one number a prompt
-  # edit is judged on. A venue the fingerprint reaches is folded before the card
-  # renders and brings its own town with it, so the case left for a human is the
-  # NEAR-match: suggested, scored, and nothing applied until someone taps.
   test "taking a town is recorded as a normalisation, not a correction" do
     place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
     CannedExtractionClient.install(events: [poster_event(place: "Zorpsaal Halle",
@@ -424,8 +350,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "locality"), :normalized?
   end
 
-  # The venue half of the same rule as the town below: the app's spelling reaches the
-  # card, so a contributor confirms the name the publish will actually file under.
   test "a venue the app already carries reaches the card in its own spelling" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     CannedExtractionClient.install(events: [poster_event(place: "ZORPSAAL",
@@ -447,8 +371,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     end
   end
 
-  # Typing at the end is not incidental: the row it fills is one of the two that just
-  # went empty, and dropping that row outright would take the long tail of towns with it.
   test "a venue the app already carries is not suggested back to the card" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     place(name: "Zorpsaal Keller", locality: "Zorpwil", canton: "BE")
@@ -463,10 +385,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".suggestions button", text: "Zorpwil"
   end
 
-  # The spelling half of the same thing, and the reason the test above had to move off
-  # it: the card is handed the town's own spelling, so there is no correction for a
-  # contributor to make and none to record. That the model shouted is an extraction
-  # issue (see EventCapture::Normalizer), not a human's edit.
   test "a town the app already carries reaches the card in its own spelling" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     CannedExtractionClient.install(events: [poster_event(locality: "ZORPWIL",
@@ -476,8 +394,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
     assert_equal "Zorpwil", field_value("locality")
     assert_equal "Zorpwil", find(".capture-card [name=proposed_locality]", visible: :all).value
-    # The citation is the one thing that stays verbatim: it is a quote of the poster,
-    # and one edited to match our spelling could no longer be checked against it.
     assert_selector ".capture-card", text: "3000 ZORPWIL"
 
     accept
@@ -487,8 +403,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal ["Zorpwil"], Event.last.location_list.grep_v(/\A(BE|Zorpsaal)\z/)
   end
 
-  # The canton is computed from the locality once, server-side, at extraction — so a
-  # locality changed on the card has to bring its own (see Locality).
   test "a locality the app already knows fills the canton beside it" do
     place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
     CannedExtractionClient.install(events: [poster_event])
@@ -501,8 +415,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "AG", field_value("canton")
   end
 
-  # Clearing it would throw away the model's own postcode reading, which is the reason
-  # the field is still asked for at all.
   test "a locality nobody knows leaves the canton standing" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -526,7 +438,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_predicate ExtractionFieldOutcome.find_by(field: "canton"), :normalized?
   end
 
-  # No poster, no paste, no model call — a page of its own, and the same publish.
   test "an event entered by hand publishes and lands back on the picker" do
     visit capture_path
     by_hand
@@ -547,9 +458,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorp Fest", Event.last.title
   end
 
-  # The strip is the only thing on this screen that holds still. Anything else that did
-  # — the poster, the decision bar — could only stay visible by letting the fields pass
-  # behind it, so what is asserted here is that everything but the strip moves.
   test "everything below the queue strip scrolls like a plain page" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -565,9 +473,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_in_delta 0, rect(".capture-queue")["top"], 1
   end
 
-  # A decision is made at the bottom of a form, and the card that replaces it takes over
-  # the page's one scroll position — so without the handover the next card opens with its
-  # title, and the shows it may duplicate, above the top of the screen.
   test "publishing brings the next card to rest under the strip" do
     CannedExtractionClient.install(events: [poster_event, matinee])
     visit capture_path
@@ -582,9 +487,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_in_delta rect(".capture-queue")["bottom"], rect(".capture-card")["top"], 2
   end
 
-  # An absence test on purpose: the card's frame is shared markup one caller away, and
-  # this is the only thing standing between it and creeping back onto a screen with no
-  # source to compare against.
   test "the hand-entry page carries none of the review screen's furniture" do
     visit capture_path
     by_hand
@@ -596,8 +498,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".drop-zone__item"
   end
 
-  # Both fields were minted blind here: the screen mounted no controller at all, so it
-  # had neither the ranked chips a poster earns nor the typed ones every screen can.
   test "the hand-entry screen offers the venues and towns the app already knows" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     place(name: "Flarnhalle", locality: "Flarnhausen", canton: "ZH")
@@ -620,9 +520,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "ZH", manual_value("canton")
   end
 
-  # The canton is derived from the town and never asked for on its own, so a town typed
-  # out in full has to move it as surely as a chip does — the tap and the keystroke reach
-  # the same field through different actions, and only one of them was ever wired.
   test "a town typed out by hand on the hand-entry screen still moves the canton" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
     place(name: "Flarnhalle", locality: "Flarnhausen", canton: "ZH")
@@ -639,8 +536,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "BE", manual_value("canton")
   end
 
-  # The third option beside publish and drop. The flags are what make it more than a
-  # coin flip — see EventCapture::Correction for why an identical request is not one.
   test "a re-read appends a fresh card instead of replacing the one being disputed" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -669,8 +564,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_empty CannedExtractionClient.corrections.compact.sole.fields
   end
 
-  # Every re-read is a paid third-party call, so the budget is per INPUT: the cards a
-  # re-read produces do not arrive with one of their own.
   test "a poster gets two re-reads and then says why there are no more" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -685,8 +578,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert find(".capture-card .card-aside button[data-action='capture#reread']").disabled?
   end
 
-  # The bar carries the two decisions that END the card. Asking for another go leaves
-  # it in play, so the button belongs with the checkboxes and the note it sends.
   test "the re-read button sits with the controls it acts on, not in the action bar" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -697,8 +588,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-card .action-bar > *", count: 2
   end
 
-  # A drop never reaches the server on its own, and it is the read worth the most:
-  # the contributor looked at the card and threw all of it away.
   test "a dropped card reports what the model had proposed" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -707,7 +596,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     reject
     assert_published 0
 
-    # The record is fire-and-forget, so it lands after the card is already gone.
     page.document.synchronize(errors: [Minitest::Assertion]) do
       assert_equal "Zorpsaal", ExtractionFieldOutcome.discarded.find_by(field: "place")&.proposed
     end
@@ -718,8 +606,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     visit capture_path
     pick "poster.png"
 
-    # `required` would stop the submit before the server ever saw it, so it is
-    # dropped through the DOM: the point is that the card survives a server refusal.
     assert_selector ".capture-card select[name=canton]"
     execute_script("document.querySelector('.capture-card [name=canton]').removeAttribute('required')")
     accept
@@ -729,8 +615,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".flash"
   end
 
-  # The strip is the only receipt for what published, and going back to the picker
-  # throws it away — so what replaces it has to say how much went live.
   test "the last decision hands the screen back to the picker" do
     CannedExtractionClient.install(events: [poster_event, matinee])
     visit capture_path
@@ -866,8 +750,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue__tile[data-state=pending]"
   end
 
-  # The strip outlives the cards, and the only thing it is scanned for is what has
-  # already been answered — so each answer has to be its own mark, not a shared one.
   test "each decided tile carries the mark for its own outcome" do
     CannedExtractionClient.install(events: [poster_event, matinee, poster_event(title: "Zorpcore Spaet")])
     visit capture_path
@@ -879,8 +761,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-queue__tile[data-state=dropped] .ph-x"
   end
 
-  # An input nothing came back from was judged by nobody, so it may not wear the mark
-  # of a card someone threw away.
   test "an input that came back with nothing does not wear a dropped card's mark" do
     CannedExtractionClient.install(events: [])
     visit capture_path
@@ -890,8 +770,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue__tile .ph-x"
   end
 
-  # The tile is stood up before the downscale that gives it a picture, so it is the one
-  # place the poster can go missing; a card's own tile is built once the blob is held.
   test "a tile stood up before its read carries the poster all the same" do
     CannedExtractionClient.install(events: [])
     visit capture_path
@@ -900,8 +778,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_decoded ".capture-queue__tile img"
   end
 
-  # The row stops repeating it while the read is in flight, so the strip is where a
-  # contributor still finds out which input a tile stands for.
   test "the tile names the input the row no longer does" do
     CannedExtractionClient.install(events: [])
     visit capture_path
@@ -955,8 +831,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-row__excerpt", text: "Zorpcore Nacht, Zorpsaal, 20 Uhr"
   end
 
-  # Picking files ends on a dialog closing and dropping them ends on a drag; typing ends
-  # on nothing, which is why this one has a button of its own.
   test "the read button is dead until there is text to read" do
     visit capture_path
     assert read_disabled?
@@ -968,11 +842,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert read_disabled?
   end
 
-  # The way in that costs no download. Chrome hands `read()` over without a prompt once
-  # the permission is granted, but Safari — the browser this exists for — puts its own
-  # paste confirmation in front of it, so the clipboard is stubbed rather than filled:
-  # what is under test is what the controller does with a ClipboardItem, and that is the
-  # same object either way.
   test "an image on the clipboard is read like a picked poster" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -982,9 +851,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_decoded ".capture-card:not([hidden]) .review-card__source img"
   end
 
-  # A clipboard item is named by nothing, so the strip cannot name the input the way it
-  # names a file — it says what the input was instead. Read as yielding nothing for the
-  # same reason the picked-file case is: a tile that found an event is renamed after it.
   test "a pasted poster is named for the gesture on its tile" do
     CannedExtractionClient.install(events: [])
     visit capture_path
@@ -1003,8 +869,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-row"
   end
 
-  # Declining the browser's own paste prompt rejects the read. That is a decision the
-  # contributor made, not a failure of theirs to be told about.
   test "a declined paste says nothing at all" do
     visit capture_path
     hold_on_clipboard "async () => { throw new DOMException('denied', 'NotAllowedError') }"
@@ -1027,7 +891,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".drop-zone__error", visible: true
   end
 
-  # The desktop door: no button, no permission prompt, just Ctrl/Cmd+V on the screen.
   test "an image pasted onto the picker is read without touching the button" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -1037,8 +900,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "Zorpcore Nacht", field_value("title")
   end
 
-  # An image rides along with the text on a clipboard filled from a rich document, and
-  # in a field that can hold the text the text is what was meant.
   test "a paste into the text field stays the text field's" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -1048,8 +909,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-picker"
   end
 
-  # Nothing on the screen is reachable while a card is being decided, and a keystroke
-  # that reaches the whole document has to answer for that itself.
   test "a paste lands nowhere while cards are being decided" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -1059,9 +918,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-row", count: 1, visible: :all
   end
 
-  # The button ships rendered, so a browser with no async clipboard read is the one that
-  # has to be simulated. connect() is re-run by hand because the controller had already
-  # connected — with the real navigator — before the stub could be put in its way.
   test "the paste button is taken away where the clipboard cannot be read" do
     visit capture_path
     assert paste_button.visible?
@@ -1074,8 +930,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".drop-zone__paste", visible: true
   end
 
-  # Nothing is held back to be sent later, so a file no browser can decode has to fail
-  # where it lands — on its own row, named — rather than as a chip that never went.
   test "a file no browser can decode fails its own row and lets the rest of the pick land" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -1122,8 +976,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector "h1", text: copy("review.title", count: 2)
   end
 
-  # The whole reason nothing is staged: there is no need to assemble a batch when
-  # deciding one hands the picker straight back for the next.
   test "a finished batch hands back a picker that reads another input" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
@@ -1159,12 +1011,8 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   private
 
-  # Far enough out that the candidate is never past.
   def show_date = Date.current + 30
 
-  # The shape EventCapture::Prompt::SCHEMA asks the model for. `date_evidence` cites
-  # no date on purpose: YearResolver would otherwise recompute the year from it and
-  # move the date this test asserts on.
   def poster_event(**overrides)
     { title: "Zorpcore Nacht", date: show_date.to_s, date_evidence: "steht auf dem Plakat",
       time: "20 Uhr", time_evidence: "20 Uhr", place: "Zorpsaal", place_evidence: "Zorpsaal",
@@ -1174,31 +1022,17 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def matinee(**overrides) = poster_event(title: "Zorpcore Matinee", **overrides)
 
-  # Blurred on purpose: the carry hangs off `change`, which a text field fires when it
-  # is left, not on every keystroke.
   def type(field, value)
     find(".capture-card [name='#{field}']").set(value)
     find(".capture-card [name=title]").click
   end
 
-  # The picker is hidden synchronously in the change handler — leavePicker() is the
-  # first statement of readImages, before the first await — so waiting on it being gone
-  # waits for nothing, and the line after would inherit the whole read inside one
-  # default_max_wait_time. Waiting on the pending copy clearing absorbs the canvas
-  # encode, the upload and the extraction here instead. The TEXT, not the element: an
-  # undecodable file keeps its row and overwrites that copy with the reason.
-  #
-  # The count is `visible: :all` because only one card is ever on screen: a row whose
-  # read has landed and is queued behind the strip holds nothing but its hidden card,
-  # so it renders empty and a visibility-filtered count can never reach names.size.
   def pick(*names)
     find(".drop-zone__input", visible: :all).set(names.map { |name| file_fixture(name) })
     assert_selector ".capture-row", count: names.size, wait: 5, visible: :all
     assert_no_selector "[data-pending]", text: copy("row.pending"), wait: 5
   end
 
-  # A filename is the one source label that is not truncated on the way in, so the
-  # overflow case needs a real file carrying a real long name.
   def pick_as(name)
     path = Rails.root.join("tmp", name)
     FileUtils.cp(file_fixture("poster.png"), path)
@@ -1215,17 +1049,12 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def paste_button = find(".drop-zone__paste")
 
-  # Replaces the whole `clipboard` object rather than its `read`: the real one is a
-  # getter on Navigator.prototype, and an own property is what shadows it.
   def hold_on_clipboard(read)
     execute_script(<<~JS)
       Object.defineProperty(navigator, "clipboard", { configurable: true, value: { read: #{read} } })
     JS
   end
 
-  # The bytes have to survive createImageBitmap and the signature sniff in
-  # EventCapture::Adapters::Image, so this is the same poster the picker tests use,
-  # carried in as base64 — a page cannot reach the fixture file itself.
   def clipboard_image
     "async () => [new ClipboardItem({ 'image/png': #{poster_blob_js} })]"
   end
@@ -1245,8 +1074,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     settle_read
   end
 
-  # A real ClipboardEvent carrying a real DataTransfer: the guard that lets a field keep
-  # its own paste reads the text off it, so a hand-rolled stand-in would not exercise it.
   def paste_onto(target, text: nil)
     execute_script(<<~JS)
       const data = new DataTransfer()
@@ -1256,7 +1083,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     JS
   end
 
-  # What `pick` waits on, for the ways in that do not go through a file input.
   def settle_read
     assert_selector ".capture-row", count: 1, wait: 5
     assert_no_selector "[data-pending]", text: copy("row.pending"), wait: 5
@@ -1286,20 +1112,12 @@ class CaptureScreenTest < ApplicationSystemTestCase
   def manual_field(field) = find("#manual-event-form [name='#{field}']")
   def manual_value(field) = manual_field(field).value
 
-  # Accepting the last card in a queue hands the screen straight back to the picker, so
-  # the tile that said it published is gone before an assertion could look for it. The
-  # flash is what outlives that, and waiting on it is also what holds a test back until
-  # the publish has landed.
   def assert_published(count = 1) = assert_selector(".flash", text: copy("queue.done", count: count))
 
-  # The strip is the only way onto a card that has not been decided yet. Waits for the
-  # tile to exist: reads land one at a time, and `all` does not wait for a count.
   def scroll_to_bottom = execute_script("window.scrollTo(0, document.body.scrollHeight)")
 
   def viewport_height = page.evaluate_script("window.innerHeight")
 
-  # Viewport coordinates, which is what "holds still" and "has scrolled past" are claims
-  # about — an offset inside the document cannot tell the two apart.
   def rect(selector) = find(selector).evaluate_script("this.getBoundingClientRect().toJSON()")
 
   def jump_to(index)
@@ -1307,8 +1125,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
     all(".capture-queue__tile")[index].click
   end
 
-  # A name nothing matches empties the list, and waiting for that is what makes the
-  # Enter land after the filter has run rather than before it, without a sleep.
   def add_genre(name)
     input = find(".capture-card [role=combobox]")
     input.send_keys(name)
@@ -1318,9 +1134,6 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def copy(key, **args) = I18n.t("capture.#{key}", locale: :de, **args)
 
-  # A src attribute only proves the slot was filled. naturalWidth is the one signal
-  # Chrome gives that the blob: URL was actually allowed to load — a CSP without
-  # blob: in img-src leaves the element in place and the image at zero.
   def assert_decoded(selector)
     find(selector)
     page.document.synchronize(errors: [Minitest::Assertion]) do

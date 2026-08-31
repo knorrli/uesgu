@@ -1,9 +1,5 @@
 require "test_helper"
 
-# The provider call, with the socket stubbed. Asserts the request we actually put
-# on the wire — Infomaniak's product-scoped OpenAI route, the image inlined as a
-# data URL, strict structured output — and that every transport failure surfaces
-# as one ProviderError for the Extractor to turn into a retryable row.
 class EventCapture::InfomaniakTest < ActiveSupport::TestCase
   class FakeHTTP
     attr_accessor :use_ssl, :open_timeout, :read_timeout
@@ -64,8 +60,6 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
     assert_equal 1200, result.input_tokens
   end
 
-  # The status is the message because that message is persisted on every failed
-  # attempt; the body it came with is a payload and stays in `detail`.
   test "a non-200 becomes a ProviderError carrying the status, with the body kept out of the message" do
     result, = call_with(response("503", "upstream busy"))
 
@@ -74,9 +68,6 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
     assert_equal "upstream busy", result.detail
   end
 
-  # The product id is interpolated into the request path, so a malformed one has to
-  # fail like any other bad configuration — Extractor rescues ProviderError only, and
-  # anything else reaches the capture screen as a 500 instead of one retryable row.
   test "a malformed product id becomes a ProviderError, not a raw exception" do
     result = EventCaptureConfig.stub(:api_token, "tok-123") do
       EventCaptureConfig.stub(:product_id, "42 42") do
@@ -87,8 +78,6 @@ class EventCapture::InfomaniakTest < ActiveSupport::TestCase
     assert_kind_of EventCapture::ProviderError, result
   end
 
-  # A body arriving with finish_reason "length" is a cut-off answer, not a bad one:
-  # read it first and it fails as unparseable JSON, naming neither cause nor fix.
   test "a response stopped at the token ceiling fails as truncated, before its body is read" do
     result, = call_with(response("200", JSON.generate(
       choices: [{ message: { content: '{"events":[{"title":"Zorpcore' }, finish_reason: "length" }],

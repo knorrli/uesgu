@@ -1,9 +1,5 @@
 require "db_test_helper"
 
-# Back navigation follows one rule: every page's back link points *up* one level,
-# and the top of the tree is the main events feed. Assertions target the
-# `.back-link` element specifically (not the nav menu, which links to /admin on
-# every admin page regardless).
 class AdminBackNavTest < ActionDispatch::IntegrationTest
   test "admin catalogue index pages link back to the dashboard" do
     sign_in_as user(admin: true)

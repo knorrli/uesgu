@@ -1,12 +1,3 @@
-/* Two label roles, kept deliberately distinct (a box reads as clickable in this
-   UI, so the box is the interactivity cue):
- *
- *   .tag   — INTERACTIVE / selectable. Boxed (hairline border). A filter token,
- *            a status filter link, a selectable style. `.active` fills it accent.
- *   .chip  — READ-ONLY information. Borderless (faint tint). A badge that states
- *            a fact (channel, type, status, a listed style/location) and is never
- *            clickable. Lives here beside .tag so the contrast is one read.
- */
 .tag {
   padding: 5px;
   font-size: 80%;
@@ -14,8 +5,6 @@
   color: var(--theme-fg-color);
   line-height: var(--tag-line-height);
   border: var(--tag-border-width) solid var(--theme-fg-color);
-  /* Tags read as chips, never links — kill the underline on the cases rendered
-     as <a> (e.g. the genre-index status filters). Harmless on button/span tags. */
   text-decoration: none;
 
   &.active {
@@ -32,30 +21,18 @@ button.tag {
   color: var(--theme-fg-color);
 }
 
-/* An applied-filter chip (tags/_filter_chip, shared by the events filter and the
-   rule form; tag-picker builds the same shape in JS): icon · label · × laid out
-   inline. */
 .tag[data-tag-chip] {
   display: inline-flex;
   align-items: center;
   gap: var(--gap-xsmall);
 }
 
-/* Dim the whole chip on hover/focus to signal "tap to remove" — same affordance
-   cue as the mobile .filter-chip, so removable filters read consistently. */
 .tag[data-tag-chip]:hover,
 .tag[data-tag-chip]:focus-visible {
   opacity: 0.82;
 }
 
-/* The × on a removable APPLIED-FILTER token: the affordance that says the chip is
-   removable, distinguishing it from a selected/current .tag.active (status/nav
-   filters), which carry no ×. The whole chip is the <button> click target now, so
-   the × is a decorative glyph (no nested button) — bigger touch surface, and the
-   same one-tap remove whether you hit the label or the ×. */
 .tag__remove {
-  /* Same colour as the label (inherits) — the chip dims as a whole on hover, so
-     the × needn't be pre-dimmed. */
   line-height: 1;
 }
 
@@ -64,8 +41,6 @@ button.tag {
   line-height: 1;
 }
 
-/* Selectable chip (favorite styles): the chip itself shows selection, so hide
-   the native checkbox and fill the chip with accent when checked. */
 label.tag {
   cursor: pointer;
 }
@@ -83,10 +58,6 @@ label.tag:has(input:checked) {
   color: var(--theme-bg-color);
 }
 
-/* A row of match-at-entry candidates beside the field they fill (shared/_suggestions).
-   Chips, so tapping one reads as picking from a vocabulary rather than as filling a
-   field — which is exactly what it is. The one place a .chip IS clickable, which is
-   why the pointer has to be stated here rather than inherited from the base rule. */
 .suggestions {
   align-items: baseline;
 }
@@ -95,14 +66,10 @@ label.tag:has(input:checked) {
   cursor: pointer;
 }
 
-/* A row down to its label alone is a label for nothing — and the locality row is
-   rendered empty on purpose, to be filled as the contributor types. */
 .suggestions:not(:has(.chip)) {
   display: none;
 }
 
-/* Read-only info badge. Borderless + faint tint so it never reads as a clickable
-   tag/button — the counterpart to .tag. */
 .chip {
   font-size: var(--font-size-small);
   padding: var(--gap-xsmall) var(--gap-small);
@@ -118,28 +85,16 @@ label.tag:has(input:checked) {
   opacity: 0.75;
 }
 
-/* A date/window or "favorites live" chip: faintly accent-tinted to read as a
-   time/favorite fact (still borderless — it's information). */
 .chip--window {
   background: var(--theme-accent-muted);
   color: var(--theme-fg-color);
 }
 
-/* A category/type badge ("New" / "What's on"): neutral, same as the base chip. */
 .chip--type {
   background: color-mix(in srgb, var(--theme-fg-color) 8%, transparent);
   color: var(--theme-fg-muted);
 }
 
-/* Event markers — a quiet chip sub-family appended AFTER an event title to add
-   status/provenance info WITHOUT competing with it. Smaller than a base .chip and
-   still borderless (read-only info). Colour separates the two things a marker can
-   say: STATUS runs warm by severity (cancelled warn-red → rescheduled sand), while
-   PROVENANCE is cool (community steel-blue) or neutral (the off-site source, base
-   .chip grey). Community and source regularly appear side by side on one title —
-   a hand-entered event linking to Instagram carries both — so they must not read
-   as the same kind of fact. They trail the title link, so each takes a small
-   leading gap. Used on the events list. */
 .chip--cancelled,
 .chip--moved,
 .chip--community,

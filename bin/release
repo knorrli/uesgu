@@ -1,14 +1,4 @@
 #!/usr/bin/env bash
-#
-# Cut a release. Tags the current main commit `vX.Y.Z` and pushes the tag, which
-# triggers .github/workflows/release.yml -> deploys to Render + publishes a GitHub
-# Release. Nothing reaches production except through this path.
-#
-#   bin/release 0.1.0        # tag v0.1.0 and ship it
-#
-# Before running: land your changes on main via PR. The release notes are
-# generated automatically from the merged PRs (see .github/release.yml) — there
-# is no changelog to update.
 
 set -euo pipefail
 
@@ -18,7 +8,6 @@ if [ -z "$version" ]; then
   exit 1
 fi
 
-# Accept both "0.1.0" and "v0.1.0"; normalise to a "v"-prefixed tag.
 version="${version#v}"
 if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "Error: '$version' is not a semantic version (expected X.Y.Z)." >&2
@@ -49,10 +38,8 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse origin/main)" ]; then
   exit 1
 fi
 
-# Refuse to release unless CI is green on this exact commit. Branch protection
-# already requires it to merge, but this guards the gap between "merged" and
-# "main's post-merge CI finished" — and against tagging a commit whose checks are
-# still running. Needs gh authenticated locally.
+# Branch protection gates the merge; this guards the gap before main's
+# post-merge CI has finished. Needs gh authenticated locally.
 echo "Checking CI on $(git rev-parse --short HEAD)..."
 checks="$(gh api "repos/knorrli/uesgu/commits/$(git rev-parse HEAD)/check-runs" \
   --jq '.check_runs[] | "\(.name)=\(.conclusion // "pending")"' 2>/dev/null || true)"

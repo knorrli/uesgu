@@ -1,15 +1,3 @@
-<%# The fields an event is entered through, wherever that happens: the review card
-    renders them beside a poster with the model's quotes attached, the hand-entry screen
-    renders them alone. Most of that needs no branch — a quote for a field with no value
-    renders nothing, and field_group drops what renders nothing.
-
-    `suggestions` is what does: the place and locality chips a card OPENS with are ranked
-    from what a model read, so a screen with no read has nothing to rank. The rows
-    themselves render either way, because they are also where the names matching what is
-    being typed are appended (see lib/capture/place_fields.js).
-
-    `controller` is whichever one the screen mounts — the two differ in everything else
-    they do, so the actions name it rather than assuming one. %>
 <%# locals: (candidate:, key:, controller:, suggestions: false, genre_options: []) %>
 <label class="flex flex-col gap-xsmall">
   <span class="field-label"><%= t('capture.candidate.title') %></span>
@@ -36,14 +24,9 @@
         locals: { attached: render("shared/cite", quote: cited_evidence(candidate, :time)) } do %>
     <label class="flex flex-col gap-xsmall">
       <span class="field-label"><%= t('capture.candidate.time') %></span>
-      <%# The value is always HH:MM or blank — a time the normalizer refused is null
-          with the raw text cited beside it (see EventCapture::Normalizer). %>
       <%= render "shared/time_field", name: :time, value: candidate.time %>
     </label>
   <% end %>
-  <%# In the row rather than in the date group's `attached`, where every other remark
-      on this card hangs off the field it concerns: half a row is too narrow for the
-      sentence, and the row is the narrowest thing that is not. %>
   <% if candidate.past? %>
     <p class="capture-fields__warning"><%= t('capture.candidate.past') %></p>
   <% end %>
@@ -58,18 +41,11 @@
                                            aria: { live: "polite" } })] } do %>
   <label class="flex flex-col gap-xsmall">
     <span class="field-label"><%= t('capture.candidate.place') %></span>
-    <%# Off as a precaution rather than on an observed fill: the town below has to be
-        (`name="locality"` is an address autofill token), and a venue beside a town and a
-        canton is the same address-shaped group — a fill here mints a street line as a
-        place, which nothing downstream can tell from a real one. %>
     <%= text_field_tag :place, candidate.place, autocomplete: "off",
           data: { action: "input->#{controller}#suggestPlaces change->#{controller}#typedPlace" } %>
   </label>
 <% end %>
 
-<%# Both rows hang off the PAIR: a chip fills the canton as well as the town (see
-    CapturesHelper#locality_chips), and the canton is computed from the locality rather
-    than read off the poster (see EventCapture::Normalizer). %>
 <% towns = suggestions ? locality_chips(ranked, candidate, controller) : [] %>
 <%= render layout: "shared/field_group",
       locals: { attached: [render("shared/cite", quote: cited_evidence(candidate, :locality)),
@@ -78,13 +54,7 @@
                                                          aria: { live: "polite" } })] } do %>
   <div class="capture-fields__where flex gap-small wrap">
     <label class="flex flex-col gap-xsmall">
-      <%# Required HERE and not at extraction: a poster never prints its own town,
-          but Location.add_to_tree drops any tuple missing the middle tier, so a
-          blank locality is an event nobody can browse to. %>
       <span class="field-label"><%= t('capture.candidate.locality') %></span>
-      <%# autocomplete off because `name="locality"` is an address autofill token and
-          the field sits beside a canton: iOS otherwise offers to fill it with a whole
-          postal address ("Bern 3008 Switzerland"), which mints that as a town. %>
       <%= text_field_tag :locality, candidate.locality, required: true, autocomplete: "off",
             data: { action: "input->#{controller}#suggestLocalities change->#{controller}#typedPlace" } %>
     </label>

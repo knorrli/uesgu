@@ -1,7 +1,3 @@
-<%# A single day's events, grouped under their venue so a venue hosting several
-    events that day shows its name once. Chronological by start time; untimed
-    events sort last. Used by the events and watchlist listings, and (read only,
-    interactive: false) the admin genre-editor preview. %>
 <% interactive = local_assigns.fetch(:interactive, true) %>
 <% groups = events
      .sort_by { |event| [event.start_time ? 0 : 1, event.start_time, event.title.to_s] }
@@ -10,15 +6,9 @@
   <% groups.each_value do |group| %>
     <% lead = group.first %>
     <% venue = lead.venue %>
-    <%# Venue is the anchor (own line, headline size); locality/canton drop to a quiet
-        metadata line beneath it, so the hierarchy reads the same logged in or out.
-        With no venue, the first location is promoted to the anchor so the group
-        still has a headline. %>
     <% locations = lead.locations.to_a %>
     <% anchor = venue || locations.first %>
     <% meta_locations = locations.reject { |location| location == anchor } %>
-    <%# Location names in this group that explain an interest match (a followed
-        venue/place) and aren't already an applied filter — flagged amber below. %>
     <% why_locs = interactive ? interest_location_names(group) : Set.new %>
     <section class="venue-group flex flex-col gap-small">
       <% if anchor %>

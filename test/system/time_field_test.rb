@@ -1,7 +1,5 @@
 require "application_system_test_case"
 
-# The only way to enter "this event's start time is unknown": no engine lets you clear
-# a native time control, so the field carries a ✕ of its own (shared/_time_field).
 class TimeFieldTest < ApplicationSystemTestCase
   test "clearing the time saves the event as untimed" do
     day = Date.current + 3
@@ -14,7 +12,7 @@ class TimeFieldTest < ApplicationSystemTestCase
     assert_equal "", find("#event_time").value
 
     find("input[type=submit]").click
-    assert_text "Manuelle Überschreibungen" # the locked-fields section, which only a saved edit renders
+    assert_text "Manuelle Überschreibungen" #
     assert_nil e.reload.start_time
   end
 
@@ -24,8 +22,6 @@ class TimeFieldTest < ApplicationSystemTestCase
     visit admin_event_path(e)
 
     assert_no_selector ".time-field__clear", visible: true
-    # Set through the DOM: typing into a native time control means driving whichever
-    # segment layout the engine happens to lay out, which is not what this asserts.
     execute_script("const i = document.querySelector('#event_time');" \
                    "i.value = '21:00'; i.dispatchEvent(new Event('input'))")
     assert_selector ".time-field__clear", visible: true

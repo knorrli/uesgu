@@ -1,7 +1,5 @@
 require "db_test_helper"
 
-# Admin CRUD over discard rules, plus the live preview. Every write re-derives
-# the discard flag across existing events so a rule takes effect immediately.
 class AdminDiscardRulesTest < ActionDispatch::IntegrationTest
   test "guests are sent to login, non-admins are forbidden" do
     get admin_discard_rules_path

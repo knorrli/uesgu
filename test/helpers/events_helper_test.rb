@@ -15,6 +15,18 @@ class EventsHelperTest < ActionView::TestCase
     assert_nil event_offsite_source(event(url: nil))
   end
 
+  test "canton_last sinks the canton and settles the rest alphabetically" do
+    e = event(location_list: ["BE", "Zorpwil", "Flarnhausen"])
+
+    assert_equal %w[Flarnhausen Zorpwil BE], canton_last(e.locations).map(&:name)
+  end
+
+  test "canton_last leaves a canton-free line alone" do
+    e = event(location_list: ["Zorpwil", "Flarnhausen"])
+
+    assert_equal %w[Flarnhausen Zorpwil], canton_last(e.locations).map(&:name)
+  end
+
   test "genre_subtree_names returns the genre plus every descendant" do
     rock = genre(name: "helprock")
     indie = genre(name: "helpindie"); indie.set_parent!(rock)

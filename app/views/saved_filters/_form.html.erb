@@ -16,7 +16,7 @@
       <legend><%= t('saved_filters.section_filter') %></legend>
 
       <% what_terms  = filter.queries + filter.genres %>
-      <% where_terms = filter.location_list.map { |loc| location_display(loc) } %>
+      <% where_terms = filter.location_list %>
       <% when_terms  = Array(filter.date_ranges.find { |r| Datepicker.preset.key?(r) }).map { |w| t("datepicker.#{w}") } %>
       <div class="filter-sheets__fields">
         <div class="filter-sheets__bar">

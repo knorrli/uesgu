@@ -8,6 +8,11 @@ class CapturesHelperTest < ActionView::TestCase
 
   def candidate(**attrs) = EventCapture::Candidate.new(**attrs)
 
+  test "the canton picker offers every code, ordered by code" do
+    assert_equal Location::CANTON_CODES.sort, canton_options
+    assert_equal %w[AG ZH], canton_options.values_at(0, -1)
+  end
+
   test "a place chip carries the whole tuple it fills" do
     chip = place_chips([suggestion("Zorpsaal", "Zorpwil")], "capture").sole
 

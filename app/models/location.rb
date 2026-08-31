@@ -29,6 +29,10 @@ class Location
     CANTON_CODES
   end
 
+  def self.canton_name(code)
+    I18n.t("cantons.#{code}", default: code)
+  end
+
   def self.type_for(name)
     name = name.to_s
     return :venue if venue_names.include?(name)

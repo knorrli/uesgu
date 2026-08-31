@@ -102,6 +102,11 @@ class LocationTest < ActiveSupport::TestCase
     refute_includes fingerprints, zorpsaal.fingerprint
   end
 
+  test "canton_name translates a code and falls back to the raw one" do
+    assert_equal "Bern", Location.canton_name("BE")
+    assert_equal "ZZ", Location.canton_name("ZZ")
+  end
+
   test "hierarchy excludes placeless venues and never yields a nil locality/canton" do
     placeless = Venue.consuming.reject(&:placed?).first
     tree = Location.hierarchy

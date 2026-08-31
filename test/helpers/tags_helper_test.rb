@@ -16,8 +16,16 @@ class TagsHelperTest < ActionView::TestCase
     assert_equal "ph ph-map-pin", tag_icon_class(context: "locality")
   end
 
-  test "canton_name falls back to the raw code for an unknown canton" do
-    assert_equal "ZZ", canton_name("ZZ")
+  test "location_filter_tree labels a canton by its code, keeping the name searchable" do
+    spot = place(name: "Zorpsaal", locality: "Zorpwil", canton: "GE")
+    event(location_list: [spot.name, spot.locality, spot.canton])
+
+    node = location_filter_tree.find { |n| n[:value] == "GE" }
+
+    assert_equal "GE", node[:name]
+    assert_equal Location.canton_name("GE"), node[:title]
+    assert_includes node[:search].split, "GE"
+    assert_includes node[:search], Location.canton_name("GE")
   end
 
   test "available_tags(:locations) lists location tags alphabetically, excluding applied" do

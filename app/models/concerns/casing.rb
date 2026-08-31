@@ -15,6 +15,17 @@ module Casing
   # append the act's country, and "(De)" reads as a word.
   COUNTRY_CODE = %r{\(\p{Upper}{2,4}(?:/\p{Upper}{2,4})*\)}
 
+  # Abbreviations of the domain, kept in their conventional spelling rather than
+  # title-cased. Matched on the WHOLE token, so "DJANGO" is untouched.
+  #
+  # Deliberately holds no artist names. Those are rulings about one entity, an admin
+  # edit makes them stick per event, and a list that accepted them would grow with the
+  # corpus for ever. Country codes that double as ordinary words stay out for a
+  # different reason: "US" and "IN" are a pronoun and a preposition far more often than
+  # they are countries, and the parenthesised form is already kept above.
+  ABBREVIATIONS = { "dj" => "DJ", "djs" => "DJs", "mc" => "MC", "mcs" => "MCs",
+                    "ep" => "EP", "lp" => "LP", "uk" => "UK", "usa" => "USA" }.freeze
+
   # A single letter is not a word. Counting them would read "SUNN O)))" as two and
   # recase a name.
   WORD = /\p{Alpha}{2,}/
@@ -44,7 +55,9 @@ module Casing
   def self.titlecased(str)
     str.gsub(TITLE_WORD) do
       digit, word = Regexp.last_match(:digit), Regexp.last_match(:word)
-      digit ? "#{digit}#{word.downcase}" : word.capitalize
+      next "#{digit}#{word.downcase}" if digit
+
+      ABBREVIATIONS[word.downcase] || word.capitalize
     end
   end
 end

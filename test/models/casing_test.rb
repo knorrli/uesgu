@@ -59,4 +59,23 @@ class CasingTest < ActiveSupport::TestCase
     assert_nil Casing.recase(nil)
     assert_equal "", Casing.recase("")
   end
+  test "an abbreviation of the domain keeps its conventional spelling" do
+    assert_equal "DJ Patife (BR)", Casing.recase("DJ PATIFE (BR)")
+    assert_equal "DJs All Night Long", Casing.recase("DJS ALL NIGHT LONG")
+    assert_equal "MC Solaar", Casing.recase("MC SOLAAR")
+    assert_equal "USA – Australien", Casing.recase("USA – AUSTRALIEN")
+  end
+
+  # Whole tokens only — the abbreviation must not reach inside a longer word.
+  test "a word that merely starts with an abbreviation is title-cased" do
+    assert_equal "Django Reinhardt", Casing.recase("DJANGO REINHARDT")
+    assert_equal "Epilog Und Lparty", Casing.recase("EPILOG UND LPARTY")
+  end
+
+  # "us" is a pronoun far more often than it is a country, and the parenthesised form
+  # is kept by the country-code rule instead.
+  test "a country code that doubles as an ordinary word is not spared" do
+    assert_equal "The Best Of Us", Casing.recase("THE BEST OF US")
+    assert_equal "Alela Diane (US)", Casing.recase("ALELA DIANE (US)")
+  end
 end

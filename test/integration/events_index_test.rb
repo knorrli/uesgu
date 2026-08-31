@@ -58,6 +58,16 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_select "p.events-empty"
   end
 
+  test "a card's location line puts the canton last" do
+    spot = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    event(title: "CantonLastShow", start_date: Date.current + 2.days,
+          location_list: [spot.name, "BE", "Zorpwil"])
+
+    get events_path
+
+    assert_equal %w[Zorpwil BE], css_select(".event-where-meta .filter-link").map { |tag| tag.text.strip }
+  end
+
   test "a location filter narrows the listing" do
     event(title: "AlphaShow", location_list: ["VenueAlpha"], start_date: Date.current + 2.days)
     event(title: "BetaShow", location_list: ["VenueBeta"], start_date: Date.current + 2.days)

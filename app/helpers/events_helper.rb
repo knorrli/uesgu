@@ -16,6 +16,10 @@ module EventsHelper
     nil
   end
 
+  def canton_last(locations)
+    locations.sort_by { |location| [Location.canton?(location.name) ? 1 : 0, location.name] }
+  end
+
   def event_filter_tag(label, field:, value:, interactive: true, modifier: nil)
     param = field.delete_suffix("[]")
 

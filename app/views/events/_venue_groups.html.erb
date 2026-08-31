@@ -6,7 +6,7 @@
   <% groups.each_value do |group| %>
     <% lead = group.first %>
     <% venue = lead.venue %>
-    <% locations = lead.locations.to_a %>
+    <% locations = canton_last(lead.locations) %>
     <% anchor = venue || locations.first %>
     <% meta_locations = locations.reject { |location| location == anchor } %>
     <% why_locs = interactive ? interest_location_names(group) : Set.new %>

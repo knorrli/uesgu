@@ -34,15 +34,18 @@ class Location
   end
 
   def self.type_for(name)
-    name = name.to_s
-    return :venue if venue_names.include?(name)
-    return :canton if canton_codes.include?(name)
+    return :venue if venue?(name)
+    return :canton if canton?(name)
 
     :locality
   end
 
   def self.venue?(name)
     venue_names.include?(name.to_s)
+  end
+
+  def self.canton?(name)
+    CANTON_CODES.include?(name.to_s)
   end
 
   def self.usage

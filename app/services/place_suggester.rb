@@ -45,10 +45,9 @@ class PlaceSuggester
     # there, and the two sources are one list because a contributor picking a name has
     # no use for which side of the registry line it falls on.
     def by_name
-      rows = Venue.in_taxonomy.map { |venue| [venue.name, venue.locality, venue.canton] }
-      rows += Place.canonicals.pluck(:name, :locality, :canton)
-      rows.sort_by { |name, _, _| name.downcase }
-          .to_h { |name, locality, canton| [name, [locality, canton]] }
+      rows = Place.canonicals.pluck(:name, :locality, :canton)
+      rows += Venue.in_taxonomy.map { |venue| [venue.name, venue.locality, venue.canton] }
+      rows.to_h { |name, locality, canton| [name, [locality, canton]] }
     end
 
     private
@@ -105,12 +104,17 @@ class PlaceSuggester
 
     Candidates = Data.define(:sql, :binds)
 
+    # Off Place.canonicals, so the names this scores and the ones by_name ships stay one
+    # set: a narrowing applied to only one of them would leave the card offering a name
+    # the ranking no longer reaches.
+    PLACE_COLUMNS = "name, locality, canton, name_folded, 'place'".freeze
+
     # Aliases are excluded rather than resolved: their canonical is already in the
     # set and scores at least as well, so offering the merged-away spelling would
     # only invite re-minting it.
     def name_candidates
       registry(Venue.in_taxonomy) { |venue| [venue.name, venue.locality, venue.canton, venue.name] }
-        .then { |rows| union("SELECT name, locality, canton, name_folded, 'place' FROM places WHERE canonical_id IS NULL", rows) }
+        .then { |rows| union(Place.canonicals.select(PLACE_COLUMNS).to_sql, rows) }
     end
 
     def registry(venues)

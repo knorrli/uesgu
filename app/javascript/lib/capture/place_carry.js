@@ -8,8 +8,8 @@ const PLACE_FIELDS = ["place", "locality", "canton"]
 // offering names for them is PlaceFields, which the hand-entry screen mounts on its own
 // — a form holding one event has no sibling to carry anything to.
 //
-// `cards` is passed in at every entry point: which cards are on screen is the
-// controller's to know, and this only needs the siblings of the one being acted on.
+// `cards` is passed in rather than found: which cards are on screen is the controller's
+// to know, and this only needs the siblings of the one being acted on.
 export class PlaceCarry {
   constructor() {
     this.shared = new Map()

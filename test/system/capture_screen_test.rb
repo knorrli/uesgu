@@ -620,6 +620,25 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_equal "ZH", manual_value("canton")
   end
 
+  # The canton is derived from the town and never asked for on its own, so a town typed
+  # out in full has to move it as surely as a chip does — the tap and the keystroke reach
+  # the same field through different actions, and only one of them was ever wired.
+  test "a town typed out by hand on the hand-entry screen still moves the canton" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    place(name: "Flarnhalle", locality: "Flarnhausen", canton: "ZH")
+    visit capture_path
+    by_hand
+
+    manual_field("locality").set("flarn")
+    find(".suggestions button", text: "Flarnhausen").click
+    assert_equal "ZH", manual_value("canton")
+
+    manual_field("locality").set("Zorpwil")
+    manual_field("title").click
+
+    assert_equal "BE", manual_value("canton")
+  end
+
   # The third option beside publish and drop. The flags are what make it more than a
   # coin flip — see EventCapture::Correction for why an identical request is not one.
   test "a re-read appends a fresh card instead of replacing the one being disputed" do

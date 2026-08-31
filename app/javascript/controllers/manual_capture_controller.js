@@ -31,7 +31,7 @@ export default class extends Controller {
     this.fields.suggest(this.element, "locality", event.target.value)
   }
 
-  typed(event) {
+  typedPlace(event) {
     this.fields.typed(this.element, event.target.name, event.target.value)
   }
 }

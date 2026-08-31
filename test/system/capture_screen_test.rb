@@ -1016,10 +1016,12 @@ class CaptureScreenTest < ApplicationSystemTestCase
     pick "poster.png"
 
     assert_no_selector ".capture-picker"
+    assert_no_selector ".page-header", text: copy("picker.add_by_hand")
     reject
     find("button[data-action='capture#startOver']").click
 
     assert_selector ".capture-picker"
+    assert_selector ".page-header", text: copy("picker.add_by_hand")
     assert_selector "h1", text: copy("title")
     assert_no_selector ".page-header", text: copy("review.hint")
     assert_no_selector ".capture-card", visible: :all
@@ -1188,7 +1190,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def read_text = find("button[data-action='capture#readText']").click
 
-  def by_hand = find(".capture-by-hand a").click
+  def by_hand = find(".page-header a[href='#{manual_capture_path}']").click
 
   def read_disabled? = find("button[data-action='capture#readText']").disabled?
 

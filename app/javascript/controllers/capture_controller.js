@@ -25,7 +25,7 @@ const isImage = (file) => isImageType(file.type)
 // Connects to data-controller="capture".
 export default class extends Controller {
   static targets = ["files", "text", "zone", "read", "paste", "pasteError", "input",
-                    "restart", "rows", "strip", "card", "source", "stagingTitle",
+                    "restart", "byHand", "rows", "strip", "card", "source", "stagingTitle",
                     "reviewTitle", "reviewHint", "genreOptions"]
   static values = {
     url: String,
@@ -196,6 +196,7 @@ export default class extends Controller {
     this.pasteErrorTarget.hidden = true
     this.inputTarget.hidden = true
     this.restartTarget.hidden = false
+    this.byHandTarget.hidden = true
   }
 
   // The downscaled blob is held beside the object URL the pane paints from: a re-read
@@ -219,6 +220,7 @@ export default class extends Controller {
     this.stripTarget.hidden = true
     this.currentId = null
     this.restartTarget.hidden = true
+    this.byHandTarget.hidden = false
     this.inputTarget.hidden = false
     this.reviewTitleTarget.hidden = true
     this.reviewHintTarget.hidden = true

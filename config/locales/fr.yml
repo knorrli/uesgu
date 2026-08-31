@@ -148,7 +148,7 @@ fr:
     calendar_feed_hint_html: Ta liste existe aussi en abonnement pour ton app calendrier — %{link}.
     calendar_feed_link: à configurer dans les réglages
   capture:
-    title: Lire une affiche
+    title: Lire
     review:
       title:
         one: 1 événement trouvé
@@ -163,7 +163,7 @@ fr:
       drop_label: Dépose tes affiches ici, ou touche pour choisir
       paste: Coller une image
       paste_empty: Aucune image dans le presse-papiers.
-      add_by_hand: Saisir à la main
+      add_by_hand: À la main
       read_text: Lire
       start_over: Annuler et recommencer
     queue:

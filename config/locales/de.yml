@@ -148,7 +148,7 @@ de:
     calendar_feed_hint_html: Die Merkliste gibts auch als Abo für deine Kalender-App — %{link}.
     calendar_feed_link: in den Einstellungen einrichten
   capture:
-    title: Poster auslesen
+    title: Auslesen
     review:
       title:
         one: 1 Event gefunden
@@ -163,7 +163,7 @@ de:
       drop_label: Poster hierhin ziehen oder antippen
       paste: Bild einfügen
       paste_empty: Kein Bild in der Zwischenablage.
-      add_by_hand: Von Hand erfassen
+      add_by_hand: Von Hand
       read_text: Auslesen
       start_over: Abbrechen und neu starten
     queue:

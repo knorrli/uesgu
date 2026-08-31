@@ -38,24 +38,38 @@ de:
   about:
     title: Über üsgu
     heading: Über üsgu
-    intro: üsgu.ch sammelt Konzerte und Events aus der Region an einem Ort, direkt von den Seiten der Veranstalter und aus Eventlisten. Kein Abklappern von zehn Websites mehr, um zu sehen, wer wann wo spielt.
-    why: Ich hab üsgu gebaut, weil ich selber dauernd den Überblick verlor und Konzerte verpasste, die ich gern gesehen hätte. Es ist ein privates Projekt für Freunde, kein Startup und kein Geschäft. Keine Werbung, nichts zu verkaufen.
-    privacy: Hier gibts mehr zum Datenschutz →
+    intro: üsgu.ch sammelt Musik-Events aus der Schweiz, aktuell liegt der Fokus auf Bern und Umgebung. Dabei geht es sowohl um Events von etablierten Lokalen wie auch um kleine Einzelanlässe, ohne dass man mit Werbung vollgeballert wird oder unnötige Daten angeben muss.
+    why:
+      title: Warum gibt es üsgu?
+      body: Ich habe üsgu gebaut, weil es in der Schweiz keine Plattform gibt, die auch Hinterhof-Gigs auflistet, und ich keinen Bock auf Facebook, Instagram oder solche Dinge habe. Ansätze wie hinto.net, BKA oder RonOrp funktionieren aus meiner Sicht nicht, weil sie erwarten, dass die Event-Daten aufbereitet und/oder eingespeist werden.
+    how:
+      title: Wie funktioniert üsgu?
+      body: Weil die Daten nicht zu uns kommen, holen wir öffentlich zugängliche Informationen einfach selber. Das geschieht grösstenteils automatisiert, aber auch manuell.
+      crawler:
+        title: Automatische Crawler
+        body: Konzertlokale mit einer öffentlichen Webseite werden in einer Liste erfasst. Einmal pro Nacht wird sie ausgelesen, neue Events werden gespeichert und bekannte aktualisiert.
+      capture:
+        title: Erfassen durch die Community
+        body: Wenn du registriert bist, kannst du eigene Events erfassen. Das geht entweder manuell, oder durch KI-gestütztes Auslesen von Postern, Flyern oder Beschreibungen. Solche Events sind mit "Community" markiert.
+    contact:
+      title: Kontakt
+      body: Falls du Fragen hast oder ein Konzertlokal in die Liste soll, schreib an %{email}
+      email: kontakt@uesgu.ch
   privacy:
     title: Datenschutz
     heading: Datenschutz
     intro: üsgu.ch ist ein privates, nicht-kommerzielles Projekt und sammelt so wenig Daten wie möglich. Hier steht, was gespeichert wird und warum.
-    collect_heading: Was wir speichern
-    collect_account: Deinen Benutzernamen und dein Passwort (verschlüsselt), damit du ein Konto hast.
-    collect_email: Deine E-Mail-Adresse, nur wenn du eine angibst, und nur um dir die Benachrichtigungen zu schicken, die du eingestellt hast.
-    collect_content: 'Was du selber anlegst: gespeicherte Filter und gemerkte Events.'
-    collect_cookies: 'Drei Cookies: einer hält dich eingeloggt, einer merkt sich dein Theme (hell/dunkel), einer den zuletzt angewendeten Filter. Sonst keine.'
+    collect_heading: Was wir speichern, falls du einen Account hast
+    collect_account: 'Deinen Benutzernamen und dein Passwort (verschlüsselt), damit du dich einloggen kannst.'
+    collect_email: "Deine E-Mail-Adresse, falls du Benachrichtigungen per E-Mail willst."
+    collect_content: 'Deine gespeicherten Filter und gemerkten Events.'
+    collect_cookies: 'Drei Cookies: eins hält dich eingeloggt, eins merkt sich dein Theme (hell/dunkel), eins den zuletzt angewendeten Filter.'
     services_heading: Externe Dienste
-    services_hosting: 'Hosting: Render (render.com). Alles läuft in deren Frankfurt-Region, deine Daten bleiben also in der EU.'
-    services_email: 'E-Mail: Resend (resend.com) verschickt die optionalen Benachrichtigungs-Mails. Keine E-Mail, kein Resend.'
+    services_hosting: 'Hosting: Render (render.com), Region Frankfurt. Deine Daten bleiben in der EU.'
+    services_email: 'E-Mail: Resend (resend.com), Region Irland. Verschickt die optionalen Benachrichtigungs-Mails.'
     services_push: 'Push: Wenn du Push-Benachrichtigungen einschaltest, laufen sie über den Push-Dienst deines Browsers oder Handys (Google, Mozilla oder Apple).'
     calendar_heading: Kalender-Link
-    calendar_body: Wenn du ein Kalender-Abo erstellst, enthält der Link einen geheimen Token. Jeder, dem du den Link gibst, sieht deine gemerkten Events, also behalt ihn für dich. Du kannst ihn jederzeit in den Einstellungen deaktivieren.
+    calendar_body: Wenn du ein Kalender-Abo erstellst, enthält der Link einen geheimen Schlüssel. Wenn du diesen Link teilst, können andere deine gemerkten Events einsehen. Du kannst den Kalender-Link jederzeit in den Einstellungen deaktivieren.
     logs_heading: Server-Logs
     logs_body: Der Server führt kurzlebige Logs, die deine IP-Adresse enthalten, wie jede Website. Sie helfen bei Fehlern und Missbrauch, und wir nutzen sie nicht, um dich zu verfolgen oder zu profilieren.
     nothing_heading: Was wir nicht tun

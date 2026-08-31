@@ -2,7 +2,7 @@
  * under `.sg` so it never leaks into the rest of the app. The point of the page
  * is to render the REAL shared element classes (button, .tag, .chip, .badge,
  * .icon-button, …) using the real bundled CSS; this file only adds the
- * scaffolding around those specimens. See docs/ui-audit.md. */
+ * scaffolding around those specimens. */
 
 .sg {
   max-width: 60rem;
@@ -77,7 +77,9 @@
 /* Larger specimen text (e.g. icon-size demos). */
 .sg-specimen--lg { font-size: 1.4rem; }
 
-.sg-specimen--review-card {
+/* Opts a specimen out of the centered flex stage, for elements that own their own
+   internal layout (the review card, a prose column). */
+.sg-specimen--block {
   display: block;
 }
 

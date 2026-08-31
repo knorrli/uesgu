@@ -5,8 +5,6 @@ class FooterPagesTest < ActionDispatch::IntegrationTest
     get about_path
     assert_response :success
     assert_select "h1", text: "Über üsgu"
-    # Links onward to the privacy notice.
-    assert_select "a[href=?]", privacy_path
   end
 
   test "privacy page renders for guests" do

@@ -38,24 +38,38 @@ en:
   about:
     title: About üsgu
     heading: About üsgu
-    intro: üsgu.ch gathers concerts and events from around the region into one place, straight from venue pages and event listings. No more checking ten websites to find out who's playing where and when.
-    why: I built it because I kept losing track myself, and missing shows I'd have loved to see. It's a private project for friends, not a startup and not a business. No ads, nothing to sell.
-    privacy: More info about data privacy →
+    intro: üsgu.ch collects music events from across Switzerland, right now the focus is Bern and the surrounding area. It lists both the shows at established venues and the small one-off gigs, without blasting you with ads or making you hand over data nobody needs.
+    why:
+      title: Why does üsgu exist?
+      body: I built üsgu because no Swiss platform lists backyard gigs as well, and because I can't be bothered with Facebook, Instagram or that kind of thing. Attempts like hinto.net, BKA or RonOrp don't work, the way I see it, because they expect the event data to be prepared and/or fed in.
+    how:
+      title: How does üsgu work?
+      body: Since the data doesn't come to us, we go and fetch the publicly available information ourselves. That happens mostly automatically, but also by hand.
+      crawler:
+        title: Automatic crawlers
+        body: Concert venues with a public website are kept in a list. Their site is read once a night, new events are stored and known ones updated.
+      capture:
+        title: Added by the community
+        body: 'If you have an account, you can add your own events. That works either by hand, or by letting AI read a poster, a flyer or a description. Those events are marked "Community".'
+    contact:
+      title: Contact
+      body: If you have questions or want a venue on the list, write to %{email}
+      email: kontakt@uesgu.ch
   privacy:
     title: Privacy
     heading: Privacy
     intro: üsgu.ch is a private, non-commercial project and collects as little data as possible. Here's what's stored, and why.
-    collect_heading: What we store
-    collect_account: Your username and password (encrypted), so you can have an account.
-    collect_email: Your email address, only if you give one, and only to send you the notifications you set up.
-    collect_content: 'Whatever you create yourself: saved filters and saved events.'
-    collect_cookies: 'Three cookies: one keeps you logged in, one remembers your theme (light/dark), one remembers the filter you last applied. Nothing else.'
+    collect_heading: What we store if you have an account
+    collect_account: Your username and password (encrypted), so you can log in.
+    collect_email: Your email address, if you want notifications by email.
+    collect_content: Your saved filters and saved events.
+    collect_cookies: 'Three cookies: one keeps you logged in, one remembers your theme (light/dark), one remembers the filter you last applied.'
     services_heading: Outside services
-    services_hosting: 'Hosting: Render (render.com). Everything runs in their Frankfurt region, so your data stays in the EU.'
-    services_email: 'Email: Resend (resend.com) delivers the optional notification emails. No email, no Resend.'
+    services_hosting: 'Hosting: Render (render.com), Frankfurt region. Your data stays in the EU.'
+    services_email: 'Email: Resend (resend.com), Ireland region. Delivers the optional notification emails.'
     services_push: 'Push: if you turn on push notifications, they travel through your browser or phone''s push service (Google, Mozilla, or Apple).'
     calendar_heading: Calendar link
-    calendar_body: If you create a calendar subscription, its link holds a secret token. Anyone you share that link with can see your saved shows, so keep it to yourself. You can deactivate it any time in settings.
+    calendar_body: If you create a calendar subscription, its link holds a secret key. If you share that link, other people can see your saved events. You can deactivate the calendar link any time in settings.
     logs_heading: Server logs
     logs_body: The server keeps short-lived logs that include your IP address, like any website does. They help with errors and abuse, and we don't use them to track or profile you.
     nothing_heading: What we don't do

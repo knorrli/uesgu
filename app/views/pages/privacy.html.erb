@@ -8,50 +8,36 @@
   <div class="prose flex flex-col gap-medium">
     <p><%= t('privacy.intro') %></p>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('privacy.collect_heading') %></h2>
-      <ul>
-        <li><%= t('privacy.collect_account') %></li>
-        <li><%= t('privacy.collect_email') %></li>
-        <li><%= t('privacy.collect_content') %></li>
-        <li><%= t('privacy.collect_cookies') %></li>
-      </ul>
-    </section>
+    <h2><%= t('privacy.collect_heading') %></h2>
+    <ul>
+      <li><%= t('privacy.collect_account') %></li>
+      <li><%= t('privacy.collect_email') %></li>
+      <li><%= t('privacy.collect_content') %></li>
+      <li><%= t('privacy.collect_cookies') %></li>
+    </ul>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('privacy.services_heading') %></h2>
-      <ul>
-        <li><%= t('privacy.services_hosting') %></li>
-        <li><%= t('privacy.services_email') %></li>
-        <li><%= t('privacy.services_push') %></li>
-      </ul>
-    </section>
+    <h2><%= t('privacy.services_heading') %></h2>
+    <ul>
+      <li><%= t('privacy.services_hosting') %></li>
+      <li><%= t('privacy.services_email') %></li>
+      <li><%= t('privacy.services_push') %></li>
+    </ul>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('privacy.calendar_heading') %></h2>
-      <p><%= t('privacy.calendar_body') %></p>
-    </section>
+    <h2><%= t('privacy.calendar_heading') %></h2>
+    <p><%= t('privacy.calendar_body') %></p>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('privacy.logs_heading') %></h2>
-      <p><%= t('privacy.logs_body') %></p>
-    </section>
+    <h2><%= t('privacy.logs_heading') %></h2>
+    <p><%= t('privacy.logs_body') %></p>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('privacy.nothing_heading') %></h2>
-      <p><%= t('privacy.nothing_body') %></p>
-    </section>
+    <h2><%= t('privacy.nothing_heading') %></h2>
+    <p><%= t('privacy.nothing_body') %></p>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('privacy.delete_heading') %></h2>
-      <p><%= t('privacy.delete_body') %></p>
-    </section>
+    <h2><%= t('privacy.delete_heading') %></h2>
+    <p><%= t('privacy.delete_body') %></p>
 
-    <section class="flex flex-col gap-small">
-      <h2><%= t('privacy.contact_heading') %></h2>
-      <%# Plain text, deliberately not a mailto: the inbox is live, but a raw
-          mailto: invites address-harvesting spam. Keep it as plain text. %>
-      <p><%= t('privacy.contact_body', email: t('privacy.contact_email')) %></p>
-    </section>
+    <h2><%= t('privacy.contact_heading') %></h2>
+    <%# Plain text, deliberately not a mailto: the inbox is live, but a raw
+        mailto: invites address-harvesting spam. Keep it as plain text. %>
+    <p><%= t('privacy.contact_body', email: t('privacy.contact_email')) %></p>
   </div>
 </div>

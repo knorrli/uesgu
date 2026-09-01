@@ -735,8 +735,10 @@ de:
           one: 1 Event
           other: "%{count} Events"
         name_label: Name
-        rename: Umbenennen
         rename_hint: Beim Umbenennen werden alle Events mit der alten Schreibweise umgehängt und gespeicherte Filter mitgezogen. Zwei Schreibweisen legst du besser zusammen.
+        url_label: Link zum Lokal
+        url_hint: Eine Website, ein Instagram-Konto, irgendetwas Bleibendes. Events hier ohne eigene Quellseite verlinken stattdessen darauf.
+        save: Speichern
         merge: Zusammenlegen
         merge_into: Zusammenlegen mit…
         merge_hint: Beim Zusammenlegen werden alle Events unter diesem Namen umgehängt, samt Ort und Kanton des anderen Lokals. Die Verknüpfung bleibt, spätere Captures landen ebenfalls beim anderen Lokal.
@@ -859,6 +861,8 @@ de:
     edit_event: Event bearbeiten
     edit_tag: Tag bearbeiten
     offsite_link: Öffnet auf %{source}, nicht der Website des Lokals
+    venue_link: Lokal
+    venue_link_hint: Öffnet die Seite von %{venue}, nicht eine Seite zu diesem Event
     index:
       empty: Keine Events für die aktuellen Filter.
       clear_filter: Filter zurücksetzen

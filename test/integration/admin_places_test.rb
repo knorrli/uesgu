@@ -145,4 +145,28 @@ class AdminPlacesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select ".catalogue-count", text: /1/
   end
+
+  test "an admin gives a venue a link, and a submit without the field leaves it alone" do
+    zorpsaal = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    sign_in_as user(admin: true)
+
+    patch admin_place_path(zorpsaal), params: { place: { name: "Zorpsaal", url: "https://zorpsaal.test" } }
+    assert_redirected_to edit_admin_place_path(zorpsaal)
+    assert_equal "https://zorpsaal.test", zorpsaal.reload.url
+
+    get edit_admin_place_path(zorpsaal)
+    assert_select "input[name=?][value=?]", "place[url]", "https://zorpsaal.test"
+
+    patch admin_place_path(zorpsaal), params: { place: { name: "Zorpsaal" } }
+    assert_equal "https://zorpsaal.test", zorpsaal.reload.url
+  end
+
+  test "a blank link is stored as NULL" do
+    zorpsaal = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE", url: "https://zorpsaal.test")
+    sign_in_as user(admin: true)
+
+    patch admin_place_path(zorpsaal), params: { place: { name: "Zorpsaal", url: "" } }
+
+    assert_nil zorpsaal.reload.url
+  end
 end

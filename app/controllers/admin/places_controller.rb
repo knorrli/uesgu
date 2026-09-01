@@ -24,7 +24,9 @@ module Admin
     def update
       @place = Place.find(params[:id])
       @count = usage_count(@place)
-      return redirect_to edit_admin_place_path(@place) if @place.rename!(params.expect(place: [:name])[:name])
+      attrs = params.expect(place: %i[name url])
+      @place.url = attrs[:url].presence if attrs.key?(:url)
+      return redirect_to edit_admin_place_path(@place) if @place.rename!(attrs[:name])
 
       render :edit, status: :unprocessable_entity
     end

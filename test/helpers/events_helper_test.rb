@@ -15,6 +15,42 @@ class EventsHelperTest < ActionView::TestCase
     assert_nil event_offsite_source(event(url: nil))
   end
 
+  test "event_link_url prefers the event's own url over the venue's" do
+    venue = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE", url: "https://zorpsaal.test")
+    e = event(url: "https://zorpsaal.test/show", location_list: [venue.name, "Zorpwil", "BE"])
+
+    assert_equal "https://zorpsaal.test/show", event_link_url(e)
+  end
+
+  test "event_link_url falls back to the venue's url when the event has none" do
+    venue = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE", url: "https://zorpsaal.test")
+    e = event(url: nil, location_list: [venue.name, "Zorpwil", "BE"])
+
+    assert_equal "https://zorpsaal.test", event_link_url(e)
+  end
+
+  test "event_link_url stays nil when neither the event nor its venue has a url" do
+    venue = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    e = event(url: nil, location_list: [venue.name, "Zorpwil", "BE"])
+
+    assert_nil event_link_url(e)
+    assert_nil event_link_url(event(url: nil, location_list: %w[Zorpwil BE]))
+  end
+
+  test "a venue url resolves through a spelling the event was tagged with" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE", url: "https://zorpsaal.test")
+    e = event(url: nil, location_list: ["zorp saal", "Zorpwil", "BE"])
+
+    assert_equal "https://zorpsaal.test", event_link_url(e)
+  end
+
+  test "event_offsite_source names the host of a fallen-back venue url" do
+    place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE", url: "https://instagram.com/zorpsaal")
+    e = event(url: nil, location_list: ["Zorpsaal", "Zorpwil", "BE"])
+
+    assert_equal "Instagram", event_offsite_source(e)
+  end
+
   test "canton_last sinks the canton and settles the rest alphabetically" do
     e = event(location_list: ["BE", "Zorpwil", "Flarnhausen"])
 

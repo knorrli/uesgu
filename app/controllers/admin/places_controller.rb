@@ -18,7 +18,15 @@ module Admin
 
     def edit
       @place = Place.find(params[:id])
-      @count = Location.usage.find { |row| row[:name] == @place.name }&.fetch(:count) || 0
+      @count = usage_count(@place)
+    end
+
+    def update
+      @place = Place.find(params[:id])
+      @count = usage_count(@place)
+      return redirect_to edit_admin_place_path(@place) if @place.rename!(params.expect(place: [:name])[:name])
+
+      render :edit, status: :unprocessable_entity
     end
 
     def merge
@@ -35,6 +43,10 @@ module Admin
     end
 
     private
+
+    def usage_count(place)
+      Location.usage.find { |row| row[:name] == place.name }&.fetch(:count) || 0
+    end
 
     def sorted(places)
       return places.sort_by { |place| place.name.downcase } unless @sort == "count"

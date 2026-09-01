@@ -200,6 +200,42 @@ class PlaceTest < ActiveSupport::TestCase
     assert_equal ["AKuT"], kept.reload.location_list
   end
 
+  test "a rename retags the events carrying the old spelling" do
+    zorpsaal = place(name: "ZORPSAAL", locality: "Zorpwil", canton: "BE")
+    show = event(location_list: ["ZORPSAAL", "Zorpwil", "BE"])
+
+    assert zorpsaal.rename!("Zorpsaal")
+
+    assert_equal %w[BE Zorpsaal Zorpwil], show.reload.location_list.to_a.sort
+  end
+
+  test "a rename repoints the saved filters holding the old spelling" do
+    zorpsaal = place(name: "ZORPSAAL", locality: "Zorpwil", canton: "BE")
+    watcher = saved_filter(user, ["ZORPSAAL"])
+
+    zorpsaal.rename!("Zorpsaal")
+
+    assert_equal ["Zorpsaal"], watcher.reload.location_list
+  end
+
+  test "a rename onto a spelling another place already answers to is refused" do
+    place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    flarnhalle = place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
+
+    refute flarnhalle.rename!("akut")
+
+    assert_equal "Flarnhalle", flarnhalle.name
+    assert_equal "Flarnhalle", flarnhalle.reload.name
+  end
+
+  test "a rename to nothing at all is refused" do
+    flarnhalle = place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
+
+    refute flarnhalle.rename!("   ")
+
+    assert_equal "Flarnhalle", flarnhalle.reload.name
+  end
+
   test "splitting undoes the link and leaves the moved events where they were moved" do
     akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
     variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")

@@ -118,7 +118,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :places, only: %i[index edit] do
+    resources :places, only: %i[index edit update] do
       member do
         post :merge
         post :unmerge

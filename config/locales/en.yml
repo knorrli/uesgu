@@ -431,6 +431,8 @@ en:
     back: "Admin"
     index:
       title: Admin
+      where_heading: Where
+      tags_in_use: Tags in use
       placed: Placed
       unplaced: Unplaced
       ignored: Ignored
@@ -743,15 +745,15 @@ en:
         browse_events: See the events
     locations:
       index:
-        title: Locations
+        title: Tags in use
         type_all: All
         type_venue: Venue
         type_locality: Locality
         type_canton: Canton
-        search: Search locations…
+        search: Search tags…
         sort_name: name
         sort_count: usage
-        empty: No locations match.
+        empty: No tags match.
     discard_rules:
       index:
         title: Discard rules
@@ -797,11 +799,6 @@ en:
         updated: Discard rule updated.
       destroy:
         deleted: Discard rule deleted.
-  activemodel:
-    models:
-      location:
-        one: Location
-        other: Locations
   activerecord:
     models:
       acts_as_taggable_on/tag:

@@ -28,6 +28,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     fill_in "username", with: user.username
     fill_in "password", with: password
     find("input[type=submit]").click
+    assert_no_current_path new_session_path, wait: 5
     user
   end
 end

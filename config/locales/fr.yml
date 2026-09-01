@@ -729,6 +729,9 @@ fr:
           zero: aucun événement
           one: 1 événement
           other: "%{count} événements"
+        name_label: Nom
+        rename: Renommer
+        rename_hint: Renommer réétiquette tous les événements portant l'ancienne orthographe et met à jour les filtres enregistrés. Pour réunir deux orthographes, fusionne-les plutôt.
         merge: Fusionner
         merge_into: Fusionner avec…
         merge_hint: "La fusion réétiquette tous les événements sous ce nom et les déplace vers la localité et le canton de l'autre salle. Le lien reste : ce qui sera capturé sous ce nom ira aussi vers l'autre salle."
@@ -820,6 +823,8 @@ fr:
         one: Invitation
         other: Invitations
     attributes:
+      place:
+        name: Nom
       user:
         username: Nom d'utilisateur
         password: Mot de passe

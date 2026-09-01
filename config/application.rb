@@ -28,6 +28,8 @@ module Uesgu
 
     config.action_controller.per_form_csrf_tokens = false
 
+    config.action_view.field_error_proc = ->(html_tag, _instance) { html_tag }
+
     Rails.application.reloader.to_prepare do
       Dir[Rails.root.join("app/services/scrapers/**/*.rb")].each { |file| require_dependency(file) }
     end

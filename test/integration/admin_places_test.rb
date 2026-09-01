@@ -85,6 +85,45 @@ class AdminPlacesTest < ActionDispatch::IntegrationTest
     assert_match "Flarnhalle — Flarnhausen, AG", response.body
   end
 
+  test "an admin fixes a venue's spelling, and the events follow" do
+    zorpsaal = place(name: "ZORPSAAL", locality: "Zorpwil", canton: "BE")
+    show = event(location_list: ["ZORPSAAL", "Zorpwil", "BE"])
+    sign_in_as user(admin: true)
+
+    patch admin_place_path(zorpsaal), params: { place: { name: "Zorpsaal" } }
+
+    assert_redirected_to edit_admin_place_path(zorpsaal)
+    assert_equal "Zorpsaal", zorpsaal.reload.name
+    assert_includes show.reload.location_list, "Zorpsaal"
+    refute_includes show.location_list, "ZORPSAAL"
+  end
+
+  test "renaming a venue onto one that already exists comes back with the error" do
+    place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    flarnhalle = place(name: "Flarnhalle", locality: "Flarnhausen", canton: "AG")
+    sign_in_as user(admin: true)
+
+    patch admin_place_path(flarnhalle), params: { place: { name: "AKuT" } }
+
+    assert_response :unprocessable_entity
+    assert_select ".form-errors"
+    assert_select "h1", text: "Flarnhalle"
+    assert_equal "Flarnhalle", flarnhalle.reload.name
+  end
+
+  test "a merged spelling is not offered a rename, the venue it resolves to is" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    variant.merge_into!(akut)
+    sign_in_as user(admin: true)
+
+    get edit_admin_place_path(variant)
+    assert_select "form[action=?]", admin_place_path(variant), count: 0
+
+    get edit_admin_place_path(akut)
+    assert_select "form[action=?]", admin_place_path(akut)
+  end
+
   test "the return_to round-trip cannot be turned into an open redirect" do
     akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
     variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")

@@ -729,6 +729,9 @@ en:
           zero: no events
           one: 1 event
           other: "%{count} events"
+        name_label: Name
+        rename: Rename
+        rename_hint: Renaming retags every event carrying the old spelling and repoints the saved filters holding it. To fold two spellings into one, merge them instead.
         merge: Merge
         merge_into: Merge into…
         merge_hint: Merging retags every event under this name, and moves them to the other venue's town and canton. The link sticks, so anything captured under this name later resolves to the other venue too.
@@ -820,6 +823,8 @@ en:
         one: Invitation
         other: Invitations
     attributes:
+      place:
+        name: Name
       user:
         username: Username
         password: Password

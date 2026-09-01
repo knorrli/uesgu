@@ -73,6 +73,7 @@ Rails.application.routes.draw do
         post :block
         post :restore
         post :merge
+        post :rename
       end
       collection do
         get :queue

@@ -46,4 +46,48 @@ class GenreNameNormalizationTest < ActiveSupport::TestCase
     e = event(genre_list: ["Flarnstep."])
     assert_equal ["Flarnstep"], e.reload.genre_list
   end
+
+  def saved_filter(owner, genres)
+    rule = owner.saved_filters.new(cadence: "daily", time_of_day: 18 * 60)
+    rule.filter_attributes = { g: genres }
+    rule.save!
+    rule
+  end
+
+  test "a rename rewrites the tag on every event carrying the old spelling" do
+    flarndj = Genre.create!(name: "Flarndj")
+    show = event_with_genres("flarn-dj")
+
+    assert flarndj.rename!("FlarnDJ")
+
+    assert_equal ["FlarnDJ"], show.reload.genre_list
+    assert_equal "FlarnDJ", flarndj.reload.name
+  end
+
+  test "a rename repoints the saved filters holding the old spelling" do
+    flarndj = Genre.create!(name: "Flarndj")
+    watcher = saved_filter(user, ["Flarndj"])
+
+    flarndj.rename!("FlarnDJ")
+
+    assert_equal ["FlarnDJ"], watcher.reload.genres
+  end
+
+  test "a rename onto a spelling another genre already answers to is refused" do
+    Genre.create!(name: "Flarnstep")
+    flarndrone = Genre.create!(name: "Flarndrone")
+
+    refute flarndrone.rename!("flarn-step")
+
+    assert_equal "Flarndrone", flarndrone.name
+    assert_equal "Flarndrone", flarndrone.reload.name
+  end
+
+  test "a rename to nothing at all is refused" do
+    flarndrone = Genre.create!(name: "Flarndrone")
+
+    refute flarndrone.rename!("   ")
+
+    assert_equal "Flarndrone", flarndrone.reload.name
+  end
 end

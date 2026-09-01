@@ -412,6 +412,9 @@ en:
     editor:
       usage: "%{count} events"
       status: "Status:"
+      name_label: Name
+      rename: Rename
+      rename_hint: Renaming rewrites the tag on every event carrying the old spelling, and the saved filters holding it.
       set_parent: Set parent
       set_parent_into: "File under another genre…"
       ignore: "Ignore"
@@ -832,6 +835,8 @@ en:
       invitation:
         code: Code
         note: Note
+      genre:
+        name: Name
   date:
     formats:
       default: "%d.%m.%Y"

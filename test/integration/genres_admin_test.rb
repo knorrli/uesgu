@@ -21,6 +21,40 @@ class GenresAdminTest < ActionDispatch::IntegrationTest
     refute g.reload.ignored?
   end
 
+  test "an admin fixes a genre's spelling, and the events follow" do
+    flarndj = Genre.create!(name: "Flarndj")
+    show = event_with_genres("Flarndj")
+
+    post rename_genre_path(flarndj), params: { genre: { name: "FlarnDJ" }, return_to: genres_path }
+
+    assert_redirected_to genres_path
+    assert_equal "FlarnDJ", flarndj.reload.name
+    assert_equal ["FlarnDJ"], show.reload.genre_list
+  end
+
+  test "renaming a genre onto one that already exists is refused and says so" do
+    Genre.create!(name: "Flarnstep")
+    flarndrone = Genre.create!(name: "Flarndrone")
+
+    post rename_genre_path(flarndrone), params: { genre: { name: "Flarn-Step" }, return_to: genres_path }
+
+    assert_redirected_to genres_path
+    assert_equal "Flarndrone", flarndrone.reload.name
+    assert flash[:alert].present?
+  end
+
+  test "a merged genre is not offered a rename, the genre it resolves to is" do
+    canonical = genre(events_count: 1)
+    variant = genre(events_count: 1)
+    variant.merge_into!(canonical)
+
+    get edit_genre_path(variant)
+    assert_select "form[action=?]", rename_genre_path(variant), count: 0
+
+    get edit_genre_path(canonical)
+    assert_select "form[action=?]", rename_genre_path(canonical)
+  end
+
   test "set_parent files the genre under the chosen parent" do
     g = genre(events_count: 2)
     parent = genre

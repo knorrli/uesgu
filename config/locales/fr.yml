@@ -610,6 +610,10 @@ fr:
         time_label: Heure
         genres_label: Genres
         genres_hint: Entrée pour ajouter. Les nouveaux genres sont permis — si un genre existe déjà, prends-le. La modification verrouille la liste — le scraper n'y touche plus, et la visibilité en est reconstruite.
+        place_label: Salle
+        locality_label: Localité
+        canton_label: Canton
+        where_hint: Modifier l'un de ces champs verrouille tout le lieu — le scraper n'y touche plus. Une salle encore inconnue est créée.
         dismissed_badge: retiré
         overridden_badge: modifié manuellement
         save: Enregistrer
@@ -620,6 +624,7 @@ fr:
         field_description: Description
         field_start_date: Date et heure
         field_genres: Genres
+        field_locations: Salle & localité
         dismiss_heading: Visibilité
         dismiss_intro: Retire cet événement de toutes les listes publiques pour de bon. Il reste en base et n'est jamais ressuscité par un scrape — annulable à tout moment.
         dismiss: Retirer l'événement
@@ -636,6 +641,7 @@ fr:
         merge: Fusionner
       update:
         saved: Événement mis à jour.
+        place_invalid: Cette salle n'a pas pu être créée.
       revert:
         reverted: Champ réinitialisé à la source.
       destroy:

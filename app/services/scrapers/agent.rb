@@ -217,7 +217,7 @@ module Scrapers
         event.genre_list = Array(event_genres(content)) + mined_genres(content)
       end
       ensure_genres_and_visibility(event)
-      event.location_list = event_locations(content)
+      event.location_list = event_locations(content) unless event.overridden?(:locations)
       event.data_source   = self.class.source_key
       postprocess(event)
       mark_cancellation(event, content)

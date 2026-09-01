@@ -606,6 +606,8 @@ fr:
         intro: Corrige les données source erronées ci-dessous. Un champ modifié est verrouillé et ne sera pas écrasé au prochain scrape.
         title_label: Titre
         description_label: Description
+        url_label: URL source
+        url_hint: Les événements de la communauté n'ont pas de page source. Ajoutes-en une si l'événement a un lien permanent — le titre dans la liste publique pointera dessus.
         date_label: Date
         time_label: Heure
         genres_label: Genres
@@ -642,6 +644,7 @@ fr:
       update:
         saved: Événement mis à jour.
         place_invalid: Cette salle n'a pas pu être créée.
+        url_taken: Cette URL appartient déjà à un autre événement.
       revert:
         reverted: Champ réinitialisé à la source.
       destroy:

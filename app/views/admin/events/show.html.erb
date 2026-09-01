@@ -32,6 +32,16 @@
       <%= text_field_tag 'event[description]', @event.description, autocomplete: 'off' %>
     </label>
 
+    <% if @event.captured? %>
+      <div class="flex flex-col gap-small">
+        <label class="flex flex-col gap-small">
+          <span class="field-label"><%= t('.url_label') %></span>
+          <%= url_field_tag 'event[url]', @event.url, autocomplete: 'off' %>
+        </label>
+        <span class="muted"><%= t('.url_hint') %></span>
+      </div>
+    <% end %>
+
     <div class="flex gap-medium wrap">
       <label class="flex flex-col gap-small flex-grow">
         <span class="field-label flex gap-small align-baseline">

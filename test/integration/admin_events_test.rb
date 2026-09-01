@@ -380,4 +380,74 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     patch revert_admin_event_path(e, field: "locations")
     refute e.reload.overridden?(:locations)
   end
+
+  test "the source URL field is offered for a captured event only" do
+    scraped = event(title: "Scraped Show")
+    captured = event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
+    sign_in_as user(admin: true)
+
+    get admin_event_path(captured)
+    assert_select "input[name=?]", "event[url]"
+
+    get admin_event_path(scraped)
+    assert_select "input[name=?]", "event[url]", count: 0
+  end
+
+  test "an admin can attach a source URL to a captured event and clear it again" do
+    e = event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: e.title, description: "", date: e.start_date.iso8601, time: "",
+      url: "https://popup.test/summer"
+    } }
+    assert_redirected_to admin_event_path(e)
+    assert_equal "https://popup.test/summer", e.reload.url
+
+    patch admin_event_path(e), params: { event: {
+      title: e.title, description: "", date: e.start_date.iso8601, time: "", url: ""
+    } }
+
+    assert_nil e.reload.url, "a blank URL is stored as NULL, never as an empty string"
+  end
+
+  test "a scraped event's URL is ignored even when the field is posted" do
+    e = event(title: "Scraped Show")
+    original = e.url
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: e.title, description: "", date: e.start_date.iso8601, time: "",
+      url: "https://evil.test/changed"
+    } }
+
+    assert_equal original, e.reload.url
+  end
+
+  test "a source URL another event already carries is refused" do
+    taken = event(title: "Owns The URL")
+    e = event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: e.title, description: "", date: e.start_date.iso8601, time: "", url: taken.url
+    } }
+
+    assert_redirected_to admin_event_path(e)
+    assert_equal I18n.t("admin.events.update.url_taken"), flash[:alert]
+    assert_nil e.reload.url
+  end
+
+  test "two captured events without a URL do not collide" do
+    first = event(title: "One", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
+    second = event(title: "Two", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(first), params: { event: {
+      title: "One", description: "", date: first.start_date.iso8601, time: "", url: ""
+    } }
+
+    assert_nil first.reload.url
+    assert_nil second.reload.url
+  end
 end

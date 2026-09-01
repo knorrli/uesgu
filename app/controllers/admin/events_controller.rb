@@ -39,8 +39,11 @@ module Admin
 
     def update
       @event = Event.find(params.expect(:id))
-      attrs = params.expect(event: %i[title description date time genres place locality canton])
+      attrs = params.expect(event: %i[title description date time genres place locality canton url])
       assign_scalars(@event, attrs)
+      assign_source_url(@event, attrs)
+      return redirect_to admin_event_path(@event), alert: t(".url_taken") if url_taken?(@event)
+
       locked = @event.changed & Event::OVERRIDABLE_FIELDS
       locked |= SCHEDULE_FIELDS if locked.intersect?(SCHEDULE_FIELDS)
       locked << "genres" if assign_genres(@event, attrs)
@@ -53,6 +56,8 @@ module Admin
       @event.save!
       @event.recompute_visibility! if locked.include?("genres")
       redirect_to admin_event_path(@event), notice: t(".saved")
+    rescue ActiveRecord::RecordNotUnique
+      redirect_to admin_event_path(@event), alert: t(".url_taken")
     end
 
     def revert
@@ -117,6 +122,18 @@ module Admin
       before = event.location_list.sort
       event.location_list = tags.names
       event.location_list.sort != before
+    end
+
+    def assign_source_url(event, attrs)
+      return unless event.captured? && attrs.key?(:url)
+
+      event.url = attrs[:url].presence
+    end
+
+    def url_taken?(event)
+      return false unless event.url_changed? && event.url.present?
+
+      Event.where(url: event.url).where.not(id: event.id).exists?
     end
 
     def assign_genres(event, attrs)

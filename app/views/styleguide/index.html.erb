@@ -703,12 +703,19 @@
 
   <section class="sg-section" id="review-card">
     <h2>Review card</h2>
-    <p class="sg-section__intro">One thing being judged, with the evidence that settles it. An ordinary block in document flow: the source at the top (left of the fields from 900px), the fields below it, the decision after the last field, and <b>one</b> page scroll for the whole card. Nothing in it holds still — a pane that stayed put while the page moved could only do it by letting the fields pass behind it. The source is capped so the first field is on screen beside it, and each field carries the line quoted off the source, so the comparison survives scrolling past the poster.</p>
+    <p class="sg-section__intro">One thing being judged, with the evidence that settles it. An ordinary block in document flow: the source at the top (left of the fields from 900px), the fields below it, anything that is not being decided after them, the decision after that, and <b>one</b> page scroll for the whole card. From 900px the aside drops into the source's column and sits at its foot, level with the last field, so it stays the thing you reach past on the way to the decision instead of lengthening the field column. Nothing in it holds still — a pane that stayed put while the page moved could only do it by letting the fields pass behind it. The source is capped so the first field is on screen beside it, and each field carries the line quoted off the source, so the comparison survives scrolling past the poster.</p>
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen sg-specimen--block">
         <%= render layout: "shared/review_card",
               locals: { id: "sg-review-card", source: image_tag("/icon.png", alt: ""),
+                        aside: render(layout: "shared/card_aside",
+                                      locals: { title: "Falsch? Markier, was nochmal ausgelesen werden soll:",
+                                                action: tag.button("Nochmal auslesen", type: "button", class: "button-small") }) {
+                          tag.div(class: "account-form flex flex-col gap-small") {
+                            tag.input(type: "text", placeholder: "Was steht da wirklich?")
+                          }
+                        },
                         actions: render(layout: "shared/action_bar") {
                           safe_join([tag.button("Veröffentlichen", class: "button-small primary", type: "button"),
                                      tag.button("Verwerfen", class: "button-small", type: "button")])
@@ -730,8 +737,8 @@
         <% end %>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Review card</span> · <code>render layout: "shared/review_card", id:, actions:, source:</code>
-        <p class="sg-purpose">The block is the body. <code>actions</code> is a pre-rendered local rather than a second block so the decision row cannot be written into the middle of the field list; <code>source</code> is the evidence, or is left out and written into the pane by a client that holds it in memory only. Pass <code>frame_class</code>/<code>frame_attrs</code> for the caller's own hooks — never a second <code>class</code> attribute.</p>
+        <span class="sg-spec__name">Review card</span> · <code>render layout: "shared/review_card", id:, actions:, source:, aside:</code>
+        <p class="sg-purpose">The block is the body. <code>actions</code> is a pre-rendered local rather than a second block so the decision row cannot be written into the middle of the field list; <code>source</code> is the evidence, or is left out and written into the pane by a client that holds it in memory only; <code>aside</code> takes a <a href="#review-card">card aside</a> and is a local for the same reason as <code>actions</code> — it is the slot that lets the card place it in the source's column on a wide screen while it still reads after the fields in the markup. Pass <code>frame_class</code>/<code>frame_attrs</code> for the caller's own hooks — never a second <code>class</code> attribute.</p>
       </div>
     </div>
 
@@ -769,7 +776,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Card aside</span> · <code>render layout: "shared/card_aside", title:, action:</code>
-        <p class="sg-purpose">A block inside a review card that is <b>not</b> part of what the card is deciding — a report on the read, a note, anything that does not post with the card's form. It separates itself by <b>kind</b> rather than weight: the card body is borderless, so every input already draws a horizontal rule and one more hairline reads as one more field, while a recessed ground and a heading read as a boundary. <code>action</code> stays beside its own controls rather than going down to the <a href="#review-card">action bar</a>.</p>
+        <p class="sg-purpose">A block inside a review card that is <b>not</b> part of what the card is deciding — a report on the read, a note, anything that does not post with the card's form. It separates itself by <b>kind</b> rather than weight: the card body is borderless, so every input already draws a horizontal rule and one more hairline reads as one more field, while a recessed ground and a heading read as a boundary. <code>action</code> stays beside its own controls rather than going down to the <a href="#review-card">action bar</a>. Hand it to a review card's <code>aside</code> slot rather than writing it into the body, or it lengthens the field column instead of dropping under the source.</p>
       </div>
     </div>
 

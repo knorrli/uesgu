@@ -86,7 +86,9 @@
     grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
     grid-template-areas:
       "source body"
+      "aside body"
       "actions actions";
+    grid-template-rows: auto 1fr auto;
     column-gap: var(--gap-large);
   }
 
@@ -94,6 +96,11 @@
     grid-area: source;
     align-self: start;
     margin-bottom: 0;
+  }
+
+  .review-card__aside {
+    grid-area: aside;
+    align-self: end;
   }
 
   .review-card__body {

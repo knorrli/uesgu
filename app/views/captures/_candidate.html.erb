@@ -1,6 +1,25 @@
 <%# locals: (candidate:, key:, attempt_token: nil, index: nil) %>
+<% reread = render(layout: "shared/card_aside",
+      locals: { title: t('capture.reread.label'),
+                action: tag.button(t('capture.actions.reread'), type: "button",
+                                   class: "button-small", data: { action: "capture#reread" }) }) do %>
+  <div class="capture-card__reread account-form flex flex-col gap-small">
+    <div class="flex gap-xsmall wrap">
+      <% EventCapture::Correction::FIELDS.each do |field| %>
+        <label class="tag">
+          <%= check_box_tag "wrong", field, false, id: nil %>
+          <%= t("capture.candidate.#{field}") %>
+        </label>
+      <% end %>
+    </div>
+    <%= text_field_tag :note, nil, id: nil, class: "capture-card__note",
+          placeholder: t('capture.reread.note_placeholder') %>
+    <p class="muted" data-spent hidden><%= t('capture.reread.spent') %></p>
+  </div>
+<% end %>
 <%= render layout: "shared/review_card",
       locals: { id: key, actions: render("captures/card_actions", key: key),
+                aside: reread,
                 frame_class: "capture-card",
                 frame_attrs: { data: { capture_target: "card", state: "open" } },
                 source_attrs: { data: { capture_target: "source", action: "click->capture#zoom" } } } do %>
@@ -25,25 +44,6 @@
 
     <%= render "captures/event_fields", candidate: candidate, key: key, suggestions: true,
           controller: "capture" %>
-  <% end %>
-
-  <%= render layout: "shared/card_aside",
-        locals: { title: t('capture.reread.label'),
-                  action: tag.button(t('capture.actions.reread'), type: "button",
-                                     class: "button-small", data: { action: "capture#reread" }) } do %>
-    <div class="capture-card__reread account-form flex flex-col gap-small">
-      <div class="flex gap-xsmall wrap">
-        <% EventCapture::Correction::FIELDS.each do |field| %>
-          <label class="tag">
-            <%= check_box_tag "wrong", field, false, id: nil %>
-            <%= t("capture.candidate.#{field}") %>
-          </label>
-        <% end %>
-      </div>
-      <%= text_field_tag :note, nil, id: nil, class: "capture-card__note",
-            placeholder: t('capture.reread.note_placeholder') %>
-      <p class="muted" data-spent hidden><%= t('capture.reread.spent') %></p>
-    </div>
   <% end %>
 
   <% if candidate.raw.any? %>

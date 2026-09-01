@@ -744,8 +744,10 @@ en:
           one: 1 event
           other: "%{count} events"
         name_label: Name
-        rename: Rename
         rename_hint: Renaming retags every event carrying the old spelling and repoints the saved filters holding it. To fold two spellings into one, merge them instead.
+        url_label: Venue link
+        url_hint: A website, an Instagram account, anything durable. Events here that carry no source page of their own link to it instead.
+        save: Save
         merge: Merge
         merge_into: Merge into…
         merge_hint: Merging retags every event under this name, and moves them to the other venue's town and canton. The link sticks, so anything captured under this name later resolves to the other venue too.
@@ -868,6 +870,7 @@ en:
     edit_event: Edit event
     edit_tag: Edit tag
     offsite_link: Opens on %{source}, not the venue's own site
+    venue_link_hint: Opens %{venue}'s own page, not a page for this event
     index:
       empty: No events match your current filters.
       clear_filter: Clear filter

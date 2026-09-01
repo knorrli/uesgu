@@ -7,13 +7,31 @@ module EventsHelper
     "petzi.ch"           => "PETZI"
   }.freeze
 
+  VenueLink = Data.define(:name, :url)
+
+  def event_link_url(event)
+    event.url.presence || event_venue_link(event)&.url
+  end
+
+  def event_venue_link(event)
+    event.locations.each do |location|
+      url = venue_urls[Fingerprint.for(location.name)]
+      return VenueLink.new(name: location.name, url: url) if url
+    end
+    nil
+  end
+
   def event_offsite_source(event)
-    host = URI.parse(event.url.to_s).host&.downcase&.delete_prefix("www.")
+    host = URI.parse(event_link_url(event).to_s).host&.downcase&.delete_prefix("www.")
     return nil if host.blank?
 
     OFFSITE_SOURCES[host] || OFFSITE_SOURCES.find { |domain, _| host.end_with?(".#{domain}") }&.last
   rescue URI::InvalidURIError
     nil
+  end
+
+  def venue_urls
+    @venue_urls ||= Place.where.not(url: nil).pluck(:fingerprint, :url).to_h
   end
 
   def canton_last(locations)

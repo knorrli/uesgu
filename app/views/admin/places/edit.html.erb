@@ -27,15 +27,22 @@
         </ul>
       <% end %>
 
+      <label class="flex flex-col gap-small">
+        <span class="field-label"><%= t('.name_label') %></span>
+        <%= f.text_field :name, autocomplete: 'off' %>
+      </label>
+      <p class="muted"><%= t('.rename_hint') %></p>
+
+      <label class="flex flex-col gap-small">
+        <span class="field-label"><%= t('.url_label') %></span>
+        <%= f.url_field :url, autocomplete: 'off' %>
+      </label>
+      <p class="muted"><%= t('.url_hint') %></p>
+
       <div class="flex justify-between gap-medium wrap align-end">
-        <label class="flex flex-col gap-small flex-grow">
-          <span class="field-label"><%= t('.name_label') %></span>
-          <%= f.text_field :name, autocomplete: 'off' %>
-        </label>
-        <%= f.submit t('.rename') %>
+        <%= f.submit t('.save') %>
       </div>
     <% end %>
-    <p class="muted"><%= t('.rename_hint') %></p>
 
     <%= form_with url: merge_admin_place_path(@place), method: :post, scope: :place,
           class: 'flex justify-between gap-medium wrap align-end' do |f| %>

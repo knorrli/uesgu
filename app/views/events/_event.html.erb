@@ -1,13 +1,15 @@
 <% interactive = local_assigns.fetch(:interactive, true) %>
 <% rescheduled = event.rescheduled? && !event.cancelled? %>
 <% interest = interactive && interest_event?(event) %>
+<% venue_link = event_venue_link(event) if event.url.blank? %>
+<% link = event.url.presence || venue_link&.url %>
 <article id="<%= dom_id event %>" class="<%= class_names(:event, past: event.start_date < Date.current.beginning_of_day, cancelled: event.cancelled?, rescheduled: rescheduled, 'is-interest': interest) %>">
   <div class="event-body">
 
     <% if event.start_time.present? %><span class="event-time"><%= l event.start_time, format: :time %></span><% end %>
 
     <h3 class="event-title">
-      <% if event.url.present? %><%= link_to event.url, target: '_blank', rel: 'noopener' do %><%= event.title %> <span class="event-link-marker" aria-hidden="true">&#8599;</span><% end %><% else %><%= event.title %><% end %><% if event.cancelled? %> <span class="chip chip--cancelled"><%= t('events.cancelled') %></span><% end %><% if rescheduled %> <span class="chip chip--moved"><%= t('events.rescheduled') %></span><% end %><% if event.captured? %> <span class="chip chip--community" title="<%= t('events.community_hint') %>"><%= t('events.community') %></span><% end %><% if (source = event_offsite_source(event)) %> <span class="chip chip--source" title="<%= t('events.offsite_link', source: source) %>"><%= source %></span><% end %>
+      <% if link.present? %><%= link_to link, target: '_blank', rel: 'noopener' do %><%= event.title %> <span class="event-link-marker" aria-hidden="true">&#8599;</span><% end %><% else %><%= event.title %><% end %><% if event.cancelled? %> <span class="chip chip--cancelled"><%= t('events.cancelled') %></span><% end %><% if rescheduled %> <span class="chip chip--moved"><%= t('events.rescheduled') %></span><% end %><% if event.captured? %> <span class="chip chip--community" title="<%= t('events.community_hint') %>"><%= t('events.community') %></span><% end %><% if (source = event_offsite_source(event)) %> <span class="chip chip--source" title="<%= venue_link ? t('events.venue_link_hint', venue: venue_link.name) : t('events.offsite_link', source: source) %>"><%= source %></span><% end %>
     </h3>
 
     <% if event.description.present? %>

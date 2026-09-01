@@ -744,8 +744,10 @@ fr:
           one: 1 événement
           other: "%{count} événements"
         name_label: Nom
-        rename: Renommer
         rename_hint: Renommer réétiquette tous les événements portant l'ancienne orthographe et met à jour les filtres enregistrés. Pour réunir deux orthographes, fusionne-les plutôt.
+        url_label: Lien de la salle
+        url_hint: Un site, un compte Instagram, n'importe quoi de durable. Les événements d'ici sans page source propre pointent dessus à la place.
+        save: Enregistrer
         merge: Fusionner
         merge_into: Fusionner avec…
         merge_hint: "La fusion réétiquette tous les événements sous ce nom et les déplace vers la localité et le canton de l'autre salle. Le lien reste : ce qui sera capturé sous ce nom ira aussi vers l'autre salle."
@@ -868,6 +870,7 @@ fr:
     edit_event: Modifier l'événement
     edit_tag: Modifier le tag
     offsite_link: S'ouvre sur %{source}, pas sur le site du lieu
+    venue_link_hint: Ouvre la page de %{venue}, pas une page dédiée à cet événement
     index:
       empty: Aucun événement ne correspond aux filtres actuels.
       clear_filter: Réinitialiser le filtre

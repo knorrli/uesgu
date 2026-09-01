@@ -23,12 +23,12 @@ module EventCapture
       end
 
       ActiveRecord::Base.transaction do
-        place = resolve_place
-        next Result.new(error: :place_invalid) if place.is_a?(Place) && !place.persisted?
+        tags = LocationTags.call(place: place_name, locality: locality, canton: canton)
+        next Result.new(error: :place_invalid) if tags.place_invalid?
 
-        event = publish(place)
+        event = publish(tags.names)
         settle(event, matched)
-        Result.new(event: event, canonical: matched, place: place.is_a?(Place) ? place : nil)
+        Result.new(event: event, canonical: matched, place: tags.place)
       end
     rescue ActiveRecord::RecordNotUnique
       Result.new(error: :place_invalid)
@@ -85,30 +85,16 @@ module EventCapture
       clock.present? ? Time.zone.parse("#{start_date} #{clock}") : nil
     end
 
-    def publish(place)
+    def publish(location_list)
       event = Event.new(
         title: title, description: description, start_date: start_date,
         start_time: start_time, data_source: DATA_SOURCE,
-        location_list: located(place),
+        location_list: location_list,
         genre_list: genres
       )
       event.save!
       event.recompute_visibility!
-      Locality.ensure!(event.location_list.select { |tag| Location.type_for(tag) == :locality })
       event
-    end
-
-    def located(place)
-      return [locality, canton].compact_blank if place.nil?
-
-      [place.name, place.locality.presence || locality, place.canton.presence || canton].compact_blank
-    end
-
-    def resolve_place
-      return if place_name.blank?
-
-      Location.resolve_venue(place_name) ||
-        Place.create(name: place_name, locality: locality, canton: canton)
     end
   end
 end

@@ -49,6 +49,28 @@
     </div>
 
     <div class="flex flex-col gap-small">
+      <div class="flex gap-medium wrap">
+        <label class="flex flex-col gap-small flex-grow">
+          <span class="field-label flex gap-small align-baseline">
+            <%= t('.place_label') %>
+            <% if @event.overridden?(:locations) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
+          </span>
+          <%= text_field_tag 'event[place]', event_location_tag(@event, :venue), autocomplete: 'off' %>
+        </label>
+        <label class="flex flex-col gap-small flex-grow">
+          <span class="field-label"><%= t('.locality_label') %></span>
+          <%= text_field_tag 'event[locality]', event_location_tag(@event, :locality), autocomplete: 'off' %>
+        </label>
+        <label class="flex flex-col gap-small">
+          <span class="field-label"><%= t('.canton_label') %></span>
+          <%= select_tag 'event[canton]', options_for_select(canton_options, event_location_tag(@event, :canton)),
+                include_blank: true %>
+        </label>
+      </div>
+      <span class="muted"><%= t('.where_hint') %></span>
+    </div>
+
+    <div class="flex flex-col gap-small">
       <%= render "shared/genre_combobox", name: "event[genres]", id: "event_genres",
             value: @event.genre_list.join(','), chip_src: chips_genres_path,
             label: t('.genres_label'), options: genre_combobox_options(Genre.offerable),

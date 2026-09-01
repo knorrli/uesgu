@@ -308,4 +308,76 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     assert_equal "Untouched", e.reload.title
   end
+
+  test "the show page offers the venue, locality and canton behind the location tags" do
+    venue = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    e = event(title: "Placed Show")
+    e.update!(location_list: [venue.name, venue.locality, venue.canton])
+    sign_in_as user(admin: true)
+
+    get admin_event_path(e)
+    assert_response :success
+    assert_select "input[name=?][value=?]", "event[place]", "Zorpsaal"
+    assert_select "input[name=?][value=?]", "event[locality]", "Zorpwil"
+    assert_select "select[name=?] option[selected][value=?]", "event[canton]", "BE"
+  end
+
+  test "editing the venue rebuilds the location tags, mints the place and pins them" do
+    e = event(title: "Wrong Venue")
+    e.update!(location_list: %w[Zorpwil BE])
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: e.title, description: "", date: e.start_date.iso8601, time: "",
+      place: "Zorpkeller", locality: "Zorpwil", canton: "BE"
+    } }
+    assert_redirected_to admin_event_path(e)
+
+    e.reload
+    assert_equal %w[BE Zorpkeller Zorpwil], e.location_list.sort
+    assert e.overridden?(:locations)
+    assert Place.exists?(fingerprint: Place.fingerprint_for("Zorpkeller"))
+  end
+
+  test "a venue that already exists is reused rather than minted a second time" do
+    venue = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    e = event(title: "Placeless")
+    sign_in_as user(admin: true)
+
+    assert_no_difference -> { Place.count } do
+      patch admin_event_path(e), params: { event: {
+        title: e.title, description: "", date: e.start_date.iso8601, time: "",
+        place: venue.name, locality: "Zorpwil", canton: "BE"
+      } }
+    end
+
+    assert_includes e.reload.location_list, venue.name
+  end
+
+  test "a submission carrying no locality leaves the location tags untouched" do
+    e = event(title: "Keep My Tags")
+    e.update!(location_list: %w[Zorpwil BE])
+    sign_in_as user(admin: true)
+
+    patch admin_event_path(e), params: { event: {
+      title: "Renamed", description: "", date: e.start_date.iso8601, time: ""
+    } }
+
+    e.reload
+    assert_equal %w[BE Zorpwil], e.location_list.sort
+    refute e.overridden?(:locations)
+  end
+
+  test "reverting the location releases it back to the scraper" do
+    e = event(title: "Pinned Place")
+    e.update!(location_list: %w[Zorpwil BE])
+    e.lock_field!(:locations)
+    sign_in_as user(admin: true)
+
+    get admin_event_path(e)
+    assert_select "form[action=?]", revert_admin_event_path(e, field: "locations")
+
+    patch revert_admin_event_path(e, field: "locations")
+    refute e.reload.overridden?(:locations)
+  end
 end

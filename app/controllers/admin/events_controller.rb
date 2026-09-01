@@ -39,11 +39,16 @@ module Admin
 
     def update
       @event = Event.find(params.expect(:id))
-      attrs = params.expect(event: %i[title description date time genres])
+      attrs = params.expect(event: %i[title description date time genres place locality canton])
       assign_scalars(@event, attrs)
       locked = @event.changed & Event::OVERRIDABLE_FIELDS
       locked |= SCHEDULE_FIELDS if locked.intersect?(SCHEDULE_FIELDS)
       locked << "genres" if assign_genres(@event, attrs)
+
+      tags = location_tags(attrs)
+      return redirect_to admin_event_path(@event), alert: t(".place_invalid") if tags&.place_invalid?
+
+      locked << "locations" if tags && assign_locations(@event, tags)
       @event.overridden_fields = (@event.overridden_fields + locked).uniq
       @event.save!
       @event.recompute_visibility! if locked.include?("genres")
@@ -100,6 +105,18 @@ module Admin
           hour, minute = attrs[:time].split(":").map(&:to_i)
           Time.zone.local(date.year, date.month, date.day, hour, minute)
         end
+    end
+
+    def location_tags(attrs)
+      return if attrs[:locality].blank?
+
+      LocationTags.call(place: attrs[:place], locality: attrs[:locality], canton: attrs[:canton])
+    end
+
+    def assign_locations(event, tags)
+      before = event.location_list.sort
+      event.location_list = tags.names
+      event.location_list.sort != before
     end
 
     def assign_genres(event, attrs)

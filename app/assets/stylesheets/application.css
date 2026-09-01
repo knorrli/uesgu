@@ -87,13 +87,21 @@ a {
 }
 
 .time-field {
+  --clear-button-size: 1.5rem;
+
   position: relative;
   display: flex;
 }
 
+/* Firefox draws its picker button inside the input's inline-end padding and offers no
+   pseudo-element to suppress it, so the space our clear button occupies has to be
+   reserved rather than taken: without the padding the two render on top of each other.
+   Chrome's indicator is dropped below and Safari draws nothing there, so the reserved
+   strip only ever holds a control in Firefox. */
 .time-field input[type="time"] {
   flex: 1;
   min-width: 0;
+  padding-inline-end: var(--clear-button-size);
 }
 
 /* Chrome parks its own picker indicator in the same corner, so the two draw on top
@@ -110,7 +118,8 @@ a {
   right: 0;
   display: flex;
   align-items: center;
-  padding: 0 var(--gap-xsmall);
+  justify-content: center;
+  width: var(--clear-button-size);
   line-height: 1;
 }
 

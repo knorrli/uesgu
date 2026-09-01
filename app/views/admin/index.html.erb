@@ -10,22 +10,28 @@
       <span class="stat__leader"></span>
       <dd class="muted"><%= Event.count %></dd>
     </div>
-    <div class="stat">
-      <dt><%= link_to Location.model_name.human(count: :many), admin_locations_path, class: 'stat-link' %></dt>
-      <span class="stat__leader"></span>
-      <dd class="muted"><%= @event_tag_stats.location_tags.count %></dd>
-    </div>
-    <div class="stat">
-      <dt><%= link_to Locality.model_name.human(count: :many), admin_localities_path, class: 'stat-link' %></dt>
-      <span class="stat__leader"></span>
-      <dd class="muted"><%= Locality.canonicals.count %></dd>
-    </div>
-    <div class="stat">
-      <dt><%= link_to Place.model_name.human(count: :many), admin_places_path, class: 'stat-link' %></dt>
-      <span class="stat__leader"></span>
-      <dd class="muted"><%= Place.canonicals.count %></dd>
-    </div>
   </dl>
+
+  <section class="flex flex-col gap-small">
+    <h2><%= link_to t('.where_heading'), admin_locations_path, class: 'heading-link' %></h2>
+    <dl class="flex flex-col gap-small">
+      <div class="stat">
+        <dt><%= link_to t('.tags_in_use'), admin_locations_path, class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= @event_tag_stats.location_tags.count %></dd>
+      </div>
+      <div class="stat">
+        <dt><%= link_to Locality.model_name.human(count: :many), admin_localities_path, class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= Locality.canonicals.count %></dd>
+      </div>
+      <div class="stat">
+        <dt><%= link_to Place.model_name.human(count: :many), admin_places_path, class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= Place.canonicals.count %></dd>
+      </div>
+    </dl>
+  </section>
 
   <section class="flex flex-col gap-small">
     <h2><%= link_to Genre.model_name.human(count: :many), genres_path, class: 'heading-link' %> <span class="muted"><%= @event_tag_stats.genre_tags.count %></span></h2>

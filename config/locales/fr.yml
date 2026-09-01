@@ -431,6 +431,8 @@ fr:
     back: "Admin"
     index:
       title: Admin
+      where_heading: Lieux
+      tags_in_use: Tags utilisés
       placed: Classés
       unplaced: Non classés
       ignored: Ignorés
@@ -743,15 +745,15 @@ fr:
         browse_events: Voir les événements
     locations:
       index:
-        title: Lieux
+        title: Tags utilisés
         type_all: Tous
         type_venue: Salle
         type_locality: Localité
         type_canton: Canton
-        search: Rechercher des lieux…
+        search: Rechercher des tags…
         sort_name: nom
         sort_count: usage
-        empty: Aucun lieu correspondant.
+        empty: Aucun tag correspondant.
     discard_rules:
       index:
         title: Règles de filtrage
@@ -797,11 +799,6 @@ fr:
         updated: Règle de filtrage mise à jour.
       destroy:
         deleted: Règle de filtrage supprimée.
-  activemodel:
-    models:
-      location:
-        one: Lieu
-        other: Lieux
   activerecord:
     models:
       acts_as_taggable_on/tag:

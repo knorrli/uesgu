@@ -606,6 +606,8 @@ en:
         intro: Correct bad source data below. A field you change is locked and won't be overwritten on the next scrape.
         title_label: Title
         description_label: Description
+        url_label: Source URL
+        url_hint: Community events have no source page. Add one if the event has a permanent link — the title on the public list then points at it.
         date_label: Date
         time_label: Time
         genres_label: Genres
@@ -642,6 +644,7 @@ en:
       update:
         saved: Event updated.
         place_invalid: That venue couldn't be created.
+        url_taken: That URL already belongs to another event.
       revert:
         reverted: Field reverted to source.
       destroy:

@@ -606,6 +606,8 @@ de:
         intro: Korrigiere fehlerhafte Quelldaten unten. Ein geändertes Feld wird gesperrt und beim nächsten Scrape nicht überschrieben.
         title_label: Titel
         description_label: Beschreibung
+        url_label: Quell-URL
+        url_hint: Community-Events haben keine Quellseite. Trag eine ein, wenn das Event einen festen Link hat — der Titel in der öffentlichen Liste zeigt dann darauf.
         date_label: Datum
         time_label: Zeit
         genres_label: Genres
@@ -642,6 +644,7 @@ de:
       update:
         saved: Event aktualisiert.
         place_invalid: Dieses Lokal liess sich nicht anlegen.
+        url_taken: Diese URL gehört schon zu einem anderen Event.
       revert:
         reverted: Feld auf Quelle zurückgesetzt.
       destroy:

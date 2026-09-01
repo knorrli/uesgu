@@ -47,6 +47,7 @@ a {
 .account-form input[type="text"],
 .account-form input[type="email"],
 .account-form input[type="password"],
+.account-form input[type="url"],
 .account-form input[type="time"],
 .account-form input[type="date"],
 .account-form textarea,
@@ -126,6 +127,7 @@ a {
 .account-form input[type="text"]:focus,
 .account-form input[type="email"]:focus,
 .account-form input[type="password"]:focus,
+.account-form input[type="url"]:focus,
 .account-form input[type="time"]:focus,
 .account-form textarea:focus,
 .account-form select:focus {

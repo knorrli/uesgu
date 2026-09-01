@@ -870,7 +870,6 @@ en:
     edit_event: Edit event
     edit_tag: Edit tag
     offsite_link: Opens on %{source}, not the venue's own site
-    venue_link: Venue
     venue_link_hint: Opens %{venue}'s own page, not a page for this event
     index:
       empty: No events match your current filters.

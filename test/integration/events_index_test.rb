@@ -34,7 +34,7 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "a captured event at a venue with a link borrows it, and says whose it is" do
+  test "a captured event at a venue with a link borrows it, and stays unchipped" do
     place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE", url: "https://zorpsaal.test")
     e = event(title: "PopUpShow", start_date: Date.current + 3, url: nil,
               location_list: ["Zorpsaal", "Zorpwil", "BE"])
@@ -44,9 +44,7 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     assert_select "##{ActionView::RecordIdentifier.dom_id(e)} .event-title" do
       assert_select "a[href=?]", "https://zorpsaal.test"
       assert_select ".event-link-marker"
-      assert_select ".chip--source", text: I18n.t("events.venue_link")
-      assert_select ".chip--source[title=?]",
-                    I18n.t("events.venue_link_hint", venue: "Zorpsaal")
+      assert_select ".chip--source", false, "a host we cannot name earns no chip"
     end
   end
 
@@ -57,7 +55,11 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
 
     get events_path
 
-    assert_select "##{ActionView::RecordIdentifier.dom_id(e)} .event-title .chip--source", text: "Instagram"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(e)} .event-title" do
+      assert_select ".chip--source", text: "Instagram"
+      assert_select ".chip--source[title=?]",
+                    I18n.t("events.venue_link_hint", venue: "Zorpsaal")
+    end
   end
 
   test "an event with its own url keeps it and is not marked as borrowing the venue's" do

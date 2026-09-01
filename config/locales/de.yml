@@ -870,7 +870,6 @@ de:
     edit_event: Event bearbeiten
     edit_tag: Tag bearbeiten
     offsite_link: Öffnet auf %{source}, nicht der Website des Lokals
-    venue_link: Lokal
     venue_link_hint: Öffnet die Seite von %{venue}, nicht eine Seite zu diesem Event
     index:
       empty: Keine Events für die aktuellen Filter.

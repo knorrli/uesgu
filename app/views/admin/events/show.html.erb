@@ -32,6 +32,16 @@
       <%= text_field_tag 'event[description]', @event.description, autocomplete: 'off' %>
     </label>
 
+    <% if @event.captured? %>
+      <div class="flex flex-col gap-small">
+        <label class="flex flex-col gap-small">
+          <span class="field-label"><%= t('.url_label') %></span>
+          <%= url_field_tag 'event[url]', @event.url, autocomplete: 'off' %>
+        </label>
+        <span class="muted"><%= t('.url_hint') %></span>
+      </div>
+    <% end %>
+
     <div class="flex gap-medium wrap">
       <label class="flex flex-col gap-small flex-grow">
         <span class="field-label flex gap-small align-baseline">
@@ -46,6 +56,28 @@
         <span class="field-label"><%= t('.time_label') %></span>
         <%= render "shared/time_field", name: 'event[time]', value: @event.start_time&.strftime('%H:%M') %>
       </label>
+    </div>
+
+    <div class="flex flex-col gap-small">
+      <div class="flex gap-medium wrap">
+        <label class="flex flex-col gap-small flex-grow">
+          <span class="field-label flex gap-small align-baseline">
+            <%= t('.place_label') %>
+            <% if @event.overridden?(:locations) %><span class="chip"><%= t('.overridden_badge') %></span><% end %>
+          </span>
+          <%= text_field_tag 'event[place]', event_location_tag(@event, :venue), autocomplete: 'off' %>
+        </label>
+        <label class="flex flex-col gap-small flex-grow">
+          <span class="field-label"><%= t('.locality_label') %></span>
+          <%= text_field_tag 'event[locality]', event_location_tag(@event, :locality), autocomplete: 'off' %>
+        </label>
+        <label class="flex flex-col gap-small">
+          <span class="field-label"><%= t('.canton_label') %></span>
+          <%= select_tag 'event[canton]', options_for_select(canton_options, event_location_tag(@event, :canton)),
+                include_blank: true %>
+        </label>
+      </div>
+      <span class="muted"><%= t('.where_hint') %></span>
     </div>
 
     <div class="flex flex-col gap-small">

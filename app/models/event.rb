@@ -74,7 +74,7 @@ class Event < ApplicationRecord
 
   OVERRIDABLE_FIELDS = %w[title description start_date start_time].freeze
 
-  OVERRIDABLE_TAG_FIELDS = %w[genres].freeze
+  OVERRIDABLE_TAG_FIELDS = %w[genres locations].freeze
 
   OVERRIDABLE_LINK_FIELDS = %w[canonical_event].freeze
 

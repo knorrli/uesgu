@@ -606,10 +606,16 @@ en:
         intro: Correct bad source data below. A field you change is locked and won't be overwritten on the next scrape.
         title_label: Title
         description_label: Description
+        url_label: Source URL
+        url_hint: Community events have no source page. Add one if the event has a permanent link — the title on the public list then points at it.
         date_label: Date
         time_label: Time
         genres_label: Genres
         genres_hint: Enter adds one. New genres are fine — if one already exists, take that instead. Editing locks the list — the scraper won't touch it, and visibility is re-built from it.
+        place_label: Venue
+        locality_label: Locality
+        canton_label: Canton
+        where_hint: Editing any of these locks the whole location — the scraper won't touch it. A venue nobody knows yet is created as a new place.
         dismissed_badge: dismissed
         overridden_badge: manually edited
         save: Save
@@ -620,6 +626,7 @@ en:
         field_description: Description
         field_start_date: Date & time
         field_genres: Genres
+        field_locations: Venue & locality
         dismiss_heading: Visibility
         dismiss_intro: Dismiss to remove this event from every public listing for good. It stays in the database and is never resurrected by a re-scrape — undo this anytime.
         dismiss: Dismiss event
@@ -636,6 +643,8 @@ en:
         merge: Merge
       update:
         saved: Event updated.
+        place_invalid: That venue couldn't be created.
+        url_taken: That URL already belongs to another event.
       revert:
         reverted: Field reverted to source.
       destroy:

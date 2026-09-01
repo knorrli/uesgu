@@ -1,3 +1,19 @@
+/* initial-value must be computationally independent per spec, so it cannot read
+   var(--color-background) however much it looks like it should. Substituting one
+   drops the registration, and every themed surface goes back to flipping instead of
+   interpolating. */
+@property --theme-bg-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e8e1cd;
+}
+
+@property --theme-fg-color {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: black;
+}
+
 body {
   --color-text: var(--color-black);
   --color-background: #e8e1cd;
@@ -30,7 +46,7 @@ body {
   color-scheme: light;
   background-color: var(--theme-bg-color);
   color: var(--theme-fg-color);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: --theme-bg-color 0.2s ease, --theme-fg-color 0.2s ease;
 }
 
 html[data-theme="dark"] body {

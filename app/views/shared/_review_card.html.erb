@@ -1,6 +1,7 @@
-<%# locals: (id:, actions:, source: nil, frame_class: nil, frame_attrs: {}, source_attrs: {}) %>
+<%# locals: (id:, actions:, source: nil, aside: nil, frame_class: nil, frame_attrs: {}, source_attrs: {}) %>
 <%= tag.div id: id, class: ["review-card", frame_class], **frame_attrs do %>
   <%= tag.div source, class: "review-card__source", **source_attrs %>
   <div class="review-card__body"><%= yield %></div>
+  <%= tag.div aside, class: "review-card__aside" if aside.present? %>
   <%= actions %>
 <% end %>

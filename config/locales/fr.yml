@@ -38,19 +38,22 @@ fr:
   about:
     title: À propos de üsgu
     heading: À propos de üsgu
-    intro: üsgu.ch rassemble les événements musicaux de toute la Suisse, pour l'instant l'accent est mis sur Berne et ses environs. Il y a aussi bien les événements des salles établies que les petits concerts ponctuels, sans te noyer sous la pub ni te demander des données inutiles.
+    intro: üsgu.ch te montre les grands événements musicaux de Suisse, mais surtout les plus petits ou les plus cachés, sans te noyer sous la pub ni te piquer tes données. Pour l'instant l'accent régional est mis sur Berne et ses environs, et il s'élargit petit à petit.
     why:
       title: Pourquoi üsgu existe ?
-      body: J'ai créé üsgu parce qu'aucune plateforme suisse ne liste aussi les gigs d'arrière-cour, et parce que je n'ai aucune envie de Facebook, Instagram ou ce genre de choses. Les approches comme hinto.net, BKA ou RonOrp ne fonctionnent pas, à mon avis, parce qu'elles attendent que les données des événements soient préparées et/ou saisies.
+      body: J'ai créé üsgu parce qu'aucune plateforme suisse ne liste aussi les gigs d'arrière-cour, et parce que je n'ai aucune envie de Facebook, Instagram ou ce genre de choses. Les approches comme hinto.net, BKA ou RonOrp ne remplissent pas ce rôle, à mon avis, parce qu'elles attendent que les données des événements soient préparées et/ou saisies.
+    account:
+      title: Faut-il un compte ?
+      body: Non, üsgu marche sans compte obligatoire. Un compte te donne juste des fonctions en plus, comme ta liste à voir avec export vers ton calendrier, ou des filtres avec notifications. Pendant la phase de test, les comptes se donnent uniquement sur invitation, écris-moi un mail si ça t'intéresse.
     how:
       title: Comment fonctionne üsgu ?
       body: Comme les données ne viennent pas à nous, nous allons chercher nous-mêmes les informations accessibles publiquement. Cela se fait en grande partie automatiquement, mais aussi manuellement.
       crawler:
         title: Crawlers automatiques
-        body: Les salles de concert qui ont un site public sont répertoriées dans une liste. Leur site est lu une fois par nuit, les nouveaux événements sont enregistrés et les connus mis à jour.
+        body: Les salles de concert qui ont un site public sont répertoriées dans une liste. Les sites sont lus une fois par nuit, les nouveaux événements sont enregistrés et les connus mis à jour.
       capture:
         title: Ajouts par la communauté
-        body: "Si tu as un compte, tu peux saisir tes propres événements. Ça se fait soit à la main, soit en laissant l'IA lire une affiche, un flyer ou une description. Ces événements sont marqués « Communauté »."
+        body: "Si tu as un compte, tu peux saisir tes propres événements. Ça se fait soit à la main, soit en laissant l'IA lire une affiche, un flyer ou une description. Ces événements sont marqués « Communauté ». C'est comme ça que je saisis en ce moment les petits événements qu'on ne trouve sur aucun site public."
     contact:
       title: Contact
       body: Si tu as des questions ou si tu veux une salle dans la liste, écris à %{email}

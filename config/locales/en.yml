@@ -38,19 +38,22 @@ en:
   about:
     title: About üsgu
     heading: About üsgu
-    intro: üsgu.ch collects music events from across Switzerland, right now the focus is Bern and the surrounding area. It lists both the shows at established venues and the small one-off gigs, without blasting you with ads or making you hand over data nobody needs.
+    intro: üsgu.ch shows you the big music events in Switzerland, but above all the smaller or hidden ones, without blasting you with ads or grabbing your data. Right now the regional focus is Bern and the surrounding area, and it keeps growing.
     why:
       title: Why does üsgu exist?
-      body: I built üsgu because no Swiss platform lists backyard gigs as well, and because I can't be bothered with Facebook, Instagram or that kind of thing. Attempts like hinto.net, BKA or RonOrp don't work, the way I see it, because they expect the event data to be prepared and/or fed in.
+      body: I built üsgu because no Swiss platform lists backyard gigs as well, and because I can't be bothered with Facebook, Instagram or that kind of thing. Attempts like hinto.net, BKA or RonOrp don't do that job, the way I see it, because they expect the event data to be prepared and/or fed in.
+    account:
+      title: Do I need an account?
+      body: No, üsgu works without forcing an account on you. An account just unlocks a few extras, like your own watchlist with calendar export, or filters with notifications. While üsgu is in testing, accounts are invitation-only — send me an email if you're interested.
     how:
       title: How does üsgu work?
       body: Since the data doesn't come to us, we go and fetch the publicly available information ourselves. That happens mostly automatically, but also by hand.
       crawler:
         title: Automatic crawlers
-        body: Concert venues with a public website are kept in a list. Their site is read once a night, new events are stored and known ones updated.
+        body: Concert venues with a public website are kept in a list. Those sites are read once a night, new events are stored and known ones updated.
       capture:
         title: Added by the community
-        body: 'If you have an account, you can add your own events. That works either by hand, or by letting AI read a poster, a flyer or a description. Those events are marked "Community".'
+        body: 'If you have an account, you can add your own events. That works either by hand, or by letting AI read a poster, a flyer or a description. Those events are marked "Community". That''s how I currently add the small events you won''t find on any public website.'
     contact:
       title: Contact
       body: If you have questions or want a venue on the list, write to %{email}

@@ -38,19 +38,22 @@ de:
   about:
     title: Über üsgu
     heading: Über üsgu
-    intro: üsgu.ch sammelt Musik-Events aus der Schweiz, aktuell liegt der Fokus auf Bern und Umgebung. Dabei geht es sowohl um Events von etablierten Lokalen wie auch um kleine Einzelanlässe, ohne dass man mit Werbung vollgeballert wird oder unnötige Daten angeben muss.
+    intro: üsgu.ch zeigt dir grosse, aber vor allem auch kleinere oder versteckte Musik-Events aus der Schweiz an, ohne dich mit Werbung vollzuballern oder deine Daten zu klauen. Aktuell liegt der regionale Fokus auf Bern und Umgebung, wird aber laufend erweitert.
     why:
       title: Warum gibt es üsgu?
-      body: Ich habe üsgu gebaut, weil es in der Schweiz keine Plattform gibt, die auch Hinterhof-Gigs auflistet, und ich keinen Bock auf Facebook, Instagram oder solche Dinge habe. Ansätze wie hinto.net, BKA oder RonOrp funktionieren aus meiner Sicht nicht, weil sie erwarten, dass die Event-Daten aufbereitet und/oder eingespeist werden.
+      body: Ich habe üsgu gebaut, weil es in der Schweiz keine Plattform gibt, die auch Hinterhof-Gigs auflistet, und ich keinen Bock auf Facebook, Instagram oder solche Dinge habe. Ansätze wie hinto.net, BKA oder RonOrp erfüllen diese Aufgabe aus meiner Sicht nicht, weil sie erwarten, dass die Event-Daten aufbereitet und/oder eingespeist werden.
+    account:
+      title: Brauche ich einen Account?
+      body: Nein, üsgu funktioniert ohne Account-Zwang. Mit einem Account kannst du einfach zusätzliche Funktionen nutzen wie z.B. eine eigene Merkliste mit Kalender-Export oder Filter mit Benachrichtigungen. In der aktuellen Testphase werden Accounts nur auf Einladung vergeben, melde dich per Mail, falls du interessiert bist.
     how:
       title: Wie funktioniert üsgu?
       body: Weil die Daten nicht zu uns kommen, holen wir öffentlich zugängliche Informationen einfach selber. Das geschieht grösstenteils automatisiert, aber auch manuell.
       crawler:
         title: Automatische Crawler
-        body: Konzertlokale mit einer öffentlichen Webseite werden in einer Liste erfasst. Einmal pro Nacht wird sie ausgelesen, neue Events werden gespeichert und bekannte aktualisiert.
+        body: Konzertlokale mit einer öffentlichen Webseite werden in einer Liste erfasst. Einmal pro Nacht werden die Webseiten ausgelesen, neue Events werden gespeichert und bekannte aktualisiert.
       capture:
         title: Erfassen durch die Community
-        body: Wenn du registriert bist, kannst du eigene Events erfassen. Das geht entweder manuell, oder durch KI-gestütztes Auslesen von Postern, Flyern oder Beschreibungen. Solche Events sind mit "Community" markiert.
+        body: Wenn du einen Account hast, kannst du eigene Events erfassen. Das geht entweder manuell, oder durch KI-gestütztes Auslesen von Postern, Flyern oder Beschreibungen. Solche Events sind mit "Community" markiert. So erfasse ich aktuell kleine Events, die nicht auf einer öffentlichen Webseite zu finden sind.
     contact:
       title: Kontakt
       body: Falls du Fragen hast oder ein Konzertlokal in die Liste soll, schreib an %{email}

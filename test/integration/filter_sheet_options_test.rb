@@ -50,6 +50,31 @@ class FilterSheetOptionsTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#filter_sheet_where input[name='l[]'][value='BE'][checked]"
   end
 
+  test "a locality with counted venues is its own collapsible group" do
+    place(name: "Zorpklub", locality: "Zorpwil", canton: "BE")
+    event(start_date: Date.current + 3, location_list: %w[BE Zorpwil Zorpklub])
+
+    get filter_options_tags_path(field: "where")
+
+    assert_response :success
+    assert_select ".loc-group--nested" do
+      assert_select ".loc-group__head .opt--mid .opt__label", text: "Zorpwil"
+      assert_select ".loc-group__head .loc-group__toggle .loc-group__count", text: "1"
+      assert_select ".loc-group__body .opt--leaf .opt__label", text: "Zorpklub"
+    end
+  end
+
+  test "a locality whose venues have no events stays a plain row" do
+    place(name: "Zorpklub", locality: "Zorpwil", canton: "BE")
+    event(start_date: Date.current + 3, location_list: %w[BE Zorpwil])
+
+    get filter_options_tags_path(field: "where")
+
+    assert_response :success
+    assert_select ".loc-group--nested", false
+    assert_select ".opt--mid .opt__count", text: "1"
+  end
+
   test "the endpoint is public — the feed's filter works signed out" do
     genre_in_tree("Zyloanon")
 

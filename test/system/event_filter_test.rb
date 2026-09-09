@@ -109,6 +109,25 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_no_selector ".sheet[data-field=what].sheet--open"
   end
 
+  test "a canton opens to its localities, and a locality opens to its venues" do
+    place(name: "Zorpklub", locality: "Zorpwil", canton: "BE")
+    event(start_date: Date.current + 3, location_list: %w[BE Zorpwil Zorpklub])
+
+    visit events_path
+    open_sheet("where")
+
+    sheet = ".sheet[data-field=where]"
+    locality = "#{sheet} .loc-group--nested"
+    assert_no_selector locality, visible: true
+
+    find("#{sheet} .loc-group:not(.loc-group--nested) > .loc-group__head .loc-group__toggle").click
+    assert_selector "#{locality} .opt--mid", text: "Zorpwil"
+    assert_no_selector "#{locality} .opt--leaf", text: "Zorpklub"
+
+    find("#{locality} > .loc-group__head .loc-group__toggle").click
+    assert_selector "#{locality} .opt--leaf", text: "Zorpklub"
+  end
+
   private
 
   def open_sheet(field)

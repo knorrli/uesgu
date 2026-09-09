@@ -379,11 +379,13 @@
 
 .loc-group__chevron { transition: transform 0.15s ease; }
 
-.loc-group:not(.collapsed) .loc-group__chevron { transform: rotate(180deg); }
+.loc-group:not(.collapsed) > .loc-group__head .loc-group__chevron { transform: rotate(180deg); }
 
-.loc-group.collapsed .loc-group__body { display: none; }
+.loc-group.collapsed > .loc-group__body { display: none; }
 
 .loc-group__body { border-bottom: var(--tag-border-width) solid var(--theme-bg-muted); }
+
+.loc-group--nested > .loc-group__body { border-bottom: 0; }
 
 .opt--newquery {
   width: 100%;

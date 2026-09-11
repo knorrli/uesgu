@@ -22,11 +22,11 @@ class Filter
   end
 
   def genres=(new_genres)
-    @genres = parse(new_genres)
+    @genres = names(new_genres)
   end
 
   def location_list=(new_locations)
-    @location_list = parse(new_locations)
+    @location_list = names(new_locations)
   end
 
   def date_ranges=(new_date_ranges)
@@ -75,6 +75,13 @@ class Filter
 
   def parse(value)
     ActsAsTaggableOn.default_parser.new(value).parse
+  end
+
+  # ActsAsTaggableOn's parser splits on commas, and "Soul, Funk & R&B" is one genre.
+  def names(value)
+    return parse(value) unless value.is_a?(Array)
+
+    value.map { |item| item.to_s.strip }.compact_blank
   end
 
   def map_date_ranges(date_ranges)

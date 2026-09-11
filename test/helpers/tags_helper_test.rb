@@ -118,6 +118,21 @@ class TagsHelperTest < ActionView::TestCase
     assert_equal canton_node[:count], filtered_count(location_list: ["GE"])
   end
 
+  test "a genre whose name contains a comma expands to its whole subtree when picked" do
+    root = genre(name: "Soul, Funk")
+    funk = genre(name: "commafunk"); funk.set_parent!(root)
+    soul = genre(name: "commasoul"); soul.set_parent!(root)
+    event_with_genres(funk.name)
+    event_with_genres(soul.name)
+    event_with_genres(genre(name: "commaelsewhere").name)
+
+    node = genre_filter_tree.find { |n| n[:value] == root.name }
+
+    assert_equal 2, node[:count]
+    assert_equal node[:count], filtered_count(genres: [root.name]),
+                 "the tag parser must not split the pick into 'Soul' and 'Funk'"
+  end
+
   test "location_filter_tree drops a venue whose only events have passed" do
     spot = place(name: "Pastsaal", locality: "Pastwil", canton: "GE")
     event(start_date: Date.current - 1.day, location_list: [spot.name, spot.locality, spot.canton])

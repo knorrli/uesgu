@@ -10,6 +10,16 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal %w[wubstep glimmercore], f.genres
   end
 
+  test "a picked name keeps its commas; a bare string still lists several" do
+    f = Filter.build(genres: ["Soul, Funk & R&B"], location_list: ["Bar, Rossli"])
+
+    assert_equal ["Soul, Funk & R&B"], f.genres, "an array element is one pick, comma and all"
+    assert_equal ["Bar, Rossli"], f.location_list
+
+    typed = Filter.build(genres: "wubstep, glimmercore")
+    assert_equal %w[wubstep glimmercore], typed.genres, "a bare string is still a comma-separated list"
+  end
+
   test "build sets the lists it is given and leaves nil ones at their default" do
     f = Filter.build(queries: "rock", genres: %w[techno], location_list: nil)
 

@@ -93,9 +93,10 @@ class FilterSheetOptionsTest < ActionDispatch::IntegrationTest
   private
 
   def genre_in_tree(name)
-    root = genre(name: "#{name}root", events_count: 0)
-    leaf = genre(name: name, events_count: 1)
+    root = genre(name: "#{name}root")
+    leaf = genre(name: name)
     leaf.set_parent!(root)
+    event_with_genres(leaf.name)
     leaf
   end
 end

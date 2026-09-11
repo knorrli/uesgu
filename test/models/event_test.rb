@@ -24,6 +24,15 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 1, Event.visible.count
   end
 
+  test "listed scope is what the index shows: visible and not in the past" do
+    today = event(start_date: Date.current)
+    later = event(start_date: Date.current + 1.day)
+    event(start_date: Date.current - 1.day)
+    event(hidden: true)
+
+    assert_equal [today, later].map(&:id).sort, Event.listed.ids.sort
+  end
+
   test "cancelled scope and predicate track cancelled_at" do
     live = event(cancelled_at: nil)
     called_off = event(cancelled_at: Time.current)

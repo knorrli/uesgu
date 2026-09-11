@@ -124,6 +124,22 @@ class Genre < ApplicationRecord
        .split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
   end
 
+  SUBTREE_PAIRS = <<~SQL.squish
+    WITH RECURSIVE subtree(root_id, id) AS (
+      SELECT id, id FROM genres
+      UNION
+      SELECT s.root_id, g.id FROM genres g JOIN subtree s ON g.parent_id = s.id
+    ) SELECT root_id, id FROM subtree
+  SQL
+
+  def self.filter_counts
+    Event.listed_taggings_in("genres")
+         .joins("JOIN tags ON tags.id = taggings.tag_id")
+         .joins("JOIN genres ON genres.name = tags.name")
+         .joins("JOIN (#{SUBTREE_PAIRS}) subtree ON subtree.id = COALESCE(genres.canonical_id, genres.id)")
+         .group("subtree.root_id").distinct.count(:taggable_id)
+  end
+
   def self.filter_names_for(picked_names)
     picked_names = Array(picked_names).map(&:to_s).reject(&:blank?)
     return [] if picked_names.empty?

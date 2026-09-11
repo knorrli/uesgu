@@ -53,16 +53,17 @@ module TagsHelper
     genres = Genre.where(hidden_at: nil, blocked_at: nil, ignored_at: nil, canonical_id: nil)
                   .by_name.to_a
     children_of = genres.group_by(&:parent_id)
+    counts = Genre.filter_counts
     (children_of[nil] || []).filter_map do |root|
       next unless children_of.key?(root.id)
 
-      genre_filter_node(root, children_of)
+      genre_filter_node(root, children_of, counts)
     end
   end
 
-  def genre_filter_node(genre, children_of)
-    child_nodes = (children_of[genre.id] || []).filter_map { |child| genre_filter_node(child, children_of) }
-    count = genre.events_count + child_nodes.sum { |node| node[:count] }
+  def genre_filter_node(genre, children_of, counts)
+    child_nodes = (children_of[genre.id] || []).filter_map { |child| genre_filter_node(child, children_of, counts) }
+    count = counts.fetch(genre.id, 0)
     return nil if count.zero?
 
     { name: genre.name, value: genre.name, count: count,
@@ -71,7 +72,7 @@ module TagsHelper
   end
 
   def location_filter_tree
-    counts = Location.usage.to_h { |row| [row[:name], row[:count]] }
+    counts = Event.listed_tag_counts("locations")
 
     Location.hierarchy.sort.filter_map do |canton, localities|
       locality_nodes = localities.sort.filter_map do |locality, venues|
@@ -82,14 +83,14 @@ module TagsHelper
         next if venue_nodes.empty? && counts[locality].to_i.zero?
 
         { name: locality, value: locality, type: :locality,
-          count: counts[locality] || venue_nodes.sum { |v| v[:count] },
+          count: counts[locality].to_i,
           search: ([locality] + venue_nodes.map { |v| v[:name] }).join(" "), children: venue_nodes }
       end
       next if locality_nodes.empty? && counts[canton].to_i.zero?
 
       title = Location.canton_name(canton)
       { name: canton, value: canton, type: :canton, title: title,
-        count: counts[canton] || locality_nodes.sum { |c| c[:count] },
+        count: counts[canton].to_i,
         search: ([canton, title] + locality_nodes.flat_map { |c| [c[:name]] + c[:children].map { |v| v[:name] } }).join(" "),
         children: locality_nodes }
     end

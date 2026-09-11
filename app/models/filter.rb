@@ -81,7 +81,7 @@ class Filter
   def names(value)
     return parse(value) unless value.is_a?(Array)
 
-    value.map { |item| item.to_s.strip }.compact_blank
+    value.flatten.map { |item| item.to_s.strip }.compact_blank
   end
 
   def map_date_ranges(date_ranges)

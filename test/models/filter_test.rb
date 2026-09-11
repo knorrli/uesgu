@@ -18,6 +18,10 @@ class FilterTest < ActiveSupport::TestCase
 
     typed = Filter.build(genres: "wubstep, glimmercore")
     assert_equal %w[wubstep glimmercore], typed.genres, "a bare string is still a comma-separated list"
+
+    nested = Filter.build(genres: [["wubstep"]], location_list: [["Bern"]])
+    assert_equal %w[wubstep], nested.genres, "a nested array flattens, as g[][]=… arrives"
+    assert_equal %w[Bern], nested.location_list
   end
 
   test "build sets the lists it is given and leaves nil ones at their default" do

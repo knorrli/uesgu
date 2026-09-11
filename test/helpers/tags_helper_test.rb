@@ -101,10 +101,33 @@ class TagsHelperTest < ActionView::TestCase
     assert_equal [1, 1, 1], [canton[:count], locality[:count], venue[:count]]
   end
 
+  test "a node's count is exactly what picking that node returns" do
+    rock = genre(name: "invrock")
+    punk = genre(name: "invpunk"); punk.set_parent!(rock)
+    spot = place(name: "Invsaal", locality: "Invwil", canton: "GE")
+    tags = [spot.name, spot.locality, spot.canton]
+    event(location_list: tags).update!(genre_list: [rock.name, punk.name])
+    event(location_list: tags).update!(genre_list: [punk.name])
+    event(start_date: Date.current - 1.day, location_list: tags).update!(genre_list: [punk.name])
+
+    genre_node = genre_filter_tree.find { |n| n[:value] == rock.name }
+    canton_node = location_filter_tree.find { |n| n[:value] == "GE" }
+
+    assert_equal 2, genre_node[:count]
+    assert_equal genre_node[:count], filtered_count(genres: [rock.name])
+    assert_equal canton_node[:count], filtered_count(location_list: ["GE"])
+  end
+
   test "location_filter_tree drops a venue whose only events have passed" do
     spot = place(name: "Pastsaal", locality: "Pastwil", canton: "GE")
     event(start_date: Date.current - 1.day, location_list: [spot.name, spot.locality, spot.canton])
 
     refute location_filter_tree.any? { |n| n[:value] == "GE" }
+  end
+
+  private
+
+  def filtered_count(**filter)
+    Event.visible.ransack(Filter.build(**filter).ransack_query).result(distinct: true).count
   end
 end

@@ -124,26 +124,21 @@ class Genre < ApplicationRecord
        .split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
   end
 
+  SUBTREE_PAIRS = <<~SQL.squish
+    WITH RECURSIVE subtree(root_id, id) AS (
+      SELECT id, id FROM genres
+      UNION
+      SELECT s.root_id, g.id FROM genres g JOIN subtree s ON g.parent_id = s.id
+    ) SELECT root_id, id FROM subtree
+  SQL
+
   def self.filter_counts
-    events = listed_events_by_genre
-    children_of = pluck(:id, :parent_id).group_by(&:last).transform_values { |rows| rows.map(&:first) }
-    subtrees = {}
-    walk = lambda do |id|
-      subtrees[id] ||= children_of.fetch(id, []).reduce(events.fetch(id, Set.new)) { |ids, child| ids | walk.call(child) }
-    end
-    children_of.fetch(nil, []).each { |root| walk.call(root) }
-    subtrees.transform_values(&:size)
+    Event.listed.taggings_in("genres")
+         .joins("JOIN tags ON tags.id = taggings.tag_id")
+         .joins("JOIN genres ON genres.name = tags.name")
+         .joins("JOIN (#{SUBTREE_PAIRS}) subtree ON subtree.id = COALESCE(genres.canonical_id, genres.id)")
+         .group("subtree.root_id").distinct.count(:taggable_id)
   end
-
-  def self.listed_events_by_genre
-    owner_of = pluck(:fingerprint, :id, :canonical_id).to_h { |fingerprint, id, canonical| [fingerprint, canonical || id] }
-    Event.listed.tag_event_ids("genres").each_with_object({}) do |(tag_name, event_ids), acc|
-      next unless (id = owner_of[fingerprint_for(tag_name)])
-
-      acc[id] = acc.fetch(id, Set.new) | event_ids
-    end
-  end
-  private_class_method :listed_events_by_genre
 
   def self.filter_names_for(picked_names)
     picked_names = Array(picked_names).map(&:to_s).reject(&:blank?)

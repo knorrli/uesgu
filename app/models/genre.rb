@@ -133,7 +133,7 @@ class Genre < ApplicationRecord
   SQL
 
   def self.filter_counts
-    Event.listed.taggings_in("genres")
+    Event.listed_taggings_in("genres")
          .joins("JOIN tags ON tags.id = taggings.tag_id")
          .joins("JOIN genres ON genres.name = tags.name")
          .joins("JOIN (#{SUBTREE_PAIRS}) subtree ON subtree.id = COALESCE(genres.canonical_id, genres.id)")

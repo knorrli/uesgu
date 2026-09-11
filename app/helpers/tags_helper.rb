@@ -72,7 +72,7 @@ module TagsHelper
   end
 
   def location_filter_tree
-    counts = Event.listed.tag_counts("locations")
+    counts = Event.listed_tag_counts("locations")
 
     Location.hierarchy.sort.filter_map do |canton, localities|
       locality_nodes = localities.sort.filter_map do |locality, venues|

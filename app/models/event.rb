@@ -33,12 +33,12 @@ class Event < ApplicationRecord
   scope :dismissed, -> { where.not(dismissed_at: nil) }
   scope :listed, -> { visible.where(start_date: Date.current..) }
 
-  def self.taggings_in(context)
-    ActsAsTaggableOn::Tagging.where(context: context, taggable_type: name, taggable_id: select(:id))
+  def self.listed_taggings_in(context)
+    ActsAsTaggableOn::Tagging.where(context: context, taggable_type: name, taggable_id: listed.select(:id))
   end
 
-  def self.tag_counts(context)
-    taggings_in(context).joins(:tag).group("tags.name").count
+  def self.listed_tag_counts(context)
+    listed_taggings_in(context).joins(:tag).group("tags.name").count
   end
 
   def cancelled?

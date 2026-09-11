@@ -31,6 +31,22 @@ class Event < ApplicationRecord
 
   scope :kept, -> { where(dismissed_at: nil) }
   scope :dismissed, -> { where.not(dismissed_at: nil) }
+  scope :listed, -> { visible.where(start_date: Date.current..) }
+
+  def self.tag_counts(context)
+    taggings_in(context).joins(:tag).group("tags.name").count
+  end
+
+  def self.tag_event_ids(context)
+    taggings_in(context).joins(:tag).pluck("tags.name", :taggable_id)
+                        .group_by(&:first)
+                        .transform_values { |rows| rows.map(&:last).to_set }
+  end
+
+  def self.taggings_in(context)
+    ActsAsTaggableOn::Tagging.where(context: context, taggable_type: name, taggable_id: select(:id))
+  end
+  private_class_method :taggings_in
 
   def cancelled?
     cancelled_at.present?

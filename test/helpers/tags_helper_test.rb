@@ -41,21 +41,70 @@ class TagsHelperTest < ActionView::TestCase
     refute_includes available_tags(context: :locations, applied: [venue]).map(&:name), venue
   end
 
-  test "genre_filter_tree nests roots, sums subtree counts, prunes empties and unplaced" do
-    rock = genre(name: "treerock", events_count: 1)
-    indie = genre(name: "treeindie", events_count: 2); indie.set_parent!(rock)
-    shoegaze = genre(name: "treeshoe", events_count: 3); shoegaze.set_parent!(indie)
-    empty = genre(name: "treeempty", events_count: 0); empty.set_parent!(rock)
-    loose = genre(name: "treeloose", events_count: 5)
+  test "genre_filter_tree nests roots, counts distinct subtree events, prunes empties and unplaced" do
+    rock = genre(name: "treerock")
+    indie = genre(name: "treeindie"); indie.set_parent!(rock)
+    shoegaze = genre(name: "treeshoe"); shoegaze.set_parent!(indie)
+    empty = genre(name: "treeempty"); empty.set_parent!(rock)
+    loose = genre(name: "treeloose"); event_with_genres(loose.name)
+    event_with_genres(rock.name)
+    event_with_genres(indie.name, shoegaze.name)
+    event_with_genres(shoegaze.name)
 
     tree = genre_filter_tree
     root = tree.find { |node| node[:name] == rock.name }
 
     assert root, "a root genre (top-level with children) is present"
-    assert_equal 6, root[:count], "subtree count sums self + every descendant (1+2+3)"
+    assert_equal 3, root[:count], "an event tagged with both a genre and its child counts once"
     indie_node = root[:children].find { |node| node[:name] == indie.name }
+    assert_equal 2, indie_node[:count]
     assert_equal [shoegaze.name], indie_node[:children].map { |node| node[:name] }
     refute root[:children].any? { |node| node[:name] == empty.name }, "a zero-count subtree is pruned"
     refute tree.any? { |node| node[:value] == loose.name }, "an unplaced childless top-level genre is excluded"
+  end
+
+  test "genre_filter_tree counts only the events the filter would list" do
+    rock = genre(name: "countrock")
+    punk = genre(name: "countpunk"); punk.set_parent!(rock)
+    event_with_genres(punk.name)
+    event(start_date: Date.current - 1.day).update!(genre_list: [punk.name])
+    event(hidden: true).update!(genre_list: [punk.name])
+
+    node = genre_filter_tree.find { |n| n[:value] == rock.name }
+
+    assert_equal 1, node[:count], "a past or hidden event is not listed, so it is not counted"
+  end
+
+  test "genre_filter_tree counts events tagged with a merged-away alias under the canonical" do
+    rock = genre(name: "aliasrock")
+    punk = genre(name: "aliaspunk"); punk.set_parent!(rock)
+    old_name = genre(name: "aliasoldpunk")
+    event_with_genres(old_name.name)
+    old_name.merge_into!(punk)
+
+    node = genre_filter_tree.find { |n| n[:value] == rock.name }
+
+    assert_equal 1, node[:count], "the filter expands to alias names, so the count has to follow"
+  end
+
+  test "location_filter_tree counts only the events the filter would list" do
+    spot = place(name: "Countsaal", locality: "Countwil", canton: "GE")
+    tags = [spot.name, spot.locality, spot.canton]
+    event(location_list: tags)
+    event(start_date: Date.current - 1.day, location_list: tags)
+    event(hidden: true, location_list: tags)
+
+    canton = location_filter_tree.find { |n| n[:value] == "GE" }
+    locality = canton[:children].find { |n| n[:value] == spot.locality }
+    venue = locality[:children].find { |n| n[:value] == spot.name }
+
+    assert_equal [1, 1, 1], [canton[:count], locality[:count], venue[:count]]
+  end
+
+  test "location_filter_tree drops a venue whose only events have passed" do
+    spot = place(name: "Pastsaal", locality: "Pastwil", canton: "GE")
+    event(start_date: Date.current - 1.day, location_list: [spot.name, spot.locality, spot.canton])
+
+    refute location_filter_tree.any? { |n| n[:value] == "GE" }
   end
 end

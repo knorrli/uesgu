@@ -124,6 +124,27 @@ class Genre < ApplicationRecord
        .split(/([ \-\/&])/).map { |part| part.match?(/[a-z]/i) ? part.capitalize : part }.join
   end
 
+  def self.filter_counts
+    events = listed_events_by_genre
+    children_of = pluck(:id, :parent_id).group_by(&:last).transform_values { |rows| rows.map(&:first) }
+    subtrees = {}
+    walk = lambda do |id|
+      subtrees[id] ||= children_of.fetch(id, []).reduce(events.fetch(id, Set.new)) { |ids, child| ids | walk.call(child) }
+    end
+    children_of.fetch(nil, []).each { |root| walk.call(root) }
+    subtrees.transform_values(&:size)
+  end
+
+  def self.listed_events_by_genre
+    owner_of = pluck(:fingerprint, :id, :canonical_id).to_h { |fingerprint, id, canonical| [fingerprint, canonical || id] }
+    Event.listed.tag_event_ids("genres").each_with_object({}) do |(tag_name, event_ids), acc|
+      next unless (id = owner_of[fingerprint_for(tag_name)])
+
+      acc[id] = acc.fetch(id, Set.new) | event_ids
+    end
+  end
+  private_class_method :listed_events_by_genre
+
   def self.filter_names_for(picked_names)
     picked_names = Array(picked_names).map(&:to_s).reject(&:blank?)
     return [] if picked_names.empty?

@@ -35,15 +35,10 @@ venues:
     canton: LU
   checked: 2026-06-21
 - domain: bee-flat.ch
-  # The venue is the Turnhalle (its events are tagged "Turnhalle"); bee-flat is the
-  # concert series/operator whose site (bee-flat.ch) we scrape. Name must equal the
-  # event tag so the WHERE tree matches.
-  name: Turnhalle
-  disposition: consume
-  place:
-    locality: Bern
-    canton: BE
-  checked: 2026-06-21
+  name: bee-flat
+  disposition: reject
+  reason: promoter
+  checked: 2026-09-26
 - domain: bejazz.ch
   name: BeJazz
   disposition: defer
@@ -372,6 +367,13 @@ venues:
     locality: Bern
     canton: BE
   checked: 2026-07-07
+- domain: progr.ch
+  name: Turnhalle
+  disposition: consume
+  place:
+    locality: Bern
+    canton: BE
+  checked: 2026-09-26
 - domain: prozess.be
   name: PROZESS
   # NOT js_only after all: the SPA hydrates from a clean JSON feed at

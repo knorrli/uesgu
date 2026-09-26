@@ -1,55 +1,74 @@
 module Scrapers
   class Turnhalle < Agent
+    AGENDA = "https://www.progr.ch/de/agenda/".freeze
+    ROOM = "PROGR Turnhalle".freeze
+    SUMMARY_LABEL = "Einfach gesagt:".freeze
+
     def self.url
-      URI.parse("https://www.bee-flat.ch/programm/aktuell/")
+      URI.parse(AGENDA)
     end
-
-    def initialize
-      super
-      @scrape_date = Date.current
-    end
-
-    field_gaps genres: :no_field
 
     def event_rows
-      page.css("article.event.tile")
+      @event_rows ||= agenda_articles
     end
 
     def skip_row?(row)
-      !row.at_css(".date")&.text.to_s.include?("Turnhalle")
+      row.at_css(".venues")&.text&.squish != ROOM
     end
 
     def event_url(row)
-      link = row.at_css("a")
-      return if link.blank?
+      path = row["data-g-path"]
+      return if path.blank?
 
-      URI.join(self.class.url, link.attr("href")).to_s
+      url = URI.join(AGENDA, path).to_s
+      recurring_paths.include?(path) ? "#{url}##{row['data-g-date']}" : url
     end
 
-    def event_start_time(content)
-      text = content.at_css(".date")&.text.to_s
-      /(?<day>\d{1,2})\.\s*(?<month>\p{L}+)/ =~ text
-      raise "Unparseable Turnhalle date: #{text.squish.inspect}" if day.blank? || month.blank?
+    def event_start_time(row)
+      date = row["data-g-date"].to_s
+      raise "Unparseable PROGR date: #{date.inspect}" unless date.match?(/\A\d{4}-\d{2}-\d{2}\z/)
 
-      month = month_number(month: month)
-      time_string = text[/\d{1,2}:\d{2}/]
-      Time.zone.parse("#{year_for(month, day.to_i)}-#{month}-#{day} #{time_string}")
+      /\A(?<hour>\d{1,2})(?::(?<minute>\d{2}))?/ =~ row.at_css(".time")&.text.to_s.strip
+      Time.zone.parse("#{date} #{hour || 0}:#{minute || '00'}")
     end
 
-    def event_title(content)
-      content.at_css("h2")&.children&.select(&:text?)&.map { |n| n.text.squish }&.compact_blank&.join(" ")
+    def event_title(row)
+      row.css(".title h2 > span:not(.invisible)").map(&:text).join(" ").squish
     end
 
-    def event_description(content)
-      content.at_css(".style")&.text&.squish.presence
+    def event_description(row)
+      summary = row.css(".details .text > p").find { |p| p.at_css("strong")&.text&.squish == SUMMARY_LABEL }
+      summary&.text&.squish&.delete_prefix(SUMMARY_LABEL)&.strip.presence
+    end
+
+    def event_genres(row)
+      row.at_css(".categories")&.text.to_s.split(",").map(&:squish).compact_blank
+    end
+
+    def event_genre_prose(row)
+      row.at_css(".details .text")&.text
     end
 
     private
 
-    def year_for(month, day)
-      year = @scrape_date.year
-      year += 1 if Date.new(year, month, day) < @scrape_date
-      year
+    def agenda_articles
+      articles = page.css("article.event").to_a
+      offset = page.at_css("#agendalist")&.[]("data-g-offset")
+      while offset.present? && (chunk = agenda_chunk(offset))
+        articles.concat(Nokogiri::HTML(chunk["data"].to_s).css("article.event").to_a)
+        offset = chunk["hasmore"] == "1" ? chunk["offset"] : nil
+      end
+      articles
+    end
+
+    def agenda_chunk(offset)
+      response = get(AGENDA, { method: "getData", offset: offset, daycount: 14 }, nil,
+                     { "X-Requested-With" => "XMLHttpRequest" })
+      parse_json(response.body, default: nil) if response
+    end
+
+    def recurring_paths
+      @recurring_paths ||= event_rows.map { |row| row["data-g-path"] }.tally.select { |_, n| n > 1 }.keys.to_set
     end
   end
 end

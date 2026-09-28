@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_080000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -54,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_210000) do
   end
 
   create_table "events", force: :cascade do |t|
+    t.string "aggregator_url"
     t.datetime "cancelled_at"
     t.bigint "canonical_event_id"
     t.bigint "captured_by_id"
@@ -63,6 +64,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_210000) do
     t.string "description"
     t.bigint "discarded_by_rule_id"
     t.datetime "dismissed_at"
+    t.datetime "event_page_checked_at"
     t.boolean "hidden", default: false, null: false
     t.jsonb "overridden_fields", default: [], null: false
     t.datetime "rescheduled_at"
@@ -71,6 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_210000) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.string "url"
+    t.index ["aggregator_url"], name: "index_events_on_aggregator_url"
     t.index ["canonical_event_id"], name: "index_events_on_canonical_event_id"
     t.index ["captured_by_id"], name: "index_events_on_captured_by_id"
     t.index ["created_in_scrape_run_id"], name: "index_events_on_created_in_scrape_run_id"

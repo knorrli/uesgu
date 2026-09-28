@@ -1,5 +1,7 @@
 module Scrapers
   class Kiff < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.kiff.ch/programm")
     end

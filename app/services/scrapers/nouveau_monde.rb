@@ -1,5 +1,7 @@
 module Scrapers
   class NouveauMonde < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.nouveaumonde.ch/agenda/")
     end

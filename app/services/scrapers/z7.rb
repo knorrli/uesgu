@@ -1,5 +1,7 @@
 module Scrapers
   class Z7 < Agent
+    self.opens_event_pages = true
+
     TAG_VOCABULARY_URL = URI.parse("https://z-7.ch/wp-json/wp/v2/product_tag?per_page=100").freeze
 
     def self.url

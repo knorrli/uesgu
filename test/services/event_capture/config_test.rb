@@ -18,9 +18,10 @@ class EventCaptureConfigTest < ActiveSupport::TestCase
   end
 
   test "a blank env var falls through to credentials rather than blanking the config" do
-    with_env("INFOMANIAK_API_TOKEN" => "   ") do
-      assert_equal Rails.application.credentials.dig(:infomaniak, :api_token).to_s.strip.presence,
-                   EventCaptureConfig.api_token
+    Rails.application.credentials.stub(:dig, "tok-from-credentials") do
+      with_env("INFOMANIAK_API_TOKEN" => "   ") do
+        assert_equal "tok-from-credentials", EventCaptureConfig.api_token
+      end
     end
   end
 end

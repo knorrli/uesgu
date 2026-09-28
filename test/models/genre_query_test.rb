@@ -192,6 +192,13 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_equal ["Wub-Hop"], Genre.names_in_prose("(Pop/Wub-hop)", index)
   end
 
+  test "names_in_prose reads genres written in styled Unicode letters" do
+    Genre.create!(name: "Zorptronic")
+    index = Genre.prose_mining_index
+
+    assert_equal ["Zorptronic"], Genre.names_in_prose("𝐙𝐨𝐫𝐩𝐭𝐫𝐨𝐧𝐢𝐜 all night", index)
+  end
+
   test "names_in_prose splits words on non-breaking spaces" do
     Genre.create!(name: "Zorptronic")
     index = Genre.prose_mining_index

@@ -170,7 +170,7 @@ class Genre < ApplicationRecord
   def self.names_in_prose(text, index)
     return [] if text.blank? || index.empty?
 
-    names_in_words(text.to_s.scan(/[^[:space:]]+/), index).uniq
+    names_in_words(text.to_s.unicode_normalize(:nfkc).scan(/[^[:space:]]+/), index).uniq
   end
 
   def self.names_in_words(words, index, compound: false)

@@ -7,14 +7,15 @@ module Scrapers
 
     USER_AGENT = "uesgu/1.0 (+https://uesgu.ch; personal event aggregator)".freeze
 
-    class_attribute :respect_robots, instance_writer: false, default: true
-
     class_attribute :_field_gaps, instance_accessor: false, default: {}.freeze
+
+    class_attribute :opens_event_pages, instance_writer: false, default: false
 
     def initialize
       super
       self.user_agent = USER_AGENT
-      self.robots = respect_robots
+      self.html_parser = NoindexTolerantHtml
+      self.robots = true
     end
 
     # webrobots (0.1.2) FAIL-CLOSES: when the robots.txt REQUEST fails — a 5xx, a
@@ -23,9 +24,9 @@ module Scrapers
     # never issued. So an unreachable robots.txt is UNKNOWN, not a ban: proceed,
     # and record it. RFC 9309 §2.3.1.4 permits this for a site we can tell is
     # misconfigured — schuur.ch serves its programme at 200 and 500s only on
-    # /robots.txt. A genuine Disallow (or a `noindex` meta tag) stashes no fetch
-    # error, which is what tells the two apart. 4xx never reaches here: Mechanize's
-    # get_robots maps it to an empty robots.txt (§2.3.1.3, allow-all).
+    # /robots.txt. A genuine Disallow stashes no fetch error, which is what tells
+    # the two apart. 4xx never reaches here: Mechanize's get_robots maps it to an
+    # empty robots.txt (§2.3.1.3, allow-all).
     def get(*args, &block)
       return without_robots { super } if robots_unreachable?(robots_origin(args.first))
 
@@ -146,7 +147,7 @@ module Scrapers
       self.robots = false
       yield
     ensure
-      self.robots = respect_robots
+      self.robots = true
     end
 
     def process_events
@@ -173,6 +174,11 @@ module Scrapers
         event = Event.find_or_initialize_by(url: url)
         next if event.dismissed?
 
+        if event_page_not_due?(event)
+          @unchanged += 1
+          next
+        end
+
         was_new = event.new_record?
         tags_before = was_new ? nil : tag_snapshot(event)
         transact do
@@ -194,12 +200,16 @@ module Scrapers
       end
     end
 
+    def event_page_not_due?(event)
+      opens_event_pages && !event.new_record? && !EventPageSchedule.due?(event)
+    end
+
     def tag_snapshot(event)
       { genres: event.genre_list.sort, locations: event.location_list.sort }
     end
 
     def changed_fields(event, tags_before)
-      fields = event.saved_changes.keys - %w[created_at updated_at genre_list location_list]
+      fields = event.saved_changes.keys - %w[created_at updated_at event_page_checked_at genre_list location_list]
       after = tag_snapshot(event)
       fields << "genres"    if after[:genres]    != tags_before[:genres]
       fields << "locations" if after[:locations] != tags_before[:locations]
@@ -208,6 +218,7 @@ module Scrapers
 
     def build_event(event, row)
       content = event_content(row)
+      event.event_page_checked_at = Time.current if opens_event_pages
       preprocess(content)
       event.start_time    = event_start_time(content) unless event.overridden?(:start_time)
       event.start_date    = event.start_time.to_date  unless event.overridden?(:start_date)

@@ -1,6 +1,10 @@
 class SavedFilter < ApplicationRecord
   CADENCES = %w[daily weekly biweekly monthly].freeze
 
+  DEFAULT_SCHEDULE = {
+    cadence: "daily", time_of_day: 1080, weekday: 5, monthday: 1, notify_push: false, notify_email: false
+  }.freeze
+
   WINDOW_RHYTHM = {
     "today" => "daily", "tomorrow" => "daily",
     "this_week" => "weekly", "this_weekend" => "weekly",

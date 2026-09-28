@@ -16,9 +16,10 @@
       <div class="event-description"><%= simple_format(event.description) %></div>
     <% end %>
 
-    <% if event.genres.any? %>
+    <% genres = shown_genres(event) %>
+    <% if genres.any? %>
       <div class="event-genres">
-        <% event.genres.each_with_index do |genre, i| %>
+        <% genres.each_with_index do |genre, i| %>
           <% if i.positive? %><span class="sep" aria-hidden="true">&middot;</span><% end %>
           <span class="event-genre"><% if interest && interest_why_genre?(event, genre) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if interactive && current_user %><%= button_to genre_exclusions_path, params: { name: genre.name, return_to: request.fullpath }, class: 'icon-button meta-action', title: t('events.exclude_genre', genre: genre.name), 'aria-label': t('events.exclude_genre', genre: genre.name), form: { data: { turbo_frame: '_top' } } do %><span class="ph ph-eye-slash"></span><% end %><% end %><% if current_user&.can?(:genres) %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-action', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
         <% end %>

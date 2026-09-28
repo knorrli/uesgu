@@ -2,6 +2,8 @@ require "nokogiri"
 
 module Scrapers
   class Petzi < Agent
+    self.opens_event_pages = true
+
     def self.venues
       Venue.all.each_with_object({}) do |venue, map|
         Array(venue.aliases["petzi"]).each { |slug| map[slug] = venue.place_tuple }
@@ -40,7 +42,7 @@ module Scrapers
       xml.css("loc").map(&:text).select { |u| u.include?("/events/") && venue_for(u) }
     end
 
-    def event_url(row) = venue_url(detail_page(row), row) || row
+    def event_url(row) = known_urls[row] || venue_url(detail_page(row), row) || row
 
     def event_content(row) = detail_page(row)
 
@@ -65,6 +67,10 @@ module Scrapers
       venue_for(current_row)
     end
 
+    def postprocess(event)
+      event.aggregator_url = current_row
+    end
+
     private
 
     def squish(str) = str.to_s.gsub(/\s+/, " ").strip
@@ -81,6 +87,10 @@ module Scrapers
 
       m = time.match(/(\d{1,2})[:.](\d{2})/)
       [m[1].to_i, m[2].to_i]
+    end
+
+    def known_urls
+      @known_urls ||= Event.where.not(aggregator_url: nil).pluck(:aggregator_url, :url).to_h
     end
 
     def detail_page(row)

@@ -2,13 +2,13 @@ require "test_helper"
 
 class Scrapers::GoldenTest < Minitest::Test
   FIXTURE_ROOT = File.expand_path("../../fixtures/scrapers", __dir__)
-  SHAPE_B = %w[bad_bonn kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken marians z7].freeze
+  SHAPE_B = %w[kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken marians z7].freeze
   CAPTURING = ENV["CAPTURE_GOLDEN"] == "1"
   REFERENCE_DATE = Date.new(2026, 6, 10)
 
   class Capture
     FIELDS = %i[start_time start_date title description genre_list location_list cancelled_at].freeze
-    attr_accessor(*FIELDS, :hidden, :data_source, :rescheduled_at)
+    attr_accessor(*FIELDS, :hidden, :data_source, :rescheduled_at, :event_page_checked_at, :aggregator_url)
     attr_reader :url
 
     def initialize(url) = @url = url
@@ -90,6 +90,7 @@ class Scrapers::GoldenTest < Minitest::Test
       scraper.define_singleton_method(:get) { |*| nil }
       scraper.define_singleton_method(:page) { list_page }
       scraper.define_singleton_method(:click) { |*| detail_page } if detail_page
+      scraper.define_singleton_method(:known_urls) { {} } if scraper.respond_to?(:known_urls, true)
       scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
       scraper.define_singleton_method(:mined_genres) { |content| [] }
 

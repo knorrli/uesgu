@@ -1,5 +1,7 @@
 module Scrapers
   class Isc < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://isc-club.ch/")
     end

@@ -4,7 +4,7 @@
     "start_time": "2026-06-10T20:30:00+02:00",
     "start_date": "2026-06-10",
     "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -15,10 +15,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/kylesa",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-06-15T20:30:00+02:00",
+    "start_date": "2026-06-15",
+    "title": "Kylesa, Impure Wilhelmina",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -29,10 +29,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/black-tusk-orgo",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-06-19T21:00:00+02:00",
+    "start_date": "2026-06-19",
+    "title": "Black Tusk, Orgo",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -43,10 +43,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/stress-positions",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-06-23T20:30:00+02:00",
+    "start_date": "2026-06-23",
+    "title": "Stress Positions, Scalpel",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -57,24 +57,24 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/dream-ivory-losers",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-06-25T20:30:00+02:00",
+    "start_date": "2026-06-25",
+    "title": "DREAM, IVORY, losers! - Abgesagt/Annulé",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
       "Düdingen",
       "FR"
     ],
-    "cancelled_at": false
+    "cancelled_at": true
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/public-house-dion-lunadon",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-07-08T20:30:00+02:00",
+    "start_date": "2026-07-08",
+    "title": "Public House, Dion Lunadon",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -85,10 +85,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/ragana",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-08-13T21:00:00+02:00",
+    "start_date": "2026-08-13",
+    "title": "Ragana, L’amour du ciel",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -99,10 +99,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/cowboy-hunters-verbrennung-3-grades",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-08-15T21:00:00+02:00",
+    "start_date": "2026-08-15",
+    "title": "Cowboy Hunters, Verbrennung 3. Grades",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -113,10 +113,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/bad-bonn-kilbi-festival-thursday",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-09-03T15:00:00+02:00",
+    "start_date": "2026-09-03",
+    "title": "Bad Bonn Kilbi Festival: Day 1",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -127,10 +127,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/bad-bonn-kilbi-festival-friday",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-09-04T15:00:00+02:00",
+    "start_date": "2026-09-04",
+    "title": "Bad Bonn Kilbi Festival: DAY 2 SOLDOUT",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -141,10 +141,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/bad-bonn-kilbi-festival-saturday",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-09-05T15:00:00+02:00",
+    "start_date": "2026-09-05",
+    "title": "Bad Bonn Kilbi Festival: DAY 3 SOLD OUT",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -155,10 +155,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/burnout-ostwest",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-10-17T21:00:00+02:00",
+    "start_date": "2026-10-17",
+    "title": "Burnout Ostwest",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -169,10 +169,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/endless-wellness",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-10-23T21:00:00+02:00",
+    "start_date": "2026-10-23",
+    "title": "Endless Wellness",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -183,10 +183,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/feeble-little-horse",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-11-08T20:00:00+01:00",
+    "start_date": "2026-11-08",
+    "title": "feeble little horse",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -197,10 +197,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/frankie-and-the-witch-fingers-iguana-death-cult",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-11-18T20:30:00+01:00",
+    "start_date": "2026-11-18",
+    "title": "Frankie and the Witch Fingers",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -211,10 +211,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/knoppel-jack-stoiker",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-12-04T21:00:00+01:00",
+    "start_date": "2026-12-04",
+    "title": "Knöppel, Jack Stoiker",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",
@@ -225,10 +225,10 @@
   },
   {
     "url": "https://club.badbonn.ch/archive/2026/ebbb",
-    "start_time": "2026-06-10T20:30:00+02:00",
-    "start_date": "2026-06-10",
-    "title": "Greet Death, Ruined",
-    "description": "Heavy & emotional - some called it Slowcore",
+    "start_time": "2026-12-16T20:30:00+01:00",
+    "start_date": "2026-12-16",
+    "title": "EBBB",
+    "description": null,
     "genre_list": [],
     "location_list": [
       "Bad Bonn",

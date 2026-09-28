@@ -1,5 +1,7 @@
 module Scrapers
   class Boeroem < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://boeroem.ch/")
     end

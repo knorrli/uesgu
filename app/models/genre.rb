@@ -162,9 +162,9 @@ class Genre < ApplicationRecord
 
   def self.prose_mining_index
     stop = PROSE_MINING_STOPWORDS.to_set { |word| fingerprint_for(word) }
-    where(blocked_at: nil).pluck(:fingerprint, :name)
-                          .reject { |fingerprint, _| fingerprint.blank? || stop.include?(fingerprint) }
-                          .to_h
+    where(blocked_at: nil, ignored_at: nil).pluck(:fingerprint, :name)
+                                           .reject { |fingerprint, _| fingerprint.blank? || stop.include?(fingerprint) }
+                                           .to_h
   end
 
   def self.names_in_prose(text, index)

@@ -2,6 +2,8 @@ require "set"
 
 module Scrapers
   class SousSoul < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.sous-soul.love/")
     end

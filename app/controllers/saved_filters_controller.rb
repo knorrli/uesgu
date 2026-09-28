@@ -6,13 +6,13 @@ class SavedFiltersController < ApplicationController
   end
 
   def new
-    @rule = current_user.saved_filters.new(default_schedule)
+    @rule = current_user.saved_filters.new(SavedFilter::DEFAULT_SCHEDULE)
     @rule.filter_attributes = filter_params
     @filter = filter_for(@rule)
   end
 
   def create
-    @rule = current_user.saved_filters.new(default_schedule)
+    @rule = current_user.saved_filters.new(SavedFilter::DEFAULT_SCHEDULE)
     @rule.assign_attributes(rule_params) if params[:saved_filter].present?
     @rule.filter_attributes = filter_params
 
@@ -27,6 +27,7 @@ class SavedFiltersController < ApplicationController
   end
 
   def edit
+    @rule.filter_attributes = filter_params if filter_params.any?
     @filter = filter_for(@rule)
     @duplicate_of = duplicate_of(@rule)
   end
@@ -36,6 +37,7 @@ class SavedFiltersController < ApplicationController
     @rule.filter_attributes = filter_params
 
     if @rule.save
+      forget_applied(@rule)
       redirect_to saved_filters_path, notice: t("saved_filters.saved")
     else
       @filter = filter_for(@rule)
@@ -64,10 +66,6 @@ class SavedFiltersController < ApplicationController
     @rule = current_user.saved_filters.find(params[:id])
   end
 
-  def default_schedule
-    { cadence: "daily", time_of_day: 1080, weekday: 5, monthday: 1, notify_push: false, notify_email: false }
-  end
-
   def rule_params
     params.require(:saved_filter).permit(
       :name, :cadence, :weekday, :monthday, :time_string, :time_hour, :time_minute,
@@ -82,6 +80,10 @@ class SavedFiltersController < ApplicationController
   def filter_for(rule)
     Filter.build(queries: rule.queries, genres: rule.genres,
                  location_list: rule.location_list, date_ranges: rule.date_ranges)
+  end
+
+  def forget_applied(rule)
+    Current.session.update!(applied_saved_filter: nil) if Current.session.applied_saved_filter_id == rule.id
   end
 
   def duplicate_of(rule)

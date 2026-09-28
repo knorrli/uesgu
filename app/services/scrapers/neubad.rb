@@ -1,5 +1,7 @@
 module Scrapers
   class Neubad < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://neubad.org/veranstaltungen")
     end

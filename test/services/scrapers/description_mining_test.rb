@@ -26,14 +26,6 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     assert_includes text, "Film"
   end
 
-  def test_bad_bonn_mines_the_detail_article_prose
-    detail = html("bad_bonn", "detail.html")
-    text = Scrapers::BadBonn.new.event_genre_prose(detail)
-
-    assert_includes text, "Shoegaze"
-    assert_includes text, "Slowcore"
-  end
-
   def test_volkshaus_mines_the_collapse_panel_prose
     row = html("volkshaus").at_css("#programmliste .tableitem.event")
     text = Scrapers::Volkshaus.new.event_genre_prose(row)

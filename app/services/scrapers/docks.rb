@@ -1,5 +1,7 @@
 module Scrapers
   class Docks < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.docks.ch/programme")
     end

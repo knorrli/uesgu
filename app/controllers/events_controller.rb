@@ -14,6 +14,7 @@ class EventsController < ApplicationController
       @saved_filter = current_user.saved_filters.matching(SavedFilter.fingerprint_for(@filter))
     end
     @saved_filters = current_user.saved_filters.order(:created_at) if current_user
+    @applied_saved_filter = Current.session&.applied_saved_filter unless @saved_filter
     @q = Event.visible.ransack(@filter.ransack_query)
 
     excluded_genres = ExcludedGenres.for(current_user, picked: @filter.genres)
@@ -51,8 +52,9 @@ class EventsController < ApplicationController
   def redirect_to_canonical_filter
     if explicit_filter_request?
       sync_filter_cookie
-      if params[:filtered].present?
-        redirect_to events_path(request.query_parameters.except("filtered").symbolize_keys)
+      track_applied_saved_filter
+      if params[:filtered].present? || params[:applied].present?
+        redirect_to events_path(request.query_parameters.except("filtered", "applied").symbolize_keys)
         return true
       end
     elsif (stored = stored_filter)
@@ -76,6 +78,16 @@ class EventsController < ApplicationController
     Date.iso8601(params[:day].to_s)
   rescue Date::Error
     nil
+  end
+
+  def track_applied_saved_filter
+    return unless Current.session
+
+    if params[:applied].present?
+      Current.session.update!(applied_saved_filter: current_user.saved_filters.find_by(id: params[:applied]))
+    elsif FILTER_KEYS.none? { |key| params[key].present? }
+      Current.session.update!(applied_saved_filter: nil)
+    end
   end
 
   def explicit_filter_request?

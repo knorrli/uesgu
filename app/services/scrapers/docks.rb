@@ -41,6 +41,10 @@ module Scrapers
              .uniq.sort
     end
 
+    def event_genre_prose(content)
+      content.css(".artist-content").map(&:text).join("\n")
+    end
+
     private
 
     def origin_code?(tag)

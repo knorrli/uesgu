@@ -37,6 +37,10 @@ module Scrapers
       [support, subtitle].compact_blank.join(", ")
     end
 
+    def event_genre_prose(content)
+      content.at_css(".event__wysiwyg-text")&.text
+    end
+
     private
 
     def link_for(row)

@@ -42,6 +42,10 @@ module Scrapers
       content.at_css("h2.page-title")&.text&.squish
     end
 
+    def event_genre_prose(content)
+      content.at_css("details .field--name-body")&.text
+    end
+
     private
 
     def detail_value(content, label)

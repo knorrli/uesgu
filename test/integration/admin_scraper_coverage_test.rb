@@ -33,7 +33,7 @@ class AdminScraperCoverageTest < ActionDispatch::IntegrationTest
 
   test "a declared field gap renders n/a (muted), not a red zero" do
     2.times do
-      event(data_source: Scrapers::BadBonn.source_key,
+      event(data_source: Scrapers::Kofmehl.source_key,
             start_time: Time.zone.local(2030, 1, 1, 20, 0), description: "With support")
     end
 
@@ -47,7 +47,7 @@ class AdminScraperCoverageTest < ActionDispatch::IntegrationTest
   end
 
   test "reality wins — a gapped field with real data shows the live percentage" do
-    e = event(data_source: Scrapers::BadBonn.source_key,
+    e = event(data_source: Scrapers::Kofmehl.source_key,
               start_time: Time.zone.local(2030, 1, 1, 20, 0))
     e.update!(genre_list: ["zorptronic"])
 

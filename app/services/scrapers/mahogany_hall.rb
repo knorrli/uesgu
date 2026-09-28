@@ -11,7 +11,7 @@ module Scrapers
     end
 
     def event_url(row)
-      URI.join(self.class.url, row.at_css(".views-field-title .field-content a").attr("href")).to_s
+      absolute_url(row.at_css(".views-field-title .field-content a").attr("href"))
     end
 
     def event_start_time(content)

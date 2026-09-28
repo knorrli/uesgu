@@ -16,7 +16,7 @@ module Scrapers
     end
 
     def event_url(row)
-      row["link"].to_s
+      absolute_url(row["link"])
     end
 
     def event_start_time(row)

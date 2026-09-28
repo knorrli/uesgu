@@ -27,10 +27,10 @@ module Scrapers
     end
 
     def event_url(row)
-      return row["link"].presence if row.dig("acf", "has_detail_page")
+      return absolute_url(row["link"]) if row.dig("acf", "has_detail_page")
 
       external = row.dig("acf", "external_link")
-      url = external.is_a?(Hash) ? external["url"].presence : nil
+      url = absolute_url(external["url"]) if external.is_a?(Hash)
       url && "#{url}#mokka-#{row.dig('acf', 'event_date')}"
     end
 

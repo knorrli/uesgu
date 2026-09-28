@@ -9,7 +9,7 @@ module Scrapers
     end
 
     def event_url(row)
-      URI.join(self.class.url, row.at_css("a.previewlink").attr("data-url")).to_s
+      absolute_url(row.at_css("a.previewlink").attr("data-url"))
     end
 
     def event_start_time(content)

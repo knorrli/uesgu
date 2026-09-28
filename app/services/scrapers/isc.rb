@@ -20,7 +20,7 @@ module Scrapers
     end
 
     def event_url(row)
-      URI.parse(row.attr("href").to_s).to_s
+      absolute_url(row.attr("href"))
     end
 
     def event_content(row)

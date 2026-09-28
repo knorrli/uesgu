@@ -32,7 +32,7 @@ module Scrapers
     end
 
     def event_url(content)
-      content.at_css('[itemprop="url"]')&.attr("href").presence
+      absolute_url(content.at_css('[itemprop="url"]')&.attr("href"))
     end
 
     def event_start_time(content)

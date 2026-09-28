@@ -19,7 +19,7 @@ module Scrapers
       link = row.at_css("a.eventlist-title-link, a.eventlist-column-thumbnail")
       return if link.nil?
 
-      URI.join(self.class.url, link.attr("href")).to_s
+      absolute_url(link.attr("href"))
     end
 
     def event_content(row)

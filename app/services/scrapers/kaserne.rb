@@ -16,7 +16,7 @@ module Scrapers
       link = row.at_css('a[href^="/de/events/"]')
       return if link.blank?
 
-      URI.join(self.class.url, link.attr("href")).to_s
+      absolute_url(link.attr("href"))
     end
 
     def event_start_time(content)

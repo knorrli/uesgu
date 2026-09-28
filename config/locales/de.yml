@@ -956,10 +956,9 @@ de:
     index:
       empty: Keine Events für die aktuellen Filter.
       clear_filter: Filter zurücksetzen
-      excluded_html:
-        one: 1 Event wird wegen deiner %{link} nicht angezeigt.
-        other: "%{count} Events werden wegen deiner %{link} nicht angezeigt."
-      excluded_link: ausgeschlossenen Genres
+      excluded:
+        one: "1 Event wird wegen deiner ausgeschlossenen Genres nicht angezeigt."
+        other: "%{count} Events werden wegen deiner ausgeschlossenen Genres nicht angezeigt."
       save_filter: Filter speichern
       save_filter_all: Über alles benachrichtigen
       save_filter_saved: Gespeichert — bearbeiten

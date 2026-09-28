@@ -72,6 +72,15 @@
   content: none;
 }
 
+.day-summary__count--excluded {
+  color: var(--theme-fg-muted);
+  text-decoration: none;
+}
+
+.day-summary__count--excluded::before {
+  content: none;
+}
+
 .event {
   display: flex;
   justify-content: space-between;

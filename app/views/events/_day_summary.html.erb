@@ -1,6 +1,11 @@
+<% excluded_count = local_assigns.fetch(:excluded_count, 0) %>
 <% saved_count = events.count { |event| event_saved?(event) } %>
 <% interest_count = events.count { |event| interest_event?(event) } %>
-<div class="day-summary" aria-hidden="true">
-  <span class="day-summary__count day-summary__count--saved" data-day-summary-target="saved" <%= 'hidden' unless saved_count.positive? %>><%= saved_count %></span>
-  <span class="day-summary__count day-summary__count--interest" <%= 'hidden' unless interest_count.positive? %>><i class="ph ph-flag"></i><%= interest_count %></span>
+<div class="day-summary">
+  <span class="day-summary__count day-summary__count--saved" aria-hidden="true" data-day-summary-target="saved" <%= 'hidden' unless saved_count.positive? %>><%= saved_count %></span>
+  <span class="day-summary__count day-summary__count--interest" aria-hidden="true" <%= 'hidden' unless interest_count.positive? %>><i class="ph ph-flag"></i><%= interest_count %></span>
+  <% if excluded_count.positive? %>
+    <%= link_to settings_path(anchor: 'excluded-genres'), class: 'day-summary__count day-summary__count--excluded',
+                'aria-label': t('events.index.excluded', count: excluded_count) do %><i class="ph ph-eye-slash" aria-hidden="true"></i><%= excluded_count %><% end %>
+  <% end %>
 </div>

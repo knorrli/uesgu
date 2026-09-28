@@ -13,7 +13,7 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
 
     assert_includes response.body, "MixedMarkerShow"
     assert_select "form[action=?]", genre_exclusions_path, false
-    assert_select ".events-excluded", false
+    assert_select ".day-summary__count--excluded", false
   end
 
   test "excluding requires an account" do
@@ -83,9 +83,20 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
 
     assert_includes response.body, "CleanMarkerShow"
     refute_includes response.body, "MixedMarkerShow"
-    assert_select ".events-excluded", text: /1 event left out/ do
-      assert_select "a[href=?]", settings_path(anchor: "excluded-genres")
-    end
+    assert_select ".day-summary__count--excluded[href=?][aria-label=?]",
+                  settings_path(anchor: "excluded-genres"), "1 event left out because of your excluded genres.",
+                  text: "1"
+  end
+
+  test "when every matching event is excluded, the empty feed says why" do
+    listener = sign_in_as user(locale: "en")
+    listener.genre_exclusions.create!(genre: @liked)
+
+    get events_path
+
+    assert_select ".day-summary__count--excluded", false
+    assert_select ".events-excluded a[href=?]", settings_path(anchor: "excluded-genres"),
+                  text: "2 events left out because of your excluded genres."
   end
 
   test "the note counts only the day on screen" do
@@ -97,7 +108,7 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
 
     get events_path
 
-    assert_select ".events-excluded", text: /1 event left out/
+    assert_select ".day-summary__count--excluded", text: "1"
   end
 
   test "a day whose events are all excluded is skipped" do
@@ -120,7 +131,7 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
     get events_path(g: [@hated.name])
 
     assert_includes response.body, "MixedMarkerShow"
-    assert_select ".events-excluded", false
+    assert_select ".day-summary__count--excluded", false
   end
 
   test "the what sheet counts leave out excluded events" do

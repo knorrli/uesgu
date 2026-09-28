@@ -248,6 +248,19 @@ class GenreQueryTest < ActiveSupport::TestCase
     refute_includes Genre.prose_mining_index.keys, hidden.fingerprint
   end
 
+  test "prose_mining_index leaves out genres that are only a number" do
+    Genre.create!(name: "4077")
+    Genre.create!(name: "Zorpcore 4077")
+    index = Genre.prose_mining_index
+
+    assert_empty Genre.names_in_prose("Dauer: ca. 4077 min", index)
+    assert_equal ["Zorpcore 4077"], Genre.names_in_prose("a night of zorpcore 4077", index)
+  end
+
+  test "a genre that is only a number still comes through a venue's genre field" do
+    assert_includes event_with_genres("4077").reload.genre_list, "4077"
+  end
+
   test "prose_mining_index excludes the everyday-word stoplist" do
     word = Genre::PROSE_MINING_STOPWORDS.first
     Genre.create!(name: word)

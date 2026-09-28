@@ -942,6 +942,10 @@ fr:
     this_weekend: Ce week-end
     today: Aujourd'hui
     tomorrow: Demain
+  media:
+    dock: Lecteur
+    play: "Écouter %{title}"
+    stop: Arrêter
   events:
     cancelled: Annulé
     rescheduled: Nouvelle date

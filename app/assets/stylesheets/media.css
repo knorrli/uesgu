@@ -1,0 +1,64 @@
+.event-play.playing {
+  color: var(--theme-accent-color);
+}
+
+.media-dock {
+  position: fixed;
+  inset-inline: var(--gap-medium);
+  bottom: calc(var(--gap-medium) + max(var(--cookie-notice-clearance, 0px), var(--safe-bottom)));
+  z-index: 800;
+  max-width: 400px;
+  margin-inline-start: auto;
+  background: var(--theme-bg-color);
+  border: var(--border-width) solid var(--rule-color);
+}
+
+.media-dock[hidden] {
+  display: none;
+}
+
+.media-dock__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-small);
+  padding: var(--gap-xsmall) var(--gap-xsmall) var(--gap-xsmall) var(--gap-small);
+  font-size: var(--font-size-small);
+}
+
+.media-dock__title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.media-dock__player iframe,
+.media-dock__specimen-frame {
+  display: block;
+  width: 100%;
+  height: 152px;
+  border: 0;
+}
+
+.media-dock__player[data-provider="youtube"] :is(iframe, .media-dock__specimen-frame),
+.media-dock__player[data-provider="vimeo"] iframe {
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+.media-dock__player[data-provider="soundcloud"] iframe {
+  height: 166px;
+}
+
+.media-dock__player[data-provider="bandcamp"] iframe {
+  height: 120px;
+}
+
+.media-dock__player[data-provider="mixcloud"] iframe {
+  height: 60px;
+}
+
+.media-dock__specimen-frame {
+  background: var(--theme-bg-muted);
+}

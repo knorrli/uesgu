@@ -28,10 +28,12 @@
 
   </div>
 
-  <% if current_user %>
+  <% play_button = media_play_button(event) if interactive %>
+  <% if current_user || play_button %>
     <div class="event-actions">
+      <%= play_button %>
       <%= event_save_button(event) %>
-      <% if current_user.can?(:curate_events) %>
+      <% if current_user&.can?(:curate_events) %>
         <%= link_to admin_event_path(event), class: 'icon-button', data: { turbo_frame: '_top' }, 'aria-label': t('events.edit_event') do %>
           <span class="ph ph-gear"></span>
         <% end %>

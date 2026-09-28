@@ -276,4 +276,17 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
       assert_select "input[type=hidden][name=_method][value=delete]"
     end
   end
+
+  test "an event with media gets a play button, also without an account, and no embed until it is tapped" do
+    with_media = event(start_date: Date.current + 3.days, media: [{ "provider" => "youtube", "id" => "cjox_JXa8eM" }])
+    without = event(start_date: Date.current + 3.days)
+
+    get events_path
+
+    assert_select "##{ActionView::RecordIdentifier.dom_id(with_media)} .event-actions button.event-play"
+    assert_select "##{ActionView::RecordIdentifier.dom_id(without)} .event-actions", false
+    assert_select "#media-dock[hidden]"
+    assert_select "iframe", false
+    assert_includes response.headers["Content-Security-Policy"], "frame-src 'self' https://www.youtube-nocookie.com"
+  end
 end

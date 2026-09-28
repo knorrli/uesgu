@@ -9,6 +9,8 @@ Rails.application.configure do
     policy.base_uri        :self
     policy.form_action     :self
     policy.frame_ancestors :self
+    policy.frame_src       :self, "https://www.youtube-nocookie.com", "https://player.vimeo.com", "https://bandcamp.com",
+                           "https://w.soundcloud.com", "https://player-widget.mixcloud.com", "https://open.spotify.com"
   end
 
   config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }

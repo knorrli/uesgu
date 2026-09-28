@@ -100,6 +100,12 @@
 .ph.ph-music-notes:before {
   content: "\e340";
 }
+.ph.ph-play:before {
+  content: "\e3d0";
+}
+.ph.ph-stop:before {
+  content: "\e46c";
+}
 .ph.ph-sun:before {
   content: "\e472";
 }

@@ -15,10 +15,6 @@ main.content {
   flex: 1 0 auto;
 }
 
-body:has(.cookie-notice:not([hidden])) .site-footer {
-  padding-bottom: calc(var(--gap-large) + 3.5rem + var(--safe-bottom));
-}
-
 h1 { font-size: var(--font-size-xl); }
 h2 { font-size: var(--font-size-lg); }
 h3 { font-size: var(--font-size-base); }

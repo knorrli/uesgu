@@ -942,6 +942,10 @@ de:
     this_weekend: Dieses Wochenende
     today: Heute
     tomorrow: Morgen
+  media:
+    dock: Player
+    play: "%{title} anhören"
+    stop: Stopp
   events:
     cancelled: Abgesagt
     rescheduled: Neues Datum

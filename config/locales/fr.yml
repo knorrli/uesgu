@@ -544,6 +544,7 @@ fr:
         sessions: Sessions actives
         invited_by: Invité par
         saved_filters: Filtres enregistrés
+        captured_events: Événements saisis
         contributor_heading: Saisir des événements
         contributor_hint: Permet à ce compte de saisir lui-même des événements — depuis une affiche ou du texte collé.
         contributor_grant: Autoriser la saisie
@@ -635,6 +636,7 @@ fr:
         dismissed_intro: Cet événement est retiré — masqué de toutes les listes publiques et ignoré par le scraper. Restaure-le pour le faire revenir.
         restore: Restaurer l'événement
         source_label: "via %{source}"
+        captured_by: "saisi par %{username}"
         field_canonical_event: Lien de doublon
         dedup_heading: Doublons
         is_duplicate_html: Cet événement est un doublon de %{link} — masqué des listes à son profit.

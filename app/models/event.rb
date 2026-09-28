@@ -8,6 +8,8 @@ class Event < ApplicationRecord
   # the inflector singularizes "saves" → "safe".
   has_many :event_saves, class_name: "EventSave", dependent: :destroy
 
+  belongs_to :captured_by, class_name: "User", optional: true, inverse_of: :captured_events
+
   belongs_to :discarded_by_rule, class_name: "DiscardRule", optional: true,
                                  inverse_of: :discarded_events
 

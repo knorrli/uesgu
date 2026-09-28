@@ -414,6 +414,17 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "event[url]", count: 0
   end
 
+  test "the show page links a captured event to the account that captured it" do
+    contributor = user(username: "zorpfan", contributor: true)
+    captured = event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE,
+                     captured_by: contributor)
+    sign_in_as user(admin: true)
+
+    get admin_event_path(captured)
+    assert_select "a[href=?]", admin_user_path(contributor),
+                  text: I18n.t("admin.events.show.captured_by", username: "zorpfan")
+  end
+
   test "an admin can attach a source URL to a captured event and clear it again" do
     e = event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
     sign_in_as user(admin: true)

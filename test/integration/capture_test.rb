@@ -94,6 +94,15 @@ class CaptureTest < ActionDispatch::IntegrationTest
     assert_equal "message: incomplete", Event.last.description
   end
 
+  test "a published event records the contributor who captured it" do
+    contributor = user(contributor: true)
+    sign_in_as contributor
+
+    post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
+                                 canton: "BE" }
+    assert_equal contributor, Event.find_by!(title: "Zorp Fest").captured_by
+  end
+
   test "entering by hand is closed to accounts without the capability" do
     sign_in_as user
 

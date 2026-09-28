@@ -544,6 +544,7 @@ en:
         sessions: Active sessions
         invited_by: Invited by
         saved_filters: Saved filters
+        captured_events: Captured events
         contributor_heading: Capture events
         contributor_hint: Lets this account capture events itself — from a poster or pasted text.
         contributor_grant: Allow capturing
@@ -635,6 +636,7 @@ en:
         dismissed_intro: This event is dismissed — hidden from every public listing and skipped by the scraper. Restore it to bring it back.
         restore: Restore event
         source_label: "via %{source}"
+        captured_by: "captured by %{username}"
         field_canonical_event: Duplicate link
         dedup_heading: Duplicates
         is_duplicate_html: This event is a duplicate of %{link} — hidden from listings in its favour.

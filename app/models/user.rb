@@ -8,6 +8,8 @@ class User < ApplicationRecord
   has_many :event_saves, class_name: "EventSave", dependent: :destroy
   has_many :saved_events, through: :event_saves, source: :event
   has_many :push_subscriptions, dependent: :destroy
+  has_many :captured_events, class_name: "Event", foreign_key: :captured_by_id,
+                             dependent: :nullify, inverse_of: :captured_by
 
   has_many :sent_invitations, class_name: "Invitation", foreign_key: :created_by_id, dependent: :destroy, inverse_of: :created_by
   has_one :accepted_invitation, class_name: "Invitation", foreign_key: :redeemed_by_id, dependent: :nullify, inverse_of: :redeemed_by

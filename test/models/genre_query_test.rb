@@ -160,6 +160,28 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_equal ["Zorp"], Genre.names_in_prose("a zorp night", index)
   end
 
+  test "names_in_prose never merges separate words into a one-word genre" do
+    Genre.create!(name: "Zorpcore")
+    index = Genre.prose_mining_index
+
+    assert_empty Genre.names_in_prose("es geht zorp core weiter", index)
+    assert_equal ["Zorpcore"], Genre.names_in_prose("a zorpcore night", index)
+  end
+
+  test "names_in_prose still matches a spaced or hyphenated genre across words" do
+    Genre.create!(name: "Wub-Hop")
+    index = Genre.prose_mining_index
+
+    assert_equal ["Wub-Hop"], Genre.names_in_prose("some wub hop tonight", index)
+  end
+
+  test "names_in_prose splits words on non-breaking spaces" do
+    Genre.create!(name: "Zorptronic")
+    index = Genre.prose_mining_index
+
+    assert_equal ["Zorptronic"], Genre.names_in_prose("pure zorptronic energy", index)
+  end
+
   test "names_in_prose mints nothing and matches only the known vocabulary" do
     Genre.create!(name: "Zorptronic")
     index = Genre.prose_mining_index

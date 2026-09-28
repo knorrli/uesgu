@@ -88,6 +88,31 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "the note counts only the day on screen" do
+    listener = sign_in_as user(locale: "en")
+    listener.genre_exclusions.create!(genre: @hated)
+    later = Date.new(2030, 1, 5)
+    2.times { event_with_genres(@hated.name).update!(start_date: later) }
+    event_with_genres(@liked.name).update!(start_date: later)
+
+    get events_path
+
+    assert_select ".events-excluded", text: /1 event left out/
+  end
+
+  test "a day whose events are all excluded is skipped" do
+    listener = sign_in_as user
+    listener.genre_exclusions.create!(genre: @hated)
+    only_excluded = Date.new(2030, 1, 2)
+    next_day = Date.new(2030, 1, 3)
+    event_with_genres(@hated.name).update!(start_date: only_excluded)
+    event_with_genres(@liked.name).update!(start_date: next_day)
+
+    get events_path(day: only_excluded.iso8601)
+
+    assert_redirected_to events_path(day: next_day.iso8601)
+  end
+
   test "filtering for an excluded genre shows its events and no note" do
     listener = sign_in_as user
     listener.genre_exclusions.create!(genre: @hated)

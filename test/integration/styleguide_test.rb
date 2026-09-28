@@ -27,5 +27,6 @@ class StyleguideTest < ActionDispatch::IntegrationTest
     assert_select ".field-group__attached"
     assert_select ".drop-zone__target"
     assert_select ".text-page .prose h3"
+    assert_select ".day-nav .range-cal"
   end
 end

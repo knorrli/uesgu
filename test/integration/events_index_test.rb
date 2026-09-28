@@ -88,10 +88,10 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
                   "a scraper re-derives its events nightly, so they carry no provenance caveat"
   end
 
-  test "the empty-state reflects whole-filter matches, not the current page" do
+  test "the empty-state shows only when nothing matches the filter" do
     event(title: "DarksideShow", start_date: Date.current + 2.months)
 
-    get events_path(q: ["DarksideShow"], page: 2)
+    get events_path(q: ["DarksideShow"])
     assert_response :success
     assert_select "p.events-empty", false
 

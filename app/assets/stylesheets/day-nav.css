@@ -1,0 +1,43 @@
+.day-nav {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: var(--gap-xsmall);
+  margin-block: -0.5rem;
+  margin-left: auto;
+  font-weight: normal;
+}
+
+.day-nav__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.day-nav__button.is-disabled {
+  color: var(--theme-fg-muted);
+  opacity: 0.35;
+  cursor: default;
+}
+
+.day-nav__calendar {
+  width: min(20rem, calc(100vw - 2rem));
+  padding: var(--gap-medium);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--theme-bg-color);
+  color: var(--theme-fg-color);
+}
+
+.day-nav__calendar::backdrop {
+  background: color-mix(in srgb, var(--theme-fg-color) 25%, transparent);
+}
+
+.day-nav__calendar .range-cal {
+  margin: 0;
+  max-width: none;
+}

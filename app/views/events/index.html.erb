@@ -1,7 +1,7 @@
 <div class="flex flex-col gap-large align-stretch">
   <%= render 'filter_sheets' %>
 
-  <% unless @has_results %>
+  <% unless @days.any? %>
     <p class="muted events-empty">
       <%= t('events.index.empty') %>
       <% if @filter.active? %>

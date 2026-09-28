@@ -29,35 +29,12 @@
     <% if custom_range %>
       <div class="opt opt--custom when-custom">
         <span class="opt__type"><%= t('events.filter.custom_range') %></span>
-        <div class="range-cal"
-             data-controller="range-calendar"
-             data-action="range-calendar:reset->range-calendar#reset"
-             data-range-calendar-today-value="<%= Date.current.iso8601 %>"
-             data-range-calendar-start-value="<%= custom_start %>"
-             data-range-calendar-end-value="<%= custom_end %>"
-             data-range-calendar-month-names-value="<%= t('date.month_names').to_json %>">
-          <div class="range-cal__head">
-            <button type="button" class="range-cal__nav ph ph-caret-left"
-                    data-action="range-calendar#prevMonth"
-                    aria-label="<%= t('events.filter.prev_month') %>"></button>
-            <span class="range-cal__month" data-range-calendar-target="label" aria-live="polite"></span>
-            <button type="button" class="range-cal__nav ph ph-caret-right"
-                    data-action="range-calendar#nextMonth"
-                    aria-label="<%= t('events.filter.next_month') %>"></button>
-          </div>
-          <div class="range-cal__weekdays" aria-hidden="true">
-            <% 7.times do |i| %>
-              <span class="range-cal__weekday"><%= t('date.abbr_day_names')[(i + 1) % 7] %></span>
-            <% end %>
-          </div>
-          <div class="range-cal__grid" role="grid"
-               data-range-calendar-target="grid"
-               data-action="keydown->range-calendar#navigate"></div>
-          <div class="range-cal__summary" data-range-calendar-target="summary" aria-live="polite"></div>
+        <%= render layout: "shared/month_calendar",
+                   locals: { start: custom_start, end: custom_end, action: "range-calendar:reset->range-calendar#reset" } do %>
           <input type="checkbox" name="d[]" hidden
                  value="<%= custom %>" <%= 'checked' if custom.present? %>
                  data-range-calendar-target="value">
-        </div>
+        <% end %>
       </div>
     <% end %>
   </div>

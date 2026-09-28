@@ -9,6 +9,10 @@ module EventsHelper
 
   VenueLink = Data.define(:name, :url)
 
+  def feed_day_path(day)
+    events_path(request.query_parameters.merge("day" => day.iso8601).symbolize_keys)
+  end
+
   def event_link_url(event)
     event.url.presence || event_venue_link(event)&.url
   end

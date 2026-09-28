@@ -1,0 +1,26 @@
+<nav class="day-nav" aria-label="<%= t('shared.day_nav.label') %>">
+  <% if previous_path %>
+    <%= link_to previous_path, rel: "prev", class: "icon-button day-nav__button", "aria-label": t("shared.day_nav.previous") do %>
+      <span class="ph ph-caret-left"></span>
+    <% end %>
+  <% else %>
+    <span class="icon-button day-nav__button is-disabled" aria-hidden="true"><span class="ph ph-caret-left"></span></span>
+  <% end %>
+
+  <button type="button" class="icon-button day-nav__button" popovertarget="day-nav-calendar"
+          aria-label="<%= t('shared.day_nav.calendar') %>">
+    <span class="ph ph-calendar-dots"></span>
+  </button>
+  <div id="day-nav-calendar" class="day-nav__calendar" popover>
+    <%= render(layout: "shared/month_calendar",
+               locals: { mode: "day", start: day.iso8601, enabled: days, url: calendar_url }) { } %>
+  </div>
+
+  <% if next_path %>
+    <%= link_to next_path, rel: "next", class: "icon-button day-nav__button", "aria-label": t("shared.day_nav.next") do %>
+      <span class="ph ph-caret-right"></span>
+    <% end %>
+  <% else %>
+    <span class="icon-button day-nav__button is-disabled" aria-hidden="true"><span class="ph ph-caret-right"></span></span>
+  <% end %>
+</nav>

@@ -415,7 +415,7 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
   end
 
   test "the show page links a captured event to the account that captured it" do
-    contributor = user(username: "zorpfan", contributor: true)
+    contributor = user(username: "zorpfan", permissions: %w[capture])
     captured = event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE,
                      captured_by: contributor)
     sign_in_as user(admin: true)

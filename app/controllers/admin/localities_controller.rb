@@ -2,6 +2,8 @@ module Admin
   class LocalitiesController < BaseController
     include CatalogueBrowsing
 
+    requires :places
+
     STATUS_SCOPES = { "aliased" => :aliased, "unsettled" => :unsettled }.freeze
     SORT_SCOPES = { "name" => :by_name, "count" => :by_usage }.freeze
 

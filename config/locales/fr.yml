@@ -453,6 +453,22 @@ fr:
       users: Comptes
       open_invitations: Invitations ouvertes
     unknown: inconnu
+    permissions:
+      curate_events:
+        name: Curation des événements
+        hint: modifier, retirer et restaurer des événements, fusionner les doublons, vérifier les ajouts de la communauté
+      genres:
+        name: Genres
+        hint: gérer la file de curation et l'arborescence, renommer, fusionner, masquer et bloquer des genres
+      places:
+        name: Lieux
+        hint: renommer et fusionner des salles et des localités
+      capture:
+        name: Saisie
+        hint: ajouter des événements depuis une affiche ou un texte copié
+      invite:
+        name: Invitations
+        hint: inviter de nouvelles personnes
     action_logs:
       deleted_account: un compte supprimé
       all_scrapers: tous les scrapers
@@ -492,6 +508,8 @@ fr:
         invitation_revoke_html: "a révoqué l'invitation %{subject}"
         user_grant_capture_html: "a permis à %{subject} de saisir des événements"
         user_revoke_capture_html: "a retiré à %{subject} le droit de saisir des événements"
+        user_grant_permission_html: "a donné la permission %{permission} à %{subject}"
+        user_revoke_permission_html: "a retiré la permission %{permission} à %{subject}"
         user_delete_html: "a supprimé le compte %{subject}"
         scrape_run_html: "a lancé un passage des scrapers (%{subject})"
         scrape_snooze_html: "a mis en pause le scraper %{subject}"
@@ -574,9 +592,7 @@ fr:
           distinct_genres: genres distincts
     users:
       admin_badge: Admin
-      contributor_badge: Saisie
-      contributor_granted: "%{username} peut désormais saisir des événements."
-      contributor_revoked: "%{username} ne peut plus saisir d'événements."
+      permissions_saved: "Permissions de %{username} enregistrées."
       cant_delete_self: Tu ne peux pas supprimer ton propre compte ici.
       deleted: "Le compte %{username} a été supprimé."
       index:
@@ -590,11 +606,11 @@ fr:
         sessions: Sessions actives
         invited_by: Invité par
         saved_filters: Filtres enregistrés
+        permissions_heading: Permissions
+        permissions_hint: Ce que ce compte peut faire en plus d'utiliser le site. Chaque permission ouvre sa partie de l'admin ; rien n'en est visible pour les autres.
+        permissions_admin: Les admins peuvent tout faire.
+        permissions_save: Enregistrer les permissions
         captured_events: Événements saisis
-        contributor_heading: Saisir des événements
-        contributor_hint: Permet à ce compte de saisir lui-même des événements — depuis une affiche ou du texte collé.
-        contributor_grant: Autoriser la saisie
-        contributor_revoke: Retirer la saisie
         delete_heading: Supprimer le compte
         delete_hint: Supprime définitivement ce compte et ses données.
         delete: Supprimer le compte

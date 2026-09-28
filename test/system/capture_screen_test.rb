@@ -3,7 +3,7 @@ require_relative "../support/canned_extraction_client"
 
 class CaptureScreenTest < ApplicationSystemTestCase
   def setup
-    @user = user(contributor: true, locale: "de")
+    @user = user(permissions: %w[capture], locale: "de")
     @staged_paths = []
     sign_in_as @user
   end
@@ -992,7 +992,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
   test "a refused request fails the row rather than leaving it pending forever" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
-    @user.update!(contributor: false)
+    @user.update!(permissions: [])
     pick "poster.png"
 
     assert_selector ".capture-row", text: copy("failures.unreachable")

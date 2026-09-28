@@ -1,5 +1,7 @@
 module Admin
   class InvitationsController < BaseController
+    requires :invite
+
     def index
       load_invitations
       @invitation = Invitation.new
@@ -22,7 +24,7 @@ module Admin
     end
 
     def destroy
-      invitation = Invitation.find(params[:id])
+      invitation = visible_invitations.find(params[:id])
 
       if invitation.redeemed?
         redirect_to admin_invitations_path, alert: t("admin.invitations.cant_revoke_redeemed"), status: :see_other
@@ -35,8 +37,10 @@ module Admin
     private
 
     def load_invitations
-      @invitations = Invitation.includes(:created_by, :redeemed_by).order(created_at: :desc)
+      @invitations = visible_invitations.includes(:created_by, :redeemed_by).order(created_at: :desc)
     end
+
+    def visible_invitations = current_user.admin? ? Invitation.all : current_user.sent_invitations
 
     def invitation_params
       params.fetch(:invitation, {}).permit(:note, :expires_in_days)

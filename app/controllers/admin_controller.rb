@@ -1,5 +1,5 @@
 class AdminController < ApplicationController
-  before_action :require_admin
+  before_action :require_moderator
 
   def index
     @event_tag_stats = EventTagStatsPresenter.new

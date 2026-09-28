@@ -453,6 +453,22 @@ de:
       users: Konten
       open_invitations: Offene Einladungen
     unknown: unbekannt
+    permissions:
+      curate_events:
+        name: Events kuratieren
+        hint: Events bearbeiten, entfernen und wiederherstellen, Duplikate zusammenlegen, Community-Einträge prüfen
+      genres:
+        name: Genres
+        hint: Genre-Queue und Baum pflegen, Genres umbenennen, zusammenführen, verbergen und blockieren
+      places:
+        name: Orte
+        hint: Lokale und Orte umbenennen und zusammenlegen
+      capture:
+        name: Erfassen
+        hint: Events aus einem Poster oder kopiertem Text erfassen
+      invite:
+        name: Einladen
+        hint: neue Leute einladen
     action_logs:
       deleted_account: ein gelöschtes Konto
       all_scrapers: alle Scraper
@@ -492,6 +508,8 @@ de:
         invitation_revoke_html: "hat die Einladung %{subject} widerrufen"
         user_grant_capture_html: "hat %{subject} das Erfassen erlaubt"
         user_revoke_capture_html: "hat %{subject} das Erfassen entzogen"
+        user_grant_permission_html: "hat %{subject} die Berechtigung %{permission} gegeben"
+        user_revoke_permission_html: "hat %{subject} die Berechtigung %{permission} entzogen"
         user_delete_html: "hat das Konto %{subject} gelöscht"
         scrape_run_html: "hat einen Scrape-Lauf gestartet (%{subject})"
         scrape_snooze_html: "hat den Scraper %{subject} pausiert"
@@ -574,9 +592,7 @@ de:
           distinct_genres: versch. Genres
     users:
       admin_badge: Admin
-      contributor_badge: Erfassung
-      contributor_granted: "%{username} kann jetzt Events erfassen."
-      contributor_revoked: "%{username} kann keine Events mehr erfassen."
+      permissions_saved: "Berechtigungen für %{username} gespeichert."
       cant_delete_self: Du kannst dein eigenes Konto hier nicht löschen.
       deleted: "Konto %{username} wurde gelöscht."
       index:
@@ -590,11 +606,11 @@ de:
         sessions: Aktive Sitzungen
         invited_by: Eingeladen von
         saved_filters: Gespeicherte Filter
+        permissions_heading: Berechtigungen
+        permissions_hint: Was dieses Konto über das normale Benutzen hinaus darf. Jede Berechtigung öffnet ihren Teil des Admins; für andere ist nichts davon sichtbar.
+        permissions_admin: Ein Admin darf alles.
+        permissions_save: Berechtigungen speichern
         captured_events: Erfasste Events
-        contributor_heading: Events erfassen
-        contributor_hint: Erlaubt diesem Konto, selbst Events zu erfassen – aus einem Poster oder kopiertem Text.
-        contributor_grant: Erfassung erlauben
-        contributor_revoke: Erfassung entziehen
         delete_heading: Konto löschen
         delete_hint: Entfernt dieses Konto und seine Daten endgültig.
         delete: Konto löschen

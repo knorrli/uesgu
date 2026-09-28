@@ -9,13 +9,16 @@ module Admin
       @captured_events = @user.captured_events.order(created_at: :desc)
     end
 
-    def toggle_contributor
+    def permissions
       @user = User.find(params[:id])
-      action = @user.contributor? ? "user.revoke_capture" : "user.grant_capture"
-      ActionLog.track(action, @user) { @user.update!(contributor: !@user.contributor?) }
-
-      notice = @user.contributor? ? "admin.users.contributor_granted" : "admin.users.contributor_revoked"
-      redirect_to admin_user_path(@user), notice: t(notice, username: @user.username), status: :see_other
+      wanted = Array(params.dig(:user, :permissions)).map(&:to_s) & User::PERMISSIONS
+      User.transaction do
+        (wanted - @user.permissions).each { |permission| log_permission("user.grant_permission", permission) }
+        (@user.permissions - wanted).each { |permission| log_permission("user.revoke_permission", permission) }
+        @user.update!(permissions: wanted)
+      end
+      redirect_to admin_user_path(@user), notice: t("admin.users.permissions_saved", username: @user.username),
+                                          status: :see_other
     end
 
     def destroy
@@ -28,6 +31,12 @@ module Admin
         ActionLog.track("user.delete", @user) { @user.destroy! }
         redirect_to admin_users_path, notice: t("admin.users.deleted", username: username), status: :see_other
       end
+    end
+
+    private
+
+    def log_permission(action, permission)
+      ActionLog.record!(action, @user, permission: permission)
     end
   end
 end

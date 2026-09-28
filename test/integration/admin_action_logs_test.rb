@@ -119,7 +119,8 @@ class AdminActionLogsTest < ActionDispatch::IntegrationTest
     post unmerge_admin_locality_path(zorpville)
     post admin_invitations_path, params: { invitation: { note: "for zorp" } }
     delete admin_invitation_path(Invitation.last)
-    2.times { patch toggle_contributor_admin_user_path(member) }
+    patch permissions_admin_user_path(member), params: { user: { permissions: %w[capture] } }
+    patch permissions_admin_user_path(member), params: { user: { permissions: [""] } }
     delete admin_user_path(member)
     Scrapers::Sweep.stub(:enqueue, ->(*, **) { }) { post admin_scrape_runs_path, params: { scraper: "bad_bonn" } }
     post snooze_admin_scrape_runs_path, params: { scraper: "bad_bonn" }
@@ -131,7 +132,7 @@ class AdminActionLogsTest < ActionDispatch::IntegrationTest
     entries = ActionLog.order(:id)
     assert_equal %w[genre.place genre.make_root genre.rename genre.ignore genre.hide genre.block genre.restore
                     genre.merge place.rename place.edit place.merge place.unmerge locality.merge locality.unmerge
-                    invitation.create invitation.revoke user.grant_capture user.revoke_capture user.delete
+                    invitation.create invitation.revoke user.grant_permission user.revoke_permission user.delete
                     scrape.run scrape.snooze scrape.wake discard_rule.create discard_rule.edit discard_rule.delete],
                  entries.map(&:action)
     assert entries.all? { |entry| entry.user == admin }

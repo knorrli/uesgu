@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -318,6 +318,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_140000) do
     t.date "last_reminded_on"
     t.string "locale"
     t.string "password_digest", null: false
+    t.string "permissions", default: [], null: false, array: true
     t.integer "reminder_lead_days", default: 0, null: false
     t.integer "reminder_time", default: 720, null: false
     t.datetime "updated_at", null: false

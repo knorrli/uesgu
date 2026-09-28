@@ -29,10 +29,27 @@ class UserTest < ActiveSupport::TestCase
     refute User.new(username: "x" * 31, password: "secret123").valid?
   end
 
-  test "contributor is a capability that defaults off and is independent of admin" do
-    refute_predicate user, :contributor?
-    refute_predicate user(admin: true), :contributor?
-    assert_predicate user(contributor: true), :contributor?
+  test "a permission is off by default, granted one at a time, and implied by admin" do
+    refute user.can?(:capture)
+    assert user(admin: true).can?(:genres)
+
+    capturer = user(permissions: %w[capture])
+    assert capturer.can?(:capture)
+    refute capturer.can?(:curate_events)
+  end
+
+  test "only known permissions are kept" do
+    assert_equal %w[genres], user(permissions: %w[genres superpowers]).permissions
+  end
+
+  test "any permission makes a moderator, who sees the log of their own areas only" do
+    refute_predicate user, :moderator?
+    refute_predicate user(permissions: %w[capture]), :moderator?
+
+    curator = user(permissions: %w[curate_events capture])
+    assert_predicate curator, :moderator?
+    assert_equal %w[events], curator.log_areas
+    assert_includes user(admin: true).log_areas, "admin"
   end
 
   test "two users may both have no email" do

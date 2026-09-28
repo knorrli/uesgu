@@ -18,8 +18,9 @@ class AppliedSavedFilterTest < ActionDispatch::IntegrationTest
 
     get events_path(g: ["Rock", "Pop"])
 
-    assert_select "a.filter-menu__save[href=?]", new_saved_filter_path(g: ["Rock", "Pop"])
-    assert_select "a.filter-menu__update[href=?]", edit_saved_filter_path(@rock, g: ["Rock", "Pop"]),
+    assert_select "a.filter-menu__save[href=?]", feed_saved_filters_path(g: ["Rock", "Pop"])
+    assert_select "a.filter-menu__update[href=?][data-turbo-method=patch]",
+                  feed_saved_filter_path(@rock, g: ["Rock", "Pop"]),
                   text: "Update “#{@rock.display_name}”"
   end
 

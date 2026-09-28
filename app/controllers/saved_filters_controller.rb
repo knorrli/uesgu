@@ -6,13 +6,13 @@ class SavedFiltersController < ApplicationController
   end
 
   def new
-    @rule = current_user.saved_filters.new(default_schedule)
+    @rule = current_user.saved_filters.new(SavedFilter::DEFAULT_SCHEDULE)
     @rule.filter_attributes = filter_params
     @filter = filter_for(@rule)
   end
 
   def create
-    @rule = current_user.saved_filters.new(default_schedule)
+    @rule = current_user.saved_filters.new(SavedFilter::DEFAULT_SCHEDULE)
     @rule.assign_attributes(rule_params) if params[:saved_filter].present?
     @rule.filter_attributes = filter_params
 
@@ -64,10 +64,6 @@ class SavedFiltersController < ApplicationController
 
   def set_rule
     @rule = current_user.saved_filters.find(params[:id])
-  end
-
-  def default_schedule
-    { cadence: "daily", time_of_day: 1080, weekday: 5, monthday: 1, notify_push: false, notify_email: false }
   end
 
   def rule_params

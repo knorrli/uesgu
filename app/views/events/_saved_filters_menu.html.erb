@@ -16,9 +16,9 @@
         <span><%= t('events.index.save_filter_saved') %></span>
       <% end %>
     <% else %>
-      <%= link_to new_saved_filter_path(q: @filter.queries, g: @filter.genres,
+      <%= link_to feed_saved_filters_path(q: @filter.queries, g: @filter.genres,
                     l: @filter.location_list, d: @filter.date_ranges),
-            class: 'nav-menu__item filter-menu__save' do %>
+            class: 'nav-menu__item filter-menu__save', data: { turbo_method: :post } do %>
         <span class="save-filter-icon" aria-hidden="true">
           <span class="ph ph-funnel"></span>
           <span class="save-filter-plus">+</span>
@@ -26,9 +26,9 @@
         <span><%= @filter.active? ? t('events.index.save_filter') : t('events.index.save_filter_all') %></span>
       <% end %>
       <% if @applied_saved_filter %>
-        <%= link_to edit_saved_filter_path(@applied_saved_filter, q: @filter.queries, g: @filter.genres,
+        <%= link_to feed_saved_filter_path(@applied_saved_filter, q: @filter.queries, g: @filter.genres,
                       l: @filter.location_list, d: @filter.date_ranges),
-              class: 'nav-menu__item filter-menu__update' do %>
+              class: 'nav-menu__item filter-menu__update', data: { turbo_method: :patch } do %>
           <span class="ph ph-funnel" aria-hidden="true"></span>
           <span><%= t('events.index.update_filter', name: @applied_saved_filter.display_name) %></span>
         <% end %>

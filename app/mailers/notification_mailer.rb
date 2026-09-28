@@ -1,4 +1,6 @@
 class NotificationMailer < ApplicationMailer
+  helper GenresHelper
+
   def digest(notification)
     @notification = notification
     @user = notification.user

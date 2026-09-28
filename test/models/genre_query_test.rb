@@ -177,6 +177,20 @@ class GenreQueryTest < ActiveSupport::TestCase
     refute_includes Genre.prose_mining_index.keys, blocked.fingerprint
   end
 
+  test "prose_mining_index excludes ignored genres" do
+    ignored = Genre.create!(name: "Wubnoise")
+    ignored.ignore!
+
+    refute_includes Genre.prose_mining_index.keys, ignored.fingerprint
+  end
+
+  test "prose_mining_index still mines hidden genres, which hide non-music events" do
+    hidden = Genre.create!(name: "Wubreading")
+    hidden.hide!
+
+    assert_includes Genre.prose_mining_index.keys, hidden.fingerprint
+  end
+
   test "prose_mining_index excludes the everyday-word stoplist" do
     word = Genre::PROSE_MINING_STOPWORDS.first
     Genre.create!(name: word)

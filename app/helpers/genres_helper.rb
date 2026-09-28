@@ -52,4 +52,12 @@ module GenresHelper
   def genre_ancestor_label(genre)
     (@genre_ancestor_paths ||= Genre.ancestor_paths)[genre.id].to_a.join(" › ")
   end
+
+  def shown_genres(event)
+    event.genres.reject { |genre| ignored_genre_fingerprints.include?(Genre.fingerprint_for(genre.name)) }
+  end
+
+  def ignored_genre_fingerprints
+    @ignored_genre_fingerprints ||= Genre.ignored.pluck(:fingerprint).to_set
+  end
 end

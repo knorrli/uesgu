@@ -21,6 +21,14 @@ updates:
     ignore:
       - dependency-name: minitest
         update-types: ["version-update:semver-major"]
+      # cuprite 0.18 / ferrum 0.18 make the account-form field-height system test
+      # fail intermittently on CI's Linux Chrome (the <select> measures 31px against
+      # 36px) while every other gem in the group passes. REMOVE THIS once the test
+      # passes reliably on 0.18.
+      - dependency-name: cuprite
+        versions: [">= 0.18"]
+      - dependency-name: ferrum
+        versions: [">= 0.18"]
 
   - package-ecosystem: github-actions
     directory: "/"

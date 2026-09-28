@@ -22,7 +22,7 @@ module Scrapers
       link = row.at_css(".views-field-title a")
       return if link.blank?
 
-      URI.join("https://neubad.org", link.attr("href")).to_s
+      absolute_url(link.attr("href"), "https://neubad.org")
     end
 
     def event_content(row)

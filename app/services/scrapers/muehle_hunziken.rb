@@ -17,7 +17,7 @@ module Scrapers
     end
 
     def event_url(row)
-      row_href(row)
+      absolute_url(row_href(row))
     end
 
     def event_content(row)

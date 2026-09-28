@@ -22,7 +22,7 @@ module Scrapers
     end
 
     def event_url(row)
-      row["detailUrl"].presence
+      absolute_url(row["detailUrl"])
     end
 
     def event_start_time(row)

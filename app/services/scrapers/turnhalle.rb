@@ -20,7 +20,7 @@ module Scrapers
       path = row["data-g-path"]
       return if path.blank?
 
-      url = URI.join(AGENDA, path).to_s
+      url = absolute_url(path, AGENDA)
       recurring_paths.include?(path) ? "#{url}##{row['data-g-date']}" : url
     end
 

@@ -18,7 +18,7 @@ module Scrapers
       anchor = row.at_css("a.toggle-link")&.attr("href")
       return if anchor.blank?
 
-      URI.join(self.class.url, anchor).to_s
+      absolute_url(anchor)
     end
 
     def event_start_time(content)

@@ -34,7 +34,7 @@ namespace :scrapers do
         node = agent.page.at_css(selector)
         href = node && node["href"]
         if href.present?
-          detail_url = URI.join(klass.url.to_s, href).to_s
+          detail_url = agent.absolute_url(href)
           print ", detail (#{detail_url})… "
           agent.get(detail_url)
           File.binwrite(dir.join("detail.html"), agent.page.body)

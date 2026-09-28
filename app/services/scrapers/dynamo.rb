@@ -32,8 +32,7 @@ module Scrapers
     end
 
     def event_url(row)
-      alias_path = row.dig("attributes", "path", "alias")
-      "https://www.dynamo.ch#{alias_path}" if alias_path.present?
+      absolute_url(row.dig("attributes", "path", "alias"), "https://www.dynamo.ch")
     end
 
     def self.event_url_pattern

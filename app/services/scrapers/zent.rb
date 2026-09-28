@@ -12,7 +12,7 @@ module Scrapers
       link = row.at_css("a.permalink")
       return if link.blank?
 
-      URI.join("https://restaurant-zent.ch", link.attr("href")).to_s
+      absolute_url(link.attr("href"), "https://restaurant-zent.ch")
     end
 
     def event_start_time(content)

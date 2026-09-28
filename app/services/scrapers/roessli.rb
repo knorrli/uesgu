@@ -11,7 +11,7 @@ module Scrapers
     end
 
     def event_url(row)
-      URI.parse(row.at_css("a").attr("href").to_s).to_s
+      absolute_url(row.at_css("a").attr("href"))
     end
 
     def self.event_url_pattern

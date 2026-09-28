@@ -9,7 +9,7 @@ module Scrapers
     end
 
     def event_url(row)
-      URI.parse(row.at_css("a.viz-event-box-details-link").attr("href").to_s).to_s
+      absolute_url(row.at_css("a.viz-event-box-details-link").attr("href"))
     end
 
     def skip_row?(row)

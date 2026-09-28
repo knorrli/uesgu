@@ -19,7 +19,7 @@ module Scrapers
     end
 
     def event_url(row)
-      URI.join(self.class.url, link_for(row).href).to_s
+      absolute_url(link_for(row).href)
     end
 
     def event_content(row)

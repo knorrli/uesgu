@@ -6,6 +6,7 @@ module Scrapers
     include Registerable
 
     USER_AGENT = "uesgu/1.0 (+https://uesgu.ch; personal event aggregator)".freeze
+    CHARACTERS_URI_REJECTS = /[^!-~]|["<>\\^`{|}]/
 
     class_attribute :_field_gaps, instance_accessor: false, default: {}.freeze
 
@@ -109,6 +110,13 @@ module Scrapers
       Result.new(seen: @seen, created: @created, updated: @updated,
                  unchanged: @unchanged, errored: @failures, discarded: @discarded,
                  created_ids: @created_ids, robots_note: robots_note)
+    end
+
+    def absolute_url(href, base = self.class.url)
+      return if href.blank?
+
+      escaped = href.strip.gsub(CHARACTERS_URI_REJECTS) { |character| ERB::Util.url_encode(character) }
+      URI.join(base.to_s, escaped).to_s
     end
 
     private

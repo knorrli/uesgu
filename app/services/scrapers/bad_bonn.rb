@@ -11,7 +11,7 @@ module Scrapers
     end
 
     def event_url(row)
-      URI.parse(row.at_css(".program-bands a")["href"]).to_s
+      absolute_url(row.at_css(".program-bands a")["href"])
     end
 
     def event_start_time(row)

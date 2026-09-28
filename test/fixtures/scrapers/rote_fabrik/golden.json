@@ -26,7 +26,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "XXXQbGvofeo"
+      },
+      {
+        "provider": "youtube",
+        "id": "fzVpcVJsOBg"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -41,7 +50,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "hXB4kmwaCD0"
+      },
+      {
+        "provider": "youtube",
+        "id": "oZq-aJtA26E"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -56,7 +74,24 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "R7K1XgYsuUM"
+      },
+      {
+        "provider": "youtube",
+        "id": "x3dE4mdUEUI"
+      },
+      {
+        "provider": "youtube",
+        "id": "mbPa0QH_zxA"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/0uAUrmEQbwcDFzg0v7VicO"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -71,7 +106,20 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "7AZeDbDDTkQ"
+      },
+      {
+        "provider": "youtube",
+        "id": "HN82J9RvCMY"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/6fxk3UXHTFYET8qCT9WlBF"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -86,7 +134,12 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/0Vpakee0j4TkZgvpn6ANJo"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -116,7 +169,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "Dwc4P3qgwQw"
+      },
+      {
+        "provider": "youtube",
+        "id": "IDXTlu7wQAM"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -131,7 +193,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "Qf6uLwkxUHE"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/6WH1V41LwGDGmlPUhSZLHO"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -146,7 +217,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "06htW8IUc9M"
+      },
+      {
+        "provider": "youtube",
+        "id": "249yI3ny8Jk"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -161,7 +241,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "m4dIdB0eU2M"
+      },
+      {
+        "provider": "youtube",
+        "id": "Bh8d5ohDeDg"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -176,7 +265,20 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "Uh6OQ7vvcd0"
+      },
+      {
+        "provider": "youtube",
+        "id": "jK680uD7qQI"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4G5ZJny3HvX6Il7eHVfnNC"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -191,7 +293,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "y4-yiYWptYA"
+      },
+      {
+        "provider": "youtube",
+        "id": "VetQ8pajXRk"
+      }
+    ],
     "cancelled_at": false
   }
 ]

@@ -54,6 +54,8 @@ module Scrapers
       row.detail&.at_css(".event-item__body")&.text
     end
 
+    def event_media(row) = Media.in(row.detail)
+
     private
 
     def list_nodes(body)

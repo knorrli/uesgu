@@ -6,7 +6,7 @@ module Scrapers
       "youtube" => %r{(?:youtube(?:-nocookie)?\.com/(?:embed/|shorts/|live/|watch\?(?:[^"'\s]*?&)?v=)|youtu\.be/|(?:img\.youtube\.com|i\.ytimg\.com)/vi/)([\w-]{11})}i,
       "vimeo" => %r{(?:player\.vimeo\.com/video/|(?<![\w.])(?:www\.)?vimeo\.com/)(\d{5,})}i,
       "bandcamp" => %r{bandcamp\.com/EmbeddedPlayer/(?:v=2/)?((?:album|track)=\d+)}i,
-      "soundcloud" => %r{(?<![\w.])(?:www\.)?soundcloud\.com/((?!pages/|discover|search|upload|you/|user-)[\w-]+/[\w-]+(?:/sets/[\w-]+)?)|api\.soundcloud\.com(?:/|%2F)((?:tracks|playlists)(?:/|%2F)\d+)}i,
+      "soundcloud" => %r{(?<![\w.])(?:www\.)?soundcloud\.com/((?!pages/|discover|search|upload|you/|user-)[\w-]+/[\w-]+(?:/sets/[\w-]+)?)|api\.soundcloud\.com(?:/|%2F)(tracks|playlists)(?:/|%2F)(?:soundcloud(?::|%3A|%253A)\w+(?::|%3A|%253A))?(\d+)}i,
       "mixcloud" => %r{(?<![\w.])(?:www\.)?mixcloud\.com/((?!widget/|discover/|upload/)[\w-]+/[\w-]+)}i,
       "spotify" => %r{open\.spotify\.com/(?:embed/)?(?:intl-\w+/)?((?:artist|album|track|playlist)/\w{22})}i
     }.freeze
@@ -17,21 +17,33 @@ module Scrapers
     module_function
 
     def in(content)
-      node = content.respond_to?(:parser) ? content.parser : content
-      return [] unless node.is_a?(Nokogiri::XML::Node)
+      content = content.parser if content.respond_to?(:parser)
 
-      references = node.xpath(OUTSIDE_SITE_CHROME).flat_map { |attribute| in_text(attribute.value) }
-      references.uniq.sort_by.with_index { |ref, i| [PROVIDERS.keys.index(ref["provider"]), i] }.first(LIMIT)
+      case content
+      when Nokogiri::XML::Node then ranked(content.xpath(OUTSIDE_SITE_CHROME).map(&:value))
+      when Hash, Array then ranked(strings_in(content))
+      else []
+      end
+    end
+
+    def ranked(values)
+      references = values.flat_map { |value| in_text(value) }.uniq
+      references.sort_by.with_index { |ref, i| [PROVIDERS.keys.index(ref["provider"]), i] }.first(LIMIT)
     end
 
     def in_text(text)
       PROVIDERS.flat_map do |provider, pattern|
-        text.scan(pattern).map { |ids| { "provider" => provider, "id" => normalize(provider, ids.compact.first) } }
+        text.scan(pattern).map { |captures| { "provider" => provider, "id" => captures.compact.join("/") } }
       end
     end
 
-    def normalize(provider, id)
-      provider == "soundcloud" ? id.gsub("%2F", "/") : id
+    def strings_in(data)
+      case data
+      when Hash then data.values.flat_map { |value| strings_in(value) }
+      when Array then data.flat_map { |value| strings_in(value) }
+      when String then [data]
+      else []
+      end
     end
   end
 end

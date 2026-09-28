@@ -15,7 +15,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/0pzoKe8wQxg2KSEnq0q2or"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -900,7 +905,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/5AUpDp4yxURZjwzl1aOVyX"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -918,7 +928,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/6wlhqnATSJIc0NQ64VxOVJ"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1024,7 +1039,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/7F1K4WlMshx23V2TTz4KwV"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1095,7 +1115,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/3ccVtqcqedranb7y8eywJ5"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1113,7 +1138,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/2dB4ya2W1Gvng8gjWSPu2H"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1150,7 +1180,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/0JWG2CZlhBBwH7qiBkNQw4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1168,7 +1203,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/4H9W4cb3X0qRpv87yKV7fV"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1260,7 +1300,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/5C4iAQXHETeW2mJgsNeqQQ"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1332,7 +1377,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "cfyZSRX1b5c"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1351,7 +1401,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/0fSuChlRe8ZYtVFYDoG87U"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1421,7 +1476,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "playlist/34lXWyKmSBx77dZwLCNZvg"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1527,7 +1587,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/5DYAABs8rkY9VhwtENoQCz"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1545,7 +1610,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/5czVIm17rZyNTdUdD6yY7w"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1564,7 +1634,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/4O71i7ke5iIBX6RNSFoZbS"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1617,7 +1692,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/2Nu9BiGXLIAbTs0mrbsmRW"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1635,7 +1715,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/0G8zjE6SsFTlbglCkU8pm3"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1654,7 +1739,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/51qUDJb5AtQX6jIL4VJx6M"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1671,7 +1761,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/39ywlwtGw8RTGobakgb11L"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1690,7 +1785,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/4sOLJi96MhdlMv5Iz9YZT9"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1708,7 +1808,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/1s1DnVoBDfp3jxjjew8cBR"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1758,7 +1863,12 @@
       "Bern",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "spotify",
+        "id": "artist/4tRSX1e4hJYjMNdl1TkINg"
+      }
+    ],
     "cancelled_at": false
   }
 ]

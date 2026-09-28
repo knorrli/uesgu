@@ -1,4 +1,13 @@
 namespace :venues do
+  desc "Fold every tag, saved filter and captured place that names a registry venue by " \
+       "a former name or a variant spelling into the venue's current name. Runs after " \
+       "every sweep (Scrapers::Sweep); this is the hand crank after a registry rename. " \
+       "Idempotent."
+  task fold: :environment do
+    VenueFold.run!
+    puts "Venue names folded."
+  end
+
   desc "Inventory the venue registry: who we cover and how it's sourced (read-only)"
   task inventory: :environment do
     venues = Venue.all.sort_by { |v| v.name.to_s.downcase }

@@ -102,6 +102,18 @@ class LocationTest < ActiveSupport::TestCase
     refute_includes fingerprints, zorpsaal.fingerprint
   end
 
+  test "a venue's former name still resolves to the venue and counts as one" do
+    renamed = Venue.new("domain" => "zorphalle.ch", "name" => "Kulturhalle Zorphalle",
+                        "former_names" => ["Zorphalle"],
+                        "place" => { "locality" => "Zorpwil", "canton" => "BE" })
+
+    Location.stub(:taxonomy_venues, [renamed]) do
+      assert_equal renamed, Location.resolve_venue("zorphalle")
+      assert_equal :venue, Location.type_for("Zorphalle")
+      refute Place.new(name: "Zorphalle", locality: "Zorpwil", canton: "BE").valid?
+    end
+  end
+
   test "canton_name translates a code and falls back to the raw one" do
     assert_equal "Bern", Location.canton_name("BE")
     assert_equal "ZZ", Location.canton_name("ZZ")

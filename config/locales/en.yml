@@ -756,7 +756,7 @@ en:
         merge_into: Merge into…
         merge_hint: Merging retags every event under this name, and moves them to the other venue's town and canton. The link sticks, so anything captured under this name later resolves to the other venue too.
         registry_hint: A venue we scrape is not in this list — its spelling lives in config/venues.yml.
-        shadowed_hint: The venue registry has since taken this venue over, so the row is a duplicate rather than a place of its own. Delete it instead of merging it — bin/rails places:drift lists them.
+        shadowed_hint: The venue registry has since taken this venue over. Tonight's sweep moves its events to the registry venue and removes this row.
         unmerge: Split
         unmerge_hint: Splitting only undoes the link. Events the merge moved stay where they were moved.
         also_known_as: Also known as

@@ -756,7 +756,7 @@ de:
         merge_into: Zusammenlegen mit…
         merge_hint: Beim Zusammenlegen werden alle Events unter diesem Namen umgehängt, samt Ort und Kanton des anderen Lokals. Die Verknüpfung bleibt, spätere Captures landen ebenfalls beim anderen Lokal.
         registry_hint: Lokale, die wir scrapen, stehen nicht in dieser Liste — ihre Schreibweise gehört in config/venues.yml.
-        shadowed_hint: Dieses Lokal steht inzwischen im Venue-Register, die Zeile ist also ein Duplikat und kein eigenes Lokal. Statt zusammenlegen besser löschen — bin/rails places:drift listet sie auf.
+        shadowed_hint: Dieses Lokal steht inzwischen im Venue-Register. Der nächtliche Durchlauf verschiebt seine Events zum Register-Eintrag und entfernt diese Zeile.
         unmerge: Trennen
         unmerge_hint: Trennen löst nur die Verknüpfung. Events bleiben dort, wohin sie verschoben wurden.
         also_known_as: Heisst auch

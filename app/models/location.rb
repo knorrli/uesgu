@@ -6,18 +6,19 @@ class Location
   end
 
   def self.taxonomy_venue_fingerprints
-    taxonomy_venues.to_set { |venue| Fingerprint.for(venue.name) }
+    taxonomy_venues.flat_map(&:known_names).to_set { |name| Fingerprint.for(name) }
   end
 
   def self.resolve_venue(typed)
     key = Fingerprint.for(typed)
     return if key.blank?
 
-    taxonomy_venues.find { |venue| Fingerprint.for(venue.name) == key } || Place.matching(typed)
+    taxonomy_venues.find { |venue| venue.known_names.any? { |name| Fingerprint.for(name) == key } } ||
+      Place.matching(typed)
   end
 
   def self.venue_names
-    taxonomy_venues.map(&:name).to_set | Place.names
+    taxonomy_venues.flat_map(&:known_names).to_set | Place.names
   end
 
   CANTON_CODES = %w[

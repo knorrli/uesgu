@@ -47,9 +47,10 @@
                       <% if city %><%= city %><% end %>
                     </div>
                   <% end %>
-                  <% if event.genres.any? %>
+                  <% genres = shown_genres(event) %>
+                  <% if genres.any? %>
                     <div class="u-text" style="margin-top:6px; font-size:12px; font-weight:700; color:#1d1620;">
-                      <%= event.genres.map(&:name).join("  ·  ") %>
+                      <%= genres.map(&:name).join("  ·  ") %>
                     </div>
                   <% end %>
                 </div>

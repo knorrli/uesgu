@@ -37,6 +37,22 @@ class NotificationMailerTest < ActionMailer::TestCase
     assert_no_match(/Neue Events/, html, "not the de-frozen title")
   end
 
+  test "an ignored genre is left out of the digest, like in the feed" do
+    u = user(email_address: "fan5@example.test", locale: "de")
+    kept = genre(name: "Zorptronic")
+    ignored = genre(name: "Wubnoise").tap(&:ignore!)
+    show = event_with_genres(kept.name, ignored.name).tap { |e| e.update!(start_date: Date.current + 2) }
+    note = u.notifications.create!(title: "D", event_ids: [show.id],
+                                   period_start: 1.week.ago, period_end: Time.current)
+
+    mail = NotificationMailer.digest(note)
+
+    [mail.html_part.body.to_s, mail.text_part.body.to_s].each do |body|
+      assert_match kept.name, body
+      assert_no_match(/#{ignored.name}/, body)
+    end
+  end
+
   test "a non-http event url is not turned into a link" do
     u = user(email_address: "fan3@example.test", locale: "de")
     show = event(start_date: Date.current + 2, title: "Sketchy Show", url: "javascript:alert(1)")

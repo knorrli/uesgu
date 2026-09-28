@@ -63,6 +63,10 @@ module Scrapers
       content.parser.css("a.tag").map { |a| squish(a.text) }.reject(&:blank?).uniq
     end
 
+    def event_genre_prose(content)
+      content.parser.css(".events__details .text_block").flat_map { |block| block.xpath(".//text()").map(&:text) }.join("\n")
+    end
+
     def event_locations(_content)
       venue_for(current_row)
     end

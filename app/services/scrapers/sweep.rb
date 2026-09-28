@@ -35,6 +35,7 @@ module Scrapers
 
       Dedup.run
 
+      VenueFold.run!
       Genre.reconcile!
       Locality.reconcile!
       CapturedVenueLeads.refresh!

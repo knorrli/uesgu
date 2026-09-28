@@ -404,7 +404,9 @@ venues:
     canton: ZH
   checked: 2026-06-21
 - domain: saegegasse.ch
-  name: Sägegasse
+  name: Kulturhalle Sägegasse
+  former_names:
+  - Sägegasse
   disposition: consume
   place:
     locality: Burgdorf

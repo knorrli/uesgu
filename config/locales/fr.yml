@@ -756,7 +756,7 @@ fr:
         merge_into: Fusionner avec…
         merge_hint: "La fusion réétiquette tous les événements sous ce nom et les déplace vers la localité et le canton de l'autre salle. Le lien reste : ce qui sera capturé sous ce nom ira aussi vers l'autre salle."
         registry_hint: Les salles qu'on scrape ne figurent pas dans cette liste — leur orthographe vit dans config/venues.yml.
-        shadowed_hint: Le registre des salles a depuis repris cette salle, donc cette ligne est un doublon et pas une salle à part. Supprime-la plutôt que de la fusionner — bin/rails places:drift les liste.
+        shadowed_hint: Le registre des salles a depuis repris cette salle. Le passage de cette nuit déplace ses événements vers la salle du registre et supprime cette ligne.
         unmerge: Séparer
         unmerge_hint: Séparer ne défait que le lien. Les événements déplacés par la fusion restent où ils sont.
         also_known_as: Aussi appelée

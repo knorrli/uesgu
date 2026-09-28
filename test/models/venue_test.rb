@@ -46,6 +46,20 @@ class VenueTest < ActiveSupport::TestCase
     refute_includes Venue.in_taxonomy, bm
   end
 
+  test "no two taxonomy venues answer to the same name, current or former" do
+    names = Venue.in_taxonomy.flat_map { |v| v.known_names.map { |name| [Fingerprint.for(name), v.domain] } }
+    clashes = names.group_by(&:first).select { |_, owners| owners.map(&:last).uniq.size > 1 }
+
+    assert_empty clashes.keys, "names shared by several venues: #{clashes.keys.join(', ')}"
+  end
+
+  test "no taxonomy venue answers to the name of a locality or canton" do
+    places = Venue.in_taxonomy.flat_map { |v| [v.locality, v.canton] }.to_set { |name| Fingerprint.for(name) }
+    shadowing = Venue.in_taxonomy.flat_map(&:known_names).select { |name| places.include?(Fingerprint.for(name)) }
+
+    assert_empty shadowing, "venue names that are also a locality or canton: #{shadowing.join(', ')}"
+  end
+
   test "matches? normalizes case and whitespace" do
     d = Venue.find_by_domain("dachstock.ch")
     assert d.matches?("Dachstock")

@@ -353,7 +353,7 @@
 .event-genre .interest-flag {
   padding: 0 5px;
   border: var(--tag-border-width) solid var(--border-color);
-  border-left: 0;
+  border-right: 0;
 }
 
 .event-where .interest-flag {

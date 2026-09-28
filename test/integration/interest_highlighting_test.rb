@@ -20,7 +20,7 @@ class InterestHighlightingTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "##{dom_id(match)}.is-interest", 1, "matching row carries the interest rule"
     assert_select "##{dom_id(other)}.is-interest", 0, "unmatched row stays plain"
-    assert_select "##{dom_id(match)} .interest-flag .ph-flag", 1, "the matched genre is flagged"
+    assert_select "##{dom_id(match)} .event-genre > .interest-flag:first-child .ph-flag", 1, "the matched genre is flagged ahead of its name"
   end
 
   test "no saved filters → no interest markers" do

@@ -1,5 +1,7 @@
 module Scrapers
   class Schueuer < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.schuur.ch/programm")
     end
@@ -36,6 +38,10 @@ module Scrapers
 
     def event_genres(content)
       content.css(".viz-event-genre").map { |node| node.text.squish }
+    end
+
+    def event_genre_prose(row)
+      get(event_url(row)).css(".viz-event-subtitle, .event-details-text").map(&:text).join("\n")
     end
 
     private

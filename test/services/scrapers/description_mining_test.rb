@@ -151,6 +151,16 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     refute_includes text, "Passiv-Mitglied"
   end
 
+  def test_schueuer_mines_its_event_page_subtitle_and_text_not_the_facts_or_other_shows
+    text = prose_from_event_page(Scrapers::Schueuer, "schueuer", ".viz-event-list-box")
+
+    assert_includes text, "Indiefolk aus Australien"
+    assert_includes text, "Singer-Songwriter"
+    refute_includes text, "Türöffnung"
+    refute_includes text, "Weitere Shows"
+    refute_includes text, "Barrierefreier"
+  end
+
   private
 
   def prose_from_event_page(scraper_class, slug, row_selector)

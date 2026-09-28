@@ -104,7 +104,7 @@ class Scrapers::SchueuerTest < Minitest::Test
     def save! = nil
     attr_accessor :start_time, :start_date, :title, :description,
                   :genre_list, :location_list, :cancelled_at, :rescheduled_at,
-                  :hidden, :data_source
+                  :hidden, :data_source, :event_page_checked_at
   end
 
   def run_offline(html)
@@ -115,6 +115,7 @@ class Scrapers::SchueuerTest < Minitest::Test
     scraper.define_singleton_method(:get) { |*| nil }
     scraper.define_singleton_method(:page) { page }
     scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
+    scraper.define_singleton_method(:mined_genres) { |_content| [] }
 
     Event.stub(:find_or_initialize_by, factory) do
       scraper.send(:process_events)

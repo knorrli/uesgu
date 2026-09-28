@@ -13,6 +13,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -28,6 +42,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -45,6 +73,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -60,6 +102,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -77,6 +133,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -92,6 +162,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -109,6 +193,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -124,6 +222,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -141,6 +253,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -156,6 +282,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -173,6 +313,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -188,6 +342,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -205,6 +373,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -220,6 +402,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -237,6 +433,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -252,6 +462,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -269,6 +493,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -284,6 +522,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -301,6 +553,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -316,6 +582,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -333,6 +613,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -348,6 +642,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -365,6 +673,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -380,6 +702,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -397,6 +733,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -412,6 +762,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -429,6 +793,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -444,6 +822,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -461,6 +853,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -476,6 +882,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -493,6 +913,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -508,6 +942,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -525,6 +973,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -540,6 +1002,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -557,6 +1033,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -572,6 +1062,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   },
@@ -589,6 +1093,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -605,6 +1123,20 @@
       "Lausanne",
       "VD"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -620,6 +1152,20 @@
       "Docks",
       "Lausanne",
       "VD"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OabtpdXfu44"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/4DD6xBZ1INIT3yGJRQLzej"
+      },
+      {
+        "provider": "spotify",
+        "id": "artist/7oYW3vYjdqYo2Qy5IA8ad1"
+      }
     ],
     "cancelled_at": false
   }

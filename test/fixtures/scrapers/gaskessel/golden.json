@@ -15,6 +15,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -33,6 +34,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -50,6 +52,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -68,6 +71,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -84,6 +88,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -100,6 +105,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -117,6 +123,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -134,6 +141,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -151,6 +159,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -167,6 +176,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -184,6 +194,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -201,6 +212,16 @@
       "Gaskessel",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "yAvMX8Ho0dU"
+      },
+      {
+        "provider": "youtube",
+        "id": "RdeLzgaAw-w"
+      }
     ],
     "cancelled_at": false
   },
@@ -220,6 +241,12 @@
       "Bern",
       "BE"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "uLqykPPDHm0"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -236,6 +263,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -252,6 +280,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -269,6 +298,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -285,6 +315,12 @@
       "Gaskessel",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "34yG17U7Q7g"
+      }
     ],
     "cancelled_at": false
   },
@@ -303,6 +339,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -321,6 +358,12 @@
       "Bern",
       "BE"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "g8IVd7iKDQE"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -337,6 +380,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -353,6 +397,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -368,6 +413,12 @@
       "Gaskessel",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "LXx4TE95BeE"
+      }
     ],
     "cancelled_at": false
   },
@@ -385,6 +436,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   }
 ]

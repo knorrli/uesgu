@@ -229,7 +229,7 @@ class Scrapers::OleTest < Minitest::Test
     def overridden?(_field) = false
     def save! = nil
     attr_accessor :start_time, :start_date, :title, :description,
-                  :genre_list, :location_list, :cancelled_at, :rescheduled_at,
+                  :genre_list, :location_list, :media, :cancelled_at, :rescheduled_at,
                   :hidden, :data_source
   end
 

@@ -11,6 +11,12 @@
       "Fribourg",
       "FR"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -24,6 +30,12 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
     ],
     "cancelled_at": false
   },
@@ -39,6 +51,12 @@
       "Fribourg",
       "FR"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -52,6 +70,12 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
     ],
     "cancelled_at": false
   },
@@ -67,6 +91,12 @@
       "Fribourg",
       "FR"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -80,6 +110,12 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
     ],
     "cancelled_at": false
   },
@@ -95,6 +131,12 @@
       "Fribourg",
       "FR"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -109,6 +151,12 @@
       "Fribourg",
       "FR"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -122,6 +170,12 @@
       "Nouveau Monde",
       "Fribourg",
       "FR"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "svZQO9Pfrp4"
+      }
     ],
     "cancelled_at": false
   }

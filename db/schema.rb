@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_080000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -66,6 +66,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_080000) do
     t.datetime "dismissed_at"
     t.datetime "event_page_checked_at"
     t.boolean "hidden", default: false, null: false
+    t.jsonb "media", default: [], null: false
     t.jsonb "overridden_fields", default: [], null: false
     t.datetime "rescheduled_at"
     t.date "start_date", null: false

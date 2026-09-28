@@ -11,6 +11,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -25,6 +26,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -38,6 +40,12 @@
       "Café Kairo",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "zxmcbgnhI1U"
+      }
     ],
     "cancelled_at": false
   },
@@ -53,6 +61,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -67,6 +76,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -81,6 +91,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -94,6 +105,12 @@
       "Café Kairo",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "kyjxA8WYC94"
+      }
     ],
     "cancelled_at": false
   },
@@ -109,6 +126,12 @@
       "Bern",
       "BE"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "ztu9msOH2AA"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -122,6 +145,12 @@
       "Café Kairo",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "1cTcDBFWFMc"
+      }
     ],
     "cancelled_at": false
   },
@@ -137,6 +166,12 @@
       "Bern",
       "BE"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "AsbQLMaXIgI"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -150,6 +185,12 @@
       "Café Kairo",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "SfMetxbVZr4"
+      }
     ],
     "cancelled_at": false
   },
@@ -165,6 +206,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -179,6 +221,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -192,6 +235,12 @@
       "Café Kairo",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "HdHUezsXLhY"
+      }
     ],
     "cancelled_at": false
   },
@@ -207,6 +256,12 @@
       "Bern",
       "BE"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "98FYbxCJ3y4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -220,6 +275,12 @@
       "Café Kairo",
       "Bern",
       "BE"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "VCFS7WTQB2c"
+      }
     ],
     "cancelled_at": false
   },
@@ -235,6 +296,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -249,6 +311,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   }
 ]

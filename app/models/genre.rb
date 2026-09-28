@@ -170,7 +170,10 @@ class Genre < ApplicationRecord
   def self.names_in_prose(text, index)
     return [] if text.blank? || index.empty?
 
-    words = text.to_s.scan(/[^[:space:]]+/)
+    names_in_words(text.to_s.scan(/[^[:space:]]+/), index).uniq
+  end
+
+  def self.names_in_words(words, index, compound: false)
     found = []
     i = 0
     while i < words.size
@@ -180,17 +183,22 @@ class Genre < ApplicationRecord
         next if i + n > words.size
 
         hit = index[fingerprint_for(words[i, n].join(" "))]
-        if hit && (n == 1 || multi_word_name?(hit))
+        if hit && (n == 1 || compound || multi_word_name?(hit))
           name = hit
           span = n
           break
         end
       end
-      found << name if name
+      if name
+        found << name
+      elsif (parts = words[i].split(%r{[-/]}).compact_blank).size > 1
+        found.concat(names_in_words(parts, index, compound: true))
+      end
       i += span
     end
-    found.uniq
+    found
   end
+  private_class_method :names_in_words
 
   def self.multi_word_name?(name)
     name.match?(/[^[:alnum:]]/)

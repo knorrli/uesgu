@@ -175,6 +175,23 @@ class GenreQueryTest < ActiveSupport::TestCase
     assert_equal ["Wub-Hop"], Genre.names_in_prose("some wub hop tonight", index)
   end
 
+  test "names_in_prose finds a genre inside a hyphenated compound" do
+    Genre.create!(name: "Wub Core")
+    Genre.create!(name: "Zorpcore")
+    index = Genre.prose_mining_index
+
+    assert_equal ["Wub Core"], Genre.names_in_prose("die wub-core-szene", index)
+    assert_equal ["Zorpcore"], Genre.names_in_prose("eine zorp-core-nacht", index)
+  end
+
+  test "names_in_prose splits compounds on slashes without leaving fragments" do
+    Genre.create!(name: "Wub-Hop")
+    Genre.create!(name: "Hop")
+    index = Genre.prose_mining_index
+
+    assert_equal ["Wub-Hop"], Genre.names_in_prose("(Pop/Wub-hop)", index)
+  end
+
   test "names_in_prose splits words on non-breaking spaces" do
     Genre.create!(name: "Zorptronic")
     index = Genre.prose_mining_index

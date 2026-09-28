@@ -453,6 +453,26 @@ de:
       users: Konten
       open_invitations: Offene Einladungen
     unknown: unbekannt
+    action_logs:
+      deleted_account: ein gelöschtes Konto
+      index:
+        title: Protokoll
+        intro: Alles, was im Admin gemacht wurde, das Neueste zuerst. Eine Aktion lässt sich rückgängig machen, solange seither nichts mehr am selben Eintrag geändert wurde.
+        undo: Rückgängig
+        undone_by: "rückgängig gemacht von %{actor}"
+        changed_since: "seither geändert von %{actor}"
+        empty: Noch nichts protokolliert.
+      undo:
+        undone: Rückgängig gemacht.
+        stale: Diese Aktion lässt sich nicht mehr rückgängig machen – der Eintrag wurde seither geändert.
+      sentences:
+        event_edit_html: "hat %{subject} bearbeitet"
+        event_revert_html: "hat ein Feld von %{subject} wieder dem Scraper überlassen"
+        event_dismiss_html: "hat %{subject} entfernt"
+        event_restore_html: "hat %{subject} wiederhergestellt"
+        event_merge_html: "hat %{subject} als Duplikat mit %{target} zusammengelegt"
+        event_unmerge_html: "hat %{subject} wieder als eigenes Event abgetrennt"
+        undo_html: "hat die Änderung von %{actor} an %{subject} rückgängig gemacht"
     scrape_runs:
       status:
         ok: ok

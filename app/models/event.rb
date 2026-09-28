@@ -84,6 +84,19 @@ class Event < ApplicationRecord
     lock_field!("canonical_event")
   end
 
+  UNDO_ATTRIBUTES = %w[title description start_date start_time url dismissed_at canonical_event_id
+                       overridden_fields].freeze
+
+  def undo_snapshot
+    attributes.slice(*UNDO_ATTRIBUTES).merge("genre_list" => genre_list.sort, "location_list" => location_list.sort)
+  end
+
+  def restore_snapshot!(snapshot)
+    assign_attributes(snapshot)
+    save!
+    recompute_visibility!
+  end
+
   OVERRIDABLE_FIELDS = %w[title description start_date start_time].freeze
 
   OVERRIDABLE_TAG_FIELDS = %w[genres locations].freeze

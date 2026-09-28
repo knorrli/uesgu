@@ -170,7 +170,7 @@ class Genre < ApplicationRecord
     stop = PROSE_MINING_STOPWORDS.to_set { |word| fingerprint_for(word) }
     excluded = effectively(:blocked).or(effectively(:ignored)).or(effectively(:hidden))
     where.not(id: excluded.select(:id)).pluck(:fingerprint, :name)
-                                       .reject { |fingerprint, _| fingerprint.blank? || stop.include?(fingerprint) }
+                                       .reject { |fingerprint, _| fingerprint.blank? || stop.include?(fingerprint) || fingerprint.match?(/\A\d+\z/) }
                                        .to_h
   end
 

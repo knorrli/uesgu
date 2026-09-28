@@ -92,4 +92,24 @@ class ModeratorPermissionsTest < ActionDispatch::IntegrationTest
     get admin_events_path
     assert_response :forbidden
   end
+
+  test "an inviter sees how many invites are left and is stopped at none" do
+    inviter = user(permissions: %w[invite], locale: "en")
+    4.times { invitation(created_by: inviter) }
+    sign_in_as inviter
+
+    get admin_invitations_path
+    assert_select "p", text: /1 of 5 invites left/
+    post admin_invitations_path, params: { invitation: { note: "last one" } }
+    assert_redirected_to admin_invitations_path
+
+    get admin_invitations_path
+    assert_select "form[action=?]", admin_invitations_path, count: 0
+    assert_select "p", text: /used all your invites/
+
+    assert_no_difference -> { Invitation.count } do
+      post admin_invitations_path, params: { invitation: { note: "one too many" } }
+    end
+    assert_response :unprocessable_entity
+  end
 end

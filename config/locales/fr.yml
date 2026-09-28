@@ -623,6 +623,10 @@ fr:
         title: Invitations
         intro: Codes d'invitation à usage unique. Partage le lien avec une personne — une fois inscrite, le code est utilisé.
         new_heading: Nouvelle invitation
+        invites_left:
+          one: "Il te reste 1 invitation sur %{allowance}. Une invitation qui expire ou que tu révoques sans qu'elle ait servi te revient."
+          other: "Il te reste %{count} invitations sur %{allowance}. Une invitation qui expire ou que tu révoques sans qu'elle ait servi te revient."
+        allowance_used: "Tu as utilisé toutes tes invitations. Révoque-en une qui n'a pas encore servi pour la récupérer."
         note_label: Note (facultatif)
         note_placeholder: p. ex. pour Anna
         expires_label: Valable jusqu'au
@@ -914,6 +918,12 @@ fr:
         note: Note
       genre:
         name: Nom
+    errors:
+      models:
+        invitation:
+          attributes:
+            base:
+              allowance_used: "Tu as utilisé tes %{allowance} invitations."
   date:
     formats:
       default: "%d.%m.%Y"

@@ -623,6 +623,10 @@ de:
         title: Einladungen
         intro: Einmal verwendbare Einladungscodes. Teile den Link mit einer Person – nach der Registrierung ist der Code verbraucht.
         new_heading: Neue Einladung
+        invites_left:
+          one: "Du hast noch 1 von %{allowance} Einladungen. Eine Einladung, die abläuft oder die du unbenutzt widerrufst, bekommst du zurück."
+          other: "Du hast noch %{count} von %{allowance} Einladungen. Eine Einladung, die abläuft oder die du unbenutzt widerrufst, bekommst du zurück."
+        allowance_used: "Du hast alle Einladungen aufgebraucht. Widerrufe eine noch unbenutzte, um sie zurückzubekommen."
         note_label: Notiz (optional)
         note_placeholder: z. B. für Anna
         expires_label: Gültig bis
@@ -914,6 +918,12 @@ de:
         note: Notiz
       genre:
         name: Name
+    errors:
+      models:
+        invitation:
+          attributes:
+            base:
+              allowance_used: "Du hast alle %{allowance} Einladungen aufgebraucht."
   date:
     formats:
       default: "%d.%m.%Y"

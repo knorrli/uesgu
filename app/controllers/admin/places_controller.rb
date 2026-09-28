@@ -2,6 +2,8 @@ module Admin
   class PlacesController < BaseController
     include CatalogueBrowsing
 
+    requires :places
+
     STATUS_SCOPES = { "aliased" => :aliased }.freeze
     SORTS = %w[name count].freeze
 

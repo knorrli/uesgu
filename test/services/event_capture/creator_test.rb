@@ -30,7 +30,7 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
   end
 
   test "records the account that captured the event" do
-    contributor = user(contributor: true)
+    contributor = user(permissions: %w[capture])
 
     assert_equal contributor, EventCapture::Creator.call(attrs, captured_by: contributor).event.captured_by
   end

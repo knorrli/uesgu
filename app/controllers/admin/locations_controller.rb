@@ -2,6 +2,8 @@ module Admin
   class LocationsController < BaseController
     include CatalogueBrowsing
 
+    requires :places
+
     TYPES = %w[all venue locality canton].freeze
     SORTS = %w[name count].freeze
 

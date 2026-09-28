@@ -5,18 +5,21 @@
   <% end %>
 
   <dl class="flex flex-col gap-small">
-    <div class="stat">
-      <dt><%= link_to Event.model_name.human(count: :many), admin_events_path, class: 'stat-link' %></dt>
-      <span class="stat__leader"></span>
-      <dd class="muted"><%= Event.count %></dd>
-    </div>
+    <% if current_user.can?(:curate_events) %>
+      <div class="stat">
+        <dt><%= link_to Event.model_name.human(count: :many), admin_events_path, class: 'stat-link' %></dt>
+        <span class="stat__leader"></span>
+        <dd class="muted"><%= Event.count %></dd>
+      </div>
+    <% end %>
     <div class="stat">
       <dt><%= link_to t('admin.action_logs.index.title'), admin_action_logs_path, class: 'stat-link' %></dt>
       <span class="stat__leader"></span>
-      <dd class="muted"><%= ActionLog.count %></dd>
+      <dd class="muted"><%= ActionLog.where(area: current_user.log_areas).count %></dd>
     </div>
   </dl>
 
+  <% if current_user.can?(:places) %>
   <section class="flex flex-col gap-small">
     <h2><%= link_to t('.where_heading'), admin_locations_path, class: 'heading-link' %></h2>
     <dl class="flex flex-col gap-small">
@@ -37,7 +40,9 @@
       </div>
     </dl>
   </section>
+  <% end %>
 
+  <% if current_user.can?(:genres) %>
   <section class="flex flex-col gap-small">
     <h2><%= link_to Genre.model_name.human(count: :many), genres_path, class: 'heading-link' %> <span class="muted"><%= @event_tag_stats.genre_tags.count %></span></h2>
     <dl class="flex flex-col gap-small">
@@ -68,7 +73,9 @@
       </div>
     </dl>
   </section>
+  <% end %>
 
+  <% if current_user.admin? %>
   <section class="flex flex-col gap-small">
     <h2><%= link_to t('.scrapers_heading'), admin_scrape_runs_path, class: 'heading-link' %></h2>
     <% if @latest_scrape_run %>
@@ -123,11 +130,19 @@
         <span class="stat__leader"></span>
         <dd class="muted"><%= User.count %></dd>
       </div>
+    </dl>
+  </section>
+  <% end %>
+
+  <% if current_user.can?(:invite) %>
+  <section class="flex flex-col gap-small">
+    <dl class="flex flex-col gap-small">
       <div class="stat">
         <dt><%= link_to t('.open_invitations'), admin_invitations_path, class: 'stat-link' %></dt>
         <span class="stat__leader"></span>
-        <dd class="muted"><%= Invitation.available.count %></dd>
+        <dd class="muted"><%= (current_user.admin? ? Invitation : current_user.sent_invitations).available.count %></dd>
       </div>
     </dl>
   </section>
+  <% end %>
 </div>

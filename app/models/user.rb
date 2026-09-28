@@ -14,7 +14,13 @@ class User < ApplicationRecord
   has_many :sent_invitations, class_name: "Invitation", foreign_key: :created_by_id, dependent: :destroy, inverse_of: :created_by
   has_one :accepted_invitation, class_name: "Invitation", foreign_key: :redeemed_by_id, dependent: :nullify, inverse_of: :redeemed_by
 
+  PERMISSIONS = %w[curate_events genres places capture invite].freeze
+
+  PERMISSION_AREAS = { "curate_events" => "events", "genres" => "genres", "places" => "places",
+                       "invite" => "invites" }.freeze
+
   normalizes :username, with: ->(u) { u.strip.downcase }
+  normalizes :permissions, with: ->(list) { list.map(&:to_s) & PERMISSIONS }
   normalizes :email_address, with: ->(e) { e.strip.downcase.presence }
 
   validates :username, presence: true, uniqueness: true, length: { in: 2..30 },
@@ -23,6 +29,12 @@ class User < ApplicationRecord
   validates :locale, inclusion: { in: I18n.available_locales.map(&:to_s) }, allow_blank: true
   validates :reminder_time, numericality: { in: 0..1439 }
   validates :reminder_lead_days, numericality: { in: 0..7 }
+
+  def can?(permission) = admin? || permissions.include?(permission.to_s)
+
+  def moderator? = admin? || PERMISSION_AREAS.keys.intersect?(permissions)
+
+  def log_areas = admin? ? ActionLog::AREAS.values.uniq : PERMISSION_AREAS.values_at(*permissions).compact
 
   def regenerate_calendar_feed_token!
     update!(calendar_feed_token: self.class.generate_calendar_feed_token)

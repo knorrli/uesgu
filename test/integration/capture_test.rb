@@ -15,7 +15,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the hand-entry page needs no model call, and carries no attempt to be judged on" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     assert_no_difference -> { ExtractionAttempt.count } do
       get manual_capture_path
@@ -26,7 +26,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the hand-entry page publishes through the same path as a card and lands back on the picker" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
 
     assert_difference -> { Event.count } => 1 do
       post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
@@ -39,7 +39,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a refusal comes back as the page with what was typed still in it" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
 
     post capture_path, params: { title: "No canton", date: "2026-09-01",
                                  locality: "Zorpwil", canton: "" }
@@ -52,7 +52,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a duplicate comes back as the page with the matches to answer" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
     already_listed
 
     assert_no_difference -> { Event.count } do
@@ -66,7 +66,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "publishing from the page records no field outcome" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     assert_no_difference -> { ExtractionFieldOutcome.count } do
       post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
@@ -75,7 +75,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the subtitle the model read is offered as the event's description" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     stub_extraction(extraction(candidates: [candidate(subtitle: "message: incomplete",
                                                       subtitle_evidence: "message: incomplete")])) do
@@ -86,7 +86,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a published card carries the description through" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
                                  canton: "BE", description: "message: incomplete" }, as: :turbo_stream
@@ -95,7 +95,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a published event records the contributor who captured it" do
-    contributor = user(contributor: true)
+    contributor = user(permissions: %w[capture])
     sign_in_as contributor
 
     post capture_path, params: { title: "Zorp Fest", date: "2026-09-01", locality: "Zorpwil",
@@ -125,7 +125,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a contributor gets the picker" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     get capture_path
 
     assert_response :success
@@ -133,7 +133,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the nav links to capture only for contributors" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     get root_path
     assert_select "a[href=?]", capture_path
 
@@ -143,7 +143,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "extract replaces the input's own row with its candidates" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     stub_extraction(extraction(candidates: [candidate, candidate(title: "Zorp Fest II")])) do
       post extract_capture_path, params: { row_id: "abc123", label: "poster.jpg", text: "..." },
@@ -156,7 +156,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a re-read carries the marked fields and the note into the extraction" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     seen = nil
 
     EventCapture::Extractor.stub(:call, ->(**args) { seen = args[:correction]; extraction }) do
@@ -171,7 +171,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a first read reaches the extractor with nothing to correct" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     seen = :unset
 
     EventCapture::Extractor.stub(:call, ->(**args) { seen = args[:correction]; extraction }) do
@@ -183,7 +183,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "extract ignores a row id that is not a plain token" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     stub_extraction(extraction(candidates: [candidate])) do
       post extract_capture_path, params: { row_id: '"><script>x</script>', text: "..." },
@@ -194,7 +194,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "extract renders the contributor-facing copy for a failure code" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
 
     stub_extraction(extraction(code: :image_too_large, error: "image is over 8MB")) do
       post extract_capture_path, params: { row_id: "abc123", text: "..." },
@@ -206,7 +206,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "an unreadable upload is one row, not a dead batch" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
     file = Rack::Test::UploadedFile.new(StringIO.new("not an image"), "image/png", original_filename: "x.png")
 
     post extract_capture_path, params: { row_id: "abc123", image: file },
@@ -217,7 +217,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "create publishes the one candidate on the card" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
 
     post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
                                  locality: "Zorpwil", canton: "BE", place: "Zorpsaal" }, as: :turbo_stream
@@ -229,7 +229,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a refusal lands on the card that caused it and writes nothing" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
 
     post capture_path, params: { card_id: "capture-row-abc-0", title: "No canton",
                                  date: "2026-09-01", locality: "Zorpwil", canton: "" }, as: :turbo_stream
@@ -241,7 +241,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a url posted past the card is ignored, not published" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
 
     post capture_path, params: { card_id: "capture-row-abc-1", title: "Unlinked",
                                  date: "2026-09-02", locality: "Zorpwil", canton: "BE",
@@ -252,7 +252,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "create ignores a card id that is not a plain token" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post capture_path, params: { card_id: '"><script>x</script>', title: "Kept",
                                  date: "2026-09-01", locality: "Zorpwil", canton: "BE" }, as: :turbo_stream
@@ -261,7 +261,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a candidate with no fields at all is a refusal, not a 500" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post capture_path, as: :turbo_stream
     assert_response :unprocessable_entity
@@ -269,7 +269,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "create splits comma-separated genres onto the event" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post capture_path, params: { card_id: "capture-row-abc-0", title: "Kept", date: "2026-09-01",
                                  locality: "Zorpwil", canton: "BE", genres: "Zorpwave, Flarncore" }, as: :turbo_stream
@@ -278,7 +278,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "an oversize upload is refused before its bytes are read" do
-    sign_in_as user(contributor: true, locale: "en")
+    sign_in_as user(permissions: %w[capture], locale: "en")
     oversize = Rack::Test::UploadedFile.new(
       StringIO.new("x" * (EventCapture::Adapters::Image::LIMIT + 1)), "image/png",
       original_filename: "big.png"
@@ -294,7 +294,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
 
   test "publishing records what the human changed against what the model proposed" do
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: attempt.capture_token,
                                  candidate_index: "0", title: "Kept", date: "2026-09-01",
@@ -311,7 +311,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
 
   test "a refused publish records no decision, because none was made" do
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: attempt.capture_token,
                                  candidate_index: "0" }, as: :turbo_stream
@@ -322,7 +322,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
 
   test "dropping a candidate records what it had proposed" do
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post drop_capture_path, params: { attempt_token: attempt.capture_token, candidate_index: "1",
                                       proposed_title: "Zorp Fest", proposed_place: "Zorpsaal" }
@@ -344,7 +344,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a forged attempt token costs the record, not the publish" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post capture_path, params: { card_id: "capture-row-abc-0", attempt_token: "not-a-signed-id",
                                  candidate_index: "0", title: "Kept", date: "2026-09-01",
@@ -355,7 +355,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the card carries the model's proposal alongside the editable value" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     attempt = ExtractionAttempt.create!(status: :ok, medium: "image")
 
     stub_extraction(extraction(candidates: [candidate(locality: "Us")]).with(attempt_token: attempt.capture_token)) do
@@ -371,7 +371,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
 
   test "a quote that settled a pair of fields is attached to the whole row" do
     place(name: "Zorpsaal", locality: "Flarnhausen", canton: "BE")
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     stub_extraction(extraction(candidates: [candidate(place: "Zorpsaal Halle",
                                                       locality_evidence: "3000 Zorpwil")])) do
@@ -386,7 +386,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "date and time each carry the line they were read from" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     stub_extraction(extraction(candidates: [candidate(date_evidence: "SA 12. SEPT",
                                                       time_evidence: "Türöffnung 20:00")])) do
@@ -401,7 +401,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the warning about a past date is the last line of the date and time row" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     stub_extraction(extraction(candidates: [candidate(date: Date.current - 1)])) do
       post extract_capture_path, params: { row_id: "abc123" },
@@ -415,7 +415,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the genre field is named by a label that does not wrap it" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     stub_extraction(extraction(candidates: [candidate])) do
       post extract_capture_path, params: { row_id: "abc123" },
@@ -433,7 +433,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
     wanted = genre(name: "zorpwave", events_count: 3)
     genre(name: "zorpwave-blocked", events_count: 3).block!
     genre(name: "zorpwave-unused", events_count: 0)
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     get capture_path
 
@@ -443,7 +443,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a chip is rendered for a genre the taxonomy has never seen" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
 
     post genre_chips_capture_path, params: { combobox_values: "dubtronica, zorpcore" },
                                    headers: { "Accept" => "text/vnd.turbo-stream.html" }
@@ -482,7 +482,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "a card whose show we already carry offers it on the card" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     match = already_listed
 
     stub_extraction(extraction(candidates: [candidate])) do
@@ -496,7 +496,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "publishing over a match writes nothing and asks instead" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     already_listed
 
     assert_no_difference -> { Event.count } do
@@ -508,7 +508,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "the question posts back to the card's own form" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     already_listed
     publish
 
@@ -516,7 +516,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "answering with the match folds the capture onto it and hands over what it read" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     match = already_listed(description: nil)
 
     assert_difference -> { Event.count } => 1 do
@@ -530,7 +530,7 @@ class CaptureTest < ActionDispatch::IntegrationTest
   end
 
   test "answering that it is a different event publishes it" do
-    sign_in_as user(contributor: true)
+    sign_in_as user(permissions: %w[capture])
     already_listed
 
     assert_difference -> { Event.count } => 1 do

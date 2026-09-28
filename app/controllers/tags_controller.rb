@@ -1,6 +1,6 @@
 class TagsController < ApplicationController
   allow_unauthenticated_access only: %i[ index chips filter_options ]
-  before_action :require_admin, only: %i[ edit ]
+  before_action -> { require_permission(:genres) }, only: %i[ edit ]
 
   FILTER_OPTION_PARTIALS = { "what" => "tags/genre_options", "where" => "tags/location_options" }.freeze
 

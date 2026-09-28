@@ -1,7 +1,7 @@
 class GenresController < ApplicationController
   include CatalogueBrowsing
 
-  before_action :require_admin
+  before_action -> { require_permission(:genres) }
 
   STATUS_SCOPES = {
     "unplaced" => :unplaced,

@@ -7,13 +7,20 @@ module ActionLogsHelper
     subject = action_log_subject(entry)
     return t("admin.action_logs.sentences.undo_html", actor: action_log_actor(entry.reverts), subject: subject) if entry.undo?
 
-    t("admin.action_logs.sentences.#{entry.action.tr('.', '_')}_html", subject: subject, **entry.details.symbolize_keys)
+    t("admin.action_logs.sentences.#{entry.action.tr('.', '_')}_html", subject: subject, **action_log_details(entry))
   end
 
   ACTION_LOG_SUBJECT_PATHS = {
     "Event" => :admin_event_path, "Genre" => :edit_genre_path, "Place" => :edit_admin_place_path,
     "Locality" => :edit_admin_locality_path, "User" => :admin_user_path, "ScrapeRun" => :admin_scrape_run_path
   }.freeze
+
+  def action_log_details(entry)
+    details = entry.details.symbolize_keys
+    return details unless details[:permission]
+
+    details.merge(permission: t("admin.permissions.#{details[:permission]}.name"))
+  end
 
   def action_log_subject(entry)
     path = ACTION_LOG_SUBJECT_PATHS[entry.subject_type]

@@ -453,6 +453,22 @@ en:
       users: Accounts
       open_invitations: Open invitations
     unknown: unknown
+    permissions:
+      curate_events:
+        name: Curate events
+        hint: edit, remove and restore events, merge duplicates, review community submissions
+      genres:
+        name: Genres
+        hint: work the genre queue and tree, rename, merge, hide and block genres
+      places:
+        name: Places
+        hint: rename and merge venues and localities
+      capture:
+        name: Capture
+        hint: add events from a poster or pasted text
+      invite:
+        name: Invite
+        hint: invite new people
     action_logs:
       deleted_account: a deleted account
       all_scrapers: all scrapers
@@ -492,6 +508,8 @@ en:
         invitation_revoke_html: "revoked the invitation %{subject}"
         user_grant_capture_html: "let %{subject} capture events"
         user_revoke_capture_html: "stopped %{subject} from capturing events"
+        user_grant_permission_html: "gave %{subject} the permission %{permission}"
+        user_revoke_permission_html: "took the permission %{permission} from %{subject}"
         user_delete_html: "deleted the account %{subject}"
         scrape_run_html: "started a scrape run (%{subject})"
         scrape_snooze_html: "snoozed the scraper %{subject}"
@@ -574,9 +592,7 @@ en:
           distinct_genres: distinct genres
     users:
       admin_badge: Admin
-      contributor_badge: Capture
-      contributor_granted: "%{username} can now capture events."
-      contributor_revoked: "%{username} can no longer capture events."
+      permissions_saved: "Permissions for %{username} saved."
       cant_delete_self: You can't delete your own account here.
       deleted: "Account %{username} was deleted."
       index:
@@ -590,11 +606,11 @@ en:
         sessions: Active sessions
         invited_by: Invited by
         saved_filters: Saved filters
+        permissions_heading: Permissions
+        permissions_hint: What this account may do beyond using the site. Each one opens its part of the admin; nothing is visible to other users.
+        permissions_admin: An admin can do everything.
+        permissions_save: Save permissions
         captured_events: Captured events
-        contributor_heading: Capture events
-        contributor_hint: Lets this account capture events itself — from a poster or pasted text.
-        contributor_grant: Allow capturing
-        contributor_revoke: Revoke capturing
         delete_heading: Delete account
         delete_hint: This permanently removes this account and its data.
         delete: Delete account

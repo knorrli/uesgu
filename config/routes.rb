@@ -85,7 +85,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :users, only: %i[index show destroy] do
-      member { patch :toggle_contributor }
+      member { patch :permissions }
     end
     resources :invitations, only: %i[index create destroy]
     resources :scrape_runs, only: %i[index show create] do

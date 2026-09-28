@@ -1,5 +1,5 @@
 class CapturesController < ApplicationController
-  before_action :require_contributor
+  before_action -> { require_permission(:capture) }
   rate_limit to: 60, within: 1.minute, only: :extract,
              by: -> { current_user&.id }, with: -> { head :too_many_requests }
 

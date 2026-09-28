@@ -63,7 +63,7 @@
             <details class="nav-menu" data-controller="menu" data-action="toggle->menu#toggle">
               <summary><%= current_user.username %><% if unread.positive? %> <span class="unread-dot" role="img" aria-label="<%= t('nav.unread_notifications') %>"></span><% end %></summary>
               <div class="nav-menu__items">
-                <% if current_user.contributor? %>
+                <% if current_user.can?(:capture) %>
                   <%= link_to capture_path, class: 'nav-menu__item' do %>
                     <span class="ph ph-calendar-plus" aria-hidden="true"></span>
                     <span><%= t('nav.capture') %></span>
@@ -85,7 +85,7 @@
                   <span class="ph ph-gear" aria-hidden="true"></span>
                   <span><%= t('nav.settings') %></span>
                 <% end %>
-                <% if current_user.admin? %>
+                <% if current_user.moderator? %>
                   <%= link_to admin_path, class: 'nav-menu__item' do %>
                     <span class="ph ph-wrench" aria-hidden="true"></span>
                     <span><%= t('nav.admin') %></span>

@@ -2,6 +2,8 @@ module Admin
   class EventsController < BaseController
     include CatalogueBrowsing
 
+    requires :curate_events
+
     STATUS_SCOPES = {
       "visible" => -> { Event.visible },
       "hidden" => -> { Event.kept.where(hidden: true) },

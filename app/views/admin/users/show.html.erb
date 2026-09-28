@@ -4,7 +4,7 @@
     <h1>
       <%= @user.username %>
       <% if @user.admin? %><span class="chip"><%= t('admin.users.admin_badge') %></span><% end %>
-      <% if @user.contributor? %><span class="chip"><%= t('admin.users.contributor_badge') %></span><% end %>
+      <% @user.permissions.each do |permission| %><span class="chip"><%= t("admin.permissions.#{permission}.name") %></span><% end %>
     </h1>
   <% end %>
 
@@ -68,10 +68,22 @@
   </section>
 
   <section class="flex flex-col gap-small">
-    <h2><%= t('.contributor_heading') %></h2>
-    <p class="muted"><%= t('.contributor_hint') %></p>
-    <%= button_to t(@user.contributor? ? '.contributor_revoke' : '.contributor_grant'),
-          toggle_contributor_admin_user_path(@user), method: :patch, class: 'button-small' %>
+    <h2><%= t('.permissions_heading') %></h2>
+    <% if @user.admin? %>
+      <p class="muted"><%= t('.permissions_admin') %></p>
+    <% else %>
+      <p class="muted"><%= t('.permissions_hint') %></p>
+      <%= form_with url: permissions_admin_user_path(@user), method: :patch, class: 'flex flex-col gap-small' do %>
+        <%= hidden_field_tag 'user[permissions][]', '', id: nil %>
+        <% User::PERMISSIONS.each do |permission| %>
+          <label class="flex gap-small align-baseline">
+            <%= check_box_tag 'user[permissions][]', permission, @user.permissions.include?(permission), id: "permission_#{permission}" %>
+            <span><%= t("admin.permissions.#{permission}.name") %> <span class="muted">— <%= t("admin.permissions.#{permission}.hint") %></span></span>
+          </label>
+        <% end %>
+        <div><%= submit_tag t('.permissions_save'), class: 'button-small' %></div>
+      <% end %>
+    <% end %>
   </section>
 
   <% unless @user == current_user %>

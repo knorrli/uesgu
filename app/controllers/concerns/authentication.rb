@@ -29,8 +29,12 @@ module Authentication
       head :forbidden unless current_user&.admin?
     end
 
-    def require_contributor
-      head :forbidden unless current_user&.contributor?
+    def require_permission(permission)
+      head :forbidden unless current_user&.can?(permission)
+    end
+
+    def require_moderator
+      head :forbidden unless current_user&.moderator?
     end
 
     def resume_session

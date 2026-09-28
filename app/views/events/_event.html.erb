@@ -20,7 +20,7 @@
       <div class="event-genres">
         <% event.genres.each_with_index do |genre, i| %>
           <% if i.positive? %><span class="sep" aria-hidden="true">&middot;</span><% end %>
-          <span class="event-genre"><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if interest && interest_why_genre?(event, genre) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><% if current_user&.admin? %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
+          <span class="event-genre"><%= event_filter_tag genre.name, field: 'g[]', value: genre.name, interactive: interactive %><% if interest && interest_why_genre?(event, genre) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><% if current_user&.can?(:genres) %><%= link_to edit_tag_path(genre), data: { turbo_frame: '_top' }, class: 'icon-button meta-edit', 'aria-label': t('events.edit_tag') do %><span class="ph ph-gear"></span><% end %><% end %></span>
         <% end %>
       </div>
     <% end %>
@@ -30,7 +30,7 @@
   <% if current_user %>
     <div class="event-actions">
       <%= event_save_button(event) %>
-      <% if current_user.admin? %>
+      <% if current_user.can?(:curate_events) %>
         <%= link_to admin_event_path(event), class: 'icon-button', data: { turbo_frame: '_top' }, 'aria-label': t('events.edit_event') do %>
           <span class="ph ph-gear"></span>
         <% end %>

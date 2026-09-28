@@ -8,7 +8,8 @@ module Admin
       "cancelled" => -> { Event.kept.cancelled },
       "discarded" => -> { Event.discarded },
       "duplicates" => -> { Event.duplicates },
-      "dismissed" => -> { Event.dismissed }
+      "dismissed" => -> { Event.dismissed },
+      "community" => -> { Event.captured }
     }.freeze
 
     SORT_SCOPES = {

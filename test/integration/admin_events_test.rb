@@ -38,6 +38,27 @@ class AdminEventsTest < ActionDispatch::IntegrationTest
     assert_select "a", text: "Called Off", count: 0
   end
 
+  test "the community filter lists every captured event, whatever its status" do
+    event(title: "Scraped Show")
+    event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
+    event(title: "Dismissed Capture", url: nil, data_source: EventCapture::Creator::DATA_SOURCE,
+          dismissed_at: Time.current)
+    sign_in_as user(admin: true)
+
+    get admin_events_path(status: "community")
+    assert_select "a", text: "Captured Show"
+    assert_select "a", text: "Dismissed Capture"
+    assert_select "a", text: "Scraped Show", count: 0
+  end
+
+  test "a captured event carries a community badge in the list" do
+    event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE)
+    sign_in_as user(admin: true)
+
+    get admin_events_path
+    assert_select ".event-row__meta span", text: I18n.t("admin.events.index.community_badge")
+  end
+
   test "the default date sort lists events chronologically (oldest first)" do
     later = event(title: "LaterShow", start_date: Date.current + 30.days)
     sooner = event(title: "SoonerShow", start_date: Date.current + 2.days)

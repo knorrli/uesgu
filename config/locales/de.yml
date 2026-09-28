@@ -587,10 +587,12 @@ de:
         status_discarded: Gefiltert
         status_duplicates: Duplikate
         status_dismissed: Entfernt
+        status_community: Community
         search: Events suchen…
         sort_date: Datum
         sort_title: Titel
         cancelled_badge: abgesagt
+        community_badge: Community
         hidden_badge: ausgeblendet
         discarded_badge: "gefiltert: %{pattern}"
         empty: Keine passenden Events.

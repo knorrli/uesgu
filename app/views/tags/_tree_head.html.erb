@@ -1,0 +1,24 @@
+<%# locals: (name:, count:, search:, param:, value:, checked:, expandable:, level: :top, title: name, type: nil) %>
+<% if expandable %>
+  <div class="loc-group__head loc-group__head--<%= level %>" data-search="<%= search %>">
+    <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
+            aria-expanded="false" title="<%= title %>">
+      <span class="loc-group__chevron ph ph-caret-right"></span>
+      <span class="opt__label"><%= name %></span>
+      <% if type %><span class="opt__type"><%= type %></span><% end %>
+      <span class="opt__count"><%= count %></span>
+    </button>
+    <label class="loc-group__pick">
+      <input type="checkbox" name="<%= param %>" value="<%= value %>" aria-label="<%= title %>" <%= 'checked' if checked %>>
+      <span class="opt__box"></span>
+    </label>
+  </div>
+<% else %>
+  <label class="opt opt--<%= level %>" title="<%= title %>" data-search="<%= search %>">
+    <input type="checkbox" name="<%= param %>" value="<%= value %>" <%= 'checked' if checked %>>
+    <span class="opt__box"></span>
+    <span class="opt__label"><%= name %></span>
+    <% if type %><span class="opt__type"><%= type %></span><% end %>
+    <span class="opt__count"><%= count %></span>
+  </label>
+<% end %>

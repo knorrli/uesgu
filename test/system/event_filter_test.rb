@@ -10,7 +10,7 @@ class EventFilterTest < ApplicationSystemTestCase
     visit events_path
     open_sheet("what")
 
-    find(".sheet[data-field=what] .opt--top", text: rock.name).click
+    find(".sheet[data-field=what] .loc-group__head", text: rock.name).find(".loc-group__pick").click
     assert_selector ".sheet[data-field=what] input[value='#{rock.name}']:checked", visible: :all
     find(".sheet[data-field=what] .sheet__apply").click
 
@@ -109,7 +109,7 @@ class EventFilterTest < ApplicationSystemTestCase
     assert_no_selector ".sheet[data-field=what].sheet--open"
   end
 
-  test "a canton opens to its localities, and a locality opens to its venues" do
+  test "tapping a canton or locality opens it without picking it" do
     place(name: "Zorpklub", locality: "Zorpwil", canton: "BE")
     event(start_date: Date.current + 3, location_list: %w[BE Zorpwil Zorpklub])
 
@@ -120,12 +120,13 @@ class EventFilterTest < ApplicationSystemTestCase
     locality = "#{sheet} .loc-group--nested"
     assert_no_selector locality, visible: true
 
-    find("#{sheet} .loc-group:not(.loc-group--nested) > .loc-group__head .loc-group__toggle").click
-    assert_selector "#{locality} .opt--mid", text: "Zorpwil"
+    find("#{sheet} .opt__label", text: "BE").click
+    assert_selector "#{locality} .loc-group__toggle", text: "Zorpwil"
     assert_no_selector "#{locality} .opt--leaf", text: "Zorpklub"
 
-    find("#{locality} > .loc-group__head .loc-group__toggle").click
+    find("#{locality} .opt__label", text: "Zorpwil").click
     assert_selector "#{locality} .opt--leaf", text: "Zorpklub"
+    assert_no_selector "#{sheet} input:checked", visible: :all
   end
 
   private

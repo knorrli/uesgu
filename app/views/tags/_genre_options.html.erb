@@ -1,17 +1,7 @@
 <% genre_filter_tree.each do |root| %>
   <div class="loc-group collapsed" data-filter-sheets-target="group">
-    <div class="loc-group__head">
-      <label class="opt opt--top" data-search="<%= root[:search] %>">
-        <input type="checkbox" name="g[]" value="<%= root[:value] %>" <%= 'checked' if filter.genres.include?(root[:value]) %>>
-        <span class="opt__box"></span>
-        <span class="opt__label"><%= root[:name] %></span>
-      </label>
-      <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
-              aria-label="<%= root[:name] %>">
-        <span class="loc-group__count"><%= root[:count] %></span>
-        <span class="loc-group__chevron ph ph-caret-down"></span>
-      </button>
-    </div>
+    <%= render "tags/tree_head", name: root[:name], count: root[:count], search: root[:search],
+          expandable: root[:children].any?, param: "g[]", value: root[:value], checked: filter.genres.include?(root[:value]) %>
     <div class="loc-group__body">
       <% root[:children].each do |child| %>
         <label class="opt opt--mid" data-search="<%= child[:search] %>">

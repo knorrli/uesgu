@@ -113,4 +113,55 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     assert_includes text, "Heartbeat-Faktor"
     refute_includes text, "kollektiver"
   end
+
+  def test_kaserne_mines_its_event_page_not_the_credits_or_related_events
+    text = prose_from_event_page(Scrapers::Kaserne, "kaserne", ".index details.concert-type")
+
+    assert_includes text, "Long String Instrument"
+    refute_includes text, "ist eine Community"
+    refute_includes text, "Soundkunst im Salonformat"
+  end
+
+  def test_dampfzentrale_mines_its_event_page_not_the_ticket_info_or_credits
+    text = prose_from_event_page(Scrapers::Dampfzentrale, "dampfzentrale", ".event-entry")
+
+    assert_includes text, "Masterclass"
+    refute_includes text, "Bequeme Kleidung"
+    refute_includes text, "Grafik:"
+  end
+
+  def test_saegegasse_mines_its_event_page_not_the_footer
+    text = prose_from_event_page(Scrapers::Saegegasse, "saegegasse", ".rs_events_container .rs_event_detail")
+
+    assert_includes text, "Indie-Pop-Band"
+    refute_includes text, "Impressum"
+  end
+
+  def test_treibhaus_mines_its_event_page_not_the_house_rules
+    text = prose_from_event_page(Scrapers::Treibhaus, "treibhaus", ".programm-list li.mb-10")
+
+    assert_includes text, "Brazen Barbie"
+    refute_includes text, "Rollstuhlfahrer"
+  end
+
+  def test_mahogany_hall_mines_its_event_page_not_the_sidebar
+    text = prose_from_event_page(Scrapers::MahoganyHall, "mahogany_hall", ".view-konzerte .views-row")
+
+    assert_includes text, "Electric Blues"
+    refute_includes text, "Passiv-Mitglied"
+  end
+
+  private
+
+  def prose_from_event_page(scraper_class, slug, row_selector)
+    row = html(slug).at_css(row_selector)
+    scraper = scraper_class.new
+    event_page = html(slug, "detail.html")
+    fetched = []
+    scraper.define_singleton_method(:get) { |url| fetched << url; event_page }
+
+    text = scraper.event_genre_prose(row)
+    assert_equal [scraper.event_url(row)], fetched
+    text
+  end
 end

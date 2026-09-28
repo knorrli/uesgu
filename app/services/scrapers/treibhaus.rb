@@ -1,5 +1,7 @@
 module Scrapers
   class Treibhaus < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.treibhausluzern.ch/programm?filter=konzerte")
     end
@@ -31,6 +33,10 @@ module Scrapers
 
     def event_description(content)
       content.at_css("p.font-medium")&.text&.squish
+    end
+
+    def event_genre_prose(row)
+      get(event_url(row)).css(".divide-y .prose").map(&:text).join("\n")
     end
   end
 end

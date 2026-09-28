@@ -1,5 +1,7 @@
 module Scrapers
   class Saegegasse < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.saegegasse.ch/programm")
     end
@@ -27,6 +29,10 @@ module Scrapers
 
     def event_description(content)
       content.css(".rsepro-small-description-block").text.squish
+    end
+
+    def event_genre_prose(row)
+      get(event_url(row)).css("#artikeltext .description").map(&:text).join("\n")
     end
   end
 end

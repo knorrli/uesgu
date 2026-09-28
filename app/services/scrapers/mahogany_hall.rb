@@ -1,5 +1,7 @@
 module Scrapers
   class MahoganyHall < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.mahogany.ch/konzerte")
     end
@@ -31,6 +33,10 @@ module Scrapers
         .map { |part| part.squish }
         .select { |part| part.split.size.between?(1, 2) }
         .map(&:titleize)
+    end
+
+    def event_genre_prose(row)
+      get(event_url(row)).css("article.node--type-konzert .node__content .text-formatted").map(&:text).join("\n")
     end
   end
 end

@@ -38,3 +38,6 @@
 
 # Claude Code local files (per-project settings, session worktrees, scratch)
 .claude/
+
+# Local cache of fetched venue pages for offline scraper analysis (see its README).
+/scraper_page_cache/

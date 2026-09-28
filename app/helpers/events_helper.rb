@@ -38,6 +38,14 @@ module EventsHelper
     @venue_urls ||= Place.where.not(url: nil).pluck(:fingerprint, :url).to_h
   end
 
+  def shown_genres(event)
+    event.genres.reject { |genre| ignored_genre_fingerprints.include?(Genre.fingerprint_for(genre.name)) }
+  end
+
+  def ignored_genre_fingerprints
+    @ignored_genre_fingerprints ||= Genre.ignored.pluck(:fingerprint).to_set
+  end
+
   def canton_last(locations)
     locations.sort_by { |location| [Location.canton?(location.name) ? 1 : 0, location.name] }
   end

@@ -120,6 +120,26 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "BetaShow"
   end
 
+  test "an ignored genre is left out of an event's genre line" do
+    kept = genre(name: "Zorptronic")
+    ignored = genre(name: "Wubnoise").tap(&:ignore!)
+    e = event_with_genres(kept.name, ignored.name)
+
+    get events_path
+
+    genres = "##{ActionView::RecordIdentifier.dom_id(e)} .event-genre"
+    assert_select genres, count: 1
+    assert_select genres, text: kept.name
+  end
+
+  test "an event whose only genres are ignored shows no genre line" do
+    e = event_with_genres(genre(name: "Wubnoise").tap(&:ignore!).name)
+
+    get events_path
+
+    assert_select "##{ActionView::RecordIdentifier.dom_id(e)} .event-genres", false
+  end
+
   test "a text query filters by title" do
     event(title: "FindMeUnique", start_date: Date.current + 2.days)
     event(title: "OtherUnique", start_date: Date.current + 2.days)

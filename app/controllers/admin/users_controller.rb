@@ -6,6 +6,7 @@ module Admin
 
     def show
       @user = User.includes(:sessions, accepted_invitation: :created_by).find(params[:id])
+      @captured_events = @user.captured_events.order(created_at: :desc)
     end
 
     def toggle_contributor

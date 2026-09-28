@@ -544,6 +544,7 @@ de:
         sessions: Aktive Sitzungen
         invited_by: Eingeladen von
         saved_filters: Gespeicherte Filter
+        captured_events: Erfasste Events
         contributor_heading: Events erfassen
         contributor_hint: Erlaubt diesem Konto, selbst Events zu erfassen – aus einem Poster oder kopiertem Text.
         contributor_grant: Erfassung erlauben
@@ -635,6 +636,7 @@ de:
         dismissed_intro: Dieses Event ist entfernt – aus allen öffentlichen Listen ausgeblendet und vom Scraper übersprungen. Stelle es wieder her, um es zurückzuholen.
         restore: Event wiederherstellen
         source_label: "via %{source}"
+        captured_by: "erfasst von %{username}"
         field_canonical_event: Duplikat-Verknüpfung
         dedup_heading: Duplikate
         is_duplicate_html: Dieses Event ist ein Duplikat von %{link} – zu dessen Gunsten aus den Listen ausgeblendet.

@@ -67,6 +67,28 @@ class AdminUsersTest < ActionDispatch::IntegrationTest
     assert_nil User.find_by(username: "spammer")
   end
 
+  test "an account page lists the events that account captured" do
+    contributor = user(username: "zorpfan", contributor: true)
+    event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE,
+          captured_by: contributor)
+    event(title: "Someone Else's Show")
+    sign_in_as user(admin: true)
+
+    get admin_user_path(contributor)
+    assert_select "a[href=?]", admin_event_path(Event.find_by!(title: "Captured Show")), text: "Captured Show"
+    assert_select "a", text: "Someone Else's Show", count: 0
+  end
+
+  test "deleting an account keeps the events it captured" do
+    spam = user(username: "spammer", contributor: true)
+    captured = event(title: "Captured Show", url: nil, data_source: EventCapture::Creator::DATA_SOURCE,
+                     captured_by: spam)
+    sign_in_as user(admin: true)
+
+    delete admin_user_path(spam)
+    assert_nil captured.reload.captured_by
+  end
+
   test "an admin cannot delete their own account here" do
     admin = user(admin: true)
     sign_in_as admin

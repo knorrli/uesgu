@@ -50,6 +50,24 @@
   </section>
 
   <section class="flex flex-col gap-small">
+    <h2><%= t('.captured_events') %></h2>
+    <% if @captured_events.any? %>
+      <div class="event-rows">
+        <% @captured_events.each do |event| %>
+          <div class="event-row">
+            <span class="muted event-row__date"><%= l(event.start_date) %></span>
+            <div class="event-row__main">
+              <%= link_to event.title, admin_event_path(event), class: 'event-row__title' %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="muted">—</p>
+    <% end %>
+  </section>
+
+  <section class="flex flex-col gap-small">
     <h2><%= t('.contributor_heading') %></h2>
     <p class="muted"><%= t('.contributor_hint') %></p>
     <%= button_to t(@user.contributor? ? '.contributor_revoke' : '.contributor_grant'),

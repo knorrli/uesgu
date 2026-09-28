@@ -29,6 +29,12 @@ class EventCapture::CreatorTest < ActiveSupport::TestCase
     assert_equal "capture", EventCapture::Creator.call(attrs).event.data_source
   end
 
+  test "records the account that captured the event" do
+    contributor = user(contributor: true)
+
+    assert_equal contributor, EventCapture::Creator.call(attrs, captured_by: contributor).event.captured_by
+  end
+
   test "mints the captured place, once, and reuses it for a variant spelling" do
     EventCapture::Creator.call(attrs)
     second = EventCapture::Creator.call(attrs(place: "ZORP-SAAL", title: "Zorp Fest 2",

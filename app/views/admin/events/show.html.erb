@@ -7,6 +7,7 @@
       <% if @event.venue %><span><%= @event.venue.name %></span><% end %>
       <% if @event.url.present? %><%= link_to t("admin.events.show.source_link"), external_url(@event.url), target: "_blank", rel: "noopener" %><% end %>
       <% if @event.data_source.present? %><span><%= t('admin.events.show.source_label', source: @event.data_source) %></span><% end %>
+      <% if @event.captured_by %><%= link_to t('admin.events.show.captured_by', username: @event.captured_by.username), admin_user_path(@event.captured_by) %><% end %>
       <% if @event.cancelled? %><span class="chip"><%= t('admin.events.index.cancelled_badge') %></span><% end %>
       <% if @event.hidden? %><span><%= t('admin.events.index.hidden_badge') %></span><% end %>
       <% if @event.dismissed? %><span class="chip"><%= t('admin.events.show.dismissed_badge') %></span><% end %>

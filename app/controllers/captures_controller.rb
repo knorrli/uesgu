@@ -16,7 +16,7 @@ class CapturesController < ApplicationController
   end
 
   def create
-    result = EventCapture::Creator.call(candidate_attributes)
+    result = EventCapture::Creator.call(candidate_attributes, captured_by: current_user)
 
     respond_to do |format|
       format.turbo_stream { decide_card(result) }

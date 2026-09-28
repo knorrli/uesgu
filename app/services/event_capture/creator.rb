@@ -9,8 +9,9 @@ module EventCapture
 
     def self.call(...) = new(...).call
 
-    def initialize(attributes)
+    def initialize(attributes, captured_by: nil)
       @attrs = attributes
+      @captured_by = captured_by
     end
 
     def call
@@ -36,7 +37,7 @@ module EventCapture
 
     private
 
-    attr_reader :attrs
+    attr_reader :attrs, :captured_by
 
     def incomplete? = title.blank? || start_date.blank? || locality.blank? || canton.blank?
 
@@ -88,7 +89,7 @@ module EventCapture
     def publish(location_list)
       event = Event.new(
         title: title, description: description, start_date: start_date,
-        start_time: start_time, data_source: DATA_SOURCE,
+        start_time: start_time, data_source: DATA_SOURCE, captured_by: captured_by,
         location_list: location_list,
         genre_list: genres
       )

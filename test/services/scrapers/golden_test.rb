@@ -2,7 +2,7 @@ require "test_helper"
 
 class Scrapers::GoldenTest < Minitest::Test
   FIXTURE_ROOT = File.expand_path("../../fixtures/scrapers", __dir__)
-  SHAPE_B = %w[bad_bonn kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken marians z7].freeze
+  SHAPE_B = %w[kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken marians z7].freeze
   CAPTURING = ENV["CAPTURE_GOLDEN"] == "1"
   REFERENCE_DATE = Date.new(2026, 6, 10)
 

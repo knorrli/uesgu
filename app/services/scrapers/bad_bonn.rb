@@ -1,49 +1,35 @@
 module Scrapers
   class BadBonn < Agent
-    self.respect_robots = false
-
     def self.url
       URI.parse("https://club.badbonn.ch/program")
     end
 
-    field_gaps genres: :no_field
+    field_gaps description: :no_field, genres: :no_field
 
     def event_rows
       page.css(".program-row")
     end
 
     def event_url(row)
-      URI.parse(link_for(row).href).to_s
+      URI.parse(row.at_css(".program-bands a")["href"]).to_s
     end
 
-    def event_content(row)
-      click(link_for(row))
+    def event_start_time(row)
+      month = Date::ABBR_MONTHNAMES.index(row["data-month"])
+      raise "Unknown month #{row['data-month'].inspect} on #{event_url(row)}" unless month
+
+      hour, minute = column(row, "time").split(":").map(&:to_i)
+      Time.zone.local(row["data-year"].to_i, month, column(row, "day").to_i, hour, minute)
     end
 
-    def event_start_time(content)
-      article = content.at_css("article[data-date]")
-      date_string = article&.attr("data-date").to_s
-      time_string = article&.attr("data-time").to_s
-      raise "Missing date (article[data-date]) on #{content.uri}" if date_string.blank?
-      Time.zone.parse("#{date_string}, #{time_string}")
-    end
-
-    def event_title(content)
-      content.at_css("article[data-date]").attr("data-title").to_s
-    end
-
-    def event_description(content)
-      content.css("article p").map { |node| node.text.squish }.find(&:present?).to_s
-    end
-
-    def event_genre_prose(content)
-      content.css("article p").map(&:text).join("\n")
+    def event_title(row)
+      column(row, "bands")
     end
 
     private
 
-    def link_for(row)
-      Page::Link.new(row.at_css(".program-bands a"), @mech, page)
+    def column(row, name)
+      row.at_css(".program-#{name}").text.squish
     end
   end
 end

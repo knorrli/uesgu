@@ -4,7 +4,6 @@ namespace :scrapers do
     root = Rails.root.join("test/fixtures/scrapers")
 
     detail_link = {
-      "bad_bonn"      => ".program-row .program-bands a",
       "kofmehl"       => ".events .events__element a.events__link",
       "docks"         => ".programme-container .mix.concerts a",
       "boeroem"       => ".ast-article-single .veranstaltung .elementor-heading-title a",

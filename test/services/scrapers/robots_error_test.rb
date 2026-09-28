@@ -95,11 +95,31 @@ class Scrapers::RobotsErrorTest < ActiveSupport::TestCase
     assert_nil @probe.robots_note
   end
 
-  test "the robots-free retry restores the scraper's own respect_robots setting" do
+  test "the robots-free retry turns robots back on" do
     ssl = OpenSSL::SSL::SSLError.new("certificate verify failed")
 
     get_with_robots_failing(ssl) { @probe.get(RobotsProbe.url) }
 
     assert @probe.robots
+  end
+
+  test "a noindex meta tag does not refuse the page" do
+    page = meta_robots_page("noindex, nofollow")
+
+    assert_not page.parser.noindex?
+  end
+
+  test "a nofollow meta tag still refuses following its links" do
+    page = meta_robots_page("noindex, nofollow")
+
+    assert_raises(Mechanize::RobotsDisallowedError) { @probe.click(page.links.first) }
+  end
+
+  def meta_robots_page(content)
+    Mechanize::Page.new(
+      URI(RobotsProbe.url), { "content-type" => "text/html" },
+      %(<html><head><meta name="robots" content="#{content}"></head><body><a href="/event">event</a></body></html>),
+      200, @probe
+    )
   end
 end

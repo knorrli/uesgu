@@ -698,7 +698,7 @@
     <div class="sg-row">
       <div class="sg-specimen">
         <header class="flex date">
-          <h2 class="date__label"><%= l Date.current, format: :weekday_short %></h2>
+          <h2 class="date__label"><%= l Date.current, format: :compact %></h2>
           <%= render "shared/day_nav", day: Date.current, days: [Date.current, Date.current + 3],
                      previous_path: nil, next_path: events_path(day: (Date.current + 3).iso8601),
                      calendar_url: events_path %>

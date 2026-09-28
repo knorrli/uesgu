@@ -932,7 +932,7 @@ en:
     formats:
       default: "%d.%m.%Y"
       detailed: "%A, %d.%m.%Y"
-      weekday_short: "%a, %d.%m.%Y"
+      compact: "%a, %d.%m.%y"
   datepicker:
     next_month: Next Month
     next_week: Next Week

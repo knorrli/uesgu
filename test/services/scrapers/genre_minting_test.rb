@@ -35,6 +35,23 @@ class Scrapers::GenreMintingTest < ActiveSupport::TestCase
 
   def fingerprints(list) = list.map { |name| Genre.fingerprint_for(name) }
 
+  test "a hidden genre named only in the text does not hide the event" do
+    Genre.create!(name: "Wubreading").hide!
+
+    event = build { |e| scraper(description: "a wubreading with a live band").send(:build_event, e, :row) }
+
+    assert_empty event.genre_list
+    assert_not event.hidden
+  end
+
+  test "a hidden genre from the venue's own genre field still hides the event" do
+    Genre.create!(name: "Wubreading").hide!
+
+    event = build { |e| scraper(genres: ["Wubreading"]).send(:build_event, e, :row) }
+
+    assert event.hidden
+  end
+
   test "a brand-new token is collected and mints new vocabulary" do
     before = Genre.count
 

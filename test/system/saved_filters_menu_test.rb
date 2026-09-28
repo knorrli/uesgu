@@ -27,6 +27,18 @@ class SavedFiltersMenuTest < ApplicationSystemTestCase
     assert_no_selector ".save-filter-plus"
   end
 
+  test "saving from the menu fills the funnel in one tap" do
+    event(start_date: Date.current + 3, genre_list: ["Rock"])
+    u = sign_in_as user
+
+    visit events_path("g[]": ["Rock"])
+    find(".filter-menu__toggle").click
+    find(".filter-menu__save").click
+
+    assert_selector ".filter-menu__toggle .funnel-fill", visible: true
+    assert_equal [["Rock"]], u.saved_filters.map(&:genres)
+  end
+
   test "on an empty feed the menu offers the notify-on-everything save" do
     event(start_date: Date.current + 3)
     sign_in_as user

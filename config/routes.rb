@@ -48,6 +48,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :feed_saved_filters, only: %i[create update]
+
   post "push_subscriptions" => "push_subscriptions#create"
   delete "push_subscriptions" => "push_subscriptions#destroy"
   post "push_subscriptions/test" => "push_subscriptions#test"

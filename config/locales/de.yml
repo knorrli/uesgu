@@ -356,6 +356,10 @@ de:
     calendar_feed_hint_off: Hol dir deine gespeicherten Events in jede Kalender-App — erstelle dafür einen privaten Link.
     calendar_feed_hint_on: Aktualisiert sich von selbst; Events verschwinden einen Tag nach dem Termin.
     calendar_feed_url_label: Kalender-Link
+    excluded_genres_heading: Ausgeschlossene Genres
+    excluded_genres_hint: Events mit einem dieser Genres siehst du nicht, auch nicht in Benachrichtigungen. Deine Merkliste bleibt, wie sie ist.
+    excluded_genres_none: Noch keine. Schliess ein Genre mit dem Symbol daneben bei einem Event aus.
+    excluded_genres_remove: "%{genre} wieder anzeigen"
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
     delete_account: Mein Konto löschen
@@ -945,11 +949,16 @@ de:
     delete_event: Event löschen
     edit_event: Event bearbeiten
     edit_tag: Tag bearbeiten
+    exclude_genre: "%{genre} ausschliessen"
     offsite_link: Öffnet auf %{source}, nicht der Website des Lokals
     venue_link_hint: Öffnet die Seite von %{venue}, nicht eine Seite zu diesem Event
     index:
       empty: Keine Events für die aktuellen Filter.
       clear_filter: Filter zurücksetzen
+      excluded_html:
+        one: 1 Event wird wegen deiner %{link} nicht angezeigt.
+        other: "%{count} Events werden wegen deiner %{link} nicht angezeigt."
+      excluded_link: ausgeschlossenen Genres
       save_filter: Filter speichern
       save_filter_all: Über alles benachrichtigen
       save_filter_saved: Gespeichert — bearbeiten

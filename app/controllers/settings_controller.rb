@@ -1,5 +1,6 @@
 class SettingsController < ApplicationController
   before_action :set_user
+  helper_method :excluded_genres
 
   def show
   end
@@ -17,6 +18,10 @@ class SettingsController < ApplicationController
 
   def set_user
     @user = Current.user
+  end
+
+  def excluded_genres
+    Genre.where(id: ExcludedGenres.for(@user).roots).by_name
   end
 
   def settings_params

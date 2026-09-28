@@ -64,6 +64,9 @@
 .ph.ph-download-simple:before {
   content: "\e20c";
 }
+.ph.ph-eye-slash:before {
+  content: "\e224";
+}
 .ph.ph-flag:before {
   content: "\e244";
 }

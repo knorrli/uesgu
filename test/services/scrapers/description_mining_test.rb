@@ -26,6 +26,70 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     assert_includes text, "Film"
   end
 
+  def test_boeroem_mines_the_post_content_not_the_newsletter_box
+    text = Scrapers::Boeroem.new.event_genre_prose(html("boeroem", "detail.html"))
+
+    assert_includes text, "Grill"
+    refute_includes text, "Newsletter"
+  end
+
+  def test_docks_mines_the_artist_texts
+    text = Scrapers::Docks.new.event_genre_prose(html("docks", "detail.html"))
+
+    assert_includes text, "groupe de rock"
+  end
+
+  def test_dynamo_mines_the_html_description_as_plain_text
+    row = Array(JSON.parse(fixture("dynamo", "list.html"))["data"])
+          .find { |r| r.dig("attributes", "field_event_description", "value").present? }
+    text = Scrapers::Dynamo.new.event_genre_prose(row)
+
+    assert_includes text, "Hardcore-Punk"
+    refute_includes text, "<p"
+  end
+
+  def test_kofmehl_mines_the_wysiwyg_text
+    text = Scrapers::Kofmehl.new.event_genre_prose(html("kofmehl", "detail.html"))
+
+    assert_includes text, "Schlagzeug"
+  end
+
+  def test_neubad_mines_the_text_tab_not_the_easy_language_tab
+    text = Scrapers::Neubad.new.event_genre_prose(html("neubad", "detail.html"))
+
+    assert_includes text, "Geschäftsübergabe"
+    refute_includes text, "Die alte Neubad Geschäftsführung"
+  end
+
+  def test_nouveau_monde_mines_the_text_area
+    text = Scrapers::NouveauMonde.new.event_genre_prose(html("nouveau_monde", "detail.html"))
+
+    assert_includes text, "For fans of"
+  end
+
+  def test_nouveau_monde_reads_the_genre_list_of_every_act_once
+    page = Nokogiri::HTML(<<~HTML)
+      <section class="groupHeading"><ul class="flexRow"><li>Rap</li><li>Trap</li></ul></section>
+      <section class="groupHeading"><ul class="flexRow"><li>Rap</li><li> </li></ul></section>
+    HTML
+
+    assert_equal %w[Rap Trap], Scrapers::NouveauMonde.new.event_genres(page)
+  end
+
+  def test_sous_soul_mines_the_rich_text_not_the_site_chrome
+    text = Scrapers::SousSoul.new.event_genre_prose(html("sous_soul", "detail.html"))
+
+    assert_includes text, "Ausstellungsdokumentation"
+    refute_includes text, "Ehemaligen Theater"
+  end
+
+  def test_zent_mines_the_row_text
+    row = html("zent").at_css("article.event-item")
+    text = Scrapers::Zent.new.event_genre_prose(row)
+
+    assert_includes text, "Vegan"
+  end
+
   def test_volkshaus_mines_the_collapse_panel_prose
     row = html("volkshaus").at_css("#programmliste .tableitem.event")
     text = Scrapers::Volkshaus.new.event_genre_prose(row)

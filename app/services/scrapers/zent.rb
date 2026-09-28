@@ -26,6 +26,10 @@ module Scrapers
       content.at_css("h2, h1")&.text&.squish
     end
 
+    def event_genre_prose(row)
+      row.at_css(".text")&.text
+    end
+
     private
 
     def prose_time(text)

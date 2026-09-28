@@ -55,6 +55,10 @@ module Scrapers
       category_tids(row).filter_map { |tid| GENRE_BY_TID[tid] }
     end
 
+    def event_genre_prose(row)
+      Nokogiri::HTML.fragment(row.dig("attributes", "field_event_description", "value").to_s).text
+    end
+
     private
 
     def category_tids(row)

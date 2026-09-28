@@ -39,6 +39,10 @@ module Scrapers
       content.css(".elementor-top-section .event-single-untertitel").text.squish
     end
 
+    def event_genre_prose(content)
+      content.at_css(".elementor-widget-theme-post-content")&.text
+    end
+
     private
 
     def link_for(row)

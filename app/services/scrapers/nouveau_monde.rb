@@ -6,8 +6,6 @@ module Scrapers
       URI.parse("https://www.nouveaumonde.ch/agenda/")
     end
 
-    field_gaps genres: :no_field
-
     def event_rows
       page.css(".poster[data-tofilter*=concert]")
     end
@@ -42,6 +40,14 @@ module Scrapers
         act_name << " (#{country_code})" if country_code.present?
         act_name.string
       end.compact_blank.join(", ")
+    end
+
+    def event_genres(content)
+      content.css(".groupHeading ul.flexRow li").map { |li| li.text.squish }.compact_blank.uniq
+    end
+
+    def event_genre_prose(content)
+      content.css(".genTexArea").map(&:text).join("\n")
     end
 
     private

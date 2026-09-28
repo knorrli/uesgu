@@ -44,6 +44,10 @@ module Scrapers
       content.at_css("h2.event_title.untertitel")&.text&.squish
     end
 
+    def event_genre_prose(content)
+      content.at_css(".text_wrapper .w-richtext")&.text
+    end
+
     private
 
     def link_for(row)

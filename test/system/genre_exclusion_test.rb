@@ -10,7 +10,7 @@ class GenreExclusionTest < ApplicationSystemTestCase
     visit events_path
     find(".event", text: "HatedShow").find(".event-genre form[action='#{genre_exclusions_path}'] button").click
 
-    assert_selector ".events-excluded a[href='#{settings_path(anchor: 'excluded-genres')}']"
+    assert_selector ".day-summary__count--excluded[href='#{settings_path(anchor: 'excluded-genres')}']", text: "1"
     assert_selector ".event", text: "LikedShow"
     assert_no_selector ".event", text: "HatedShow"
   end

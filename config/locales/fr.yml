@@ -956,10 +956,9 @@ fr:
     index:
       empty: Aucun événement ne correspond aux filtres actuels.
       clear_filter: Réinitialiser le filtre
-      excluded_html:
-        one: 1 événement n'est pas affiché à cause de tes %{link}.
-        other: "%{count} événements ne sont pas affichés à cause de tes %{link}."
-      excluded_link: genres exclus
+      excluded:
+        one: "1 événement n'est pas affiché à cause de tes genres exclus."
+        other: "%{count} événements ne sont pas affichés à cause de tes genres exclus."
       save_filter: Enregistrer le filtre
       save_filter_all: Me notifier de tout
       save_filter_saved: Enregistré — modifier

@@ -1,14 +1,12 @@
 <div class="flex flex-col gap-large align-stretch">
   <%= render 'filter_sheets' %>
 
-  <% if @excluded_count.positive? %>
-    <p class="muted events-excluded">
-      <%= t('events.index.excluded_html', count: @excluded_count,
-            link: link_to(t('events.index.excluded_link'), settings_path(anchor: 'excluded-genres'), class: 'text-link')) %>
-    </p>
-  <% end %>
-
   <% unless @days.any? %>
+    <% if @excluded_count.positive? %>
+      <p class="muted events-excluded">
+        <%= link_to t('events.index.excluded', count: @excluded_count), settings_path(anchor: 'excluded-genres'), class: 'text-link' %>
+      </p>
+    <% end %>
     <p class="muted events-empty">
       <%= t('events.index.empty') %>
       <% if @filter.active? %>

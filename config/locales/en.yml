@@ -956,10 +956,9 @@ en:
     index:
       empty: No events match your current filters.
       clear_filter: Clear filter
-      excluded_html:
-        one: 1 event left out because of your %{link}.
-        other: "%{count} events left out because of your %{link}."
-      excluded_link: excluded genres
+      excluded:
+        one: "1 event left out because of your excluded genres."
+        other: "%{count} events left out because of your excluded genres."
       save_filter: Save this filter
       save_filter_all: Notify me about everything
       save_filter_saved: Saved — edit

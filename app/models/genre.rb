@@ -157,7 +157,7 @@ class Genre < ApplicationRecord
   end
 
   PROSE_MINING_STOPWORDS = %w[
-    house pop soul folk country garage industrial drum band world wave experimental
+    house soul drum band world wave experimental
   ].freeze
 
   def self.prose_mining_index

@@ -470,7 +470,7 @@ en:
         event_revert_html: "handed a field of %{subject} back to the scraper"
         event_dismiss_html: "removed %{subject}"
         event_restore_html: "restored %{subject}"
-        event_merge_html: "merged %{subject} into another event as a duplicate"
+        event_merge_html: "merged %{subject} into %{target} as a duplicate"
         event_unmerge_html: "split %{subject} back out as its own event"
         undo_html: "undid %{actor}'s change to %{subject}"
     scrape_runs:

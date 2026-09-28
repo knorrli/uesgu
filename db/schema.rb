@@ -21,6 +21,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_140000) do
     t.string "area", null: false
     t.jsonb "before", default: {}, null: false
     t.datetime "created_at", null: false
+    t.jsonb "details", default: {}, null: false
     t.bigint "reverts_id"
     t.bigint "subject_id"
     t.string "subject_label"

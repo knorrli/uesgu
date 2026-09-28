@@ -8,6 +8,7 @@ class CreateActionLogs < ActiveRecord::Migration[8.1]
       t.bigint :subject_id
       t.string :subject_label
       t.jsonb :before, null: false, default: {}
+      t.jsonb :details, null: false, default: {}
       t.references :reverts, foreign_key: { to_table: :action_logs }
       t.timestamps
     end

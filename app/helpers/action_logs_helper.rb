@@ -7,7 +7,7 @@ module ActionLogsHelper
     subject = action_log_subject(entry)
     return t("admin.action_logs.sentences.undo_html", actor: action_log_actor(entry.reverts), subject: subject) if entry.undo?
 
-    t("admin.action_logs.sentences.#{entry.action.tr('.', '_')}_html", subject: subject)
+    t("admin.action_logs.sentences.#{entry.action.tr('.', '_')}_html", subject: subject, **entry.details.symbolize_keys)
   end
 
   def action_log_subject(entry)

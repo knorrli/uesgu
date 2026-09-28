@@ -89,7 +89,7 @@ module Admin
       canonical = Event.find_by(id: params[:canonical_id])
       return redirect_to admin_event_path(event), alert: t(".merge_missing") if canonical.nil?
 
-      ActionLog.track("event.merge", event) { event.merge_into!(canonical) }
+      ActionLog.track("event.merge", event, target: canonical.title) { event.merge_into!(canonical) }
       redirect_to admin_event_path(canonical), notice: t(".merged")
     rescue ArgumentError => e
       redirect_to admin_event_path(event), alert: e.message

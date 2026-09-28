@@ -37,6 +37,16 @@ class AdminActionLogsTest < ActionDispatch::IntegrationTest
                  ActionLog.order(:id).pluck(:action)
   end
 
+  test "a merge names the event it went into" do
+    show = event(title: "Zorp Night (copy)")
+    canonical = event(title: "Zorp Night")
+    sign_in_as user(admin: true)
+    patch merge_admin_event_path(show), params: { canonical_id: canonical.id }
+
+    get admin_action_logs_path
+    assert_select ".event-row__main", text: /Zorp Night \(copy\).*Zorp Night/
+  end
+
   test "the log lists an action with an undo that restores the event" do
     show = event(title: "Zorp Night")
     sign_in_as user(admin: true, username: "zorpadmin")

@@ -15,22 +15,22 @@ class ActionLog < ApplicationRecord
 
   scope :newest_first, -> { order(id: :desc) }
 
-  def self.track(action, subject, user: Current.user, reverts: nil)
+  def self.track(action, subject, user: Current.user, reverts: nil, **details)
     before = snapshot_of(subject)
     transaction do
       yield
-      record!(action, subject, before: before, user: user, reverts: reverts)
+      record!(action, subject, before: before, user: user, reverts: reverts, **details)
     end
   end
 
-  def self.record!(action, subject, before: nil, user: Current.user, reverts: nil)
+  def self.record!(action, subject, before: nil, user: Current.user, reverts: nil, **details)
     after = snapshot_of(subject)
     changed = before.to_h.reject { |key, value| after.to_h[key] == value }
     return if before && changed.empty?
 
     create!(action: action, area: reverts&.area || AREAS.fetch(action.split(".").first),
             subject: subject, subject_label: label_for(subject), before: changed.as_json,
-            user: user, reverts: reverts)
+            details: details.as_json, user: user, reverts: reverts)
   end
 
   def self.snapshot_of(subject) = subject.try(:undo_snapshot)

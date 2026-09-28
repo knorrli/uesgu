@@ -962,6 +962,7 @@ de:
       save_filter: Filter speichern
       save_filter_all: Über alles benachrichtigen
       save_filter_saved: Gespeichert — bearbeiten
+      update_filter: "„%{name}“ aktualisieren"
     filter:
       what: "Acts, Stile, alles suchen…"
       when: Wann?

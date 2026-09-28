@@ -21,7 +21,7 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "details.filter-menu"
     assert_select "a.filter-menu__apply[href=?]",
-                  events_path(q: [], g: ["Rock"], l: ["Bern"], d: [])
+                  events_path(q: [], g: ["Rock"], l: ["Bern"], d: [], applied: r.id, filtered: 1)
   end
 
   test "the saved-filters menu shows for any signed-in user, but never when signed out" do

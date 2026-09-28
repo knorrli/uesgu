@@ -962,6 +962,7 @@ en:
       save_filter: Save this filter
       save_filter_all: Notify me about everything
       save_filter_saved: Saved — edit
+      update_filter: Update “%{name}”
     filter:
       what: "Search acts, styles, anything…"
       when: When?

@@ -31,7 +31,8 @@
 
           <div class="saved-filter-card__actions flex gap-small">
             <%= link_to t('saved_filters.apply'),
-                  events_path(q: rule.queries, g: rule.genres, l: rule.location_list, d: rule.date_ranges),
+                  events_path(q: rule.queries, g: rule.genres, l: rule.location_list, d: rule.date_ranges,
+                              applied: rule.id, filtered: 1),
                   class: 'button-small' %>
             <% if rule.notifying? %>
               <%= button_to t('saved_filters.fire_now'), fire_saved_filter_path(rule), class: 'button-small' %>

@@ -1,6 +1,6 @@
 # Weekly dependency update PRs. Security advisories are also opened automatically
-# regardless of schedule. Kept low-noise: grouped minor/patch bumps, one open PR
-# limit per ecosystem.
+# regardless of schedule. Kept low-noise: minor/patch bumps arrive as one grouped PR,
+# major bumps as another.
 version: 2
 updates:
   - package-ecosystem: bundler
@@ -11,6 +11,8 @@ updates:
     groups:
       ruby-minor-and-patch:
         update-types: [minor, patch]
+      ruby-major:
+        update-types: [major]
     # Hold minitest on 5.x. minitest 6 removed `minitest/mock` (the `Mock` class
     # and `stub`) from core into a separate, version-skewed gem. Our golden/scraper
     # suites rely on it (13 `.stub` sites), AND railties' own minitest plugin still

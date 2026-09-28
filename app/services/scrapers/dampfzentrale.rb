@@ -1,5 +1,7 @@
 module Scrapers
   class Dampfzentrale < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.dampfzentrale.ch/")
     end
@@ -33,6 +35,10 @@ module Scrapers
 
     def event_description(content)
       content.at_css(".event-information h3")&.text&.squish
+    end
+
+    def event_genre_prose(row)
+      get(event_url(row)).css('.element-body[id^="element_"]').map(&:text).join("\n")
     end
 
     def event_cancelled?(_event, content)

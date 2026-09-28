@@ -1,5 +1,7 @@
 module Scrapers
   class Kaserne < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://kaserne-basel.ch/de")
     end
@@ -28,6 +30,10 @@ module Scrapers
 
     def event_title(content)
       content.at_css("add-to-calendar-button")&.attr("name")&.strip
+    end
+
+    def event_genre_prose(row)
+      get(event_url(row)).css(".event .rich-text-container").map(&:text).join("\n")
     end
   end
 end

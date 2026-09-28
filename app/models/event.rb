@@ -162,7 +162,7 @@ class Event < ApplicationRecord
     fingerprints = genre_list.map { |name| Genre.fingerprint_for(name) }
     return false if fingerprints.empty?
 
-    hidden = Genre.hidden.where(fingerprint: fingerprints).pluck(:fingerprint).to_set
+    hidden = Genre.effectively(:hidden).where(fingerprint: fingerprints).pluck(:fingerprint).to_set
     fingerprints.all? { |fingerprint| hidden.include?(fingerprint) }
   end
 end

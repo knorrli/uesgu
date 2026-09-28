@@ -223,6 +223,17 @@ class GenreQueryTest < ActiveSupport::TestCase
     refute_includes Genre.prose_mining_index.keys, blocked.fingerprint
   end
 
+  test "prose_mining_index excludes aliases of blocked, ignored and hidden genres" do
+    { block!: "Wubnoise", ignore!: "Wubtalk", hide!: "Wubreading" }.each do |disposition, canonical_name|
+      canonical = Genre.create!(name: canonical_name)
+      variant = Genre.create!(name: "#{canonical_name} Variant")
+      variant.merge_into!(canonical)
+      canonical.public_send(disposition)
+
+      refute_includes Genre.prose_mining_index.keys, variant.fingerprint, "alias of a genre after #{disposition}"
+    end
+  end
+
   test "prose_mining_index excludes ignored genres" do
     ignored = Genre.create!(name: "Wubnoise")
     ignored.ignore!

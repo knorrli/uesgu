@@ -89,4 +89,65 @@ class GenreDispositionTest < ActiveSupport::TestCase
     refute g.blocked?
     refute event.reload.hidden, "un-hiding re-derives the event as visible"
   end
+
+  test "an alias of a blocked genre stays off events on the next scrape" do
+    noise = genre(name: "zorp-noise")
+    variant = genre(name: "zorp-noize")
+    variant.merge_into!(noise)
+    noise.block!
+
+    fresh = event_with_genres(variant.name, "glimmercore")
+
+    refute_includes fresh.reload.genre_list, variant.name
+    assert_includes fresh.genre_list, "Glimmercore"
+  end
+
+  test "block! strips the taggings of the genre's aliases too" do
+    noise = genre(name: "zorp-noise")
+    variant = genre(name: "zorp-noize")
+    variant.merge_into!(noise)
+    event = event_with_genres(variant.name, "glimmercore")
+
+    noise.block!
+
+    refute_includes event.reload.genre_list, variant.name
+    assert_equal 0, variant.reload.events_count
+  end
+
+  test "merging into a blocked genre strips the merged genre from events" do
+    noise = genre(name: "zorp-noise")
+    noise.block!
+    variant = genre(name: "zorp-noize")
+    event = event_with_genres(variant.name, "glimmercore")
+
+    variant.merge_into!(noise)
+
+    refute_includes event.reload.genre_list, variant.name
+  end
+
+  test "hide! hides an event whose only genre is an alias of the hidden one" do
+    spoken = genre(name: "lecture")
+    variant = genre(name: "lectures")
+    variant.merge_into!(spoken)
+    event = event_with_genres(variant.name)
+    event.recompute_visibility!
+    refute event.reload.hidden
+
+    spoken.hide!
+
+    assert event.reload.hidden
+  end
+
+  test "merging into a hidden genre hides an event whose only genre is the merged one" do
+    spoken = genre(name: "lecture")
+    spoken.hide!
+    variant = genre(name: "lectures")
+    event = event_with_genres(variant.name)
+    event.recompute_visibility!
+    refute event.reload.hidden
+
+    variant.merge_into!(spoken)
+
+    assert event.reload.hidden
+  end
 end

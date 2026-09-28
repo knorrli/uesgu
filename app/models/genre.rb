@@ -1,4 +1,6 @@
 class Genre < ApplicationRecord
+  DISPOSITION_COLUMNS = { blocked: :blocked_at, ignored: :ignored_at, hidden: :hidden_at }.freeze
+
   belongs_to :canonical, class_name: "Genre", optional: true
   has_many :aliases, class_name: "Genre", foreign_key: :canonical_id,
                      inverse_of: :canonical, dependent: :nullify
@@ -22,6 +24,10 @@ class Genre < ApplicationRecord
   scope :hidden, -> { where.not(hidden_at: nil) }
   scope :blocked, -> { where.not(blocked_at: nil) }
   scope :aliased, -> { where.not(canonical_id: nil) }
+  scope :effectively, lambda { |disposition|
+    column = DISPOSITION_COLUMNS.fetch(disposition)
+    where.not(column => nil).or(where(canonical_id: Genre.where.not(column => nil).select(:id)))
+  }
   scope :listable, lambda {
     where("events_count > 0 OR ignored_at IS NOT NULL OR hidden_at IS NOT NULL " \
           "OR blocked_at IS NOT NULL OR canonical_id IS NOT NULL " \
@@ -162,9 +168,10 @@ class Genre < ApplicationRecord
 
   def self.prose_mining_index
     stop = PROSE_MINING_STOPWORDS.to_set { |word| fingerprint_for(word) }
-    where(blocked_at: nil, ignored_at: nil, hidden_at: nil).pluck(:fingerprint, :name)
-                                                            .reject { |fingerprint, _| fingerprint.blank? || stop.include?(fingerprint) }
-                                                            .to_h
+    excluded = effectively(:blocked).or(effectively(:ignored)).or(effectively(:hidden))
+    where.not(id: excluded.select(:id)).pluck(:fingerprint, :name)
+                                       .reject { |fingerprint, _| fingerprint.blank? || stop.include?(fingerprint) }
+                                       .to_h
   end
 
   def self.names_in_prose(text, index)
@@ -247,18 +254,14 @@ class Genre < ApplicationRecord
     transaction do
       update!(blocked_at: Time.current, ignored_at: nil, hidden_at: nil, canonical_id: nil, parent_id: nil)
     end
-    affected = Event.tagged_with(name, on: :genres).pluck(:id)
-    Event.where(id: affected).find_each do |event|
-      event.genre_list.remove(name)
-      event.recompute_visibility!
-    end
-    update_columns(events_count: 0)
+    strip_from_events!
   end
 
   def merge_into!(canonical)
     raise ArgumentError, "a genre cannot be merged into itself" if canonical.id == id
 
     update!(canonical_id: canonical.id, ignored_at: nil, hidden_at: nil, blocked_at: nil, parent_id: nil)
+    canonical.blocked? ? strip_from_events! : recompute_events!
     Genre.reconcile!
   end
 
@@ -284,7 +287,7 @@ class Genre < ApplicationRecord
   end
 
   def self.blocked_fingerprints
-    blocked.pluck(:fingerprint).to_set
+    effectively(:blocked).pluck(:fingerprint).to_set
   end
 
   def self.ensure!(names)
@@ -367,6 +370,23 @@ class Genre < ApplicationRecord
   end
 
   def recompute_events!
-    Event.tagged_with(name, on: :genres).find_each(&:recompute_visibility!)
+    events_tagged_with_self_or_aliases.find_each(&:recompute_visibility!)
+  end
+
+  def strip_from_events!
+    names = names_with_aliases
+    events_tagged_with_self_or_aliases.find_each do |event|
+      event.genre_list.remove(names)
+      event.recompute_visibility!
+    end
+    Genre.where(id: [id, *aliases.ids]).update_all(events_count: 0)
+  end
+
+  def events_tagged_with_self_or_aliases
+    Event.where(id: Event.tagged_with(names_with_aliases, on: :genres, any: true).pluck(:id))
+  end
+
+  def names_with_aliases
+    [name, *aliases.pluck(:name)]
   end
 end

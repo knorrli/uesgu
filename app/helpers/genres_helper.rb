@@ -58,6 +58,6 @@ module GenresHelper
   end
 
   def ignored_genre_fingerprints
-    @ignored_genre_fingerprints ||= Genre.ignored.pluck(:fingerprint).to_set
+    @ignored_genre_fingerprints ||= Genre.effectively(:ignored).pluck(:fingerprint).to_set
   end
 end

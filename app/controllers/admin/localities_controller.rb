@@ -20,14 +20,16 @@ module Admin
 
     def merge
       locality = Locality.find(params[:id])
-      locality.merge_into!(Locality.find(params.expect(locality: [:canonical_locality_id])[:canonical_locality_id]))
+      target = Locality.find(params.expect(locality: [:canonical_locality_id])[:canonical_locality_id])
+      ActionLog.track("locality.merge", locality, target: target.name) { locality.merge_into!(target) }
       redirect_to return_to
     rescue ArgumentError
       redirect_to edit_admin_locality_path(locality)
     end
 
     def unmerge
-      Locality.find(params[:id]).unmerge!
+      locality = Locality.find(params[:id])
+      ActionLog.track("locality.unmerge", locality) { locality.unmerge! }
       redirect_to return_to
     end
 

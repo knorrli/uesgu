@@ -13,6 +13,7 @@ module Admin
       )
 
       if @invitation.save
+        ActionLog.record!("invitation.create", @invitation, label: @invitation.formatted_code)
         redirect_to admin_invitations_path, notice: t("admin.invitations.created", code: @invitation.formatted_code)
       else
         load_invitations
@@ -26,7 +27,7 @@ module Admin
       if invitation.redeemed?
         redirect_to admin_invitations_path, alert: t("admin.invitations.cant_revoke_redeemed"), status: :see_other
       else
-        invitation.destroy
+        ActionLog.track("invitation.revoke", invitation, label: invitation.formatted_code) { invitation.destroy! }
         redirect_to admin_invitations_path, notice: t("admin.invitations.revoked"), status: :see_other
       end
     end

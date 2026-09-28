@@ -11,7 +11,8 @@ module Admin
 
     def toggle_contributor
       @user = User.find(params[:id])
-      @user.update!(contributor: !@user.contributor?)
+      action = @user.contributor? ? "user.revoke_capture" : "user.grant_capture"
+      ActionLog.track(action, @user) { @user.update!(contributor: !@user.contributor?) }
 
       notice = @user.contributor? ? "admin.users.contributor_granted" : "admin.users.contributor_revoked"
       redirect_to admin_user_path(@user), notice: t(notice, username: @user.username), status: :see_other
@@ -24,7 +25,7 @@ module Admin
         redirect_to admin_users_path, alert: t("admin.users.cant_delete_self"), status: :see_other
       else
         username = @user.username
-        @user.destroy
+        ActionLog.track("user.delete", @user) { @user.destroy! }
         redirect_to admin_users_path, notice: t("admin.users.deleted", username: username), status: :see_other
       end
     end

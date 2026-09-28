@@ -15,6 +15,7 @@ module Admin
     def create
       @rule = DiscardRule.new(rule_params)
       if @rule.save
+        ActionLog.record!("discard_rule.create", @rule, label: @rule.pattern)
         DiscardRule.reapply_all!
         redirect_to admin_discard_rules_path, notice: t(".created")
       else
@@ -25,6 +26,7 @@ module Admin
     def update
       @rule = DiscardRule.find(params.expect(:id))
       if @rule.update(rule_params)
+        ActionLog.record!("discard_rule.edit", @rule, label: @rule.pattern)
         DiscardRule.reapply_all!
         redirect_to admin_discard_rules_path, notice: t(".updated")
       else
@@ -33,7 +35,8 @@ module Admin
     end
 
     def destroy
-      DiscardRule.find(params.expect(:id)).destroy
+      rule = DiscardRule.find(params.expect(:id))
+      ActionLog.track("discard_rule.delete", rule, label: rule.pattern) { rule.destroy! }
       DiscardRule.reapply_all!
       redirect_to admin_discard_rules_path, notice: t(".deleted"), status: :see_other
     end

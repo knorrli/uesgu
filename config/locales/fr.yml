@@ -455,6 +455,7 @@ fr:
     unknown: inconnu
     action_logs:
       deleted_account: un compte supprimé
+      all_scrapers: tous les scrapers
       index:
         title: Journal
         intro: Tout ce qui a été fait dans l'admin, le plus récent d'abord. Une action peut être annulée tant que rien n'a changé depuis sur le même élément.
@@ -473,6 +474,31 @@ fr:
         event_merge_html: "a fusionné %{subject} comme doublon de %{target}"
         event_unmerge_html: "a de nouveau séparé %{subject} en événement à part"
         undo_html: "a annulé la modification de %{actor} sur %{subject}"
+        genre_place_html: "a placé %{subject} sous %{target}"
+        genre_make_root_html: "a fait de %{subject} un genre principal"
+        genre_rename_html: "a renommé %{from} en %{subject}"
+        genre_ignore_html: "a ignoré %{subject}"
+        genre_hide_html: "a masqué %{subject}"
+        genre_block_html: "a bloqué %{subject}"
+        genre_restore_html: "a remis %{subject} dans la file de curation"
+        genre_merge_html: "a fusionné %{subject} avec %{target}"
+        place_edit_html: "a modifié la salle %{subject}"
+        place_rename_html: "a renommé la salle %{from} en %{subject}"
+        place_merge_html: "a fusionné la salle %{subject} avec %{target}"
+        place_unmerge_html: "a de nouveau séparé la salle %{subject}"
+        locality_merge_html: "a fusionné la localité %{subject} avec %{target}"
+        locality_unmerge_html: "a de nouveau séparé la localité %{subject}"
+        invitation_create_html: "a créé l'invitation %{subject}"
+        invitation_revoke_html: "a révoqué l'invitation %{subject}"
+        user_grant_capture_html: "a permis à %{subject} de saisir des événements"
+        user_revoke_capture_html: "a retiré à %{subject} le droit de saisir des événements"
+        user_delete_html: "a supprimé le compte %{subject}"
+        scrape_run_html: "a lancé un passage des scrapers (%{subject})"
+        scrape_snooze_html: "a mis en pause le scraper %{subject}"
+        scrape_wake_html: "a réactivé le scraper %{subject}"
+        discard_rule_create_html: "a ajouté la règle de filtrage %{subject}"
+        discard_rule_edit_html: "a modifié la règle de filtrage %{subject}"
+        discard_rule_delete_html: "a supprimé la règle de filtrage %{subject}"
     scrape_runs:
       status:
         ok: ok

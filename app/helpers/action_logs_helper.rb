@@ -10,9 +10,15 @@ module ActionLogsHelper
     t("admin.action_logs.sentences.#{entry.action.tr('.', '_')}_html", subject: subject, **entry.details.symbolize_keys)
   end
 
-  def action_log_subject(entry)
-    return entry.subject_label unless entry.subject.is_a?(Event)
+  ACTION_LOG_SUBJECT_PATHS = {
+    "Event" => :admin_event_path, "Genre" => :edit_genre_path, "Place" => :edit_admin_place_path,
+    "Locality" => :edit_admin_locality_path, "User" => :admin_user_path, "ScrapeRun" => :admin_scrape_run_path
+  }.freeze
 
-    link_to entry.subject_label, admin_event_path(entry.subject)
+  def action_log_subject(entry)
+    path = ACTION_LOG_SUBJECT_PATHS[entry.subject_type]
+    return entry.subject_label unless path && entry.subject
+
+    link_to entry.subject_label, public_send(path, entry.subject)
   end
 end

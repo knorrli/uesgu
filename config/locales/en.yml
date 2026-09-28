@@ -455,6 +455,7 @@ en:
     unknown: unknown
     action_logs:
       deleted_account: a deleted account
+      all_scrapers: all scrapers
       index:
         title: Log
         intro: Everything done in the admin, newest first. An action can be undone while nothing has changed its record since.
@@ -473,6 +474,31 @@ en:
         event_merge_html: "merged %{subject} into %{target} as a duplicate"
         event_unmerge_html: "split %{subject} back out as its own event"
         undo_html: "undid %{actor}'s change to %{subject}"
+        genre_place_html: "placed %{subject} under %{target}"
+        genre_make_root_html: "made %{subject} a top-level genre"
+        genre_rename_html: "renamed %{from} to %{subject}"
+        genre_ignore_html: "ignored %{subject}"
+        genre_hide_html: "hid %{subject}"
+        genre_block_html: "blocked %{subject}"
+        genre_restore_html: "put %{subject} back in the assignment queue"
+        genre_merge_html: "merged %{subject} into %{target}"
+        place_edit_html: "edited the venue %{subject}"
+        place_rename_html: "renamed the venue %{from} to %{subject}"
+        place_merge_html: "merged the venue %{subject} into %{target}"
+        place_unmerge_html: "split the venue %{subject} back out"
+        locality_merge_html: "merged the locality %{subject} into %{target}"
+        locality_unmerge_html: "split the locality %{subject} back out"
+        invitation_create_html: "created the invitation %{subject}"
+        invitation_revoke_html: "revoked the invitation %{subject}"
+        user_grant_capture_html: "let %{subject} capture events"
+        user_revoke_capture_html: "stopped %{subject} from capturing events"
+        user_delete_html: "deleted the account %{subject}"
+        scrape_run_html: "started a scrape run (%{subject})"
+        scrape_snooze_html: "snoozed the scraper %{subject}"
+        scrape_wake_html: "woke the scraper %{subject}"
+        discard_rule_create_html: "added the discard rule %{subject}"
+        discard_rule_edit_html: "edited the discard rule %{subject}"
+        discard_rule_delete_html: "deleted the discard rule %{subject}"
     scrape_runs:
       status:
         ok: ok

@@ -25,22 +25,32 @@ module Admin
       @place = Place.find(params[:id])
       @count = usage_count(@place)
       attrs = params.expect(place: %i[name url])
+      previous = @place.name
       @place.url = attrs[:url].presence if attrs.key?(:url)
-      return redirect_to edit_admin_place_path(@place) if @place.rename!(attrs[:name])
+      if @place.rename!(attrs[:name])
+        if previous == @place.name
+          ActionLog.record!("place.edit", @place)
+        else
+          ActionLog.record!("place.rename", @place, from: previous)
+        end
+        return redirect_to edit_admin_place_path(@place)
+      end
 
       render :edit, status: :unprocessable_entity
     end
 
     def merge
       place = Place.find(params[:id])
-      place.merge_into!(Place.find(params.expect(place: [:canonical_place_id])[:canonical_place_id]))
+      target = Place.find(params.expect(place: [:canonical_place_id])[:canonical_place_id])
+      ActionLog.track("place.merge", place, target: target.name) { place.merge_into!(target) }
       redirect_to return_to
     rescue ArgumentError
       redirect_to edit_admin_place_path(place)
     end
 
     def unmerge
-      Place.find(params[:id]).unmerge!
+      place = Place.find(params[:id])
+      ActionLog.track("place.unmerge", place) { place.unmerge! }
       redirect_to return_to
     end
 

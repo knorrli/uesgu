@@ -45,7 +45,10 @@ class GenresController < ApplicationController
   end
 
   def set_parent
-    Genre.find(params[:id]).set_parent!(genre_params[:parent_genre_id])
+    genre = Genre.find(params[:id])
+    parent = Genre.find_by(id: genre_params[:parent_genre_id].presence)
+    action, details = parent ? ["genre.place", { target: parent.name }] : ["genre.make_root", {}]
+    ActionLog.track(action, genre, **details) { genre.set_parent!(genre_params[:parent_genre_id]) }
     redirect_to return_to
   rescue ArgumentError => e
     redirect_to return_to, alert: e.message
@@ -53,7 +56,11 @@ class GenresController < ApplicationController
 
   def rename
     genre = Genre.find(params[:id])
-    return redirect_to return_to if genre.rename!(genre_params[:name])
+    previous = genre.name
+    if genre.rename!(genre_params[:name])
+      ActionLog.record!("genre.rename", genre, from: previous)
+      return redirect_to return_to
+    end
 
     redirect_to return_to, alert: genre.errors.full_messages.to_sentence
   end
@@ -63,28 +70,33 @@ class GenresController < ApplicationController
   end
 
   def ignore
-    Genre.find(params[:id]).ignore!
+    genre = Genre.find(params[:id])
+    ActionLog.track("genre.ignore", genre) { genre.ignore! }
     redirect_to return_to
   end
 
   def hide
-    Genre.find(params[:id]).hide!
+    genre = Genre.find(params[:id])
+    ActionLog.track("genre.hide", genre) { genre.hide! }
     redirect_to return_to
   end
 
   def block
-    Genre.find(params[:id]).block!
+    genre = Genre.find(params[:id])
+    ActionLog.track("genre.block", genre) { genre.block! }
     redirect_to return_to
   end
 
   def restore
-    Genre.find(params[:id]).restore!
+    genre = Genre.find(params[:id])
+    ActionLog.track("genre.restore", genre) { genre.restore! }
     redirect_to return_to
   end
 
   def merge
     canonical = Genre.find(genre_params[:canonical_genre_id])
-    Genre.find(params[:id]).merge_into!(canonical)
+    genre = Genre.find(params[:id])
+    ActionLog.track("genre.merge", genre, target: canonical.name) { genre.merge_into!(canonical) }
     redirect_to return_to
   end
 

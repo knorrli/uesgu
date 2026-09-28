@@ -17,6 +17,15 @@ class EventsDayPagingTest < ActionDispatch::IntegrationTest
     assert_select ".date__label", count: 1
   end
 
+  test "the date header abbreviates the weekday" do
+    sign_in_as user(locale: "de")
+    event(title: "WednesdayShow", start_date: Date.new(2030, 1, 2))
+
+    get events_path(day: "2030-01-02")
+
+    assert_select ".date__label", text: "Mi, 02.01.2030"
+  end
+
   test "the arrows step over empty days and stop at the ends" do
     get events_path
 

@@ -161,6 +161,16 @@ class Scrapers::DescriptionMiningTest < Minitest::Test
     refute_includes text, "Barrierefreier"
   end
 
+  def test_petzi_mines_the_text_block_one_line_per_break
+    page = Mechanize::Page.new(URI("https://www.petzi.ch/en/events/1-fri-son-x/"), { "content-type" => "text/html; charset=utf-8" },
+                               fixture("petzi", "fri_son_detail.html"), "200", Mechanize.new)
+    lines = Scrapers::Petzi.new.event_genre_prose(page).lines.map(&:strip)
+
+    assert_includes lines, "Reggae, Roots, Dub, Steppa"
+    refute lines.any? { |line| line.include?("Organized by") }
+    refute lines.any? { |line| line.include?("Search events") }
+  end
+
   private
 
   def prose_from_event_page(scraper_class, slug, row_selector)

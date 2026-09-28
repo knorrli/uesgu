@@ -507,6 +507,14 @@
 
 .range-cal__day.is-other-month { color: var(--theme-fg-muted); opacity: 0.5; }
 
+.range-cal__day:disabled {
+  color: var(--theme-fg-muted);
+  opacity: 0.35;
+  cursor: default;
+}
+
+.range-cal__day:disabled:hover { background: none; }
+
 .range-cal__day.is-today { background: var(--theme-bg-emphasis); }
 
 .range-cal__day.is-in-range {

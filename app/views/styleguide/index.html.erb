@@ -26,6 +26,7 @@
     <a href="#nav">Navigation</a>
     <a href="#catalogue-controls">Catalogue controls</a>
     <a href="#pagination">Pagination</a>
+    <a href="#day-nav">Day navigation</a>
     <a href="#page-header">Page header</a>
     <a href="#text-pages">Text pages</a>
     <a href="#review-card">Review card</a>
@@ -666,7 +667,7 @@
 
   <section class="sg-section" id="pagination">
     <h2>Pagination</h2>
-    <p class="sg-section__intro">Every long list closes with the same quiet pager: prev/next plus a <code>Seite X / Y</code> readout, <b>never</b> a number grid, so it stays one calm line at any width. Built from <code>shared/_pagination</code>; pass the Kaminari <code>collection</code>. It renders nothing for a single page, and the end you cannot move past shows as muted, inert text so the readout never shifts as you page.</p>
+    <p class="sg-section__intro">Every long list except the events feed closes with the same quiet pager: prev/next plus a <code>Seite X / Y</code> readout, <b>never</b> a number grid, so it stays one calm line at any width. Built from <code>shared/_pagination</code>; pass the Kaminari <code>collection</code>. It renders nothing for a single page, and the end you cannot move past shows as muted, inert text so the readout never shifts as you page.</p>
 
     <div class="sg-row">
       <div class="sg-specimen">
@@ -675,6 +676,26 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Pager</span> · <code>render 'shared/pagination', collection: @events</code>
         <p class="sg-purpose">Use it everywhere a <code>.page(params[:page])</code> collection is listed, so the pager reads identically across admin and app.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sg-section" id="day-nav">
+    <h2>Day navigation</h2>
+    <p class="sg-section__intro">The events feed pages by day, not by count, so a day is never split across two pages. The date header carries the pager: previous day, a calendar, next day. Built from <code>shared/_day_nav</code>. The arrows skip days without events, and the end you cannot move past stays in place, muted and inert, so the calendar never shifts.</p>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <header class="flex date">
+          <h2 class="date__label"><%= l Date.current, format: :detailed %></h2>
+          <%= render "shared/day_nav", day: Date.current, days: [Date.current, Date.current + 3],
+                     previous_path: nil, next_path: events_path(day: (Date.current + 3).iso8601),
+                     calendar_url: events_path %>
+        </header>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Day pager</span> &middot; <code>render "shared/day_nav", day:, days:, previous_path:, next_path:, calendar_url:</code>
+        <p class="sg-purpose">A <code>nil</code> path disables that arrow. <code>days</code> are the only dates the calendar lets you pick; picking one visits <code>calendar_url</code> with <code>?day=</code> set, so any filter in that URL carries over. The calendar is the When sheet&rsquo;s own month grid (<code>shared/_month_calendar</code>) in its single-day mode, opened as a popover.</p>
       </div>
     </div>
   </section>

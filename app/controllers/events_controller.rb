@@ -16,9 +16,11 @@ class EventsController < ApplicationController
     @saved_filters = current_user.saved_filters.order(:created_at) if current_user
     @q = Event.visible.ransack(@filter.ransack_query)
 
-    events = @q.result(distinct: true).order(start_date: :asc)
-    @has_results = events.exists?
-    @events = events.includes(:locations, :genres).page(params[:page])
+    events = @q.result(distinct: true)
+    @days = EventDays.new(events)
+    return if redirect_to_canonical_day
+
+    @events = events.where(start_date: @day).includes(:locations, :genres)
   end
 
   def destroy
@@ -54,6 +56,22 @@ class EventsController < ApplicationController
       return true
     end
     false
+  end
+
+  def redirect_to_canonical_day
+    @day = params[:day].present? ? @days.resolve(requested_day) : @days.default
+    canonical = request.query_parameters.except("page", "day")
+    canonical["day"] = @day.iso8601 if params[:day].present? && @day
+    return false if canonical == request.query_parameters
+
+    redirect_to events_path(canonical.symbolize_keys)
+    true
+  end
+
+  def requested_day
+    Date.iso8601(params[:day].to_s)
+  rescue Date::Error
+    nil
   end
 
   def explicit_filter_request?

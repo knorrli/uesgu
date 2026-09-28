@@ -1,0 +1,34 @@
+<% mode = local_assigns.fetch(:mode, "range") %>
+<%= tag.div class: "range-cal", data: {
+      controller: "range-calendar",
+      action: local_assigns[:action],
+      range_calendar_mode_value: mode,
+      range_calendar_today_value: Date.current.iso8601,
+      range_calendar_start_value: local_assigns[:start],
+      range_calendar_end_value: local_assigns[:end],
+      range_calendar_enabled_value: local_assigns[:enabled]&.map(&:iso8601),
+      range_calendar_url_value: local_assigns[:url],
+      range_calendar_month_names_value: t("date.month_names")
+    } do %>
+  <div class="range-cal__head">
+    <button type="button" class="range-cal__nav ph ph-caret-left"
+            data-action="range-calendar#prevMonth"
+            aria-label="<%= t('events.filter.prev_month') %>"></button>
+    <span class="range-cal__month" data-range-calendar-target="label" aria-live="polite"></span>
+    <button type="button" class="range-cal__nav ph ph-caret-right"
+            data-action="range-calendar#nextMonth"
+            aria-label="<%= t('events.filter.next_month') %>"></button>
+  </div>
+  <div class="range-cal__weekdays" aria-hidden="true">
+    <% 7.times do |i| %>
+      <span class="range-cal__weekday"><%= t('date.abbr_day_names')[(i + 1) % 7] %></span>
+    <% end %>
+  </div>
+  <div class="range-cal__grid" role="grid"
+       data-range-calendar-target="grid"
+       data-action="keydown->range-calendar#navigate"></div>
+  <% if mode == "range" %>
+    <div class="range-cal__summary" data-range-calendar-target="summary" aria-live="polite"></div>
+  <% end %>
+  <%= yield %>
+<% end %>

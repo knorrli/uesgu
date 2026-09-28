@@ -980,6 +980,11 @@ de:
   shared:
     cancel: Abbrechen
     cite: "„%{quote}“"
+    day_nav:
+      label: Tage
+      previous: Vorheriger Tag
+      next: Nächster Tag
+      calendar: Tag wählen
     time_field:
       clear: Zeit löschen
   helpers:

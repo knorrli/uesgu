@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
 
 export default class extends Controller {
   static targets = ["value", "grid", "label", "summary"]
@@ -7,6 +8,9 @@ export default class extends Controller {
     start: String,      // pre-applied range start ISO (or "")
     end: String,        // pre-applied range end ISO (or "")
     monthNames: Array,  // I18n date.month_names: [null, "Januar", … "Dezember"]
+    mode: { type: String, default: "range" },
+    enabled: Array,
+    url: String,
   }
 
   connect() {
@@ -24,6 +28,8 @@ export default class extends Controller {
 
   pick(event) {
     const iso = event.currentTarget.dataset.date
+    if (this.#dayMode) return this.#visit(iso)
+
     if (!this.start || this.end) {
       this.start = iso
       this.end = null
@@ -39,7 +45,7 @@ export default class extends Controller {
   }
 
   preview(event) {
-    if (!this.start || this.end) return
+    if (this.#dayMode || !this.start || this.end) return
     this.hover = event.currentTarget.dataset.date
     this.#paint()
   }
@@ -57,8 +63,8 @@ export default class extends Controller {
     if (!iso) return
     event.preventDefault()
 
-    const [y, m, d] = iso.split("-").map(Number)
-    const next = new Date(y, m - 1, d + step)
+    const next = this.#step(iso, step)
+    if (!next) return
     if (next.getFullYear() !== this.viewYear || next.getMonth() + 1 !== this.viewMonth) {
       this.viewYear = next.getFullYear()
       this.viewMonth = next.getMonth() + 1
@@ -74,6 +80,32 @@ export default class extends Controller {
     this.valueTarget.checked = false
     this.valueTarget.value = ""
     this.#paint()
+  }
+
+  get #dayMode() { return this.modeValue === "day" }
+
+  #selectable(iso) { return !this.#dayMode || this.enabledValue.includes(iso) }
+
+  #step(iso, step) {
+    const [y, m, d] = iso.split("-").map(Number)
+    for (let i = 1; ; i++) {
+      const next = new Date(y, m - 1, d + step * i)
+      const nextIso = this.#iso(next)
+      if (this.#selectable(nextIso)) return next
+      if (this.#beyondEnabled(nextIso, step)) return null
+    }
+  }
+
+  #beyondEnabled(iso, step) {
+    const dates = this.enabledValue
+    if (dates.length === 0) return true
+    return step > 0 ? iso > dates[dates.length - 1] : iso < dates[0]
+  }
+
+  #visit(iso) {
+    const url = new URL(this.urlValue, window.location.href)
+    url.searchParams.set("day", iso)
+    Turbo.visit(url.toString())
   }
 
   #shiftMonth(delta) {
@@ -109,6 +141,7 @@ export default class extends Controller {
       const label = `${date.getDate()}. ${this.monthNamesValue[date.getMonth() + 1]} ${date.getFullYear()}`
       cells.push(
         `<button type="button" role="gridcell" data-date="${iso}" aria-label="${label}"` +
+          `${this.#selectable(iso) ? "" : " disabled"}` +
           ` class="range-cal__day${otherMonth ? " is-other-month" : ""}${iso === this.todayValue ? " is-today" : ""}"` +
           ` data-action="click->range-calendar#pick mouseenter->range-calendar#preview mouseleave->range-calendar#clearPreview">` +
           `${date.getDate()}</button>`
@@ -142,6 +175,7 @@ export default class extends Controller {
   }
 
   #renderSummary() {
+    if (!this.hasSummaryTarget) return
     const fmt = (iso) => { const [y, m, d] = iso.split("-"); return `${d}.${m}.${y}` }
     if (!this.start) {
       this.summaryTarget.textContent = ""

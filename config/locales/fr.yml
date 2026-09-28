@@ -980,6 +980,11 @@ fr:
   shared:
     cancel: Annuler
     cite: "« %{quote} »"
+    day_nav:
+      label: Jours
+      previous: Jour précédent
+      next: Jour suivant
+      calendar: Choisis un jour
     time_field:
       clear: Effacer l'heure
   helpers:

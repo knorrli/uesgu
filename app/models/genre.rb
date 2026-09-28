@@ -170,7 +170,7 @@ class Genre < ApplicationRecord
   def self.names_in_prose(text, index)
     return [] if text.blank? || index.empty?
 
-    words = text.to_s.split
+    words = text.to_s.scan(/[^[:space:]]+/)
     found = []
     i = 0
     while i < words.size
@@ -179,7 +179,8 @@ class Genre < ApplicationRecord
       3.downto(1) do |n|
         next if i + n > words.size
 
-        if (hit = index[fingerprint_for(words[i, n].join(" "))])
+        hit = index[fingerprint_for(words[i, n].join(" "))]
+        if hit && (n == 1 || multi_word_name?(hit))
           name = hit
           span = n
           break
@@ -190,6 +191,11 @@ class Genre < ApplicationRecord
     end
     found.uniq
   end
+
+  def self.multi_word_name?(name)
+    name.match?(/[^[:alnum:]]/)
+  end
+  private_class_method :multi_word_name?
 
   def self.canonicalize_names(names)
     names = Array(names).map(&:to_s)

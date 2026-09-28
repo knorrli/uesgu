@@ -27,6 +27,7 @@ class SavedFiltersController < ApplicationController
   end
 
   def edit
+    @rule.filter_attributes = filter_params if filter_params.any?
     @filter = filter_for(@rule)
     @duplicate_of = duplicate_of(@rule)
   end
@@ -36,6 +37,7 @@ class SavedFiltersController < ApplicationController
     @rule.filter_attributes = filter_params
 
     if @rule.save
+      forget_applied(@rule)
       redirect_to saved_filters_path, notice: t("saved_filters.saved")
     else
       @filter = filter_for(@rule)
@@ -82,6 +84,10 @@ class SavedFiltersController < ApplicationController
   def filter_for(rule)
     Filter.build(queries: rule.queries, genres: rule.genres,
                  location_list: rule.location_list, date_ranges: rule.date_ranges)
+  end
+
+  def forget_applied(rule)
+    Current.session.update!(applied_saved_filter: nil) if Current.session.applied_saved_filter_id == rule.id
   end
 
   def duplicate_of(rule)

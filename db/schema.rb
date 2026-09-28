@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -278,11 +278,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_200000) do
   end
 
   create_table "sessions", force: :cascade do |t|
+    t.bigint "applied_saved_filter_id"
     t.datetime "created_at", null: false
     t.string "ip_address"
     t.datetime "updated_at", null: false
     t.string "user_agent"
     t.bigint "user_id", null: false
+    t.index ["applied_saved_filter_id"], name: "index_sessions_on_applied_saved_filter_id"
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -369,6 +371,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_200000) do
   add_foreign_key "push_subscriptions", "users"
   add_foreign_key "saved_filters", "users"
   add_foreign_key "scrape_results", "scrape_runs", on_delete: :cascade
+  add_foreign_key "sessions", "saved_filters", column: "applied_saved_filter_id", on_delete: :nullify
   add_foreign_key "sessions", "users"
   add_foreign_key "taggings", "tags"
 end

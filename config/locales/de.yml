@@ -455,6 +455,7 @@ de:
     unknown: unbekannt
     action_logs:
       deleted_account: ein gelöschtes Konto
+      all_scrapers: alle Scraper
       index:
         title: Protokoll
         intro: Alles, was im Admin gemacht wurde, das Neueste zuerst. Eine Aktion lässt sich rückgängig machen, solange seither nichts mehr am selben Eintrag geändert wurde.
@@ -473,6 +474,31 @@ de:
         event_merge_html: "hat %{subject} als Duplikat mit %{target} zusammengelegt"
         event_unmerge_html: "hat %{subject} wieder als eigenes Event abgetrennt"
         undo_html: "hat die Änderung von %{actor} an %{subject} rückgängig gemacht"
+        genre_place_html: "hat %{subject} unter %{target} eingeordnet"
+        genre_make_root_html: "hat %{subject} zu einem Hauptgenre gemacht"
+        genre_rename_html: "hat %{from} in %{subject} umbenannt"
+        genre_ignore_html: "hat %{subject} ignoriert"
+        genre_hide_html: "hat %{subject} verborgen"
+        genre_block_html: "hat %{subject} blockiert"
+        genre_restore_html: "hat %{subject} zurück in die Queue gelegt"
+        genre_merge_html: "hat %{subject} mit %{target} zusammengeführt"
+        place_edit_html: "hat das Lokal %{subject} bearbeitet"
+        place_rename_html: "hat das Lokal %{from} in %{subject} umbenannt"
+        place_merge_html: "hat das Lokal %{subject} mit %{target} zusammengelegt"
+        place_unmerge_html: "hat das Lokal %{subject} wieder abgetrennt"
+        locality_merge_html: "hat den Ort %{subject} mit %{target} zusammengelegt"
+        locality_unmerge_html: "hat den Ort %{subject} wieder abgetrennt"
+        invitation_create_html: "hat die Einladung %{subject} erstellt"
+        invitation_revoke_html: "hat die Einladung %{subject} widerrufen"
+        user_grant_capture_html: "hat %{subject} das Erfassen erlaubt"
+        user_revoke_capture_html: "hat %{subject} das Erfassen entzogen"
+        user_delete_html: "hat das Konto %{subject} gelöscht"
+        scrape_run_html: "hat einen Scrape-Lauf gestartet (%{subject})"
+        scrape_snooze_html: "hat den Scraper %{subject} pausiert"
+        scrape_wake_html: "hat den Scraper %{subject} wieder aktiviert"
+        discard_rule_create_html: "hat die Filterregel %{subject} angelegt"
+        discard_rule_edit_html: "hat die Filterregel %{subject} bearbeitet"
+        discard_rule_delete_html: "hat die Filterregel %{subject} gelöscht"
     scrape_runs:
       status:
         ok: ok

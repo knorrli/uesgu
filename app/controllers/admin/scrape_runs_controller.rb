@@ -22,19 +22,21 @@ module Admin
         return redirect_to admin_scrape_runs_path, alert: t(".unknown_scraper"), status: :see_other
       end
 
-      Scrapers::Sweep.enqueue(ScrapeRun.create!(started_at: Time.current), scrapers: scrapers)
+      run = ScrapeRun.create!(started_at: Time.current)
+      ActionLog.record!("scrape.run", run, label: params[:scraper].presence || t("admin.action_logs.all_scrapers"))
+      Scrapers::Sweep.enqueue(run, scrapers: scrapers)
       redirect_to admin_scrape_runs_path, notice: trigger_notice(scrapers), status: :see_other
     end
 
     def snooze
       slug = known_scraper_slug or return refuse_unknown_scraper
-      ScraperSnooze.snooze!(slug)
+      ActionLog.track("scrape.snooze", nil, label: slug) { ScraperSnooze.snooze!(slug) }
       redirect_to admin_scrape_runs_path, notice: t(".snoozed", scraper: slug), status: :see_other
     end
 
     def wake
       slug = known_scraper_slug or return refuse_unknown_scraper
-      ScraperSnooze.wake!(slug)
+      ActionLog.track("scrape.wake", nil, label: slug) { ScraperSnooze.wake!(slug) }
       redirect_to admin_scrape_runs_path, notice: t(".woke", scraper: slug), status: :see_other
     end
 

@@ -93,4 +93,55 @@ class AdminActionLogsTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
     assert_predicate show.reload, :dismissed?
   end
+
+  test "every other admin action is logged, readable in every language, and has no undo" do
+    admin = user(admin: true, username: "zorpadmin")
+    sign_in_as admin
+    wave = genre(name: "zorpwave")
+    core = genre(name: "zorpcore")
+    stray = genre(name: "zorpstray")
+    saal = place(name: "Zorpsaal", locality: "Zorpwil", canton: "BE")
+    keller = place(name: "Zorpkeller", locality: "Zorpwil", canton: "BE")
+    zorpheim = Locality.create!(name: "Zorpheim")
+    zorpville = Locality.create!(name: "Zorpville")
+    member = user(username: "zorpmember")
+
+    post set_parent_genre_path(wave), params: { genre: { parent_genre_id: core.id } }
+    post set_parent_genre_path(wave), params: { genre: { parent_genre_id: "" } }
+    post rename_genre_path(wave), params: { genre: { name: "zorpwaves" } }
+    %i[ignore_genre_path hide_genre_path block_genre_path restore_genre_path].each { |path| post public_send(path, wave) }
+    post merge_genre_path(stray), params: { genre: { canonical_genre_id: core.id } }
+    patch admin_place_path(saal), params: { place: { name: "Zorpsaal Neu", url: "" } }
+    patch admin_place_path(saal), params: { place: { name: "Zorpsaal Neu", url: "https://zorpsaal.example" } }
+    post merge_admin_place_path(keller), params: { place: { canonical_place_id: saal.id } }
+    post unmerge_admin_place_path(keller)
+    post merge_admin_locality_path(zorpville), params: { locality: { canonical_locality_id: zorpheim.id } }
+    post unmerge_admin_locality_path(zorpville)
+    post admin_invitations_path, params: { invitation: { note: "for zorp" } }
+    delete admin_invitation_path(Invitation.last)
+    2.times { patch toggle_contributor_admin_user_path(member) }
+    delete admin_user_path(member)
+    Scrapers::Sweep.stub(:enqueue, ->(*, **) { }) { post admin_scrape_runs_path, params: { scraper: "bad_bonn" } }
+    post snooze_admin_scrape_runs_path, params: { scraper: "bad_bonn" }
+    post wake_admin_scrape_runs_path, params: { scraper: "bad_bonn" }
+    post admin_discard_rules_path, params: { discard_rule: { pattern: "zorpquiz" } }
+    patch admin_discard_rule_path(DiscardRule.last), params: { discard_rule: { pattern: "zorpquizz" } }
+    delete admin_discard_rule_path(DiscardRule.last)
+
+    entries = ActionLog.order(:id)
+    assert_equal %w[genre.place genre.make_root genre.rename genre.ignore genre.hide genre.block genre.restore
+                    genre.merge place.rename place.edit place.merge place.unmerge locality.merge locality.unmerge
+                    invitation.create invitation.revoke user.grant_capture user.revoke_capture user.delete
+                    scrape.run scrape.snooze scrape.wake discard_rule.create discard_rule.edit discard_rule.delete],
+                 entries.map(&:action)
+    assert entries.all? { |entry| entry.user == admin }
+    assert entries.none?(&:undoable?)
+
+    %w[en de fr].each do |locale|
+      admin.update!(locale: locale)
+      get admin_action_logs_path
+      assert_response :success
+      assert_select "form[action*=undo]", count: 0
+    end
+  end
 end

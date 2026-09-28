@@ -932,6 +932,7 @@ de:
     formats:
       default: "%d.%m.%Y"
       detailed: "%A, %d.%m.%Y"
+      weekday_short: "%a, %d.%m.%Y"
   datepicker:
     next_month: Nächsten Monat
     next_week: Nächste Woche

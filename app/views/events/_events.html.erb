@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-medium date-events <%= class_names(past: @day < Date.current) %>"
        data-controller="day-summary" data-action="save:toggled->day-summary#adjustSaved">
     <header class="flex date">
-      <h2 id="<%= @day.iso8601 %>" class="date__label"><%= l @day, format: :detailed %></h2>
+      <h2 id="<%= @day.iso8601 %>" class="date__label"><%= l @day, format: :weekday_short %></h2>
       <%= render 'day_summary', events: events %>
       <%= render 'shared/day_nav', day: @day, days: @days.dates,
                  previous_path: @days.before(@day)&.then { |day| feed_day_path(day) },

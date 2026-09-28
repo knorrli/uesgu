@@ -28,6 +28,7 @@ class Event < ApplicationRecord
   scope :discarded, -> { kept.where.not(discarded_by_rule_id: nil) }
   scope :cancelled, -> { where.not(cancelled_at: nil) }
   scope :rescheduled, -> { where.not(rescheduled_at: nil) }
+  scope :captured, -> { where(data_source: EventCapture::Creator::DATA_SOURCE) }
 
   scope :kept, -> { where(dismissed_at: nil) }
   scope :dismissed, -> { where.not(dismissed_at: nil) }

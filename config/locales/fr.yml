@@ -587,10 +587,12 @@ fr:
         status_discarded: Filtrés
         status_duplicates: Doublons
         status_dismissed: Retirés
+        status_community: Communauté
         search: Rechercher des événements…
         sort_date: date
         sort_title: titre
         cancelled_badge: annulé
+        community_badge: communauté
         hidden_badge: masqué
         discarded_badge: "filtré : %{pattern}"
         empty: Aucun événement correspondant.

@@ -587,10 +587,12 @@ en:
         status_discarded: Discarded
         status_duplicates: Duplicates
         status_dismissed: Dismissed
+        status_community: Community
         search: Search events…
         sort_date: date
         sort_title: title
         cancelled_badge: cancelled
+        community_badge: community
         hidden_badge: hidden
         discarded_badge: "discarded: %{pattern}"
         empty: No events match.

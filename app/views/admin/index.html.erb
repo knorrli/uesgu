@@ -10,6 +10,11 @@
       <span class="stat__leader"></span>
       <dd class="muted"><%= Event.count %></dd>
     </div>
+    <div class="stat">
+      <dt><%= link_to t('admin.action_logs.index.title'), admin_action_logs_path, class: 'stat-link' %></dt>
+      <span class="stat__leader"></span>
+      <dd class="muted"><%= ActionLog.count %></dd>
+    </div>
   </dl>
 
   <section class="flex flex-col gap-small">

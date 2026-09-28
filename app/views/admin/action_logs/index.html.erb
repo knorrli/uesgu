@@ -1,0 +1,33 @@
+<% content_for :title, t('.title') %>
+<div class="flex flex-col gap-large">
+  <%= render layout: "shared/page_header", locals: { back_path: admin_path, back_label: t("admin.back") } do %>
+    <h1><%= t('admin.action_logs.index.title') %></h1>
+  <% end %>
+
+  <p class="muted"><%= t('.intro') %></p>
+
+  <% if @entries.any? %>
+    <div class="event-rows">
+      <% @entries.each do |entry| %>
+        <div class="event-row">
+          <span class="muted event-row__date"><%= l(entry.created_at, format: :short) %></span>
+          <div class="event-row__main">
+            <span><strong><%= action_log_actor(entry) %></strong> <%= action_log_sentence(entry) %></span>
+            <% if entry.reversal %>
+              <div class="event-row__meta"><span><%= t('.undone_by', actor: action_log_actor(entry.reversal)) %></span></div>
+            <% elsif entry.undoable_action? && entry.superseded_by %>
+              <div class="event-row__meta"><span><%= t('.changed_since', actor: action_log_actor(entry.superseded_by)) %></span></div>
+            <% end %>
+          </div>
+          <% if entry.undoable? %>
+            <%= button_to t('.undo'), undo_admin_action_log_path(entry), class: 'button-small' %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%= render 'shared/pagination', collection: @entries %>
+  <% else %>
+    <p class="muted"><%= t('.empty') %></p>
+  <% end %>
+</div>

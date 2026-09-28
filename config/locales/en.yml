@@ -453,6 +453,26 @@ en:
       users: Accounts
       open_invitations: Open invitations
     unknown: unknown
+    action_logs:
+      deleted_account: a deleted account
+      index:
+        title: Log
+        intro: Everything done in the admin, newest first. An action can be undone while nothing has changed its record since.
+        undo: Undo
+        undone_by: "undone by %{actor}"
+        changed_since: "changed since by %{actor}"
+        empty: Nothing logged yet.
+      undo:
+        undone: Undone.
+        stale: "That action can no longer be undone: its record has changed since."
+      sentences:
+        event_edit_html: "edited %{subject}"
+        event_revert_html: "handed a field of %{subject} back to the scraper"
+        event_dismiss_html: "removed %{subject}"
+        event_restore_html: "restored %{subject}"
+        event_merge_html: "merged %{subject} into another event as a duplicate"
+        event_unmerge_html: "split %{subject} back out as its own event"
+        undo_html: "undid %{actor}'s change to %{subject}"
     scrape_runs:
       status:
         ok: ok

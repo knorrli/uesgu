@@ -97,6 +97,10 @@ Rails.application.routes.draw do
 
     resources :venue_leads, only: %i[index]
 
+    resources :action_logs, only: %i[index] do
+      member { post :undo }
+    end
+
     resources :extraction_attempts, only: %i[index]
 
     resources :events, only: %i[index show update destroy] do

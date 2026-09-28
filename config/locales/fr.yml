@@ -453,6 +453,26 @@ fr:
       users: Comptes
       open_invitations: Invitations ouvertes
     unknown: inconnu
+    action_logs:
+      deleted_account: un compte supprimé
+      index:
+        title: Journal
+        intro: Tout ce qui a été fait dans l'admin, le plus récent d'abord. Une action peut être annulée tant que rien n'a changé depuis sur le même élément.
+        undo: Annuler
+        undone_by: "annulé par %{actor}"
+        changed_since: "modifié depuis par %{actor}"
+        empty: Rien dans le journal pour l'instant.
+      undo:
+        undone: Annulé.
+        stale: "Cette action ne peut plus être annulée : l'élément a changé depuis."
+      sentences:
+        event_edit_html: "a modifié %{subject}"
+        event_revert_html: "a rendu un champ de %{subject} au scraper"
+        event_dismiss_html: "a retiré %{subject}"
+        event_restore_html: "a restauré %{subject}"
+        event_merge_html: "a fusionné %{subject} comme doublon d'un autre événement"
+        event_unmerge_html: "a de nouveau séparé %{subject} en événement à part"
+        undo_html: "a annulé la modification de %{actor} sur %{subject}"
     scrape_runs:
       status:
         ok: ok

@@ -40,6 +40,7 @@ module Admin
 
     def update
       @event = Event.find(params.expect(:id))
+      before = @event.undo_snapshot
       attrs = params.expect(event: %i[title description date time genres place locality canton url])
       assign_scalars(@event, attrs)
       assign_source_url(@event, attrs)
@@ -54,8 +55,11 @@ module Admin
 
       locked << "locations" if tags && assign_locations(@event, tags)
       @event.overridden_fields = (@event.overridden_fields + locked).uniq
-      @event.save!
-      @event.recompute_visibility! if locked.include?("genres")
+      Event.transaction do
+        @event.save!
+        @event.recompute_visibility! if locked.include?("genres")
+        ActionLog.record!("event.edit", @event, before: before)
+      end
       redirect_to admin_event_path(@event), notice: t(".saved")
     rescue ActiveRecord::RecordNotUnique
       redirect_to admin_event_path(@event), alert: t(".url_taken")
@@ -64,19 +68,19 @@ module Admin
     def revert
       event = Event.find(params.expect(:id))
       fields = SCHEDULE_FIELDS.include?(params[:field]) ? SCHEDULE_FIELDS : [params[:field]]
-      fields.each { |field| event.release_field!(field) }
+      ActionLog.track("event.revert", event) { fields.each { |field| event.release_field!(field) } }
       redirect_to admin_event_path(event), notice: t(".reverted")
     end
 
     def destroy
       event = Event.find(params.expect(:id))
-      event.dismiss!
+      ActionLog.track("event.dismiss", event) { event.dismiss! }
       redirect_to admin_events_path(status: "dismissed"), notice: t(".dismissed")
     end
 
     def undismiss
       event = Event.find(params.expect(:id))
-      event.undismiss!
+      ActionLog.track("event.restore", event) { event.undismiss! }
       redirect_to admin_event_path(event), notice: t(".restored")
     end
 
@@ -85,7 +89,7 @@ module Admin
       canonical = Event.find_by(id: params[:canonical_id])
       return redirect_to admin_event_path(event), alert: t(".merge_missing") if canonical.nil?
 
-      event.merge_into!(canonical)
+      ActionLog.track("event.merge", event) { event.merge_into!(canonical) }
       redirect_to admin_event_path(canonical), notice: t(".merged")
     rescue ArgumentError => e
       redirect_to admin_event_path(event), alert: e.message
@@ -93,7 +97,7 @@ module Admin
 
     def unmerge
       event = Event.find(params.expect(:id))
-      event.mark_standalone!
+      ActionLog.track("event.unmerge", event) { event.mark_standalone! }
       redirect_to admin_event_path(event), notice: t(".unmerged")
     end
 

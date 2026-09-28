@@ -22,7 +22,7 @@ class EventsController < ApplicationController
   end
 
   def destroy
-    @event.dismiss!
+    ActionLog.track("event.dismiss", @event) { @event.dismiss! }
     redirect_to delete_return_path, status: :see_other
   end
 

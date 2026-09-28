@@ -10,11 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
+
+  create_table "action_logs", force: :cascade do |t|
+    t.string "action", null: false
+    t.string "area", null: false
+    t.jsonb "before", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.bigint "reverts_id"
+    t.bigint "subject_id"
+    t.string "subject_label"
+    t.string "subject_type"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id"
+    t.index ["area"], name: "index_action_logs_on_area"
+    t.index ["reverts_id"], name: "index_action_logs_on_reverts_id"
+    t.index ["subject_type", "subject_id", "id"], name: "index_action_logs_on_subject_type_and_subject_id_and_id"
+    t.index ["user_id"], name: "index_action_logs_on_user_id"
+  end
 
   create_table "discard_rules", force: :cascade do |t|
     t.boolean "active", default: true, null: false
@@ -320,6 +337,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_120000) do
     t.index ["source", "venue", "locality", "canton"], name: "index_venue_leads_on_source_and_place", unique: true
   end
 
+  add_foreign_key "action_logs", "action_logs", column: "reverts_id"
+  add_foreign_key "action_logs", "users", on_delete: :nullify
   add_foreign_key "event_saves", "events"
   add_foreign_key "event_saves", "users"
   add_foreign_key "events", "discard_rules", column: "discarded_by_rule_id", on_delete: :nullify

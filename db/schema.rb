@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -111,6 +111,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_180000) do
     t.datetime "updated_at", null: false
     t.index ["extraction_attempt_id", "candidate_index", "field"], name: "idx_on_extraction_attempt_id_candidate_index_field_3d754946ef", unique: true
     t.index ["field", "outcome"], name: "index_extraction_field_outcomes_on_field_and_outcome"
+  end
+
+  create_table "genre_exclusions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "genre_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["genre_id"], name: "index_genre_exclusions_on_genre_id"
+    t.index ["user_id", "genre_id"], name: "index_genre_exclusions_on_user_id_and_genre_id", unique: true
   end
 
   create_table "genres", force: :cascade do |t|
@@ -347,6 +356,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_180000) do
   add_foreign_key "events", "scrape_runs", column: "created_in_scrape_run_id", on_delete: :nullify
   add_foreign_key "events", "users", column: "captured_by_id", on_delete: :nullify
   add_foreign_key "extraction_field_outcomes", "extraction_attempts", on_delete: :cascade
+  add_foreign_key "genre_exclusions", "genres", on_delete: :cascade
+  add_foreign_key "genre_exclusions", "users", on_delete: :cascade
   add_foreign_key "genres", "genres", column: "canonical_id"
   add_foreign_key "genres", "genres", column: "parent_id"
   add_foreign_key "invitations", "users", column: "created_by_id"

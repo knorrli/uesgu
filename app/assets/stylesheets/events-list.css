@@ -188,12 +188,18 @@
   align-items: stretch;
 }
 
-.event-genre .meta-edit {
+.event-genre form {
+  display: flex;
+}
+
+.event-genre .meta-action {
   display: inline-flex;
   align-items: center;
   padding: 0 5px;
   border: var(--tag-border-width) solid var(--border-color);
   border-left: 0;
+  border-radius: 0;
+  font-size: inherit;
 }
 
 .sep {

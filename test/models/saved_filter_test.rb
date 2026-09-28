@@ -57,6 +57,23 @@ class SavedFilterTest < ActiveSupport::TestCase
     refute_includes matched, past
   end
 
+  test "a notification leaves out the user's excluded genres unless the filter picks them" do
+    u = user
+    hated = genre(name: "notifyhated")
+    liked = genre(name: "notifyliked")
+    mixed = event(created_at: 1.hour.ago, start_date: Date.current + 5, genre_list: [hated.name, liked.name])
+    clean = event(created_at: 1.hour.ago, start_date: Date.current + 5, genre_list: [liked.name])
+    u.genre_exclusions.create!(genre: hated)
+
+    everything = rule(u, filter: {}).tap(&:save!)
+    everything.update_column(:last_fired_at, 2.hours.ago)
+    picked = rule(u, filter: { g: [hated.name] }).tap(&:save!)
+    picked.update_column(:last_fired_at, 2.hours.ago)
+
+    assert_equal [clean], everything.matched_events(Time.current).to_a
+    assert_equal [mixed], picked.matched_events(Time.current).to_a
+  end
+
   test "happening matches by start_date in the window regardless of created_at" do
     u = user
     today_show = event(start_date: Date.current, created_at: 1.hour.ago)

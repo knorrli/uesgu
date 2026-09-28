@@ -103,6 +103,27 @@
     <% end %>
   </section>
 
+  <section class="settings-section" id="excluded-genres">
+    <h2><%= t('settings.excluded_genres_heading') %></h2>
+    <div class="flex flex-col gap-small">
+      <p class="muted"><%= t('settings.excluded_genres_hint') %></p>
+      <% if excluded_genres.any? %>
+        <div class="flex wrap gap-small">
+          <% excluded_genres.each do |genre| %>
+            <%= button_to genre_exclusion_path(genre), method: :delete, class: 'filter-chip',
+                  'aria-label': t('settings.excluded_genres_remove', genre: genre.name) do %>
+              <span class="filter-chip__icon ph ph-eye-slash" aria-hidden="true"></span>
+              <span class="filter-chip__label"><%= genre.name %></span>
+              <span class="filter-chip__remove ph ph-x" aria-hidden="true"></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="muted"><%= t('settings.excluded_genres_none') %></p>
+      <% end %>
+    </div>
+  </section>
+
   <section class="settings-section">
     <h2><%= t('settings.delete_account_heading') %></h2>
     <p class="muted"><%= t('settings.delete_account_hint') %></p>

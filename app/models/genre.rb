@@ -132,8 +132,8 @@ class Genre < ApplicationRecord
     ) SELECT root_id, id FROM subtree
   SQL
 
-  def self.filter_counts
-    Event.listed_taggings_in("genres")
+  def self.filter_counts(events = Event.listed)
+    Event.listed_taggings_in("genres", events)
          .joins("JOIN tags ON tags.id = taggings.tag_id")
          .joins("JOIN genres ON genres.name = tags.name")
          .joins("JOIN (#{SUBTREE_PAIRS}) subtree ON subtree.id = COALESCE(genres.canonical_id, genres.id)")
@@ -144,9 +144,16 @@ class Genre < ApplicationRecord
     picked_names = Array(picked_names).map(&:to_s).reject(&:blank?)
     return [] if picked_names.empty?
 
-    root_ids = where(fingerprint: picked_names.map { |name| fingerprint_for(name) }).ids
+    subtree_names(where(fingerprint: picked_names.map { |name| fingerprint_for(name) }).ids)
+  end
+
+  def self.subtree_names(root_ids)
     subtree = subtree_ids(root_ids)
     (where(id: subtree).pluck(:name) + where(canonical_id: subtree).pluck(:name)).uniq
+  end
+
+  def self.canonical_ids
+    distinct.pluck(Arel.sql("COALESCE(genres.canonical_id, genres.id)"))
   end
 
   PROSE_MINING_STOPWORDS = %w[

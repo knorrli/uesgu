@@ -356,6 +356,10 @@ en:
     calendar_feed_hint_off: Get your saved shows in any calendar app — create a private link to get started.
     calendar_feed_hint_on: Updates on its own; shows drop off a day after they happen.
     calendar_feed_url_label: Calendar link
+    excluded_genres_heading: Excluded genres
+    excluded_genres_hint: You don't see events with any of these genres, not in notifications either. Your watchlist stays as it is.
+    excluded_genres_none: None yet. Exclude a genre with the icon next to it on any event.
+    excluded_genres_remove: Stop excluding %{genre}
     delete_account_heading: Delete account
     delete_account_hint: Wipes your account and all your data for good.
     delete_account: Delete my account
@@ -945,11 +949,16 @@ en:
     delete_event: Delete event
     edit_event: Edit event
     edit_tag: Edit tag
+    exclude_genre: Exclude %{genre}
     offsite_link: Opens on %{source}, not the venue's own site
     venue_link_hint: Opens %{venue}'s own page, not a page for this event
     index:
       empty: No events match your current filters.
       clear_filter: Clear filter
+      excluded_html:
+        one: 1 event left out because of your %{link}.
+        other: "%{count} events left out because of your %{link}."
+      excluded_link: excluded genres
       save_filter: Save this filter
       save_filter_all: Notify me about everything
       save_filter_saved: Saved — edit

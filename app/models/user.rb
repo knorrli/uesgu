@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :event_saves, class_name: "EventSave", dependent: :destroy
   has_many :saved_events, through: :event_saves, source: :event
   has_many :push_subscriptions, dependent: :destroy
+  has_many :genre_exclusions, dependent: :delete_all
   has_many :captured_events, class_name: "Event", foreign_key: :captured_by_id,
                              dependent: :nullify, inverse_of: :captured_by
 

@@ -1,6 +1,8 @@
 require "db_test_helper"
 
 class TagsHelperTest < ActionView::TestCase
+  attr_accessor :current_user
+
   test "tag_icon_glyph maps known contexts and falls back for the rest" do
     assert_equal "ph-magnifying-glass", tag_icon_glyph(context: "query")
     assert_equal "ph-calendar-dots", tag_icon_glyph(context: "date")

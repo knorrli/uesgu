@@ -118,7 +118,7 @@ class SavedFilter < ApplicationRecord
   end
 
   def matched_events(now = Time.current)
-    rel = Event.visible
+    rel = ExcludedGenres.for(user, picked: genres).apply(Event.visible)
     rel = rel.where(created_at: coverage_floor...now) if added?
     rel.ransack(to_filter.ransack_query).result(distinct: true).order(:start_date, :start_time, :title)
   end

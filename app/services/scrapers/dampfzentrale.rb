@@ -38,8 +38,10 @@ module Scrapers
     end
 
     def event_genre_prose(row)
-      get(event_url(row)).css('.element-body[id^="element_"]').map(&:text).join("\n")
+      event_page(row).css('.element-body[id^="element_"]').map(&:text).join("\n")
     end
+
+    def event_media(row) = Media.in(event_page(row))
 
     def event_cancelled?(_event, content)
       content.classes.include?("abgesagt") || content.at_css(".banner.cancelled").present?

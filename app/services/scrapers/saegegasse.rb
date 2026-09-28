@@ -32,7 +32,9 @@ module Scrapers
     end
 
     def event_genre_prose(row)
-      get(event_url(row)).css("#artikeltext .description").map(&:text).join("\n")
+      event_page(row).css("#artikeltext .description").map(&:text).join("\n")
     end
+
+    def event_media(row) = Media.in(event_page(row))
   end
 end

@@ -317,6 +317,14 @@ module Scrapers
 
     def event_media(content) = Media.in(content)
 
+    def event_page(row)
+      return @event_page if @event_page_row.equal?(row)
+
+      @event_page = get(event_url(row))
+      @event_page_row = row
+      @event_page
+    end
+
     def postprocess(_event) = nil
 
     def event_cancelled?(event, _content)

@@ -128,11 +128,11 @@ class SavedFiltersTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_saved_filter_path(existing)
   end
 
-  test "the save control is a single menu item: draft link when unsaved, edit link when saved" do
+  test "the save control is a single menu item: save action when unsaved, edit link when saved" do
     u = sign_in_as user
 
     get events_path(g: ["Rock"])
-    assert_select "a.filter-menu__save[href=?]", new_saved_filter_path(g: ["Rock"])
+    assert_select "a.filter-menu__save[href=?][data-turbo-method=post]", feed_saved_filters_path(g: ["Rock"])
     assert_select "a.filter-menu__save.is-saved", false
 
     r = u.saved_filters.new(name: "x", cadence: "daily", time_of_day: 540)

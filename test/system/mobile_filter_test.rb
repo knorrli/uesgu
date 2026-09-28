@@ -28,11 +28,11 @@ class MobileFilterTest < ApplicationSystemTestCase
     visit events_path
 
     open_what_sheet
-    assert_selector ".sheet[data-field=what] .opt--top", text: rock.name, visible: true
+    assert_selector ".sheet[data-field=what] .loc-group__head", text: rock.name, visible: true
 
     checked = ".sheet[data-field=what] input[value='#{rock.name}']:checked"
     10.times do
-      find(".sheet[data-field=what] .opt--top", text: rock.name).click
+      find(".sheet[data-field=what] .loc-group__head", text: rock.name).find(".loc-group__pick").click
       break if has_selector?(checked, visible: :all, wait: 1)
     end
     assert_selector checked, visible: :all

@@ -446,7 +446,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Checkboxes</span> · <code>input[type=checkbox]</code> &nbsp;/&nbsp; <code>label.tag</code> &nbsp;/&nbsp; <code>.opt__box</code> (sheets)
-        <p class="sg-purpose">Confirm an opt-in. One custom box (left) everywhere; the selectable chip fills accent when checked.</p>
+        <p class="sg-purpose">Confirm an opt-in. One custom box everywhere: left of the label in forms, at the row's right edge in a filter sheet; the selectable chip fills accent when checked.</p>
       </div>
     </div>
 
@@ -461,6 +461,32 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Sheet option rows</span> · <code>.opt</code> &nbsp;/&nbsp; <code>.opt--single</code>
         <p class="sg-purpose">The checkable rows inside a filter sheet (What / Where / When). The box shape is the only signal: square is multi-select, <code>.opt--single</code> rounds it to a radio dot for a sheet that takes exactly one value.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
+        <div style="min-width: 16rem; border: var(--border-width) solid var(--rule-color);" data-controller="filter-sheets">
+          <div class="loc-group" data-filter-sheets-target="group">
+            <%= render "tags/tree_head", name: "BE", title: "Kanton Bern", count: 12, search: "BE Bern Burgdorf",
+                  type: "Kanton", expandable: true, param: "sg-tree", value: "BE", checked: false %>
+            <div class="loc-group__body">
+              <div class="loc-group loc-group--nested collapsed" data-filter-sheets-target="group">
+                <%= render "tags/tree_head", name: "Burgdorf", count: 5, search: "Burgdorf", level: :mid,
+                      type: "Ort", expandable: true, param: "sg-tree", value: "Burgdorf", checked: false %>
+                <div class="loc-group__body">
+                  <label class="opt opt--leaf"><input type="checkbox" checked><span class="opt__box"></span><span class="opt__label">Kulturhalle Sägegasse</span><span class="opt__count">3</span></label>
+                </div>
+              </div>
+              <%= render "tags/tree_head", name: "Thun", count: 7, search: "Thun", level: :mid,
+                    type: "Ort", expandable: false, param: "sg-tree", value: "Thun", checked: false %>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Sheet tree rows</span> · <code>render "tags/tree_head"</code> inside <code>.loc-group</code>
+        <p class="sg-purpose">A parent in the What / Where tree. Tapping the row opens it; only the box on the right picks it, so drilling down to a venue never widens the filter to its canton. A parent with nothing under it renders as a plain option row.</p>
       </div>
     </div>
 

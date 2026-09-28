@@ -28,7 +28,7 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     assert_selector "h1", text: /Zylopunk/
 
     find(".filter-trigger[data-filter-sheets-field-param='what']").click
-    find(".sheet[data-field=what] .opt--top", text: @root.name).click
+    find(".sheet[data-field=what] .loc-group__head", text: @root.name).find(".loc-group__pick").click
     assert_selector "h1", text: /#{@root.name}/
     assert_selector "h1", text: /Zylopunk/
   end
@@ -37,7 +37,7 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     visit edit_saved_filter_path(@rule)
 
     find(".filter-trigger[data-filter-sheets-field-param='what']").click
-    find(".sheet[data-field=what] .opt--top", text: @root.name).click
+    find(".sheet[data-field=what] .loc-group__head", text: @root.name).find(".loc-group__pick").click
     find(".sheet[data-field=what] .sheet__apply").click
 
     find(".saved-filter-form input[type=submit]").click
@@ -50,7 +50,7 @@ class SavedFilterEditTest < ApplicationSystemTestCase
     visit edit_saved_filter_path(@rule)
 
     find(".filter-trigger[data-filter-sheets-field-param='what']").click
-    find(".sheet[data-field=what] .opt--top", text: @root.name).click
+    find(".sheet[data-field=what] .loc-group__head", text: @root.name).find(".loc-group__pick").click
     find(".sheet[data-field=what] .sheet__apply").click
     find(".form-actions > a.button-small:not(.danger)").click
 

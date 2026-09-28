@@ -1,35 +1,15 @@
 <% location_filter_tree.each do |canton| %>
   <div class="loc-group collapsed" data-filter-sheets-target="group">
-    <div class="loc-group__head">
-      <label class="opt opt--top" title="<%= canton[:title] %>" data-search="<%= canton[:search] %>">
-        <input type="checkbox" name="l[]" value="<%= canton[:value] %>" <%= 'checked' if filter.location_list.include?(canton[:value]) %>>
-        <span class="opt__box"></span>
-        <span class="opt__label"><%= canton[:name] %></span>
-        <span class="opt__type"><%= t('events.filter.location_types.canton') %></span>
-      </label>
-      <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
-              aria-label="<%= canton[:title] %>">
-        <span class="loc-group__count"><%= canton[:count] %></span>
-        <span class="loc-group__chevron ph ph-caret-down"></span>
-      </button>
-    </div>
+    <%= render "tags/tree_head", name: canton[:name], title: canton[:title], count: canton[:count],
+          search: canton[:search], expandable: canton[:children].any?, type: t('events.filter.location_types.canton'),
+          param: "l[]", value: canton[:value], checked: filter.location_list.include?(canton[:value]) %>
     <div class="loc-group__body">
       <% canton[:children].each do |locality| %>
         <% if locality[:children].any? %>
           <div class="loc-group loc-group--nested collapsed" data-filter-sheets-target="group">
-            <div class="loc-group__head">
-              <label class="opt opt--mid" data-search="<%= locality[:search] %>">
-                <input type="checkbox" name="l[]" value="<%= locality[:value] %>" <%= 'checked' if filter.location_list.include?(locality[:value]) %>>
-                <span class="opt__box"></span>
-                <span class="opt__label"><%= locality[:name] %></span>
-                <span class="opt__type"><%= t('events.filter.location_types.locality') %></span>
-              </label>
-              <button type="button" class="loc-group__toggle" data-action="filter-sheets#toggleGroup"
-                      aria-label="<%= locality[:name] %>">
-                <span class="loc-group__count"><%= locality[:count] %></span>
-                <span class="loc-group__chevron ph ph-caret-down"></span>
-              </button>
-            </div>
+            <%= render "tags/tree_head", name: locality[:name], count: locality[:count], level: :mid,
+                  search: locality[:search], expandable: true, type: t('events.filter.location_types.locality'),
+                  param: "l[]", value: locality[:value], checked: filter.location_list.include?(locality[:value]) %>
             <div class="loc-group__body">
               <% locality[:children].each do |venue| %>
                 <label class="opt opt--leaf" data-search="<%= venue[:search] %>">
@@ -42,13 +22,9 @@
             </div>
           </div>
         <% else %>
-          <label class="opt opt--mid" data-search="<%= locality[:search] %>">
-            <input type="checkbox" name="l[]" value="<%= locality[:value] %>" <%= 'checked' if filter.location_list.include?(locality[:value]) %>>
-            <span class="opt__box"></span>
-            <span class="opt__label"><%= locality[:name] %></span>
-            <span class="opt__type"><%= t('events.filter.location_types.locality') %></span>
-            <span class="opt__count"><%= locality[:count] %></span>
-          </label>
+          <%= render "tags/tree_head", name: locality[:name], count: locality[:count], level: :mid,
+                search: locality[:search], expandable: false, type: t('events.filter.location_types.locality'),
+                param: "l[]", value: locality[:value], checked: filter.location_list.include?(locality[:value]) %>
         <% end %>
       <% end %>
     </div>

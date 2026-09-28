@@ -11,7 +11,7 @@ class FilterSheetOptionsTest < ActionDispatch::IntegrationTest
     %w[what where].each do |field|
       assert_select "turbo-frame##{"filter_sheet_#{field}"}[data-src]"
       assert_select "turbo-frame##{"filter_sheet_#{field}"}[src]", false
-      assert_select ".sheet[data-field=#{field}] .opt--top", false
+      assert_select ".sheet[data-field=#{field}] .loc-group", false
     end
   end
 
@@ -50,6 +50,28 @@ class FilterSheetOptionsTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#filter_sheet_where input[name='l[]'][value='BE'][checked]"
   end
 
+  test "a parent row expands from its name and is picked only by its own checkbox" do
+    place(name: "Zorpklub", locality: "Zorpwil", canton: "BE")
+    event(start_date: Date.current + 3, location_list: %w[BE Zorpwil Zorpklub])
+
+    get filter_options_tags_path(field: "where")
+
+    assert_select ".loc-group__head" do
+      assert_select "button.loc-group__toggle[aria-expanded=false] .opt__label", text: "BE"
+      assert_select "button.loc-group__toggle input", false
+      assert_select "label.loc-group__pick input[name='l[]'][value='BE'][aria-label]"
+    end
+  end
+
+  test "a canton with nothing under it is a plain pickable row, not a group that opens onto nothing" do
+    event(start_date: Date.current + 3, location_list: ["BE"])
+
+    get filter_options_tags_path(field: "where")
+
+    assert_select ".loc-group__head", false
+    assert_select "label.opt.opt--top input[name='l[]'][value='BE']"
+  end
+
   test "a locality with counted venues is its own collapsible group" do
     place(name: "Zorpklub", locality: "Zorpwil", canton: "BE")
     event(start_date: Date.current + 3, location_list: %w[BE Zorpwil Zorpklub])
@@ -58,8 +80,8 @@ class FilterSheetOptionsTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select ".loc-group--nested" do
-      assert_select ".loc-group__head .opt--mid .opt__label", text: "Zorpwil"
-      assert_select ".loc-group__head .loc-group__toggle .loc-group__count", text: "1"
+      assert_select ".loc-group__head--mid .loc-group__toggle .opt__label", text: "Zorpwil"
+      assert_select ".loc-group__head--mid .loc-group__toggle .opt__count", text: "1"
       assert_select ".loc-group__body .opt--leaf .opt__label", text: "Zorpklub"
     end
   end

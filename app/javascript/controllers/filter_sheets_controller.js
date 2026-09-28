@@ -31,7 +31,7 @@ export default class extends Controller {
   }
 
   groupTargetConnected(group) {
-    if (group.querySelector("input:checked")) group.classList.remove("collapsed")
+    this.#setExpanded(group, !!group.querySelector("input:checked"))
   }
 
   open(event) {
@@ -62,7 +62,8 @@ export default class extends Controller {
   }
 
   toggleGroup(event) {
-    event.currentTarget.closest(".loc-group")?.classList.toggle("collapsed")
+    const group = event.currentTarget.closest(".loc-group")
+    this.#setExpanded(group, group.classList.contains("collapsed"))
   }
 
   enforceSingle(event) {
@@ -84,13 +85,9 @@ export default class extends Controller {
     })
 
     sheet.querySelectorAll(".loc-group").forEach((group) => {
-      if (query === "") {
-        group.classList.add("collapsed")
-        group.classList.remove("loc-group--hidden")
-      } else {
-        group.classList.remove("collapsed")
-        group.classList.toggle("loc-group--hidden", !group.querySelector(".opt:not(.opt--hidden)"))
-      }
+      const haystack = group.querySelector("[data-search]").dataset.search.toLowerCase()
+      this.#setExpanded(group, query !== "")
+      group.classList.toggle("loc-group--hidden", query !== "" && !haystack.includes(query))
     })
 
     this.#updateNewQuery(sheet, raw)
@@ -269,5 +266,10 @@ export default class extends Controller {
 
   #isDesktop() {
     return window.matchMedia("(min-width: 600px)").matches
+  }
+
+  #setExpanded(group, expanded) {
+    group.classList.toggle("collapsed", !expanded)
+    group.querySelector(":scope > .loc-group__head > .loc-group__toggle")?.setAttribute("aria-expanded", expanded)
   }
 }

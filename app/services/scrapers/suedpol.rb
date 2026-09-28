@@ -1,5 +1,7 @@
 module Scrapers
   class Suedpol < Agent
+    self.opens_event_pages = true
+
     MUSIC_CATEGORIES = ["Konzert", "Club"].freeze
 
     field_gaps genres: :no_field, description: :no_field

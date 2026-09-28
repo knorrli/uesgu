@@ -1,5 +1,7 @@
 module Scrapers
   class MuehleHunziken < Agent
+    self.opens_event_pages = true
+
     DATE_SLUG = /-(?<y>\d{4})-(?<mo>\d{2})-(?<d>\d{2})\z/
 
     def self.url

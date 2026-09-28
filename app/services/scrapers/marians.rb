@@ -1,5 +1,7 @@
 module Scrapers
   class Marians < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://www.mariansjazzroom.ch/termine-marians")
     end

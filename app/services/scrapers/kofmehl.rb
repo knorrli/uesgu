@@ -1,5 +1,7 @@
 module Scrapers
   class Kofmehl < Agent
+    self.opens_event_pages = true
+
     def self.url
       URI.parse("https://kofmehl.net/")
     end

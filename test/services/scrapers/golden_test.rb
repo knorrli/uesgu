@@ -8,7 +8,7 @@ class Scrapers::GoldenTest < Minitest::Test
 
   class Capture
     FIELDS = %i[start_time start_date title description genre_list location_list cancelled_at].freeze
-    attr_accessor(*FIELDS, :hidden, :data_source, :rescheduled_at)
+    attr_accessor(*FIELDS, :hidden, :data_source, :rescheduled_at, :event_page_checked_at, :aggregator_url)
     attr_reader :url
 
     def initialize(url) = @url = url
@@ -90,6 +90,7 @@ class Scrapers::GoldenTest < Minitest::Test
       scraper.define_singleton_method(:get) { |*| nil }
       scraper.define_singleton_method(:page) { list_page }
       scraper.define_singleton_method(:click) { |*| detail_page } if detail_page
+      scraper.define_singleton_method(:known_urls) { {} } if scraper.respond_to?(:known_urls, true)
       scraper.define_singleton_method(:ensure_genres_and_visibility) { |event| }
       scraper.define_singleton_method(:mined_genres) { |content| [] }
 

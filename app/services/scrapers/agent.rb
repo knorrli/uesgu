@@ -9,6 +9,8 @@ module Scrapers
 
     class_attribute :_field_gaps, instance_accessor: false, default: {}.freeze
 
+    class_attribute :opens_event_pages, instance_writer: false, default: false
+
     def initialize
       super
       self.user_agent = USER_AGENT
@@ -172,6 +174,11 @@ module Scrapers
         event = Event.find_or_initialize_by(url: url)
         next if event.dismissed?
 
+        if event_page_not_due?(event)
+          @unchanged += 1
+          next
+        end
+
         was_new = event.new_record?
         tags_before = was_new ? nil : tag_snapshot(event)
         transact do
@@ -193,12 +200,16 @@ module Scrapers
       end
     end
 
+    def event_page_not_due?(event)
+      opens_event_pages && !event.new_record? && !EventPageSchedule.due?(event)
+    end
+
     def tag_snapshot(event)
       { genres: event.genre_list.sort, locations: event.location_list.sort }
     end
 
     def changed_fields(event, tags_before)
-      fields = event.saved_changes.keys - %w[created_at updated_at genre_list location_list]
+      fields = event.saved_changes.keys - %w[created_at updated_at event_page_checked_at genre_list location_list]
       after = tag_snapshot(event)
       fields << "genres"    if after[:genres]    != tags_before[:genres]
       fields << "locations" if after[:locations] != tags_before[:locations]
@@ -207,6 +218,7 @@ module Scrapers
 
     def build_event(event, row)
       content = event_content(row)
+      event.event_page_checked_at = Time.current if opens_event_pages
       preprocess(content)
       event.start_time    = event_start_time(content) unless event.overridden?(:start_time)
       event.start_date    = event.start_time.to_date  unless event.overridden?(:start_date)

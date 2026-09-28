@@ -76,4 +76,31 @@ class InvitationTest < ActiveSupport::TestCase
 
     assert_nil Invitation.find_by(id: inv.id)
   end
+
+  test "an inviter gets five invites; open and redeemed ones count, expired and revoked ones come back" do
+    inviter = user(permissions: %w[invite])
+    open = invitation(created_by: inviter)
+    invitation(created_by: inviter).redeem!(user)
+    invitation(created_by: inviter, expires_at: 1.day.ago)
+    invitation(created_by: inviter).destroy!
+
+    assert_equal 3, inviter.invites_left
+    3.times { invitation(created_by: inviter) }
+    assert_equal 0, inviter.invites_left
+
+    refused = Invitation.new(created_by: inviter)
+    refute_predicate refused, :valid?
+    assert_includes refused.errors[:base], I18n.t("activerecord.errors.models.invitation.attributes.base.allowance_used",
+                                                  allowance: User::INVITE_ALLOWANCE)
+
+    open.destroy!
+    assert_predicate Invitation.new(created_by: inviter), :valid?
+  end
+
+  test "an admin invites without a limit" do
+    admin = user(admin: true)
+    6.times { invitation(created_by: admin) }
+
+    assert_predicate Invitation.new(created_by: admin), :valid?
+  end
 end

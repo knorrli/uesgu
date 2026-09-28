@@ -623,6 +623,10 @@ en:
         title: Invitations
         intro: Single-use invitation codes. Share the link with one person — once they sign up, the code is spent.
         new_heading: New invitation
+        invites_left:
+          one: "You have 1 of %{allowance} invites left. An invite that expires or that you revoke unused comes back."
+          other: "You have %{count} of %{allowance} invites left. An invite that expires or that you revoke unused comes back."
+        allowance_used: "You've used all your invites. Revoke one that hasn't been used yet to get it back."
         note_label: Note (optional)
         note_placeholder: e.g. for Anna
         expires_label: Valid until
@@ -914,6 +918,12 @@ en:
         note: Note
       genre:
         name: Name
+    errors:
+      models:
+        invitation:
+          attributes:
+            base:
+              allowance_used: "You've used all %{allowance} of your invites."
   date:
     formats:
       default: "%d.%m.%Y"

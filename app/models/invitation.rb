@@ -8,6 +8,7 @@ class Invitation < ApplicationRecord
   belongs_to :redeemed_by, class_name: "User", optional: true
 
   validates :code, presence: true, uniqueness: true
+  validate :within_allowance, on: :create
 
   before_validation :assign_code, on: :create
 
@@ -60,6 +61,12 @@ class Invitation < ApplicationRecord
   end
 
   private
+
+  def within_allowance
+    return if created_by.nil? || created_by.may_invite_more?
+
+    errors.add(:base, :allowance_used, allowance: User::INVITE_ALLOWANCE)
+  end
 
   def assign_code
     self.code ||= loop do

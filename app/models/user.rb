@@ -16,6 +16,8 @@ class User < ApplicationRecord
 
   PERMISSIONS = %w[curate_events genres places capture invite].freeze
 
+  INVITE_ALLOWANCE = 5
+
   PERMISSION_AREAS = { "curate_events" => "events", "genres" => "genres", "places" => "places",
                        "invite" => "invites" }.freeze
 
@@ -31,6 +33,12 @@ class User < ApplicationRecord
   validates :reminder_lead_days, numericality: { in: 0..7 }
 
   def can?(permission) = admin? || permissions.include?(permission.to_s)
+
+  def invites_left
+    INVITE_ALLOWANCE - sent_invitations.redeemed.count - sent_invitations.available.count
+  end
+
+  def may_invite_more? = admin? || invites_left.positive?
 
   def moderator? = admin? || PERMISSION_AREAS.keys.intersect?(permissions)
 

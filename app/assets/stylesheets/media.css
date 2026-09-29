@@ -39,18 +39,12 @@
 .media-dock__specimen-frame {
   display: block;
   width: 100%;
-  height: 152px;
+  height: 80px;
   border: 0;
 }
 
-.media-dock__player[data-provider="youtube"] :is(iframe, .media-dock__specimen-frame),
-.media-dock__player[data-provider="vimeo"] iframe {
-  height: auto;
-  aspect-ratio: 16 / 9;
-}
-
 .media-dock__player[data-provider="soundcloud"] iframe {
-  height: 166px;
+  height: 60px;
 }
 
 .media-dock__player:is([data-provider="bandcamp"], [data-provider="mixcloud"]) iframe {
@@ -59,4 +53,36 @@
 
 .media-dock__specimen-frame {
   background: var(--theme-bg-muted);
+}
+
+.media-dock:has(.media-dock__player:is([data-provider="youtube"], [data-provider="vimeo"])) {
+  display: grid;
+  grid-template-columns: 160px minmax(0, 1fr);
+  max-width: 360px;
+
+  .media-dock__player {
+    grid-area: 1 / 1;
+  }
+
+  .media-dock__player :is(iframe, .media-dock__specimen-frame) {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  .media-dock__bar {
+    grid-area: 1 / 2;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: flex-end;
+    padding-block: var(--gap-xsmall);
+  }
+
+  .media-dock__title {
+    order: 1;
+    flex-basis: 100%;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
 }

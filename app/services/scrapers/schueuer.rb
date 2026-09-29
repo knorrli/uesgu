@@ -41,8 +41,10 @@ module Scrapers
     end
 
     def event_genre_prose(row)
-      get(event_url(row)).css(".viz-event-subtitle, .event-details-text").map(&:text).join("\n")
+      event_page(row).css(".viz-event-subtitle, .event-details-text").map(&:text).join("\n")
     end
+
+    def event_media(row) = Media.in(event_page(row))
 
     private
 

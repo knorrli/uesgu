@@ -944,6 +944,7 @@ fr:
     today: Aujourd'hui
     tomorrow: Demain
   media:
+    open: "L’ouvrir à la source, si ça ne joue pas ici"
     via: "Joue dans le lecteur de %{provider}"
     dock: Lecteur
     play: "Écouter %{title}"

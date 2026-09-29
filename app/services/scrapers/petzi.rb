@@ -46,13 +46,14 @@ module Scrapers
 
     def event_content(row) = detail_page(row)
 
-    def event_start_time(content)
-      date = title_parts(content).find { |p| p =~ %r{\A\d{2}\.\d{2}\.\d{4}\z} }
-      raise "Unparseable PETZI date for #{current_row}" if date.blank?
+    TITLE_DATE = %r{\A(?<day>\d{2})\.(?<month>\d{2})(?:\.(?<year>\d{4})|-\d{2}\.(?<end_month>\d{2})\.(?<end_year>\d{4}))\z}
 
-      d, m, y = date.split(".").map(&:to_i)
+    def event_start_time(content)
+      date = title_parts(content).lazy.filter_map { |p| TITLE_DATE.match(p) }.first
+      raise "Unparseable PETZI date for #{current_row}" unless date
+
       hour, minute = show_or_doors(content)
-      Time.zone.local(y, m, d, hour, minute)
+      Time.zone.local(start_year(date), date[:month].to_i, date[:day].to_i, hour, minute)
     end
 
     def event_title(content)
@@ -81,6 +82,13 @@ module Scrapers
 
     def title_parts(content)
       squish(content.parser.at_css("title")&.text).split(" / ")
+    end
+
+    def start_year(date)
+      return date[:year].to_i if date[:year]
+
+      crosses_new_year = date[:month].to_i > date[:end_month].to_i
+      date[:end_year].to_i - (crosses_new_year ? 1 : 0)
     end
 
     def show_or_doors(content)

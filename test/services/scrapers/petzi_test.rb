@@ -49,6 +49,22 @@ class Scrapers::PetziTest < Minitest::Test
     assert_equal [2026, 6, 17, 18, 45], [t.year, t.month, t.day, t.hour, t.min]
   end
 
+  def titled(date) = page_from_html("<html><head><title>Festival / #{date} / KiFF - Aarau / PETZI</title></head></html>", DETAIL_URL)
+
+  def test_date_range_starts_on_its_first_day
+    t = scraper.event_start_time(titled("25.11-28.11.2026"))
+    assert_equal [2026, 11, 25], [t.year, t.month, t.day]
+  end
+
+  def test_date_range_across_new_year_starts_in_the_earlier_year
+    t = scraper.event_start_time(titled("01.10-13.05.2027"))
+    assert_equal [2026, 10, 1], [t.year, t.month, t.day]
+  end
+
+  def test_date_without_a_year_is_unparseable
+    assert_raises(RuntimeError) { scraper.event_start_time(titled("16-18.10")) }
+  end
+
   def test_extracts_curated_genre_tags
     assert_equal %w[Concert Rock], scraper.event_genres(detail)
   end

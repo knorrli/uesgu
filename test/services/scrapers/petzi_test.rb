@@ -78,6 +78,20 @@ class Scrapers::PetziTest < Minitest::Test
                  scraper_on(detail).event_url(DETAIL_URL)
   end
 
+  def test_url_skips_a_link_to_the_venue_homepage
+    homepage = page_from_html('<html><body><a href="https://kofmehl.net/de">Kofmehl</a></body></html>', DETAIL_URL)
+    assert_equal DETAIL_URL, scraper_on(homepage).event_url(DETAIL_URL)
+  end
+
+  def test_homepage_is_the_bare_domain_or_a_language_root
+    assert Scrapers::Petzi.homepage?("https://www.fri-son.ch")
+    assert Scrapers::Petzi.homepage?("https://sedel.ch/")
+    assert Scrapers::Petzi.homepage?("https://www.fri-son.ch/fr")
+    refute Scrapers::Petzi.homepage?("https://kofmehl.net/programm/malevolence/")
+    refute Scrapers::Petzi.homepage?("https://www.fri-son.ch/fr/programme/2026/11/sniper-fr")
+    refute Scrapers::Petzi.homepage?("https://www.sudpol.ch/?event=42")
+  end
+
   def test_url_falls_back_to_petzi_when_no_venue_link
     bare = page_from_html('<html><body><a href="https://www.petzi.ch/x">x</a></body></html>', DETAIL_URL)
     assert_equal DETAIL_URL, scraper_on(bare).event_url(DETAIL_URL)

@@ -71,7 +71,7 @@ de:
     services_hosting: 'Hosting: Render (render.com), Region Frankfurt. Deine Daten bleiben in der EU.'
     services_email: 'E-Mail: Resend (resend.com), Region Irland. Verschickt die optionalen Benachrichtigungs-Mails.'
     services_push: 'Push: Wenn du Push-Benachrichtigungen einschaltest, laufen sie über den Push-Dienst deines Browsers oder Handys (Google, Mozilla oder Apple).'
-    services_players: "Musik-Player: Tippst du auf Play, lädt der Player von YouTube, Spotify, SoundCloud, Vimeo, Bandcamp oder Mixcloud; vorher lädt nichts davon. Ab dann sieht dieser Dienst deinen Besuch und kann eigene Cookies setzen, nach seinen eigenen Datenschutzregeln."
+    services_players: "Musik-Player: Tippst du auf Play, lädt der Player von YouTube, Spotify, SoundCloud, Vimeo, Bandcamp oder Mixcloud. Ab dann sieht dieser Dienst deinen Besuch und kann eigene Cookies setzen, nach seinen eigenen Datenschutzregeln."
     calendar_heading: Kalender-Link
     calendar_body: Wenn du ein Kalender-Abo erstellst, enthält der Link einen geheimen Schlüssel. Wenn du diesen Link teilst, können andere deine gemerkten Events einsehen. Du kannst den Kalender-Link jederzeit in den Einstellungen deaktivieren.
     logs_heading: Server-Logs

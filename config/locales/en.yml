@@ -71,7 +71,7 @@ en:
     services_hosting: 'Hosting: Render (render.com), Frankfurt region. Your data stays in the EU.'
     services_email: 'Email: Resend (resend.com), Ireland region. Delivers the optional notification emails.'
     services_push: 'Push: if you turn on push notifications, they travel through your browser or phone''s push service (Google, Mozilla, or Apple).'
-    services_players: "Music player: tapping play loads the player of YouTube, Spotify, SoundCloud, Vimeo, Bandcamp or Mixcloud, and nothing of theirs loads before that tap. From then on that service sees your visit and may set its own cookies, under its own privacy policy."
+    services_players: "Music player: tapping play loads the player of YouTube, Spotify, SoundCloud, Vimeo, Bandcamp or Mixcloud. From then on that service sees your visit and may set its own cookies, under its own privacy policy."
     calendar_heading: Calendar link
     calendar_body: If you create a calendar subscription, its link holds a secret key. If you share that link, other people can see your saved events. You can deactivate the calendar link any time in settings.
     logs_heading: Server logs

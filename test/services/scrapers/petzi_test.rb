@@ -69,6 +69,45 @@ class Scrapers::PetziTest < Minitest::Test
     assert_equal %w[Concert Rock], scraper.event_genres(detail)
   end
 
+  def described(text_block)
+    page_from_html("<html><body><h1>Malevolence</h1><div class='events__details'><p class='text_block'>#{text_block}</p></div></body></html>", DETAIL_URL)
+  end
+
+  def test_description_is_the_leading_support_line
+    assert_equal "Mit Drain, Gridiron", scraper.event_description(detail)
+  end
+
+  def test_description_skips_fri_son_ticket_prices
+    fri_son = page_from("fri_son_detail.html", DETAIL_URL, "text/html; charset=utf-8")
+    assert_equal "Soundsystem meeting\nReggae, Roots, Dub, Steppa", scraper.event_description(fri_son)
+  end
+
+  def test_description_prefers_a_support_paragraph_and_lists_it_on_one_line
+    page = described("Geht es noch extremer?<br><br>Ein langer Text.<br><br>Special guests:<br>Servant (DE)<br>Spere (DE)")
+    assert_equal "Special guests: Servant (DE), Spere (DE)", scraper.event_description(page)
+  end
+
+  def test_description_is_nil_when_the_text_opens_with_a_blurb
+    assert_nil scraper.event_description(described("#{'Lange Prosa über die Band. ' * 10}<br><br>Mehr Prosa."))
+  end
+
+  def test_description_is_nil_for_a_multi_line_info_block
+    assert_nil scraper.event_description(described("Quentin Sauvé<br>+ Léa Martinez<br>Indie Folk<br>Salle de spectacle"))
+  end
+
+  def test_description_drops_door_times_and_prices
+    page = described("Türöffnung: 20:00 Uhr<br>Eintritt: CHF 25.00<br><br>Die Ü40-Party!")
+    assert_equal "Die Ü40-Party!", scraper.event_description(page)
+  end
+
+  def test_description_is_nil_when_it_repeats_the_title
+    assert_nil scraper.event_description(described("MALEVOLENCE"))
+  end
+
+  def test_description_reads_unicode_styled_letters_as_plain_text
+    assert_equal "Folk, Jazz", scraper.event_description(described("𝐅𝐨𝐥𝐤, 𝐉𝐚𝐳𝐳"))
+  end
+
   def test_resolves_venue_location_from_url_slug
     assert_equal ["Kofmehl", "Solothurn", "SO"], scraper.event_locations(detail)
   end

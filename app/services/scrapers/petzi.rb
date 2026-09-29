@@ -43,8 +43,6 @@ module Scrapers
       false
     end
 
-    field_gaps description: :no_field
-
     def event_rows
       xml = Nokogiri::XML(page.body)
       xml.remove_namespaces!
@@ -73,6 +71,12 @@ module Scrapers
       content.parser.css("a.tag").map { |a| squish(a.text) }.reject(&:blank?).uniq
     end
 
+    def event_description(content)
+      paragraphs = description_paragraphs(content)
+      pick = support_line(paragraphs) || tagline(paragraphs.first)
+      pick if pick && pick.length <= DESCRIPTION_MAX && !same_text?(pick, event_title(content))
+    end
+
     def event_genre_prose(content)
       content.parser.css(".events__details .text_block").flat_map { |block| block.xpath(".//text()").map(&:text) }.join("\n")
     end
@@ -85,7 +89,42 @@ module Scrapers
       event.aggregator_url = current_row
     end
 
+    DESCRIPTION_MAX = 120
+    TAGLINE_LINES = 2
+    LANGUAGE_TAG = /\A(?:FR|DE|EN)\s*:\s*/
+    SUPPORT_LABEL = /\A(?:support|special guests?)\b/i
+    LOGISTICS = %r{
+      https?://|prix|preis|chf|gib/donne|eintritt|türöffnung|konzertbeginn|abendkasse|
+      billet|ticket|sold\s*out|ausverkauft|\bcomplet\b|resale|préventes|prélocation|portes|(?:â|a)ge\s+minimum|minimum\s+age|\d{1,2}\.\d{1,2}\.\d{2,4}
+    }xi
+
     private
+
+    def description_paragraphs(content)
+      text = content.parser.css(".events__details .text_block").map { |block| text_with_breaks(block) }.join("\n\n")
+      text.unicode_normalize(:nfkc).split(/\n\s*\n/).filter_map do |paragraph|
+        paragraph.split("\n").map { |line| squish(line).sub(LANGUAGE_TAG, "") }.reject { |line| logistics?(line) }.join("\n").presence
+      end
+    end
+
+    def support_line(paragraphs)
+      label, *acts = paragraphs.find { |p| p.match?(SUPPORT_LABEL) }&.lines(chomp: true)
+      return label if label.nil? || acts.empty?
+
+      "#{label.delete_suffix(':').strip}: #{acts.join(', ')}"
+    end
+
+    def tagline(paragraph)
+      paragraph if paragraph && paragraph.lines.size <= TAGLINE_LINES
+    end
+
+    def text_with_breaks(block)
+      block.xpath(".//text()|.//br").map { |node| node.name == "br" ? "\n" : node.text.tr("\n", " ") }.join
+    end
+
+    def logistics?(line) = line.match?(LOGISTICS) || !line.match?(/[[:alnum:]]/)
+
+    def same_text?(a, b) = a.downcase.gsub(/[^[:alnum:]]/, "") == b.downcase.gsub(/[^[:alnum:]]/, "")
 
     def squish(str) = str.to_s.gsub(/\s+/, " ").strip
 

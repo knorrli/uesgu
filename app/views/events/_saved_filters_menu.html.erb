@@ -13,7 +13,7 @@
       <%= link_to edit_saved_filter_path(@saved_filter),
             class: 'nav-menu__item filter-menu__save is-saved' do %>
         <span class="ph ph-funnel" aria-hidden="true"></span>
-        <span><%= t('events.index.save_filter_saved') %></span>
+        <span><%= t('events.index.edit_filter') %></span>
       <% end %>
     <% else %>
       <%= link_to feed_saved_filters_path(q: @filter.queries, g: @filter.genres,

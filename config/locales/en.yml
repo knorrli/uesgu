@@ -968,7 +968,7 @@ en:
         other: "%{count} events left out because of your excluded genres."
       save_filter: Save this filter
       save_filter_all: Notify me about everything
-      save_filter_saved: Saved — edit
+      edit_filter: Edit filter
       update_filter: Update “%{name}”
     filter:
       what: "Search acts, styles, anything…"

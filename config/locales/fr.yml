@@ -968,7 +968,7 @@ fr:
         other: "%{count} événements ne sont pas affichés à cause de tes genres exclus."
       save_filter: Enregistrer le filtre
       save_filter_all: Me notifier de tout
-      save_filter_saved: Enregistré — modifier
+      edit_filter: Modifier le filtre
       update_filter: Mettre à jour « %{name} »
     filter:
       what: "Rechercher : artistes, styles…"

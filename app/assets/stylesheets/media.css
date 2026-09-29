@@ -4,13 +4,20 @@
 
 .media-dock {
   position: fixed;
-  inset-inline: var(--gap-medium);
-  bottom: calc(var(--gap-medium) + max(var(--cookie-notice-clearance, 0px), var(--safe-bottom)));
+  inset-inline: 0;
+  bottom: var(--cookie-notice-clearance, 0px);
   z-index: 800;
-  max-width: 400px;
-  margin-inline-start: auto;
+  margin-inline: auto;
+  padding-bottom: max(0px, var(--safe-bottom) - var(--cookie-notice-clearance, 0px));
   background: var(--theme-bg-color);
-  border: var(--border-width) solid var(--rule-color);
+  border-top: var(--border-width) solid var(--rule-color);
+}
+
+@media (min-width: 600px) {
+  .media-dock {
+    max-width: 400px;
+    border-inline: var(--border-width) solid var(--rule-color);
+  }
 }
 
 .media-dock[hidden] {
@@ -54,7 +61,6 @@
 .media-dock:has(.media-dock__player:is([data-provider="youtube"], [data-provider="vimeo"])) {
   display: grid;
   grid-template-columns: 160px minmax(0, 1fr);
-  max-width: 360px;
 
   .media-dock__player {
     grid-area: 1 / 1;

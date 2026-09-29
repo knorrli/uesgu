@@ -39,14 +39,10 @@ module MediaHelper
                data: { controller: "media-play", action: "media-play#toggle media:changed@window->media-play#sync",
                        media_play_event_id_value: event.id, media_play_title_value: event.title,
                        media_play_provider_value: reference["provider"], media_play_src_value: media_embed_src(reference),
-                       media_play_page_url_value: media_page_url(reference), media_play_event_url_value: media_event_url(event),
+                       media_play_page_url_value: media_page_url(reference), media_play_event_url_value: event_link_url(event),
                        media_play_provider_name_value: MEDIA_PROVIDER_NAMES[reference["provider"]] } do
       content_tag(:span, "", class: "ph ph-play", 'aria-hidden': true, data: { media_play_target: "icon" })
     end
-  end
-
-  def media_event_url(event)
-    events_path(day: event.start_date.iso8601, anchor: dom_id(event))
   end
 
   private

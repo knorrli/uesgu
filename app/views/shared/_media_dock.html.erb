@@ -2,7 +2,7 @@
 <%= tag.section class: "media-dock", id: ("media-dock" unless specimen), hidden: !specimen, 'aria-label': t("media.dock"),
                 data: ({ controller: "media-dock", action: "media:toggle@window->media-dock#toggle" } unless specimen) do %>
   <div class="media-dock__bar">
-    <a class="media-dock__title" href="#" data-media-dock-target="title"><%= "Holy Wave" if specimen %></a>
+    <a class="media-dock__title" <%= 'href="#"'.html_safe if specimen %> target="_blank" rel="noopener" data-media-dock-target="title"><%= "Holy Wave" if specimen %></a>
     <%= link_to (specimen ? "YouTube ↗" : ""), (specimen ? "#media-dock" : "#"), class: "text-link", target: "_blank", rel: "noopener",
                 hidden: !specimen, title: t("media.open"), data: { media_dock_target: "link" } %>
     <button type="button" class="icon-button" data-action="media-dock#stop" aria-label="<%= t('media.stop') %>">

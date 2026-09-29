@@ -29,7 +29,7 @@ export default class extends Controller {
     this.playerTarget.replaceChildren(frame)
     this.playerTarget.dataset.provider = provider
     this.titleTarget.textContent = title
-    this.titleTarget.href = eventUrl
+    this.#linkTitle(eventUrl)
     this.#showLink(pageUrl, providerName)
     this.element.dataset.eventId = eventId
     this.element.hidden = false
@@ -42,7 +42,7 @@ export default class extends Controller {
     delete this.playerTarget.dataset.provider
     delete this.element.dataset.eventId
     this.titleTarget.textContent = ""
-    this.titleTarget.href = "#"
+    this.#linkTitle("")
     this.#showLink("", "")
     this.element.hidden = true
     Turbo.cache.resetCacheControl()
@@ -75,6 +75,11 @@ export default class extends Controller {
     for (const { name } of [...body.attributes]) body.removeAttribute(name)
     for (const { name, value } of newBody.attributes) body.setAttribute(name, value)
     this.element.before(...newBody.childNodes)
+  }
+
+  #linkTitle(url) {
+    if (url) this.titleTarget.href = url
+    else this.titleTarget.removeAttribute("href")
   }
 
   #showLink(url, providerName) {

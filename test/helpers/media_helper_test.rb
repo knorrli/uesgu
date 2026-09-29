@@ -1,6 +1,8 @@
 require "db_test_helper"
 
 class MediaHelperTest < ActionView::TestCase
+  include EventsHelper
+
   def ref(provider, id) = { "provider" => provider, "id" => id }
 
   test "each provider embeds through its own player host" do
@@ -46,7 +48,7 @@ class MediaHelperTest < ActionView::TestCase
     assert_equal "YouTube", button["data-media-play-provider-name-value"]
     assert_equal "false", button["aria-pressed"]
     assert_equal I18n.t("media.via", provider: "YouTube"), button["title"]
-    assert_equal "/events?day=2030-01-01#event_#{show.id}", button["data-media-play-event-url-value"]
+    assert_equal show.url, button["data-media-play-event-url-value"]
     assert_nil button.at_css("iframe, img")
   end
 

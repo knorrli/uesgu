@@ -30,6 +30,15 @@ class Rack::Attack
       cookies.key?("_uesgu_session")
     end
 
+    def wants_page?
+      accept = get_header("HTTP_ACCEPT").to_s
+      accept.include?("text/html") || accept.include?("text/vnd.turbo-stream.html")
+    end
+
+    def retry_after
+      (env.dig("rack.attack.match_data", :period) || 60).to_i.to_s
+    end
+
     def true_ip_addr
       return @true_ip_addr if defined?(@true_ip_addr)
 
@@ -118,13 +127,17 @@ class Rack::Attack
   track("measure/facets") { |req| req.faceted? && !req.asset? }
 
   self.throttled_responder = lambda do |req|
-    match_data = req.env["rack.attack.match_data"] || {}
-    retry_after = (match_data[:period] || 60).to_i
-    [
-      429,
-      { "Content-Type" => "text/plain", "Retry-After" => retry_after.to_s },
-      ["Too many requests. Please slow down and try again shortly.\n"]
-    ]
+    if req.wants_page?
+      status, headers, body = RateLimitsController.action(:show).call(req.env)
+      headers["retry-after"] = req.retry_after
+      [status, headers, body]
+    else
+      [
+        429,
+        { "content-type" => "text/plain", "retry-after" => req.retry_after },
+        ["Too many requests. Please slow down and try again shortly.\n"]
+      ]
+    end
   end
 
   self.blocklisted_responder = lambda do |req|

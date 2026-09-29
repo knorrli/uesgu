@@ -130,6 +130,11 @@ en:
     rate_limited: Try again later.
     invite_label: Invitation code
     invite_hint: Sign-up is invitation only.
+  rate_limited:
+    title: Slow down
+    heading: Slow down a little
+    body: That was a lot in a short time. Wait a minute, then try again.
+    short: Slow down a little. Try again in a minute.
   registrations:
     welcome: Welcome to üsgu!
     account_deleted: Your account was deleted.

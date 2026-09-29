@@ -1,0 +1,15 @@
+<% if turbo_frame_request? %>
+  <%= turbo_frame_tag turbo_frame_request_id do %>
+    <p class="muted"><%= t('rate_limited.short') %></p>
+  <% end %>
+<% else %>
+  <% content_for :title, t('rate_limited.title') %>
+
+  <div class="text-page flex flex-col gap-large">
+    <%= render layout: "shared/page_header", locals: { back_path: root_path, back_label: t('nav.events') } do %>
+      <h1><%= t('rate_limited.heading') %></h1>
+    <% end %>
+
+    <p><%= t('rate_limited.body') %></p>
+  </div>
+<% end %>

@@ -29,6 +29,7 @@ class MediaHelperTest < ActionView::TestCase
     assert_equal "youtube", button["data-media-play-provider-value"]
     assert_equal media_embed_src(ref("youtube", "cjox_JXa8eM")), button["data-media-play-src-value"]
     assert_equal "false", button["aria-pressed"]
+    assert_equal I18n.t("media.via", provider: "YouTube"), button["title"]
     assert_nil button.at_css("iframe, img")
   end
 

@@ -1,4 +1,9 @@
 module MediaHelper
+  MEDIA_PROVIDER_NAMES = {
+    "youtube" => "YouTube", "vimeo" => "Vimeo", "bandcamp" => "Bandcamp",
+    "soundcloud" => "SoundCloud", "mixcloud" => "Mixcloud", "spotify" => "Spotify"
+  }.freeze
+
   def media_embed_src(reference)
     id = reference["id"]
     case reference["provider"]
@@ -19,6 +24,7 @@ module MediaHelper
                class: "event-play icon-button",
                'aria-pressed': "false",
                'aria-label': t("media.play", title: event.title),
+               title: t("media.via", provider: MEDIA_PROVIDER_NAMES[reference["provider"]]),
                data: { controller: "media-play", action: "media-play#toggle media:changed@window->media-play#sync",
                        media_play_event_id_value: event.id, media_play_title_value: event.title,
                        media_play_provider_value: reference["provider"], media_play_src_value: media_embed_src(reference) } do

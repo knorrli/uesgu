@@ -28,4 +28,25 @@ namespace :events do
                  .update_all(dismissed_at: Time.current)
     puts "Dismissed #{count} stale Südpol event(s)."
   end
+
+  desc "One-off cleanup: re-key PETZI events whose url is the venue's homepage onto " \
+       "their petzi.ch aggregator_url, which is unique per event. Two events keyed " \
+       "on the same homepage would overwrite each other every night. Re-keying in " \
+       "place keeps saves and bookmarks; a row whose aggregator_url is already " \
+       "taken is skipped and reported. Idempotent."
+  task rekey_petzi_homepage_urls: :environment do
+    rekeyed = 0
+    Event.where(data_source: "Petzi").where.not(aggregator_url: nil).find_each do |event|
+      next unless Scrapers::Petzi.homepage?(event.url)
+
+      if Event.exists?(url: event.aggregator_url)
+        puts "Skipped #{event.id}: #{event.aggregator_url} is already taken"
+        next
+      end
+
+      event.update_columns(url: event.aggregator_url)
+      rekeyed += 1
+    end
+    puts "Re-keyed #{rekeyed} PETZI event(s) off a venue homepage."
+  end
 end

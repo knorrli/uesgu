@@ -34,6 +34,15 @@ module Scrapers
       true
     end
 
+    def self.homepage?(url)
+      uri = URI(url)
+      segments = uri.path.split("/").compact_blank
+      segments.shift if segments.first&.match?(/\A[a-z]{2}\z/)
+      segments.empty? && uri.query.blank?
+    rescue URI::InvalidURIError
+      false
+    end
+
     field_gaps description: :no_field
 
     def event_rows
@@ -118,7 +127,7 @@ module Scrapers
       return if domain.blank?
 
       page.links.filter_map(&:href)
-          .find { |href| href.start_with?("http") && Scrapers::Discovery.domain(href) == domain }
+          .find { |href| href.start_with?("http") && Scrapers::Discovery.domain(href) == domain && !self.class.homepage?(href) }
     end
 
     def slug_for(url)

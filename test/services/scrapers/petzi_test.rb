@@ -27,7 +27,7 @@ class Scrapers::PetziTest < Minitest::Test
     Scrapers::Petzi.new.tap { |s| s.instance_variable_set(:@current_row, current_row) }
   end
 
-  def test_event_rows_keeps_only_tracked_venue_events
+  def test_event_rows_keeps_only_tracked_venue_events_once_each
     s = Scrapers::Petzi.new
     sitemap = page_from("sitemap.xml", Scrapers::Petzi.url.to_s, "application/xml; charset=utf-8")
     s.define_singleton_method(:page) { sitemap }

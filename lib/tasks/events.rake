@@ -49,4 +49,18 @@ namespace :events do
     end
     puts "Re-keyed #{rekeyed} PETZI event(s) off a venue homepage."
   end
+
+  desc "One-off cleanup after dropping the FriSon scraper: dismiss its upcoming " \
+       "events, then re-run dedup. Dedup ranks bespoke scrapers above PETZI, so " \
+       "the frozen FriSon rows would otherwise stay canonical and hide PETZI's " \
+       "live copies of the same shows until their dates pass. Dismissed is the " \
+       "soft, sticky remove, as for dismiss_stale_suedpol. Idempotent; run once " \
+       "after deploying the removal."
+  task dismiss_fri_son: :environment do
+    stale = Event.where(data_source: "FriSon", dismissed_at: nil).where(start_date: Date.current..)
+    saves = EventSave.where(event_id: stale.select(:id)).count
+    count = stale.update_all(dismissed_at: Time.current)
+    Scrapers::Dedup.run
+    puts "Dismissed #{count} FriSon event(s) (#{saves} save(s) on them); PETZI copies are canonical now."
+  end
 end

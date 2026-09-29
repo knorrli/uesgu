@@ -8,7 +8,6 @@ VENUES = [
   { slug: 'kairo',         petzi: 'cafe-kairo' },
   { slug: 'gaskessel',     petzi: 'gaskessel' },
   { slug: 'kofmehl',       petzi: 'kulturfabrik-kofmehl' },
-  { slug: 'fri_son',       petzi: 'fri-son' },
   { slug: 'sedel',         petzi: 'sedel' },
   { slug: 'nouveau_monde', petzi: 'nouveau-monde' },
   { slug: 'helsinki',      petzi: 'helsinki' },

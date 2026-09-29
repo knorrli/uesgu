@@ -69,6 +69,24 @@
     aspect-ratio: 16 / 9;
   }
 
+  .media-dock__player[data-provider="youtube"] {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+
+  /* iOS never autoplays YouTube, and below 180px tall YouTube's embed covers
+     its own play button with invisible title and menu layers, so the frame
+     is laid out at double size and drawn at half. */
+  .media-dock__player[data-provider="youtube"] iframe {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 200%;
+    height: 200%;
+    transform: scale(0.5);
+    transform-origin: 0 0;
+  }
+
   .media-dock__bar {
     grid-area: 1 / 2;
     flex-wrap: wrap;

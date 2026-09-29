@@ -13,13 +13,6 @@
   border-top: var(--border-width) solid var(--rule-color);
 }
 
-@media (min-width: 600px) {
-  .media-dock {
-    max-width: 400px;
-    border-inline: var(--border-width) solid var(--rule-color);
-  }
-}
-
 .media-dock[hidden] {
   display: none;
 }
@@ -58,51 +51,75 @@
   background: var(--theme-bg-muted);
 }
 
-.media-dock:has(.media-dock__player:is([data-provider="youtube"], [data-provider="vimeo"])) {
-  display: grid;
-  grid-template-columns: 160px minmax(0, 1fr);
-
-  .media-dock__player {
-    grid-area: 1 / 1;
+@media (min-width: 600px) {
+  .media-dock {
+    inset-inline-start: auto;
+    width: 400px;
+    border-inline-start: var(--border-width) solid var(--rule-color);
   }
 
-  .media-dock__player :is(iframe, .media-dock__specimen-frame) {
+  .media-dock__player iframe,
+  .media-dock__specimen-frame {
+    height: 152px;
+  }
+
+  .media-dock__player[data-provider="soundcloud"] iframe {
+    height: 166px;
+  }
+
+  .media-dock__player:is([data-provider="youtube"], [data-provider="vimeo"]) :is(iframe, .media-dock__specimen-frame) {
     height: auto;
     aspect-ratio: 16 / 9;
   }
+}
 
-  .media-dock__player[data-provider="youtube"] {
-    position: relative;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-  }
+@media (max-width: 599px) {
+  .media-dock:has(.media-dock__player:is([data-provider="youtube"], [data-provider="vimeo"])) {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
 
-  /* iOS never autoplays YouTube, and below 180px tall YouTube's embed covers
-     its own play button with invisible title and menu layers, so the frame
-     is laid out at double size and drawn at half. */
-  .media-dock__player[data-provider="youtube"] iframe {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 200%;
-    height: 200%;
-    transform: scale(0.5);
-    transform-origin: 0 0;
-  }
+    .media-dock__player {
+      grid-area: 1 / 1;
+    }
 
-  .media-dock__bar {
-    grid-area: 1 / 2;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    justify-content: flex-end;
-    padding-block: var(--gap-xsmall);
-  }
+    .media-dock__player :is(iframe, .media-dock__specimen-frame) {
+      height: auto;
+      aspect-ratio: 16 / 9;
+    }
 
-  .media-dock__title {
-    order: 1;
-    flex-basis: 100%;
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    .media-dock__player[data-provider="youtube"] {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+    }
+
+    /* iOS never autoplays YouTube, and below 180px tall YouTube's embed covers
+       its own play button with invisible title and menu layers, so the frame
+       is laid out at double size and drawn at half. */
+    .media-dock__player[data-provider="youtube"] iframe {
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 200%;
+      height: 200%;
+      transform: scale(0.5);
+      transform-origin: 0 0;
+    }
+
+    .media-dock__bar {
+      grid-area: 1 / 2;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      justify-content: flex-end;
+      padding-block: var(--gap-xsmall);
+    }
+
+    .media-dock__title {
+      order: 1;
+      flex-basis: 100%;
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
   }
 }

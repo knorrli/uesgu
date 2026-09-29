@@ -30,6 +30,14 @@ class Scrapers::MediaTest < Minitest::Test
     assert_equal [ref("youtube", "kEn5lJTpqg8")], found
   end
 
+  def test_reads_a_video_wrapped_url_encoded_in_an_embedly_player
+    found = media(<<~HTML)
+      <span data-g-videoembed="&lt;iframe src=&quot;//cdn.embedly.com/widgets/media.html?src=https%3A%2F%2Fwww.youtube.com%2Fembed%2FSZns8lLIBxI%3Fautoplay%3D1&amp;url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DSZns8lLIBxI&amp;schema=youtube&quot;&gt;&lt;/iframe&gt;"></span>
+    HTML
+
+    assert_equal [ref("youtube", "SZns8lLIBxI")], found
+  end
+
   def test_reads_click_to_load_placeholders_by_their_thumbnail
     found = media('<div style="background-image:url(https://img.youtube.com/vi/OJb_WomPAuk/hqdefault.jpg)"></div>')
 

@@ -7,7 +7,7 @@ class Scrapers::GoldenTest < Minitest::Test
   REFERENCE_DATE = Date.new(2026, 6, 10)
 
   class Capture
-    FIELDS = %i[start_time start_date title description genre_list location_list cancelled_at].freeze
+    FIELDS = %i[start_time start_date title description genre_list location_list media cancelled_at].freeze
     attr_accessor(*FIELDS, :hidden, :data_source, :rescheduled_at, :event_page_checked_at, :aggregator_url)
     attr_reader :url
 
@@ -52,7 +52,7 @@ class Scrapers::GoldenTest < Minitest::Test
 
     captured = capture_events(klass, slug, dir)
     assert_url_shape(klass, slug, captured)
-    actual = captured.map(&:to_h)
+    actual = JSON.parse(captured.map(&:to_h).to_json, symbolize_names: true)
     golden_path = File.join(dir, "golden.json")
 
     if CAPTURING

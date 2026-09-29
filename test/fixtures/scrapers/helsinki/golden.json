@@ -11,6 +11,16 @@
       "Zürich",
       "ZH"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "Gp8qfP6kvPE"
+      },
+      {
+        "provider": "youtube",
+        "id": "00xEuHQQFPI"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -25,6 +35,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -39,6 +50,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -53,6 +65,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -66,6 +79,12 @@
       "Helsinki Klub",
       "Zürich",
       "ZH"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "DbWAld6tr9Q"
+      }
     ],
     "cancelled_at": false
   },
@@ -81,6 +100,24 @@
       "Zürich",
       "ZH"
     ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "3te_caZwoYc"
+      },
+      {
+        "provider": "youtube",
+        "id": "CY15O09BBvo"
+      },
+      {
+        "provider": "youtube",
+        "id": "zLHA4XyG_Ks"
+      },
+      {
+        "provider": "youtube",
+        "id": "W80Vf3Enixg"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -95,6 +132,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -108,6 +146,12 @@
       "Helsinki Klub",
       "Zürich",
       "ZH"
+    ],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "OiP995isBM8"
+      }
     ],
     "cancelled_at": false
   },
@@ -123,6 +167,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -137,6 +182,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -151,6 +197,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -165,6 +212,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -179,6 +227,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -193,6 +242,7 @@
       "Zürich",
       "ZH"
     ],
+    "media": [],
     "cancelled_at": false
   }
 ]

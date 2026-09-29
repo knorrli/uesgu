@@ -237,6 +237,7 @@ module Scrapers
       end
       ensure_genres_and_visibility(event)
       event.location_list = event_locations(content) unless event.overridden?(:locations)
+      event.media         = event_media(content)
       event.data_source   = self.class.source_key
       postprocess(event)
       mark_cancellation(event, content)
@@ -313,6 +314,8 @@ module Scrapers
     def event_genres(_content) = nil
 
     def event_genre_prose(_content) = nil
+
+    def event_media(content) = Media.in(content)
 
     def postprocess(_event) = nil
 

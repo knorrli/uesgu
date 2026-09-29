@@ -11,6 +11,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -25,6 +26,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -39,6 +41,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": false
   },
   {
@@ -53,6 +56,7 @@
       "Bern",
       "BE"
     ],
+    "media": [],
     "cancelled_at": true
   }
 ]

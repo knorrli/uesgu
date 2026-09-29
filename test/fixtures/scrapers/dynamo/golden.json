@@ -83,7 +83,12 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "jcrNNpMkBQ4"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -100,7 +105,12 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "PJfRaDHojd0"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -118,7 +128,12 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "MmPo4ZH0Oxo"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -154,7 +169,12 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "GMqlmMDJxJQ"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -171,7 +191,12 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "1gOnsfeyeVQ"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -186,7 +211,16 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "hStN_RIAKd0"
+      },
+      {
+        "provider": "youtube",
+        "id": "Ge077WkFJo0"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -203,7 +237,24 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "xv1Xb4E3bqI"
+      },
+      {
+        "provider": "youtube",
+        "id": "qKeI-9hiA00"
+      },
+      {
+        "provider": "youtube",
+        "id": "aK4MMyUbSKo"
+      },
+      {
+        "provider": "youtube",
+        "id": "equ6MrAFboM"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -259,7 +310,12 @@
       "Zürich",
       "ZH"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "Gn11JLXHoKg"
+      }
+    ],
     "cancelled_at": false
   }
 ]

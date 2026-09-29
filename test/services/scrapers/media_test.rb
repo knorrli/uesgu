@@ -93,7 +93,20 @@ class Scrapers::MediaTest < Minitest::Test
     assert_equal [ref("youtube", "cjox_JXa8eM")], Scrapers::Media.in(page)
   end
 
-  def test_content_that_is_not_markup_has_no_media
-    assert_empty Scrapers::Media.in({ "video" => "https://youtu.be/dC-U0-3yRms" })
+  def test_reads_the_string_values_of_a_json_row
+    row = { "title" => "Ellen", "videos" => [{ "uri" => "https://www.youtube.com/watch?v=jcrNNpMkBQ4" }],
+            "body" => '<iframe src="https://player.vimeo.com/video/123456789"></iframe>', "id" => 42 }
+
+    assert_equal [ref("youtube", "jcrNNpMkBQ4"), ref("vimeo", "123456789")], Scrapers::Media.in(row)
+  end
+
+  def test_reads_soundcloud_embeds_that_address_a_track_by_urn
+    found = media('<iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1789018924&amp;color=%237f3ed9"></iframe>')
+
+    assert_equal [ref("soundcloud", "tracks/1789018924")], found
+  end
+
+  def test_content_that_is_neither_markup_nor_json_has_no_media
+    assert_empty Scrapers::Media.in("https://youtu.be/dC-U0-3yRms")
   end
 end

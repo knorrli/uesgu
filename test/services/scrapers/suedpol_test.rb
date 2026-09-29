@@ -20,6 +20,15 @@ class Scrapers::SuedpolTest < Minitest::Test
     assert_equal "2026-01-06 00:00", scraper.event_start_time(row).strftime("%Y-%m-%d %H:%M")
   end
 
+  def test_media_comes_from_the_detail_fragment
+    row = row_for(detail: %(<div class="event-item__body"><iframe src="https://www.youtube.com/embed/_0SW-R0X1mo"></iframe></div>))
+    assert_equal [{ "provider" => "youtube", "id" => "_0SW-R0X1mo" }], scraper.send(:event_media, row)
+  end
+
+  def test_missing_detail_has_no_media
+    assert_empty scraper.send(:event_media, row_for(detail: nil))
+  end
+
   def test_event_url_is_the_alias_deep_link
     assert_equal "https://www.sudpol.ch/programm?event=zorp-night-2",
                  scraper.event_url(row_for(detail: nil))

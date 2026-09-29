@@ -11,7 +11,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "Is465_Upeug"
+      },
+      {
+        "provider": "youtube",
+        "id": "3oA4VjL1nGE"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -41,7 +50,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "cuBkg30woGs"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -71,7 +85,24 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "soundcloud",
+        "id": "tracks/1789018924"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "delevndj/x-club-of-groovecore-b2b"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "tracks/2119791564"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "sonare_podcasts/sonare-podcast-series-sergio-brutal-1"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -131,7 +162,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "W8u7c5jIILw"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -161,7 +197,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "cXZhipTgtaU"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -191,7 +232,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "5qQWr9BkcB0"
+      },
+      {
+        "provider": "youtube",
+        "id": "Qz10-L5qNEY"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -206,7 +256,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "BxdGGJ1QEaM"
+      },
+      {
+        "provider": "youtube",
+        "id": "z06wQx77Wj8"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -221,7 +280,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "t8hGZlKFjMc"
+      },
+      {
+        "provider": "youtube",
+        "id": "BTOQMWzmNUM"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -251,7 +319,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "iOb7j1AEeZU"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -266,7 +339,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "C2DOQBipJ7I"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -281,7 +359,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "sc9AhQVWT_E"
+      },
+      {
+        "provider": "youtube",
+        "id": "Zz_hdWPSK10"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -311,7 +398,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "f3Y2drIy5LQ"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -326,7 +418,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "soundcloud",
+        "id": "tracks/2151024912"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "yannick-stagee/bouncymix-vol-2-mix2025"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -401,7 +502,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "w37MtDEdCvg"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -416,7 +522,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "w37MtDEdCvg"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -431,7 +542,28 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "soundcloud",
+        "id": "tracks/956639815"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "erratic_maniac/memento-mori-vs-massivebass-vs-erratic-maniac-breaking-me"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "tracks/2280223637"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "don-imon/simdra-audio-extrahiert"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "tracks/2136040857"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -446,7 +578,24 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "soundcloud",
+        "id": "tracks/2050549292"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "damian-oegut/d-nation-dont-fall-original"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "tracks/2220667268"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "lunaticsoulofficial/lunaticsoul-i-to-my-thing-free"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -461,7 +610,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "k8DgQY-SUps"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -476,7 +630,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "jOTc4QmNZJU"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -506,7 +665,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "Xb3MxxFH4PE"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -776,7 +940,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "twBbPzvaRVw"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -791,7 +960,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "DHPfjBCXonA"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -806,7 +980,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "soundcloud",
+        "id": "playlists/2233026158"
+      },
+      {
+        "provider": "soundcloud",
+        "id": "drparnassus/sets"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -851,7 +1034,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "otmx4YfieBA"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -866,7 +1054,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "alprm6BPOBM"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -881,7 +1074,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "lmEpztGvPsY"
+      },
+      {
+        "provider": "youtube",
+        "id": "rKlLp0nqqRQ"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -971,7 +1173,16 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "81MB5ErRIJs"
+      },
+      {
+        "provider": "youtube",
+        "id": "Bn3Wokn13Vo"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1196,7 +1407,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "rFtP7Xc_Fbo"
+      }
+    ],
     "cancelled_at": false
   },
   {
@@ -1226,7 +1442,12 @@
       "Thun",
       "BE"
     ],
-    "media": [],
+    "media": [
+      {
+        "provider": "youtube",
+        "id": "H0crTTcNyHg"
+      }
+    ],
     "cancelled_at": false
   }
 ]

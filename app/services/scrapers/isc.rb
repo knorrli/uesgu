@@ -59,6 +59,14 @@ module Scrapers
 
     private
 
+    def event_media(content)
+      (Media.ranked(click_to_load_videos(content)) + Media.in(content)).uniq.first(Media::LIMIT)
+    end
+
+    def click_to_load_videos(content)
+      content.css(".video_player[data-type='youtube'][data-embed]").map { |player| "https://youtu.be/#{player["data-embed"]}" }
+    end
+
     def year_for(month, day)
       year = @scrape_date.year
       year += 1 if Date.new(year, month, day) < @scrape_date

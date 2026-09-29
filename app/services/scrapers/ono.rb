@@ -54,6 +54,12 @@ module Scrapers
       Array(content["data-ono-genre"].presence)
     end
 
+    # EventON writes the event's HTML description into its JSON-LD with raw tabs and newlines,
+    # which strict JSON rejects, so the script text is read as HTML rather than parsed.
+    def event_media(content)
+      Media.in(Nokogiri::HTML.fragment(content.css('script[type="application/ld+json"]').map(&:text).join))
+    end
+
     def event_cancelled?(_event, content)
       content.at_css('meta[itemprop="eventStatus"]')&.attr("content").to_s.include?("EventCancelled")
     end

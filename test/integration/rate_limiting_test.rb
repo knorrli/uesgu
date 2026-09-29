@@ -51,6 +51,72 @@ class RateLimitingTest < ActionDispatch::IntegrationTest
     }
   end
 
+  FACETED = { g: [ "Rock" ] }.freeze
+
+  def throttled_headers(client_ip, **extra)
+    edge_request(client_ip: client_ip, edge_ip: "104.23.175.21").merge(extra)
+  end
+
+  def exhaust_facet_limit(client_ip)
+    12.times { get root_path(FACETED), headers: throttled_headers(client_ip) }
+  end
+
+  test "shows a throttled browser a translated page instead of raw text" do
+    freeze_time do
+      exhaust_facet_limit("198.51.100.40")
+
+      get root_path(FACETED), headers: throttled_headers("198.51.100.40",
+        "HTTP_ACCEPT" => "text/html,application/xhtml+xml", "HTTP_ACCEPT_LANGUAGE" => "de-CH")
+
+      assert_response :too_many_requests
+      assert_equal "text/html", response.media_type
+      assert_equal "60", response.headers["Retry-After"]
+      assert_select "h1", I18n.t("rate_limited.heading", locale: :de)
+      assert_select ".site-header"
+    end
+  end
+
+  test "answers a throttled frame request with the same frame so Turbo can show it in place" do
+    freeze_time do
+      exhaust_facet_limit("198.51.100.41")
+
+      get root_path(FACETED), headers: throttled_headers("198.51.100.41",
+        "HTTP_ACCEPT" => "text/html,application/xhtml+xml", "HTTP_TURBO_FRAME" => "genre_options")
+
+      assert_response :too_many_requests
+      assert_select "turbo-frame#genre_options", text: I18n.t("rate_limited.short")
+      assert_select ".site-header", count: 0
+    end
+  end
+
+  test "answers a throttled Turbo form submission with a flash stream" do
+    freeze_time do
+      exhaust_facet_limit("198.51.100.42")
+
+      post root_path(FACETED), headers: throttled_headers("198.51.100.42",
+        "HTTP_ACCEPT" => "text/vnd.turbo-stream.html, text/html, application/xhtml+xml")
+
+      assert_response :too_many_requests
+      assert_equal "text/vnd.turbo-stream.html", response.media_type
+      assert_equal "60", response.headers["Retry-After"]
+      assert_select "turbo-stream[action=append][targets='.flashes'] template .flash.alert",
+                    text: I18n.t("rate_limited.short")
+    end
+  end
+
+  test "keeps the short plain-text answer for clients that do not ask for a page" do
+    freeze_time do
+      exhaust_facet_limit("198.51.100.43")
+
+      get root_path(FACETED), headers: throttled_headers("198.51.100.43", "HTTP_ACCEPT" => "*/*")
+
+      assert_response :too_many_requests
+      assert_equal "text/plain", response.media_type
+      assert_equal "60", response.headers["Retry-After"]
+      assert_match(/Too many requests/, response.body)
+    end
+  end
+
   test "counts one client across many Cloudflare edge IPs as a single bucket" do
     freeze_time do
       12.times do |i|

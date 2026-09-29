@@ -17,6 +17,7 @@ export default class extends Controller {
     dropUrl: String,
     pending: String,
     error: String,
+    rateLimited: String,
     undecodable: String,
     sourceAlt: String,
     pasted: String,
@@ -387,6 +388,7 @@ export default class extends Controller {
         body,
         headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
       })
+      if (response.status === 429) return this.failRow(id, this.rateLimitedValue)
       if (!response.ok) return this.failRow(id)
 
       const stream = await response.text()

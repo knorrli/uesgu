@@ -130,6 +130,11 @@ de:
     rate_limited: Versuche es später erneut.
     invite_label: Einladungscode
     invite_hint: Die Registrierung ist nur mit Einladung möglich.
+  rate_limited:
+    title: Etwas langsamer
+    heading: Etwas langsamer, bitte
+    body: Das war ziemlich viel in kurzer Zeit. Warte eine Minute und versuche es dann erneut.
+    short: Etwas langsamer, bitte. Versuche es in einer Minute erneut.
   registrations:
     welcome: Willkommen bei üsgu!
     account_deleted: Dein Konto wurde gelöscht.

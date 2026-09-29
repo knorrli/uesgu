@@ -130,6 +130,11 @@ fr:
     rate_limited: Réessaie plus tard.
     invite_label: Code d'invitation
     invite_hint: L'inscription se fait uniquement sur invitation.
+  rate_limited:
+    title: Doucement
+    heading: Doucement
+    body: Ça fait beaucoup en peu de temps. Attends une minute, puis réessaie.
+    short: Doucement. Réessaie dans une minute.
   registrations:
     welcome: Bienvenue sur üsgu !
     account_deleted: Ton compte a été supprimé.

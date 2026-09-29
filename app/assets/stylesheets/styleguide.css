@@ -122,3 +122,7 @@
 .sg-swatch__label code {
   color: var(--theme-fg-muted);
 }
+
+.sg .media-dock {
+  position: static;
+}

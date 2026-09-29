@@ -1,7 +1,10 @@
 body {
+  --bottom-clearance: max(var(--cookie-notice-clearance, 0px), var(--media-dock-clearance, 0px));
+
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh + var(--bottom-clearance));
+  padding-bottom: var(--bottom-clearance);
 }
 
 .content {
@@ -13,10 +16,6 @@ body {
 
 main.content {
   flex: 1 0 auto;
-}
-
-body:has(.cookie-notice:not([hidden])) .site-footer {
-  padding-bottom: calc(var(--gap-large) + 3.5rem + var(--safe-bottom));
 }
 
 h1 { font-size: var(--font-size-xl); }

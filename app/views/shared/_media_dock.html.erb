@@ -1,0 +1,13 @@
+<%# locals: (specimen: false) %>
+<%= tag.section class: "media-dock", id: ("media-dock" unless specimen), hidden: !specimen, 'aria-label': t("media.dock"),
+                data: ({ controller: "media-dock", action: "media:toggle@window->media-dock#toggle" } unless specimen) do %>
+  <div class="media-dock__bar">
+    <a class="media-dock__title" href="#" data-media-dock-target="title"><%= "Holy Wave" if specimen %></a>
+    <button type="button" class="icon-button" data-action="media-dock#stop" aria-label="<%= t('media.stop') %>">
+      <span class="ph ph-x" aria-hidden="true"></span>
+    </button>
+  </div>
+  <div class="media-dock__player" data-media-dock-target="player" <%= 'data-provider="youtube"'.html_safe if specimen %>>
+    <% if specimen %><div class="media-dock__specimen-frame"></div><% end %>
+  </div>
+<% end %>

@@ -71,6 +71,7 @@ fr:
     services_hosting: 'Hébergement : Render (render.com), région de Francfort. Tes données restent dans l''UE.'
     services_email: 'E-mail : Resend (resend.com), région d''Irlande. Envoie les e-mails de notification optionnels.'
     services_push: 'Push : si tu actives les notifications push, elles passent par le service push de ton navigateur ou de ton téléphone (Google, Mozilla ou Apple).'
+    services_players: "Lecteur de musique : quand tu appuies sur lecture, le lecteur de YouTube, Spotify, SoundCloud, Vimeo, Bandcamp ou Mixcloud se charge. Dès lors, ce service voit ta visite et peut poser ses propres cookies, selon sa propre politique de confidentialité."
     calendar_heading: Lien calendrier
     calendar_body: Si tu crées un abonnement calendrier, son lien contient une clé secrète. Si tu partages ce lien, d'autres personnes peuvent voir tes événements gardés. Tu peux désactiver le lien calendrier à tout moment dans les réglages.
     logs_heading: Journaux serveur
@@ -942,6 +943,11 @@ fr:
     this_weekend: Ce week-end
     today: Aujourd'hui
     tomorrow: Demain
+  media:
+    via: "Joue dans le lecteur de %{provider}"
+    dock: Lecteur
+    play: "Écouter %{title}"
+    stop: Arrêter
   events:
     cancelled: Annulé
     rescheduled: Nouvelle date

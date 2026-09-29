@@ -625,6 +625,27 @@
         <p class="sg-purpose">"Save this show" — the rare, powerful signal, and the one raspberry on the site. Faint outline = not saved, solid <b>raspberry</b> = saved. Its counterpart is the green <b>star</b> of a saved filter: the two personal signals differ in shape as well as colour.</p>
       </div>
     </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen sg-specimen--lg">
+        <button type="button" class="event-play icon-button" aria-label="Listen"><span class="ph ph-play" aria-hidden="true"></span></button>
+        <button type="button" class="event-play icon-button playing" aria-label="Stop"><span class="ph ph-stop" aria-hidden="true"></span></button>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Play button</span> · <code>media_play_button(event)</code>
+        <p class="sg-purpose">Plays the event's music in the <a href="#media-dock">player</a>; it sits before the heart and only exists when a scraper found media. Muted <b>play</b> = idle, green <b>stop</b> = this event is playing. Available without an account. Nothing third-party loads until the tap.</p>
+      </div>
+    </div>
+
+    <div class="sg-row" id="media-dock">
+      <div class="sg-specimen">
+        <%= render "shared/media_dock", specimen: true %>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Player</span> · <code>render "shared/media_dock"</code>
+        <p class="sg-purpose">Rendered once by the layout, docked bottom-right and hidden until a play button is tapped. The title links to the event on its day in the feed. It keeps playing across page visits and is replaced by the next play or closed with <b>×</b>, which removes the embed. The frame takes the provider's own height (16:9 for video, a strip for SoundCloud, Spotify, Bandcamp and Mixcloud).</p>
+      </div>
+    </div>
   </section>
 
   <section class="sg-section" id="nav">

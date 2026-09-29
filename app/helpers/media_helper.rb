@@ -10,8 +10,8 @@ module MediaHelper
     when "youtube" then "https://www.youtube-nocookie.com/embed/#{id}?autoplay=1&playsinline=1&rel=0"
     when "vimeo" then "https://player.vimeo.com/video/#{id}?autoplay=1&dnt=1"
     when "bandcamp" then "https://bandcamp.com/EmbeddedPlayer/#{id}/size=large/artwork=small/tracklist=false/transparent=true/"
-    when "soundcloud" then "https://w.soundcloud.com/player/?#{{ url: soundcloud_url(id), auto_play: true, visual: false }.to_query}"
-    when "mixcloud" then "https://player-widget.mixcloud.com/widget/iframe/?#{{ feed: "/#{id}/", mini: 1, autoplay: 1 }.to_query}"
+    when "soundcloud" then "https://w.soundcloud.com/player/?#{{ url: soundcloud_url(id), auto_play: true, visual: false, show_teaser: false }.to_query}"
+    when "mixcloud" then "https://player-widget.mixcloud.com/widget/iframe/?#{{ feed: "/#{id}/", hide_cover: 1, autoplay: 1 }.to_query}"
     when "spotify" then "https://open.spotify.com/embed/#{id}"
     end
   end

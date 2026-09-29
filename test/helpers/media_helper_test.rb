@@ -13,8 +13,12 @@ class MediaHelperTest < ActionView::TestCase
                  media_embed_src(ref("bandcamp", "album=2928376541"))
     assert_equal "https://open.spotify.com/embed/artist/1Deno0E7v6B4caD2VOL1No",
                  media_embed_src(ref("spotify", "artist/1Deno0E7v6B4caD2VOL1No"))
-    assert_equal "https://player-widget.mixcloud.com/widget/iframe/?autoplay=1&feed=%2Fsomeone%2Fa-long-mix%2F&mini=1",
+    assert_equal "https://player-widget.mixcloud.com/widget/iframe/?autoplay=1&feed=%2Fsomeone%2Fa-long-mix%2F&hide_cover=1",
                  media_embed_src(ref("mixcloud", "someone/a-long-mix"))
+  end
+
+  test "soundcloud embeds without the teaser it lays over its player on phones" do
+    assert_includes media_embed_src(ref("soundcloud", "someband/a-song")), "show_teaser=false"
   end
 
   test "soundcloud embeds a track id through the api and a page path through the site" do

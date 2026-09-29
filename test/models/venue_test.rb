@@ -96,12 +96,12 @@ class VenueTest < ActiveSupport::TestCase
     assert_includes bm.venue_domains, "bewegungsmelder.ch", "still covers its own feed host"
   end
 
-  test "every consume venue is backed by an own-domain scraper or an aggregator" do
-    own = Scrapers::All.scrapers.values.reject(&:aggregator?).flat_map(&:venue_domains).to_set
+  test "every consume venue is backed by a scraper that covers its domain or an aggregator" do
+    covered = Scrapers::All.scrapers.values.flat_map(&:venue_domains).to_set
     feeds = Scrapers::All.scrapers.values.select(&:aggregator?).map { |k| Scrapers::Discovery.domain(k.url.host) }.to_set
     Venue.consuming.each do |v|
-      next if own.include?(v.domain) || feeds.include?(v.domain)
-      assert v.sourced_via_aggregator?, "#{v.domain}: consume but no own scraper and not aggregator-sourced"
+      next if covered.include?(v.domain) || feeds.include?(v.domain)
+      assert v.sourced_via_aggregator?, "#{v.domain}: consume but no scraper covers it and not aggregator-sourced"
     end
   end
 

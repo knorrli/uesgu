@@ -32,9 +32,11 @@ module Scrapers
     end
 
     def in_text(text)
-      PROVIDERS.flat_map do |provider, pattern|
-        text.scan(pattern).map { |captures| { "provider" => provider, "id" => captures.compact.join("/") } }
-      end
+      [text, CGI.unescape(text).scrub].uniq.flat_map do |variant|
+        PROVIDERS.flat_map do |provider, pattern|
+          variant.scan(pattern).map { |captures| { "provider" => provider, "id" => captures.compact.join("/") } }
+        end
+      end.uniq
     end
 
     def strings_in(data)

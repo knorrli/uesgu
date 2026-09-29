@@ -22,12 +22,28 @@ class MediaHelperTest < ActionView::TestCase
                     "url=#{CGI.escape('https://soundcloud.com/someband/a-song')}"
   end
 
+  test "each reference with a public page links to it on the provider's site" do
+    assert_equal "https://www.youtube.com/watch?v=mI_3DVHXLhM", media_page_url(ref("youtube", "mI_3DVHXLhM"))
+    assert_equal "https://vimeo.com/123456789", media_page_url(ref("vimeo", "123456789"))
+    assert_equal "https://soundcloud.com/someband/a-song", media_page_url(ref("soundcloud", "someband/a-song"))
+    assert_equal "https://www.mixcloud.com/someone/a-long-mix/", media_page_url(ref("mixcloud", "someone/a-long-mix"))
+    assert_equal "https://open.spotify.com/artist/1Deno0E7v6B4caD2VOL1No",
+                 media_page_url(ref("spotify", "artist/1Deno0E7v6B4caD2VOL1No"))
+  end
+
+  test "embeds addressed by numeric id have no public page to link" do
+    assert_nil media_page_url(ref("soundcloud", "tracks/1789018924"))
+    assert_nil media_page_url(ref("bandcamp", "album=2928376541"))
+  end
+
   test "the play button carries the first reference's embed and loads nothing itself" do
     show = event(title: "Holy Wave", media: [ref("youtube", "cjox_JXa8eM"), ref("spotify", "artist/1Deno0E7v6B4caD2VOL1No")])
     button = Nokogiri::HTML.fragment(media_play_button(show)).at_css("button.event-play")
 
     assert_equal "youtube", button["data-media-play-provider-value"]
     assert_equal media_embed_src(ref("youtube", "cjox_JXa8eM")), button["data-media-play-src-value"]
+    assert_equal "https://www.youtube.com/watch?v=cjox_JXa8eM", button["data-media-play-page-url-value"]
+    assert_equal "YouTube", button["data-media-play-provider-name-value"]
     assert_equal "false", button["aria-pressed"]
     assert_equal I18n.t("media.via", provider: "YouTube"), button["title"]
     assert_equal "/events?day=2030-01-01#event_#{show.id}", button["data-media-play-event-url-value"]

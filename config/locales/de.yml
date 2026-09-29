@@ -944,6 +944,7 @@ de:
     today: Heute
     tomorrow: Morgen
   media:
+    open: "Dort öffnen, wo es herkommt, falls es hier nicht spielt"
     via: "Spielt im Player von %{provider}"
     dock: Player
     play: "%{title} anhören"

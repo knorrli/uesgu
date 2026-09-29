@@ -48,7 +48,7 @@ module Scrapers
     def event_rows
       xml = Nokogiri::XML(page.body)
       xml.remove_namespaces!
-      xml.css("loc").map(&:text).select { |u| u.include?("/events/") && venue_for(u) }
+      xml.css("loc").map(&:text).select { |u| u.include?("/events/") && venue_for(u) }.uniq
     end
 
     def event_url(row) = known_urls[row] || venue_url(detail_page(row), row) || row

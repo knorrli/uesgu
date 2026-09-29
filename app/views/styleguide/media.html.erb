@@ -1,0 +1,14 @@
+<% content_for :title, "Player bench" %>
+
+<div class="sg">
+  <h1>Player bench</h1>
+  <p class="sg-lede">
+    One event per reference shape the scrapers extract, rendered as real feed rows with the real
+    <a href="<%= styleguide_path(anchor: 'media-dock') %>">player</a>. Every id is a public track, video or mix.
+    Nothing third-party loads until a play button is tapped.
+  </p>
+
+  <section id="events" class="event-list">
+    <%= render 'events/venue_groups', events: @events, filter: nil %>
+  </section>
+</div>

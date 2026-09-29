@@ -55,6 +55,7 @@ Rails.application.routes.draw do
   post "push_subscriptions/test" => "push_subscriptions#test"
 
   get "styleguide" => "styleguide#index", as: :styleguide
+  get "styleguide/media" => "styleguide#media", as: :styleguide_media
 
   resources :events, only: [:index, :destroy]
   resources :tags, only: [:index, :edit] do

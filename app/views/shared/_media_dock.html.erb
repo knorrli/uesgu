@@ -3,8 +3,13 @@
                 data: ({ controller: "media-dock", action: "media:toggle@window->media-dock#toggle" } unless specimen) do %>
   <div class="media-dock__bar">
     <a class="media-dock__title" <%= 'href="#"'.html_safe if specimen %> target="_blank" rel="noopener" data-media-dock-target="title"><%= "Holy Wave" if specimen %></a>
-    <%= link_to (specimen ? "YouTube ↗" : ""), (specimen ? "#media-dock" : "#"), class: "text-link", target: "_blank", rel: "noopener",
-                hidden: !specimen, title: t("media.open"), data: { media_dock_target: "link" } %>
+    <% if authenticated? %>
+      <%= button_tag type: :button, class: "event-save icon-button", 'aria-pressed': "false", 'aria-label': t("saved_events.toggle"),
+                     data: ({ controller: "save", action: "save#toggle save:toggled@window->save#sync" } unless specimen)
+                             .to_h.merge(media_dock_target: "save") do %>
+        <span class="save-heart" aria-hidden="true"></span>
+      <% end %>
+    <% end %>
     <button type="button" class="icon-button" data-action="media-dock#stop" aria-label="<%= t('media.stop') %>">
       <span class="ph ph-x" aria-hidden="true"></span>
     </button>

@@ -139,7 +139,7 @@ module EventsHelper
                class: class_names("event-save", "icon-button", saved: saved),
                'aria-pressed': saved.to_s,
                'aria-label': t("saved_events.toggle"),
-               data: { controller: "save", action: "save#toggle",
+               data: { controller: "save", action: "save#toggle save:toggled@window->save#sync",
                        save_event_id_value: event.id, save_saved_value: saved } do
       content_tag(:span, "", class: "save-heart", 'aria-hidden': true)
     end

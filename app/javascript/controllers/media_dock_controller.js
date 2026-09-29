@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
 export default class extends Controller {
-  static targets = ["title", "link", "player"]
+  static targets = ["title", "save", "player"]
 
   connect() {
     this.prepareRender = this.prepareRender.bind(this)
@@ -19,7 +19,7 @@ export default class extends Controller {
     this.resizeObserver.disconnect()
   }
 
-  toggle({ detail: { eventId, title, eventUrl, provider, providerName, src, pageUrl } }) {
+  toggle({ detail: { eventId, title, eventUrl, saved, provider, src } }) {
     if (this.element.dataset.eventId === String(eventId)) return this.stop()
 
     const frame = document.createElement("iframe")
@@ -30,7 +30,7 @@ export default class extends Controller {
     this.playerTarget.dataset.provider = provider
     this.titleTarget.textContent = title
     this.#linkTitle(eventUrl)
-    this.#showLink(pageUrl, providerName)
+    this.#showSave(eventId, saved)
     this.element.dataset.eventId = eventId
     this.element.hidden = false
     this.keepOutOfCache()
@@ -43,7 +43,6 @@ export default class extends Controller {
     delete this.element.dataset.eventId
     this.titleTarget.textContent = ""
     this.#linkTitle("")
-    this.#showLink("", "")
     this.element.hidden = true
     Turbo.cache.resetCacheControl()
     this.#announce(null)
@@ -82,10 +81,11 @@ export default class extends Controller {
     else this.titleTarget.removeAttribute("href")
   }
 
-  #showLink(url, providerName) {
-    this.linkTarget.hidden = !url
-    this.linkTarget.href = url || "#"
-    this.linkTarget.textContent = url ? `${providerName} ↗` : ""
+  #showSave(eventId, saved) {
+    if (!this.hasSaveTarget) return
+
+    this.saveTarget.dataset.saveEventIdValue = eventId
+    this.saveTarget.dataset.saveSavedValue = saved
   }
 
   #announce(eventId) {

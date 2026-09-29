@@ -968,7 +968,7 @@ de:
         other: "%{count} Events werden wegen deiner ausgeschlossenen Genres nicht angezeigt."
       save_filter: Filter speichern
       save_filter_all: Über alles benachrichtigen
-      save_filter_saved: Gespeichert — bearbeiten
+      edit_filter: Filter bearbeiten
       update_filter: "„%{name}“ aktualisieren"
     filter:
       what: "Acts, Stile, alles suchen…"

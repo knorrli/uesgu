@@ -9,11 +9,18 @@ export default class extends Controller {
     this.#persist(saved).catch(() => this.#apply(!saved))
   }
 
-  #apply(saved) {
-    this.savedValue = saved
+  sync({ detail: { eventId, saved } }) {
+    if (eventId === this.eventIdValue && saved !== this.savedValue) this.#apply(saved)
+  }
+
+  savedValueChanged(saved) {
     this.element.classList.toggle("saved", saved)
     this.element.setAttribute("aria-pressed", saved)
-    this.dispatch("toggled", { detail: { saved }, bubbles: true })
+  }
+
+  #apply(saved) {
+    this.savedValue = saved
+    this.dispatch("toggled", { detail: { eventId: this.eventIdValue, saved }, bubbles: true })
   }
 
   async #persist(saved) {

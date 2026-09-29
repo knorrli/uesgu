@@ -944,7 +944,6 @@ en:
     today: Today
     tomorrow: Tomorrow
   media:
-    open: "Open it where it lives, if it won’t play here"
     via: "Plays in %{provider}'s player"
     dock: Player
     play: "Listen to %{title}"

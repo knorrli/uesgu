@@ -28,6 +28,8 @@
 .media-dock__title {
   flex: 1;
   min-width: 0;
+  color: var(--theme-fg-color);
+  text-decoration: underline;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

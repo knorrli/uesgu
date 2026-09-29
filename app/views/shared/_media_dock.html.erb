@@ -2,7 +2,7 @@
 <%= tag.section class: "media-dock", id: ("media-dock" unless specimen), hidden: !specimen, 'aria-label': t("media.dock"),
                 data: ({ controller: "media-dock", action: "media:toggle@window->media-dock#toggle" } unless specimen) do %>
   <div class="media-dock__bar">
-    <span class="media-dock__title" data-media-dock-target="title"><%= "Holy Wave" if specimen %></span>
+    <a class="media-dock__title" href="#" data-media-dock-target="title"><%= "Holy Wave" if specimen %></a>
     <button type="button" class="icon-button" data-action="media-dock#stop" aria-label="<%= t('media.stop') %>">
       <span class="ph ph-x" aria-hidden="true"></span>
     </button>

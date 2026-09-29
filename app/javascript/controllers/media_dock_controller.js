@@ -19,7 +19,7 @@ export default class extends Controller {
     this.resizeObserver.disconnect()
   }
 
-  toggle({ detail: { eventId, title, provider, src } }) {
+  toggle({ detail: { eventId, title, eventUrl, provider, src } }) {
     if (this.element.dataset.eventId === String(eventId)) return this.stop()
 
     const frame = document.createElement("iframe")
@@ -29,6 +29,7 @@ export default class extends Controller {
     this.playerTarget.replaceChildren(frame)
     this.playerTarget.dataset.provider = provider
     this.titleTarget.textContent = title
+    this.titleTarget.href = eventUrl
     this.element.dataset.eventId = eventId
     this.element.hidden = false
     this.keepOutOfCache()
@@ -40,6 +41,7 @@ export default class extends Controller {
     delete this.playerTarget.dataset.provider
     delete this.element.dataset.eventId
     this.titleTarget.textContent = ""
+    this.titleTarget.href = "#"
     this.element.hidden = true
     Turbo.cache.resetCacheControl()
     this.#announce(null)

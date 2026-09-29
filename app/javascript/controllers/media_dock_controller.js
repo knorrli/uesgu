@@ -78,7 +78,7 @@ export default class extends Controller {
   }
 
   #reserveSpace() {
-    const height = this.element.hidden ? 0 : this.element.offsetHeight
-    document.documentElement.style.setProperty("--media-dock-clearance", `${height}px`)
+    const covered = this.element.hidden ? 0 : this.element.offsetHeight + parseFloat(getComputedStyle(this.element).bottom)
+    document.documentElement.style.setProperty("--media-dock-clearance", `${covered}px`)
   }
 }

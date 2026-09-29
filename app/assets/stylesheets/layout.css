@@ -151,8 +151,7 @@
   width: 100%;
   max-width: var(--content-max-width);
   margin-inline: auto;
-  padding: var(--gap-large) var(--gap-large)
-    calc(var(--gap-large) + var(--media-dock-clearance, 0px) + max(var(--cookie-notice-clearance, 0px), var(--safe-bottom)));
+  padding: var(--gap-large) var(--gap-large) calc(var(--gap-large) + var(--safe-bottom));
   border-top: var(--border-width) solid var(--border-color);
   font-size: var(--font-size-small);
 }

@@ -2,7 +2,7 @@ require "test_helper"
 
 class Scrapers::GoldenTest < Minitest::Test
   FIXTURE_ROOT = File.expand_path("../../fixtures/scrapers", __dir__)
-  SHAPE_B = %w[kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken marians z7].freeze
+  SHAPE_B = %w[kofmehl docks boeroem isc kiff nouveau_monde sedel sous_soul neubad muehle_hunziken marians z7 x_tra].freeze
   CAPTURING = ENV["CAPTURE_GOLDEN"] == "1"
   REFERENCE_DATE = Date.new(2026, 6, 10)
 
@@ -88,6 +88,7 @@ class Scrapers::GoldenTest < Minitest::Test
     Date.stub(:current, REFERENCE_DATE) do
       scraper = klass.new
       scraper.define_singleton_method(:get) { |*| nil }
+      scraper.define_singleton_method(:post) { |*| nil }
       scraper.define_singleton_method(:page) { list_page }
       scraper.define_singleton_method(:click) { |*| detail_page } if detail_page
       scraper.define_singleton_method(:known_urls) { {} } if scraper.respond_to?(:known_urls, true)

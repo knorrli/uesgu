@@ -43,11 +43,7 @@
   border: 0;
 }
 
-.media-dock__player[data-provider="soundcloud"] iframe {
-  height: 60px;
-}
-
-.media-dock__player:is([data-provider="bandcamp"], [data-provider="mixcloud"]) iframe {
+.media-dock__player:is([data-provider="bandcamp"], [data-provider="mixcloud"], [data-provider="soundcloud"]) iframe {
   height: 120px;
 }
 

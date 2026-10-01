@@ -248,6 +248,31 @@
   padding: var(--gap-xsmall);
 }
 
+@media (max-width: 599px) {
+  .event {
+    display: grid;
+    grid-template-columns: 5ch minmax(0, 1fr) auto;
+    align-items: baseline;
+    row-gap: var(--gap-xsmall);
+    column-gap: 0.8ch;
+  }
+
+  .event-body {
+    display: contents;
+  }
+
+  .event-description,
+  .event-genres {
+    grid-column: 2 / -1;
+  }
+
+  .event-actions {
+    grid-area: 1 / 3;
+    align-self: start;
+    margin-inline-start: calc(var(--gap-medium) - 0.8ch);
+  }
+}
+
 .event.past,
 .date-events.past .date {
   opacity: 0.5;

@@ -10,15 +10,16 @@
     <% anchor = venue || locations.first %>
     <% meta_locations = locations.reject { |location| location == anchor } %>
     <% why_locs = interactive ? interest_location_names(group) : Set.new %>
+    <% excludable = interactive && current_user %>
     <section class="venue-group flex flex-col gap-small">
       <% if anchor %>
         <div class="venue-header flex flex-col gap-xsmall">
           <div class="event-where"><%= event_filter_tag anchor.name, field: 'l[]', value: anchor.name, interactive: interactive,
-                  modifier: 'venue' %><% if why_locs.include?(anchor.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><% if interactive && current_user && venue %><%= button_to location_exclusions_path, params: { name: venue.name, return_to: request.fullpath }, class: 'icon-button meta-action', title: t('events.exclude_location', location: venue.name), 'aria-label': t('events.exclude_location', location: venue.name), form: { data: { turbo_frame: '_top' } } do %><span class="ph ph-eye-slash"></span><% end %><% end %></div>
+                  modifier: 'venue' %><% if why_locs.include?(anchor.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><% if excludable %><%= render 'location_exclude_button', name: anchor.name %><% end %></div>
           <% if meta_locations.any? %>
             <div class="event-where-meta">
               <% meta_locations.each_with_index do |location, i| %>
-                <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %><%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive %><% if why_locs.include?(location.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %>
+                <% if i > 0 %><span class="sep" aria-hidden="true">&middot;</span><% end %><%= event_filter_tag location.name, field: 'l[]', value: location.name, interactive: interactive %><% if why_locs.include?(location.name) %><span class="interest-flag" aria-hidden="true"><i class="ph ph-flag"></i></span><% end %><% if excludable %><%= render 'location_exclude_button', name: location.name %><% end %>
               <% end %>
             </div>
           <% end %>

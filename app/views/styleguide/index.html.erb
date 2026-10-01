@@ -272,11 +272,14 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <div class="event-where"><a class="filter-link venue" href="#">Zorphalle</a><button type="button" class="icon-button meta-action" aria-label="Exclude Zorphalle"><span class="ph ph-eye-slash"></span></button></div>
+        <div class="venue-header flex flex-col gap-xsmall">
+          <div class="event-where"><a class="filter-link venue" href="#">Zorphalle</a><button type="button" class="icon-button meta-action" aria-label="Exclude Zorphalle"><span class="ph ph-eye-slash"></span></button></div>
+          <div class="event-where-meta"><a class="filter-link" href="#">Zorpwil</a><button type="button" class="icon-button meta-action" aria-label="Exclude Zorpwil"><span class="ph ph-eye-slash"></span></button><span class="sep" aria-hidden="true">&middot;</span><a class="filter-link" href="#">BE</a><button type="button" class="icon-button meta-action" aria-label="Exclude BE"><span class="ph ph-eye-slash"></span></button></div>
+        </div>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Venue heading action</span> · <code>.event-where .meta-action</code>
-        <p class="sg-purpose">The same exclude, after a venue heading: signed in, it takes every event at that venue out of the feed and notifications at once. Only a venue gets it, not the town or canton line below.</p>
+        <span class="sg-spec__name">Location heading actions</span> · <code>events/_location_exclude_button</code>
+        <p class="sg-purpose">The same exclude, after the venue heading and after each town and canton below it: signed in, it takes every event at that place out of the feed and notifications at once.</p>
       </div>
     </div>
 

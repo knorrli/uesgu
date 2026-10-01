@@ -1,0 +1,1 @@
+<%= button_to location_exclusions_path, params: { name: name, return_to: request.fullpath }, class: 'icon-button meta-action', title: t('events.exclude_location', location: name), 'aria-label': t('events.exclude_location', location: name), form: { data: { turbo_frame: '_top' } } do %><span class="ph ph-eye-slash"></span><% end %>

@@ -20,13 +20,33 @@ class LocationExclusionsTest < ActionDispatch::IntegrationTest
     assert_equal 0, LocationExclusion.count
   end
 
-  test "a venue heading carries an exclude button, a town heading does not" do
+  test "the venue, its town and its canton each carry an exclude button" do
     sign_in_as user
 
     get events_path
 
-    assert_select ".event-where form[action=?]", location_exclusions_path, count: 1
     assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
+    group = Nokogiri::HTML(response.body).at_css("##{dom_id(@there)}").ancestors(".venue-group").first
+    assert_equal [@hall.locality, @hall.canton], group.css(".event-where-meta form input[name=name]").map { |input| input["value"] }
+  end
+
+  test "a town heading without a venue carries an exclude button" do
+    sign_in_as user
+
+    get events_path
+
+    assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.locality
+  end
+
+  test "excluding a town leaves out every event there, at a venue or not" do
+    listener = sign_in_as user
+
+    post location_exclusions_path, params: { name: @hall.locality }
+
+    assert_equal [@hall.locality], listener.location_exclusions.pluck(:name)
+    get events_path
+    refute_includes response.body, "ThereMarkerShow"
+    refute_includes response.body, "ElsewhereMarkerShow"
   end
 
   test "excluding a venue takes effect at once and returns to the page it was pressed on" do

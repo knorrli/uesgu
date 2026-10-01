@@ -28,13 +28,18 @@ module MediaHelper
                data: { controller: "media-play",
                        action: "media-play#toggle media:changed@window->media-play#sync save:toggled@window->media-play#syncSaved",
                        media_play_event_id_value: event.id, media_play_title_value: event.title,
-                       media_play_provider_value: reference["provider"], media_play_src_value: media_embed_src(reference),
+                       media_play_media_value: event.media.map { |item| media_dock_item(item) },
                        media_play_event_url_value: event_link_url(event), media_play_saved_value: event_saved?(event) } do
       content_tag(:span, "", class: "ph ph-play", 'aria-hidden': true, data: { media_play_target: "icon" })
     end
   end
 
   private
+
+  def media_dock_item(reference)
+    { provider: reference["provider"], src: media_embed_src(reference),
+      via: t("media.via", provider: MEDIA_PROVIDER_NAMES[reference["provider"]]) }
+  end
 
   def soundcloud_url(id)
     id.start_with?("tracks/", "playlists/") ? "https://api.soundcloud.com/#{id}" : "https://soundcloud.com/#{id}"

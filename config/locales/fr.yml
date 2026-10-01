@@ -957,6 +957,8 @@ fr:
     dock: Lecteur
     play: "Écouter %{title}"
     stop: Arrêter
+    previous: Morceau précédent
+    next: Morceau suivant
   events:
     cancelled: Annulé
     rescheduled: Nouvelle date

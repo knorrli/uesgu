@@ -20,18 +20,25 @@ class StyleguideController < ApplicationController
   def index; end
 
   def media
-    @events = MEDIA_SAMPLES.each_with_index.map { |(provider, id), i| media_sample(provider, id, position: i) }
+    @events = MEDIA_SAMPLES.each_with_index.map do |(provider, id), i|
+      media_sample("#{MediaHelper::MEDIA_PROVIDER_NAMES[provider]} #{id}", [[provider, id]], position: i)
+    end
+    @events << media_sample("Switching between providers", switching_sample, position: MEDIA_SAMPLES.size)
   end
 
   private
 
-  def media_sample(provider, id, position:)
+  def switching_sample
+    MEDIA_SAMPLES.uniq(&:first).first(Scrapers::Media::LIMIT)
+  end
+
+  def media_sample(title, references, position:)
     Event.instantiate(Event.column_defaults.merge(
       "id" => -(position + 1),
-      "title" => "#{MediaHelper::MEDIA_PROVIDER_NAMES[provider]} #{id}",
+      "title" => title,
       "start_date" => Date.current.iso8601,
       "start_time" => "#{Date.current.iso8601} 20:#{format('%02d', position)}:00",
-      "media" => [{ provider: provider, id: id }].to_json
+      "media" => references.map { |provider, id| { provider: provider, id: id } }.to_json
     ))
   end
 end

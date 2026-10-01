@@ -44,9 +44,18 @@ class StyleguideTest < ActionDispatch::IntegrationTest
     get styleguide_media_path
 
     assert_response :success
-    assert_select "#events .event .event-play", count: StyleguideController::MEDIA_SAMPLES.size
+    assert_select "#events .event .event-play", count: StyleguideController::MEDIA_SAMPLES.size + 1
     assert_equal StyleguideController::MEDIA_SAMPLES.map(&:first).uniq,
-                 css_select(".event-play").map { |button| button["data-media-play-provider-value"] }.uniq
+                 played_providers.map(&:first).uniq
+    assert_operator played_providers.map(&:size).max, :>, 1
     assert_select "iframe", count: 0
+  end
+
+  private
+
+  def played_providers
+    css_select(".event-play").map do |button|
+      JSON.parse(button["data-media-play-media-value"]).pluck("provider")
+    end
   end
 end

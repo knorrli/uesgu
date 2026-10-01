@@ -30,12 +30,16 @@ class MediaHelperTest < ActionView::TestCase
                     "url=#{CGI.escape('https://soundcloud.com/someband/a-song')}"
   end
 
-  test "the play button carries the first reference's embed and loads nothing itself" do
+  test "the play button carries every reference's embed in order and loads nothing itself" do
     show = event(title: "Holy Wave", media: [ref("youtube", "cjox_JXa8eM"), ref("spotify", "artist/1Deno0E7v6B4caD2VOL1No")])
     button = Nokogiri::HTML.fragment(media_play_button(show)).at_css("button.event-play")
 
-    assert_equal "youtube", button["data-media-play-provider-value"]
-    assert_equal media_embed_src(ref("youtube", "cjox_JXa8eM")), button["data-media-play-src-value"]
+    assert_equal [
+      { "provider" => "youtube", "src" => media_embed_src(ref("youtube", "cjox_JXa8eM")),
+        "via" => I18n.t("media.via", provider: "YouTube") },
+      { "provider" => "spotify", "src" => media_embed_src(ref("spotify", "artist/1Deno0E7v6B4caD2VOL1No")),
+        "via" => I18n.t("media.via", provider: "Spotify") }
+    ], JSON.parse(button["data-media-play-media-value"])
     assert_equal "false", button["aria-pressed"]
     assert_equal I18n.t("media.via", provider: "YouTube"), button["title"]
     assert_equal show.url, button["data-media-play-event-url-value"]

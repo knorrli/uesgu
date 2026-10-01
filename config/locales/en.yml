@@ -957,6 +957,8 @@ en:
     dock: Player
     play: "Listen to %{title}"
     stop: Stop
+    previous: Previous track
+    next: Next track
   events:
     cancelled: Cancelled
     rescheduled: New date

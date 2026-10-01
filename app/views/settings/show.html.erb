@@ -124,6 +124,27 @@
     </div>
   </section>
 
+  <section class="settings-section" id="excluded-locations">
+    <h2><%= t('settings.excluded_locations_heading') %></h2>
+    <div class="flex flex-col gap-small">
+      <p class="muted"><%= t('settings.excluded_locations_hint') %></p>
+      <% if excluded_locations.any? %>
+        <div class="flex wrap gap-small">
+          <% excluded_locations.each do |exclusion| %>
+            <%= button_to location_exclusion_path(exclusion), method: :delete, class: 'filter-chip',
+                  'aria-label': t('settings.excluded_locations_remove', location: exclusion.name) do %>
+              <span class="filter-chip__icon ph ph-eye-slash" aria-hidden="true"></span>
+              <span class="filter-chip__label"><%= exclusion.name %></span>
+              <span class="filter-chip__remove ph ph-x" aria-hidden="true"></span>
+            <% end %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="muted"><%= t('settings.excluded_locations_none') %></p>
+      <% end %>
+    </div>
+  </section>
+
   <section class="settings-section">
     <h2><%= t('settings.delete_account_heading') %></h2>
     <p class="muted"><%= t('settings.delete_account_hint') %></p>

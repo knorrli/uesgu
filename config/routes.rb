@@ -32,6 +32,7 @@ Rails.application.routes.draw do
 
   resource :calendar_feed, only: %i[create destroy]
   resources :genre_exclusions, only: %i[create destroy]
+  resources :location_exclusions, only: %i[create destroy]
   get "calendar/:token", to: "calendar_feeds#show", as: :public_calendar_feed,
       constraints: { format: "ics" }, format: true
 

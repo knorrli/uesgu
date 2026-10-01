@@ -5,6 +5,7 @@ class VenueFold
     ActiveRecord::Base.transaction do
       retag_events
       rewrite_saved_filters
+      LocationExclusion.rename_all { |name| venue_for(name)&.name }
       Place.where(fingerprint: venue_by_fingerprint.keys).destroy_all
     end
   end

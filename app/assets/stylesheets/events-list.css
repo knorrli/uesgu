@@ -133,6 +133,18 @@
   font-weight: bold;
 }
 
+.event-where form,
+.event-where-meta form {
+  display: inline;
+}
+
+.event-where .meta-action {
+  margin-left: 0.35ch;
+  padding: 0;
+  vertical-align: middle;
+  font-size: 1.1rem;
+}
+
 .event-where-meta {
   font-size: var(--font-size-small);
   color: var(--theme-fg-muted);
@@ -364,6 +376,13 @@
 
 .event-where-meta .interest-flag {
   margin-left: 0.3ch;
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+
+.event-where-meta .meta-action {
+  margin-left: 0.3ch;
+  padding: 0;
   vertical-align: middle;
   font-size: 0.95rem;
 }

@@ -247,4 +247,23 @@ class PlaceTest < ActiveSupport::TestCase
     refute_predicate variant.reload, :alias?
     assert_includes show.reload.location_list, "AKuT"
   end
+
+  test "an exclusion of a merged-away place follows it to the canonical" do
+    akut = place(name: "AKuT", locality: "Zorpwil", canton: "BE")
+    variant = place(name: "AKUT Zorpwil", locality: "Zorpwil", canton: "BE")
+    exclusion = user.location_exclusions.create!(name: variant.name)
+
+    variant.merge_into!(akut)
+
+    assert_equal "AKuT", exclusion.reload.name
+  end
+
+  test "an exclusion follows a renamed place" do
+    flarn = place(name: "Flarnhalle")
+    exclusion = user.location_exclusions.create!(name: flarn.name)
+
+    flarn.rename!("Flarnsaal")
+
+    assert_equal "Flarnsaal", exclusion.reload.name
+  end
 end

@@ -79,4 +79,22 @@ class VenueFoldTest < ActiveSupport::TestCase
 
     assert_equal ["BE", "Kulturhalle Zorphalle", "Zorpwil"], show.reload.location_list.sort
   end
+
+  test "an exclusion naming the former name follows the rename" do
+    exclusion = user.location_exclusions.create!(name: "Zorphalle")
+
+    with_registry { VenueFold.run! }
+
+    assert_equal "Kulturhalle Zorphalle", exclusion.reload.name
+  end
+
+  test "an exclusion the rename turns into a duplicate of another is dropped" do
+    owner = user
+    kept = owner.location_exclusions.create!(name: "Kulturhalle Zorphalle")
+    owner.location_exclusions.create!(name: "Zorphalle")
+
+    with_registry { VenueFold.run! }
+
+    assert_equal [kept], owner.location_exclusions.reload.to_a
+  end
 end

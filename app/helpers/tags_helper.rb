@@ -53,7 +53,7 @@ module TagsHelper
     genres = Genre.where(hidden_at: nil, blocked_at: nil, ignored_at: nil, canonical_id: nil)
                   .by_name.to_a
     children_of = genres.group_by(&:parent_id)
-    counts = ExcludedGenres.for(current_user).genre_filter_counts
+    counts = Exclusions.for(current_user).genre_filter_counts
     (children_of[nil] || []).filter_map do |root|
       next unless children_of.key?(root.id)
 
@@ -72,7 +72,7 @@ module TagsHelper
   end
 
   def location_filter_tree
-    counts = ExcludedGenres.for(current_user).location_filter_counts
+    counts = Exclusions.for(current_user).location_filter_counts
 
     Location.hierarchy.sort.filter_map do |canton, localities|
       locality_nodes = localities.sort.filter_map do |locality, venues|

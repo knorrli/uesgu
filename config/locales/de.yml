@@ -366,6 +366,10 @@ de:
     excluded_genres_hint: Events mit einem dieser Genres siehst du nicht, auch nicht in Benachrichtigungen. Deine Merkliste bleibt, wie sie ist.
     excluded_genres_none: Noch keine. Schliess ein Genre mit dem Symbol daneben bei einem Event aus.
     excluded_genres_remove: "%{genre} wieder anzeigen"
+    excluded_locations_heading: Ausgeschlossene Orte
+    excluded_locations_hint: Events an diesen Orten siehst du nicht, auch nicht in Benachrichtigungen. Deine Merkliste bleibt, wie sie ist.
+    excluded_locations_none: Noch keine. Schliess einen Ort mit dem Symbol neben seinem Namen aus.
+    excluded_locations_remove: "%{location} wieder anzeigen"
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
     delete_account: Mein Konto löschen
@@ -962,14 +966,15 @@ de:
     edit_event: Event bearbeiten
     edit_tag: Tag bearbeiten
     exclude_genre: "%{genre} ausschliessen"
+    exclude_location: "%{location} ausschliessen"
     offsite_link: Öffnet auf %{source}, nicht der Website des Lokals
     venue_link_hint: Öffnet die Seite von %{venue}, nicht eine Seite zu diesem Event
     index:
       empty: Keine Events für die aktuellen Filter.
       clear_filter: Filter zurücksetzen
       excluded:
-        one: "1 Event wird wegen deiner ausgeschlossenen Genres nicht angezeigt."
-        other: "%{count} Events werden wegen deiner ausgeschlossenen Genres nicht angezeigt."
+        one: "1 Event wird wegen deiner Ausschlüsse nicht angezeigt."
+        other: "%{count} Events werden wegen deiner Ausschlüsse nicht angezeigt."
       save_filter: Filter speichern
       save_filter_all: Über alles benachrichtigen
       edit_filter: Filter bearbeiten

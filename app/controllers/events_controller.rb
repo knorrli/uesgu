@@ -17,13 +17,13 @@ class EventsController < ApplicationController
     @applied_saved_filter = Current.session&.applied_saved_filter unless @saved_filter
     @q = Event.visible.ransack(@filter.ransack_query)
 
-    excluded_genres = ExcludedGenres.for(current_user, picked: @filter.genres)
+    exclusions = Exclusions.for(current_user, genres: @filter.genres, locations: @filter.location_list)
     matching = @q.result(distinct: true)
-    events = excluded_genres.apply(matching)
+    events = exclusions.apply(matching)
     @days = EventDays.new(events)
     return if redirect_to_canonical_day
 
-    excluded = excluded_genres.excluded_from(matching)
+    excluded = exclusions.excluded_from(matching)
     @excluded_count = (@day ? excluded.where(start_date: @day) : excluded).count
     @events = events.where(start_date: @day).includes(:locations, :genres)
   end

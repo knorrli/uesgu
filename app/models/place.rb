@@ -44,7 +44,7 @@ class Place < ApplicationRecord
       aliases.update_all(canonical_id: target.id)
       retag_events(add: [target.name, target.locality, target.canton].compact_blank,
                    strip: [locality, canton])
-      rewrite_saved_filters(target.name)
+      rewrite_user_picks(target.name)
     end
   end
 
@@ -57,7 +57,7 @@ class Place < ApplicationRecord
 
     transaction do
       retag_events(add: [name, locality, canton].compact_blank)
-      rewrite_saved_filters(name)
+      rewrite_user_picks(name)
       save!
     end
     true

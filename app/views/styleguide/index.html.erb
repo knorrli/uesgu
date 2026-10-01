@@ -272,6 +272,19 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
+        <div class="venue-header flex flex-col gap-xsmall">
+          <div class="event-where"><a class="filter-link venue" href="#">Zorphalle</a><button type="button" class="icon-button meta-action" aria-label="Exclude Zorphalle"><span class="ph ph-eye-slash"></span></button></div>
+          <div class="event-where-meta"><a class="filter-link" href="#">Zorpwil</a><button type="button" class="icon-button meta-action" aria-label="Exclude Zorpwil"><span class="ph ph-eye-slash"></span></button><span class="sep" aria-hidden="true">&middot;</span><a class="filter-link" href="#">BE</a><button type="button" class="icon-button meta-action" aria-label="Exclude BE"><span class="ph ph-eye-slash"></span></button></div>
+        </div>
+      </div>
+      <div class="sg-spec">
+        <span class="sg-spec__name">Location heading actions</span> · <code>events/_location_exclude_button</code>
+        <p class="sg-purpose">The same exclude, after the venue heading and after each town and canton below it: signed in, it takes every event at that place out of the feed and notifications at once.</p>
+      </div>
+    </div>
+
+    <div class="sg-row">
+      <div class="sg-specimen">
         <button type="button" class="filter-chip">
           <span class="filter-chip__icon ph ph-music-notes"></span>
           <span class="filter-chip__label">Jazz</span>
@@ -280,7 +293,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Applied filter chip</span> · <code>.filter-chip</code>
-        <p class="sg-purpose">An active filter on the mobile summary row; tapping it removes that one value. Dims on hover/focus to signal the affordance. The excluded genres in the settings use the same chip: tapping one stops excluding it.</p>
+        <p class="sg-purpose">An active filter on the mobile summary row; tapping it removes that one value. Dims on hover/focus to signal the affordance. The excluded genres and places in the settings use the same chip: tapping one stops excluding it.</p>
       </div>
     </div>
 
@@ -599,7 +612,7 @@
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Glyph set</span> · <code>.ph .ph-*</code>
-        <p class="sg-purpose">Hover a glyph to see its name. Edit, delete, notify, close/remove, search, disclosure, locality/venue/canton, style/genre, date, exclude a genre. (Follow/save use the masked star/heart below, not a font glyph.)</p>
+        <p class="sg-purpose">Hover a glyph to see its name. Edit, delete, notify, close/remove, search, disclosure, locality/venue/canton, style/genre, date, exclude a genre or place. (Follow/save use the masked star/heart below, not a font glyph.)</p>
       </div>
     </div>
 

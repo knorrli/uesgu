@@ -366,6 +366,10 @@ fr:
     excluded_genres_hint: Tu ne vois pas les événements avec un de ces genres, ni dans les notifications. Ta liste À voir reste telle quelle.
     excluded_genres_none: Aucun pour l'instant. Exclus un genre avec l'icône à côté de lui sur un événement.
     excluded_genres_remove: Ne plus exclure %{genre}
+    excluded_locations_heading: Lieux exclus
+    excluded_locations_hint: Tu ne vois pas les événements dans ces lieux, ni dans les notifications. Ta liste À voir reste telle quelle.
+    excluded_locations_none: Aucun pour l'instant. Exclus un lieu avec l'icône à côté de son nom.
+    excluded_locations_remove: Ne plus exclure %{location}
     delete_account_heading: Supprimer le compte
     delete_account_hint: Supprime ton compte et toutes tes données définitivement.
     delete_account: Supprimer mon compte
@@ -962,14 +966,15 @@ fr:
     edit_event: Modifier l'événement
     edit_tag: Modifier le tag
     exclude_genre: Exclure %{genre}
+    exclude_location: Exclure %{location}
     offsite_link: S'ouvre sur %{source}, pas sur le site du lieu
     venue_link_hint: Ouvre la page de %{venue}, pas une page dédiée à cet événement
     index:
       empty: Aucun événement ne correspond aux filtres actuels.
       clear_filter: Réinitialiser le filtre
       excluded:
-        one: "1 événement n'est pas affiché à cause de tes genres exclus."
-        other: "%{count} événements ne sont pas affichés à cause de tes genres exclus."
+        one: "1 événement n'est pas affiché à cause de tes exclusions."
+        other: "%{count} événements ne sont pas affichés à cause de tes exclusions."
       save_filter: Enregistrer le filtre
       save_filter_all: Me notifier de tout
       edit_filter: Modifier le filtre

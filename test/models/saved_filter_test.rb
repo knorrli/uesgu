@@ -74,6 +74,22 @@ class SavedFilterTest < ActiveSupport::TestCase
     assert_equal [mixed], picked.matched_events(Time.current).to_a
   end
 
+  test "a notification leaves out the user's excluded venues unless the filter picks them" do
+    u = user
+    hall = place(name: "Notifyhalle")
+    there = event(created_at: 1.hour.ago, start_date: Date.current + 5, location_list: [hall.name, hall.locality, hall.canton])
+    elsewhere = event(created_at: 1.hour.ago, start_date: Date.current + 5, location_list: [hall.locality, hall.canton])
+    u.location_exclusions.create!(name: hall.name)
+
+    everything = rule(u, filter: {}).tap(&:save!)
+    everything.update_column(:last_fired_at, 2.hours.ago)
+    picked = rule(u, filter: { l: [hall.name] }).tap(&:save!)
+    picked.update_column(:last_fired_at, 2.hours.ago)
+
+    assert_equal [elsewhere], everything.matched_events(Time.current).to_a
+    assert_equal [there], picked.matched_events(Time.current).to_a
+  end
+
   test "happening matches by start_date in the window regardless of created_at" do
     u = user
     today_show = event(start_date: Date.current, created_at: 1.hour.ago)

@@ -1,6 +1,6 @@
 require "db_test_helper"
 
-class ExcludedGenresTest < ActiveSupport::TestCase
+class ExclusionsTest < ActiveSupport::TestCase
   setup do
     @listener = user
   end
@@ -8,8 +8,8 @@ class ExcludedGenresTest < ActiveSupport::TestCase
   test "without a user nothing is excluded" do
     shown = event_with_genres(genre(name: "exnone").name)
 
-    assert_equal [shown], ExcludedGenres.for(nil).apply(Event.where(id: shown.id)).to_a
-    assert_empty ExcludedGenres.for(nil).excluded_from(Event.all)
+    assert_equal [shown], Exclusions.for(nil).apply(Event.where(id: shown.id)).to_a
+    assert_empty Exclusions.for(nil).excluded_from(Event.all)
   end
 
   test "an event is left out when any of its genres is excluded" do
@@ -20,7 +20,7 @@ class ExcludedGenresTest < ActiveSupport::TestCase
     exclude(hated)
 
     assert_equal [clean], shown
-    assert_equal [mixed], ExcludedGenres.for(@listener).excluded_from(Event.all).to_a
+    assert_equal [mixed], Exclusions.for(@listener).excluded_from(Event.all).to_a
   end
 
   test "excluding a genre also excludes its subgenres" do
@@ -112,7 +112,7 @@ class ExcludedGenresTest < ActiveSupport::TestCase
     event_with_genres(liked.name)
     exclude(hated)
 
-    counts = ExcludedGenres.for(@listener).genre_filter_counts
+    counts = Exclusions.for(@listener).genre_filter_counts
 
     [root, hated, liked].each do |node|
       assert_equal shown(picked: [node.name], filtered: true).size, counts.fetch(node.id, 0), node.name
@@ -128,7 +128,52 @@ class ExcludedGenresTest < ActiveSupport::TestCase
     event(location_list: tags)
     exclude(hated)
 
-    assert_equal 1, ExcludedGenres.for(@listener).location_filter_counts["GE"]
+    assert_equal 1, Exclusions.for(@listener).location_filter_counts["GE"]
+  end
+
+  test "an event at an excluded venue is left out" do
+    hall = place(name: "Exhalle")
+    there = event(location_list: [hall.name, hall.locality, hall.canton])
+    elsewhere = event(location_list: [hall.locality, hall.canton])
+    exclude_location(hall.name)
+
+    assert_equal [elsewhere], shown
+    assert_equal [there], Exclusions.for(@listener).excluded_from(Event.all).to_a
+  end
+
+  test "picking an excluded venue shows its events, picking its town does not" do
+    hall = place(name: "Expickhalle")
+    there = event(location_list: [hall.name, hall.locality, hall.canton])
+    exclude_location(hall.name)
+
+    assert_equal [there], located(picked: [hall.name])
+    assert_empty located(picked: [hall.locality])
+  end
+
+  test "a location count is what picking that location returns" do
+    hall = place(name: "Excounthalle", locality: "Excountwil", canton: "GE")
+    tags = [hall.name, hall.locality, hall.canton]
+    event(location_list: tags)
+    event(location_list: tags)
+    event(location_list: [hall.locality, hall.canton])
+    exclude_location(hall.name)
+
+    counts = Exclusions.for(@listener).location_filter_counts
+
+    [hall.name, hall.locality, hall.canton].each do |name|
+      assert_equal located(picked: [name], filtered: true).size, counts.fetch(name, 0), name
+    end
+    assert_equal [2, 1, 1], tags.map { |name| counts.fetch(name, 0) }
+  end
+
+  test "genre counts leave out events at an excluded venue" do
+    liked = genre(name: "exvenueliked")
+    hall = place(name: "Exgenrehalle")
+    event(location_list: [hall.name, hall.locality, hall.canton]).update!(genre_list: [liked.name])
+    event.update!(genre_list: [liked.name])
+    exclude_location(hall.name)
+
+    assert_equal 1, Exclusions.for(@listener).genre_filter_counts[liked.id]
   end
 
   private
@@ -137,8 +182,17 @@ class ExcludedGenresTest < ActiveSupport::TestCase
     @listener.genre_exclusions.create!(genre: genre)
   end
 
+  def exclude_location(name)
+    @listener.location_exclusions.create!(name: name)
+  end
+
+  def located(picked: [], filtered: false)
+    events = filtered ? Event.visible.ransack(Filter.build(location_list: picked).ransack_query).result(distinct: true) : Event.all
+    Exclusions.for(@listener, locations: picked).apply(events).to_a
+  end
+
   def shown(picked: [], filtered: false)
     events = filtered ? Event.visible.ransack(Filter.build(genres: picked).ransack_query).result(distinct: true) : Event.all
-    ExcludedGenres.for(@listener, picked: picked).apply(events).to_a
+    Exclusions.for(@listener, genres: picked).apply(events).to_a
   end
 end

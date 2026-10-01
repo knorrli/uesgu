@@ -133,6 +133,17 @@
   font-weight: bold;
 }
 
+.event-where form {
+  display: inline;
+}
+
+.event-where .meta-action {
+  margin-left: 0.35ch;
+  padding: 0;
+  vertical-align: middle;
+  font-size: 1.1rem;
+}
+
 .event-where-meta {
   font-size: var(--font-size-small);
   color: var(--theme-fg-muted);

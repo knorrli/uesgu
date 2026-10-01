@@ -7,7 +7,7 @@ module LocationTagFold
     ActsAsTaggableOn::Tag.joins(:taggings)
                          .where(taggings: { context: "locations", taggable_type: Event.name })
                          .distinct.pluck(:name)
-                         .select { |tag| Fingerprint.for(tag) == fingerprint }
+                         .select { |tag| variant?(tag) }
   end
 
   def retag_events(add:, strip: [])
@@ -22,10 +22,17 @@ module LocationTagFold
     end
   end
 
+  def rewrite_user_picks(canonical_name)
+    rewrite_saved_filters(canonical_name)
+    LocationExclusion.rename_all { |name| canonical_name if variant?(name) }
+  end
+
+  def variant?(name) = Fingerprint.for(name) == fingerprint
+
   def rewrite_saved_filters(canonical_name)
     SavedFilter.find_each do |saved|
       locations = saved.location_list
-      rewritten = locations.map { |name| Fingerprint.for(name) == fingerprint ? canonical_name : name }.uniq
+      rewritten = locations.map { |name| variant?(name) ? canonical_name : name }.uniq
       next if rewritten == locations
 
       saved.filter = saved.filter.merge("location_list" => rewritten)

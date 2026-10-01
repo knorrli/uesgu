@@ -84,7 +84,7 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "CleanMarkerShow"
     refute_includes response.body, "MixedMarkerShow"
     assert_select ".day-summary__count--excluded[href=?][aria-label=?]",
-                  settings_path(anchor: "excluded-genres"), "1 event left out because of your excluded genres.",
+                  settings_path(anchor: "excluded-genres"), "1 event left out because of your exclusions.",
                   text: "1"
   end
 
@@ -96,7 +96,7 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
 
     assert_select ".day-summary__count--excluded", false
     assert_select ".events-excluded a[href=?]", settings_path(anchor: "excluded-genres"),
-                  text: "2 events left out because of your excluded genres."
+                  text: "2 events left out because of your exclusions."
   end
 
   test "the note counts only the day on screen" do

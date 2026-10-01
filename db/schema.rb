@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_01_080000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "fuzzystrmatch"
   enable_extension "pg_catalog.plpgsql"
@@ -173,6 +173,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
     t.index ["canonical_id"], name: "index_localities_on_canonical_id"
     t.index ["fingerprint"], name: "index_localities_on_fingerprint", unique: true
     t.check_constraint "canonical_id IS NULL OR canonical_id <> id", name: "localities_canonical_not_self"
+  end
+
+  create_table "location_exclusions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "name"], name: "index_location_exclusions_on_user_id_and_name", unique: true
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -369,6 +377,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_120000) do
   add_foreign_key "invitations", "users", column: "created_by_id"
   add_foreign_key "invitations", "users", column: "redeemed_by_id"
   add_foreign_key "localities", "localities", column: "canonical_id"
+  add_foreign_key "location_exclusions", "users", on_delete: :cascade
   add_foreign_key "notifications", "saved_filters"
   add_foreign_key "notifications", "users"
   add_foreign_key "places", "places", column: "canonical_id"

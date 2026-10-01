@@ -112,7 +112,7 @@ class Locality < ApplicationRecord
     transaction do
       retag_events(add: [canonical_name])
       move_places(canonical_name)
-      rewrite_saved_filters(canonical_name)
+      rewrite_user_picks(canonical_name)
     end
   end
 

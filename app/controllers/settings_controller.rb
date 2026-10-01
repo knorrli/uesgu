@@ -1,6 +1,6 @@
 class SettingsController < ApplicationController
   before_action :set_user
-  helper_method :excluded_genres
+  helper_method :excluded_genres, :excluded_locations
 
   def show
   end
@@ -21,7 +21,11 @@ class SettingsController < ApplicationController
   end
 
   def excluded_genres
-    Genre.where(id: ExcludedGenres.for(@user).roots).by_name
+    Genre.where(id: Exclusions.for(@user).genre_roots).by_name
+  end
+
+  def excluded_locations
+    @user.location_exclusions.order(:name)
   end
 
   def settings_params

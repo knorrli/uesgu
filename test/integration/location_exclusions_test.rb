@@ -30,6 +30,27 @@ class LocationExclusionsTest < ActionDispatch::IntegrationTest
     assert_equal [@hall.locality, @hall.canton], group.css(".event-where-meta form input[name=name]").map { |input| input["value"] }
   end
 
+  test "a notification's event list carries the exclude button" do
+    listener = sign_in_as user
+    digest = listener.notifications.create!(title: "D", event_ids: [@there.id],
+                                            period_start: 2.days.ago, period_end: Time.current)
+
+    get notification_path(digest)
+
+    assert_response :success
+    assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
+  end
+
+  test "the saved-shows list carries the exclude button" do
+    listener = sign_in_as user
+    listener.event_saves.create!(event: @there)
+
+    get saved_events_path
+
+    assert_response :success
+    assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
+  end
+
   test "a town heading without a venue carries an exclude button" do
     sign_in_as user
 

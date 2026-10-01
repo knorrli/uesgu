@@ -35,6 +35,21 @@
   white-space: nowrap;
 }
 
+.media-dock__switcher {
+  display: flex;
+  align-items: center;
+}
+
+.media-dock__switcher[hidden] {
+  display: none;
+}
+
+.media-dock__position {
+  color: var(--theme-fg-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .media-dock__player iframe,
 .media-dock__specimen-frame {
   display: block;

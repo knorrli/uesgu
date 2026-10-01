@@ -3,6 +3,15 @@
                 data: ({ controller: "media-dock", action: "media:toggle@window->media-dock#toggle" } unless specimen) do %>
   <div class="media-dock__bar">
     <a class="media-dock__title" <%= 'href="#"'.html_safe if specimen %> target="_blank" rel="noopener" data-media-dock-target="title"><%= "Holy Wave" if specimen %></a>
+    <%= tag.div class: "media-dock__switcher", hidden: !specimen, data: { media_dock_target: "switcher" } do %>
+      <button type="button" class="icon-button" data-action="media-dock#previous" data-media-dock-target="previous" aria-label="<%= t('media.previous') %>">
+        <span class="ph ph-caret-left" aria-hidden="true"></span>
+      </button>
+      <span class="media-dock__position" data-media-dock-target="position"><%= "2 / 3" if specimen %></span>
+      <button type="button" class="icon-button" data-action="media-dock#next" data-media-dock-target="next" aria-label="<%= t('media.next') %>">
+        <span class="ph ph-caret-right" aria-hidden="true"></span>
+      </button>
+    <% end %>
     <% if authenticated? %>
       <%= button_tag type: :button, class: "event-save icon-button", 'aria-pressed': "false", 'aria-label': t("saved_events.toggle"),
                      data: ({ controller: "save", action: "save#toggle save:toggled@window->save#sync" } unless specimen)

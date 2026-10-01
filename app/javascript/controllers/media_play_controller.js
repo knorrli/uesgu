@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["icon"]
-  static values = { eventId: Number, title: String, provider: String, src: String, eventUrl: String, saved: Boolean }
+  static values = { eventId: Number, title: String, eventUrl: String, saved: Boolean, media: Array }
 
   connect() {
     this.#show(document.getElementById("media-dock")?.dataset.eventId === String(this.eventIdValue))
@@ -17,8 +17,7 @@ export default class extends Controller {
         title: this.titleValue,
         eventUrl: this.eventUrlValue,
         saved: this.savedValue,
-        provider: this.providerValue,
-        src: this.srcValue
+        media: this.mediaValue
       }
     })
   }

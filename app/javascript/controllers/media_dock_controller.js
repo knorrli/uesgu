@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
 export default class extends Controller {
-  static targets = ["title", "save", "player"]
+  static targets = ["title", "save", "player", "switcher", "previous", "next", "position"]
 
   connect() {
     this.prepareRender = this.prepareRender.bind(this)
@@ -19,22 +19,27 @@ export default class extends Controller {
     this.resizeObserver.disconnect()
   }
 
-  toggle({ detail: { eventId, title, eventUrl, saved, provider, src } }) {
+  toggle({ detail: { eventId, title, eventUrl, saved, media } }) {
     if (this.element.dataset.eventId === String(eventId)) return this.stop()
 
-    const frame = document.createElement("iframe")
-    frame.src = src
-    frame.title = title
-    frame.allow = "autoplay; encrypted-media; fullscreen; picture-in-picture"
-    this.playerTarget.replaceChildren(frame)
-    this.playerTarget.dataset.provider = provider
+    this.media = media
+    this.switcherTarget.hidden = media.length < 2
     this.titleTarget.textContent = title
+    this.#load(0)
     this.#linkTitle(eventUrl)
     this.#showSave(eventId, saved)
     this.element.dataset.eventId = eventId
     this.element.hidden = false
     this.keepOutOfCache()
     this.#announce(eventId)
+  }
+
+  previous() {
+    this.#load(this.#offset(-1))
+  }
+
+  next() {
+    this.#load(this.#offset(1))
   }
 
   stop() {
@@ -74,6 +79,24 @@ export default class extends Controller {
     for (const { name } of [...body.attributes]) body.removeAttribute(name)
     for (const { name, value } of newBody.attributes) body.setAttribute(name, value)
     this.element.before(...newBody.childNodes)
+  }
+
+  #load(index) {
+    const { provider, src } = this.media[index]
+    const frame = document.createElement("iframe")
+    frame.src = src
+    frame.title = this.titleTarget.textContent
+    frame.allow = "autoplay; encrypted-media; fullscreen; picture-in-picture"
+    this.playerTarget.replaceChildren(frame)
+    this.playerTarget.dataset.provider = provider
+    this.index = index
+    this.positionTarget.textContent = `${index + 1} / ${this.media.length}`
+    this.previousTarget.title = this.media[this.#offset(-1)].via
+    this.nextTarget.title = this.media[this.#offset(1)].via
+  }
+
+  #offset(step) {
+    return (this.index + step + this.media.length) % this.media.length
   }
 
   #linkTitle(url) {

@@ -445,6 +445,11 @@ venues:
   disposition: reject
   reason: non_music
   checked: 2026-06-21
+- domain: stufenbau.ch
+  name: Stufenbau
+  disposition: reject
+  reason: feed_quality
+  checked: 2026-10-02
 - domain: sudpol.ch
   name: Südpol
   disposition: consume

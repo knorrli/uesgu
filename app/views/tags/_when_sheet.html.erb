@@ -1,5 +1,5 @@
 <% single = local_assigns.fetch(:single, false) %>
-<% selected_window = filter.date_ranges.find { |r| Datepicker.preset.key?(r) } if single %>
+<% selected_window = filter.date_ranges.first if single %>
 <section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
          aria-label="<%= t('events.filter.sheet.when') %>"
          data-filter-sheets-target="sheet" data-field="when"

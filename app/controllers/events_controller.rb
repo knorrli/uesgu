@@ -50,7 +50,10 @@ class EventsController < ApplicationController
   end
 
   def redirect_to_canonical_filter
-    if explicit_filter_request?
+    if stale_date_ranges?
+      redirect_to events_path(request.query_parameters.merge("d" => preset_date_ranges(params[:d]).presence).compact.symbolize_keys)
+      return true
+    elsif explicit_filter_request?
       sync_filter_cookie
       track_applied_saved_filter
       if params[:filtered].present? || params[:applied].present?
@@ -72,6 +75,14 @@ class EventsController < ApplicationController
 
     redirect_to events_path(canonical.symbolize_keys)
     true
+  end
+
+  def stale_date_ranges?
+    params[:d].present? && Array(params[:d]) != preset_date_ranges(params[:d])
+  end
+
+  def preset_date_ranges(values)
+    Array(values).select { |range| Datepicker.preset.key?(range) }
   end
 
   def requested_day
@@ -118,6 +129,7 @@ class EventsController < ApplicationController
 
     filter = FILTER_KEYS.each_with_object({}) do |key, acc|
       values = Array(data[key.to_s]).compact_blank
+      values = preset_date_ranges(values) if key == :d
       acc[key.to_s] = values if values.any?
     end
     filter.presence

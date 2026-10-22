@@ -17,7 +17,7 @@
 
       <% what_terms  = filter.queries + filter.genres %>
       <% where_terms = filter.location_list %>
-      <% when_terms  = Array(filter.date_ranges.find { |r| Datepicker.preset.key?(r) }).map { |w| t("datepicker.#{w}") } %>
+      <% when_terms  = Array(filter.date_ranges.first).map { |w| t("datepicker.#{w}") } %>
       <div class="filter-sheets__fields">
         <div class="filter-sheets__bar">
           <%= render 'tags/filter_trigger', field: 'what',  icon: 'query',     terms: what_terms,  empty: t('events.filter.what') %>

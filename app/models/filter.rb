@@ -30,8 +30,8 @@ class Filter
   end
 
   def date_ranges=(new_date_ranges)
-    ranges = parse(new_date_ranges).select { |range| Datepicker.preset.key?(range) }
-    @date_ranges = ranges.sort_by { |range| Datepicker.preset.keys.index(range) }
+    presets = Datepicker.preset.keys
+    @date_ranges = parse(new_date_ranges).select { |range| presets.include?(range) }.sort_by { |range| presets.index(range) }
   end
 
   def active?
@@ -81,10 +81,9 @@ class Filter
   end
 
   def map_date_ranges(date_ranges)
-    return [] if date_ranges.blank?
-
+    presets = Datepicker.preset
     date_ranges.map do |range|
-      start_date, end_date = Datepicker.preset[range][:values]
+      start_date, end_date = presets[range][:values]
       "#{start_date} - #{end_date}"
     end
   end

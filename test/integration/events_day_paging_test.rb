@@ -114,13 +114,25 @@ class EventsDayPagingTest < ActionDispatch::IntegrationTest
     assert_select ".day-nav a[rel=prev]", false
   end
 
-  test "a custom range from an old link is ignored" do
+  test "a custom range from an old link is dropped from the URL, presets survive" do
+    stale = "#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"
+
+    get events_path(q: ["Show"], d: [stale, "tomorrow"])
+    assert_redirected_to events_path(q: ["Show"], d: ["tomorrow"])
+
+    get events_path(d: [stale])
+    assert_redirected_to events_path
+  end
+
+  test "a custom range in a stored filter cookie is ignored" do
     event(title: "PastShow", start_date: Date.current - 3)
+    cookies[EventsController::FILTER_COOKIE.to_s] = { d: ["#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"] }.to_json
 
-    get events_path(d: ["#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"])
+    get events_path
 
+    assert_response :success
     assert_includes response.body, "FirstDayShow"
-    assert_select ".filter-chip", false
+    refute_includes response.body, "PastShow"
   end
 
   test "the When sheet offers the presets and no calendar" do

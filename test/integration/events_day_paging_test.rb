@@ -120,8 +120,22 @@ class EventsDayPagingTest < ActionDispatch::IntegrationTest
     get events_path(q: ["Show"], d: [stale, "tomorrow"])
     assert_redirected_to events_path(q: ["Show"], d: ["tomorrow"])
 
-    get events_path(d: [stale])
+    get events_path(d: ["today,tomorrow"])
+    assert_redirected_to events_path(d: %w[today tomorrow])
+  end
+
+  test "a link holding only a custom range clears the stored filter like any explicit link" do
+    cookies[EventsController::FILTER_COOKIE.to_s] = { g: ["Jazz"] }.to_json
+
+    get events_path(d: ["#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"])
+    assert_redirected_to events_path(filtered: "1")
+    follow_redirect!
     assert_redirected_to events_path
+    follow_redirect!
+
+    assert_response :success
+    assert_includes response.body, "FirstDayShow"
+    assert cookies[EventsController::FILTER_COOKIE.to_s].blank?
   end
 
   test "a custom range in a stored filter cookie is ignored" do

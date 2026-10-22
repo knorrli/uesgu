@@ -137,12 +137,16 @@ export default class extends Controller {
     for (let i = 0; i < 42; i++) {
       const date = new Date(this.viewYear, this.viewMonth - 1, 1 - lead + i)
       const iso = this.#iso(date)
-      const otherMonth = date.getMonth() + 1 !== this.viewMonth
+      const classes = ["range-cal__day"]
+      if (date.getMonth() + 1 !== this.viewMonth) classes.push("is-other-month")
+      if (iso === this.todayValue) classes.push("is-today")
+      if (this.#dayMode && iso < this.todayValue) classes.push("is-past")
+      if (this.#dayMode && this.#selectable(iso)) classes.push("has-events")
       const label = `${date.getDate()}. ${this.monthNamesValue[date.getMonth() + 1]} ${date.getFullYear()}`
       cells.push(
         `<button type="button" role="gridcell" data-date="${iso}" aria-label="${label}"` +
           `${this.#selectable(iso) ? "" : " disabled"}` +
-          ` class="range-cal__day${otherMonth ? " is-other-month" : ""}${iso === this.todayValue ? " is-today" : ""}"` +
+          ` class="${classes.join(" ")}"` +
           ` data-action="click->range-calendar#pick mouseenter->range-calendar#preview mouseleave->range-calendar#clearPreview">` +
           `${date.getDate()}</button>`
       )

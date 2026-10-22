@@ -44,7 +44,7 @@ class Filter
     Genre.filter_names_for(genres)
   end
 
-  def ransack_query
+  def ransack_query(including_past: false)
     {
       g: [
         {
@@ -59,7 +59,7 @@ class Filter
           if mapped_ranges = map_date_ranges(date_ranges).presence
             date_group[:start_date_between_any] = mapped_ranges
             date_group[:start_date_gteq] = Date.current.beginning_of_day unless custom_range?
-          else
+          elsif !including_past
             date_group[:start_date_gteq] = Date.current.beginning_of_day
           end
         end

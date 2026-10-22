@@ -274,7 +274,7 @@
 }
 
 .event.past,
-.date-events.past .date {
+.date-events.past .date__label {
   opacity: 0.5;
 }
 

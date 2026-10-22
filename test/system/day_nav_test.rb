@@ -34,4 +34,17 @@ class DayNavTest < ApplicationSystemTestCase
     find(target).click until has_selector?("h2[id='#{@third.iso8601}']", wait: 1)
     assert_current_path events_path(day: @third.iso8601)
   end
+
+  test "past days with events stay pickable but read as past" do
+    past = Date.current - 7
+    event(start_date: past, genre_list: ["Rock"])
+    visit events_path(day: past.iso8601)
+
+    calendar = ".day-nav__calendar"
+    trigger = find(".day-nav button[popovertarget]")
+    trigger.click until has_selector?("#{calendar} .range-cal__day", minimum: 28, wait: 1)
+
+    assert_selector "#{calendar} .range-cal__day.is-past.has-events:not([disabled])[data-date='#{past.iso8601}']"
+    assert_selector "#{calendar} .range-cal__day.is-past[disabled]:not(.has-events)[data-date='#{(past + 1).iso8601}']"
+  end
 end

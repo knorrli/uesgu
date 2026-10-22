@@ -15,7 +15,7 @@ class EventsController < ApplicationController
     end
     @saved_filters = current_user.saved_filters.order(:created_at) if current_user
     @applied_saved_filter = Current.session&.applied_saved_filter unless @saved_filter
-    @q = Event.visible.ransack(@filter.ransack_query)
+    @q = Event.visible.ransack(@filter.ransack_query(including_past: true))
 
     exclusions = Exclusions.for(current_user, genres: @filter.genres, locations: @filter.location_list)
     matching = @q.result(distinct: true)

@@ -733,14 +733,14 @@
       <div class="sg-specimen">
         <header class="flex date">
           <h2 class="date__label"><%= l Date.current, format: :compact %></h2>
-          <%= render "shared/day_nav", day: Date.current, days: [Date.current, Date.current + 3],
-                     previous_path: nil, next_path: events_path(day: (Date.current + 3).iso8601),
+          <%= render "shared/day_nav", day: Date.current, days: [Date.current - 2, Date.current, Date.current + 3],
+                     previous_path: events_path(day: (Date.current - 2).iso8601), next_path: events_path(day: (Date.current + 3).iso8601),
                      calendar_url: events_path %>
         </header>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Day pager</span> &middot; <code>render "shared/day_nav", day:, days:, previous_path:, next_path:, calendar_url:</code>
-        <p class="sg-purpose">A <code>nil</code> path disables that arrow. <code>days</code> are the only dates the calendar lets you pick; picking one visits <code>calendar_url</code> with <code>?day=</code> set, so any filter in that URL carries over. The calendar is the When sheet&rsquo;s own month grid (<code>shared/_month_calendar</code>) in its single-day mode, opened as a popover.</p>
+        <p class="sg-purpose">A <code>nil</code> path disables that arrow. <code>days</code> are the only dates the calendar lets you pick, each marked with a dot. Days before today are muted whether they have events or not, so the past stays browsable without reading as upcoming. Picking one visits <code>calendar_url</code> with <code>?day=</code> set, so any filter in that URL carries over. The calendar is the When sheet&rsquo;s own month grid (<code>shared/_month_calendar</code>) in its single-day mode, opened as a popover.</p>
       </div>
     </div>
   </section>

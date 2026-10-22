@@ -114,26 +114,20 @@ class EventsDayPagingTest < ActionDispatch::IntegrationTest
     assert_select ".day-nav a[rel=prev]", false
   end
 
-  test "a custom range reaches into the past, and the arrows follow it" do
-    past = Date.current - 3
-    event(title: "PastShow", start_date: past)
-    range = "#{(past - 1).iso8601} - #{@second.iso8601}"
+  test "a custom range from an old link is ignored" do
+    event(title: "PastShow", start_date: Date.current - 3)
 
-    get events_path(d: [range], day: @first.iso8601)
+    get events_path(d: ["#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"])
 
-    assert_response :success
-    assert_select ".day-nav a[rel=prev][href=?]", events_path(d: [range], day: past.iso8601)
+    assert_includes response.body, "FirstDayShow"
+    assert_select ".filter-chip", false
   end
 
-  test "a custom range entirely in the past opens on its last day" do
-    past = Date.current - 3
-    event(title: "PastShow", start_date: past)
-    event(title: "OlderShow", start_date: past - 2)
+  test "the When sheet offers the presets and no calendar" do
+    get events_path
 
-    get events_path(d: ["#{(past - 5).iso8601} - #{(past + 1).iso8601}"])
-
-    assert_includes response.body, "PastShow"
-    refute_includes response.body, "OlderShow"
+    assert_select ".sheet[data-field=when] input[name='d[]']", count: Datepicker.preset.size
+    assert_select ".sheet[data-field=when] .range-cal", false
   end
 
   test "the calendar enables exactly the days with matching events, past ones included" do

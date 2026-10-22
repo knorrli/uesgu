@@ -434,13 +434,6 @@
   .opt--newquery { display: none; }
 }
 
-.opt--custom {
-  flex-direction: column;
-  align-items: stretch;
-  gap: var(--gap-small);
-  cursor: default;
-}
-
 .range-cal {
   width: 100%;
   max-width: 20rem;
@@ -519,51 +512,14 @@
 
 .range-cal__day.is-past { color: var(--theme-fg-muted); }
 
-.range-cal__day.is-in-range {
-  background: color-mix(in srgb, var(--theme-accent-color) 16%, transparent);
-}
-
-.range-cal__day.is-start,
-.range-cal__day.is-end {
+.range-cal__day.is-selected {
   background: var(--theme-accent-color);
   color: var(--theme-on-accent);
   font-weight: bold;
 }
 
-.range-cal__summary {
-  margin-top: var(--gap-small);
-  height: 1.25rem;
-  line-height: 1.25rem;
-  text-align: center;
-  font-size: var(--font-size-small);
-  color: var(--theme-fg-muted);
-}
-
 @media (min-width: 600px) {
-  .filter-sheets .sheet[data-field="when"]:has(.when-custom) { max-height: 34rem; }
-
-  .filter-sheets .sheet[data-field="when"]:not(:has(.when-custom)) { max-height: 30rem; }
-
-  .when-body:has(.when-custom) {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    gap: var(--gap-large);
-  }
-
-  .when-presets:has(+ .when-custom) {
-    flex: 0 0 auto;
-    padding-block: var(--gap-small);
-    white-space: nowrap;
-    border-right: var(--border-width) solid var(--rule-color);
-  }
-
-  .when-custom {
-    flex: 1 1 auto;
-    display: flex;
-    justify-content: center;
-  }
-  .when-custom .range-cal { margin-top: 0; max-width: 22rem; }
+  .filter-sheets .sheet[data-field="when"] { max-height: 30rem; }
 }
 
 .save-heart {

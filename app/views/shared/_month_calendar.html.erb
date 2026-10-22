@@ -1,13 +1,10 @@
-<% mode = local_assigns.fetch(:mode, "range") %>
+<%# locals: (selected:, enabled:, url:) %>
 <%= tag.div class: "range-cal", data: {
       controller: "range-calendar",
-      action: local_assigns[:action],
-      range_calendar_mode_value: mode,
       range_calendar_today_value: Date.current.iso8601,
-      range_calendar_start_value: local_assigns[:start],
-      range_calendar_end_value: local_assigns[:end],
-      range_calendar_enabled_value: local_assigns[:enabled]&.map(&:iso8601),
-      range_calendar_url_value: local_assigns[:url],
+      range_calendar_selected_value: selected,
+      range_calendar_enabled_value: enabled.map(&:iso8601),
+      range_calendar_url_value: url,
       range_calendar_month_names_value: t("date.month_names")
     } do %>
   <div class="range-cal__head">
@@ -27,8 +24,4 @@
   <div class="range-cal__grid" role="grid"
        data-range-calendar-target="grid"
        data-action="keydown->range-calendar#navigate"></div>
-  <% if mode == "range" %>
-    <div class="range-cal__summary" data-range-calendar-target="summary" aria-live="polite"></div>
-  <% end %>
-  <%= yield %>
 <% end %>

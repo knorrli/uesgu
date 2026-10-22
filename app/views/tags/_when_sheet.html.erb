@@ -1,10 +1,5 @@
-<% custom_range = local_assigns.fetch(:custom_range, true) %>
-<% single       = local_assigns.fetch(:single, false) %>
+<% single = local_assigns.fetch(:single, false) %>
 <% selected_window = filter.date_ranges.find { |r| Datepicker.preset.key?(r) } if single %>
-<% if custom_range %>
-  <% custom = filter.date_ranges.find { |r| r.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) } %>
-  <% custom_start, custom_end = custom&.split(' - ') %>
-<% end %>
 <section class="sheet" role="dialog" aria-modal="true" aria-hidden="true"
          aria-label="<%= t('events.filter.sheet.when') %>"
          data-filter-sheets-target="sheet" data-field="when"
@@ -14,28 +9,14 @@
     <h2 class="sheet__title"><%= t('events.filter.sheet.when') %></h2>
     <button type="button" class="sheet__clear" data-action="filter-sheets#clear" data-filter-sheets-field-param="when"><%= t('events.filter.clear') %></button>
   </header>
-  <div class="sheet__body when-body">
-    <div class="when-presets">
-      <% Datepicker.preset.each do |key, preset| %>
-        <% checked = single ? key.to_s == selected_window : filter.date_ranges.include?(key.to_s) %>
-        <label class="opt <%= 'opt--single' if single %>">
-          <input type="checkbox" name="d[]" value="<%= key %>" <%= 'checked' if checked %>>
-          <span class="opt__box"></span>
-          <span class="opt__label"><%= preset[:label] %></span>
-        </label>
-      <% end %>
-    </div>
-
-    <% if custom_range %>
-      <div class="opt opt--custom when-custom">
-        <span class="opt__type"><%= t('events.filter.custom_range') %></span>
-        <%= render layout: "shared/month_calendar",
-                   locals: { start: custom_start, end: custom_end, action: "range-calendar:reset->range-calendar#reset" } do %>
-          <input type="checkbox" name="d[]" hidden
-                 value="<%= custom %>" <%= 'checked' if custom.present? %>
-                 data-range-calendar-target="value">
-        <% end %>
-      </div>
+  <div class="sheet__body">
+    <% Datepicker.preset.each do |key, preset| %>
+      <% checked = single ? key.to_s == selected_window : filter.date_ranges.include?(key.to_s) %>
+      <label class="opt <%= 'opt--single' if single %>">
+        <input type="checkbox" name="d[]" value="<%= key %>" <%= 'checked' if checked %>>
+        <span class="opt__box"></span>
+        <span class="opt__label"><%= preset[:label] %></span>
+      </label>
     <% end %>
   </div>
   <footer class="sheet__footer">

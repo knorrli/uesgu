@@ -63,6 +63,15 @@ class FilterTest < ActiveSupport::TestCase
     assert_equal Date.current.beginning_of_day, date_group[:start_date_gteq]
   end
 
+  test "ransack_query including the past drops the floor only when no preset is set" do
+    open_query = Filter.new.ransack_query(including_past: true)[:g]
+    refute open_query.any? { |h| h.key?(:start_date_gteq) }
+
+    preset = Filter.build(date_ranges: ["this_month"]).ransack_query(including_past: true)[:g]
+              .find { |h| h.key?(:start_date_between_any) }
+    assert_equal Date.current.beginning_of_day, preset[:start_date_gteq]
+  end
+
   test "ransack_query maps a date preset into a concrete between range" do
     f = Filter.new
     f.date_ranges = ["today"]

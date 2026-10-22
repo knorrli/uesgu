@@ -517,6 +517,8 @@
 
 .range-cal__day.is-today { background: var(--theme-bg-emphasis); }
 
+.range-cal__day.is-past { color: var(--theme-fg-muted); }
+
 .range-cal__day.is-in-range {
   background: color-mix(in srgb, var(--theme-accent-color) 16%, transparent);
 }

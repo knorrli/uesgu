@@ -78,12 +78,40 @@ class EventsDayPagingTest < ActionDispatch::IntegrationTest
     assert_redirected_to events_path
   end
 
-  test "without a date filter the feed starts today" do
+  test "without a date filter the feed opens on today and steps back into the past" do
+    past = Date.current - 3
+    event(title: "PastShow", start_date: past)
+
+    get events_path
+
+    refute_includes response.body, "PastShow"
+    assert_select ".day-nav a[rel=prev][href=?]", events_path(day: past.iso8601)
+
+    get events_path(day: past.iso8601)
+
+    assert_response :success
+    assert_includes response.body, "PastShow"
+    assert_select ".date-events.past"
+  end
+
+  test "a filter with nothing upcoming opens on its most recent past day" do
+    event(title: "PastShow", start_date: Date.current - 3)
+    event(title: "PastShow Older", start_date: Date.current - 9)
+
+    get events_path(q: ["PastShow"])
+
+    assert_includes response.body, "PastShow"
+    refute_includes response.body, "PastShow Older"
+  end
+
+  test "a preset window keeps the past out of the day navigation" do
     event(title: "PastShow", start_date: Date.current - 3)
 
-    get events_path(day: (Date.current - 3).iso8601)
+    get events_path(d: ["tomorrow"])
 
-    assert_redirected_to events_path(day: @first.iso8601)
+    enabled = JSON.parse(css_select(".day-nav [data-range-calendar-enabled-value]").first["data-range-calendar-enabled-value"])
+    assert_equal [@first.iso8601], enabled
+    assert_select ".day-nav a[rel=prev]", false
   end
 
   test "a custom range reaches into the past, and the arrows follow it" do
@@ -108,11 +136,14 @@ class EventsDayPagingTest < ActionDispatch::IntegrationTest
     refute_includes response.body, "OlderShow"
   end
 
-  test "the calendar enables exactly the days with matching events" do
+  test "the calendar enables exactly the days with matching events, past ones included" do
+    past = Date.current - 3
+    event(title: "PastShow", start_date: past)
+
     get events_path
 
     enabled = JSON.parse(css_select(".day-nav [data-range-calendar-enabled-value]").first["data-range-calendar-enabled-value"])
-    assert_equal [@first.iso8601, @second.iso8601], enabled
+    assert_equal [past.iso8601, @first.iso8601, @second.iso8601], enabled
   end
 
   test "the day never becomes part of the stored filter" do

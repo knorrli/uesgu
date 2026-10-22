@@ -41,3 +41,19 @@
   margin: 0;
   max-width: none;
 }
+
+.day-nav__calendar .range-cal__day { position: relative; }
+
+.day-nav__calendar .range-cal__day:not(:disabled)::after {
+  content: "";
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 50%;
+  background: var(--theme-accent-color);
+  transform: translateX(-50%);
+}
+
+.day-nav__calendar .range-cal__day.is-start::after { background: var(--theme-on-accent); }

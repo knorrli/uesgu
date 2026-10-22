@@ -44,7 +44,7 @@ class DayNavTest < ApplicationSystemTestCase
     trigger = find(".day-nav button[popovertarget]")
     trigger.click until has_selector?("#{calendar} .range-cal__day", minimum: 28, wait: 1)
 
-    assert_selector "#{calendar} .range-cal__day.is-past.has-events:not([disabled])[data-date='#{past.iso8601}']"
-    assert_selector "#{calendar} .range-cal__day.is-past[disabled]:not(.has-events)[data-date='#{(past + 1).iso8601}']"
+    assert_selector "#{calendar} .range-cal__day.is-past:not([disabled])[data-date='#{past.iso8601}']"
+    assert_selector "#{calendar} .range-cal__day.is-past[disabled][data-date='#{(past + 1).iso8601}']"
   end
 end

@@ -519,22 +519,6 @@
 
 .range-cal__day.is-past { color: var(--theme-fg-muted); }
 
-.range-cal__day.has-events { position: relative; }
-
-.range-cal__day.has-events::after {
-  content: "";
-  position: absolute;
-  bottom: 18%;
-  left: 50%;
-  width: 0.25rem;
-  height: 0.25rem;
-  border-radius: 50%;
-  background: var(--theme-accent-color);
-  transform: translateX(-50%);
-}
-
-.range-cal__day.is-start.has-events::after { background: var(--theme-on-accent); }
-
 .range-cal__day.is-in-range {
   background: color-mix(in srgb, var(--theme-accent-color) 16%, transparent);
 }

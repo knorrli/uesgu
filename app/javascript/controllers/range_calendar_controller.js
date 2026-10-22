@@ -141,7 +141,6 @@ export default class extends Controller {
       if (date.getMonth() + 1 !== this.viewMonth) classes.push("is-other-month")
       if (iso === this.todayValue) classes.push("is-today")
       if (this.#dayMode && iso < this.todayValue) classes.push("is-past")
-      if (this.#dayMode && this.#selectable(iso)) classes.push("has-events")
       const label = `${date.getDate()}. ${this.monthNamesValue[date.getMonth() + 1]} ${date.getFullYear()}`
       cells.push(
         `<button type="button" role="gridcell" data-date="${iso}" aria-label="${label}"` +

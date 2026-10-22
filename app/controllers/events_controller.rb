@@ -78,8 +78,8 @@ class EventsController < ApplicationController
   end
 
   def stale_date_ranges?
-    presets = Datepicker.preset.keys
-    Array(params[:d]).compact_blank.any? { |range| !presets.include?(range) }
+    values = Array(params[:d]).compact_blank
+    values.any? && values.sort != date_ranges_from(values).sort
   end
 
   def query_without_stale_date_ranges

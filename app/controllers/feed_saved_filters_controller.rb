@@ -13,7 +13,7 @@ class FeedSavedFiltersController < ApplicationController
     rule.filter_attributes = filter_params
     rule = already_saved(rule) || rule.tap(&:save!)
 
-    redirect_to events_path(q: rule.queries, g: rule.genres, l: rule.location_list, d: rule.date_ranges,
+    redirect_to events_path(q: rule.queries, g: rule.genres, l: rule.location_list, d: rule.active_windows,
                             applied: rule.id, filtered: 1)
   end
 

@@ -80,10 +80,10 @@ export default class extends Controller {
     this.labelTarget.textContent = `${this.monthNamesValue[this.viewMonth]} ${this.viewYear}`
 
     const first = new Date(this.viewYear, this.viewMonth - 1, 1)
-    const lead = (first.getDay() + 6) % 7 // leading blanks for a Monday-first week
+    const daysBeforeMonday = (first.getDay() + 6) % 7
     const cells = []
     for (let i = 0; i < 42; i++) {
-      const date = new Date(this.viewYear, this.viewMonth - 1, 1 - lead + i)
+      const date = new Date(this.viewYear, this.viewMonth - 1, 1 - daysBeforeMonday + i)
       const iso = this.#iso(date)
       const classes = ["range-cal__day"]
       if (date.getMonth() + 1 !== this.viewMonth) classes.push("is-other-month")

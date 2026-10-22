@@ -12,8 +12,7 @@
     <span class="ph ph-calendar-dots"></span>
   </button>
   <div id="day-nav-calendar" class="day-nav__calendar" popover>
-    <%= render(layout: "shared/month_calendar",
-               locals: { mode: "day", start: day.iso8601, enabled: days, url: calendar_url }) { } %>
+    <%= render "shared/month_calendar", selected: day.iso8601, enabled: days, url: calendar_url %>
   </div>
 
   <% if next_path %>

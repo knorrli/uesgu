@@ -114,26 +114,46 @@ class EventsDayPagingTest < ActionDispatch::IntegrationTest
     assert_select ".day-nav a[rel=prev]", false
   end
 
-  test "a custom range reaches into the past, and the arrows follow it" do
-    past = Date.current - 3
-    event(title: "PastShow", start_date: past)
-    range = "#{(past - 1).iso8601} - #{@second.iso8601}"
+  test "a custom range from an old link is dropped from the URL, presets survive" do
+    stale = "#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"
 
-    get events_path(d: [range], day: @first.iso8601)
+    get events_path(q: ["Show"], d: [stale, "tomorrow"])
+    assert_redirected_to events_path(q: ["Show"], d: ["tomorrow"])
 
-    assert_response :success
-    assert_select ".day-nav a[rel=prev][href=?]", events_path(d: [range], day: past.iso8601)
+    get events_path(d: ["today,tomorrow"])
+    assert_redirected_to events_path(d: %w[today tomorrow])
   end
 
-  test "a custom range entirely in the past opens on its last day" do
-    past = Date.current - 3
-    event(title: "PastShow", start_date: past)
-    event(title: "OlderShow", start_date: past - 2)
+  test "a link holding only a custom range clears the stored filter like any explicit link" do
+    cookies[EventsController::FILTER_COOKIE.to_s] = { g: ["Jazz"] }.to_json
 
-    get events_path(d: ["#{(past - 5).iso8601} - #{(past + 1).iso8601}"])
+    get events_path(d: ["#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"])
+    assert_redirected_to events_path(filtered: "1")
+    follow_redirect!
+    assert_redirected_to events_path
+    follow_redirect!
 
-    assert_includes response.body, "PastShow"
-    refute_includes response.body, "OlderShow"
+    assert_response :success
+    assert_includes response.body, "FirstDayShow"
+    assert cookies[EventsController::FILTER_COOKIE.to_s].blank?
+  end
+
+  test "a custom range in a stored filter cookie is ignored" do
+    event(title: "PastShow", start_date: Date.current - 3)
+    cookies[EventsController::FILTER_COOKIE.to_s] = { d: ["#{(Date.current - 5).iso8601} - #{(Date.current - 1).iso8601}"] }.to_json
+
+    get events_path
+
+    assert_response :success
+    assert_includes response.body, "FirstDayShow"
+    refute_includes response.body, "PastShow"
+  end
+
+  test "the When sheet offers the presets and no calendar" do
+    get events_path
+
+    assert_select ".sheet[data-field=when] input[name='d[]']", count: Datepicker.preset.size
+    assert_select ".sheet[data-field=when] .range-cal", false
   end
 
   test "the calendar enables exactly the days with matching events, past ones included" do

@@ -1001,7 +1001,6 @@ en:
       close: Close
       search_for: 'Search for “%{query}”'
       search_anything: Type to search for anything
-      custom_range: Custom range
       prev_month: Previous
       next_month: Next
       loading: Loading…

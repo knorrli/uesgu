@@ -50,7 +50,10 @@ class EventsController < ApplicationController
   end
 
   def redirect_to_canonical_filter
-    if explicit_filter_request?
+    if stale_date_ranges?
+      redirect_to events_path(query_without_stale_date_ranges.symbolize_keys)
+      return true
+    elsif explicit_filter_request?
       sync_filter_cookie
       track_applied_saved_filter
       if params[:filtered].present? || params[:applied].present?
@@ -72,6 +75,20 @@ class EventsController < ApplicationController
 
     redirect_to events_path(canonical.symbolize_keys)
     true
+  end
+
+  def stale_date_ranges?
+    values = Array(params[:d]).compact_blank
+    values.any? && values.sort != date_ranges_from(values).sort
+  end
+
+  def query_without_stale_date_ranges
+    query = request.query_parameters.merge("d" => date_ranges_from(params[:d]).presence).compact
+    FILTER_KEYS.any? { |key| query[key.to_s].present? } ? query : query.merge("filtered" => "1")
+  end
+
+  def date_ranges_from(values)
+    Filter.build(date_ranges: Array(values).compact_blank).date_ranges
   end
 
   def requested_day
@@ -118,6 +135,7 @@ class EventsController < ApplicationController
 
     filter = FILTER_KEYS.each_with_object({}) do |key, acc|
       values = Array(data[key.to_s]).compact_blank
+      values = date_ranges_from(values) if key == :d
       acc[key.to_s] = values if values.any?
     end
     filter.presence

@@ -1001,7 +1001,6 @@ de:
       close: Schliessen
       search_for: 'Suchen nach „%{query}“'
       search_anything: Tippe, um nach allem zu suchen
-      custom_range: Eigener Zeitraum
       prev_month: Zurück
       next_month: Weiter
       loading: Lädt…

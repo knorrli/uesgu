@@ -27,7 +27,7 @@ class DayNavTest < ApplicationSystemTestCase
     trigger = find(".day-nav button[popovertarget]")
     trigger.click until has_selector?("#{calendar} .range-cal__day", minimum: 28, wait: 1)
 
-    assert_selector "#{calendar} .range-cal__day.is-start[data-date='#{@second.iso8601}']"
+    assert_selector "#{calendar} .range-cal__day.is-selected[data-date='#{@second.iso8601}']"
     assert_selector "#{calendar} .range-cal__day[data-date='#{(@second + 1).iso8601}'][disabled]"
 
     target = "#{calendar} .range-cal__day[data-date='#{@third.iso8601}']"

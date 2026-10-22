@@ -56,4 +56,4 @@
   transform: translateX(-50%);
 }
 
-.day-nav__calendar .range-cal__day.is-start::after { background: var(--theme-on-accent); }
+.day-nav__calendar .range-cal__day.is-selected::after { background: var(--theme-on-accent); }

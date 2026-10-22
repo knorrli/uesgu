@@ -38,7 +38,7 @@
     <% if applyable.any? %>
       <hr class="filter-menu__divider">
       <% applyable.each do |sf| %>
-        <%= link_to events_path(q: sf.queries, g: sf.genres, l: sf.location_list, d: sf.date_ranges,
+        <%= link_to events_path(q: sf.queries, g: sf.genres, l: sf.location_list, d: sf.active_windows,
                                 applied: sf.id, filtered: 1),
               class: 'nav-menu__item filter-menu__apply' do %>
           <span class="ph ph-funnel" aria-hidden="true"></span>

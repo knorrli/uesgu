@@ -2,24 +2,19 @@ import { Controller } from "@hotwired/stimulus"
 import { Turbo } from "@hotwired/turbo-rails"
 
 export default class extends Controller {
-  static targets = ["value", "grid", "label", "summary"]
+  static targets = ["grid", "label"]
   static values = {
-    today: String,      // server "today" ISO — drives the today-pill + default month
-    start: String,      // pre-applied range start ISO (or "")
-    end: String,        // pre-applied range end ISO (or "")
-    monthNames: Array,  // I18n date.month_names: [null, "Januar", … "Dezember"]
-    mode: { type: String, default: "range" },
+    today: String,
+    selected: String,
+    monthNames: Array,
     enabled: Array,
     url: String,
   }
 
   connect() {
-    this.start = this.startValue || null
-    this.end = this.endValue || null
-    this.hover = null
-    const [year, month] = (this.start || this.todayValue).split("-").map(Number)
+    const [year, month] = (this.selectedValue || this.todayValue).split("-").map(Number)
     this.viewYear = year
-    this.viewMonth = month // 1–12
+    this.viewMonth = month
     this.#render()
   }
 
@@ -27,33 +22,7 @@ export default class extends Controller {
   nextMonth() { this.#shiftMonth(1) }
 
   pick(event) {
-    const iso = event.currentTarget.dataset.date
-    if (this.#dayMode) return this.#visit(iso)
-
-    if (!this.start || this.end) {
-      this.start = iso
-      this.end = null
-    } else if (iso < this.start) {
-      this.end = this.start
-      this.start = iso
-    } else {
-      this.end = iso
-    }
-    this.hover = null
-    this.#commitValue()
-    this.#paint()
-  }
-
-  preview(event) {
-    if (this.#dayMode || !this.start || this.end) return
-    this.hover = event.currentTarget.dataset.date
-    this.#paint()
-  }
-
-  clearPreview() {
-    if (this.hover === null) return
-    this.hover = null
-    this.#paint()
+    this.#visit(event.currentTarget.dataset.date)
   }
 
   navigate(event) {
@@ -73,18 +42,7 @@ export default class extends Controller {
     this.gridTarget.querySelector(`[data-date="${this.#iso(next)}"]`)?.focus()
   }
 
-  reset() {
-    this.start = null
-    this.end = null
-    this.hover = null
-    this.valueTarget.checked = false
-    this.valueTarget.value = ""
-    this.#paint()
-  }
-
-  get #dayMode() { return this.modeValue === "day" }
-
-  #selectable(iso) { return !this.#dayMode || this.enabledValue.includes(iso) }
+  #selectable(iso) { return this.enabledValue.includes(iso) }
 
   #step(iso, step) {
     const [y, m, d] = iso.split("-").map(Number)
@@ -118,77 +76,30 @@ export default class extends Controller {
     this.#render()
   }
 
-  #commitValue() {
-    if (this.start && this.end) {
-      this.valueTarget.value = `${this.start} - ${this.end}`
-      this.valueTarget.checked = true
-    } else {
-      this.valueTarget.checked = false
-    }
-    this.element.dispatchEvent(new Event("change", { bubbles: true }))
-  }
-
   #render() {
     this.labelTarget.textContent = `${this.monthNamesValue[this.viewMonth]} ${this.viewYear}`
 
     const first = new Date(this.viewYear, this.viewMonth - 1, 1)
-    const lead = (first.getDay() + 6) % 7 // leading blanks for a Monday-first week
+    const daysBeforeMonday = (first.getDay() + 6) % 7
     const cells = []
     for (let i = 0; i < 42; i++) {
-      const date = new Date(this.viewYear, this.viewMonth - 1, 1 - lead + i)
+      const date = new Date(this.viewYear, this.viewMonth - 1, 1 - daysBeforeMonday + i)
       const iso = this.#iso(date)
       const classes = ["range-cal__day"]
       if (date.getMonth() + 1 !== this.viewMonth) classes.push("is-other-month")
       if (iso === this.todayValue) classes.push("is-today")
-      if (this.#dayMode && iso < this.todayValue) classes.push("is-past")
+      if (iso < this.todayValue) classes.push("is-past")
+      if (iso === this.selectedValue) classes.push("is-selected")
       const label = `${date.getDate()}. ${this.monthNamesValue[date.getMonth() + 1]} ${date.getFullYear()}`
       cells.push(
         `<button type="button" role="gridcell" data-date="${iso}" aria-label="${label}"` +
           `${this.#selectable(iso) ? "" : " disabled"}` +
           ` class="${classes.join(" ")}"` +
-          ` data-action="click->range-calendar#pick mouseenter->range-calendar#preview mouseleave->range-calendar#clearPreview">` +
+          ` data-action="click->range-calendar#pick">` +
           `${date.getDate()}</button>`
       )
     }
     this.gridTarget.innerHTML = cells.join("")
-    this.#paint()
-  }
-
-  #paint() {
-    const lo = this.start
-    let hi = this.end || (this.start && !this.end ? this.hover : null)
-    let [a, b] = hi && hi < lo ? [hi, lo] : [lo, hi]
-
-    this.gridTarget.querySelectorAll(".range-cal__day").forEach((cell) => {
-      const iso = cell.dataset.date
-      cell.classList.remove("is-start", "is-end", "is-in-range")
-      if (!this.start) return
-      if (!b) {
-        if (iso === a) cell.classList.add("is-start")
-      } else if (iso === a) {
-        cell.classList.add("is-start")
-      } else if (iso === b) {
-        cell.classList.add("is-end")
-      } else if (iso > a && iso < b) {
-        cell.classList.add("is-in-range")
-      }
-    })
-
-    this.#renderSummary()
-  }
-
-  #renderSummary() {
-    if (!this.hasSummaryTarget) return
-    const fmt = (iso) => { const [y, m, d] = iso.split("-"); return `${d}.${m}.${y}` }
-    if (!this.start) {
-      this.summaryTarget.textContent = ""
-    } else if (!this.end) {
-      this.summaryTarget.textContent = `${fmt(this.start)} → …`
-    } else if (this.start === this.end) {
-      this.summaryTarget.textContent = fmt(this.start)
-    } else {
-      this.summaryTarget.textContent = `${fmt(this.start)} → ${fmt(this.end)}`
-    }
   }
 
   #iso(date) {

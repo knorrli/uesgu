@@ -57,7 +57,6 @@ export default class extends Controller {
     const sheet = this.#sheetFor(event.params.field)
     if (!sheet) return
     sheet.querySelectorAll("input[type=checkbox]").forEach((input) => { input.checked = false })
-    sheet.querySelectorAll(".range-cal").forEach((cal) => cal.dispatchEvent(new CustomEvent("range-calendar:reset")))
     sheet.querySelectorAll("[data-dynamic]").forEach((row) => row.remove())
   }
 
@@ -125,9 +124,6 @@ export default class extends Controller {
       input.checked = false
       input.closest("[data-dynamic]")?.remove()
     })
-    if (name === "d" && String(value).includes(" - ")) {
-      this.element.querySelectorAll(".range-cal").forEach((cal) => cal.dispatchEvent(new CustomEvent("range-calendar:reset")))
-    }
     this.#submit()
   }
 

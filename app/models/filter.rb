@@ -30,8 +30,8 @@ class Filter
   end
 
   def date_ranges=(new_date_ranges)
-    ranges = parse(new_date_ranges)
-    @date_ranges = ranges.sort_by { |r| index = Datepicker.preset.keys.index(r); [index ? 0 : 1, index] }
+    presets = Datepicker.preset.keys
+    @date_ranges = parse(new_date_ranges).select { |range| presets.include?(range) }.sort_by { |range| presets.index(range) }
   end
 
   def active?
@@ -58,7 +58,7 @@ class Filter
         {}.tap do |date_group|
           if mapped_ranges = map_date_ranges(date_ranges).presence
             date_group[:start_date_between_any] = mapped_ranges
-            date_group[:start_date_gteq] = Date.current.beginning_of_day unless custom_range?
+            date_group[:start_date_gteq] = Date.current.beginning_of_day
           elsif !including_past
             date_group[:start_date_gteq] = Date.current.beginning_of_day
           end
@@ -68,10 +68,6 @@ class Filter
   end
 
   private
-
-  def custom_range?
-    date_ranges.any? { |range| !Datepicker.preset.key?(range) && range.to_s.match?(/\A\d{4}-\d{2}-\d{2} - \d{4}-\d{2}-\d{2}\z/) }
-  end
 
   def parse(value)
     ActsAsTaggableOn.default_parser.new(value).parse
@@ -85,15 +81,10 @@ class Filter
   end
 
   def map_date_ranges(date_ranges)
-    return [] if date_ranges.blank?
-
+    presets = Datepicker.preset
     date_ranges.map do |range|
-      if preset = Datepicker.preset[range]
-        start_date, end_date = preset[:values]
-        "#{start_date.to_date.iso8601} - #{end_date.to_date.iso8601}"
-      else
-        /\d{4}-\d{2}-\d{2}\s-\s\d{4}-\d{2}-\d{2}/.match?(range) ? range : nil
-      end
+      start_date, end_date = presets[range][:values]
+      "#{start_date} - #{end_date}"
     end
   end
 end

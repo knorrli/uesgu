@@ -48,11 +48,11 @@ class FilterTest < ActiveSupport::TestCase
                  "presets sort into Datepicker.preset key order"
   end
 
-  test "unknown date ranges sort after the known presets" do
+  test "anything but a preset is dropped from the date ranges" do
     f = Filter.new
-    f.date_ranges = ["2030-01-01 - 2030-01-31", "today"]
+    f.date_ranges = ["2030-01-01 - 2030-01-31", "today", "someday"]
 
-    assert_equal "today", f.date_ranges.first
+    assert_equal %w[today], f.date_ranges
   end
 
   test "ransack_query defaults to upcoming events when no date range is set" do
@@ -81,16 +81,10 @@ class FilterTest < ActiveSupport::TestCase
     assert_includes date_group[:start_date_between_any].first, Date.current.iso8601
   end
 
-  test "a named preset keeps the future floor; an explicit absolute range drops it" do
+  test "a named preset keeps the future floor" do
     preset = Filter.build(date_ranges: ["this_month"]).ransack_query[:g]
               .find { |h| h.key?(:start_date_between_any) }
-    assert_equal Date.current.beginning_of_day, preset[:start_date_gteq],
-                 "a preset window still hides past events"
-
-    custom = Filter.build(date_ranges: ["2020-01-01 - 2020-12-31"]).ransack_query[:g]
-              .find { |h| h.key?(:start_date_between_any) }
-    refute custom.key?(:start_date_gteq),
-           "an explicitly typed absolute range reveals past events"
+    assert_equal Date.current.beginning_of_day, preset[:start_date_gteq]
   end
 
   test "genres makes the filter active" do

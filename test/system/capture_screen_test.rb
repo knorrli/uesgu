@@ -878,6 +878,17 @@ class CaptureScreenTest < ApplicationSystemTestCase
     settle_read
 
     assert_decoded ".capture-card:not([hidden]) .review-card__source img"
+    assert_selector ".capture-row", count: 1, visible: :all
+    assert_no_selector ".capture-row__excerpt", visible: :all
+  end
+
+  test "a clipboard that fails mid-read says so rather than doing nothing" do
+    visit capture_path
+    hold_on_clipboard "async () => [{ types: ['text/plain'], getType: async () => { throw new DOMException('gone', 'NotFoundError') } }]"
+    paste_button.click
+
+    assert_selector ".capture-clipboard__error", text: copy("picker.paste_empty")
+    assert_no_selector ".capture-row"
   end
 
   test "a clipboard with nothing readable on it says so rather than failing a row" do

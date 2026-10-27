@@ -85,10 +85,10 @@ export default class extends Controller {
       return
     }
 
-    const images = await this.clipboardImages(items)
+    const images = await this.clipboardImages(items).catch(() => [])
     if (images.length > 0) return this.readImages(images)
 
-    const text = await this.clipboardText(items)
+    const text = await this.clipboardText(items).catch(() => "")
     if (text !== "") return this.extractText(text)
 
     this.clipboardErrorTarget.hidden = false

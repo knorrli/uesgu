@@ -33,8 +33,8 @@
   <% end %>
 
   <div class="capture-picker account-form flex flex-col gap-large" data-capture-target="input">
-    <div class="capture-image">
-      <p class="field-label"><%= t('capture.image_label') %></p>
+    <div class="capture-image" role="group" aria-labelledby="capture-image-label">
+      <p class="field-label" id="capture-image-label"><%= t('capture.image_label') %></p>
       <%= render "shared/drop_zone",
             id: "capture-files", label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
             input_attrs: { accept: "image/*", multiple: true,
@@ -52,8 +52,9 @@
               data-action="capture#readText" disabled><%= t('capture.picker.read_text') %></button>
     </div>
 
-    <div class="capture-clipboard" data-capture-target="clipboard">
-      <p class="field-label"><%= t('capture.clipboard_label') %></p>
+    <div class="capture-clipboard" role="group" aria-labelledby="capture-clipboard-label"
+         data-capture-target="clipboard">
+      <p class="field-label" id="capture-clipboard-label"><%= t('capture.clipboard_label') %></p>
       <p class="muted"><%= t('capture.clipboard_hint') %></p>
       <button type="button" class="button-small" data-action="capture#readClipboard"><%= t('capture.picker.paste') %></button>
       <p class="capture-clipboard__error" role="status" data-capture-target="clipboardError" hidden><%= t('capture.picker.paste_empty') %></p>

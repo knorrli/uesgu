@@ -404,7 +404,7 @@ export default class extends Controller {
         headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
       })
       if (response.status === 429) return this.failRow(id, this.rateLimitedValue)
-      if (!response.ok) return this.failRow(id)
+      if (!response.ok) return this.failRow(id, this.errorValue, { retryable: response.status >= 500 })
 
       const stream = await response.text()
       Turbo.renderStreamMessage(stream)

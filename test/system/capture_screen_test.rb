@@ -1024,14 +1024,13 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-queue__tile[data-state=failed]"
   end
 
-  test "a refused request offers to send the same poster again" do
-    CannedExtractionClient.install(events: [poster_event])
+  test "a provider failure on a poster sends the same poster again" do
+    CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
     visit capture_path
-    @user.update!(permissions: [])
     pick "poster.png"
-    assert_selector ".capture-row", text: copy("failures.unreachable")
+    assert_selector ".capture-row", text: copy("failures.provider_error")
 
-    @user.update!(permissions: %w[capture])
+    CannedExtractionClient.install(events: [poster_event])
     retry_read
 
     assert_equal "Zorpcore Nacht", field_value("title")
@@ -1043,6 +1042,16 @@ class CaptureScreenTest < ApplicationSystemTestCase
     pick "broken.png"
 
     assert_selector ".capture-row", text: copy("failures.image_unsupported")
+    assert_no_selector ".capture-row__retry"
+  end
+
+  test "a refused request offers no retry, since it would be refused again" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    @user.update!(permissions: [])
+    pick "poster.png"
+
+    assert_selector ".capture-row", text: copy("failures.unreachable")
     assert_no_selector ".capture-row__retry"
   end
 

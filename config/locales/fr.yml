@@ -163,15 +163,18 @@ fr:
         one: 1 événement trouvé
         other: "%{count} événements trouvés"
       hint: Touche une image pour voir cet événement.
+    image_label: Image
     images_hint: Plusieurs à la fois, pas de souci. Les images ne sont jamais stockées.
     text_label: Texte
     text_hint: D'un chat, d'une newsletter, peu importe.
+    clipboard_label: Presse-papiers
+    clipboard_hint: Une image ou un texte que tu viens de copier.
     manual:
       title: Saisir un événement
     picker:
-      drop_label: Dépose tes affiches ici, ou touche pour choisir
-      paste: Coller une image
-      paste_empty: Aucune image dans le presse-papiers.
+      drop_label: Prends une photo, choisis une image ou dépose-la ici
+      paste: Coller
+      paste_empty: Rien à lire dans le presse-papiers.
       add_by_hand: À la main
       read_text: Lire
       start_over: Annuler et recommencer

@@ -1,5 +1,4 @@
-<%# locals: (id:, label:, hint: nil, paste_label: nil, paste_error: nil,
-             input_attrs: {}, zone_attrs: {}, paste_attrs: {}, error_attrs: {}) %>
+<%# locals: (id:, label:, hint: nil, input_attrs: {}, zone_attrs: {}) %>
 <%= tag.div class: "drop-zone", **zone_attrs do %>
   <label class="drop-zone__target" for="<%= id %>">
     <span class="ph ph-camera" aria-hidden="true"></span>
@@ -7,8 +6,4 @@
     <% if hint.present? %><span class="drop-zone__hint muted"><%= hint %></span><% end %>
   </label>
   <%= tag.input type: "file", id: id, class: "drop-zone__input", **input_attrs %>
-  <% if paste_label.present? %>
-    <%= tag.button paste_label, type: "button", class: "button-small drop-zone__paste", **paste_attrs %>
-    <%= tag.p paste_error, class: "drop-zone__error", role: "status", hidden: true, **error_attrs %>
-  <% end %>
 <% end %>

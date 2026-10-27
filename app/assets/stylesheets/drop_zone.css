@@ -43,14 +43,3 @@
   outline: var(--border-width) solid var(--focus-ring);
   outline-offset: 2px;
 }
-
-.drop-zone__paste {
-  align-self: flex-start;
-}
-
-.drop-zone__error {
-  align-self: flex-start;
-  margin: 0;
-  font-size: var(--font-size-small);
-  color: var(--theme-warn-color);
-}

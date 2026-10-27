@@ -2,10 +2,21 @@
   --queue-tile-size: 3.25rem;
 }
 
-.capture-text {
+.capture-image,
+.capture-text,
+.capture-clipboard {
   display: flex;
   flex-direction: column;
   gap: var(--gap-small);
+}
+
+.capture-clipboard > button {
+  align-self: flex-start;
+}
+
+.capture-clipboard__error {
+  font-size: var(--font-size-small);
+  color: var(--theme-warn-color);
 }
 
 .capture-text textarea {

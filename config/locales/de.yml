@@ -163,15 +163,18 @@ de:
         one: 1 Event gefunden
         other: "%{count} Events gefunden"
       hint: Tipp auf ein Bild, um das Event anzusehen.
+    image_label: Bild
     images_hint: Mehrere aufs Mal gehen. Die Bilder werden nirgends gespeichert.
     text_label: Text
     text_hint: Aus einem Chat, einem Newsletter, egal woher.
+    clipboard_label: Zwischenablage
+    clipboard_hint: Ein Bild oder Text, den du gerade kopiert hast.
     manual:
       title: Event erfassen
     picker:
-      drop_label: Poster hierhin ziehen oder antippen
-      paste: Bild einfügen
-      paste_empty: Kein Bild in der Zwischenablage.
+      drop_label: Foto machen, Bild wählen oder hierhin ziehen
+      paste: Einfügen
+      paste_empty: Nichts Lesbares in der Zwischenablage.
       add_by_hand: Von Hand
       read_text: Auslesen
       start_over: Abbrechen und neu starten

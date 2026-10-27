@@ -21,6 +21,7 @@ export default class extends Controller {
     undecodable: String,
     sourceAlt: String,
     pasted: String,
+    retry: String,
     maxEdge: { type: Number, default: 1568 },
     concurrency: { type: Number, default: 3 },
     localities: Object,
@@ -38,6 +39,7 @@ export default class extends Controller {
     this.carry = new PlaceCarry()
     this.strip = new CaptureQueueStrip(this.stripTarget, this.sources, this.sourceAltValue)
     this.currentId = null
+    this.attempts = new Map()
   }
 
   connect() {
@@ -124,7 +126,7 @@ export default class extends Controller {
       this.appendPending(id, file.name)
       const image = await downscale(file, this.maxEdgeValue).catch(() => null)
       if (!image) {
-        this.failRow(id, this.undecodableValue)
+        this.failRow(id, this.undecodableValue, { retryable: false })
         continue
       }
 
@@ -158,6 +160,7 @@ export default class extends Controller {
 
   startOver() {
     this.sources.clear()
+    this.attempts.clear()
     this.carry.clear()
     this.strip.clear()
     this.rowsTarget.replaceChildren()
@@ -368,8 +371,20 @@ export default class extends Controller {
     return event.target.closest(".capture-card")
   }
 
+  retry(event) {
+    const row = event.target.closest(".capture-row")
+    const id = row.id.replace(/^capture-row-/, "")
+    const attempt = this.attempts.get(id)
+    if (!attempt) return
+
+    row.replaceWith(this.pendingRow(id, attempt.label))
+    this.strip.markPending(row.id)
+    this.extract(attempt.payload, attempt.label, id)
+  }
+
   async extract(payload, label, id = crypto.randomUUID()) {
     if (!document.getElementById(this.rowId(id))) this.appendPending(id, label)
+    this.attempts.set(id, { payload, label })
 
     const body = new FormData()
     body.append("row_id", id)
@@ -389,7 +404,7 @@ export default class extends Controller {
         headers: { Accept: "text/vnd.turbo-stream.html", "X-CSRF-Token": this.csrfToken }
       })
       if (response.status === 429) return this.failRow(id, this.rateLimitedValue)
-      if (!response.ok) return this.failRow(id)
+      if (!response.ok) return this.failRow(id, this.errorValue, { retryable: response.status >= 500 })
 
       const stream = await response.text()
       Turbo.renderStreamMessage(stream)
@@ -419,11 +434,23 @@ export default class extends Controller {
     this.strip.markFailed(this.rowId(id))
   }
 
-  failRow(id, message = this.errorValue) {
+  failRow(id, message = this.errorValue, { retryable = true } = {}) {
     const row = document.getElementById(this.rowId(id))
-    if (row) row.replaceChildren(this.rowLabel(row.dataset.label), this.rowFailure(message))
+    if (row) {
+      row.replaceChildren(this.rowLabel(row.dataset.label), this.rowFailure(message))
+      if (retryable) row.appendChild(this.retryButton())
+    }
     this.settleEmpty(id)
     return false
+  }
+
+  retryButton() {
+    const button = document.createElement("button")
+    button.type = "button"
+    button.className = "button-small capture-row__retry"
+    button.dataset.action = "capture#retry"
+    button.textContent = this.retryValue
+    return button
   }
 
   rowLabel(label) {
@@ -464,6 +491,11 @@ export default class extends Controller {
   }
 
   appendPending(id, label) {
+    this.rowsTarget.appendChild(this.pendingRow(id, label))
+    this.strip.appendPending(this.rowId(id), label)
+  }
+
+  pendingRow(id, label) {
     const row = document.createElement("div")
     row.id = this.rowId(id)
     row.className = "capture-row"
@@ -472,9 +504,7 @@ export default class extends Controller {
     pending.dataset.pending = ""
     pending.textContent = this.pendingValue
     row.appendChild(pending)
-    this.rowsTarget.appendChild(row)
-
-    this.strip.appendPending(this.rowId(id), label)
+    return row
   }
 
   get csrfToken() {

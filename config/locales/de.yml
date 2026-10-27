@@ -207,6 +207,7 @@ de:
     row:
       pending: wird ausgelesen …
       pasted: Eingefügtes Bild
+      retry: Nochmal versuchen
       untitled: Text
       nothing_found: Nichts gefunden, was nach einem Event aussieht.
       source_alt: Das ausgelesene Bild
@@ -233,10 +234,10 @@ de:
       image_too_large: Das Bild ist zu gross (max. 8 MB).
       image_unsupported: Dieses Bildformat können wir nicht lesen – speichere es als JPEG oder PNG.
       text_empty: Da war kein Text.
-      provider_error: Das Auslesen hat nicht geklappt. Nochmal versuchen?
-      truncated: Das Auslesen ist mittendrin abgebrochen. Nochmal versuchen?
+      provider_error: Das Auslesen hat nicht geklappt.
+      truncated: Das Auslesen ist mittendrin abgebrochen.
       unconfigured: Das Auslesen ist gerade nicht eingerichtet.
-      unreachable: Keine Verbindung. Nochmal versuchen?
+      unreachable: Keine Verbindung.
       unknown: Das hat nicht geklappt.
   copy_field:
     copy: Kopieren

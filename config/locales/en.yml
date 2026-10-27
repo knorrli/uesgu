@@ -207,6 +207,7 @@ en:
     row:
       pending: reading …
       pasted: Pasted image
+      retry: Try again
       untitled: Text
       nothing_found: Nothing here looks like an event.
       source_alt: The image this was read from
@@ -233,10 +234,10 @@ en:
       image_too_large: That image is too big (8 MB max).
       image_unsupported: We can't read that image format — save it as JPEG or PNG.
       text_empty: There was no text.
-      provider_error: Reading it didn't work. Try again?
-      truncated: The read broke off halfway. Try again?
+      provider_error: Reading it didn't work.
+      truncated: The read broke off halfway.
       unconfigured: Reading isn't set up right now.
-      unreachable: No connection. Try again?
+      unreachable: No connection.
       unknown: That didn't work.
   copy_field:
     copy: Copy

@@ -5,6 +5,10 @@
     <p class="capture-row__failure" data-failed>
       <%= t("capture.failures.#{extraction.code}", default: t('capture.failures.unknown')) %>
     </p>
+    <% if extraction.retryable? %>
+      <button type="button" class="button-small capture-row__retry"
+              data-action="capture#retry"><%= t('capture.row.retry') %></button>
+    <% end %>
   <% elsif extraction.candidates.empty? %>
     <p class="capture-row__label field-label"><%= label.presence || t('capture.row.untitled') %></p>
     <p class="muted"><%= t('capture.row.nothing_found') %></p>

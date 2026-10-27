@@ -1009,7 +1009,58 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_no_selector ".capture-card", visible: :all
   end
 
+  test "a provider failure offers to send the same text again" do
+    CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
+    visit capture_path
+    paste "Zorpcore Nacht, Zorpsaal, 20 Uhr"
+    assert_selector ".capture-row", text: copy("failures.provider_error")
+
+    CannedExtractionClient.install(events: [poster_event])
+    retry_read
+
+    assert_equal "Zorpcore Nacht", field_value("title")
+    assert_selector ".capture-row__excerpt", text: "Zorpcore Nacht, Zorpsaal, 20 Uhr"
+    assert_selector ".capture-queue__tile[data-card][data-state=open]", count: 1
+    assert_no_selector ".capture-queue__tile[data-state=failed]"
+  end
+
+  test "a provider failure on a poster sends the same poster again" do
+    CannedExtractionClient.install(raises: "HTTP 503: upstream busy")
+    visit capture_path
+    pick "poster.png"
+    assert_selector ".capture-row", text: copy("failures.provider_error")
+
+    CannedExtractionClient.install(events: [poster_event])
+    retry_read
+
+    assert_equal "Zorpcore Nacht", field_value("title")
+    assert_decoded ".capture-card:not([hidden]) .review-card__source img"
+  end
+
+  test "a failure that would fail again offers no retry" do
+    visit capture_path
+    pick "broken.png"
+
+    assert_selector ".capture-row", text: copy("failures.image_unsupported")
+    assert_no_selector ".capture-row__retry"
+  end
+
+  test "a refused request offers no retry, since it would be refused again" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    @user.update!(permissions: [])
+    pick "poster.png"
+
+    assert_selector ".capture-row", text: copy("failures.unreachable")
+    assert_no_selector ".capture-row__retry"
+  end
+
   private
+
+  def retry_read
+    find(".capture-row__retry", text: copy("row.retry")).click
+    assert_no_selector "[data-pending]", text: copy("row.pending"), wait: 5
+  end
 
   def show_date = Date.current + 30
 

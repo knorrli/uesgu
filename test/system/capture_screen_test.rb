@@ -859,12 +859,33 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-queue__tile[aria-label='#{copy("row.pasted")}']"
   end
 
-  test "a clipboard with no image on it says so rather than failing a row" do
+  test "text on the clipboard is read like typed text" do
+    CannedExtractionClient.install(events: [poster_event])
     visit capture_path
     hold_on_clipboard clipboard_text
     paste_button.click
+    settle_read
 
-    assert_selector ".drop-zone__error", text: copy("picker.paste_empty")
+    assert_equal "Zorpcore Nacht", field_value("title")
+    assert_selector ".capture-row__excerpt", text: "Zorpcore Nacht"
+  end
+
+  test "an image on the clipboard wins over the text beside it" do
+    CannedExtractionClient.install(events: [poster_event])
+    visit capture_path
+    hold_on_clipboard "async () => [new ClipboardItem({ 'text/plain': new Blob(['Zorpcore'], { type: 'text/plain' }), 'image/png': #{poster_blob_js} })]"
+    paste_button.click
+    settle_read
+
+    assert_decoded ".capture-card:not([hidden]) .review-card__source img"
+  end
+
+  test "a clipboard with nothing readable on it says so rather than failing a row" do
+    visit capture_path
+    hold_on_clipboard clipboard_blank
+    paste_button.click
+
+    assert_selector ".capture-clipboard__error", text: copy("picker.paste_empty")
     assert_selector ".capture-picker"
     assert_no_selector ".capture-row"
   end
@@ -874,21 +895,21 @@ class CaptureScreenTest < ApplicationSystemTestCase
     hold_on_clipboard "async () => { throw new DOMException('denied', 'NotAllowedError') }"
     paste_button.click
 
-    assert_no_selector ".drop-zone__error", visible: true
+    assert_no_selector ".capture-clipboard__error", visible: true
     assert_no_selector ".capture-row"
   end
 
   test "the refusal does not outlive the picker it was shown on" do
     CannedExtractionClient.install(events: [poster_event])
     visit capture_path
-    hold_on_clipboard clipboard_text
+    hold_on_clipboard clipboard_blank
     paste_button.click
-    assert_selector ".drop-zone__error"
+    assert_selector ".capture-clipboard__error"
 
     pick "poster.png"
     find("button[data-action='capture#startOver']").click
 
-    assert_no_selector ".drop-zone__error", visible: true
+    assert_no_selector ".capture-clipboard__error", visible: true
   end
 
   test "an image pasted onto the picker is read without touching the button" do
@@ -918,7 +939,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     assert_selector ".capture-row", count: 1, visible: :all
   end
 
-  test "the paste button is taken away where the clipboard cannot be read" do
+  test "the clipboard reader is taken away where the clipboard cannot be read" do
     visit capture_path
     assert paste_button.visible?
 
@@ -927,7 +948,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
       Stimulus.getControllerForElementAndIdentifier(document.querySelector(".capture"), "capture").connect()
     JS
 
-    assert_no_selector ".drop-zone__paste", visible: true
+    assert_no_selector ".capture-clipboard", visible: true
   end
 
   test "a file no browser can decode fails its own row and lets the rest of the pick land" do
@@ -1098,7 +1119,7 @@ class CaptureScreenTest < ApplicationSystemTestCase
     read_text
   end
 
-  def paste_button = find(".drop-zone__paste")
+  def paste_button = find("button[data-action='capture#readClipboard']")
 
   def hold_on_clipboard(read)
     execute_script(<<~JS)
@@ -1112,6 +1133,10 @@ class CaptureScreenTest < ApplicationSystemTestCase
 
   def clipboard_text
     "async () => [new ClipboardItem({ 'text/plain': new Blob(['Zorpcore Nacht'], { type: 'text/plain' }) })]"
+  end
+
+  def clipboard_blank
+    "async () => [new ClipboardItem({ 'text/plain': new Blob(['  '], { type: 'text/plain' }) })]"
   end
 
   def poster_blob_js

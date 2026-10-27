@@ -9,7 +9,7 @@ import { PlaceCarry } from "lib/capture/place_carry"
 import { PlaceFields } from "lib/capture/place_fields"
 
 export default class extends Controller {
-  static targets = ["files", "text", "zone", "read", "paste", "pasteError", "input",
+  static targets = ["files", "text", "zone", "read", "clipboard", "clipboardError", "input",
                     "restart", "byHand", "rows", "strip", "card", "source", "stagingTitle",
                     "reviewTitle", "reviewHint", "genreOptions"]
   static values = {
@@ -43,7 +43,7 @@ export default class extends Controller {
   }
 
   connect() {
-    if (!navigator.clipboard?.read) this.pasteTarget.hidden = true
+    if (!navigator.clipboard?.read) this.clipboardTarget.hidden = true
   }
 
   disconnect() {
@@ -70,15 +70,13 @@ export default class extends Controller {
     this.readImages(Array.from(event.dataTransfer.files).filter(isImage))
   }
 
-  // The way in that costs no download: copy a poster wherever it is and paste it here,
-  // rather than saving it to the photo library first. A phone has no keystroke for
-  // that, so it is a button — Safari answers the read with a system paste prompt of
-  // its own, and a declined prompt rejects and is not a failure to report.
+  // Safari answers the read with a system paste prompt of its own, and a declined
+  // prompt rejects and is not a failure to report.
   //
   // `read()` is started before anything is awaited: the tap's transient activation is
   // what buys that prompt, and the first await spends it.
-  async pasteImages() {
-    this.pasteErrorTarget.hidden = true
+  async readClipboard() {
+    this.clipboardErrorTarget.hidden = true
 
     let items
     try {
@@ -88,12 +86,12 @@ export default class extends Controller {
     }
 
     const images = await this.clipboardImages(items)
-    if (images.length === 0) {
-      this.pasteErrorTarget.hidden = false
-      return
-    }
+    if (images.length > 0) return this.readImages(images)
 
-    this.readImages(images)
+    const text = await this.clipboardText(items)
+    if (text !== "") return this.extractText(text)
+
+    this.clipboardErrorTarget.hidden = false
   }
 
   pasted(event) {
@@ -114,6 +112,13 @@ export default class extends Controller {
       if (type) images.push(new File([await item.getType(type)], this.pastedValue, { type }))
     }
     return images
+  }
+
+  async clipboardText(items) {
+    const item = items.find((candidate) => candidate.types.includes("text/plain"))
+    if (!item) return ""
+
+    return (await (await item.getType("text/plain")).text()).trim()
   }
 
   async readImages(files) {
@@ -142,17 +147,21 @@ export default class extends Controller {
     const text = this.pendingText
     if (text === "") return
 
-    const id = crypto.randomUUID()
-    const label = text.slice(0, 40)
     this.textTarget.value = ""
     this.refreshRead()
+    this.extractText(text)
+  }
+
+  extractText(text) {
+    const id = crypto.randomUUID()
+    const label = text.slice(0, 40)
     this.leavePicker()
     this.sources.remember(this.rowId(id), id, { label, text })
     this.extract({ text }, label, id)
   }
 
   leavePicker() {
-    this.pasteErrorTarget.hidden = true
+    this.clipboardErrorTarget.hidden = true
     this.inputTarget.hidden = true
     this.restartTarget.hidden = false
     this.byHandTarget.hidden = true

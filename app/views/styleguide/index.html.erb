@@ -551,7 +551,7 @@
 
   <section class="sg-section" id="drop-zone">
     <h2>Drop zone</h2>
-    <p class="sg-section__intro">A file picker drawn as a drop target: drop files on it, tap it to open the system picker, or paste an image onto it. It holds nothing and lists nothing &mdash; what happens on pick belongs to the caller.</p>
+    <p class="sg-section__intro">A file picker drawn as a drop target: drop files on it, or tap it to open the system picker. It holds nothing and lists nothing &mdash; what happens on pick belongs to the caller.</p>
 
     <div class="sg-row sg-row--stack">
       <div class="sg-specimen">
@@ -561,19 +561,6 @@
       <div class="sg-spec">
         <span class="sg-spec__name">Drop zone</span> · <code>render "shared/drop_zone", id:, label:, hint:</code>
         <p class="sg-purpose">A real <code>&lt;input type="file"&gt;</code> stays behind the dashed target, visually hidden and wrapped by a <code>&lt;label for&gt;</code>: the drop handler is an <b>enhancement</b>, and without the input keyboard users and every iOS browser lose the picker entirely. The dashed edge is the only one on the site, so a drop target is never mistaken for a field. Pass <code>zone_attrs</code>/<code>input_attrs</code> for the caller's own hooks.</p>
-      </div>
-    </div>
-
-    <div class="sg-row sg-row--stack">
-      <div class="sg-specimen">
-        <%= render "shared/drop_zone", id: "sg-drop-zone-paste",
-              label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
-              paste_label: t('capture.picker.paste'), paste_error: t('capture.picker.paste_empty'),
-              error_attrs: { hidden: false } %>
-      </div>
-      <div class="sg-spec">
-        <span class="sg-spec__name">…with a paste button</span> · <code>paste_label:</code>, <code>paste_error:</code>
-        <p class="sg-purpose">A third way in for a phone, which has no keystroke for pasting. The button is a <b>sibling</b> of the <code>&lt;label for&gt;</code> and never inside it — a label forwards every tap in its subtree to the file input, which would open the system picker instead. The caller hides it where <code>navigator.clipboard.read</code> is missing. The refusal is specimened here; live it starts hidden.</p>
       </div>
     </div>
   </section>

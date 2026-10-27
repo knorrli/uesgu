@@ -33,15 +33,15 @@
   <% end %>
 
   <div class="capture-picker account-form flex flex-col gap-large" data-capture-target="input">
-    <%= render "shared/drop_zone",
-          id: "capture-files", label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
-          paste_label: t('capture.picker.paste'), paste_error: t('capture.picker.paste_empty'),
-          input_attrs: { accept: "image/*", multiple: true,
-                         data: { capture_target: "files", action: "change->capture#readFiles" } },
-          zone_attrs: { data: { capture_target: "zone",
-                                action: "dragover->capture#dragOver dragleave->capture#dragLeave drop->capture#dropFiles" } },
-          paste_attrs: { data: { capture_target: "paste", action: "capture#pasteImages" } },
-          error_attrs: { data: { capture_target: "pasteError" } } %>
+    <div class="capture-image">
+      <p class="field-label"><%= t('capture.image_label') %></p>
+      <%= render "shared/drop_zone",
+            id: "capture-files", label: t('capture.picker.drop_label'), hint: t('capture.images_hint'),
+            input_attrs: { accept: "image/*", multiple: true,
+                           data: { capture_target: "files", action: "change->capture#readFiles" } },
+            zone_attrs: { data: { capture_target: "zone",
+                                  action: "dragover->capture#dragOver dragleave->capture#dragLeave drop->capture#dropFiles" } } %>
+    </div>
 
     <div class="capture-text">
       <label class="field-label" for="capture-text"><%= t('capture.text_label') %></label>
@@ -50,6 +50,13 @@
                 data-action="input->capture#refreshRead"></textarea>
       <button type="button" class="button-small primary" data-capture-target="read"
               data-action="capture#readText" disabled><%= t('capture.picker.read_text') %></button>
+    </div>
+
+    <div class="capture-clipboard" data-capture-target="clipboard">
+      <p class="field-label"><%= t('capture.clipboard_label') %></p>
+      <p class="muted"><%= t('capture.clipboard_hint') %></p>
+      <button type="button" class="button-small" data-action="capture#readClipboard"><%= t('capture.picker.paste') %></button>
+      <p class="capture-clipboard__error" role="status" data-capture-target="clipboardError" hidden><%= t('capture.picker.paste_empty') %></p>
     </div>
   </div>
 

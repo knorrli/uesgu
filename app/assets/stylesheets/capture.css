@@ -39,6 +39,10 @@
   color: var(--theme-warn-color);
 }
 
+.capture-row__retry {
+  align-self: flex-start;
+}
+
 .capture-row [data-pending] {
   margin: 0;
   font-size: var(--font-size-lg);

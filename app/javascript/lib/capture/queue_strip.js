@@ -50,6 +50,14 @@ export class CaptureQueueStrip {
     if (pending) this.markTile(pending, "failed")
   }
 
+  markPending(rowId) {
+    const failed = this.element.querySelector(`[data-row="${rowId}"] [data-state="failed"]:not([data-card])`)
+    if (!failed) return
+
+    failed.dataset.state = "pending"
+    failed.querySelector(".ph")?.remove()
+  }
+
   highlight(cardId) {
     this.tiles.forEach((tile) => { tile.classList.toggle("is-current", tile.dataset.card === cardId) })
   }

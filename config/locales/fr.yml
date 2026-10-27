@@ -207,6 +207,7 @@ fr:
     row:
       pending: lecture …
       pasted: Image collée
+      retry: Réessayer
       untitled: Texte
       nothing_found: Rien ici ne ressemble à un événement.
       source_alt: L'image lue
@@ -233,10 +234,10 @@ fr:
       image_too_large: Cette image est trop lourde (8 Mo max).
       image_unsupported: On ne sait pas lire ce format — enregistre-la en JPEG ou PNG.
       text_empty: Il n'y avait pas de texte.
-      provider_error: La lecture n'a pas marché. Tu réessaies ?
-      truncated: La lecture s'est arrêtée en cours de route. Tu réessaies ?
+      provider_error: La lecture n'a pas marché.
+      truncated: La lecture s'est arrêtée en cours de route.
       unconfigured: La lecture n'est pas configurée pour le moment.
-      unreachable: Pas de connexion. Tu réessaies ?
+      unreachable: Pas de connexion.
       unknown: Ça n'a pas marché.
   copy_field:
     copy: Copier

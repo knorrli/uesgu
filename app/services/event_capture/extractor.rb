@@ -9,6 +9,8 @@ module EventCapture
 
       def ok? = error.nil?
 
+      def retryable? = code.in?(%i[provider_error truncated])
+
       def issue_counts = candidates.flat_map(&:issues).tally.transform_keys(&:to_s)
     end
 

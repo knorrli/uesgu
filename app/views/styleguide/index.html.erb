@@ -262,24 +262,32 @@
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <span class="event-genres"><span class="event-genre"><a class="filter-link" href="#">Techno</a><button type="button" class="icon-button meta-action" aria-label="Exclude Techno"><span class="ph ph-eye-slash"></span></button><a class="icon-button meta-action" href="#" aria-label="Edit tag"><span class="ph ph-gear"></span></a></span></span>
+        <span class="event-genres"><span class="event-genre"><a class="filter-link" href="#">Techno</a><a class="icon-button meta-action" href="#" aria-label="Edit tag"><span class="ph ph-gear"></span></a></span></span>
       </div>
       <div class="sg-spec">
         <span class="sg-spec__name">Genre tag actions</span> · <code>.event-genre .meta-action</code>
-        <p class="sg-purpose">Muted icon buttons attached to the right of a genre tag on an event. Signed in, everyone gets <b>exclude</b> (eye-slash), which takes effect at once; the <b>gear</b> follows only for someone with the genres permission.</p>
+        <p class="sg-purpose">A muted icon button attached to the right of a genre tag on an event: the <b>gear</b>, only for someone with the genres permission.</p>
       </div>
     </div>
 
     <div class="sg-row">
       <div class="sg-specimen">
-        <div class="venue-header flex flex-col gap-xsmall">
-          <div class="event-where"><a class="filter-link venue" href="#">Zorphalle</a><button type="button" class="icon-button meta-action" aria-label="Exclude Zorphalle"><span class="ph ph-eye-slash"></span></button></div>
-          <div class="event-where-meta"><a class="filter-link" href="#">Zorpwil</a><button type="button" class="icon-button meta-action" aria-label="Exclude Zorpwil"><span class="ph ph-eye-slash"></span></button><span class="sep" aria-hidden="true">&middot;</span><a class="filter-link" href="#">BE</a><button type="button" class="icon-button meta-action" aria-label="Exclude BE"><span class="ph ph-eye-slash"></span></button></div>
+        <div class="event-actions">
+          <details class="nav-menu exclude-menu" data-controller="menu" data-action="toggle->menu#toggle">
+            <summary class="icon-button" aria-label="Exclude"><span class="ph ph-eye-slash" aria-hidden="true"></span></summary>
+            <div class="nav-menu__items exclude-menu__panel">
+              <p class="exclude-menu__heading">Exclude</p>
+              <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>Zorphalle</span></button>
+              <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>Zorpwil</span></button>
+              <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>BE</span></button>
+              <button type="button" class="nav-menu__item"><span class="ph ph-music-notes" aria-hidden="true"></span><span>Techno</span></button>
+            </div>
+          </details>
         </div>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Location heading actions</span> · <code>events/_location_exclude_button</code>
-        <p class="sg-purpose">The same exclude, after the venue heading and after each town and canton below it: signed in, it takes every event at that place out of the feed and notifications at once.</p>
+        <span class="sg-spec__name">Exclude menu</span> · <code>events/_exclude_menu</code>
+        <p class="sg-purpose">One eye-slash per event, beside the heart, signed in only. It opens the event's venue, town, canton and genres; tapping one takes every matching event out of the feed and notifications at once.</p>
       </div>
     </div>
 

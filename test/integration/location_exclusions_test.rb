@@ -20,14 +20,22 @@ class LocationExclusionsTest < ActionDispatch::IntegrationTest
     assert_equal 0, LocationExclusion.count
   end
 
-  test "the venue, its town and its canton each carry an exclude button" do
+  test "an event's exclude menu offers its venue, then its town, then its canton" do
     sign_in_as user
 
     get events_path
 
-    assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
-    group = Nokogiri::HTML(response.body).at_css("##{dom_id(@there)}").ancestors(".venue-group").first
-    assert_equal [@hall.locality, @hall.canton], group.css(".event-where-meta form input[name=name]").map { |input| input["value"] }
+    menu = Nokogiri::HTML(response.body).at_css("##{dom_id(@there)} .exclude-menu")
+    names = menu.css("form[action='#{location_exclusions_path}'] input[name=name]").map { |input| input["value"] }
+    assert_equal [@hall.name, @hall.locality, @hall.canton], names
+  end
+
+  test "the venue heading carries no exclude button of its own" do
+    sign_in_as user
+
+    get events_path
+
+    assert_select ".venue-header form", false
   end
 
   test "a notification's event list carries the exclude button" do
@@ -38,7 +46,7 @@ class LocationExclusionsTest < ActionDispatch::IntegrationTest
     get notification_path(digest)
 
     assert_response :success
-    assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
+    assert_select ".exclude-menu form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
   end
 
   test "the saved-shows list carries the exclude button" do
@@ -48,15 +56,15 @@ class LocationExclusionsTest < ActionDispatch::IntegrationTest
     get saved_events_path
 
     assert_response :success
-    assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
+    assert_select ".exclude-menu form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.name
   end
 
-  test "a town heading without a venue carries an exclude button" do
+  test "an event without a venue offers its town to exclude" do
     sign_in_as user
 
     get events_path
 
-    assert_select ".event-where form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.locality
+    assert_select "##{dom_id(@elsewhere)} .exclude-menu form[action=?] input[name=name][value=?]", location_exclusions_path, @hall.locality
   end
 
   test "excluding a town leaves out every event there, at a venue or not" do

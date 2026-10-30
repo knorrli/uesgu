@@ -23,12 +23,12 @@ class GenreExclusionsTest < ActionDispatch::IntegrationTest
     assert_equal 0, GenreExclusion.count
   end
 
-  test "every genre tag on the feed carries an exclude button for a signed-in user" do
+  test "an event's exclude menu offers every genre on it to a signed-in user" do
     sign_in_as user
 
     get events_path
 
-    assert_select "##{dom_id(@mixed)} .event-genre form[action=?]", genre_exclusions_path, count: 2
+    assert_select "##{dom_id(@mixed)} .exclude-menu form[action=?]", genre_exclusions_path, count: 2
   end
 
   test "excluding a genre takes effect at once and returns to the page it was pressed on" do

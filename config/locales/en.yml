@@ -368,11 +368,11 @@ en:
     calendar_feed_url_label: Calendar link
     excluded_genres_heading: Excluded genres
     excluded_genres_hint: You don't see events with any of these genres, not in notifications either. Your watchlist stays as it is.
-    excluded_genres_none: None yet. Exclude a genre with the icon next to it on any event.
+    excluded_genres_none: None yet. Exclude a genre from the eye icon on any event.
     excluded_genres_remove: Stop excluding %{genre}
     excluded_locations_heading: Excluded places
     excluded_locations_hint: You don't see events at these places, not in notifications either. Your watchlist stays as it is.
-    excluded_locations_none: None yet. Exclude a place with the icon next to its name.
+    excluded_locations_none: None yet. Exclude a place from the eye icon on any event.
     excluded_locations_remove: Stop excluding %{location}
     delete_account_heading: Delete account
     delete_account_hint: Wipes your account and all your data for good.
@@ -973,6 +973,7 @@ en:
     edit_tag: Edit tag
     exclude_genre: Exclude %{genre}
     exclude_location: Exclude %{location}
+    exclude_menu: Exclude
     offsite_link: Opens on %{source}, not the venue's own site
     venue_link_hint: Opens %{venue}'s own page, not a page for this event
     index:

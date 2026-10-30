@@ -368,11 +368,11 @@ de:
     calendar_feed_url_label: Kalender-Link
     excluded_genres_heading: Ausgeschlossene Genres
     excluded_genres_hint: Events mit einem dieser Genres siehst du nicht, auch nicht in Benachrichtigungen. Deine Merkliste bleibt, wie sie ist.
-    excluded_genres_none: Noch keine. Schliess ein Genre mit dem Symbol daneben bei einem Event aus.
+    excluded_genres_none: Noch keine. Schliess ein Genre über das Auge-Symbol bei einem Event aus.
     excluded_genres_remove: "%{genre} wieder anzeigen"
     excluded_locations_heading: Ausgeschlossene Orte
     excluded_locations_hint: Events an diesen Orten siehst du nicht, auch nicht in Benachrichtigungen. Deine Merkliste bleibt, wie sie ist.
-    excluded_locations_none: Noch keine. Schliess einen Ort mit dem Symbol neben seinem Namen aus.
+    excluded_locations_none: Noch keine. Schliess einen Ort über das Auge-Symbol bei einem Event aus.
     excluded_locations_remove: "%{location} wieder anzeigen"
     delete_account_heading: Konto löschen
     delete_account_hint: Löscht dein Konto und alle deine Daten endgültig.
@@ -973,6 +973,7 @@ de:
     edit_tag: Tag bearbeiten
     exclude_genre: "%{genre} ausschliessen"
     exclude_location: "%{location} ausschliessen"
+    exclude_menu: Ausschliessen
     offsite_link: Öffnet auf %{source}, nicht der Website des Lokals
     venue_link_hint: Öffnet die Seite von %{venue}, nicht eine Seite zu diesem Event
     index:

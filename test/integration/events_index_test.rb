@@ -255,16 +255,27 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     refute e.reload.dismissed?
   end
 
-  test "the edit gear links to the admin event page, only for admins" do
+  test "the event menu links to the admin event page, only for admins" do
     e = event(start_date: Date.current + 3.days)
 
     sign_in_as user(admin: true)
     get events_path
-    assert_select "a.icon-button[href=?]", admin_event_path(e)
+    assert_select ".event-menu a[href=?]", admin_event_path(e)
 
     sign_in_as user(admin: false)
     get events_path
-    assert_select "a.icon-button", count: 0
+    assert_select ".event-menu a[href=?]", admin_event_path(e), count: 0
+  end
+
+  test "play and heart sit outside the event menu, in that order, ahead of it" do
+    e = event(start_date: Date.current + 3.days, media: [{ "provider" => "youtube", "id" => "cjox_JXa8eM" }])
+    sign_in_as user
+
+    get events_path
+
+    actions = Nokogiri::HTML(response.body).css("##{ActionView::RecordIdentifier.dom_id(e)} .event-actions > *")
+    assert_equal [true, true, true], [actions[0].matches?(".event-play"), actions[1].matches?(".event-save"), actions[2].matches?(".event-menu")]
+    assert_equal 3, actions.size
   end
 
   test "the delete button submits a real DELETE (method override present)" do

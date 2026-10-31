@@ -971,6 +971,7 @@ fr:
     delete_event: Supprimer l'événement
     edit_event: Modifier l'événement
     edit_tag: Modifier le tag
+    event_menu: Autres actions
     exclude_genre: Exclure %{genre}
     exclude_location: Exclure %{location}
     exclude_menu: Exclure

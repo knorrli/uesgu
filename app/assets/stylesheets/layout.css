@@ -66,13 +66,16 @@
 
 .nav-menu > summary {
   cursor: pointer;
-  list-style: none;
   /* Match the nav links exactly (guards against summary UA-font quirks). */
   font: inherit;
   color: var(--theme-accent-color);
 }
 
-.nav-menu > summary::-webkit-details-marker {
+.nav-menu summary {
+  list-style: none;
+}
+
+.nav-menu summary::-webkit-details-marker {
   display: none;
 }
 

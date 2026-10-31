@@ -16,6 +16,7 @@ export default class extends Controller {
       this.startListening()
     } else {
       this.stopListening()
+      this.element.querySelectorAll("details[open]").forEach((submenu) => { submenu.open = false })
     }
   }
 

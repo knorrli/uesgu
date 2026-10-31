@@ -127,11 +127,10 @@
     <div class="sg-row">
       <div class="sg-specimen">
         <a href="#buttons" class="icon-button" aria-label="Edit"><span class="ph ph-gear"></span></a>
-        <button type="button" class="icon-button danger" aria-label="Delete"><span class="ph ph-trash"></span></button>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Icon button</span> · <code>.icon-button</code>, <code>.icon-button.danger</code>
-        <p class="sg-purpose">A flat, boxless inline icon action on a row (edit gear, delete trash). Muted at rest → foreground on hover; danger → warn on hover.</p>
+        <span class="sg-spec__name">Icon button</span> · <code>.icon-button</code>
+        <p class="sg-purpose">A flat, boxless inline icon action on a row (edit gear). Muted at rest → foreground on hover.</p>
       </div>
     </div>
 
@@ -273,21 +272,27 @@
     <div class="sg-row">
       <div class="sg-specimen">
         <div class="event-actions">
-          <details class="nav-menu exclude-menu" data-controller="menu" data-action="toggle->menu#toggle">
-            <summary class="icon-button" aria-label="Exclude"><span class="ph ph-eye-slash" aria-hidden="true"></span></summary>
-            <div class="nav-menu__items exclude-menu__panel">
-              <p class="exclude-menu__heading">Exclude</p>
-              <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>Zorphalle</span></button>
-              <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>Zorpwil</span></button>
-              <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>BE</span></button>
-              <button type="button" class="nav-menu__item"><span class="ph ph-music-notes" aria-hidden="true"></span><span>Techno</span></button>
+          <details class="nav-menu event-menu" data-controller="menu" data-action="toggle->menu#toggle">
+            <summary class="icon-button" aria-label="More actions"><span class="ph ph-gear" aria-hidden="true"></span></summary>
+            <div class="nav-menu__items event-menu__panel">
+              <details class="exclude-menu" open>
+                <summary class="nav-menu__item"><span class="ph ph-eye-slash" aria-hidden="true"></span><span>Exclude</span><span class="ph ph-caret-right exclude-menu__caret" aria-hidden="true"></span></summary>
+                <div class="exclude-menu__items">
+                  <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>Zorphalle</span></button>
+                  <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>Zorpwil</span></button>
+                  <button type="button" class="nav-menu__item"><span class="ph ph-map-pin" aria-hidden="true"></span><span>BE</span></button>
+                  <button type="button" class="nav-menu__item"><span class="ph ph-music-notes" aria-hidden="true"></span><span>Techno</span></button>
+                </div>
+              </details>
+              <a class="nav-menu__item" href="#"><span class="ph ph-gear" aria-hidden="true"></span><span>Edit event</span></a>
+              <button type="button" class="nav-menu__item danger"><span class="ph ph-trash" aria-hidden="true"></span><span>Delete event</span></button>
             </div>
           </details>
         </div>
       </div>
       <div class="sg-spec">
-        <span class="sg-spec__name">Exclude menu</span> · <code>events/_exclude_menu</code>
-        <p class="sg-purpose">One eye-slash per event, beside the heart, signed in only. It opens the event's venue, town, canton and genres; tapping one takes every matching event out of the feed and notifications at once.</p>
+        <span class="sg-spec__name">Event menu</span> · <code>events/_event_menu</code>
+        <p class="sg-purpose">One gear per event, after the play button and the heart, which always stay outside it. Inside, <b>Exclude</b> (signed in) unfolds its own submenu of the event's venue, town, canton and genres, and tapping one takes every matching event out of the feed and notifications at once; <b>Edit event</b> and <b>Delete event</b> follow only for curators.</p>
       </div>
     </div>
 

@@ -9,7 +9,8 @@ class GenreExclusionTest < ApplicationSystemTestCase
 
     visit events_path
     show = find(".event", text: "HatedShow")
-    show.find(".exclude-menu summary").click
+    show.find(".event-menu > summary").click
+    show.find(".exclude-menu > summary").click
     show.find(".exclude-menu form[action='#{genre_exclusions_path}'] button", text: "Sysexhated").click
 
     assert_selector ".day-summary__count--excluded[href='#{settings_path(anchor: 'excluded-genres')}']", text: "1"

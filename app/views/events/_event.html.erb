@@ -33,15 +33,7 @@
     <div class="event-actions">
       <%= play_button %>
       <%= event_save_button(event) %>
-      <% if interactive && current_user %><%= render 'events/exclude_menu', event: event, genres: genres %><% end %>
-      <% if current_user&.can?(:curate_events) %>
-        <%= link_to admin_event_path(event), class: 'icon-button', data: { turbo_frame: '_top' }, 'aria-label': t('events.edit_event') do %>
-          <span class="ph ph-gear"></span>
-        <% end %>
-        <%= button_to event, method: :delete, params: { return_to: local_assigns[:return_to] }.compact, class: 'icon-button danger', 'aria-label': t('events.delete_event') do %>
-          <span class="ph ph-trash"></span>
-        <% end %>
-      <% end %>
+      <%= render 'events/event_menu', event: event, genres: genres, interactive: interactive, return_to: local_assigns[:return_to] %>
     </div>
   <% end %>
 </article>

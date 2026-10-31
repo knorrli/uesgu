@@ -20,7 +20,7 @@ class StyleguideTest < ActionDispatch::IntegrationTest
     assert_select "h1", text: /styleguide/i
     assert_select "input[type=submit]"
     assert_select ".button-small.danger"
-    assert_select ".icon-button.danger"
+    assert_select ".event-menu .exclude-menu"
     assert_select ".scrape-badge--ok"
     assert_select ".funnel-fill"
     assert_select ".suggestions .chip"

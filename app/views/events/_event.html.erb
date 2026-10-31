@@ -33,11 +33,7 @@
     <div class="event-actions">
       <%= play_button %>
       <%= event_save_button(event) %>
-      <% excludable = interactive && current_user.present? %>
-      <% curatable = current_user&.can?(:curate_events) %>
-      <% if excludable || curatable %>
-        <%= render 'events/event_menu', event: event, genres: genres, excludable: excludable, curatable: curatable, return_to: local_assigns[:return_to] %>
-      <% end %>
+      <%= render 'events/event_menu', event: event, genres: genres, interactive: interactive, return_to: local_assigns[:return_to] %>
     </div>
   <% end %>
 </article>

@@ -1,4 +1,7 @@
-<%# locals: (event:, genres:, excludable:, curatable:, return_to: nil) %>
+<%# locals: (event:, genres:, interactive:, return_to: nil) %>
+<% excludable = interactive && current_user.present? %>
+<% curatable = current_user&.can?(:curate_events) %>
+<% if excludable || curatable %>
 <details class="nav-menu event-menu" data-controller="menu" data-action="toggle->menu#toggle">
   <summary class="icon-button" title="<%= t('events.event_menu') %>" aria-label="<%= t('events.event_menu') %>"><span class="ph ph-gear" aria-hidden="true"></span></summary>
   <div class="nav-menu__items event-menu__panel">
@@ -40,3 +43,4 @@
     <% end %>
   </div>
 </details>
+<% end %>

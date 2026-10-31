@@ -219,7 +219,7 @@
   gap: var(--gap-small);
 }
 
-.event-actions form {
+.event-actions > form {
   margin: 0;
   display: flex;
 }
@@ -265,14 +265,6 @@
 
 .event-menu__panel .nav-menu__item.danger:hover {
   color: var(--theme-warn-color);
-}
-
-.exclude-menu > summary {
-  list-style: none;
-}
-
-.exclude-menu > summary::-webkit-details-marker {
-  display: none;
 }
 
 .exclude-menu[open] .exclude-menu__caret {

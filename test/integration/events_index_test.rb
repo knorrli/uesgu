@@ -288,6 +288,16 @@ class EventsIndexTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "a signed-in non-curator gets the event menu without the delete button" do
+    e = event(start_date: Date.current + 3.days)
+    sign_in_as user(admin: false)
+
+    get events_path
+
+    assert_select "##{ActionView::RecordIdentifier.dom_id(e)} .event-menu"
+    assert_select "form[action=?]", event_path(e), count: 0
+  end
+
   test "an event with media gets a play button, also without an account, and no embed until it is tapped" do
     with_media = event(start_date: Date.current + 3.days, media: [{ "provider" => "youtube", "id" => "cjox_JXa8eM" }])
     without = event(start_date: Date.current + 3.days)

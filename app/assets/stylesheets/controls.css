@@ -55,10 +55,6 @@ button.icon-button:hover {
   color: var(--theme-fg-color);
 }
 
-.icon-button.danger:hover {
-  color: var(--theme-warn-color);
-}
-
 .icon {
   color: var(--theme-fg-muted);
   line-height: 1;
